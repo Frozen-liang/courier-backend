@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest(classes = DocumentFactoryApplicationTests.class)
 public class DocumentFactoryTest {
     public static final String CONFIG_OPEN_API_V_3_YAML = "/config/openapi_v3.yaml";
     @Autowired
