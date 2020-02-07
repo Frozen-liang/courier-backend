@@ -6,6 +6,9 @@ import static com.sms.satp.utils.ApiSchemaUtil.resolveApiSchemaMap;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.Header;
 import com.sms.satp.entity.Parameter;
+import com.sms.satp.entity.dto.ApiInterfaceDto;
+import com.sms.satp.entity.dto.PageDto;
+import com.sms.satp.mapper.ApiInterfaceMapper;
 import com.sms.satp.parser.DocumentFactory;
 import com.sms.satp.parser.common.DocumentType;
 import com.sms.satp.parser.common.HttpMethod;
@@ -22,10 +25,17 @@ import com.sms.satp.utils.ApiHeaderConverter;
 import com.sms.satp.utils.ApiParameterConverter;
 import com.sms.satp.utils.ApiRequestBodyConverter;
 import com.sms.satp.utils.ApiResponseConverter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,29 +43,52 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     private final ApiInterfaceRepository apiInterfaceRepository;
     private final DocumentFactory documentFactory;
+    private final ApiInterfaceMapper apiInterfaceMapper;
 
     public ApiInterfaceServiceImpl(ApiInterfaceRepository apiInterfaceRepository,
-        DocumentFactory documentFactory) {
+        DocumentFactory documentFactory, ApiInterfaceMapper apiInterfaceMapper) {
         this.apiInterfaceRepository = apiInterfaceRepository;
         this.documentFactory = documentFactory;
+        this.apiInterfaceMapper = apiInterfaceMapper;
     }
 
     @Override
-    public List<ApiInterface> list() {
-        return apiInterfaceRepository.findAll();
+    public List<ApiInterfaceDto> list(String projectId) {
+        ApiInterface apiInterface = ApiInterface.builder()
+            .projectId(projectId)
+            .build();
+        Example<ApiInterface> example = Example.of(apiInterface);
+        return apiInterfaceMapper.toDtoList(apiInterfaceRepository.findAll(example));
     }
 
     @Override
-    public void save(String url, String documentType) {
+    public Page<ApiInterfaceDto> page(PageDto pageDto, String projectId) {
+        ApiInterface apiInterface = ApiInterface.builder()
+            .projectId(projectId)
+            .build();
+        Example<ApiInterface> example = Example.of(apiInterface);
+        Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        return apiInterfaceRepository.findAll(example, pageable)
+            .map(apiInterfaceMapper::toDto);
+    }
+
+    @Override
+    public void save(String url, String documentType, String projectId) {
         ApiDocument apiDocument = documentFactory.create(url, DocumentType.resolve(documentType));
-        List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(apiDocument);
+        List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(apiDocument, projectId);
         apiInterfaceRepository.insert(apiInterfaces);
     }
 
     @Override
-    public ApiInterface getApiInterfaceById(String id) {
+    public void add(ApiInterfaceDto apiInterfaceDto) {
+        apiInterfaceRepository.insert(apiInterfaceMapper.toEntity(apiInterfaceDto));
+    }
+
+    @Override
+    public ApiInterfaceDto getApiInterfaceById(String id) {
         Optional<ApiInterface> optionalApiInterface = apiInterfaceRepository.findById(id);
-        return optionalApiInterface.orElse(null);
+        return apiInterfaceMapper.toDto(optionalApiInterface.orElse(null));
     }
 
     @Override
@@ -63,32 +96,38 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         apiInterfaceRepository.deleteById(id);
     }
 
-    private List<ApiInterface> convertApiPathsToApiInterfaces(ApiDocument apiDocument) {
+    private List<ApiInterface> convertApiPathsToApiInterfaces(
+            ApiDocument apiDocument,String projectId) {
         List<ApiInterface> apiInterfaces = new ArrayList<>();
         List<ApiPath> apiPaths = apiDocument.getPaths();
         Map<String, ApiSchema> apiSchema = apiDocument.getSchemas();
         resolveApiSchemaMap(apiSchema, apiSchema);
         apiPaths.forEach((ApiPath apiPath) ->
             apiPath.getOperations().forEach((ApiOperation apiOperation) -> {
-                apiInterfaces.add(apiPathOperationResolver(apiOperation, apiSchema, apiPath));
+                apiInterfaces.add(
+                    apiPathOperationResolver(apiOperation, apiSchema, apiPath, projectId));
             })
         );
         return apiInterfaces;
     }
 
     private ApiInterface apiPathOperationResolver(ApiOperation apiOperation,
-        Map<String, ApiSchema> apiSchema, ApiPath apiPath) {
-        Optional<ApiRequestBody> apiRequestBodyOptional = Optional.ofNullable(apiOperation.getApiRequestBody());
-        Optional<ApiResponse> apiResponseOptional = Optional.ofNullable(apiOperation.getApiResponse());
+        Map<String, ApiSchema> apiSchema, ApiPath apiPath, String projectId) {
+        Optional<ApiRequestBody> apiRequestBodyOptional = Optional
+            .ofNullable(apiOperation.getApiRequestBody());
+        Optional<ApiResponse> apiResponseOptional = Optional
+            .ofNullable(apiOperation.getApiResponse());
         Optional<String> requestBodyRefOptional = apiRequestBodyOptional
             .map(ApiRequestBody::getSchema).map(ApiSchema::getRef);
-        Optional<String> responseRefOptional = apiResponseOptional.map(ApiResponse::getSchema).map(ApiSchema::getRef);
+        Optional<String> responseRefOptional = apiResponseOptional
+            .map(ApiResponse::getSchema).map(ApiSchema::getRef);
         requestBodyRefOptional.ifPresent(requestRef -> apiRequestBodyOptional.get()
             .setSchema(apiSchema.get(getRefKey(requestRef))));
         responseRefOptional.ifPresent(responseRdf -> apiResponseOptional.get()
             .setSchema(apiSchema.get(getRefKey(responseRdf))));
         ApiInterface apiInterface = ApiInterface.builder()
             .method(HttpMethod.resolve(apiOperation.getHttpMethod().name()))
+            .projectId(projectId)
             .tag(apiOperation.getTags())
             .title(apiOperation.getSummary())
             .path(apiPath.getPath())
@@ -101,6 +140,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                 apiRequestBodyOptional.map(ApiRequestBodyConverter.CONVERT_TO_REQUEST_BODY).orElse(null))
             .response(
                 apiResponseOptional.map(ApiResponseConverter.CONVERT_TO_RESPONSE).orElse(null))
+            .createDateTime(LocalDateTime.now())
             .build();
         apiParameterResolver(apiInterface, apiOperation.getParameters());
         return apiInterface;
