@@ -43,11 +43,13 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     private final ApiInterfaceRepository apiInterfaceRepository;
     private final DocumentFactory documentFactory;
+    private final ApiInterfaceMapper apiInterfaceMapper;
 
     public ApiInterfaceServiceImpl(ApiInterfaceRepository apiInterfaceRepository,
-        DocumentFactory documentFactory) {
+        DocumentFactory documentFactory, ApiInterfaceMapper apiInterfaceMapper) {
         this.apiInterfaceRepository = apiInterfaceRepository;
         this.documentFactory = documentFactory;
+        this.apiInterfaceMapper = apiInterfaceMapper;
     }
 
     @Override
@@ -56,7 +58,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             .projectId(projectId)
             .build();
         Example<ApiInterface> example = Example.of(apiInterface);
-        return ApiInterfaceMapper.INSTANCE.toDtoList(apiInterfaceRepository.findAll(example));
+        return apiInterfaceMapper.toDtoList(apiInterfaceRepository.findAll(example));
     }
 
     @Override
@@ -68,7 +70,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
         Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
         return apiInterfaceRepository.findAll(example, pageable)
-            .map(ApiInterfaceMapper.INSTANCE::toDto);
+            .map(apiInterfaceMapper::toDto);
     }
 
     @Override
@@ -80,13 +82,13 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     @Override
     public void add(ApiInterfaceDto apiInterfaceDto) {
-        apiInterfaceRepository.insert(ApiInterfaceMapper.INSTANCE.toEntity(apiInterfaceDto));
+        apiInterfaceRepository.insert(apiInterfaceMapper.toEntity(apiInterfaceDto));
     }
 
     @Override
     public ApiInterfaceDto getApiInterfaceById(String id) {
         Optional<ApiInterface> optionalApiInterface = apiInterfaceRepository.findById(id);
-        return ApiInterfaceMapper.INSTANCE.toDto(optionalApiInterface.orElse(null));
+        return apiInterfaceMapper.toDto(optionalApiInterface.orElse(null));
     }
 
     @Override

@@ -22,6 +22,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -46,6 +47,9 @@ class ApiInterfaceServiceTest {
 
     @SpyBean
     private ApiInterfaceService apiInterfaceService;
+
+    @Autowired
+    ApiInterfaceMapper apiInterfaceMapper;
 
     private final static int LIST_SIZE = 10;
     private final static int TOTAL_ELEMENTS = 60;
@@ -167,7 +171,7 @@ class ApiInterfaceServiceTest {
     @DisplayName("Test the add method in the apiInterface service")
     void add_test() {
         ApiInterfaceDto apiInterfaceDto = ApiInterfaceDto.builder().build();
-        ApiInterface apiInterface = ApiInterfaceMapper.INSTANCE.toEntity(apiInterfaceDto);
+        ApiInterface apiInterface = apiInterfaceMapper.toEntity(apiInterfaceDto);
         when(apiInterfaceRepository.insert(apiInterface)).thenReturn(apiInterface);
         apiInterfaceService.add(apiInterfaceDto);
         verify(apiInterfaceRepository, times(1)).insert(apiInterface);
@@ -184,6 +188,5 @@ class ApiInterfaceServiceTest {
     @Test
     void save2() {
         String location = DocumentFactoryTest.class.getResource(CONFIG_OPEN_API_V_3_YAML).toString();
-//        apiInterfaceService.save(location, DOCUMENT_TYPE_SWAGGER);
     }
 }

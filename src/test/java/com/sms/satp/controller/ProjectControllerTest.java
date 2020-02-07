@@ -15,31 +15,21 @@ import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.ProjectDto;
 import com.sms.satp.repository.ApiInterfaceRepository;
 import com.sms.satp.repository.ProjectRepository;
-import com.sms.satp.service.ApplicationTests;
 import com.sms.satp.service.ProjectService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest(classes = ApplicationTests.class,
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
-@DisplayName("")
+@WebMvcTest(value = ProjectController.class)
+@DisplayName("Tests for ProjectControllerTest")
 class ProjectControllerTest {
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     @MockBean
     ApiInterfaceRepository apiInterfaceRepository;
@@ -51,18 +41,15 @@ class ProjectControllerTest {
     ProjectService projectService;
 
     @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
-    private MockMvc mockMvc;
     private final static Integer PAGE_NUMBER = 3;
     private final static Integer PAGE_SIZE = 20;
     private final static String PROJECT_ID = "id";
     private final static String PROJECT_NAME = "name";
-
-    @BeforeEach
-    void setupMockMvc() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
 
     @Test
     @DisplayName("")

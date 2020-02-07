@@ -46,6 +46,9 @@ class ProjectServiceTest {
     @Autowired
     ProjectService projectService;
 
+    @Autowired
+    ProjectMapper projectMapper;
+
     private final static String NAME = "project";
     private final static String PROJECT_ID = "25";
     private final static int TOTAL_ELEMENTS = 60;
@@ -117,7 +120,7 @@ class ProjectServiceTest {
     @DisplayName("Test the add method in the project service")
     void add_test() {
         ProjectDto projectDto = ProjectDto.builder().build();
-        Project project = ProjectMapper.INSTANCE.toEntity(projectDto);
+        Project project = projectMapper.toEntity(projectDto);
         when(projectRepository.insert(any(Project.class))).thenReturn(project);
         projectService.add(projectDto);
         verify(projectRepository, times(1)).insert(any(Project.class));
@@ -127,7 +130,7 @@ class ProjectServiceTest {
     @DisplayName("Test the edit method in the project service")
     void edit_test() {
         ProjectDto projectDto = ProjectDto.builder().build();
-        Project project = ProjectMapper.INSTANCE.toEntity(projectDto);
+        Project project = projectMapper.toEntity(projectDto);
         when(projectRepository.save(any(Project.class))).thenReturn(project);
         projectService.edit(projectDto);
         verify(projectRepository, times(1)).save(any(Project.class));

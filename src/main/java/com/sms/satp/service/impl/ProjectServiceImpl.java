@@ -20,34 +20,36 @@ import org.springframework.stereotype.Service;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final ProjectMapper projectMapper;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, ProjectMapper projectMapper) {
         this.projectRepository = projectRepository;
+        this.projectMapper = projectMapper;
     }
 
     @Override
     public List<ProjectDto> list() {
         return projectRepository.findAll()
-            .stream().map(ProjectMapper.INSTANCE::toDto).collect(Collectors.toList());
+            .stream().map(projectMapper::toDto).collect(Collectors.toList());
     }
 
     @Override
     public Page<ProjectDto> page(PageDto pageDto) {
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
         Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
-        return projectRepository.findAll(pageable).map(ProjectMapper.INSTANCE::toDto);
+        return projectRepository.findAll(pageable).map(projectMapper::toDto);
     }
 
     @Override
     public void add(ProjectDto projectDto) {
-        Project project = ProjectMapper.INSTANCE.toEntity(projectDto);
+        Project project = projectMapper.toEntity(projectDto);
         project.setCreateDateTime(LocalDateTime.now());
         projectRepository.insert(project);
     }
 
     @Override
     public void edit(ProjectDto projectDto) {
-        Project project = ProjectMapper.INSTANCE.toEntity(projectDto);
+        Project project = projectMapper.toEntity(projectDto);
         project.setModifyDateTime(LocalDateTime.now());
         projectRepository.save(project);
     }

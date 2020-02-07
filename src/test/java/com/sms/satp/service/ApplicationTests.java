@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoCo
 @SpringBootApplication(
     scanBasePackages = {
         "com.sms.satp.service",
+        "com.sms.satp.mapper",
         "com.sms.satp.repository",
         "com.sms.satp.parser",
         "com.sms.satp.controller"

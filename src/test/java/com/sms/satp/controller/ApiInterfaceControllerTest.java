@@ -16,30 +16,20 @@ import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.repository.ApiInterfaceRepository;
 import com.sms.satp.repository.ProjectRepository;
 import com.sms.satp.service.ApiInterfaceService;
-import com.sms.satp.service.ApplicationTests;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest(classes = ApplicationTests.class,
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
+@WebMvcTest(value = ApiInterfaceController.class)
 @DisplayName("Tests for ApiInterfaceControllerTest")
 class ApiInterfaceControllerTest {
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     @MockBean
     ApiInterfaceRepository apiInterfaceRepository;
@@ -51,19 +41,16 @@ class ApiInterfaceControllerTest {
     ApiInterfaceService apiInterfaceService;
 
     @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
-    private MockMvc mockMvc;
     private final static String TITLE = "title";
     private final static String PROJECT_ID = "25";
     private final static String API_INTERFACE_ID = "25";
     private final static Integer PAGE_NUMBER = 3;
     private final static Integer PAGE_SIZE = 20;
-
-    @BeforeEach
-    void setupMockMvc() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
 
     @Test
     @DisplayName("")
