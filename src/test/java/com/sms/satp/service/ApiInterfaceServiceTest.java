@@ -1,14 +1,17 @@
 package com.sms.satp.service;
 
 
+import static com.sms.satp.common.ErrorCode.DOCUMENT_TYPE_ERROR;
 import static com.sms.satp.parser.DocumentFactoryTest.CONFIG_OPEN_API_V_3_YAML;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
 import com.sms.satp.entity.dto.PageDto;
@@ -16,6 +19,9 @@ import com.sms.satp.mapper.ApiInterfaceMapper;
 import com.sms.satp.parser.DocumentFactoryTest;
 import com.sms.satp.repository.ApiInterfaceRepository;
 import com.sms.satp.repository.ProjectRepository;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +39,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.mock.web.MockMultipartFile;
 
 @SpringBootTest(classes = ApplicationTests.class,
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -62,8 +69,8 @@ class ApiInterfaceServiceTest {
     private final static String TITLE = "title";
     private final static String NOT_EXIST_ID = "nul";
     private final static String DOCUMENT_TYPE_SWAGGER = "SWAGGER";
+    private final static String WRONG_DOCUMENT_TYPE = "wrong";
     private final static String URL = "https://meshdev.smsassist.com/filestorage/swagger/v1/swagger.json";
-
 
     @Test
     @DisplayName("Test the query method without query criteria")
@@ -168,6 +175,34 @@ class ApiInterfaceServiceTest {
     }
 
     @Test
+    @DisplayName("Test the save method with wrong type in the apiInterface service")
+    void save_with_wrong_type() {
+        assertThatThrownBy(() -> apiInterfaceService.save(URL, WRONG_DOCUMENT_TYPE, PROJECT_ID))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DOCUMENT_TYPE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the method of saving by file in the apiInterface service")
+    void save2() throws IOException {
+        List<ApiInterface> apiInterfaces = new ArrayList<>();
+        for (int i = 0; i < LIST_SIZE; i++) {
+            apiInterfaces.add(
+                ApiInterface.builder()
+                    .title(TITLE)
+                    .build()
+            );
+        }
+        when(apiInterfaceRepository.insert(anyList())).thenReturn(apiInterfaces);
+        String location = DocumentFactoryTest.class.getResource(CONFIG_OPEN_API_V_3_YAML).getPath();
+        File file = new File(location);
+        FileInputStream fileInputStream = new FileInputStream(file);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile(file.getName(),fileInputStream);
+        apiInterfaceService.save(mockMultipartFile, DOCUMENT_TYPE_SWAGGER, PROJECT_ID);
+        verify(apiInterfaceRepository, times(1)).insert(anyList());
+    }
+
+    @Test
     @DisplayName("Test the add method in the apiInterface service")
     void add_test() {
         ApiInterfaceDto apiInterfaceDto = ApiInterfaceDto.builder().build();
@@ -183,10 +218,5 @@ class ApiInterfaceServiceTest {
         doNothing().when(apiInterfaceRepository).deleteById(PROJECT_ID);
         apiInterfaceService.deleteById(PROJECT_ID);
         verify(apiInterfaceRepository, times(1)).deleteById(PROJECT_ID);
-    }
-
-    @Test
-    void save2() {
-        String location = DocumentFactoryTest.class.getResource(CONFIG_OPEN_API_V_3_YAML).toString();
     }
 }

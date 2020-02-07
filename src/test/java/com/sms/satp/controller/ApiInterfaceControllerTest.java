@@ -53,7 +53,7 @@ class ApiInterfaceControllerTest {
     private final static Integer PAGE_SIZE = 20;
 
     @Test
-    @DisplayName("")
+    @DisplayName("Query the page data for the ApiInterface by projectId and default query criteria")
     void getApiInterfacePageByDefaultRequirements() throws Exception {
         PageDto pageDto = PageDto.builder().build();
         when(apiInterfaceService.page(pageDto, PROJECT_ID)).thenReturn(null);
@@ -67,7 +67,7 @@ class ApiInterfaceControllerTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("Query the page data for the ApiInterface by projectId and specified query criteria")
     void getApiInterfacePageBySpecifiedRequirements() throws Exception {
         PageDto pageDto = PageDto.builder()
             .pageNumber(PAGE_NUMBER)
@@ -86,7 +86,7 @@ class ApiInterfaceControllerTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("Get its specific information through the id of the ApiInterface")
     void getInfoById() throws Exception{
         ApiInterfaceDto apiInterfaceDto = ApiInterfaceDto.builder().build();
         when(apiInterfaceService.getApiInterfaceById(API_INTERFACE_ID)).thenReturn(apiInterfaceDto);
@@ -100,7 +100,7 @@ class ApiInterfaceControllerTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("Add ApiInterface")
     void addApiInterface() throws Exception{
         ApiInterfaceDto apiInterfaceDto = ApiInterfaceDto.builder()
             .title(TITLE)
@@ -118,7 +118,7 @@ class ApiInterfaceControllerTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("Delete the ApiInterface by id")
     void deleteProject() throws Exception{
         doNothing().when(apiInterfaceService).deleteById(API_INTERFACE_ID);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders

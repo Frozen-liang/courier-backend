@@ -52,7 +52,7 @@ class ProjectControllerTest {
     private final static String PROJECT_NAME = "name";
 
     @Test
-    @DisplayName("")
+    @DisplayName("Query the page data for the Project by default query criteria")
     void getProjectPageByDefaultRequirements() throws Exception {
         PageDto pageDto = PageDto.builder().build();
         when(projectService.page(pageDto)).thenReturn(null);
@@ -66,7 +66,7 @@ class ProjectControllerTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("Query the page data for the Project by specified query criteria")
     void getProjectPageBySpecifiedRequirements() throws Exception {
         PageDto pageDto = PageDto.builder()
             .pageNumber(PAGE_NUMBER)
@@ -85,7 +85,7 @@ class ProjectControllerTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("Add a Project")
     void addProject() throws Exception{
         ProjectDto projectDto = ProjectDto.builder()
             .name(PROJECT_NAME)
@@ -103,7 +103,7 @@ class ProjectControllerTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("Edit the Project by id")
     void editProject() throws Exception{
         ProjectDto projectDto = ProjectDto.builder()
             .id(PROJECT_ID)
@@ -122,7 +122,7 @@ class ProjectControllerTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("Delete the Project by id")
     void deleteProject() throws Exception{
         doNothing().when(projectService).delete(PROJECT_ID);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders

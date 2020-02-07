@@ -3,6 +3,8 @@ package com.sms.satp.service.impl;
 import static com.sms.satp.utils.ApiSchemaUtil.getRefKey;
 import static com.sms.satp.utils.ApiSchemaUtil.resolveApiSchemaMap;
 
+import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.ErrorCode;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.Header;
 import com.sms.satp.entity.Parameter;
@@ -25,6 +27,8 @@ import com.sms.satp.utils.ApiHeaderConverter;
 import com.sms.satp.utils.ApiParameterConverter;
 import com.sms.satp.utils.ApiRequestBodyConverter;
 import com.sms.satp.utils.ApiResponseConverter;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +41,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ApiInterfaceServiceImpl implements ApiInterfaceService {
@@ -75,9 +80,23 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     @Override
     public void save(String url, String documentType, String projectId) {
-        ApiDocument apiDocument = documentFactory.create(url, DocumentType.resolve(documentType));
-        List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(apiDocument, projectId);
-        apiInterfaceRepository.insert(apiInterfaces);
+        Optional<DocumentType> documentTypeOptional = Optional.ofNullable(
+            DocumentType.resolve(documentType));
+        if (documentTypeOptional.isPresent()) {
+            ApiDocument apiDocument = documentFactory.create(url, documentTypeOptional.get());
+            List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(
+                apiDocument, projectId);
+            apiInterfaceRepository.insert(apiInterfaces);
+        } else {
+            throw new ApiTestPlatformException(ErrorCode.DOCUMENT_TYPE_ERROR);
+        }
+    }
+
+    @Override
+    public void save(MultipartFile multipartFile, String documentType, String projectId) throws IOException {
+        File file = convertToFile(multipartFile);
+        save(file.toString(), documentType, projectId);
+        file.delete();
     }
 
     @Override
@@ -94,6 +113,12 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     @Override
     public void deleteById(String id) {
         apiInterfaceRepository.deleteById(id);
+    }
+
+    private File convertToFile(MultipartFile multipartFile) throws IOException {
+        File file = File.createTempFile("tmp", null);
+        multipartFile.transferTo(file);
+        return file;
     }
 
     private List<ApiInterface> convertApiPathsToApiInterfaces(
