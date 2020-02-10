@@ -1,0 +1,87 @@
+image: maven:3.6.2-jdk-8
+
+before_script:
+  - 'source /tool/.bash_profile_docker'
+
+stages:
+  - build_test
+  - build_artifact
+  - build_image
+  - deploy
+
+variables:
+  MAVEN_SETTING_OPTS: "--settings ./.m2/settings.xml --batch-mode"
+  MAVEN_TEST_OPTS: "sonar:sonar"
+  MAVEN_BUILD_OPTS: " -Dmaven.test.skip=true -Dfindbugs.skip=true -Dcheckstyle.skip"
+  MAVEN_OPTS: "-Xmx2048m -Xms1024m -XX:MaxPermSize=512m -Djava.awt.headless=true"
+  IMAGE: ${CI_REGISTRY}/${CI_PROJECT_PATH}
+  IMAGE_TAG: ${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}
+  PROD_RELEASE_NAME: ${CI_PROJECT_NAME}
+
+cache:
+  key: ${CI_PROJECT_NAME}
+  paths:
+    - .m2/repository/
+
+
+task_test:
+  tags:
+    - docker-runner
+  stage: build_test
+  only:
+    - merge_requests
+  script:
+    - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "settings.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./.m2/settings.xml" -once'
+    - echo "Running sonar test \n"
+    - mvn install $MAVEN_TEST_OPTS $MAVEN_SETTING_OPTS
+    - "cat target/site/jacoco/index.html"
+#  artifacts:
+#    reports:
+#      junit:
+#        - target/surefire-reports/TEST-*.xml
+#        - target/failsafe-reports/TEST-*.xml
+task_build_artifact:
+  tags:
+    - docker-runner
+  stage: build_artifact
+  only:
+    refs:
+      - develop
+  script:
+    - echo "Running mvn compile \n"
+    - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "settings.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./.m2/settings.xml" -once'
+    - mvn clean package $MAVEN_BUILD_OPTS $MAVEN_SETTING_OPTS
+  artifacts:
+    paths:
+      - ./target/
+    expire_in: 1 day
+
+
+task_build_image:
+  tags:
+    - docker-runner
+  stage: build_image
+  only:
+    refs:
+      - develop
+  image: docker:19.03.1
+  script:
+    - echo "Running build docker image"
+    - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "application.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./target/application.properties" -once'
+    - 'docker build -t ${IMAGE}:${IMAGE_TAG} .'
+    - 'docker --config=/tool/.docker/ push ${IMAGE}:${IMAGE_TAG}'
+    - echo "Finished build docker image ${IMAGE} ${IMAGE_TAG}"
+
+task_deploy:
+  tags:
+    - linux
+  stage: deploy
+  only:
+    refs:
+      - develop
+  before_script:
+    - echo "Running deploy docker image"
+  script:
+    - ssh -i $HOME/.ssh/device.pem ec2-user@13.251.89.98 /home/ec2-user/satp/starter.sh ${IMAGE} ${IMAGE_TAG}
+
+

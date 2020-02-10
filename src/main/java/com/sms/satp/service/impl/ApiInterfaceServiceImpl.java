@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,6 +45,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@Slf4j
 public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     private final ApiInterfaceRepository apiInterfaceRepository;
@@ -96,7 +98,10 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     public void save(MultipartFile multipartFile, String documentType, String projectId) throws IOException {
         File file = convertToFile(multipartFile);
         save(file.toString(), documentType, projectId);
-        file.delete();
+        boolean delete = file.delete();
+        if (!delete) {
+            log.warn("Delete temp file failed");
+        }
     }
 
     @Override
@@ -122,7 +127,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     }
 
     private List<ApiInterface> convertApiPathsToApiInterfaces(
-            ApiDocument apiDocument,String projectId) {
+        ApiDocument apiDocument, String projectId) {
         List<ApiInterface> apiInterfaces = new ArrayList<>();
         List<ApiPath> apiPaths = apiDocument.getPaths();
         Map<String, ApiSchema> apiSchema = apiDocument.getSchemas();
