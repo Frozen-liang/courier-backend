@@ -1,1 +1,1 @@
-{{printf "sms-satp/%s/settings.xml" (env "REPO") | key}}
+{{printf "DevOps/%s/settings.xml" (env "REPO") | key}}

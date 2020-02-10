@@ -16,7 +16,7 @@ variables:
   MAVEN_OPTS: "-Xmx2048m -Xms1024m -XX:MaxPermSize=512m -Djava.awt.headless=true"
   IMAGE: ${CI_REGISTRY}/${CI_PROJECT_PATH}
   IMAGE_TAG: ${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}
-
+  PROD_RELEASE_NAME: ${CI_PROJECT_NAME}
 
 cache:
   key: ${CI_PROJECT_NAME}
@@ -33,8 +33,13 @@ task_test:
   script:
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "settings.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./.m2/settings.xml" -once'
     - echo "Running sonar test \n"
-    - mvn test $MAVEN_TEST_OPTS $MAVEN_SETTING_OPTS
-
+    - mvn install $MAVEN_TEST_OPTS $MAVEN_SETTING_OPTS
+    - "cat target/site/jacoco/index.html"
+#  artifacts:
+#    reports:
+#      junit:
+#        - target/surefire-reports/TEST-*.xml
+#        - target/failsafe-reports/TEST-*.xml
 task_build_artifact:
   tags:
     - docker-runner
@@ -69,12 +74,14 @@ task_build_image:
 
 task_deploy:
   tags:
-    - docker-runner
+    - linux
   stage: deploy
   only:
     refs:
       - develop
+  before_script:
+    - echo "Running deploy docker image"
   script:
-    - echo "Running deploy docker image.."
+    - ssh -i $HOME/.ssh/device.pem ec2-user@13.251.89.98 /home/ec2-user/satp/starter.sh ${IMAGE} ${IMAGE_TAG}
 
 

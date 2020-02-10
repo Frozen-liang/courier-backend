@@ -6,5 +6,5 @@ RUN mkdir /root/sms-satp/
 WORKDIR /root/sms-satp/
 ADD ./target/sms-satp-${RELEASE_VERSION}.jar sms-satp.jar
 ADD ./target/application.properties application.properties
-EXPOSE 80
+EXPOSE 8080
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar sms-satp.jar --spring.config.location=./application.properties"]

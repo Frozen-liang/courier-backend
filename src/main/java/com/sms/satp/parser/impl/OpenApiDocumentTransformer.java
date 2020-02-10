@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -84,13 +85,13 @@ public class OpenApiDocumentTransformer implements DocumentTransformer<OpenAPI> 
     private List<ApiOperation> collectApiOperations(Entry<String, PathItem> pathItemEntry) {
         PathItem pathItem = pathItemEntry.getValue();
         return Arrays.stream(HttpMethod.values())
-            .map(httpMethod -> StringUtils.capitalize(httpMethod.name().toLowerCase())).map(methodName -> {
+            .map(httpMethod -> StringUtils.capitalize(httpMethod.name().toLowerCase(Locale.US))).map(methodName -> {
                 try {
                     Operation operation = (Operation) MethodUtils.invokeMethod(pathItem, "get".concat(methodName));
                     if (Objects.nonNull(operation)) {
 
                         return OPERATION_CONVERTER.apply(operation)
-                            .httpMethod(HttpMethod.resolve(StringUtils.upperCase(methodName))).build();
+                            .httpMethod(HttpMethod.resolve(StringUtils.upperCase(methodName, Locale.US))).build();
                     }
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                     log.warn("Parsing [OpenApi {} Operation] content,Cause by {}", methodName, e.getMessage());
