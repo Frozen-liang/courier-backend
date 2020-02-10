@@ -27,7 +27,7 @@ public class ApiInterfaceController {
     }
 
     @GetMapping("/page/{projectId}")
-    public Response<Page<ApiInterfaceDto>> list(PageDto pageDto, @PathVariable String projectId) {
+    public Response<Page<ApiInterfaceDto>> page(PageDto pageDto, @PathVariable String projectId) {
         return Response.ok(apiInterfaceService.page(pageDto, projectId));
     }
 

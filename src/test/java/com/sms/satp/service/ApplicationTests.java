@@ -13,7 +13,9 @@ import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoCo
         "com.sms.satp.mapper",
         "com.sms.satp.repository",
         "com.sms.satp.parser",
-        "com.sms.satp.controller"
+        "com.sms.satp.controller",
+        "com.sms.satp.http",
+        "com.sms.satp.engine"
     },
     exclude = {MongoAutoConfiguration.class, EmbeddedMongoAutoConfiguration.class}
 )
