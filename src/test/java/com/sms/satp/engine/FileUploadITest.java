@@ -17,18 +17,15 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 
 @SpringBootTest(classes = ApiExecuteApplicationTests.class,
 
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ExtendWith(SpringExtension.class)
 public class FileUploadITest {
 
     @LocalServerPort
@@ -84,7 +81,7 @@ public class FileUploadITest {
         MultiPart multiPart1 = MultiPart.builder().controlName("controlName1").mimeType("mime-type1")
             .file(tempFile.toFile()).build();
         MultiPart multiPart2 = MultiPart.builder().controlName("controlName2").mimeType("mime-type2")
-            .file(tempFile.toFile()).build();
+            .file(tempFile2.toFile()).build();
         ApiUnitRequest apiUnitRequest =
             ApiUnitRequest.builder().serverAddress(baseUrl).multiParts(Arrays.asList(multiPart1, multiPart2)).
                 path("/multiFileUpload").enableExecutionTime(true).httpMethod(HttpMethod.POST)
