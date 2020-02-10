@@ -12,7 +12,10 @@ import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.ProjectDto;
 import com.sms.satp.mapper.ProjectMapper;
 import com.sms.satp.repository.ApiInterfaceRepository;
+import com.sms.satp.repository.ProjectEnvironmentRepository;
 import com.sms.satp.repository.ProjectRepository;
+import com.sms.satp.repository.StatusCodeDocRepository;
+import com.sms.satp.repository.WikiRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -41,7 +44,16 @@ class ProjectServiceTest {
     private ApiInterfaceRepository apiInterfaceRepository;
 
     @MockBean
-    ProjectRepository projectRepository;
+    private ProjectRepository projectRepository;
+
+    @MockBean
+    private ProjectEnvironmentRepository projectEnvironmentRepository;
+
+    @MockBean
+    private StatusCodeDocRepository statusCodeDocRepository;
+
+    @MockBean
+    private WikiRepository wikiRepository;
 
     @Autowired
     ProjectService projectService;

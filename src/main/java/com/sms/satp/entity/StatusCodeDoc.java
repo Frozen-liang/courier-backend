@@ -13,17 +13,14 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "ProjectEnvironment")
-public class ProjectEnvironment {
+@Document(collection = "StatusCodeDoc")
+public class StatusCodeDoc {
 
     @Id
     private String id;
-    private String name;
-    private String desc;
-    @Field("project_id")
+    private String code;
+    private String description;
     private String projectId;
-    @Field("base_path")
-    private String basePath;
     @Field("create_date_time")
     private LocalDateTime createDateTime;
     @Field("modify_date_time")
