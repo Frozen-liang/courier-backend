@@ -35,9 +35,9 @@ task_test:
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "settings.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./.m2/settings.xml" -once'
     - echo "Running sonar test \n"
     - mvn install $MAVEN_TEST_OPTS $MAVEN_SETTING_OPTS
-    - "mv target/site/jacoco/ public"
+    - "mv target/site/jacoco/ public/"
   artifacts:
-    path:
+    paths:
       - public
     expire_in: 30 days
     reports:
