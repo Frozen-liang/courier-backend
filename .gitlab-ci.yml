@@ -54,7 +54,7 @@ task_build_artifact:
     - echo "Running mvn compile \n"
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "settings.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./.m2/settings.xml" -once'
     - mvn clean package $MAVEN_BUILD_OPTS $MAVEN_SETTING_OPTS
-    - "cat  public/index.html"
+    - "cat  ./public/index.html"
   artifacts:
     paths:
       - ./target/
