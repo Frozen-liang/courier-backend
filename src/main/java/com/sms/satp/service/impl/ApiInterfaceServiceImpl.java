@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -83,7 +84,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     @Override
     public void save(String url, String documentType, String projectId) {
         Optional<DocumentType> documentTypeOptional = Optional.ofNullable(
-            DocumentType.resolve(documentType.toUpperCase()));
+            DocumentType.resolve(documentType.toUpperCase(Locale.getDefault())));
         if (documentTypeOptional.isPresent()) {
             ApiDocument apiDocument = documentFactory.create(url, documentTypeOptional.get());
             List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(
