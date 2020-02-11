@@ -6,7 +6,7 @@ import com.sms.satp.entity.Project;
 import com.sms.satp.entity.dto.ProjectDto;
 import com.sms.satp.repository.ApiInterfaceRepository;
 import com.sms.satp.repository.ProjectRepository;
-import com.sms.satp.service.ApplicationTests;
+import com.sms.satp.ApplicationTests;
 import com.sms.satp.service.ProjectEnvironmentService;
 import com.sms.satp.service.StatusCodeDocService;
 import com.sms.satp.service.WikiService;

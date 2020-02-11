@@ -6,20 +6,18 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.ApplicationTests;
 import com.sms.satp.entity.StatusCodeDoc;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.StatusCodeDocDto;
 import com.sms.satp.mapper.StatusCodeDocMapper;
-import com.sms.satp.repository.ApiInterfaceRepository;
-import com.sms.satp.repository.ProjectEnvironmentRepository;
-import com.sms.satp.repository.ProjectRepository;
 import com.sms.satp.repository.StatusCodeDocRepository;
-import com.sms.satp.repository.WikiRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -31,30 +29,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
-@SpringBootTest(classes = ApplicationTests.class,
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = ApplicationTests.class)
 @DisplayName("Test the service layer interface of the StatusCodeDoc")
 public class StatusCodeDocServiceTest {
 
-    @MockBean
-    private ApiInterfaceRepository apiInterfaceRepository;
-
-    @MockBean
-    private ProjectRepository projectRepository;
-
-    @MockBean
-    private ProjectEnvironmentRepository projectEnvironmentRepository;
 
     @MockBean
     private StatusCodeDocRepository statusCodeDocRepository;
 
-    @MockBean
-    private WikiRepository wikiRepository;
-    
     @SpyBean
     private StatusCodeDocService statusCodeDocService;
     
-    @SpyBean
+    @Autowired
     private StatusCodeDocMapper statusCodeDocMapper;
 
     private final static int TOTAL_ELEMENTS = 60;

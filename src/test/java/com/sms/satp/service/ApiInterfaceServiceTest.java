@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.ApplicationTests;
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
@@ -18,10 +19,6 @@ import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.mapper.ApiInterfaceMapper;
 import com.sms.satp.parser.DocumentFactoryTest;
 import com.sms.satp.repository.ApiInterfaceRepository;
-import com.sms.satp.repository.ProjectEnvironmentRepository;
-import com.sms.satp.repository.ProjectRepository;
-import com.sms.satp.repository.StatusCodeDocRepository;
-import com.sms.satp.repository.WikiRepository;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,7 +31,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -44,27 +40,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.mock.web.MockMultipartFile;
 
-@SpringBootTest(classes = ApplicationTests.class,
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = ApplicationTests.class)
 @DisplayName("Test the service layer interface of the ApiInterface")
-class ApiInterfaceServiceTest {
+public class ApiInterfaceServiceTest {
 
     @MockBean
     private ApiInterfaceRepository apiInterfaceRepository;
 
-    @MockBean
-    private ProjectRepository projectRepository;
-
-    @MockBean
-    private ProjectEnvironmentRepository projectEnvironmentRepository;
-
-    @MockBean
-    private StatusCodeDocRepository statusCodeDocRepository;
-
-    @MockBean
-    private WikiRepository wikiRepository;
-
-    @SpyBean
+    @Autowired
     private ApiInterfaceService apiInterfaceService;
 
     @Autowired

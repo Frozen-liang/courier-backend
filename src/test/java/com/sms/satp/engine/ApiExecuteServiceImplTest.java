@@ -1,5 +1,6 @@
 package com.sms.satp.engine;
 
+import com.sms.satp.ApplicationTests;
 import com.sms.satp.engine.model.ApiUnitRequest;
 import com.sms.satp.engine.model.ApiUnitResponse;
 import com.sms.satp.engine.service.ApiExecuteService;
@@ -15,8 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
 
-@SpringBootTest(classes = ApiExecuteApplicationTests.class,
-
+@SpringBootTest(classes = ApplicationTests.class,
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ApiExecuteServiceImplTest {
 
