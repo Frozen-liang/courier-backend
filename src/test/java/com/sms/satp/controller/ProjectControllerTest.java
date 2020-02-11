@@ -32,12 +32,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 class ProjectControllerTest {
 
     @MockBean
-    ApiInterfaceRepository apiInterfaceRepository;
-
-    @MockBean
-    ProjectRepository projectRepository;
-
-    @MockBean
     ProjectService projectService;
 
     @Autowired

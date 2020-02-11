@@ -1,6 +1,5 @@
 package com.sms.satp;
 
-import com.sms.satp.SatpApplication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;

@@ -31,8 +31,7 @@ import org.springframework.data.domain.Sort.Direction;
 
 @SpringBootTest(classes = ApplicationTests.class)
 @DisplayName("Test the service layer interface of the StatusCodeDoc")
-public class StatusCodeDocServiceTest {
-
+class StatusCodeDocServiceTest {
 
     @MockBean
     private StatusCodeDocRepository statusCodeDocRepository;

@@ -83,7 +83,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     @Override
     public void save(String url, String documentType, String projectId) {
         Optional<DocumentType> documentTypeOptional = Optional.ofNullable(
-            DocumentType.resolve(documentType));
+            DocumentType.resolve(documentType.toUpperCase()));
         if (documentTypeOptional.isPresent()) {
             ApiDocument apiDocument = documentFactory.create(url, documentTypeOptional.get());
             List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(
