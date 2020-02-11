@@ -7,6 +7,9 @@ import com.sms.satp.entity.dto.ApiInterfaceDto;
 import com.sms.satp.repository.ApiInterfaceRepository;
 import com.sms.satp.repository.ProjectRepository;
 import com.sms.satp.service.ApplicationTests;
+import com.sms.satp.service.ProjectEnvironmentService;
+import com.sms.satp.service.StatusCodeDocService;
+import com.sms.satp.service.WikiService;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +34,15 @@ class ApiInterfaceMapperTest {
 
     @MockBean
     ProjectRepository projectRepository;
+
+    @MockBean
+    ProjectEnvironmentService projectEnvironmentService;
+
+    @MockBean
+    StatusCodeDocService statusCodeDocService;
+
+    @MockBean
+    WikiService wikiService;
 
     private static final Integer SIZE = 10;
     private static final String TITLE = "title";

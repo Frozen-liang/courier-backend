@@ -9,6 +9,9 @@ import com.sms.satp.parser.common.HttpMethod;
 import com.sms.satp.repository.ProjectRepository;
 import com.sms.satp.service.ApiInterfaceService;
 import com.sms.satp.service.ApplicationTests;
+import com.sms.satp.service.ProjectEnvironmentService;
+import com.sms.satp.service.StatusCodeDocService;
+import com.sms.satp.service.WikiService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,6 +49,15 @@ class DataControllerTest {
 
     @MockBean
     ProjectRepository projectRepository;
+
+    @MockBean
+    ProjectEnvironmentService projectEnvironmentService;
+
+    @MockBean
+    StatusCodeDocService statusCodeDocService;
+
+    @MockBean
+    WikiService wikiService;
 
     private String baseUrl;
     private Path tempFile;

@@ -18,7 +18,10 @@ import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.mapper.ApiInterfaceMapper;
 import com.sms.satp.parser.DocumentFactoryTest;
 import com.sms.satp.repository.ApiInterfaceRepository;
+import com.sms.satp.repository.ProjectEnvironmentRepository;
 import com.sms.satp.repository.ProjectRepository;
+import com.sms.satp.repository.StatusCodeDocRepository;
+import com.sms.satp.repository.WikiRepository;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -51,6 +54,15 @@ class ApiInterfaceServiceTest {
 
     @MockBean
     private ProjectRepository projectRepository;
+
+    @MockBean
+    private ProjectEnvironmentRepository projectEnvironmentRepository;
+
+    @MockBean
+    private StatusCodeDocRepository statusCodeDocRepository;
+
+    @MockBean
+    private WikiRepository wikiRepository;
 
     @SpyBean
     private ApiInterfaceService apiInterfaceService;
