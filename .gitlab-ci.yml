@@ -29,17 +29,22 @@ task_test:
     - docker-runner
   stage: build_test
   only:
-    - merge_requests
+    refs:
+      - develop
   script:
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "settings.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./.m2/settings.xml" -once'
     - echo "Running sonar test \n"
     - mvn install $MAVEN_TEST_OPTS $MAVEN_SETTING_OPTS
-    - "cat target/site/jacoco/index.html"
-#  artifacts:
-#    reports:
-#      junit:
-#        - target/surefire-reports/TEST-*.xml
-#        - target/failsafe-reports/TEST-*.xml
+    - "mv target/site/jacoco/ public"
+  artifacts:
+    path:
+      - public
+    expire_in: 30 days
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+        - target/failsafe-reports/TEST-*.xml
+
 task_build_artifact:
   tags:
     - docker-runner
@@ -82,6 +87,6 @@ task_deploy:
   before_script:
     - echo "Running deploy docker image"
   script:
-    - ssh -i $HOME/.ssh/device.pem ec2-user@13.251.89.98 /home/ec2-user/satp/starter.sh ${IMAGE} ${IMAGE_TAG}
+    - ssh API-DEV /home/ec2-user/satp/starter.sh ${IMAGE} ${IMAGE_TAG}
 
 
