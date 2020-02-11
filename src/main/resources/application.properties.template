@@ -1,1 +1,3 @@
-
+spring.application.name=sms-satp
+logging.file.max-history=5
+logging.file.name=./logs/satp-server.log
