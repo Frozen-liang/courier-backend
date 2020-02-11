@@ -29,21 +29,16 @@ task_test:
     - docker-runner
   stage: build_test
   only:
-    refs:
-      - develop
+    - merge_requests
   script:
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "settings.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./.m2/settings.xml" -once'
     - echo "Running sonar test \n"
     - mvn install $MAVEN_TEST_OPTS $MAVEN_SETTING_OPTS
-    - "mv target/site/jacoco/ public/"
+    - "mv target/site/jacoco/ report/"
   artifacts:
     paths:
-      - public
-    expire_in: 30 days
-    reports:
-      junit:
-        - target/surefire-reports/TEST-*.xml
-        - target/failsafe-reports/TEST-*.xml
+      - report
+    expire_in: 10 days
 
 task_build_artifact:
   tags:
@@ -52,6 +47,8 @@ task_build_artifact:
   only:
     refs:
       - develop
+  dependencies:
+    - task_test
   script:
     - echo "Running mvn compile \n"
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "settings.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./.m2/settings.xml" -once'
