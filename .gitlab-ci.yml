@@ -35,11 +35,6 @@ task_test:
     - echo "Running sonar test \n"
     - mvn install $MAVEN_TEST_OPTS $MAVEN_SETTING_OPTS
     - "cat target/site/jacoco/index.html"
-    - "mv target/site/jacoco/ public/"
-  artifacts:
-    paths:
-      - public
-    expire_in: 10 days
 
 task_build_artifact:
   tags:
@@ -48,13 +43,10 @@ task_build_artifact:
   only:
     refs:
       - develop
-  dependencies:
-    - task_test
   script:
     - echo "Running mvn compile \n"
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "settings.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./.m2/settings.xml" -once'
     - mvn clean package $MAVEN_BUILD_OPTS $MAVEN_SETTING_OPTS
-    - "cat  ./public/index.html"
   artifacts:
     paths:
       - ./target/
