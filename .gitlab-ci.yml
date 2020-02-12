@@ -5,7 +5,6 @@ before_script:
 
 stages:
   - build_test
-  - deploy_page
   - build_artifact
   - build_image
   - deploy
