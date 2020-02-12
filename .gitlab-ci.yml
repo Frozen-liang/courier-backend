@@ -31,8 +31,9 @@ task_test:
   only:
     - merge_requests
     - develop
-  rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME != "master"'
+  except:
+    variables:
+      - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
   script:
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "settings.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./.m2/settings.xml" -once'
     - echo "Running sonar test \n"
