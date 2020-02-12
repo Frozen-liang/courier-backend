@@ -5,6 +5,7 @@ before_script:
 
 stages:
   - build_test
+  - deploy_page
   - build_artifact
   - build_image
   - deploy
@@ -39,6 +40,24 @@ task_test:
     - echo "Running sonar test \n"
     - mvn verify $MAVEN_TEST_OPTS $MAVEN_SETTING_OPTS
     - "cat target/site/jacoco/index.html"
+    - "mv target/site/jacoco/ report"
+  artifacts:
+    paths:
+      - report
+    expire_in: 1 day
+
+pages:
+  tags:
+    - docker-runner
+  stage: deploy_page
+  dependencies:
+    - task_test
+  script:
+    - "mv report/ public"
+  artifacts:
+    paths:
+      - public
+    expire_in: 1 day
 
 task_build_artifact:
   tags:
