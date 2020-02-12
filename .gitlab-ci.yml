@@ -30,10 +30,11 @@ task_test:
   stage: build_test
   only:
     - merge_requests
+    - develop
   script:
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "settings.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./.m2/settings.xml" -once'
     - echo "Running sonar test \n"
-    - mvn install $MAVEN_TEST_OPTS $MAVEN_SETTING_OPTS
+    - mvn verify $MAVEN_TEST_OPTS $MAVEN_SETTING_OPTS
     - "cat target/site/jacoco/index.html"
 
 task_build_artifact:
