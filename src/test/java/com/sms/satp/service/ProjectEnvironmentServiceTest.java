@@ -31,7 +31,7 @@ import org.springframework.data.domain.Sort.Direction;
 
 @SpringBootTest(classes = ApplicationTests.class)
 @DisplayName("Test the service layer interface of the ProjectEnvironment")
-public class ProjectEnvironmentServiceTest {
+class ProjectEnvironmentServiceTest {
 
 
     @MockBean

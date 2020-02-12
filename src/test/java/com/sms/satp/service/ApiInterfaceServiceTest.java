@@ -42,7 +42,7 @@ import org.springframework.mock.web.MockMultipartFile;
 
 @SpringBootTest(classes = ApplicationTests.class)
 @DisplayName("Test the service layer interface of the ApiInterface")
-public class ApiInterfaceServiceTest {
+class ApiInterfaceServiceTest {
 
     @MockBean
     private ApiInterfaceRepository apiInterfaceRepository;

@@ -9,5 +9,8 @@ public class Constants {
     public static final String INTERFACE_PATH = SDK_VERSION + "/interface";
     public static final String DATA_PATH = SDK_VERSION + "/data";
     public static final String PROJECT_PATH = SDK_VERSION + "/project";
+    public static final String PROJECT_ENVIRONMENT_PATH = SDK_VERSION + "/project-environment";
+    public static final String STATUS_CODE_DOC_PATH = SDK_VERSION + "/status-code-doc";
+    public static final String WIKI_PATH = SDK_VERSION + "/wiki";
 
 }

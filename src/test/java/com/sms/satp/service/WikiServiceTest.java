@@ -33,7 +33,6 @@ import org.springframework.data.domain.Sort.Direction;
 @DisplayName("Test the service layer interface of the Wiki")
 class WikiServiceTest {
 
-
     @MockBean
     private WikiRepository wikiRepository;
     
