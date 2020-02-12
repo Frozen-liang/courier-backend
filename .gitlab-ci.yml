@@ -42,7 +42,7 @@ task_build_artifact:
   stage: build_artifact
   only:
     refs:
-      - develop
+      - master
   script:
     - echo "Running mvn compile \n"
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "settings.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./.m2/settings.xml" -once'
@@ -59,7 +59,7 @@ task_build_image:
   stage: build_image
   only:
     refs:
-      - develop
+      - master
   image: docker:19.03.1
   script:
     - echo "Running build docker image"
@@ -74,7 +74,7 @@ task_deploy:
   stage: deploy
   only:
     refs:
-      - develop
+      - master
   before_script:
     - echo "Running deploy docker image"
   script:
