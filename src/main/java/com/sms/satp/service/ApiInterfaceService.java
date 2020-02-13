@@ -13,7 +13,7 @@ public interface ApiInterfaceService {
 
     Page<ApiInterfaceDto> page(PageDto pageDto, String projectId);
 
-    void save(String url, String documentType, String projectId);
+    void save(String location, String documentType, String projectId);
 
     void save(MultipartFile multipartFile, String documentType, String projectId) throws IOException;
 
