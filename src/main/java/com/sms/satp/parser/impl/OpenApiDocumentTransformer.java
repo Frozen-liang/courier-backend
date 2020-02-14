@@ -8,6 +8,7 @@ import static com.sms.satp.parser.OpenApiConverterFunction.TAGS_CONVERTER;
 import static java.util.stream.Collectors.toList;
 
 import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.ErrorCode;
 import com.sms.satp.parser.DocumentTransformer;
 import com.sms.satp.parser.annotation.Reader;
 import com.sms.satp.parser.common.DocumentType;
@@ -32,6 +33,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import javax.validation.constraints.Null;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -112,6 +114,11 @@ public class OpenApiDocumentTransformer implements DocumentTransformer<OpenAPI> 
 
     @Override
     public OpenAPI read(String location) {
-        return OPEN_API_PARSER.read(location);
+        try {
+            return OPEN_API_PARSER.read(location);
+        } catch (Exception e) {
+            log.error("Failed to read the [OpenAPI location]", e);
+            throw new ApiTestPlatformException(ErrorCode.FILE_FORMAT_ERROR);
+        }
     }
 }

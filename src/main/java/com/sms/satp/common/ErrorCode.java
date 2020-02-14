@@ -4,6 +4,7 @@ public enum ErrorCode {
 
     SYSTEM_ERROR("9999", "System error"),
     PARSER_OPEN_API_ERROR("30001", "Document of OpenApi parsing has failed"),
+    FILE_FORMAT_ERROR("3002","File format error"),
     GET_REF_KEY_ERROR("40001", "The reference value cannot be null"),
     DOCUMENT_TYPE_ERROR("4002", "Document type error"),
     // 60001 describes the test exception
