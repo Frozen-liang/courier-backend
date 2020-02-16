@@ -1,5 +1,12 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.ErrorCode.ADD_PROJECT_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_PROJECT_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.EDIT_PROJECT_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_PROJECT_LIST_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_PROJECT_PAGE_ERROR;
+
+import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.Project;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.ProjectDto;
@@ -36,7 +43,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .stream().map(projectMapper::toDto).collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Failed to get the project list!", e);
-            throw e;
+            throw new ApiTestPlatformException(GET_PROJECT_LIST_ERROR);
         }
     }
 
@@ -49,7 +56,7 @@ public class ProjectServiceImpl implements ProjectService {
             return projectRepository.findAll(pageable).map(projectMapper::toDto);
         } catch (Exception e) {
             log.error("Failed to get the project page!", e);
-            throw e;
+            throw new ApiTestPlatformException(GET_PROJECT_PAGE_ERROR);
         }
     }
 
@@ -65,7 +72,7 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.insert(project);
         } catch (Exception e) {
             log.error("Failed to add the project!", e);
-            throw e;
+            throw new ApiTestPlatformException(ADD_PROJECT_ERROR);
         }
     }
 
@@ -81,7 +88,7 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.save(project);
         } catch (Exception e) {
             log.error("Failed to edit the project!", e);
-            throw e;
+            throw new ApiTestPlatformException(EDIT_PROJECT_ERROR);
         }
     }
 
@@ -91,7 +98,7 @@ public class ProjectServiceImpl implements ProjectService {
             projectRepository.deleteById(id);
         } catch (Exception e) {
             log.error("Failed to delete the project!", e);
-            throw e;
+            throw new ApiTestPlatformException(DELETE_PROJECT_BY_ID_ERROR);
         }
     }
 }

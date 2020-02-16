@@ -1,10 +1,16 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.ErrorCode.ADD_API_INTERFACE_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_API_INTERFACE_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.DOCUMENT_TYPE_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_LIST_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
+import static com.sms.satp.common.ErrorCode.PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR;
 import static com.sms.satp.utils.ApiSchemaUtil.getRefKey;
 import static com.sms.satp.utils.ApiSchemaUtil.resolveApiSchemaMap;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.common.ErrorCode;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.Header;
 import com.sms.satp.entity.Parameter;
@@ -70,7 +76,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             return apiInterfaceMapper.toDtoList(apiInterfaceRepository.findAll(example));
         } catch (Exception e) {
             log.error("Failed to get the ApiInterface list!", e);
-            throw e;
+            throw new ApiTestPlatformException(GET_API_INTERFACE_LIST_ERROR);
         }
     }
 
@@ -88,7 +94,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                 .map(apiInterfaceMapper::toDto);
         } catch (Exception e) {
             log.error("Failed to get the ApiInterface page!", e);
-            throw e;
+            throw new ApiTestPlatformException(GET_API_INTERFACE_PAGE_ERROR);
         }
     }
 
@@ -110,10 +116,10 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                 apiInterfaceRepository.insert(apiInterfaces);
             } catch (Exception e) {
                 log.error("Failed to parse the file and save as ApiInterface!", e);
-                throw e;
+                throw new ApiTestPlatformException(PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR);
             }
         } else {
-            throw new ApiTestPlatformException(ErrorCode.DOCUMENT_TYPE_ERROR);
+            throw new ApiTestPlatformException(DOCUMENT_TYPE_ERROR);
         }
     }
 
@@ -137,7 +143,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             apiInterfaceRepository.insert(apiInterfaceMapper.toEntity(apiInterfaceDto));
         } catch (Exception e) {
             log.error("Failed to add the ApiInterface!", e);
-            throw e;
+            throw new ApiTestPlatformException(ADD_API_INTERFACE_ERROR);
         }
     }
 
@@ -148,7 +154,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             return apiInterfaceMapper.toDto(optionalApiInterface.orElse(null));
         } catch (Exception e) {
             log.error("Failed to get the ApiInterface by id!", e);
-            throw e;
+            throw new ApiTestPlatformException(GET_API_INTERFACE_BY_ID_ERROR);
         }
     }
 
@@ -158,7 +164,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             apiInterfaceRepository.deleteById(id);
         } catch (Exception e) {
             log.error("Failed to delete the ApiInterface!", e);
-            throw e;
+            throw new ApiTestPlatformException(DELETE_API_INTERFACE_BY_ID_ERROR);
         }
     }
 

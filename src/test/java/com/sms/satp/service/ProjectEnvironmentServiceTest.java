@@ -1,5 +1,9 @@
 package com.sms.satp.service;
 
+import static com.sms.satp.common.ErrorCode.ADD_PROJECT_ENVIRONMENT_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.EDIT_PROJECT_ENVIRONMENT_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,6 +15,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ProjectEnvironment;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.ProjectEnvironmentDto;
@@ -142,7 +147,8 @@ class ProjectEnvironmentServiceTest {
             pageDto.getPageNumber(), pageDto.getPageSize(), sort);
         doThrow(new RuntimeException()).when(projectEnvironmentRepository).findAll(Example.of(projectEnvironment), pageable);
         assertThatThrownBy(() -> projectEnvironmentService.page(pageDto, PROJECT_ID))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_PROJECT_ENVIRONMENT_PAGE_ERROR.getCode());
     }
 
     @Test
@@ -150,7 +156,8 @@ class ProjectEnvironmentServiceTest {
     void add_exception_test() {
         doThrow(new RuntimeException()).when(projectEnvironmentRepository).insert(any(ProjectEnvironment.class));
         assertThatThrownBy(() -> projectEnvironmentService.add(ProjectEnvironmentDto.builder().build()))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(ADD_PROJECT_ENVIRONMENT_ERROR.getCode());
     }
 
     @Test
@@ -158,7 +165,8 @@ class ProjectEnvironmentServiceTest {
     void edit_exception_test() {
         doThrow(new RuntimeException()).when(projectEnvironmentRepository).save(argThat(t -> true));
         assertThatThrownBy(() -> projectEnvironmentService.edit(ProjectEnvironmentDto.builder().build()))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_PROJECT_ENVIRONMENT_ERROR.getCode());
     }
 
     @Test
@@ -166,6 +174,7 @@ class ProjectEnvironmentServiceTest {
     void delete_exception_test() {
         doThrow(new RuntimeException()).when(projectEnvironmentRepository).deleteById(anyString());
         assertThatThrownBy(() -> projectEnvironmentService.deleteById(anyString()))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR.getCode());
     }
 }

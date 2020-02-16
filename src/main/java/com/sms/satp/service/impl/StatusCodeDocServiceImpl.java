@@ -1,5 +1,11 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.ErrorCode.ADD_STATUS_CODE_DOC_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_STATUS_CODE_DOC_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.EDIT_STATUS_CODE_DOC_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_STATUS_CODE_DOC_PAGE_ERROR;
+
+import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.StatusCodeDoc;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.StatusCodeDocDto;
@@ -42,7 +48,7 @@ public class StatusCodeDocServiceImpl implements StatusCodeDocService {
                 .map(statusCodeDocMapper::toDto);
         } catch (Exception e) {
             log.error("Failed to get the StatusCodeDoc page!", e);
-            throw e;
+            throw new ApiTestPlatformException(GET_STATUS_CODE_DOC_PAGE_ERROR);
         }
     }
 
@@ -57,7 +63,7 @@ public class StatusCodeDocServiceImpl implements StatusCodeDocService {
                 statusCodeDocMapper.toEntity(statusCodeDocDto));
         } catch (Exception e) {
             log.error("Failed to add the statusCodeDoc!", e);
-            throw e;
+            throw new ApiTestPlatformException(ADD_STATUS_CODE_DOC_ERROR);
         }
     }
 
@@ -72,7 +78,7 @@ public class StatusCodeDocServiceImpl implements StatusCodeDocService {
                 statusCodeDocMapper.toEntity(statusCodeDocDto));
         } catch (Exception e) {
             log.error("Failed to edit the statusCodeDoc!", e);
-            throw e;
+            throw new ApiTestPlatformException(EDIT_STATUS_CODE_DOC_ERROR);
         }
     }
 
@@ -82,7 +88,7 @@ public class StatusCodeDocServiceImpl implements StatusCodeDocService {
             statusCodeDocRepository.deleteById(id);
         } catch (Exception e) {
             log.error("Failed to delete the statusCodeDoc!", e);
-            throw e;
+            throw new ApiTestPlatformException(DELETE_STATUS_CODE_DOC_BY_ID_ERROR);
         }
     }
 }

@@ -1,7 +1,13 @@
 package com.sms.satp.service;
 
 
+import static com.sms.satp.common.ErrorCode.ADD_API_INTERFACE_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.DOCUMENT_TYPE_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_LIST_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
+import static com.sms.satp.common.ErrorCode.PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR;
 import static com.sms.satp.parser.DocumentFactoryTest.CONFIG_OPEN_API_V_3_YAML;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -223,7 +229,8 @@ class ApiInterfaceServiceTest {
         ApiInterface apiInterface = ApiInterface.builder().projectId(PROJECT_ID).build();
         doThrow(new RuntimeException()).when(apiInterfaceRepository).findAll(Example.of(apiInterface));
         assertThatThrownBy(() -> apiInterfaceService.list(PROJECT_ID))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_API_INTERFACE_LIST_ERROR.getCode());
     }
 
     @Test
@@ -236,7 +243,8 @@ class ApiInterfaceServiceTest {
             pageDto.getPageNumber(), pageDto.getPageSize(), sort);
         doThrow(new RuntimeException()).when(apiInterfaceRepository).findAll(Example.of(apiInterface), pageable);
         assertThatThrownBy(() -> apiInterfaceService.page(pageDto, PROJECT_ID))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_API_INTERFACE_PAGE_ERROR.getCode());
     }
 
     @Test
@@ -244,7 +252,8 @@ class ApiInterfaceServiceTest {
     void add_exception_test() {
         doThrow(new RuntimeException()).when(apiInterfaceRepository).insert(any(ApiInterface.class));
         assertThatThrownBy(() -> apiInterfaceService.add(ApiInterfaceDto.builder().build()))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(ADD_API_INTERFACE_ERROR.getCode());
     }
 
     @Test
@@ -252,7 +261,8 @@ class ApiInterfaceServiceTest {
     void addByFile_exception_test() {
         doThrow(new RuntimeException()).when(apiInterfaceRepository).insert(anyList());
         assertThatThrownBy(() -> apiInterfaceService.save(URL, DOCUMENT_TYPE_SWAGGER, PROJECT_ID))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR.getCode());
     }
 
     @Test
@@ -260,7 +270,8 @@ class ApiInterfaceServiceTest {
     void getApiInterface_exception_test() {
         doThrow(new RuntimeException()).when(apiInterfaceRepository).findById(anyString());
         assertThatThrownBy(() -> apiInterfaceService.getApiInterfaceById(anyString()))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_API_INTERFACE_BY_ID_ERROR.getCode());
     }
 
     @Test
@@ -268,6 +279,7 @@ class ApiInterfaceServiceTest {
     void delete_exception_test() {
         doThrow(new RuntimeException()).when(apiInterfaceRepository).deleteById(anyString());
         assertThatThrownBy(() -> apiInterfaceService.deleteById(anyString()))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DELETE_API_INTERFACE_BY_ID_ERROR.getCode());
     }
 }

@@ -1,5 +1,11 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.ErrorCode.ADD_WIKI_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_WIKI_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.EDIT_WIKI_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_WIKI_PAGE_ERROR;
+
+import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.Wiki;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.WikiDto;
@@ -41,7 +47,7 @@ public class WikiServiceImpl implements WikiService {
                 .map(wikiMapper::toDto);
         } catch (Exception e) {
             log.error("Failed to get the Wiki page!", e);
-            throw e;
+            throw new ApiTestPlatformException(GET_WIKI_PAGE_ERROR);
         }
     }
 
@@ -56,7 +62,7 @@ public class WikiServiceImpl implements WikiService {
                 wikiMapper.toEntity(wikiDto));
         } catch (Exception e) {
             log.error("Failed to add the wiki!", e);
-            throw e;
+            throw new ApiTestPlatformException(ADD_WIKI_ERROR);
         }
     }
 
@@ -71,7 +77,7 @@ public class WikiServiceImpl implements WikiService {
                 wikiMapper.toEntity(wikiDto));
         } catch (Exception e) {
             log.error("Failed to edit the wiki!", e);
-            throw e;
+            throw new ApiTestPlatformException(EDIT_WIKI_ERROR);
         }
     }
 
@@ -81,7 +87,7 @@ public class WikiServiceImpl implements WikiService {
             wikiRepository.deleteById(id);
         } catch (Exception e) {
             log.error("Failed to delete the wiki!", e);
-            throw e;
+            throw new ApiTestPlatformException(DELETE_WIKI_BY_ID_ERROR);
         }
     }
 }

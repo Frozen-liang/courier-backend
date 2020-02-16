@@ -1,5 +1,9 @@
 package com.sms.satp.service;
 
+import static com.sms.satp.common.ErrorCode.ADD_STATUS_CODE_DOC_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_STATUS_CODE_DOC_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.EDIT_STATUS_CODE_DOC_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_STATUS_CODE_DOC_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,6 +15,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.StatusCodeDoc;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.StatusCodeDocDto;
@@ -142,7 +147,8 @@ class StatusCodeDocServiceTest {
             pageDto.getPageNumber(), pageDto.getPageSize(), sort);
         doThrow(new RuntimeException()).when(statusCodeDocRepository).findAll(Example.of(statusCodeDoc), pageable);
         assertThatThrownBy(() -> statusCodeDocService.page(pageDto, PROJECT_ID))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_STATUS_CODE_DOC_PAGE_ERROR.getCode());
     }
 
     @Test
@@ -150,7 +156,8 @@ class StatusCodeDocServiceTest {
     void add_exception_test() {
         doThrow(new RuntimeException()).when(statusCodeDocRepository).insert(any(StatusCodeDoc.class));
         assertThatThrownBy(() -> statusCodeDocService.add(StatusCodeDocDto.builder().build()))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(ADD_STATUS_CODE_DOC_ERROR.getCode());
     }
 
     @Test
@@ -158,7 +165,8 @@ class StatusCodeDocServiceTest {
     void edit_exception_test() {
         doThrow(new RuntimeException()).when(statusCodeDocRepository).save(argThat(t -> true));
         assertThatThrownBy(() -> statusCodeDocService.edit(StatusCodeDocDto.builder().build()))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_STATUS_CODE_DOC_ERROR.getCode());
     }
 
     @Test
@@ -166,7 +174,8 @@ class StatusCodeDocServiceTest {
     void delete_exception_test() {
         doThrow(new RuntimeException()).when(statusCodeDocRepository).deleteById(anyString());
         assertThatThrownBy(() -> statusCodeDocService.deleteById(anyString()))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DELETE_STATUS_CODE_DOC_BY_ID_ERROR.getCode());
     }
 
 }

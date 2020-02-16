@@ -1,5 +1,9 @@
 package com.sms.satp.service;
 
+import static com.sms.satp.common.ErrorCode.ADD_WIKI_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_WIKI_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.EDIT_WIKI_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_WIKI_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,6 +15,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.Wiki;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.WikiDto;
@@ -143,7 +148,8 @@ class WikiServiceTest {
             pageDto.getPageNumber(), pageDto.getPageSize(), sort);
         doThrow(new RuntimeException()).when(wikiRepository).findAll(Example.of(wiki), pageable);
         assertThatThrownBy(() -> wikiService.page(pageDto, PROJECT_ID))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_WIKI_PAGE_ERROR.getCode());
     }
 
     @Test
@@ -151,7 +157,8 @@ class WikiServiceTest {
     void add_exception_test() {
         doThrow(new RuntimeException()).when(wikiRepository).insert(any(Wiki.class));
         assertThatThrownBy(() -> wikiService.add(WikiDto.builder().build()))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(ADD_WIKI_ERROR.getCode());
     }
 
     @Test
@@ -159,7 +166,8 @@ class WikiServiceTest {
     void edit_exception_test() {
         doThrow(new RuntimeException()).when(wikiRepository).save(argThat(t -> true));
         assertThatThrownBy(() -> wikiService.edit(WikiDto.builder().build()))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_WIKI_ERROR.getCode());
     }
 
     @Test
@@ -167,7 +175,8 @@ class WikiServiceTest {
     void delete_exception_test() {
         doThrow(new RuntimeException()).when(wikiRepository).deleteById(anyString());
         assertThatThrownBy(() -> wikiService.deleteById(anyString()))
-            .isInstanceOf(RuntimeException.class);
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DELETE_WIKI_BY_ID_ERROR.getCode());
     }
 
 }
