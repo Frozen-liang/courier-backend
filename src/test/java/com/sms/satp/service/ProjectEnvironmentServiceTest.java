@@ -1,12 +1,21 @@
 package com.sms.satp.service;
 
+import static com.sms.satp.common.ErrorCode.ADD_PROJECT_ENVIRONMENT_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.EDIT_PROJECT_ENVIRONMENT_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sms.satp.ApplicationTests;
+import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ProjectEnvironment;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.ProjectEnvironmentDto;
@@ -15,10 +24,9 @@ import com.sms.satp.repository.ProjectEnvironmentRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Example;
@@ -29,8 +37,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
-@SpringBootTest(classes = ApplicationTests.class)
-@DisplayName("Test the service layer interface of the ProjectEnvironment")
+@Disabled
+@DisplayName("Test cases for ProjectEnvironmentService")
 class ProjectEnvironmentServiceTest {
 
 
@@ -40,7 +48,7 @@ class ProjectEnvironmentServiceTest {
     @SpyBean
     private ProjectEnvironmentService projectEnvironmentService;
 
-    @Autowired
+    @SpyBean
     private ProjectEnvironmentMapper projectEnvironmentMapper;
 
     private final static int TOTAL_ELEMENTS = 60;
@@ -127,5 +135,46 @@ class ProjectEnvironmentServiceTest {
         doNothing().when(projectEnvironmentRepository).deleteById(PROJECT_ID);
         projectEnvironmentService.deleteById(PROJECT_ID);
         verify(projectEnvironmentRepository, times(1)).deleteById(PROJECT_ID);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getting projectEnvironment page")
+    void page_exception_test() {
+        ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().projectId(PROJECT_ID).build();
+        PageDto pageDto = PageDto.builder().build();
+        Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
+        Pageable pageable = PageRequest.of(
+            pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        doThrow(new RuntimeException()).when(projectEnvironmentRepository).findAll(Example.of(projectEnvironment), pageable);
+        assertThatThrownBy(() -> projectEnvironmentService.page(pageDto, PROJECT_ID))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_PROJECT_ENVIRONMENT_PAGE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while adding projectEnvironment")
+    void add_exception_test() {
+        doThrow(new RuntimeException()).when(projectEnvironmentRepository).insert(any(ProjectEnvironment.class));
+        assertThatThrownBy(() -> projectEnvironmentService.add(ProjectEnvironmentDto.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(ADD_PROJECT_ENVIRONMENT_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while edit projectEnvironment")
+    void edit_exception_test() {
+        doThrow(new RuntimeException()).when(projectEnvironmentRepository).save(argThat(t -> true));
+        assertThatThrownBy(() -> projectEnvironmentService.edit(ProjectEnvironmentDto.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_PROJECT_ENVIRONMENT_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while delete projectEnvironment")
+    void delete_exception_test() {
+        doThrow(new RuntimeException()).when(projectEnvironmentRepository).deleteById(anyString());
+        assertThatThrownBy(() -> projectEnvironmentService.deleteById(anyString()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR.getCode());
     }
 }

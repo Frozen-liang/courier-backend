@@ -1,12 +1,21 @@
 package com.sms.satp.service;
 
+import static com.sms.satp.common.ErrorCode.ADD_WIKI_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_WIKI_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.EDIT_WIKI_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_WIKI_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sms.satp.ApplicationTests;
+import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.Wiki;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.WikiDto;
@@ -15,10 +24,9 @@ import com.sms.satp.repository.WikiRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Example;
@@ -29,8 +37,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
-@SpringBootTest(classes = ApplicationTests.class)
-@DisplayName("Test the service layer interface of the Wiki")
+@Disabled
+@DisplayName("Test cases for WikiService")
 class WikiServiceTest {
 
     @MockBean
@@ -39,7 +47,7 @@ class WikiServiceTest {
     @SpyBean
     private WikiService wikiService;
     
-    @Autowired
+    @SpyBean
     private WikiMapper wikiMapper;
 
     private final static int TOTAL_ELEMENTS = 60;
@@ -128,6 +136,47 @@ class WikiServiceTest {
         doNothing().when(wikiRepository).deleteById(PROJECT_ID);
         wikiService.deleteById(PROJECT_ID);
         verify(wikiRepository, times(1)).deleteById(PROJECT_ID);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getting wiki page")
+    void page_exception_test() {
+        Wiki wiki = Wiki.builder().projectId(PROJECT_ID).build();
+        PageDto pageDto = PageDto.builder().build();
+        Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
+        Pageable pageable = PageRequest.of(
+            pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        doThrow(new RuntimeException()).when(wikiRepository).findAll(Example.of(wiki), pageable);
+        assertThatThrownBy(() -> wikiService.page(pageDto, PROJECT_ID))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_WIKI_PAGE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while adding wiki")
+    void add_exception_test() {
+        doThrow(new RuntimeException()).when(wikiRepository).insert(any(Wiki.class));
+        assertThatThrownBy(() -> wikiService.add(WikiDto.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(ADD_WIKI_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while edit wiki")
+    void edit_exception_test() {
+        doThrow(new RuntimeException()).when(wikiRepository).save(argThat(t -> true));
+        assertThatThrownBy(() -> wikiService.edit(WikiDto.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_WIKI_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while delete wiki")
+    void delete_exception_test() {
+        doThrow(new RuntimeException()).when(wikiRepository).deleteById(anyString());
+        assertThatThrownBy(() -> wikiService.deleteById(anyString()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DELETE_WIKI_BY_ID_ERROR.getCode());
     }
 
 }

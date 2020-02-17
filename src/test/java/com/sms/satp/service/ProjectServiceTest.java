@@ -1,13 +1,22 @@
 package com.sms.satp.service;
 
+import static com.sms.satp.common.ErrorCode.ADD_PROJECT_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_PROJECT_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.EDIT_PROJECT_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_PROJECT_LIST_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_PROJECT_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sms.satp.ApplicationTests;
+import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.Project;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.ProjectDto;
@@ -16,11 +25,11 @@ import com.sms.satp.repository.ProjectRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -28,17 +37,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
-@SpringBootTest(classes = ApplicationTests.class)
-@DisplayName("Test the service layer interface of the API Project")
+@Disabled
+@DisplayName("Test cases for ProjectService")
 class ProjectServiceTest {
 
     @MockBean
     private ProjectRepository projectRepository;
 
-    @Autowired
+    @SpyBean
     ProjectService projectService;
 
-    @Autowired
+    @SpyBean
     ProjectMapper projectMapper;
 
     private final static String NAME = "project";
@@ -135,4 +144,50 @@ class ProjectServiceTest {
         projectService.delete(PROJECT_ID);
         verify(projectRepository, times(1)).deleteById(PROJECT_ID);
     }
+
+    @Test
+    @DisplayName("An exception occurred while getting project list")
+    void list_exception_test() {
+        doThrow(new RuntimeException()).when(projectRepository).findAll();
+        assertThatThrownBy(() -> projectService.list())
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_PROJECT_LIST_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getting project page")
+    void page_exception_test() {
+        doThrow(new RuntimeException()).when(projectRepository).findAll(any(Pageable.class));
+        assertThatThrownBy(() -> projectService.page(PageDto.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_PROJECT_PAGE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while adding project")
+    void add_exception_test() {
+        doThrow(new RuntimeException()).when(projectRepository).insert(any(Project.class));
+        assertThatThrownBy(() -> projectService.add(ProjectDto.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(ADD_PROJECT_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while edit project")
+    void edit_exception_test() {
+        doThrow(new RuntimeException()).when(projectRepository).save(argThat(t -> true));
+        assertThatThrownBy(() -> projectService.edit(ProjectDto.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_PROJECT_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while delete project")
+    void delete_exception_test() {
+        doThrow(new RuntimeException()).when(projectRepository).deleteById(anyString());
+        assertThatThrownBy(() -> projectService.delete(anyString()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DELETE_PROJECT_BY_ID_ERROR.getCode());
+    }
+
 }
