@@ -2,7 +2,6 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.entity.StatusCodeDoc;
 import com.sms.satp.entity.dto.StatusCodeDocDto;
-import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,8 +14,10 @@ public interface StatusCodeDocMapper {
         @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss"),
         @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     })
-    StatusCodeDocDto toDto(StatusCodeDoc projectEnvironment);
+    StatusCodeDocDto toDto(StatusCodeDoc statusCodeDoc);
 
-    @InheritInverseConfiguration
-    StatusCodeDoc toEntity(StatusCodeDocDto projectEnvironmentDto);
+    //  @InheritInverseConfiguration
+    @Mapping(target = "modifyDateTime",  ignore = true)
+    @Mapping(target = "createDateTime",  ignore = true)
+    StatusCodeDoc toEntity(StatusCodeDocDto statusCodeDocDto);
 }

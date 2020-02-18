@@ -12,7 +12,11 @@ import com.sms.satp.entity.dto.ProjectEnvironmentDto;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
 import com.sms.satp.service.ProjectEnvironmentService;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.codecs.pojo.IdGenerators;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -59,8 +63,11 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
                 projectEnvironmentDto.toString()));
         }
         try {
-            projectEnvironmentRepository.insert(
-                projectEnvironmentMapper.toEntity(projectEnvironmentDto));
+            ProjectEnvironment projectEnvironment = projectEnvironmentMapper
+                .toEntity(projectEnvironmentDto);
+            projectEnvironment.setId(new ObjectId().toString());
+            projectEnvironment.setCreateDateTime(LocalDateTime.now());
+            projectEnvironmentRepository.insert(projectEnvironment);
         } catch (Exception e) {
             log.error("Failed to add the projectEnvironment!", e);
             throw new ApiTestPlatformException(ADD_PROJECT_ENVIRONMENT_ERROR);
@@ -74,8 +81,16 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
                 projectEnvironmentDto.toString()));
         }
         try {
-            projectEnvironmentRepository.save(
-                projectEnvironmentMapper.toEntity(projectEnvironmentDto));
+            ProjectEnvironment projectEnvironment = projectEnvironmentMapper
+                .toEntity(projectEnvironmentDto);
+            Optional<ProjectEnvironment> projectEnvironmentOptional = projectEnvironmentRepository
+                .findById(projectEnvironment.getId());
+            projectEnvironmentOptional.ifPresent(projectEnvironmentFindById -> {
+                projectEnvironment.setCreateDateTime(
+                    projectEnvironmentFindById.getCreateDateTime());
+                projectEnvironment.setModifyDateTime(LocalDateTime.now());
+                projectEnvironmentRepository.save(projectEnvironment);
+            });
         } catch (Exception e) {
             log.error("Failed to edit the projectEnvironment!", e);
             throw new ApiTestPlatformException(EDIT_PROJECT_ENVIRONMENT_ERROR);

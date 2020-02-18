@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Wiki {
 
     @Id
+    @Field("_id")
     private String id;
     private String title;
     @Field("content_type")

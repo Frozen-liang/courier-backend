@@ -12,7 +12,11 @@ import com.sms.satp.entity.dto.StatusCodeDocDto;
 import com.sms.satp.mapper.StatusCodeDocMapper;
 import com.sms.satp.repository.StatusCodeDocRepository;
 import com.sms.satp.service.StatusCodeDocService;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.codecs.pojo.IdGenerators;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -59,8 +63,10 @@ public class StatusCodeDocServiceImpl implements StatusCodeDocService {
                 statusCodeDocDto.toString()));
         }
         try {
-            statusCodeDocRepository.insert(
-                statusCodeDocMapper.toEntity(statusCodeDocDto));
+            StatusCodeDoc statusCodeDoc = statusCodeDocMapper.toEntity(statusCodeDocDto);
+            statusCodeDoc.setId(new ObjectId().toString());
+            statusCodeDoc.setCreateDateTime(LocalDateTime.now());
+            statusCodeDocRepository.insert(statusCodeDoc);
         } catch (Exception e) {
             log.error("Failed to add the statusCodeDoc!", e);
             throw new ApiTestPlatformException(ADD_STATUS_CODE_DOC_ERROR);
@@ -74,8 +80,14 @@ public class StatusCodeDocServiceImpl implements StatusCodeDocService {
                 statusCodeDocDto.toString()));
         }
         try {
-            statusCodeDocRepository.save(
-                statusCodeDocMapper.toEntity(statusCodeDocDto));
+            StatusCodeDoc statusCodeDoc = statusCodeDocMapper.toEntity(statusCodeDocDto);
+            Optional<StatusCodeDoc> statusCodeDocOptional = statusCodeDocRepository
+                .findById(statusCodeDoc.getId());
+            statusCodeDocOptional.ifPresent(codeDoc -> {
+                statusCodeDoc.setCreateDateTime(codeDoc.getCreateDateTime());
+                statusCodeDoc.setModifyDateTime(LocalDateTime.now());
+                statusCodeDocRepository.save(statusCodeDoc);
+            });
         } catch (Exception e) {
             log.error("Failed to edit the statusCodeDoc!", e);
             throw new ApiTestPlatformException(EDIT_STATUS_CODE_DOC_ERROR);

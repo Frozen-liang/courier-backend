@@ -12,7 +12,11 @@ import com.sms.satp.entity.dto.WikiDto;
 import com.sms.satp.mapper.WikiMapper;
 import com.sms.satp.repository.WikiRepository;
 import com.sms.satp.service.WikiService;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.codecs.pojo.IdGenerators;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -58,8 +62,10 @@ public class WikiServiceImpl implements WikiService {
                 wikiDto.toString()));
         }
         try {
-            wikiRepository.insert(
-                wikiMapper.toEntity(wikiDto));
+            Wiki wiki = wikiMapper.toEntity(wikiDto);
+            wiki.setId(new ObjectId().toString());
+            wiki.setCreateDateTime(LocalDateTime.now());
+            wikiRepository.insert(wiki);
         } catch (Exception e) {
             log.error("Failed to add the wiki!", e);
             throw new ApiTestPlatformException(ADD_WIKI_ERROR);
@@ -73,8 +79,14 @@ public class WikiServiceImpl implements WikiService {
                 wikiDto.toString()));
         }
         try {
-            wikiRepository.save(
-                wikiMapper.toEntity(wikiDto));
+            Wiki wiki = wikiMapper.toEntity(wikiDto);
+            Optional<Wiki> wikiOptional = wikiRepository
+                .findById(wiki.getId());
+            wikiOptional.ifPresent(wikiFindById -> {
+                wiki.setCreateDateTime(wikiFindById.getCreateDateTime());
+                wiki.setModifyDateTime(LocalDateTime.now());
+                wikiRepository.save(wiki);
+            });
         } catch (Exception e) {
             log.error("Failed to edit the wiki!", e);
             throw new ApiTestPlatformException(EDIT_WIKI_ERROR);

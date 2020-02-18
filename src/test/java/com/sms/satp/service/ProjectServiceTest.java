@@ -24,6 +24,7 @@ import com.sms.satp.mapper.ProjectMapper;
 import com.sms.satp.repository.ProjectRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -52,6 +53,7 @@ class ProjectServiceTest {
 
     private final static String NAME = "project";
     private final static String PROJECT_ID = "25";
+    private final static String ID = "25";
     private final static int TOTAL_ELEMENTS = 60;
     private final static int PAGE_NUMBER = 2;
     private final static int PAGE_SIZE = 20;
@@ -130,8 +132,9 @@ class ProjectServiceTest {
     @Test
     @DisplayName("Test the edit method in the project service")
     void edit_test() {
-        ProjectDto projectDto = ProjectDto.builder().build();
+        ProjectDto projectDto = ProjectDto.builder().id(ID).build();
         Project project = projectMapper.toEntity(projectDto);
+        when(projectRepository.findById(ID)).thenReturn(Optional.of(Project.builder().build()));
         when(projectRepository.save(any(Project.class))).thenReturn(project);
         projectService.edit(projectDto);
         verify(projectRepository, times(1)).save(any(Project.class));
@@ -175,8 +178,9 @@ class ProjectServiceTest {
     @Test
     @DisplayName("An exception occurred while edit project")
     void edit_exception_test() {
+        when(projectRepository.findById(ID)).thenReturn(Optional.of(Project.builder().build()));
         doThrow(new RuntimeException()).when(projectRepository).save(argThat(t -> true));
-        assertThatThrownBy(() -> projectService.edit(ProjectDto.builder().build()))
+        assertThatThrownBy(() -> projectService.edit(ProjectDto.builder().id(ID).build()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_PROJECT_ERROR.getCode());
     }

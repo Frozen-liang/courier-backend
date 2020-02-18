@@ -2,7 +2,6 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.entity.ProjectEnvironment;
 import com.sms.satp.entity.dto.ProjectEnvironmentDto;
-import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,6 +16,7 @@ public interface ProjectEnvironmentMapper {
     })
     ProjectEnvironmentDto toDto(ProjectEnvironment projectEnvironment);
 
-    @InheritInverseConfiguration
+    @Mapping(target = "modifyDateTime",  ignore = true)
+    @Mapping(target = "createDateTime",  ignore = true)
     ProjectEnvironment toEntity(ProjectEnvironmentDto projectEnvironmentDto);
 }

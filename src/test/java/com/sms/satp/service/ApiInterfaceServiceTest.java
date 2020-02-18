@@ -212,7 +212,7 @@ class ApiInterfaceServiceTest {
         ApiInterface apiInterface = apiInterfaceMapper.toEntity(apiInterfaceDto);
         when(apiInterfaceRepository.insert(apiInterface)).thenReturn(apiInterface);
         apiInterfaceService.add(apiInterfaceDto);
-        verify(apiInterfaceRepository, times(1)).insert(apiInterface);
+        verify(apiInterfaceRepository, times(1)).insert(any(ApiInterface.class));
     }
 
     @Test

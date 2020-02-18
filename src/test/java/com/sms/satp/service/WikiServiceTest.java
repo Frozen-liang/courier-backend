@@ -23,6 +23,7 @@ import com.sms.satp.mapper.WikiMapper;
 import com.sms.satp.repository.WikiRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -55,6 +56,7 @@ class WikiServiceTest {
     private final static int PAGE_SIZE = 20;
     private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
+    private final static String ID = "25";
     private final static String PROJECT_ID = "25";
     private final static String TITLE = "title";
 
@@ -117,17 +119,18 @@ class WikiServiceTest {
         Wiki wiki = wikiMapper.toEntity(wikiDto);
         when(wikiRepository.insert(wiki)).thenReturn(wiki);
         wikiService.add(wikiDto);
-        verify(wikiRepository, times(1)).insert(wiki);
+        verify(wikiRepository, times(1)).insert(any(Wiki.class));
     }
 
     @Test
     @DisplayName("Test the edit method in the Wiki service")
     void edit_test() {
-        WikiDto wikiDto = WikiDto.builder().build();
+        WikiDto wikiDto = WikiDto.builder().id(ID).build();
         Wiki wiki = wikiMapper.toEntity(wikiDto);
+        when(wikiRepository.findById(ID)).thenReturn(Optional.of(Wiki.builder().build()));
         when(wikiRepository.save(wiki)).thenReturn(wiki);
         wikiService.edit(wikiDto);
-        verify(wikiRepository, times(1)).save(wiki);
+        verify(wikiRepository, times(1)).save(any(Wiki.class));
     }
 
     @Test
@@ -164,8 +167,9 @@ class WikiServiceTest {
     @Test
     @DisplayName("An exception occurred while edit wiki")
     void edit_exception_test() {
+        when(wikiRepository.findById(ID)).thenReturn(Optional.of(Wiki.builder().build()));
         doThrow(new RuntimeException()).when(wikiRepository).save(argThat(t -> true));
-        assertThatThrownBy(() -> wikiService.edit(WikiDto.builder().build()))
+        assertThatThrownBy(() -> wikiService.edit(WikiDto.builder().id(ID).build()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_WIKI_ERROR.getCode());
     }

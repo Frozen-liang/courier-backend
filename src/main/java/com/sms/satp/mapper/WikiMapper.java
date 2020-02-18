@@ -2,7 +2,6 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.entity.Wiki;
 import com.sms.satp.entity.dto.WikiDto;
-import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,6 +16,7 @@ public interface WikiMapper {
     })
     WikiDto toDto(Wiki wiki);
 
-    @InheritInverseConfiguration
+    @Mapping(target = "modifyDateTime",  ignore = true)
+    @Mapping(target = "createDateTime",  ignore = true)
     Wiki toEntity(WikiDto wikiDto);
 }
