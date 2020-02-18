@@ -1,12 +1,21 @@
 package com.sms.satp.service;
 
+import static com.sms.satp.common.ErrorCode.ADD_STATUS_CODE_DOC_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_STATUS_CODE_DOC_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.EDIT_STATUS_CODE_DOC_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_STATUS_CODE_DOC_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sms.satp.ApplicationTests;
+import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.StatusCodeDoc;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.StatusCodeDocDto;
@@ -15,10 +24,9 @@ import com.sms.satp.repository.StatusCodeDocRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Example;
@@ -29,8 +37,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
-@SpringBootTest(classes = ApplicationTests.class)
-@DisplayName("Test the service layer interface of the StatusCodeDoc")
+@Disabled
+@DisplayName("Test cases for StatusCodeDocService")
 class StatusCodeDocServiceTest {
 
     @MockBean
@@ -39,7 +47,7 @@ class StatusCodeDocServiceTest {
     @SpyBean
     private StatusCodeDocService statusCodeDocService;
     
-    @Autowired
+    @SpyBean
     private StatusCodeDocMapper statusCodeDocMapper;
 
     private final static int TOTAL_ELEMENTS = 60;
@@ -127,6 +135,47 @@ class StatusCodeDocServiceTest {
         doNothing().when(statusCodeDocRepository).deleteById(PROJECT_ID);
         statusCodeDocService.deleteById(PROJECT_ID);
         verify(statusCodeDocRepository, times(1)).deleteById(PROJECT_ID);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getting statusCodeDoc page")
+    void page_exception_test() {
+        StatusCodeDoc statusCodeDoc = StatusCodeDoc.builder().projectId(PROJECT_ID).build();
+        PageDto pageDto = PageDto.builder().build();
+        Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
+        Pageable pageable = PageRequest.of(
+            pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        doThrow(new RuntimeException()).when(statusCodeDocRepository).findAll(Example.of(statusCodeDoc), pageable);
+        assertThatThrownBy(() -> statusCodeDocService.page(pageDto, PROJECT_ID))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_STATUS_CODE_DOC_PAGE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while adding statusCodeDoc")
+    void add_exception_test() {
+        doThrow(new RuntimeException()).when(statusCodeDocRepository).insert(any(StatusCodeDoc.class));
+        assertThatThrownBy(() -> statusCodeDocService.add(StatusCodeDocDto.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(ADD_STATUS_CODE_DOC_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while edit statusCodeDoc")
+    void edit_exception_test() {
+        doThrow(new RuntimeException()).when(statusCodeDocRepository).save(argThat(t -> true));
+        assertThatThrownBy(() -> statusCodeDocService.edit(StatusCodeDocDto.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_STATUS_CODE_DOC_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while delete statusCodeDoc")
+    void delete_exception_test() {
+        doThrow(new RuntimeException()).when(statusCodeDocRepository).deleteById(anyString());
+        assertThatThrownBy(() -> statusCodeDocService.deleteById(anyString()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DELETE_STATUS_CODE_DOC_BY_ID_ERROR.getCode());
     }
 
 }

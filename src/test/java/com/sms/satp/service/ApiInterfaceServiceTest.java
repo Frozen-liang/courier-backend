@@ -1,17 +1,25 @@
 package com.sms.satp.service;
 
 
+import static com.sms.satp.common.ErrorCode.ADD_API_INTERFACE_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.DOCUMENT_TYPE_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_LIST_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
+import static com.sms.satp.common.ErrorCode.PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR;
 import static com.sms.satp.parser.DocumentFactoryTest.CONFIG_OPEN_API_V_3_YAML;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sms.satp.ApplicationTests;
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
@@ -26,11 +34,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -40,17 +48,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.mock.web.MockMultipartFile;
 
-@SpringBootTest(classes = ApplicationTests.class)
-@DisplayName("Test the service layer interface of the ApiInterface")
+@Disabled
+@DisplayName("Test cases for ApiInterfaceService")
 class ApiInterfaceServiceTest {
 
     @MockBean
     private ApiInterfaceRepository apiInterfaceRepository;
 
-    @Autowired
+    @SpyBean
     private ApiInterfaceService apiInterfaceService;
 
-    @Autowired
+    @SpyBean
     ApiInterfaceMapper apiInterfaceMapper;
 
     private final static int LIST_SIZE = 10;
@@ -213,5 +221,65 @@ class ApiInterfaceServiceTest {
         doNothing().when(apiInterfaceRepository).deleteById(PROJECT_ID);
         apiInterfaceService.deleteById(PROJECT_ID);
         verify(apiInterfaceRepository, times(1)).deleteById(PROJECT_ID);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getting apiInterface list")
+    void list_exception_test() {
+        ApiInterface apiInterface = ApiInterface.builder().projectId(PROJECT_ID).build();
+        doThrow(new RuntimeException()).when(apiInterfaceRepository).findAll(Example.of(apiInterface));
+        assertThatThrownBy(() -> apiInterfaceService.list(PROJECT_ID))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_API_INTERFACE_LIST_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getting apiInterface page")
+    void page_exception_test() {
+        ApiInterface apiInterface = ApiInterface.builder().projectId(PROJECT_ID).build();
+        PageDto pageDto = PageDto.builder().build();
+        Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
+        Pageable pageable = PageRequest.of(
+            pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        doThrow(new RuntimeException()).when(apiInterfaceRepository).findAll(Example.of(apiInterface), pageable);
+        assertThatThrownBy(() -> apiInterfaceService.page(pageDto, PROJECT_ID))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_API_INTERFACE_PAGE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while adding apiInterface")
+    void add_exception_test() {
+        doThrow(new RuntimeException()).when(apiInterfaceRepository).insert(any(ApiInterface.class));
+        assertThatThrownBy(() -> apiInterfaceService.add(ApiInterfaceDto.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(ADD_API_INTERFACE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while adding apiInterface through uploaded files")
+    void addByFile_exception_test() {
+        doThrow(new RuntimeException()).when(apiInterfaceRepository).insert(anyList());
+        assertThatThrownBy(() -> apiInterfaceService.save(URL, DOCUMENT_TYPE_SWAGGER, PROJECT_ID))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getting apiInterface by id")
+    void getApiInterface_exception_test() {
+        doThrow(new RuntimeException()).when(apiInterfaceRepository).findById(anyString());
+        assertThatThrownBy(() -> apiInterfaceService.getApiInterfaceById(anyString()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_API_INTERFACE_BY_ID_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while deleting apiInterface")
+    void delete_exception_test() {
+        doThrow(new RuntimeException()).when(apiInterfaceRepository).deleteById(anyString());
+        assertThatThrownBy(() -> apiInterfaceService.deleteById(anyString()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DELETE_API_INTERFACE_BY_ID_ERROR.getCode());
     }
 }

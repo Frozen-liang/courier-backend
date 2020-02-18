@@ -1,10 +1,16 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.ErrorCode.ADD_API_INTERFACE_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_API_INTERFACE_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.DOCUMENT_TYPE_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_LIST_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
+import static com.sms.satp.common.ErrorCode.PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR;
 import static com.sms.satp.utils.ApiSchemaUtil.getRefKey;
 import static com.sms.satp.utils.ApiSchemaUtil.resolveApiSchemaMap;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.common.ErrorCode;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.Header;
 import com.sms.satp.entity.Parameter;
@@ -45,8 +51,8 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service
 @Slf4j
+@Service
 public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     private final ApiInterfaceRepository apiInterfaceRepository;
@@ -62,36 +68,58 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     @Override
     public List<ApiInterfaceDto> list(String projectId) {
-        ApiInterface apiInterface = ApiInterface.builder()
-            .projectId(projectId)
-            .build();
-        Example<ApiInterface> example = Example.of(apiInterface);
-        return apiInterfaceMapper.toDtoList(apiInterfaceRepository.findAll(example));
+        try {
+            ApiInterface apiInterface = ApiInterface.builder()
+                .projectId(projectId)
+                .build();
+            Example<ApiInterface> example = Example.of(apiInterface);
+            return apiInterfaceMapper.toDtoList(apiInterfaceRepository.findAll(example));
+        } catch (Exception e) {
+            log.error("Failed to get the ApiInterface list!", e);
+            throw new ApiTestPlatformException(GET_API_INTERFACE_LIST_ERROR);
+        }
     }
 
     @Override
     public Page<ApiInterfaceDto> page(PageDto pageDto, String projectId) {
-        ApiInterface apiInterface = ApiInterface.builder()
-            .projectId(projectId)
-            .build();
-        Example<ApiInterface> example = Example.of(apiInterface);
-        Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
-        return apiInterfaceRepository.findAll(example, pageable)
-            .map(apiInterfaceMapper::toDto);
+        try {
+            ApiInterface apiInterface = ApiInterface.builder()
+                .projectId(projectId)
+                .build();
+            Example<ApiInterface> example = Example.of(apiInterface);
+            Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
+            Pageable pageable = PageRequest.of(
+                pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+            return apiInterfaceRepository.findAll(example, pageable)
+                .map(apiInterfaceMapper::toDto);
+        } catch (Exception e) {
+            log.error("Failed to get the ApiInterface page!", e);
+            throw new ApiTestPlatformException(GET_API_INTERFACE_PAGE_ERROR);
+        }
     }
 
     @Override
-    public void save(String url, String documentType, String projectId) {
+    public void save(String location, String documentType, String projectId) {
+        if (log.isDebugEnabled()) {
+            log.debug(
+                String.format("ApiInterfaceService-save()-Parameter: [location]%s, [documentType]%s, [projectId]%s",
+                location, documentType, projectId));
+        }
         Optional<DocumentType> documentTypeOptional = Optional.ofNullable(
             DocumentType.resolve(documentType.toUpperCase(Locale.getDefault())));
         if (documentTypeOptional.isPresent()) {
-            ApiDocument apiDocument = documentFactory.create(url, documentTypeOptional.get());
-            List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(
-                apiDocument, projectId);
-            apiInterfaceRepository.insert(apiInterfaces);
+            try {
+                ApiDocument apiDocument = documentFactory.create(
+                    location, documentTypeOptional.get());
+                List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(
+                    apiDocument, projectId);
+                apiInterfaceRepository.insert(apiInterfaces);
+            } catch (Exception e) {
+                log.error("Failed to parse the file and save as ApiInterface!", e);
+                throw new ApiTestPlatformException(PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR);
+            }
         } else {
-            throw new ApiTestPlatformException(ErrorCode.DOCUMENT_TYPE_ERROR);
+            throw new ApiTestPlatformException(DOCUMENT_TYPE_ERROR);
         }
     }
 
@@ -107,18 +135,37 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     @Override
     public void add(ApiInterfaceDto apiInterfaceDto) {
-        apiInterfaceRepository.insert(apiInterfaceMapper.toEntity(apiInterfaceDto));
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("ApiInterfaceService-add()-Parameter: %s",
+                apiInterfaceDto.toString()));
+        }
+        try {
+            apiInterfaceRepository.insert(apiInterfaceMapper.toEntity(apiInterfaceDto));
+        } catch (Exception e) {
+            log.error("Failed to add the ApiInterface!", e);
+            throw new ApiTestPlatformException(ADD_API_INTERFACE_ERROR);
+        }
     }
 
     @Override
     public ApiInterfaceDto getApiInterfaceById(String id) {
-        Optional<ApiInterface> optionalApiInterface = apiInterfaceRepository.findById(id);
-        return apiInterfaceMapper.toDto(optionalApiInterface.orElse(null));
+        try {
+            Optional<ApiInterface> optionalApiInterface = apiInterfaceRepository.findById(id);
+            return apiInterfaceMapper.toDto(optionalApiInterface.orElse(null));
+        } catch (Exception e) {
+            log.error("Failed to get the ApiInterface by id!", e);
+            throw new ApiTestPlatformException(GET_API_INTERFACE_BY_ID_ERROR);
+        }
     }
 
     @Override
     public void deleteById(String id) {
-        apiInterfaceRepository.deleteById(id);
+        try {
+            apiInterfaceRepository.deleteById(id);
+        } catch (Exception e) {
+            log.error("Failed to delete the ApiInterface!", e);
+            throw new ApiTestPlatformException(DELETE_API_INTERFACE_BY_ID_ERROR);
+        }
     }
 
     private File convertToFile(MultipartFile multipartFile) throws IOException {
