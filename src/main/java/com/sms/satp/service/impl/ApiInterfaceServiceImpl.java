@@ -105,7 +105,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         if (log.isDebugEnabled()) {
             log.debug(
                 String.format("ApiInterfaceService-save()-Parameter: [location]%s, [documentType]%s, [projectId]%s",
-                location, documentType, projectId));
+                    location, documentType, projectId));
         }
         Optional<DocumentType> documentTypeOptional = Optional.ofNullable(
             DocumentType.resolve(documentType.toUpperCase(Locale.getDefault())));
@@ -229,7 +229,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             .setSchema(apiSchema.get(getRefKey(requestRef))));
         responseRefOptional.ifPresent(responseRdf -> apiResponseOptional.get()
             .setSchema(apiSchema.get(getRefKey(responseRdf))));
-        ApiInterface apiInterface = ApiInterface.builder()
+        ApiInterface.ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
             .id(new ObjectId().toString())
             .method(HttpMethod.resolve(apiOperation.getHttpMethod().name()))
             .projectId(projectId)
@@ -237,16 +237,16 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             .title(apiOperation.getSummary())
             .path(apiPath.getPath())
             .description(apiOperation.getDescription())
-            .responseHeaders(
-                apiResponseOptional.map(ApiResponse::getHeaders).isPresent()
-                    ? ApiHeaderConverter.CONVERT_TO_HEADER.apply(apiResponseOptional.map(ApiResponse::getHeaders).get())
-                    : null)
+            .responseHeaders(null)
             .requestBody(
                 apiRequestBodyOptional.map(ApiRequestBodyConverter.CONVERT_TO_REQUEST_BODY).orElse(null))
             .response(
                 apiResponseOptional.map(ApiResponseConverter.CONVERT_TO_RESPONSE).orElse(null))
-            .createDateTime(LocalDateTime.now())
-            .build();
+            .createDateTime(LocalDateTime.now());
+        apiResponseOptional.map(ApiResponse::getHeaders).ifPresent(apiHeaders -> {
+            apiInterfaceBuilder.responseHeaders(ApiHeaderConverter.CONVERT_TO_HEADER.apply(apiHeaders));
+        });
+        ApiInterface apiInterface = apiInterfaceBuilder.build();
         apiParameterResolver(apiInterface, apiOperation.getParameters());
         return apiInterface;
     }
