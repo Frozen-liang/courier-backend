@@ -8,6 +8,8 @@ import static io.restassured.path.xml.XmlPath.CompatibilityMode.HTML;
 import static java.lang.String.format;
 
 import com.google.common.collect.Lists;
+import com.sms.satp.engine.auth.ApiAuth;
+import com.sms.satp.engine.auth.AuthType;
 import com.sms.satp.engine.auth.OnePlatformAuthConfig;
 import io.restassured.config.LogConfig;
 import io.restassured.filter.FilterContext;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 
+@ApiAuth(type = AuthType.ONE_PLATFORM)
 public class OnePlatformAuthFilter implements AuthFilter {
 
     private static final String FIND_INPUT_VALUE_OF_INPUT_TAG_WITH_NAME = "html.depthFirst().grep { it.name() == "

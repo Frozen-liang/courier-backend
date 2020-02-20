@@ -3,6 +3,8 @@ package com.sms.satp.engine.auth.filter;
 
 import static io.restassured.RestAssured.given;
 
+import com.sms.satp.engine.auth.ApiAuth;
+import com.sms.satp.engine.auth.AuthType;
 import com.sms.satp.engine.auth.ServiceMeshAuthConfig;
 import io.restassured.config.LogConfig;
 import io.restassured.filter.FilterContext;
@@ -17,7 +19,7 @@ import io.restassured.spi.AuthFilter;
 import java.net.URI;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
-
+@ApiAuth(type = AuthType.SERVICE_MESH)
 public class ServiceMeshAuthFilter implements AuthFilter {
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
