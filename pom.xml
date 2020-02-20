@@ -30,6 +30,7 @@
             **/parser/model/**.java,
             **/pojo/**.java,
             **/engine/model/**.java,
+            **/engine/auth/**.java,
             **/parser/schema/**.java
         </sonar.coverage.exclusions>
         <sonar.issue.ignore.multicriteria>e1</sonar.issue.ignore.multicriteria>

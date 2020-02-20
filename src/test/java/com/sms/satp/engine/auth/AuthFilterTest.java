@@ -2,6 +2,7 @@ package com.sms.satp.engine.auth;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 
 import com.sms.satp.ApplicationTests;
 import com.sms.satp.engine.auth.filter.OnePlatformAuthFilter;
@@ -32,15 +33,14 @@ public class AuthFilterTest {
             .body(containsString("div class=\"db-1\" data-type=\"dashboard\""));
 
 
-
     }
+
 
     @Test
     public void jwt_token_test() {
         given().auth().none().filter(serviceMeshAuthFilter).
-            baseUri("https://meshdev.smsassist.com").when().get("/eventlogger").then().assertThat()
-            .statusCode(404);
-
+            baseUri("https://meshdev.smsassist.com").when().get("/eventlogger/v1/eventLog/")
+            .then().assertThat().statusCode(404).body("message", equalTo("No message available"));
 
 
     }
