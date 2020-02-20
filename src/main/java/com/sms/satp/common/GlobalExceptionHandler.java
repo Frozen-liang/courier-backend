@@ -22,7 +22,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 
     @ExceptionHandler(ApiTestPlatformException.class)
-    public Response<?> customExceptionHandler(HttpServletRequest request, final ApiTestPlatformException e,
+    public Response<Object> customExceptionHandler(HttpServletRequest request, final ApiTestPlatformException e,
         HttpServletResponse response) {
         response.setStatus(HttpStatus.BAD_REQUEST.value());
         log.error("[Application=API Testing Platform][Exception Level=BUSINESS_ERROR]:", e);
@@ -31,10 +31,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 
     @ExceptionHandler(RuntimeException.class)
-    public Response<?> runtimeExceptionHandler(final Exception e,
+    public Response<Object> runtimeExceptionHandler(final Exception e,
         HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error("[Application=API Testing Platform][Exception Level=INTERNAL_SERVER_ERROR]:", e);
+        log.error("[Application = API Testing Platform][Exception Level=INTERNAL_SERVER_ERROR]:", e);
         return Response.error(Integer.toString(HttpStatus.INTERNAL_SERVER_ERROR.value()),
             e.getMessage());
     }

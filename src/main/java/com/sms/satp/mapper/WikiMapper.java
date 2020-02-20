@@ -5,18 +5,16 @@ import com.sms.satp.entity.dto.WikiDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface WikiMapper {
 
-    @Mappings({
-        @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss"),
-        @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    })
+
+    @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     WikiDto toDto(Wiki wiki);
 
-    @Mapping(target = "modifyDateTime",  ignore = true)
-    @Mapping(target = "createDateTime",  ignore = true)
+    @Mapping(target = "modifyDateTime", ignore = true)
+    @Mapping(target = "createDateTime", ignore = true)
     Wiki toEntity(WikiDto wikiDto);
 }

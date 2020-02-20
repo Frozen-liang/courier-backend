@@ -59,6 +59,10 @@ public abstract class OpenApiConverterFunction {
     public static final Function<Operation, ApiOperation.ApiOperationBuilder>
         OPERATION_CONVERTER = OpenApiConverterFunction::operationConvert;
 
+    private OpenApiConverterFunction() {
+        throw new IllegalStateException("Cannot initialize tool class");
+    }
+
     private static ApiSchema schemaConvert(Schema<?> schema) {
         return Objects.nonNull(schema)
             ? ApiSchema.builder()

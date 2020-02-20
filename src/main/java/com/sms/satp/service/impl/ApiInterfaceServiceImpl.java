@@ -36,6 +36,7 @@ import com.sms.satp.utils.ApiRequestBodyConverter;
 import com.sms.satp.utils.ApiResponseConverter;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,10 +130,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     public void save(MultipartFile multipartFile, String documentType, String projectId) throws IOException {
         File file = convertToFile(multipartFile);
         save(file.toString(), documentType, projectId);
-        boolean delete = file.delete();
-        if (!delete) {
-            log.warn("Delete temp file failed");
-        }
+        Files.delete(file.toPath());
     }
 
     @Override
@@ -206,11 +204,12 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         List<ApiPath> apiPaths = apiDocument.getPaths();
         Map<String, ApiSchema> apiSchema = apiDocument.getSchemas();
         resolveApiSchemaMap(apiSchema, apiSchema);
-        apiPaths.forEach((ApiPath apiPath) ->
-            apiPath.getOperations().forEach((ApiOperation apiOperation) -> {
+        apiPaths.forEach(apiPath ->
+            apiPath.getOperations().forEach(apiOperation ->
                 apiInterfaces.add(
-                    apiPathOperationResolver(apiOperation, apiSchema, apiPath, projectId));
-            })
+                    apiPathOperationResolver(apiOperation, apiSchema, apiPath, projectId))
+            )
+
         );
         return apiInterfaces;
     }
@@ -243,9 +242,9 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             .response(
                 apiResponseOptional.map(ApiResponseConverter.CONVERT_TO_RESPONSE).orElse(null))
             .createDateTime(LocalDateTime.now());
-        apiResponseOptional.map(ApiResponse::getHeaders).ifPresent(apiHeaders -> {
-            apiInterfaceBuilder.responseHeaders(ApiHeaderConverter.CONVERT_TO_HEADER.apply(apiHeaders));
-        });
+        apiResponseOptional.map(ApiResponse::getHeaders).ifPresent(apiHeaders ->
+            apiInterfaceBuilder.responseHeaders(ApiHeaderConverter.CONVERT_TO_HEADER.apply(apiHeaders))
+        );
         ApiInterface apiInterface = apiInterfaceBuilder.build();
         apiParameterResolver(apiInterface, apiOperation.getParameters());
         return apiInterface;

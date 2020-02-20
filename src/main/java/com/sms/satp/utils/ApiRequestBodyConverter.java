@@ -1,13 +1,13 @@
 package com.sms.satp.utils;
 
 import com.sms.satp.entity.RequestBody;
+import com.sms.satp.entity.RequestBody.RequestBodyBuilder;
 import com.sms.satp.parser.common.MediaType;
 import com.sms.satp.parser.model.ApiRequestBody;
-
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.apache.commons.collections4.CollectionUtils;
 
 public abstract class ApiRequestBodyConverter {
 
@@ -15,17 +15,24 @@ public abstract class ApiRequestBodyConverter {
     }
 
     public static final Function<ApiRequestBody, RequestBody> CONVERT_TO_REQUEST_BODY =
-            ApiRequestBodyConverter::apiRequestBodyConvert;
+        ApiRequestBodyConverter::apiRequestBodyConvert;
 
     private static RequestBody apiRequestBodyConvert(ApiRequestBody apiRequestBody) {
-        return Objects.nonNull(apiRequestBody)
-                ? RequestBody.builder()
+        if (Objects.nonNull(apiRequestBody)) {
+            RequestBodyBuilder requestBodyBuilder = RequestBody.builder()
                 .description(apiRequestBody.getDescription())
-                .mediaTypes(
-                        Optional.ofNullable(apiRequestBody.getMediaTypes()).isPresent() ? apiRequestBody.getMediaTypes()
-                                .stream().map(MediaType::getType).collect(Collectors.toList()) : null)
+                .mediaTypes(null)
                 .schema(ApiSchemaUtil.CONVERT_TO_SCHEMA.apply(apiRequestBody.getSchema()))
-                .required(apiRequestBody.getRequired())
-                .build() : null;
+                .required(apiRequestBody.getRequired());
+            if (CollectionUtils.isNotEmpty(apiRequestBody.getMediaTypes())) {
+                requestBodyBuilder.mediaTypes(apiRequestBody.getMediaTypes()
+                    .stream().map(MediaType::getType).collect(Collectors.toList()));
+            }
+            return requestBodyBuilder.build();
+        } else {
+            return null;
+        }
+
+
     }
 }
