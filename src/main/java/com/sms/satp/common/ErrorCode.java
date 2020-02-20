@@ -11,6 +11,7 @@ public enum ErrorCode {
     GET_API_INTERFACE_PAGE_ERROR("4003","Failed to get the ApiInterface page!"),
     PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR("4004","Failed to parse the file and save as ApiInterface!"),
     ADD_API_INTERFACE_ERROR("4005","Failed to add the ApiInterface!"),
+    EDIT_API_INTERFACE_ERROR("4026","Failed to edit the ApiInterface!"),
     GET_API_INTERFACE_BY_ID_ERROR("4006","Failed to get the ApiInterface by id!"),
     DELETE_API_INTERFACE_BY_ID_ERROR("4007","Failed to delete the ApiInterface!"),
     GET_PROJECT_ENVIRONMENT_PAGE_ERROR("4008","Failed to get the ProjectEnvironment page!"),

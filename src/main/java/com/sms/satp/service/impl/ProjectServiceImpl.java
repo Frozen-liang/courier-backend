@@ -15,8 +15,10 @@ import com.sms.satp.repository.ProjectRepository;
 import com.sms.satp.service.ProjectService;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -68,6 +70,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
         try {
             Project project = projectMapper.toEntity(projectDto);
+            project.setId(new ObjectId().toString());
             project.setCreateDateTime(LocalDateTime.now());
             projectRepository.insert(project);
         } catch (Exception e) {
@@ -84,8 +87,12 @@ public class ProjectServiceImpl implements ProjectService {
         }
         try {
             Project project = projectMapper.toEntity(projectDto);
-            project.setModifyDateTime(LocalDateTime.now());
-            projectRepository.save(project);
+            Optional<Project> projectOptional = projectRepository.findById(project.getId());
+            projectOptional.ifPresent(projectFindById -> {
+                project.setCreateDateTime(projectFindById.getCreateDateTime());
+                project.setModifyDateTime(LocalDateTime.now());
+                projectRepository.save(project);
+            });
         } catch (Exception e) {
             log.error("Failed to edit the project!", e);
             throw new ApiTestPlatformException(EDIT_PROJECT_ERROR);

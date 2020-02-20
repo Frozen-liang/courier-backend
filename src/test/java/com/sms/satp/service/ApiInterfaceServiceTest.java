@@ -4,6 +4,7 @@ package com.sms.satp.service;
 import static com.sms.satp.common.ErrorCode.ADD_API_INTERFACE_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.DOCUMENT_TYPE_ERROR;
+import static com.sms.satp.common.ErrorCode.EDIT_API_INTERFACE_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_LIST_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
@@ -14,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -212,7 +214,18 @@ class ApiInterfaceServiceTest {
         ApiInterface apiInterface = apiInterfaceMapper.toEntity(apiInterfaceDto);
         when(apiInterfaceRepository.insert(apiInterface)).thenReturn(apiInterface);
         apiInterfaceService.add(apiInterfaceDto);
-        verify(apiInterfaceRepository, times(1)).insert(apiInterface);
+        verify(apiInterfaceRepository, times(1)).insert(any(ApiInterface.class));
+    }
+
+    @Test
+    @DisplayName("Test the edit method in the apiInterface service")
+    void edit_test() {
+        ApiInterfaceDto apiInterfaceDto = ApiInterfaceDto.builder().id(ID).build();
+        ApiInterface apiInterface = apiInterfaceMapper.toEntity(apiInterfaceDto);
+        when(apiInterfaceRepository.findById(ID)).thenReturn(Optional.of(ApiInterface.builder().build()));
+        when(apiInterfaceRepository.save(apiInterface)).thenReturn(apiInterface);
+        apiInterfaceService.edit(apiInterfaceDto);
+        verify(apiInterfaceRepository, times(1)).save(any(ApiInterface.class));
     }
 
     @Test
@@ -254,6 +267,16 @@ class ApiInterfaceServiceTest {
         assertThatThrownBy(() -> apiInterfaceService.add(ApiInterfaceDto.builder().build()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_API_INTERFACE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while edit apiInterface")
+    void edit_exception_test() {
+        when(apiInterfaceRepository.findById(ID)).thenReturn(Optional.of(ApiInterface.builder().id(ID).build()));
+        doThrow(new RuntimeException()).when(apiInterfaceRepository).save(argThat(t -> true));
+        assertThatThrownBy(() -> apiInterfaceService.edit(ApiInterfaceDto.builder().id(ID).build()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_API_INTERFACE_ERROR.getCode());
     }
 
     @Test

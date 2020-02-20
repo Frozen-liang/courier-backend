@@ -23,6 +23,7 @@ import com.sms.satp.mapper.ProjectEnvironmentMapper;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -56,6 +57,7 @@ class ProjectEnvironmentServiceTest {
     private final static int PAGE_SIZE = 20;
     private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
+    private final static String ID = "25";
     private final static String PROJECT_ID = "25";
     private final static String NAME = "title";
 
@@ -116,17 +118,18 @@ class ProjectEnvironmentServiceTest {
         ProjectEnvironment projectEnvironment = projectEnvironmentMapper.toEntity(projectEnvironmentDto);
         when(projectEnvironmentRepository.insert(projectEnvironment)).thenReturn(projectEnvironment);
         projectEnvironmentService.add(projectEnvironmentDto);
-        verify(projectEnvironmentRepository, times(1)).insert(projectEnvironment);
+        verify(projectEnvironmentRepository, times(1)).insert(any(ProjectEnvironment.class));
     }
 
     @Test
     @DisplayName("Test the edit method in the ProjectEnvironment service")
     void edit_test() {
-        ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder().build();
+        ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder().id(ID).build();
         ProjectEnvironment projectEnvironment = projectEnvironmentMapper.toEntity(projectEnvironmentDto);
+        when(projectEnvironmentRepository.findById(ID)).thenReturn(Optional.of(ProjectEnvironment.builder().build()));
         when(projectEnvironmentRepository.save(projectEnvironment)).thenReturn(projectEnvironment);
         projectEnvironmentService.edit(projectEnvironmentDto);
-        verify(projectEnvironmentRepository, times(1)).save(projectEnvironment);
+        verify(projectEnvironmentRepository, times(1)).save(any(ProjectEnvironment.class));
     }
 
     @Test
@@ -163,8 +166,9 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("An exception occurred while edit projectEnvironment")
     void edit_exception_test() {
+        when(projectEnvironmentRepository.findById(ID)).thenReturn(Optional.of(ProjectEnvironment.builder().build()));
         doThrow(new RuntimeException()).when(projectEnvironmentRepository).save(argThat(t -> true));
-        assertThatThrownBy(() -> projectEnvironmentService.edit(ProjectEnvironmentDto.builder().build()))
+        assertThatThrownBy(() -> projectEnvironmentService.edit(ProjectEnvironmentDto.builder().id(ID).build()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_PROJECT_ENVIRONMENT_ERROR.getCode());
     }

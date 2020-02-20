@@ -3,6 +3,7 @@ package com.sms.satp.service.impl;
 import static com.sms.satp.common.ErrorCode.ADD_API_INTERFACE_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.DOCUMENT_TYPE_ERROR;
+import static com.sms.satp.common.ErrorCode.EDIT_API_INTERFACE_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_LIST_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
@@ -42,6 +43,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -140,10 +142,34 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                 apiInterfaceDto.toString()));
         }
         try {
-            apiInterfaceRepository.insert(apiInterfaceMapper.toEntity(apiInterfaceDto));
+            ApiInterface apiInterface = apiInterfaceMapper.toEntity(apiInterfaceDto);
+            apiInterface.setId(new ObjectId().toString());
+            apiInterface.setCreateDateTime(LocalDateTime.now());
+            apiInterfaceRepository.insert(apiInterface);
         } catch (Exception e) {
             log.error("Failed to add the ApiInterface!", e);
             throw new ApiTestPlatformException(ADD_API_INTERFACE_ERROR);
+        }
+    }
+
+    @Override
+    public void edit(ApiInterfaceDto apiInterfaceDto) {
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("ApiInterfaceService-edit()-Parameter: %s",
+                apiInterfaceDto.toString()));
+        }
+        try {
+            ApiInterface apiInterface = apiInterfaceMapper.toEntity(apiInterfaceDto);
+            Optional<ApiInterface> apiInterfaceOptional = apiInterfaceRepository
+                .findById(apiInterface.getId());
+            apiInterfaceOptional.ifPresent(apiInterfaceFindById -> {
+                apiInterface.setCreateDateTime(apiInterfaceFindById.getCreateDateTime());
+                apiInterface.setModifyDateTime(LocalDateTime.now());
+                apiInterfaceRepository.save(apiInterface);
+            });
+        } catch (Exception e) {
+            log.error("Failed to add the ApiInterface!", e);
+            throw new ApiTestPlatformException(EDIT_API_INTERFACE_ERROR);
         }
     }
 
@@ -204,6 +230,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         responseRefOptional.ifPresent(responseRdf -> apiResponseOptional.get()
             .setSchema(apiSchema.get(getRefKey(responseRdf))));
         ApiInterface apiInterface = ApiInterface.builder()
+            .id(new ObjectId().toString())
             .method(HttpMethod.resolve(apiOperation.getHttpMethod().name()))
             .projectId(projectId)
             .tag(apiOperation.getTags())

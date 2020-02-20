@@ -19,6 +19,8 @@ public interface ApiInterfaceService {
 
     void add(ApiInterfaceDto apiInterfaceDto);
 
+    void edit(ApiInterfaceDto apiInterfaceDto);
+
     ApiInterfaceDto getApiInterfaceById(String id);
 
     void deleteById(String id);

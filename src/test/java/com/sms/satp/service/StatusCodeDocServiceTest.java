@@ -23,6 +23,7 @@ import com.sms.satp.mapper.StatusCodeDocMapper;
 import com.sms.satp.repository.StatusCodeDocRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -55,6 +56,7 @@ class StatusCodeDocServiceTest {
     private final static int PAGE_SIZE = 20;
     private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
+    private final static String ID = "25";
     private final static String PROJECT_ID = "25";
     private final static String CODE = "200";
 
@@ -116,17 +118,18 @@ class StatusCodeDocServiceTest {
         StatusCodeDoc statusCodeDoc = statusCodeDocMapper.toEntity(statusCodeDocDto);
         when(statusCodeDocRepository.insert(statusCodeDoc)).thenReturn(statusCodeDoc);
         statusCodeDocService.add(statusCodeDocDto);
-        verify(statusCodeDocRepository, times(1)).insert(statusCodeDoc);
+        verify(statusCodeDocRepository, times(1)).insert(any(StatusCodeDoc.class));
     }
 
     @Test
     @DisplayName("Test the edit method in the StatusCodeDoc service")
     void edit_test() {
-        StatusCodeDocDto statusCodeDocDto = StatusCodeDocDto.builder().build();
+        StatusCodeDocDto statusCodeDocDto = StatusCodeDocDto.builder().id(ID).build();
         StatusCodeDoc statusCodeDoc = statusCodeDocMapper.toEntity(statusCodeDocDto);
+        when(statusCodeDocRepository.findById(ID)).thenReturn(Optional.of(StatusCodeDoc.builder().build()));
         when(statusCodeDocRepository.save(statusCodeDoc)).thenReturn(statusCodeDoc);
         statusCodeDocService.edit(statusCodeDocDto);
-        verify(statusCodeDocRepository, times(1)).save(statusCodeDoc);
+        verify(statusCodeDocRepository, times(1)).save(any(StatusCodeDoc.class));
     }
 
     @Test
@@ -163,8 +166,9 @@ class StatusCodeDocServiceTest {
     @Test
     @DisplayName("An exception occurred while edit statusCodeDoc")
     void edit_exception_test() {
+        when(statusCodeDocRepository.findById(ID)).thenReturn(Optional.of(StatusCodeDoc.builder().build()));
         doThrow(new RuntimeException()).when(statusCodeDocRepository).save(argThat(t -> true));
-        assertThatThrownBy(() -> statusCodeDocService.edit(StatusCodeDocDto.builder().build()))
+        assertThatThrownBy(() -> statusCodeDocService.edit(StatusCodeDocDto.builder().id(ID).build()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_STATUS_CODE_DOC_ERROR.getCode());
     }
