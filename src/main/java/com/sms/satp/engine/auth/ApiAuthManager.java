@@ -1,6 +1,5 @@
 package com.sms.satp.engine.auth;
 
-
 import io.restassured.spi.AuthFilter;
 import java.util.Map;
 
