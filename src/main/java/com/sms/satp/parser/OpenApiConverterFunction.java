@@ -77,8 +77,9 @@ public abstract class OpenApiConverterFunction {
         builder.required(requestBody.getRequired());
         Content content = requestBody.getContent();
         builder.mediaTypes(collectMediaTypes(content));
-        builder.schema(
-            SCHEMA_CONVERTER.apply(requestBody.getContent().values().stream().findFirst().get().getSchema()));
+        requestBody.getContent().values().stream()
+            .findFirst().ifPresent(mediaType -> builder.schema(
+            SCHEMA_CONVERTER.apply(mediaType.getSchema())));
         return builder
             .build();
     }
@@ -112,8 +113,9 @@ public abstract class OpenApiConverterFunction {
         builder.headers(HEADER_CONVERTER.apply(response.getHeaders()));
         if (MapUtils.isNotEmpty(response.getContent())) {
 
-            builder.schema(
-                SCHEMA_CONVERTER.apply(response.getContent().values().stream().findFirst().get().getSchema()));
+            response.getContent().values().stream()
+                .findFirst().ifPresent(mediaType -> builder.schema(
+                SCHEMA_CONVERTER.apply(mediaType.getSchema())));
         }
         return builder
             .build();
