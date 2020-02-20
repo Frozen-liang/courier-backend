@@ -19,6 +19,7 @@ import io.restassured.spi.AuthFilter;
 import java.net.URI;
 import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
+
 @ApiAuth(type = AuthType.SERVICE_MESH)
 public class ServiceMeshAuthFilter implements AuthFilter {
 
