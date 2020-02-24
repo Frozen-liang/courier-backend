@@ -31,6 +31,11 @@ public class ProjectController {
         return Response.ok(projectService.page(pageDto));
     }
 
+    @GetMapping("/{id}")
+    public Response<ProjectDto> getById(@PathVariable String id) {
+        return Response.ok(projectService.findById(id));
+    }
+
     @PostMapping()
     public Response add(@Valid @RequestBody ProjectDto projectDto) {
         projectService.add(projectDto);

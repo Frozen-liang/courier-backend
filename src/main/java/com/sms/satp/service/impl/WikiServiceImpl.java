@@ -3,6 +3,7 @@ package com.sms.satp.service.impl;
 import static com.sms.satp.common.ErrorCode.ADD_WIKI_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_WIKI_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_WIKI_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_WIKI_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_WIKI_PAGE_ERROR;
 
 import com.sms.satp.common.ApiTestPlatformException;
@@ -99,6 +100,18 @@ public class WikiServiceImpl implements WikiService {
         } catch (Exception e) {
             log.error("Failed to delete the wiki!", e);
             throw new ApiTestPlatformException(DELETE_WIKI_BY_ID_ERROR);
+        }
+    }
+
+    @Override
+    public WikiDto findById(String id) {
+        try {
+            Optional<Wiki> wikiOptional
+                = wikiRepository.findById(id);
+            return wikiMapper.toDto(wikiOptional.orElse(null));
+        } catch (Exception e) {
+            log.error("Failed to get the Schema by id!", e);
+            throw new ApiTestPlatformException(GET_WIKI_BY_ID_ERROR);
         }
     }
 }

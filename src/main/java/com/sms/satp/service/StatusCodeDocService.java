@@ -13,4 +13,6 @@ public interface StatusCodeDocService {
     void edit(StatusCodeDocDto projectEnvironmentDto);
 
     void deleteById(String id);
+
+    StatusCodeDocDto findById(String id);
 }

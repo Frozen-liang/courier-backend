@@ -13,8 +13,6 @@ import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.ProjectDto;
-import com.sms.satp.repository.ApiInterfaceRepository;
-import com.sms.satp.repository.ProjectRepository;
 import com.sms.satp.service.ProjectService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,6 +40,7 @@ class ProjectControllerTest {
 
     private final static Integer PAGE_NUMBER = 3;
     private final static Integer PAGE_SIZE = 20;
+    private final static String ID = "30";
     private final static String PROJECT_ID = "id";
     private final static String PROJECT_NAME = "name";
 
@@ -108,6 +107,20 @@ class ProjectControllerTest {
             .put(Constants.PROJECT_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .content(asJsonString(objectMapper, projectDto));
+        ResultActions perform = mockMvc.perform(request);
+        perform.andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(Response.ok().build().getCode())))
+            .andExpect(jsonPath("$.message", is(Response.ok().build().getMessage())));
+    }
+
+    @Test
+    @DisplayName("Get its specific information through the id of the Project")
+    void getInfoById() throws Exception{
+        ProjectDto projectDto = ProjectDto.builder().build();
+        when(projectService.findById(ID)).thenReturn(projectDto);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+            .get(Constants.PROJECT_PATH + "/" + ID);
         ResultActions perform = mockMvc.perform(request);
         perform.andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))

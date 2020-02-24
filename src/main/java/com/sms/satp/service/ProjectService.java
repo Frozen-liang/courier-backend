@@ -17,4 +17,6 @@ public interface ProjectService {
 
     void delete(String id);
 
+    ProjectDto findById(String id);
+
 }

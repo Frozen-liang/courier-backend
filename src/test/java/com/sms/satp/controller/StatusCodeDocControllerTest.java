@@ -40,6 +40,7 @@ class StatusCodeDocControllerTest {
 
     private final static Integer PAGE_NUMBER = 3;
     private final static Integer PAGE_SIZE = 20;
+    private final static String ID = "30";
     private final static String PROJECT_ID = "id";
     private final static String CODE = "200";
 
@@ -106,6 +107,20 @@ class StatusCodeDocControllerTest {
             .put(Constants.STATUS_CODE_DOC_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .content(asJsonString(objectMapper, statusCodeDocDto));
+        ResultActions perform = mockMvc.perform(request);
+        perform.andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(Response.ok().build().getCode())))
+            .andExpect(jsonPath("$.message", is(Response.ok().build().getMessage())));
+    }
+
+    @Test
+    @DisplayName("Get its specific information through the id of the StatusCodeDoc")
+    void getInfoById() throws Exception{
+        StatusCodeDocDto statusCodeDocDto = StatusCodeDocDto.builder().build();
+        when(statusCodeDocService.findById(ID)).thenReturn(statusCodeDocDto);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+            .get(Constants.STATUS_CODE_DOC_PATH + "/" + ID);
         ResultActions perform = mockMvc.perform(request);
         perform.andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))

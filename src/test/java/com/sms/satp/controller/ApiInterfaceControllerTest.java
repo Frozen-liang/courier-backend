@@ -13,8 +13,6 @@ import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
 import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.repository.ApiInterfaceRepository;
-import com.sms.satp.repository.ProjectRepository;
 import com.sms.satp.service.ApiInterfaceService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -83,7 +81,7 @@ class ApiInterfaceControllerTest {
     @DisplayName("Get its specific information through the id of the ApiInterface")
     void getInfoById() throws Exception{
         ApiInterfaceDto apiInterfaceDto = ApiInterfaceDto.builder().build();
-        when(apiInterfaceService.getApiInterfaceById(API_INTERFACE_ID)).thenReturn(apiInterfaceDto);
+        when(apiInterfaceService.findById(API_INTERFACE_ID)).thenReturn(apiInterfaceDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .get(Constants.INTERFACE_PATH + "/" + API_INTERFACE_ID);
         ResultActions perform = mockMvc.perform(request);
@@ -102,6 +100,25 @@ class ApiInterfaceControllerTest {
         doNothing().when(apiInterfaceService).add(apiInterfaceDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .post(Constants.INTERFACE_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(objectMapper, apiInterfaceDto));
+        ResultActions perform = mockMvc.perform(request);
+        perform.andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(Response.ok().build().getCode())))
+            .andExpect(jsonPath("$.message", is(Response.ok().build().getMessage())));
+    }
+
+    @Test
+    @DisplayName("Edit the ApiInterface by id")
+    void editWiki() throws Exception{
+        ApiInterfaceDto apiInterfaceDto = ApiInterfaceDto.builder()
+            .id(PROJECT_ID)
+            .title(TITLE)
+            .build();
+        doNothing().when(apiInterfaceService).edit(apiInterfaceDto);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+            .put(Constants.INTERFACE_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .content(asJsonString(objectMapper, apiInterfaceDto));
         ResultActions perform = mockMvc.perform(request);

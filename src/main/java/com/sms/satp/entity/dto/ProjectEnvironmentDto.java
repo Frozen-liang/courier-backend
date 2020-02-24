@@ -1,5 +1,6 @@
 package com.sms.satp.entity.dto;
 
+import com.sms.satp.entity.AuthInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,8 @@ public class ProjectEnvironmentDto {
     private String name;
     private String desc;
     private String projectId;
-    private String basePath;
+    private String serverAdress;
+    private AuthInfo authInfo;
     private String createDateTime;
     private String modifyDateTime;
 }

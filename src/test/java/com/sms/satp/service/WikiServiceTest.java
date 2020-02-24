@@ -3,6 +3,7 @@ package com.sms.satp.service;
 import static com.sms.satp.common.ErrorCode.ADD_WIKI_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_WIKI_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_WIKI_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_WIKI_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_WIKI_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -57,6 +58,7 @@ class WikiServiceTest {
     private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
     private final static String ID = "25";
+    private final static String NOT_EXIST_ID = "30";
     private final static String PROJECT_ID = "25";
     private final static String TITLE = "title";
 
@@ -134,6 +136,20 @@ class WikiServiceTest {
     }
 
     @Test
+    @DisplayName("Test the method of querying the Wiki by id")
+    void findById_test() {
+        Wiki statusCodeDoc = Wiki.builder()
+            .title(TITLE)
+            .build();
+        Optional<Wiki> statusCodeDocOptional = Optional.ofNullable(statusCodeDoc);
+        when(wikiRepository.findById(ID)).thenReturn(statusCodeDocOptional);
+        WikiDto result1 = wikiService.findById(ID);
+        WikiDto result2 = wikiService.findById(NOT_EXIST_ID);
+        assertThat(result1.getTitle()).isEqualTo(TITLE);
+        assertThat(result2).isNull();
+    }
+
+    @Test
     @DisplayName("Test the delete method in the Wiki service")
     void delete_test() {
         doNothing().when(wikiRepository).deleteById(PROJECT_ID);
@@ -172,6 +188,15 @@ class WikiServiceTest {
         assertThatThrownBy(() -> wikiService.edit(WikiDto.builder().id(ID).build()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_WIKI_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getting statusCodeDoc by id")
+    void getStatusCodeDoc_exception_test() {
+        doThrow(new RuntimeException()).when(wikiRepository).findById(anyString());
+        assertThatThrownBy(() -> wikiService.findById(anyString()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_WIKI_BY_ID_ERROR.getCode());
     }
 
     @Test

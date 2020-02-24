@@ -3,6 +3,7 @@ package com.sms.satp.service;
 import static com.sms.satp.common.ErrorCode.ADD_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_PROJECT_ENVIRONMENT_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -58,6 +59,7 @@ class ProjectEnvironmentServiceTest {
     private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
     private final static String ID = "25";
+    private final static String NOT_EXIST_ID = "30";
     private final static String PROJECT_ID = "25";
     private final static String NAME = "title";
 
@@ -133,6 +135,20 @@ class ProjectEnvironmentServiceTest {
     }
 
     @Test
+    @DisplayName("Test the method of querying the ProjectEnvironment by id")
+    void findProjectEnvironmentById() {
+        ProjectEnvironment projectEnvironment = ProjectEnvironment.builder()
+            .name(NAME)
+            .build();
+        Optional<ProjectEnvironment> projectEnvironmentOptional = Optional.ofNullable(projectEnvironment);
+        when(projectEnvironmentRepository.findById(ID)).thenReturn(projectEnvironmentOptional);
+        ProjectEnvironmentDto result1 = projectEnvironmentService.findById(ID);
+        ProjectEnvironmentDto result2 = projectEnvironmentService.findById(NOT_EXIST_ID);
+        assertThat(result1.getName()).isEqualTo(NAME);
+        assertThat(result2).isNull();
+    }
+
+    @Test
     @DisplayName("Test the delete method in the ProjectEnvironment service")
     void delete_test() {
         doNothing().when(projectEnvironmentRepository).deleteById(PROJECT_ID);
@@ -171,6 +187,15 @@ class ProjectEnvironmentServiceTest {
         assertThatThrownBy(() -> projectEnvironmentService.edit(ProjectEnvironmentDto.builder().id(ID).build()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_PROJECT_ENVIRONMENT_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getting projectEnvironment by id")
+    void getProjectEnvironment_exception_test() {
+        doThrow(new RuntimeException()).when(projectEnvironmentRepository).findById(anyString());
+        assertThatThrownBy(() -> projectEnvironmentService.findById(anyString()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR.getCode());
     }
 
     @Test

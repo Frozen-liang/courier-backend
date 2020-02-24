@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -54,6 +53,13 @@ class ApiRequestBodyConverterTest {
             .schema(apiSchema)
             .build();
         RequestBody requestBody = CONVERT_TO_REQUEST_BODY.apply(apiRequestBody);
-        assertThat(StringUtils.equals(requestBody.getSchema().getDescription(), apiRequestBody.getSchema().getDescription()));
+        assertThat(requestBody.getSchema().getDescription()).isEqualTo(apiRequestBody.getSchema().getDescription());
+    }
+
+    @Test
+    @DisplayName("[Null Input Parameter]Convert the ApiRequestBody to an RequestBody")
+    void test_Null_CONVERT_TO_REQUEST_BODY() {
+        RequestBody requestBody = CONVERT_TO_REQUEST_BODY.apply(null);
+        assertThat(requestBody).isNull();
     }
 }

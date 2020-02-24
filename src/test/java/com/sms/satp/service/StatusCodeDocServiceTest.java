@@ -3,6 +3,7 @@ package com.sms.satp.service;
 import static com.sms.satp.common.ErrorCode.ADD_STATUS_CODE_DOC_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_STATUS_CODE_DOC_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_STATUS_CODE_DOC_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_STATUS_CODE_DOC_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_STATUS_CODE_DOC_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -57,6 +58,7 @@ class StatusCodeDocServiceTest {
     private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
     private final static String ID = "25";
+    private final static String NOT_EXIST_ID = "30";
     private final static String PROJECT_ID = "25";
     private final static String CODE = "200";
 
@@ -133,6 +135,20 @@ class StatusCodeDocServiceTest {
     }
 
     @Test
+    @DisplayName("Test the method of querying the StatusCodeDoc by id")
+    void findById_test() {
+        StatusCodeDoc statusCodeDoc = StatusCodeDoc.builder()
+            .code(CODE)
+            .build();
+        Optional<StatusCodeDoc> statusCodeDocOptional = Optional.ofNullable(statusCodeDoc);
+        when(statusCodeDocRepository.findById(ID)).thenReturn(statusCodeDocOptional);
+        StatusCodeDocDto result1 = statusCodeDocService.findById(ID);
+        StatusCodeDocDto result2 = statusCodeDocService.findById(NOT_EXIST_ID);
+        assertThat(result1.getCode()).isEqualTo(CODE);
+        assertThat(result2).isNull();
+    }
+
+    @Test
     @DisplayName("Test the delete method in the StatusCodeDoc service")
     void delete_test() {
         doNothing().when(statusCodeDocRepository).deleteById(PROJECT_ID);
@@ -171,6 +187,15 @@ class StatusCodeDocServiceTest {
         assertThatThrownBy(() -> statusCodeDocService.edit(StatusCodeDocDto.builder().id(ID).build()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_STATUS_CODE_DOC_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getting statusCodeDoc by id")
+    void getStatusCodeDoc_exception_test() {
+        doThrow(new RuntimeException()).when(statusCodeDocRepository).findById(anyString());
+        assertThatThrownBy(() -> statusCodeDocService.findById(anyString()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_STATUS_CODE_DOC_BY_ID_ERROR.getCode());
     }
 
     @Test

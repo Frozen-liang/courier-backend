@@ -31,6 +31,11 @@ public class WikiController {
         return Response.ok(wikiService.page(pageDto, projectId));
     }
 
+    @GetMapping("/{id}")
+    public Response<WikiDto> getById(@PathVariable String id) {
+        return Response.ok(wikiService.findById(id));
+    }
+
     @PostMapping()
     public Response add(@Valid @RequestBody WikiDto wikiDto) {
         wikiService.add(wikiDto);
