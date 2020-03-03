@@ -1,3 +1,5 @@
 spring.application.name=sms-satp
 logging.file.max-history=5
 logging.file.name=./logs/satp-server.log
+server.http2.enabled=true
+server.compression.enabled=true
