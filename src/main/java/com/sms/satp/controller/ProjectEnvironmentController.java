@@ -31,6 +31,11 @@ public class ProjectEnvironmentController {
         return Response.ok(projectEnvironmentService.page(pageDto, projectId));
     }
 
+    @GetMapping("/{id}")
+    public Response<ProjectEnvironmentDto> getById(@PathVariable String id) {
+        return Response.ok(projectEnvironmentService.findById(id));
+    }
+
     @PostMapping()
     public Response add(@Valid @RequestBody ProjectEnvironmentDto projectEnvironmentDto) {
         projectEnvironmentService.add(projectEnvironmentDto);

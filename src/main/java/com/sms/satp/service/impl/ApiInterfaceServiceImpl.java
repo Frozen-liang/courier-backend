@@ -172,7 +172,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     }
 
     @Override
-    public ApiInterfaceDto getApiInterfaceById(String id) {
+    public ApiInterfaceDto findById(String id) {
         try {
             Optional<ApiInterface> optionalApiInterface = apiInterfaceRepository.findById(id);
             return apiInterfaceMapper.toDto(optionalApiInterface.orElse(null));
@@ -198,8 +198,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         return file;
     }
 
-    private List<ApiInterface> convertApiPathsToApiInterfaces(
-        ApiDocument apiDocument, String projectId) {
+    private List<ApiInterface> convertApiPathsToApiInterfaces(ApiDocument apiDocument, String projectId) {
         List<ApiInterface> apiInterfaces = new ArrayList<>();
         List<ApiPath> apiPaths = apiDocument.getPaths();
         Map<String, ApiSchema> apiSchema = apiDocument.getSchemas();

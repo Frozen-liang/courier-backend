@@ -13,4 +13,6 @@ public interface ProjectEnvironmentService {
     void edit(ProjectEnvironmentDto projectEnvironmentDto);
 
     void deleteById(String id);
+
+    ProjectEnvironmentDto findById(String id);
 }

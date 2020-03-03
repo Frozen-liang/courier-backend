@@ -23,8 +23,9 @@ public class ProjectEnvironment {
     private String desc;
     @Field("project_id")
     private String projectId;
-    @Field("base_path")
-    private String basePath;
+    @Field("server_adress")
+    private String serverAdress;
+    private AuthInfo authInfo;
     @Field("create_date_time")
     private LocalDateTime createDateTime;
     @Field("modify_date_time")

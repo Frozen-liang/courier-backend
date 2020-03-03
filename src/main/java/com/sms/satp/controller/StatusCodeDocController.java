@@ -31,6 +31,11 @@ public class StatusCodeDocController {
         return Response.ok(statusCodeDocService.page(pageDto, projectId));
     }
 
+    @GetMapping("/{id}")
+    public Response<StatusCodeDocDto> getById(@PathVariable String id) {
+        return Response.ok(statusCodeDocService.findById(id));
+    }
+
     @PostMapping()
     public Response add(@Valid @RequestBody StatusCodeDocDto statusCodeDocDto) {
         statusCodeDocService.add(statusCodeDocDto);

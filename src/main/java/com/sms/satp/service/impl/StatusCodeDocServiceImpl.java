@@ -3,6 +3,7 @@ package com.sms.satp.service.impl;
 import static com.sms.satp.common.ErrorCode.ADD_STATUS_CODE_DOC_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_STATUS_CODE_DOC_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_STATUS_CODE_DOC_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_STATUS_CODE_DOC_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_STATUS_CODE_DOC_PAGE_ERROR;
 
 import com.sms.satp.common.ApiTestPlatformException;
@@ -100,6 +101,18 @@ public class StatusCodeDocServiceImpl implements StatusCodeDocService {
         } catch (Exception e) {
             log.error("Failed to delete the statusCodeDoc!", e);
             throw new ApiTestPlatformException(DELETE_STATUS_CODE_DOC_BY_ID_ERROR);
+        }
+    }
+
+    @Override
+    public StatusCodeDocDto findById(String id) {
+        try {
+            Optional<StatusCodeDoc> statusCodeDocOptional
+                = statusCodeDocRepository.findById(id);
+            return statusCodeDocMapper.toDto(statusCodeDocOptional.orElse(null));
+        } catch (Exception e) {
+            log.error("Failed to get the Schema by id!", e);
+            throw new ApiTestPlatformException(GET_STATUS_CODE_DOC_BY_ID_ERROR);
         }
     }
 }

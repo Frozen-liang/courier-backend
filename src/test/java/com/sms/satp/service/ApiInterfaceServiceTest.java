@@ -75,7 +75,8 @@ class ApiInterfaceServiceTest {
     private final static String NOT_EXIST_ID = "nul";
     private final static String DOCUMENT_TYPE_SWAGGER = "SWAGGER";
     private final static String WRONG_DOCUMENT_TYPE = "wrong";
-    private final static String URL = "https://meshdev.smsassist.com/filestorage/swagger/v1/swagger.json";
+    private final static String PATH = "/config/openapi_v3.yaml";
+    private final static String LOCATION = ApiInterfaceServiceTest.class.getResource(PATH).toString();
 
     @Test
     @DisplayName("Test the query method without query criteria")
@@ -157,8 +158,8 @@ class ApiInterfaceServiceTest {
             .build();
         Optional<ApiInterface> apiInterfaceOptional = Optional.ofNullable(apiInterface);
         when(apiInterfaceRepository.findById(ID)).thenReturn(apiInterfaceOptional);
-        ApiInterfaceDto result1 = apiInterfaceService.getApiInterfaceById(ID);
-        ApiInterfaceDto result2 = apiInterfaceService.getApiInterfaceById(NOT_EXIST_ID);
+        ApiInterfaceDto result1 = apiInterfaceService.findById(ID);
+        ApiInterfaceDto result2 = apiInterfaceService.findById(NOT_EXIST_ID);
         assertThat(result1.getTitle()).isEqualTo(TITLE);
         assertThat(result2).isNull();
     }
@@ -175,14 +176,14 @@ class ApiInterfaceServiceTest {
             );
         }
         when(apiInterfaceRepository.insert(anyList())).thenReturn(apiInterfaces);
-        apiInterfaceService.save(URL, DOCUMENT_TYPE_SWAGGER, PROJECT_ID);
+        apiInterfaceService.save(LOCATION, DOCUMENT_TYPE_SWAGGER, PROJECT_ID);
         verify(apiInterfaceRepository, times(1)).insert(anyList());
     }
 
     @Test
     @DisplayName("Test the save method with wrong type in the apiInterface service")
     void save_with_wrong_type() {
-        assertThatThrownBy(() -> apiInterfaceService.save(URL, WRONG_DOCUMENT_TYPE, PROJECT_ID))
+        assertThatThrownBy(() -> apiInterfaceService.save(LOCATION, WRONG_DOCUMENT_TYPE, PROJECT_ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DOCUMENT_TYPE_ERROR.getCode());
     }
@@ -283,7 +284,7 @@ class ApiInterfaceServiceTest {
     @DisplayName("An exception occurred while adding apiInterface through uploaded files")
     void addByFile_exception_test() {
         doThrow(new RuntimeException()).when(apiInterfaceRepository).insert(anyList());
-        assertThatThrownBy(() -> apiInterfaceService.save(URL, DOCUMENT_TYPE_SWAGGER, PROJECT_ID))
+        assertThatThrownBy(() -> apiInterfaceService.save(LOCATION, DOCUMENT_TYPE_SWAGGER, PROJECT_ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR.getCode());
     }
@@ -292,7 +293,7 @@ class ApiInterfaceServiceTest {
     @DisplayName("An exception occurred while getting apiInterface by id")
     void getApiInterface_exception_test() {
         doThrow(new RuntimeException()).when(apiInterfaceRepository).findById(anyString());
-        assertThatThrownBy(() -> apiInterfaceService.getApiInterfaceById(anyString()))
+        assertThatThrownBy(() -> apiInterfaceService.findById(anyString()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_INTERFACE_BY_ID_ERROR.getCode());
     }

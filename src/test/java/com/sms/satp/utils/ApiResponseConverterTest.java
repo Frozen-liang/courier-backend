@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -62,6 +61,13 @@ class ApiResponseConverterTest {
             .schema(apiSchema)
             .build();
         Response response = ApiResponseConverter.CONVERT_TO_RESPONSE.apply(apiResponse);
-        assertThat(StringUtils.equals(response.getSchema().getDescription(), apiResponse.getSchema().getDescription()));
+        assertThat(response.getSchema().getDescription()).isEqualTo(apiResponse.getSchema().getDescription());
+    }
+
+    @Test
+    @DisplayName("[Null Input Parameter]Convert the ApiResponse to an Response")
+    void null_input_test() {
+        Response response = ApiResponseConverter.CONVERT_TO_RESPONSE.apply(null);
+        assertThat(response).isNull();
     }
 }

@@ -13,4 +13,6 @@ public interface WikiService {
     void edit(WikiDto wikiDto);
 
     void deleteById(String id);
+
+    WikiDto findById(String id);
 }

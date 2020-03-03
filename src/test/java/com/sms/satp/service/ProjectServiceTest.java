@@ -3,6 +3,7 @@ package com.sms.satp.service;
 import static com.sms.satp.common.ErrorCode.ADD_PROJECT_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_PROJECT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_PROJECT_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_PROJECT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_LIST_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,6 +55,7 @@ class ProjectServiceTest {
     private final static String NAME = "project";
     private final static String PROJECT_ID = "25";
     private final static String ID = "25";
+    private final static String NOT_EXIST_ID = "30";
     private final static int TOTAL_ELEMENTS = 60;
     private final static int PAGE_NUMBER = 2;
     private final static int PAGE_SIZE = 20;
@@ -141,6 +143,20 @@ class ProjectServiceTest {
     }
 
     @Test
+    @DisplayName("Test the method of querying the Project by id")
+    void findById_test() {
+        Project project = Project.builder()
+            .name(NAME)
+            .build();
+        Optional<Project> projectEnvironmentOptional = Optional.ofNullable(project);
+        when(projectRepository.findById(ID)).thenReturn(projectEnvironmentOptional);
+        ProjectDto result1 = projectService.findById(ID);
+        ProjectDto result2 = projectService.findById(NOT_EXIST_ID);
+        assertThat(result1.getName()).isEqualTo(NAME);
+        assertThat(result2).isNull();
+    }
+
+    @Test
     @DisplayName("Test the delete method in the project service")
     void delete_test() {
         doNothing().when(projectRepository).deleteById(PROJECT_ID);
@@ -183,6 +199,15 @@ class ProjectServiceTest {
         assertThatThrownBy(() -> projectService.edit(ProjectDto.builder().id(ID).build()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_PROJECT_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getting projectEnvironment by id")
+    void getProjectEnvironment_exception_test() {
+        doThrow(new RuntimeException()).when(projectRepository).findById(anyString());
+        assertThatThrownBy(() -> projectService.findById(anyString()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_PROJECT_BY_ID_ERROR.getCode());
     }
 
     @Test

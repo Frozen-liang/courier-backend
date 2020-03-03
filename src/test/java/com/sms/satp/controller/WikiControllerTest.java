@@ -40,6 +40,7 @@ class WikiControllerTest {
 
     private final static Integer PAGE_NUMBER = 3;
     private final static Integer PAGE_SIZE = 20;
+    private final static String ID = "30";
     private final static String PROJECT_ID = "id";
     private final static String TITLE = "name";
 
@@ -106,6 +107,20 @@ class WikiControllerTest {
             .put(Constants.WIKI_PATH)
             .contentType(MediaType.APPLICATION_JSON)
             .content(asJsonString(objectMapper, wikiDto));
+        ResultActions perform = mockMvc.perform(request);
+        perform.andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(Response.ok().build().getCode())))
+            .andExpect(jsonPath("$.message", is(Response.ok().build().getMessage())));
+    }
+
+    @Test
+    @DisplayName("Get its specific information through the id of the Wiki")
+    void getInfoById() throws Exception{
+        WikiDto wikiDto = WikiDto.builder().build();
+        when(wikiService.findById(ID)).thenReturn(wikiDto);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+            .get(Constants.WIKI_PATH + "/" + ID);
         ResultActions perform = mockMvc.perform(request);
         perform.andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))

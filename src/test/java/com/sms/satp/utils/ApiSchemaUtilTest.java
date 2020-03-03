@@ -13,7 +13,6 @@ import com.sms.satp.parser.common.SchemaType;
 import com.sms.satp.parser.schema.ApiSchema;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -49,9 +48,9 @@ class ApiSchemaUtilTest {
             .description(DESCRIPTION)
             .build();
         Schema schema = CONVERT_TO_SCHEMA.apply(apiSchema);
-        assertThat(StringUtils.equals(schema.getName(), apiSchema.getName()));
-        assertThat(StringUtils.equals(schema.getTitle(), apiSchema.getTitle()));
-        assertThat(StringUtils.equals(schema.getType().getType(), apiSchema.getType().getType()));
+        assertThat(schema.getName()).isEqualTo(apiSchema.getName());
+        assertThat(schema.getTitle()).isEqualTo(apiSchema.getTitle());
+        assertThat(schema.getType().getType()).isEqualTo(apiSchema.getType().getType());
     }
 
     @Test
@@ -59,7 +58,7 @@ class ApiSchemaUtilTest {
     void test_GET_REF_KEY() {
         String ref = "#/components/schemas/Category";
         String result = getRefKey(ref);
-        assertThat(StringUtils.equals(result, "Category"));
+        assertThat(result).isEqualTo("Category");
     }
 
     @Test

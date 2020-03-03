@@ -3,6 +3,7 @@ package com.sms.satp.service.impl;
 import static com.sms.satp.common.ErrorCode.ADD_PROJECT_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_PROJECT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_PROJECT_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_PROJECT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_LIST_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_PAGE_ERROR;
 
@@ -106,6 +107,18 @@ public class ProjectServiceImpl implements ProjectService {
         } catch (Exception e) {
             log.error("Failed to delete the project!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_BY_ID_ERROR);
+        }
+    }
+
+    @Override
+    public ProjectDto findById(String id) {
+        try {
+            Optional<Project> projectOptional
+                = projectRepository.findById(id);
+            return projectMapper.toDto(projectOptional.orElse(null));
+        } catch (Exception e) {
+            log.error("Failed to get the Project by id!", e);
+            throw new ApiTestPlatformException(GET_PROJECT_BY_ID_ERROR);
         }
     }
 }

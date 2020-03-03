@@ -3,6 +3,7 @@ package com.sms.satp.service.impl;
 import static com.sms.satp.common.ErrorCode.ADD_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_PROJECT_ENVIRONMENT_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
 
 import com.sms.satp.common.ApiTestPlatformException;
@@ -103,6 +104,18 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
         } catch (Exception e) {
             log.error("Failed to delete the projectEnvironment!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR);
+        }
+    }
+
+    @Override
+    public ProjectEnvironmentDto findById(String id) {
+        try {
+            Optional<ProjectEnvironment> projectEnvironmentOptional
+                = projectEnvironmentRepository.findById(id);
+            return projectEnvironmentMapper.toDto(projectEnvironmentOptional.orElse(null));
+        } catch (Exception e) {
+            log.error("Failed to get the ProjectEnvironment by id!", e);
+            throw new ApiTestPlatformException(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR);
         }
     }
 }
