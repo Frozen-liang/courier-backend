@@ -16,7 +16,7 @@ public class ProjectEnvironmentDto {
     private String name;
     private String desc;
     private String projectId;
-    private String serverAddress;
+    private String serverAdress;
     private AuthInfo authInfo;
     private String createDateTime;
     private String modifyDateTime;
