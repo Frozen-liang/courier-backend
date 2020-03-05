@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -26,7 +27,8 @@ public abstract class ApiSchemaUtil {
         Iterator<Entry<String, ApiSchema>> entryIterator = apiSchemaMap.entrySet().iterator();
         entryIterator.forEachRemaining(entry -> {
             if (StringUtils.isBlank(entry.getValue().getRef())) {
-                if (entry.getValue().getType().matches(SchemaType.OBJECT.getType())) {
+                if (entry.getValue().getType().matches(SchemaType.OBJECT
+                        .getType()) && Objects.nonNull(entry.getValue().getProperties())) {
                     resolveApiSchemaMap(entry.getValue().getProperties(), root);
                 }
             } else {

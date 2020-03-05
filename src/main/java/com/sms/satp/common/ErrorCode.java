@@ -40,6 +40,10 @@ public enum ErrorCode {
     GET_PROJECT_BY_ID_ERROR("4033","Failed to get the Project by id!"),
     GET_STATUS_CODE_DOC_BY_ID_ERROR("4034","Failed to get the StatusCodeDoc by id!"),
     GET_WIKI_BY_ID_ERROR("4035","Failed to get the Wiki by id!"),
+    GET_INTERFACE_GROUP_LIST_ERROR("4036","Failed to get the Group list!"),
+    ADD_INTERFACE_GROUP_ERROR("4037","Failed to add the Group!"),
+    EDIT_INTERFACE_GROUP_ERROR("4038","Failed to edit the Group!"),
+    DELETE_INTERFACE_GROUP_BY_ID_ERROR("4039","Failed to delete the Group!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

@@ -24,6 +24,7 @@ public class ApiInterfaceDto {
     private String title;
     private String path;
     private String description;
+    private String groupId;
     private String projectId;
     private List<Header> requestHeaders;
     private List<Header> responseHeaders;

@@ -1,23 +1,30 @@
 package com.sms.satp.service.impl;
 
 import static com.sms.satp.common.ErrorCode.ADD_API_INTERFACE_ERROR;
+import static com.sms.satp.common.ErrorCode.ADD_INTERFACE_GROUP_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_API_INTERFACE_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_INTERFACE_GROUP_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.DOCUMENT_TYPE_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_API_INTERFACE_ERROR;
+import static com.sms.satp.common.ErrorCode.EDIT_INTERFACE_GROUP_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_LIST_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_INTERFACE_GROUP_LIST_ERROR;
 import static com.sms.satp.common.ErrorCode.PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR;
 import static com.sms.satp.utils.ApiSchemaUtil.getRefKey;
 import static com.sms.satp.utils.ApiSchemaUtil.resolveApiSchemaMap;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ApiInterface;
+import com.sms.satp.entity.ApiInterface.ApiInterfaceBuilder;
 import com.sms.satp.entity.Header;
+import com.sms.satp.entity.InterfaceGroup;
 import com.sms.satp.entity.Parameter;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
+import com.sms.satp.entity.dto.InterfaceGroupDto;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.mapper.ApiInterfaceMapper;
+import com.sms.satp.mapper.InterfaceGroupMapper;
 import com.sms.satp.parser.DocumentFactory;
 import com.sms.satp.parser.common.DocumentType;
 import com.sms.satp.parser.common.HttpMethod;
@@ -29,6 +36,7 @@ import com.sms.satp.parser.model.ApiRequestBody;
 import com.sms.satp.parser.model.ApiResponse;
 import com.sms.satp.parser.schema.ApiSchema;
 import com.sms.satp.repository.ApiInterfaceRepository;
+import com.sms.satp.repository.InterfaceGroupRepository;
 import com.sms.satp.service.ApiInterfaceService;
 import com.sms.satp.utils.ApiHeaderConverter;
 import com.sms.satp.utils.ApiParameterConverter;
@@ -37,13 +45,18 @@ import com.sms.satp.utils.ApiResponseConverter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -59,42 +72,35 @@ import org.springframework.web.multipart.MultipartFile;
 public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     private final ApiInterfaceRepository apiInterfaceRepository;
+    private final InterfaceGroupRepository interfaceGroupRepository;
     private final DocumentFactory documentFactory;
     private final ApiInterfaceMapper apiInterfaceMapper;
+    private final InterfaceGroupMapper interfaceGroupMapper;
 
     public ApiInterfaceServiceImpl(ApiInterfaceRepository apiInterfaceRepository,
-        DocumentFactory documentFactory, ApiInterfaceMapper apiInterfaceMapper) {
+            DocumentFactory documentFactory, ApiInterfaceMapper apiInterfaceMapper,
+            InterfaceGroupRepository interfaceGroupRepository, InterfaceGroupMapper interfaceGroupMapper) {
         this.apiInterfaceRepository = apiInterfaceRepository;
+        this.interfaceGroupRepository = interfaceGroupRepository;
         this.documentFactory = documentFactory;
         this.apiInterfaceMapper = apiInterfaceMapper;
+        this.interfaceGroupMapper = interfaceGroupMapper;
     }
 
     @Override
-    public List<ApiInterfaceDto> list(String projectId) {
+    public Page<ApiInterfaceDto> page(PageDto pageDto, String projectId, String groupId) {
         try {
-            ApiInterface apiInterface = ApiInterface.builder()
-                .projectId(projectId)
-                .build();
-            Example<ApiInterface> example = Example.of(apiInterface);
-            return apiInterfaceMapper.toDtoList(apiInterfaceRepository.findAll(example));
-        } catch (Exception e) {
-            log.error("Failed to get the ApiInterface list!", e);
-            throw new ApiTestPlatformException(GET_API_INTERFACE_LIST_ERROR);
-        }
-    }
-
-    @Override
-    public Page<ApiInterfaceDto> page(PageDto pageDto, String projectId) {
-        try {
-            ApiInterface apiInterface = ApiInterface.builder()
-                .projectId(projectId)
-                .build();
-            Example<ApiInterface> example = Example.of(apiInterface);
+            ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
+                .projectId(projectId);
+            if (StringUtils.isNoneBlank(groupId)) {
+                apiInterfaceBuilder.groupId(groupId);
+            }
+            Example<ApiInterface> example = Example.of(apiInterfaceBuilder.build());
             Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
             Pageable pageable = PageRequest.of(
                 pageDto.getPageNumber(), pageDto.getPageSize(), sort);
             return apiInterfaceRepository.findAll(example, pageable)
-                .map(apiInterfaceMapper::toDto);
+                .map(apiInterfaceMapper::toDtoPage);
         } catch (Exception e) {
             log.error("Failed to get the ApiInterface page!", e);
             throw new ApiTestPlatformException(GET_API_INTERFACE_PAGE_ERROR);
@@ -128,9 +134,15 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     @Override
     public void save(MultipartFile multipartFile, String documentType, String projectId) throws IOException {
-        File file = convertToFile(multipartFile);
-        save(file.toString(), documentType, projectId);
-        Files.delete(file.toPath());
+        File file = null;
+        try {
+            file = convertToFile(multipartFile);
+            save(file.toString(), documentType, projectId);
+        } finally {
+            if (Objects.nonNull(file)) {
+                Files.delete(file.toPath());
+            }
+        }
     }
 
     @Override
@@ -192,10 +204,79 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         }
     }
 
+    @Override
+    public List<InterfaceGroupDto> getGroupList() {
+        try {
+            return interfaceGroupMapper.toDtoList(interfaceGroupRepository.findAll());
+        } catch (Exception e) {
+            log.error("Failed to get the InterfaceGroup list!", e);
+            throw new ApiTestPlatformException(GET_INTERFACE_GROUP_LIST_ERROR);
+        }
+    }
+
+    @Override
+    public String addGroup(InterfaceGroupDto interfaceGroupDto) {
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("ApiInterfaceService-addGroup()-Parameter: %s",
+                interfaceGroupDto.toString()));
+        }
+        try {
+            InterfaceGroup interfaceGroup = interfaceGroupMapper.toEntity(interfaceGroupDto);
+            interfaceGroup.setId(new ObjectId().toString());
+            interfaceGroupRepository.insert(interfaceGroup);
+            return interfaceGroup.getId();
+        } catch (Exception e) {
+            log.error("Failed to add the InterfaceGroup!", e);
+            throw new ApiTestPlatformException(ADD_INTERFACE_GROUP_ERROR);
+        }
+    }
+
+    @Override
+    public void editGroup(InterfaceGroupDto interfaceGroupDto) {
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("ApiInterfaceService-editGroup()-Parameter: %s",
+                interfaceGroupDto.toString()));
+        }
+        try {
+            InterfaceGroup interfaceGroup = interfaceGroupMapper.toEntity(interfaceGroupDto);
+            Optional<InterfaceGroup> interfaceGroupOptional = interfaceGroupRepository
+                .findById(interfaceGroup.getId());
+            if (interfaceGroupOptional.isPresent()) {
+                interfaceGroupRepository.save(interfaceGroup);
+            }
+        } catch (Exception e) {
+            log.error("Failed to add the InterfaceGroup!", e);
+            throw new ApiTestPlatformException(EDIT_INTERFACE_GROUP_ERROR);
+        }
+    }
+
+    @Override
+    public void deleteGroup(String id) {
+        try {
+            interfaceGroupRepository.deleteById(id);
+        } catch (Exception e) {
+            log.error("Failed to delete the InterfaceGroup!", e);
+            throw new ApiTestPlatformException(DELETE_INTERFACE_GROUP_BY_ID_ERROR);
+        }
+    }
+
+    @Override
+    public String addGroupByNameAndReturnId(String groupName) {
+        Example<InterfaceGroup> example = Example
+            .of(InterfaceGroup.builder().name(groupName).build());
+        Optional<InterfaceGroup> interfaceGroupOptional = interfaceGroupRepository.findOne(example);
+        if (interfaceGroupOptional.isPresent()) {
+            return interfaceGroupOptional.get().getId();
+        } else {
+            return addGroup(InterfaceGroupDto.builder().name(groupName).build());
+        }
+    }
+
     private File convertToFile(MultipartFile multipartFile) throws IOException {
-        File file = File.createTempFile("tmp", null);
-        multipartFile.transferTo(file);
-        return file;
+        String tempDir = System.getProperty("java.io.tmpdir");
+        Path path = Paths.get(tempDir +  UUID.randomUUID().toString() + ".tmp");
+        multipartFile.transferTo(path);
+        return path.toFile();
     }
 
     private List<ApiInterface> convertApiPathsToApiInterfaces(ApiDocument apiDocument, String projectId) {
@@ -227,12 +308,15 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             .setSchema(apiSchema.get(getRefKey(requestRef))));
         responseRefOptional.ifPresent(responseRdf -> apiResponseOptional.get()
             .setSchema(apiSchema.get(getRefKey(responseRdf))));
+        List<String> tags = apiOperation.getTags();
+        String groupId = tags.isEmpty() ? null : addGroupByNameAndReturnId(tags.get(0));
         ApiInterface.ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
             .id(new ObjectId().toString())
             .method(HttpMethod.resolve(apiOperation.getHttpMethod().name()))
             .projectId(projectId)
+            .groupId(groupId)
             .tag(apiOperation.getTags())
-            .title(apiOperation.getSummary())
+            .title(StringUtils.isBlank(apiOperation.getSummary()) ? apiPath.getPath() : apiOperation.getSummary())
             .path(apiPath.getPath())
             .description(apiOperation.getDescription())
             .responseHeaders(null)
