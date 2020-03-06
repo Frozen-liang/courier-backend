@@ -9,7 +9,6 @@ import com.sms.satp.service.ApiInterfaceService;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,9 +60,9 @@ public class ApiInterfaceController {
         return Response.ok().build();
     }
 
-    @GetMapping("/group/list")
-    public Response<List<InterfaceGroupDto>> getGroupList() {
-        return Response.ok(apiInterfaceService.getGroupList());
+    @GetMapping("/group/list/{projectId}")
+    public Response<List<InterfaceGroupDto>> getGroupList(@PathVariable String projectId) {
+        return Response.ok(apiInterfaceService.getGroupList(projectId));
     }
 
     @PostMapping("/group")

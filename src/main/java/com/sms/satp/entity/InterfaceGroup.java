@@ -18,6 +18,8 @@ public class InterfaceGroup {
     @Id
     @Field("_id")
     private String id;
+    @Field("project_id")
+    private String projectId;
     private String name;
 
 }

@@ -240,11 +240,14 @@ class ApiInterfaceServiceTest {
         for (int i = 0; i < LIST_SIZE; i++) {
             interfaceGroupList.add(
                 InterfaceGroup.builder()
+                    .projectId(PROJECT_ID)
                     .name(GROUP_NAME)
                     .build());
         }
-        when(interfaceGroupRepository.findAll()).thenReturn(interfaceGroupList);
-        List<InterfaceGroupDto> interfaceGroupDtoList = apiInterfaceService.getGroupList();
+        InterfaceGroup interfaceGroup = InterfaceGroup.builder().projectId(PROJECT_ID).build();
+        Example<InterfaceGroup> example = Example.of(interfaceGroup);
+        when(interfaceGroupRepository.findAll(example)).thenReturn(interfaceGroupList);
+        List<InterfaceGroupDto> interfaceGroupDtoList = apiInterfaceService.getGroupList(PROJECT_ID);
         assertThat(interfaceGroupDtoList).allMatch(result -> StringUtils.equals(result.getName(), GROUP_NAME));
         assertThat(interfaceGroupDtoList.size()).isEqualTo(LIST_SIZE);
     }
@@ -341,8 +344,10 @@ class ApiInterfaceServiceTest {
     @Test
     @DisplayName("An exception occurred while getting InterfaceGroup list")
     void getGroupList_exception_test() {
-        doThrow(new RuntimeException()).when(interfaceGroupRepository).findAll();
-        assertThatThrownBy(() -> apiInterfaceService.getGroupList())
+        InterfaceGroup interfaceGroup = InterfaceGroup.builder().projectId(PROJECT_ID).build();
+        Example<InterfaceGroup> example = Example.of(interfaceGroup);
+        doThrow(new RuntimeException()).when(interfaceGroupRepository).findAll(example);
+        assertThatThrownBy(() -> apiInterfaceService.getGroupList(PROJECT_ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_INTERFACE_GROUP_LIST_ERROR.getCode());
     }

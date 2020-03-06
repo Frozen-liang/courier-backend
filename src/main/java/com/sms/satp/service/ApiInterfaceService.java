@@ -24,7 +24,7 @@ public interface ApiInterfaceService {
 
     void deleteById(String id);
 
-    List<InterfaceGroupDto> getGroupList();
+    List<InterfaceGroupDto> getGroupList(String projectId);
 
     String addGroup(InterfaceGroupDto interfaceGroupDto);
 
@@ -32,5 +32,5 @@ public interface ApiInterfaceService {
 
     void deleteGroup(String id);
 
-    String addGroupByNameAndReturnId(String groupName);
+    String addGroupByNameAndReturnId(String groupName, String projectId);
 }

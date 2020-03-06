@@ -205,9 +205,11 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     }
 
     @Override
-    public List<InterfaceGroupDto> getGroupList() {
+    public List<InterfaceGroupDto> getGroupList(String projectId) {
         try {
-            return interfaceGroupMapper.toDtoList(interfaceGroupRepository.findAll());
+            InterfaceGroup interfaceGroup = InterfaceGroup.builder().projectId(projectId).build();
+            Example<InterfaceGroup> example = Example.of(interfaceGroup);
+            return interfaceGroupMapper.toDtoList(interfaceGroupRepository.findAll(example));
         } catch (Exception e) {
             log.error("Failed to get the InterfaceGroup list!", e);
             throw new ApiTestPlatformException(GET_INTERFACE_GROUP_LIST_ERROR);
@@ -261,14 +263,14 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     }
 
     @Override
-    public String addGroupByNameAndReturnId(String groupName) {
+    public String addGroupByNameAndReturnId(String groupName, String projectId) {
         Example<InterfaceGroup> example = Example
             .of(InterfaceGroup.builder().name(groupName).build());
         Optional<InterfaceGroup> interfaceGroupOptional = interfaceGroupRepository.findOne(example);
         if (interfaceGroupOptional.isPresent()) {
             return interfaceGroupOptional.get().getId();
         } else {
-            return addGroup(InterfaceGroupDto.builder().name(groupName).build());
+            return addGroup(InterfaceGroupDto.builder().name(groupName).projectId(projectId).build());
         }
     }
 
@@ -309,7 +311,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         responseRefOptional.ifPresent(responseRdf -> apiResponseOptional.get()
             .setSchema(apiSchema.get(getRefKey(responseRdf))));
         List<String> tags = apiOperation.getTags();
-        String groupId = tags.isEmpty() ? null : addGroupByNameAndReturnId(tags.get(0));
+        String groupId = tags.isEmpty() ? null : addGroupByNameAndReturnId(tags.get(0), projectId);
         ApiInterface.ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
             .id(new ObjectId().toString())
             .method(HttpMethod.resolve(apiOperation.getHttpMethod().name()))
@@ -346,6 +348,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                     pathParams.add(ApiParameterConverter.CONVERT_TO_PARAMETER.apply(apiParameter));
                     break;
                 case HEADER:
+                case COOKIE:
                     requestHeaders.add(ApiParameterConverter.CONVERT_TO_HEADER.apply(apiParameter));
                     break;
                 default:

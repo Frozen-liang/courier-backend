@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class InterfaceGroupDto {
 
     private String id;
+    private String projectId;
     private String name;
 
 }

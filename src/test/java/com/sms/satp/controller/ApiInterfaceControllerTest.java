@@ -157,9 +157,9 @@ class ApiInterfaceControllerTest {
                     .name(GROUP_NAME)
                     .build());
         }
-        when(apiInterfaceService.getGroupList()).thenReturn(interfaceGroupList);
+        when(apiInterfaceService.getGroupList(PROJECT_ID)).thenReturn(interfaceGroupList);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-            .get(Constants.INTERFACE_PATH + "/group/list");
+            .get(Constants.INTERFACE_PATH + "/group/list/" + PROJECT_ID);
         ResultActions perform = mockMvc.perform(request);
         perform.andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
