@@ -4,7 +4,8 @@ public enum ErrorCode {
 
     SYSTEM_ERROR("9999", "System error"),
     PARSER_OPEN_API_ERROR("30001", "Document of OpenApi parsing has failed"),
-    FILE_FORMAT_ERROR("3002","File format error"),
+    FILE_FORMAT_ERROR("30002","File format error"),
+    FILE_READ_ERROR("30003","File has been read to fail"),
     GET_REF_KEY_ERROR("40001", "The reference value cannot be null"),
     DOCUMENT_TYPE_ERROR("4002", "Document type error"),
     GET_API_INTERFACE_PAGE_ERROR("4003","Failed to get the ApiInterface page!"),

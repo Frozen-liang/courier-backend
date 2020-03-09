@@ -18,12 +18,14 @@ import com.sms.satp.parser.model.ApiOperation;
 import com.sms.satp.parser.model.ApiPath;
 import com.sms.satp.parser.model.ApiTag;
 import com.sms.satp.parser.schema.ApiSchema;
+import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
-import io.swagger.v3.parser.OpenAPIV3Parser;
+import io.swagger.v3.parser.core.models.ParseOptions;
+import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +36,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
@@ -43,7 +46,7 @@ import org.apache.commons.lang3.reflect.MethodUtils;
 @Slf4j
 public class OpenApiDocumentTransformer implements DocumentTransformer<OpenAPI> {
 
-    private static final OpenAPIV3Parser OPEN_API_PARSER = new OpenAPIV3Parser();
+    private static final OpenAPIParser OPEN_API_PARSER = new OpenAPIParser();
 
     @Override
     public ApiInfo transformInfo(OpenAPI openApi) {
@@ -112,12 +115,40 @@ public class OpenApiDocumentTransformer implements DocumentTransformer<OpenAPI> 
     }
 
     @Override
-    public OpenAPI read(String location) {
+    public OpenAPI readLocation(String location) {
         try {
-            return OPEN_API_PARSER.read(location);
+            ParseOptions parseOptions = new ParseOptions();
+            parseOptions.setResolve(true);
+            SwaggerParseResult swaggerParseResult = OPEN_API_PARSER.readLocation(location, null, parseOptions);
+            verifyResult(swaggerParseResult);
+            return swaggerParseResult.getOpenAPI();
         } catch (Exception e) {
-            log.error("Failed to read the [OpenAPI location]", e);
-            throw new ApiTestPlatformException(ErrorCode.FILE_FORMAT_ERROR);
+            return handleError(e);
         }
+    }
+
+
+    @Override
+    public OpenAPI readContents(String contents) {
+        try {
+            ParseOptions parseOptions = new ParseOptions();
+            parseOptions.setResolve(true);
+            SwaggerParseResult swaggerParseResult = OPEN_API_PARSER.readContents(contents, null, parseOptions);
+            verifyResult(swaggerParseResult);
+            return swaggerParseResult.getOpenAPI();
+        } catch (Exception e) {
+            return handleError(e);
+        }
+    }
+
+    private void verifyResult(SwaggerParseResult swaggerParseResult) {
+        if (CollectionUtils.isNotEmpty(swaggerParseResult.getMessages())) {
+            log.warn("API file has been parsed to fail error={}", swaggerParseResult.getMessages());
+        }
+    }
+
+    private OpenAPI handleError(Exception e) {
+        log.error("Failed to read the [OpenAPI location]", e);
+        throw new ApiTestPlatformException(ErrorCode.FILE_FORMAT_ERROR);
     }
 }

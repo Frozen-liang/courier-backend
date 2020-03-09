@@ -39,9 +39,12 @@ import com.sms.satp.repository.InterfaceGroupRepository;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -91,7 +94,7 @@ class ApiInterfaceServiceTest {
     private final static String DOCUMENT_TYPE_SWAGGER = "SWAGGER";
     private final static String WRONG_DOCUMENT_TYPE = "wrong";
     private final static String PATH = "/config/openapi_v3.yaml";
-    private final static String LOCATION = ApiInterfaceServiceTest.class.getResource(PATH).toString();
+    private final static URL LOCATION = ApiInterfaceServiceTest.class.getResource(PATH);
 
     @Test
     @DisplayName("Test the paging method with no parameters in the apiInterface service")
@@ -162,7 +165,7 @@ class ApiInterfaceServiceTest {
 
     @Test
     @DisplayName("Test the save method in the apiInterface service")
-    void save() {
+    void save() throws IOException {
         List<ApiInterface> apiInterfaces = new ArrayList<>();
         for (int i = 0; i < LIST_SIZE; i++) {
             apiInterfaces.add(
@@ -172,14 +175,16 @@ class ApiInterfaceServiceTest {
             );
         }
         when(apiInterfaceRepository.insert(anyList())).thenReturn(apiInterfaces);
-        apiInterfaceService.save(LOCATION, DOCUMENT_TYPE_SWAGGER, PROJECT_ID);
+        String contents = IOUtils.toString(LOCATION, StandardCharsets.UTF_8);
+        apiInterfaceService.save(contents, DOCUMENT_TYPE_SWAGGER, PROJECT_ID);
         verify(apiInterfaceRepository, times(1)).insert(anyList());
     }
 
     @Test
     @DisplayName("Test the save method with wrong type in the apiInterface service")
-    void save_with_wrong_type() {
-        assertThatThrownBy(() -> apiInterfaceService.save(LOCATION, WRONG_DOCUMENT_TYPE, PROJECT_ID))
+    void save_with_wrong_type() throws IOException {
+        String contents = IOUtils.toString(LOCATION, StandardCharsets.UTF_8);
+        assertThatThrownBy(() -> apiInterfaceService.save(contents, WRONG_DOCUMENT_TYPE, PROJECT_ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DOCUMENT_TYPE_ERROR.getCode());
     }
@@ -316,9 +321,10 @@ class ApiInterfaceServiceTest {
 
     @Test
     @DisplayName("An exception occurred while adding apiInterface through uploaded files")
-    void addByFile_exception_test() {
+    void addByFile_exception_test() throws IOException {
         doThrow(new RuntimeException()).when(apiInterfaceRepository).insert(anyList());
-        assertThatThrownBy(() -> apiInterfaceService.save(LOCATION, DOCUMENT_TYPE_SWAGGER, PROJECT_ID))
+        String contents = IOUtils.toString(LOCATION, StandardCharsets.UTF_8);
+        assertThatThrownBy(() -> apiInterfaceService.save(contents, DOCUMENT_TYPE_SWAGGER, PROJECT_ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR.getCode());
     }

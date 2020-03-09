@@ -10,8 +10,16 @@ import java.util.Map;
 
 public interface DocumentTransformer<T> extends DocumentReader<T> {
 
-    default ApiDocument build(String location) {
-        T document = read(location);
+    default ApiDocument buildByResource(String location) {
+        T document = readLocation(location);
+        return ApiDocument.builder().info(transformInfo(document)).paths(transformPaths(document))
+            .schemas(transformSchemas(document))
+            .tags(transformTags(document)).build();
+
+    }
+
+    default ApiDocument buildByContents(String contents) {
+        T document = readContents(contents);
         return ApiDocument.builder().info(transformInfo(document)).paths(transformPaths(document))
             .schemas(transformSchemas(document))
             .tags(transformTags(document)).build();

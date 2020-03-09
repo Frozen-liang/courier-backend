@@ -5,7 +5,9 @@ import com.sms.satp.parser.model.ApiDocument;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContextAware;
 
-public interface DocumentFactory extends  ApplicationContextAware, InitializingBean {
+public interface DocumentFactory extends ApplicationContextAware, InitializingBean {
 
-    public ApiDocument create(String location, DocumentType documentType);
+    public ApiDocument buildByResource(String location, DocumentType documentType);
+
+    public ApiDocument buildByContents(String contents, DocumentType documentType);
 }

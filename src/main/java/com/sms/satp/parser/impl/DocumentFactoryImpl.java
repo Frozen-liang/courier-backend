@@ -38,9 +38,15 @@ public class DocumentFactoryImpl implements DocumentFactory {
     }
 
     @Override
-    public ApiDocument create(String location, DocumentType documentType) {
+    public ApiDocument buildByResource(String location, DocumentType documentType) {
         DocumentTransformer<?> transformer = transformerMap.get(documentType);
-        return transformer.build(location);
+        return transformer.buildByResource(location);
+    }
+
+    @Override
+    public ApiDocument buildByContents(String contents, DocumentType documentType) {
+        DocumentTransformer<?> transformer = transformerMap.get(documentType);
+        return transformer.buildByContents(contents);
     }
 
 

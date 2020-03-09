@@ -42,20 +42,16 @@ import com.sms.satp.utils.ApiHeaderConverter;
 import com.sms.satp.utils.ApiParameterConverter;
 import com.sms.satp.utils.ApiRequestBodyConverter;
 import com.sms.satp.utils.ApiResponseConverter;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
@@ -78,8 +74,8 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     private final InterfaceGroupMapper interfaceGroupMapper;
 
     public ApiInterfaceServiceImpl(ApiInterfaceRepository apiInterfaceRepository,
-            DocumentFactory documentFactory, ApiInterfaceMapper apiInterfaceMapper,
-            InterfaceGroupRepository interfaceGroupRepository, InterfaceGroupMapper interfaceGroupMapper) {
+        DocumentFactory documentFactory, ApiInterfaceMapper apiInterfaceMapper,
+        InterfaceGroupRepository interfaceGroupRepository, InterfaceGroupMapper interfaceGroupMapper) {
         this.apiInterfaceRepository = apiInterfaceRepository;
         this.interfaceGroupRepository = interfaceGroupRepository;
         this.documentFactory = documentFactory;
@@ -108,18 +104,18 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     }
 
     @Override
-    public void save(String location, String documentType, String projectId) {
+    public void save(String contents, String documentType, String projectId) {
         if (log.isDebugEnabled()) {
             log.debug(
-                String.format("ApiInterfaceService-save()-Parameter: [location]%s, [documentType]%s, [projectId]%s",
-                    location, documentType, projectId));
+                String.format("ApiInterfaceService-save()-Parameter: [contents]%s, [documentType]%s, [projectId]%s",
+                    contents, documentType, projectId));
         }
         Optional<DocumentType> documentTypeOptional = Optional.ofNullable(
             DocumentType.resolve(documentType.toUpperCase(Locale.getDefault())));
         if (documentTypeOptional.isPresent()) {
             try {
-                ApiDocument apiDocument = documentFactory.create(
-                    location, documentTypeOptional.get());
+                ApiDocument apiDocument = documentFactory.buildByContents(
+                    contents, documentTypeOptional.get());
                 List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(
                     apiDocument, projectId);
                 apiInterfaceRepository.insert(apiInterfaces);
@@ -134,15 +130,12 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     @Override
     public void save(MultipartFile multipartFile, String documentType, String projectId) throws IOException {
-        File file = null;
-        try {
-            file = convertToFile(multipartFile);
-            save(file.toString(), documentType, projectId);
-        } finally {
-            if (Objects.nonNull(file)) {
-                Files.delete(file.toPath());
-            }
-        }
+        log.info(
+            "ApiInterfaceService-save()-params: [documentType]={}, [projectId]={}",
+            documentType, projectId);
+        String contents = IOUtils.toString(multipartFile.getInputStream(), StandardCharsets.UTF_8);
+        save(contents, documentType, projectId);
+
     }
 
     @Override
@@ -274,12 +267,6 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         }
     }
 
-    private File convertToFile(MultipartFile multipartFile) throws IOException {
-        String tempDir = System.getProperty("java.io.tmpdir");
-        Path path = Paths.get(tempDir +  UUID.randomUUID().toString() + ".tmp");
-        multipartFile.transferTo(path);
-        return path.toFile();
-    }
 
     private List<ApiInterface> convertApiPathsToApiInterfaces(ApiDocument apiDocument, String projectId) {
         List<ApiInterface> apiInterfaces = new ArrayList<>();
