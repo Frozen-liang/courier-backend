@@ -261,6 +261,18 @@
                             </limits>
                         </rule>
                     </rules>
+                    <excludes>
+                        <exclude>**/entity/**.class</exclude>
+                        <exclude>**/SatpApplication.class</exclude>
+                        <exclude>**/response/Response.class</exclude>
+                        <exclude>**/parser/model/**.class</exclude>
+                        <exclude>**/pojo/**.class</exclude>
+                        <exclude>**/engine/model/**.class</exclude>
+                        <exclude>**/engine/auth/**.class</exclude>
+                        <exclude>**/engine/auth/filter/**.class</exclude>
+                        <exclude>**/parser/schema/**.class</exclude>
+                        <exclude>**/parser/common/**.class</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>

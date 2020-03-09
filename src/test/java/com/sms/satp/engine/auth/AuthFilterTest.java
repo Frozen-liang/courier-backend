@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.equalTo;
 import com.sms.satp.ApplicationTests;
 import com.sms.satp.engine.auth.filter.OnePlatformAuthFilter;
 import com.sms.satp.engine.auth.filter.ServiceMeshAuthFilter;
+import io.restassured.response.Response;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +39,10 @@ public class AuthFilterTest {
 
     @Test
     public void jwt_token_test() {
-        given().auth().none().filter(serviceMeshAuthFilter).
-            baseUri("https://meshdev.smsassist.com").when().get("/eventlogger/v1/eventLog/")
-            .then().assertThat().statusCode(404).body("message", equalTo("No message available"));
+        Response response = given().auth().none().filter(serviceMeshAuthFilter).
+            baseUri("https://meshdev.smsassist.com").when().get("/eventlogger/v1/eventLog/");
+        response
+            .then().assertThat().statusCode(404).body("message", equalTo("Not Found"));
 
 
     }

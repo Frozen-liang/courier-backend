@@ -2,8 +2,6 @@ package com.sms.satp.engine;
 
 import static io.restassured.RestAssured.given;
 
-import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.common.ErrorCode;
 import com.sms.satp.engine.model.ApiUnitRequest;
 import com.sms.satp.engine.model.ApiUnitResponse;
 import com.sms.satp.engine.model.MultiPart;
@@ -20,10 +18,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -52,59 +49,39 @@ public class RestAssuredTestEngineImpl implements TestEngine {
 
         RequestSender sender = given(requestSpecification, RESPONSE_SPEC_BUILDER.build());
         log.debug("API {} begin execution", path);
-
-        switch (method) {
-            case GET:
-                return sender.get(path);
-            case POST:
-                return sender.post(path);
-            case PUT:
-                return sender.put(path);
-            case DELETE:
-                return sender.delete(path);
-            default:
-                throw new ApiTestPlatformException(ErrorCode.NOT_SUPPORT_METHOD);
-        }
+        return method.getExecutor().unchecked().apply(path, sender);
     }
 
     private static Function<ApiUnitRequest, RequestSpecification> apply() {
         return apiUnitRequest -> {
-            RequestSpecBuilder builder = new RequestSpecBuilder();
-            if (StringUtils.isNotBlank(apiUnitRequest.getServerAddress())) {
-                builder.setBaseUri(apiUnitRequest.getServerAddress());
-            }
-
-            if (MapUtils.isNotEmpty(apiUnitRequest.getCookies())) {
-                builder.addCookies(apiUnitRequest.getCookies());
-            }
-            if (MapUtils.isNotEmpty(apiUnitRequest.getQueryParams())) {
-                builder.addQueryParams(apiUnitRequest.getQueryParams());
-            }
-            if (MapUtils.isNotEmpty(apiUnitRequest.getFormParams())) {
-                builder.addFormParams(apiUnitRequest.getFormParams());
-            }
-            if (MapUtils.isNotEmpty(apiUnitRequest.getPathParams())) {
-                builder.addPathParams(apiUnitRequest.getPathParams());
-            }
-            if (CollectionUtils.isNotEmpty(apiUnitRequest.getMultiParts())) {
-                addMultiPartSpecification(apiUnitRequest.getMultiParts(), builder);
-            }
+            final RequestSpecBuilder builder = new RequestSpecBuilder();
+            ifNeedAdd(apiUnitRequest.getServerAddress(), builder::setBaseUri);
+            ifNeedAdd(apiUnitRequest.getCookies(), builder::addCookies);
+            ifNeedAdd(apiUnitRequest.getQueryParams(), builder::addQueryParams);
+            ifNeedAdd(apiUnitRequest.getFormParams(), builder::addFormParams);
+            ifNeedAdd(apiUnitRequest.getPathParams(), builder::addPathParams);
+            ifNeedAdd(apiUnitRequest.getMultiParts(), (multiParts) -> addMultiPartSpecification(multiParts,
+                builder));
             builder.log(LogDetail.ALL);
             RequestSpecification requestSpecification = builder.build();
-            Object body = apiUnitRequest.getBody();
-            if (Objects.nonNull(body)) {
-                if (body instanceof File) {
-                    requestSpecification.body((File) body);
-                } else {
-                    requestSpecification.body(body.toString());
-                }
-            }
-            if (MapUtils.isNotEmpty(apiUnitRequest.getHeaders())) {
-                requestSpecification.headers(apiUnitRequest.getHeaders());
-
-            }
+            ifNeedAdd(apiUnitRequest.getBody(), (body) -> buildBody(requestSpecification, body));
+            ifNeedAdd(apiUnitRequest.getHeaders(), requestSpecification::headers);
             return requestSpecification;
         };
+    }
+
+    private static void buildBody(RequestSpecification requestSpecification, Object body) {
+        if (body instanceof File) {
+            requestSpecification.body((File) body);
+        } else {
+            requestSpecification.body(body.toString());
+        }
+    }
+
+    private static <T> void ifNeedAdd(T t, Consumer<T> consumer) {
+        if (Objects.nonNull(t)) {
+            consumer.accept(t);
+        }
     }
 
     private static void addMultiPartSpecification(List<MultiPart> multiParts, RequestSpecBuilder builder) {

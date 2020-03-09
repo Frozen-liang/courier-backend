@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableConfigurationProperties({OnePlatformAuthConfig.class, ServiceMeshAuthConfig.class})
+
 public class ApiAuthConfiguration {
 
 
@@ -25,6 +26,8 @@ public class ApiAuthConfiguration {
 
         return new ApiAuthManager(authFilterMap);
     }
+
+
 
 
 }
