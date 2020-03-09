@@ -7,11 +7,9 @@ import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.Header;
 import com.sms.satp.entity.Parameter;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -60,20 +58,21 @@ class ApiInterfaceMapperTest {
         ApiInterface apiInterface = apiInterfaceMapper.toEntity(apiInterfaceDto);
         assertThat(apiInterface.getTitle()).isEqualTo(TITLE);
     }
-    
+
     @Test
-    @DisplayName("Test the method for converting an ApiInterface entity list object to a dto list object")
-    void apiInterfaceList_to_apiInterfaceDtoList() {
-        List<ApiInterface> apiInterfaceList = new ArrayList<>();
-        for (int i = 0; i < SIZE; i++) {
-            apiInterfaceList.add(
-                ApiInterface.builder()
-                    .title(TITLE)
-                    .build());
-        }
-        List<ApiInterfaceDto> apiInterfaceDtoList = apiInterfaceMapper.toDtoList(apiInterfaceList);
-        assertThat(apiInterfaceDtoList.size()).isEqualTo(SIZE);
-        assertThat(apiInterfaceDtoList).allMatch(result -> StringUtils.equals(result.getTitle(), TITLE));
+    @DisplayName("Test the method to convert the ApiInterface's entity object to a dto page object")
+    void entity_to_dtoPage() {
+        ApiInterface apiInterface = ApiInterface.builder()
+            .title(TITLE)
+            .tag(TAG_LIST)
+            .requestHeaders(HEADER_LIST)
+            .responseHeaders(HEADER_LIST)
+            .queryParams(PARAMETER_LIST)
+            .pathParams(PARAMETER_LIST)
+            .build();
+        ApiInterfaceDto apiInterfaceDto = apiInterfaceMapper.toDtoPage(apiInterface);
+        assertThat(apiInterfaceDto.getTitle()).isEqualTo(TITLE);
+        assertThat(apiInterfaceDto.getRequestBody()).isNull();
     }
 
     @Test
@@ -91,10 +90,10 @@ class ApiInterfaceMapperTest {
     }
 
     @Test
-    @DisplayName("[Null Input Parameter]Test the method for converting an ApiInterface entity list object to a dto list object")
-    void null_entityList_to_dtoList() {
-        List<ApiInterfaceDto> apiInterfaceDtoList = apiInterfaceMapper.toDtoList(null);
-        assertThat(apiInterfaceDtoList).isNull();
+    @DisplayName("[Null Input Parameter]Test the method to convert the ApiInterface's entity object to a dto page object")
+    void null_entity_to_dtoPage() {
+        ApiInterfaceDto apiInterfaceDto = apiInterfaceMapper.toDtoPage(null);
+        assertThat(apiInterfaceDto).isNull();
     }
 
 }

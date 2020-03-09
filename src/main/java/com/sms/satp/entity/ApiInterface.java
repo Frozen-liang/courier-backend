@@ -26,6 +26,8 @@ public class ApiInterface {
     private String title;
     private String path;
     private String description;
+    @Field("group_id")
+    private String groupId;
     @Field("project_id")
     private String projectId;
     @Field("request_headers")
