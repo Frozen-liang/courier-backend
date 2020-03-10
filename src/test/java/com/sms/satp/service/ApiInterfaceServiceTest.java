@@ -12,6 +12,7 @@ import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_INTERFACE_GROUP_LIST_ERROR;
 import static com.sms.satp.common.ErrorCode.PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR;
+import static com.sms.satp.common.ErrorCode.PARSE_URL_AND_SAVE_AS_APIINTERFACE_ERROR;
 import static com.sms.satp.parser.DocumentFactoryTest.CONFIG_OPEN_API_V_3_YAML;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -29,6 +30,7 @@ import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.InterfaceGroup;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
+import com.sms.satp.entity.dto.DataImportDto;
 import com.sms.satp.entity.dto.InterfaceGroupDto;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.mapper.ApiInterfaceMapper;
@@ -79,6 +81,7 @@ class ApiInterfaceServiceTest {
     @SpyBean
     InterfaceGroupMapper interfaceGroupMapper;
 
+
     private final static int LIST_SIZE = 10;
     private final static int TOTAL_ELEMENTS = 60;
     private final static int PAGE_NUMBER = 2;
@@ -94,7 +97,9 @@ class ApiInterfaceServiceTest {
     private final static String DOCUMENT_TYPE_SWAGGER = "SWAGGER";
     private final static String WRONG_DOCUMENT_TYPE = "wrong";
     private final static String PATH = "/config/openapi_v3.yaml";
+    private final static String URL = "https://meshdev.smsassist.com/filestorage/swagger/v1/swagger.json";
     private final static URL LOCATION = ApiInterfaceServiceTest.class.getResource(PATH);
+
 
     @Test
     @DisplayName("Test the paging method with no parameters in the apiInterface service")
@@ -207,6 +212,31 @@ class ApiInterfaceServiceTest {
         MockMultipartFile mockMultipartFile = new MockMultipartFile(file.getName(),fileInputStream);
         apiInterfaceService.save(mockMultipartFile, DOCUMENT_TYPE_SWAGGER, PROJECT_ID);
         verify(apiInterfaceRepository, times(1)).insert(anyList());
+    }
+
+    @Test
+    @DisplayName("Test the method of saving by URL in the apiInterface service")
+    void save3() {
+        DataImportDto dataImportDto = DataImportDto.builder().url(URL).type(DOCUMENT_TYPE_SWAGGER).projectId(PROJECT_ID).build();
+        List<ApiInterface> apiInterfaces = new ArrayList<>();
+        for (int i = 0; i < LIST_SIZE; i++) {
+            apiInterfaces.add(
+                ApiInterface.builder()
+                    .title(TITLE)
+                    .build()
+            );
+        }
+        when(apiInterfaceRepository.insert(anyList())).thenReturn(apiInterfaces);
+        apiInterfaceService.saveByUrl(dataImportDto);
+        verify(apiInterfaceRepository, times(1)).insert(anyList());
+    }
+
+    @Test
+    @DisplayName("Test the saveByUrl method with wrong type in the apiInterface service")
+    void saveByUrl_with_wrong_type() {
+        assertThatThrownBy(() -> apiInterfaceService.save(URL, WRONG_DOCUMENT_TYPE, PROJECT_ID))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DOCUMENT_TYPE_ERROR.getCode());
     }
 
     @Test
@@ -327,6 +357,16 @@ class ApiInterfaceServiceTest {
         assertThatThrownBy(() -> apiInterfaceService.save(contents, DOCUMENT_TYPE_SWAGGER, PROJECT_ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while adding apiInterface through URL")
+    void addByURL_exception_test() {
+        DataImportDto dataImportDto = DataImportDto.builder().url(URL).type(DOCUMENT_TYPE_SWAGGER).projectId(PROJECT_ID).build();
+        doThrow(new RuntimeException()).when(apiInterfaceRepository).insert(anyList());
+        assertThatThrownBy(() -> apiInterfaceService.saveByUrl(dataImportDto))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(PARSE_URL_AND_SAVE_AS_APIINTERFACE_ERROR.getCode());
     }
 
     @Test

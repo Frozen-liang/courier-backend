@@ -11,6 +11,7 @@ import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_INTERFACE_GROUP_LIST_ERROR;
 import static com.sms.satp.common.ErrorCode.PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR;
+import static com.sms.satp.common.ErrorCode.PARSE_URL_AND_SAVE_AS_APIINTERFACE_ERROR;
 import static com.sms.satp.utils.ApiSchemaUtil.getRefKey;
 import static com.sms.satp.utils.ApiSchemaUtil.resolveApiSchemaMap;
 
@@ -21,6 +22,7 @@ import com.sms.satp.entity.Header;
 import com.sms.satp.entity.InterfaceGroup;
 import com.sms.satp.entity.Parameter;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
+import com.sms.satp.entity.dto.DataImportDto;
 import com.sms.satp.entity.dto.InterfaceGroupDto;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.mapper.ApiInterfaceMapper;
@@ -66,6 +68,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @Service
 public class ApiInterfaceServiceImpl implements ApiInterfaceService {
+
+    private static final Integer FIRST_TAG = 0;
 
     private final ApiInterfaceRepository apiInterfaceRepository;
     private final InterfaceGroupRepository interfaceGroupRepository;
@@ -135,6 +139,30 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             documentType, projectId);
         String contents = IOUtils.toString(multipartFile.getInputStream(), StandardCharsets.UTF_8);
         save(contents, documentType, projectId);
+
+    }
+
+    @Override
+    public void saveByUrl(DataImportDto dataImportDto) {
+        log.info(
+            "ApiInterfaceService-saveByUrl()-params: [URL]={}, [documentType]={}, [projectId]={}",
+            dataImportDto.getUrl(), dataImportDto.getType(), dataImportDto.getProjectId());
+        Optional<DocumentType> documentTypeOptional = Optional.ofNullable(
+            DocumentType.resolve(dataImportDto.getType().toUpperCase(Locale.getDefault())));
+        if (documentTypeOptional.isPresent()) {
+            try {
+                ApiDocument apiDocument = documentFactory.buildByResource(
+                    dataImportDto.getUrl(), documentTypeOptional.get());
+                List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(
+                    apiDocument, dataImportDto.getProjectId());
+                apiInterfaceRepository.insert(apiInterfaces);
+            } catch (Exception e) {
+                log.error("Failed to parse the URL and save as ApiInterface!", e);
+                throw new ApiTestPlatformException(PARSE_URL_AND_SAVE_AS_APIINTERFACE_ERROR);
+            }
+        } else {
+            throw new ApiTestPlatformException(DOCUMENT_TYPE_ERROR);
+        }
 
     }
 
@@ -278,7 +306,6 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                 apiInterfaces.add(
                     apiPathOperationResolver(apiOperation, apiSchema, apiPath, projectId))
             )
-
         );
         return apiInterfaces;
     }
@@ -298,7 +325,8 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         responseRefOptional.ifPresent(responseRdf -> apiResponseOptional.get()
             .setSchema(apiSchema.get(getRefKey(responseRdf))));
         List<String> tags = apiOperation.getTags();
-        String groupId = tags.isEmpty() ? null : addGroupByNameAndReturnId(tags.get(0), projectId);
+        String groupId = tags.isEmpty() ? null : addGroupByNameAndReturnId(
+            tags.get(FIRST_TAG), projectId);
         ApiInterface.ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
             .id(new ObjectId().toString())
             .method(HttpMethod.resolve(apiOperation.getHttpMethod().name()))

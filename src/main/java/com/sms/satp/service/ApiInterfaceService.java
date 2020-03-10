@@ -1,6 +1,7 @@
 package com.sms.satp.service;
 
 import com.sms.satp.entity.dto.ApiInterfaceDto;
+import com.sms.satp.entity.dto.DataImportDto;
 import com.sms.satp.entity.dto.InterfaceGroupDto;
 import com.sms.satp.entity.dto.PageDto;
 import java.io.IOException;
@@ -15,6 +16,8 @@ public interface ApiInterfaceService {
     void save(String location, String documentType, String projectId);
 
     void save(MultipartFile multipartFile, String documentType, String projectId) throws IOException;
+
+    void saveByUrl(DataImportDto dataImportDto);
 
     void add(ApiInterfaceDto apiInterfaceDto);
 

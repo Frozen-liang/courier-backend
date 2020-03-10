@@ -45,6 +45,7 @@ public enum ErrorCode {
     ADD_INTERFACE_GROUP_ERROR("4037","Failed to add the Group!"),
     EDIT_INTERFACE_GROUP_ERROR("4038","Failed to edit the Group!"),
     DELETE_INTERFACE_GROUP_BY_ID_ERROR("4039","Failed to delete the Group!"),
+    PARSE_URL_AND_SAVE_AS_APIINTERFACE_ERROR("4040","Failed to parse the URL and save as ApiInterface!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 
