@@ -11,7 +11,7 @@ import static com.sms.satp.common.ErrorCode.EDIT_INTERFACE_GROUP_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_INTERFACE_GROUP_LIST_ERROR;
-import static com.sms.satp.common.ErrorCode.PARSE_FILE_OR_URL_AND_SAVE_AS_APIINTERFACE_ERROR;
+import static com.sms.satp.common.ErrorCode.PARSE_TO_APIINTERFACE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -338,7 +338,7 @@ class ApiInterfaceServiceTest {
         MockMultipartFile mockMultipartFile = new MockMultipartFile(FILE_NAME,inputStream);
         assertThatThrownBy(() -> apiInterfaceService.importByFile(mockMultipartFile, DOCUMENT_TYPE_SWAGGER, PROJECT_ID))
             .isInstanceOf(ApiTestPlatformException.class)
-            .extracting("code").isEqualTo(PARSE_FILE_OR_URL_AND_SAVE_AS_APIINTERFACE_ERROR.getCode());
+            .extracting("code").isEqualTo(PARSE_TO_APIINTERFACE_ERROR.getCode());
     }
 
     @Test
@@ -348,7 +348,7 @@ class ApiInterfaceServiceTest {
         doThrow(new RuntimeException()).when(apiInterfaceRepository).insert(anyList());
         assertThatThrownBy(() -> apiInterfaceService.importByUrl(dataImportDto))
             .isInstanceOf(ApiTestPlatformException.class)
-            .extracting("code").isEqualTo(PARSE_FILE_OR_URL_AND_SAVE_AS_APIINTERFACE_ERROR.getCode());
+            .extracting("code").isEqualTo(PARSE_TO_APIINTERFACE_ERROR.getCode());
     }
 
     @Test

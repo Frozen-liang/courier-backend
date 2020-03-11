@@ -9,7 +9,7 @@ public enum ErrorCode {
     GET_REF_KEY_ERROR("40001", "The reference value cannot be null"),
     DOCUMENT_TYPE_ERROR("4002", "Document type error"),
     GET_API_INTERFACE_PAGE_ERROR("4003","Failed to get the ApiInterface page!"),
-    PARSE_FILE_OR_URL_AND_SAVE_AS_APIINTERFACE_ERROR("4004","Failed to parse the file or url and save as ApiInterface!"),
+    PARSE_TO_APIINTERFACE_ERROR("4004","Failed to parse the file or url and save as ApiInterface!"),
     ADD_API_INTERFACE_ERROR("4005","Failed to add the ApiInterface!"),
     GET_API_INTERFACE_BY_ID_ERROR("4006","Failed to get the ApiInterface by id!"),
     DELETE_API_INTERFACE_BY_ID_ERROR("4007","Failed to delete the ApiInterface!"),

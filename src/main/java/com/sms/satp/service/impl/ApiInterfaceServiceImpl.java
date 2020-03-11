@@ -10,7 +10,7 @@ import static com.sms.satp.common.ErrorCode.EDIT_INTERFACE_GROUP_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_INTERFACE_GROUP_LIST_ERROR;
-import static com.sms.satp.common.ErrorCode.PARSE_FILE_OR_URL_AND_SAVE_AS_APIINTERFACE_ERROR;
+import static com.sms.satp.common.ErrorCode.PARSE_TO_APIINTERFACE_ERROR;
 import static com.sms.satp.utils.ApiSchemaUtil.removeSchemaMapRef;
 import static com.sms.satp.utils.ApiSchemaUtil.splitKeyFromRef;
 
@@ -257,7 +257,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         }
     }
 
-    private void save(String type, String contentsOrResource, String documentType, String projectId ) {
+    private void save(String type, String contentsOrResource, String documentType, String projectId) {
         Optional<DocumentType> documentTypeOptional = Optional.ofNullable(
             DocumentType.resolve(documentType.toUpperCase(Locale.getDefault())));
         if (documentTypeOptional.isPresent()) {
@@ -270,7 +270,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                 apiInterfaceRepository.insert(apiInterfaces);
             } catch (Exception e) {
                 log.error("Failed to parse the file or url and save as ApiInterface!", e);
-                throw new ApiTestPlatformException(PARSE_FILE_OR_URL_AND_SAVE_AS_APIINTERFACE_ERROR);
+                throw new ApiTestPlatformException(PARSE_TO_APIINTERFACE_ERROR);
             }
         } else {
             throw new ApiTestPlatformException(DOCUMENT_TYPE_ERROR);
@@ -296,7 +296,8 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         Map<String, ApiSchema> apiSchemaMap, ApiPath apiPath, String projectId) {
         Optional<ApiRequestBody> apiRequestBodyOptional = Optional.ofNullable(apiOperation.getApiRequestBody());
         Optional<ApiResponse> apiResponseOptional = Optional.ofNullable(apiOperation.getApiResponse());
-        Optional<String> requestBodyRefOptional = apiRequestBodyOptional.map(ApiRequestBody::getSchema).map(ApiSchema::getRef);
+        Optional<String> requestBodyRefOptional = apiRequestBodyOptional.map(
+            ApiRequestBody::getSchema).map(ApiSchema::getRef);
         Optional<String> responseRefOptional = apiResponseOptional.map(ApiResponse::getSchema).map(ApiSchema::getRef);
         requestBodyRefOptional.ifPresent(requestRef -> {
             ApiSchema apiSchema = apiSchemaMap.get(splitKeyFromRef(requestRef));
