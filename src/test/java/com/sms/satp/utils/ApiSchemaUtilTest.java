@@ -1,8 +1,8 @@
 package com.sms.satp.utils;
 
 import static com.sms.satp.utils.ApiSchemaUtil.CONVERT_TO_SCHEMA;
-import static com.sms.satp.utils.ApiSchemaUtil.getRefKey;
-import static com.sms.satp.utils.ApiSchemaUtil.resolveApiSchemaMap;
+import static com.sms.satp.utils.ApiSchemaUtil.splitKeyFromRef;
+import static com.sms.satp.utils.ApiSchemaUtil.removeSchemaMapRef;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -57,14 +57,14 @@ class ApiSchemaUtilTest {
     @DisplayName("Gets the reference object in the ref character string")
     void test_GET_REF_KEY() {
         String ref = "#/components/schemas/Category";
-        String result = getRefKey(ref);
+        String result = splitKeyFromRef(ref);
         assertThat(result).isEqualTo("Category");
     }
 
     @Test
     @DisplayName("Throws an ApiTestPlatformException when the parameter is null [GET_REF_KEY]")
     void test_GET_REF_KEY_Error() {
-        assertThatThrownBy(() -> getRefKey(null))
+        assertThatThrownBy(() -> splitKeyFromRef(null))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ErrorCode.GET_REF_KEY_ERROR.getCode());
     }
@@ -100,7 +100,7 @@ class ApiSchemaUtilTest {
             .build();
         apiSchemaMap.put("Pet", pet);
         apiSchemaMap.put("Category", category);
-        resolveApiSchemaMap(apiSchemaMap, apiSchemaMap);
+        removeSchemaMapRef(apiSchemaMap, apiSchemaMap);
         ApiSchema categoryPropertiesAfterResolve = apiSchemaMap.get("Pet").getProperties().get("category");
         ApiSchema categorySchemaAfterResolve = apiSchemaMap.get("Category");
         assertThat(categoryPropertiesAfterResolve.getProperties().equals(categorySchemaAfterResolve.getProperties())).isEqualTo(true);

@@ -13,11 +13,9 @@ public interface ApiInterfaceService {
 
     Page<ApiInterfaceDto> page(PageDto pageDto, String projectId, String groupId);
 
-    void save(String location, String documentType, String projectId);
+    void importByFile(MultipartFile multipartFile, String documentType, String projectId) throws IOException;
 
-    void save(MultipartFile multipartFile, String documentType, String projectId) throws IOException;
-
-    void saveByUrl(DataImportDto dataImportDto);
+    void importByUrl(DataImportDto dataImportDto);
 
     void add(ApiInterfaceDto apiInterfaceDto);
 

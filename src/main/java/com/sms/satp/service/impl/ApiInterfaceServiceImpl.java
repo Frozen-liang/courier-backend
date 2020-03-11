@@ -10,10 +10,9 @@ import static com.sms.satp.common.ErrorCode.EDIT_INTERFACE_GROUP_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_INTERFACE_GROUP_LIST_ERROR;
-import static com.sms.satp.common.ErrorCode.PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR;
-import static com.sms.satp.common.ErrorCode.PARSE_URL_AND_SAVE_AS_APIINTERFACE_ERROR;
-import static com.sms.satp.utils.ApiSchemaUtil.getRefKey;
-import static com.sms.satp.utils.ApiSchemaUtil.resolveApiSchemaMap;
+import static com.sms.satp.common.ErrorCode.PARSE_FILE_OR_URL_AND_SAVE_AS_APIINTERFACE_ERROR;
+import static com.sms.satp.utils.ApiSchemaUtil.removeSchemaMapRef;
+import static com.sms.satp.utils.ApiSchemaUtil.splitKeyFromRef;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ApiInterface;
@@ -70,6 +69,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     private static final Integer FIRST_TAG = 0;
+    private static final String FILE_IMPORT = "file";
+    private static final String URL_IMPORT = "url";
 
     private final ApiInterfaceRepository apiInterfaceRepository;
     private final InterfaceGroupRepository interfaceGroupRepository;
@@ -107,63 +108,24 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         }
     }
 
-    @Override
-    public void save(String contents, String documentType, String projectId) {
-        if (log.isDebugEnabled()) {
-            log.debug(
-                String.format("ApiInterfaceService-save()-Parameter: [contents]%s, [documentType]%s, [projectId]%s",
-                    contents, documentType, projectId));
-        }
-        Optional<DocumentType> documentTypeOptional = Optional.ofNullable(
-            DocumentType.resolve(documentType.toUpperCase(Locale.getDefault())));
-        if (documentTypeOptional.isPresent()) {
-            try {
-                ApiDocument apiDocument = documentFactory.buildByContents(
-                    contents, documentTypeOptional.get());
-                List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(
-                    apiDocument, projectId);
-                apiInterfaceRepository.insert(apiInterfaces);
-            } catch (Exception e) {
-                log.error("Failed to parse the file and save as ApiInterface!", e);
-                throw new ApiTestPlatformException(PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR);
-            }
-        } else {
-            throw new ApiTestPlatformException(DOCUMENT_TYPE_ERROR);
-        }
-    }
 
     @Override
-    public void save(MultipartFile multipartFile, String documentType, String projectId) throws IOException {
+    public void importByFile(MultipartFile multipartFile, String documentType, String projectId) throws IOException {
         log.info(
             "ApiInterfaceService-save()-params: [documentType]={}, [projectId]={}",
             documentType, projectId);
         String contents = IOUtils.toString(multipartFile.getInputStream(), StandardCharsets.UTF_8);
-        save(contents, documentType, projectId);
+        save(FILE_IMPORT, contents, documentType, projectId);
 
     }
 
     @Override
-    public void saveByUrl(DataImportDto dataImportDto) {
+    public void importByUrl(DataImportDto dataImportDto) {
         log.info(
             "ApiInterfaceService-saveByUrl()-params: [URL]={}, [documentType]={}, [projectId]={}",
             dataImportDto.getUrl(), dataImportDto.getType(), dataImportDto.getProjectId());
-        Optional<DocumentType> documentTypeOptional = Optional.ofNullable(
-            DocumentType.resolve(dataImportDto.getType().toUpperCase(Locale.getDefault())));
-        if (documentTypeOptional.isPresent()) {
-            try {
-                ApiDocument apiDocument = documentFactory.buildByResource(
-                    dataImportDto.getUrl(), documentTypeOptional.get());
-                List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(
-                    apiDocument, dataImportDto.getProjectId());
-                apiInterfaceRepository.insert(apiInterfaces);
-            } catch (Exception e) {
-                log.error("Failed to parse the URL and save as ApiInterface!", e);
-                throw new ApiTestPlatformException(PARSE_URL_AND_SAVE_AS_APIINTERFACE_ERROR);
-            }
-        } else {
-            throw new ApiTestPlatformException(DOCUMENT_TYPE_ERROR);
-        }
-
+        save(URL_IMPORT, dataImportDto.getUrl(),
+            dataImportDto.getType(), dataImportDto.getProjectId());
     }
 
     @Override
@@ -295,12 +257,32 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         }
     }
 
+    private void save(String type, String contentsOrResource, String documentType, String projectId ) {
+        Optional<DocumentType> documentTypeOptional = Optional.ofNullable(
+            DocumentType.resolve(documentType.toUpperCase(Locale.getDefault())));
+        if (documentTypeOptional.isPresent()) {
+            try {
+                ApiDocument apiDocument = StringUtils.equals(type, FILE_IMPORT)
+                    ?   documentFactory.buildByContents(contentsOrResource, documentTypeOptional.get()) :
+                    documentFactory.buildByResource(contentsOrResource, documentTypeOptional.get());
+                List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(
+                    apiDocument, projectId);
+                apiInterfaceRepository.insert(apiInterfaces);
+            } catch (Exception e) {
+                log.error("Failed to parse the file or url and save as ApiInterface!", e);
+                throw new ApiTestPlatformException(PARSE_FILE_OR_URL_AND_SAVE_AS_APIINTERFACE_ERROR);
+            }
+        } else {
+            throw new ApiTestPlatformException(DOCUMENT_TYPE_ERROR);
+        }
+    }
+
 
     private List<ApiInterface> convertApiPathsToApiInterfaces(ApiDocument apiDocument, String projectId) {
         List<ApiInterface> apiInterfaces = new ArrayList<>();
         List<ApiPath> apiPaths = apiDocument.getPaths();
         Map<String, ApiSchema> apiSchema = apiDocument.getSchemas();
-        resolveApiSchemaMap(apiSchema, apiSchema);
+        removeSchemaMapRef(apiSchema, apiSchema);
         apiPaths.forEach(apiPath ->
             apiPath.getOperations().forEach(apiOperation ->
                 apiInterfaces.add(
@@ -311,22 +293,20 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     }
 
     private ApiInterface apiPathOperationResolver(ApiOperation apiOperation,
-        Map<String, ApiSchema> apiSchema, ApiPath apiPath, String projectId) {
-        Optional<ApiRequestBody> apiRequestBodyOptional = Optional
-            .ofNullable(apiOperation.getApiRequestBody());
-        Optional<ApiResponse> apiResponseOptional = Optional
-            .ofNullable(apiOperation.getApiResponse());
-        Optional<String> requestBodyRefOptional = apiRequestBodyOptional
-            .map(ApiRequestBody::getSchema).map(ApiSchema::getRef);
-        Optional<String> responseRefOptional = apiResponseOptional
-            .map(ApiResponse::getSchema).map(ApiSchema::getRef);
-        requestBodyRefOptional.ifPresent(requestRef -> apiRequestBodyOptional.get()
-            .setSchema(apiSchema.get(getRefKey(requestRef))));
-        responseRefOptional.ifPresent(responseRdf -> apiResponseOptional.get()
-            .setSchema(apiSchema.get(getRefKey(responseRdf))));
-        List<String> tags = apiOperation.getTags();
-        String groupId = tags.isEmpty() ? null : addGroupByNameAndReturnId(
-            tags.get(FIRST_TAG), projectId);
+        Map<String, ApiSchema> apiSchemaMap, ApiPath apiPath, String projectId) {
+        Optional<ApiRequestBody> apiRequestBodyOptional = Optional.ofNullable(apiOperation.getApiRequestBody());
+        Optional<ApiResponse> apiResponseOptional = Optional.ofNullable(apiOperation.getApiResponse());
+        Optional<String> requestBodyRefOptional = apiRequestBodyOptional.map(ApiRequestBody::getSchema).map(ApiSchema::getRef);
+        Optional<String> responseRefOptional = apiResponseOptional.map(ApiResponse::getSchema).map(ApiSchema::getRef);
+        requestBodyRefOptional.ifPresent(requestRef -> {
+            ApiSchema apiSchema = apiSchemaMap.get(splitKeyFromRef(requestRef));
+            apiRequestBodyOptional.get().setSchema(apiSchema);
+        });
+        responseRefOptional.ifPresent(responseRef -> {
+            ApiSchema apiSchema = apiSchemaMap.get(splitKeyFromRef(responseRef));
+            apiResponseOptional.get().setSchema(apiSchema);
+        });
+        String groupId = getGroupIdByOperationTags(apiOperation, projectId);
         ApiInterface.ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
             .id(new ObjectId().toString())
             .method(HttpMethod.resolve(apiOperation.getHttpMethod().name()))
@@ -345,12 +325,17 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         apiResponseOptional.map(ApiResponse::getHeaders).ifPresent(apiHeaders ->
             apiInterfaceBuilder.responseHeaders(ApiHeaderConverter.CONVERT_TO_HEADER.apply(apiHeaders))
         );
-        ApiInterface apiInterface = apiInterfaceBuilder.build();
-        apiParameterResolver(apiInterface, apiOperation.getParameters());
-        return apiInterface;
+        addParameterToInterface(apiInterfaceBuilder, apiOperation.getParameters());
+        return apiInterfaceBuilder.build();
     }
 
-    private void apiParameterResolver(ApiInterface apiInterface, List<ApiParameter> apiParameters) {
+    private String getGroupIdByOperationTags(ApiOperation apiOperation, String projectId) {
+        List<String> tags = apiOperation.getTags();
+        return tags.isEmpty() ? null : addGroupByNameAndReturnId(
+            tags.get(FIRST_TAG), projectId);
+    }
+
+    private void addParameterToInterface(ApiInterfaceBuilder apiInterfaceBuilder, List<ApiParameter> apiParameters) {
         List<Header> requestHeaders = new ArrayList<>();
         List<Parameter> queryParams = new ArrayList<>();
         List<Parameter> pathParams = new ArrayList<>();
@@ -370,8 +355,9 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                     break;
             }
         }
-        apiInterface.setQueryParams(queryParams.isEmpty() ? null : queryParams);
-        apiInterface.setRequestHeaders(requestHeaders.isEmpty() ? null : requestHeaders);
-        apiInterface.setPathParams(pathParams.isEmpty() ? null : pathParams);
+        apiInterfaceBuilder
+            .responseHeaders(requestHeaders.isEmpty() ? null : requestHeaders)
+            .queryParams(queryParams.isEmpty() ? null : queryParams)
+            .pathParams(pathParams.isEmpty() ? null : pathParams);
     }
 }

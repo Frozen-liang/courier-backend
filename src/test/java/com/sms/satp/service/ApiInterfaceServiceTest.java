@@ -11,9 +11,7 @@ import static com.sms.satp.common.ErrorCode.EDIT_INTERFACE_GROUP_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_INTERFACE_GROUP_LIST_ERROR;
-import static com.sms.satp.common.ErrorCode.PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR;
-import static com.sms.satp.common.ErrorCode.PARSE_URL_AND_SAVE_AS_APIINTERFACE_ERROR;
-import static com.sms.satp.parser.DocumentFactoryTest.CONFIG_OPEN_API_V_3_YAML;
+import static com.sms.satp.common.ErrorCode.PARSE_FILE_OR_URL_AND_SAVE_AS_APIINTERFACE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,12 +33,10 @@ import com.sms.satp.entity.dto.InterfaceGroupDto;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.mapper.ApiInterfaceMapper;
 import com.sms.satp.mapper.InterfaceGroupMapper;
-import com.sms.satp.parser.DocumentFactoryTest;
 import com.sms.satp.repository.ApiInterfaceRepository;
 import com.sms.satp.repository.InterfaceGroupRepository;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -88,6 +84,7 @@ class ApiInterfaceServiceTest {
     private final static int PAGE_SIZE = 20;
     private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
+    private final static String FILE_NAME = "fileName";
     private final static String PROJECT_ID = "25";
     private final static String ID = "123";
     private final static String GROUP_ID = "25";
@@ -169,8 +166,8 @@ class ApiInterfaceServiceTest {
     }
 
     @Test
-    @DisplayName("Test the save method in the apiInterface service")
-    void save() throws IOException {
+    @DisplayName("Test the importByFile method in the apiInterface service")
+    void importByFile() throws IOException {
         List<ApiInterface> apiInterfaces = new ArrayList<>();
         for (int i = 0; i < LIST_SIZE; i++) {
             apiInterfaces.add(
@@ -180,43 +177,25 @@ class ApiInterfaceServiceTest {
             );
         }
         when(apiInterfaceRepository.insert(anyList())).thenReturn(apiInterfaces);
-        String contents = IOUtils.toString(LOCATION, StandardCharsets.UTF_8);
-        apiInterfaceService.save(contents, DOCUMENT_TYPE_SWAGGER, PROJECT_ID);
+        InputStream inputStream = IOUtils.toInputStream(IOUtils.toString(LOCATION, StandardCharsets.UTF_8));
+        MockMultipartFile mockMultipartFile = new MockMultipartFile(FILE_NAME,inputStream);
+        apiInterfaceService.importByFile(mockMultipartFile, DOCUMENT_TYPE_SWAGGER, PROJECT_ID);
         verify(apiInterfaceRepository, times(1)).insert(anyList());
     }
 
     @Test
-    @DisplayName("Test the save method with wrong type in the apiInterface service")
-    void save_with_wrong_type() throws IOException {
-        String contents = IOUtils.toString(LOCATION, StandardCharsets.UTF_8);
-        assertThatThrownBy(() -> apiInterfaceService.save(contents, WRONG_DOCUMENT_TYPE, PROJECT_ID))
+    @DisplayName("Test the importByFile method with wrong type in the apiInterface service")
+    void importByFile_with_wrong_type() throws IOException {
+        InputStream inputStream = IOUtils.toInputStream(IOUtils.toString(LOCATION, StandardCharsets.UTF_8));
+        MockMultipartFile mockMultipartFile = new MockMultipartFile(FILE_NAME,inputStream);
+        assertThatThrownBy(() -> apiInterfaceService.importByFile(mockMultipartFile, WRONG_DOCUMENT_TYPE, PROJECT_ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DOCUMENT_TYPE_ERROR.getCode());
     }
 
     @Test
-    @DisplayName("Test the method of saving by file in the apiInterface service")
-    void save2() throws IOException {
-        List<ApiInterface> apiInterfaces = new ArrayList<>();
-        for (int i = 0; i < LIST_SIZE; i++) {
-            apiInterfaces.add(
-                ApiInterface.builder()
-                    .title(TITLE)
-                    .build()
-            );
-        }
-        when(apiInterfaceRepository.insert(anyList())).thenReturn(apiInterfaces);
-        String location = DocumentFactoryTest.class.getResource(CONFIG_OPEN_API_V_3_YAML).getPath();
-        File file = new File(location);
-        FileInputStream fileInputStream = new FileInputStream(file);
-        MockMultipartFile mockMultipartFile = new MockMultipartFile(file.getName(),fileInputStream);
-        apiInterfaceService.save(mockMultipartFile, DOCUMENT_TYPE_SWAGGER, PROJECT_ID);
-        verify(apiInterfaceRepository, times(1)).insert(anyList());
-    }
-
-    @Test
     @DisplayName("Test the method of saving by URL in the apiInterface service")
-    void save3() {
+    void importByUrl() {
         DataImportDto dataImportDto = DataImportDto.builder().url(URL).type(DOCUMENT_TYPE_SWAGGER).projectId(PROJECT_ID).build();
         List<ApiInterface> apiInterfaces = new ArrayList<>();
         for (int i = 0; i < LIST_SIZE; i++) {
@@ -227,14 +206,16 @@ class ApiInterfaceServiceTest {
             );
         }
         when(apiInterfaceRepository.insert(anyList())).thenReturn(apiInterfaces);
-        apiInterfaceService.saveByUrl(dataImportDto);
+        apiInterfaceService.importByUrl(dataImportDto);
         verify(apiInterfaceRepository, times(1)).insert(anyList());
     }
 
     @Test
     @DisplayName("Test the saveByUrl method with wrong type in the apiInterface service")
-    void saveByUrl_with_wrong_type() {
-        assertThatThrownBy(() -> apiInterfaceService.save(URL, WRONG_DOCUMENT_TYPE, PROJECT_ID))
+    void importByUrl_with_wrong_type() {
+        DataImportDto dataImportDto = DataImportDto.builder()
+            .url(URL).type(WRONG_DOCUMENT_TYPE).projectId(PROJECT_ID).build();
+        assertThatThrownBy(() -> apiInterfaceService.importByUrl(dataImportDto))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DOCUMENT_TYPE_ERROR.getCode());
     }
@@ -353,10 +334,11 @@ class ApiInterfaceServiceTest {
     @DisplayName("An exception occurred while adding apiInterface through uploaded files")
     void addByFile_exception_test() throws IOException {
         doThrow(new RuntimeException()).when(apiInterfaceRepository).insert(anyList());
-        String contents = IOUtils.toString(LOCATION, StandardCharsets.UTF_8);
-        assertThatThrownBy(() -> apiInterfaceService.save(contents, DOCUMENT_TYPE_SWAGGER, PROJECT_ID))
+        InputStream inputStream = IOUtils.toInputStream(IOUtils.toString(LOCATION, StandardCharsets.UTF_8));
+        MockMultipartFile mockMultipartFile = new MockMultipartFile(FILE_NAME,inputStream);
+        assertThatThrownBy(() -> apiInterfaceService.importByFile(mockMultipartFile, DOCUMENT_TYPE_SWAGGER, PROJECT_ID))
             .isInstanceOf(ApiTestPlatformException.class)
-            .extracting("code").isEqualTo(PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR.getCode());
+            .extracting("code").isEqualTo(PARSE_FILE_OR_URL_AND_SAVE_AS_APIINTERFACE_ERROR.getCode());
     }
 
     @Test
@@ -364,9 +346,9 @@ class ApiInterfaceServiceTest {
     void addByURL_exception_test() {
         DataImportDto dataImportDto = DataImportDto.builder().url(URL).type(DOCUMENT_TYPE_SWAGGER).projectId(PROJECT_ID).build();
         doThrow(new RuntimeException()).when(apiInterfaceRepository).insert(anyList());
-        assertThatThrownBy(() -> apiInterfaceService.saveByUrl(dataImportDto))
+        assertThatThrownBy(() -> apiInterfaceService.importByUrl(dataImportDto))
             .isInstanceOf(ApiTestPlatformException.class)
-            .extracting("code").isEqualTo(PARSE_URL_AND_SAVE_AS_APIINTERFACE_ERROR.getCode());
+            .extracting("code").isEqualTo(PARSE_FILE_OR_URL_AND_SAVE_AS_APIINTERFACE_ERROR.getCode());
     }
 
     @Test

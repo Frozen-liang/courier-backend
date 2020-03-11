@@ -22,23 +22,23 @@ public abstract class ApiSchemaUtil {
     private ApiSchemaUtil() {
     }
 
-    public static void resolveApiSchemaMap(
+    public static void removeSchemaMapRef(
         Map<String, ApiSchema> apiSchemaMap, Map<String, ApiSchema> root) {
         Iterator<Entry<String, ApiSchema>> entryIterator = apiSchemaMap.entrySet().iterator();
         entryIterator.forEachRemaining(entry -> {
             if (StringUtils.isBlank(entry.getValue().getRef())) {
                 if (entry.getValue().getType().matches(SchemaType.OBJECT
                         .getType()) && Objects.nonNull(entry.getValue().getProperties())) {
-                    resolveApiSchemaMap(entry.getValue().getProperties(), root);
+                    removeSchemaMapRef(entry.getValue().getProperties(), root);
                 }
             } else {
-                String refKey = getRefKey(entry.getValue().getRef());
+                String refKey = splitKeyFromRef(entry.getValue().getRef());
                 entry.setValue(root.get(refKey));
             }
         });
     }
 
-    public static String getRefKey(String ref) {
+    public static String splitKeyFromRef(String ref) {
         if (StringUtils.isNoneBlank(ref)) {
             List<String> refs = Splitter.on("/").splitToList(ref);
             return refs.get(refs.size() - 1);
