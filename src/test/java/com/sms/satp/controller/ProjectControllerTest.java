@@ -43,6 +43,7 @@ class ProjectControllerTest {
     private final static String ID = "30";
     private final static String PROJECT_ID = "id";
     private final static String PROJECT_NAME = "name";
+    private static final String PARAM_INVALIDATE_CODE = "400";
 
     @Test
     @DisplayName("Query the page data for the Project by default query criteria")
@@ -139,6 +140,23 @@ class ProjectControllerTest {
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.code", is(Response.ok().build().getCode())))
             .andExpect(jsonPath("$.message", is(Response.ok().build().getMessage())));
+    }
+
+    @Test
+    @DisplayName("Add a Project with Empty name")
+    void addProject_withEmptyName() throws Exception{
+        ProjectDto projectDto = ProjectDto.builder()
+            .build();
+        doNothing().when(projectService).add(projectDto);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+            .post(Constants.PROJECT_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(objectMapper, projectDto));
+        ResultActions perform = mockMvc.perform(request);
+        perform.andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(PARAM_INVALIDATE_CODE)))
+            .andExpect(jsonPath("$.message", is("Project name cannot be empty")));
     }
 
 }

@@ -49,6 +49,7 @@ class ApiInterfaceControllerTest {
     private final static String API_INTERFACE_ID = "25";
     private final static Integer PAGE_NUMBER = 3;
     private final static Integer PAGE_SIZE = 20;
+    private static final String PARAM_INVALIDATE_CODE = "400";
 
     @Test
     @DisplayName("Query the page data for the ApiInterface by projectId and default query criteria")
@@ -171,6 +172,7 @@ class ApiInterfaceControllerTest {
     @DisplayName("Add InterfaceGroup")
     void addInterfaceGroup() throws Exception{
         InterfaceGroupDto interfaceGroupDto = InterfaceGroupDto.builder()
+            .projectId(PROJECT_ID)
             .name(GROUP_NAME)
             .build();
         when(apiInterfaceService.addGroup(interfaceGroupDto)).thenReturn(GROUP_ID);
@@ -191,6 +193,7 @@ class ApiInterfaceControllerTest {
         InterfaceGroupDto interfaceGroupDto = InterfaceGroupDto.builder()
             .id(GROUP_ID)
             .name(GROUP_NAME)
+            .projectId(PROJECT_ID)
             .build();
         doNothing().when(apiInterfaceService).editGroup(interfaceGroupDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -215,6 +218,38 @@ class ApiInterfaceControllerTest {
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.code", is(Response.ok().build().getCode())))
             .andExpect(jsonPath("$.message", is(Response.ok().build().getMessage())));
+    }
+
+    @Test
+    @DisplayName("Add InterfaceGroup with empty name")
+    void addInterfaceGroup_withEmptyName() throws Exception{
+        InterfaceGroupDto interfaceGroupDto = InterfaceGroupDto.builder().projectId(PROJECT_ID).build();
+        when(apiInterfaceService.addGroup(interfaceGroupDto)).thenReturn(GROUP_ID);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+            .post(Constants.INTERFACE_PATH + "/group")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(objectMapper, interfaceGroupDto));
+        ResultActions perform = mockMvc.perform(request);
+        perform.andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(PARAM_INVALIDATE_CODE)))
+            .andExpect(jsonPath("$.message", is("GroupName cannot be empty")));
+    }
+
+    @Test
+    @DisplayName("Add InterfaceGroup with empty projectId")
+    void addInterfaceGroup_withEmptyProjectId() throws Exception{
+        InterfaceGroupDto interfaceGroupDto = InterfaceGroupDto.builder().name(GROUP_NAME).build();
+        when(apiInterfaceService.addGroup(interfaceGroupDto)).thenReturn(GROUP_ID);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+            .post(Constants.INTERFACE_PATH + "/group")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(objectMapper, interfaceGroupDto));
+        ResultActions perform = mockMvc.perform(request);
+        perform.andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(PARAM_INVALIDATE_CODE)))
+            .andExpect(jsonPath("$.message", is("ProjectId cannot be empty")));
     }
 
 }
