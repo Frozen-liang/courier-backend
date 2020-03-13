@@ -10,7 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
-import com.sms.satp.entity.dto.DataImportDto;
+import com.sms.satp.entity.dto.DocumentImportDto;
+import com.sms.satp.entity.dto.ImportWay;
 import com.sms.satp.service.ApiInterfaceService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,9 @@ class DataControllerTest {
             .param("projectId", PROJECT_ID)
             .param("type", TYPE);
         ResultActions perform = mockMvc.perform(request);
-        doNothing().when(apiInterfaceService).importByFile(mockMultipartFile, TYPE, PROJECT_ID);
+        DocumentImportDto documentImportDto = DocumentImportDto.builder()
+            .file(mockMultipartFile).projectId(PROJECT_ID).type(TYPE).build();
+        doNothing().when(apiInterfaceService).importDocument(documentImportDto, ImportWay.FILE);
         perform.andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath(
@@ -64,13 +67,13 @@ class DataControllerTest {
     @Test
     @DisplayName("Import the interface through the URL")
     void importByUrl() throws Exception {
-        DataImportDto dataImportDto = DataImportDto.builder()
+        DocumentImportDto documentImportDto = DocumentImportDto.builder()
             .url(URL).type(TYPE).projectId(PROJECT_ID).build();
-        doNothing().when(apiInterfaceService).importByUrl(dataImportDto);
+        doNothing().when(apiInterfaceService).importDocument(documentImportDto, ImportWay.URL);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .post(Constants.DATA_PATH + "/url")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(asJsonString(objectMapper, dataImportDto));
+            .content(asJsonString(objectMapper, documentImportDto));
         ResultActions perform = mockMvc.perform(request);
         perform.andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -79,32 +82,15 @@ class DataControllerTest {
     }
 
     @Test
-    @DisplayName("Import the interface through the URL with url empty")
-    void importByUrl_withUrlEmpty() throws Exception {
-        DataImportDto dataImportDto = DataImportDto.builder()
-            .type(TYPE).projectId(PROJECT_ID).build();
-        doNothing().when(apiInterfaceService).importByUrl(dataImportDto);
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-            .post(Constants.DATA_PATH + "/url")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(asJsonString(objectMapper, dataImportDto));
-        ResultActions perform = mockMvc.perform(request);
-        perform.andExpect(status().isBadRequest())
-            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.code", is(PARAM_INVALIDATE_CODE)))
-            .andExpect(jsonPath("$.message", is("Import url cannot be empty")));
-    }
-
-    @Test
     @DisplayName("Import the interface through the URL with projectId empty")
     void importByUrl_withpRrojectIdEmpty() throws Exception {
-        DataImportDto dataImportDto = DataImportDto.builder()
+        DocumentImportDto documentImportDto = DocumentImportDto.builder()
             .type(TYPE).url(URL).build();
-        doNothing().when(apiInterfaceService).importByUrl(dataImportDto);
+        doNothing().when(apiInterfaceService).importDocument(documentImportDto, ImportWay.URL);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .post(Constants.DATA_PATH + "/url")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(asJsonString(objectMapper, dataImportDto));
+            .content(asJsonString(objectMapper, documentImportDto));
         ResultActions perform = mockMvc.perform(request);
         perform.andExpect(status().isBadRequest())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -115,17 +101,17 @@ class DataControllerTest {
     @Test
     @DisplayName("Import the interface through the URL with type empty")
     void importByUrl_withTypeEmpty() throws Exception {
-        DataImportDto dataImportDto = DataImportDto.builder()
+        DocumentImportDto documentImportDto = DocumentImportDto.builder()
             .url(URL).projectId(PROJECT_ID).build();
-        doNothing().when(apiInterfaceService).importByUrl(dataImportDto);
+        doNothing().when(apiInterfaceService).importDocument(documentImportDto, ImportWay.URL);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .post(Constants.DATA_PATH + "/url")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(asJsonString(objectMapper, dataImportDto));
+            .content(asJsonString(objectMapper, documentImportDto));
         ResultActions perform = mockMvc.perform(request);
         perform.andExpect(status().isBadRequest())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.code", is(PARAM_INVALIDATE_CODE)))
-            .andExpect(jsonPath("$.message", is("Data type cannot be empty")));
+            .andExpect(jsonPath("$.message", is("DocumentType cannot be empty")));
     }
 }

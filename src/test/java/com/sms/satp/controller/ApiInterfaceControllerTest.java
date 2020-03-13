@@ -15,6 +15,7 @@ import com.sms.satp.entity.dto.ApiInterfaceDto;
 import com.sms.satp.entity.dto.InterfaceGroupDto;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.service.ApiInterfaceService;
+import com.sms.satp.service.InterfaceGroupService;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +35,9 @@ class ApiInterfaceControllerTest {
 
     @MockBean
     ApiInterfaceService apiInterfaceService;
+
+    @MockBean
+    InterfaceGroupService interfaceGroupService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -158,7 +162,7 @@ class ApiInterfaceControllerTest {
                     .name(GROUP_NAME)
                     .build());
         }
-        when(apiInterfaceService.getGroupList(PROJECT_ID)).thenReturn(interfaceGroupList);
+        when(interfaceGroupService.getGroupList(PROJECT_ID)).thenReturn(interfaceGroupList);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .get(Constants.INTERFACE_PATH + "/group/list/" + PROJECT_ID);
         ResultActions perform = mockMvc.perform(request);
@@ -175,7 +179,7 @@ class ApiInterfaceControllerTest {
             .projectId(PROJECT_ID)
             .name(GROUP_NAME)
             .build();
-        when(apiInterfaceService.addGroup(interfaceGroupDto)).thenReturn(GROUP_ID);
+        when(interfaceGroupService.addGroup(interfaceGroupDto)).thenReturn(GROUP_ID);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .post(Constants.INTERFACE_PATH + "/group")
             .contentType(MediaType.APPLICATION_JSON)
@@ -195,7 +199,7 @@ class ApiInterfaceControllerTest {
             .name(GROUP_NAME)
             .projectId(PROJECT_ID)
             .build();
-        doNothing().when(apiInterfaceService).editGroup(interfaceGroupDto);
+        doNothing().when(interfaceGroupService).editGroup(interfaceGroupDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .put(Constants.INTERFACE_PATH + "/group")
             .contentType(MediaType.APPLICATION_JSON)
@@ -210,7 +214,7 @@ class ApiInterfaceControllerTest {
     @Test
     @DisplayName("Delete the InterfaceGroup by id")
     void deleteInterfaceGroup() throws Exception{
-        doNothing().when(apiInterfaceService).deleteGroup(GROUP_ID);
+        doNothing().when(interfaceGroupService).deleteGroup(GROUP_ID);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .delete(Constants.INTERFACE_PATH + "/group/" + GROUP_ID);
         ResultActions perform = mockMvc.perform(request);
@@ -224,7 +228,7 @@ class ApiInterfaceControllerTest {
     @DisplayName("Add InterfaceGroup with empty name")
     void addInterfaceGroup_withEmptyName() throws Exception{
         InterfaceGroupDto interfaceGroupDto = InterfaceGroupDto.builder().projectId(PROJECT_ID).build();
-        when(apiInterfaceService.addGroup(interfaceGroupDto)).thenReturn(GROUP_ID);
+        when(interfaceGroupService.addGroup(interfaceGroupDto)).thenReturn(GROUP_ID);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .post(Constants.INTERFACE_PATH + "/group")
             .contentType(MediaType.APPLICATION_JSON)
@@ -240,7 +244,7 @@ class ApiInterfaceControllerTest {
     @DisplayName("Add InterfaceGroup with empty projectId")
     void addInterfaceGroup_withEmptyProjectId() throws Exception{
         InterfaceGroupDto interfaceGroupDto = InterfaceGroupDto.builder().name(GROUP_NAME).build();
-        when(apiInterfaceService.addGroup(interfaceGroupDto)).thenReturn(GROUP_ID);
+        when(interfaceGroupService.addGroup(interfaceGroupDto)).thenReturn(GROUP_ID);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .post(Constants.INTERFACE_PATH + "/group")
             .contentType(MediaType.APPLICATION_JSON)

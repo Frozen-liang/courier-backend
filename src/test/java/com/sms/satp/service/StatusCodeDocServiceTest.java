@@ -16,6 +16,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.ApplicationTests;
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.StatusCodeDoc;
 import com.sms.satp.entity.dto.PageDto;
@@ -26,9 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Example;
@@ -39,7 +40,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
-@Disabled
+@SpringBootTest(classes = ApplicationTests.class)
 @DisplayName("Test cases for StatusCodeDocService")
 class StatusCodeDocServiceTest {
 

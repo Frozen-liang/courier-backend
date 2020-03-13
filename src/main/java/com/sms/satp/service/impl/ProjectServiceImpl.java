@@ -65,10 +65,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void add(ProjectDto projectDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("ProjectService-add()-Parameter: %s",
-                projectDto.toString()));
-        }
+        log.info("ProjectService-add()-params: [Project]={}", projectDto.toString());
         try {
             Project project = projectMapper.toEntity(projectDto);
             project.setId(new ObjectId().toString());
@@ -82,10 +79,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void edit(ProjectDto projectDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("ProjectService-edit()-Parameter: %s",
-                projectDto.toString()));
-        }
+        log.info("ProjectService-edit()-params: [Project]={}", projectDto.toString());
         try {
             Project project = projectMapper.toEntity(projectDto);
             Optional<Project> projectOptional = projectRepository.findById(project.getId());

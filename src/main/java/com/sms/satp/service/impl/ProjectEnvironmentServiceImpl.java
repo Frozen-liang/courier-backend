@@ -58,10 +58,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
 
     @Override
     public void add(ProjectEnvironmentDto projectEnvironmentDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("ProjectEnvironmentService-add()-Parameter: %s",
-                projectEnvironmentDto.toString()));
-        }
+        log.info("ProjectEnvironmentService-add()-params: [ProjectEnvironment]={}", projectEnvironmentDto.toString());
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentDto);
@@ -76,10 +73,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
 
     @Override
     public void edit(ProjectEnvironmentDto projectEnvironmentDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("ProjectEnvironmentService-edit()-Parameter: %s",
-                projectEnvironmentDto.toString()));
-        }
+        log.info("ProjectEnvironmentService-edit()-params: [ProjectEnvironment]={}", projectEnvironmentDto.toString());
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentDto);

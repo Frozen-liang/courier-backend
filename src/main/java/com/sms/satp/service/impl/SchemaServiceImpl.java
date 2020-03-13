@@ -57,10 +57,7 @@ public class SchemaServiceImpl implements SchemaService {
 
     @Override
     public void add(SchemaDto schemaDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("SchemaService-add()-Parameter: %s",
-                schemaDto.toString()));
-        }
+        log.info("SchemaService-add()-params: [Schema]={}", schemaDto.toString());
         try {
             Schema schema = schemaMapper.toEntity(schemaDto);
             schema.setId(new ObjectId().toString());
@@ -74,10 +71,7 @@ public class SchemaServiceImpl implements SchemaService {
 
     @Override
     public void edit(SchemaDto schemaDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("SchemaService-edit()-Parameter: %s",
-                schemaDto.toString()));
-        }
+        log.info("SchemaService-edit()-params: [Schema]={}", schemaDto.toString());
         try {
             Schema schema = schemaMapper.toEntity(schemaDto);
             Optional<Schema> schemaOptional = schemaRepository

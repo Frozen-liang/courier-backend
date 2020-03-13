@@ -6,6 +6,7 @@ import com.sms.satp.entity.dto.ApiInterfaceDto;
 import com.sms.satp.entity.dto.InterfaceGroupDto;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.service.ApiInterfaceService;
+import com.sms.satp.service.InterfaceGroupService;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -24,9 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApiInterfaceController {
 
     private final ApiInterfaceService apiInterfaceService;
+    private final InterfaceGroupService interfaceGroupService;
 
-    public ApiInterfaceController(ApiInterfaceService apiInterfaceService) {
+    public ApiInterfaceController(ApiInterfaceService apiInterfaceService,
+        InterfaceGroupService interfaceGroupService) {
         this.apiInterfaceService = apiInterfaceService;
+        this.interfaceGroupService = interfaceGroupService;
     }
 
     @GetMapping("/page/{projectId}")
@@ -62,25 +66,25 @@ public class ApiInterfaceController {
 
     @GetMapping("/group/list/{projectId}")
     public Response<List<InterfaceGroupDto>> getGroupList(@PathVariable String projectId) {
-        return Response.ok(apiInterfaceService.getGroupList(projectId));
+        return Response.ok(interfaceGroupService.getGroupList(projectId));
     }
 
     @PostMapping("/group")
     public Response addGroup(@Valid @RequestBody InterfaceGroupDto interfaceGroupDto) {
-        apiInterfaceService.addGroup(interfaceGroupDto);
+        interfaceGroupService.addGroup(interfaceGroupDto);
         return Response.ok().build();
     }
 
     @PutMapping("/group")
     public Response editGroup(@Valid @RequestBody InterfaceGroupDto interfaceGroupDto) {
-        apiInterfaceService.editGroup(interfaceGroupDto);
+        interfaceGroupService.editGroup(interfaceGroupDto);
         return Response.ok().build();
     }
 
     @DeleteMapping("/group/{ids}")
     public Response deleteGroups(@PathVariable String[] ids) {
         for (String id :ids) {
-            apiInterfaceService.deleteGroup(id);
+            interfaceGroupService.deleteGroup(id);
         }
         return Response.ok().build();
     }

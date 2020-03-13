@@ -57,10 +57,7 @@ public class WikiServiceImpl implements WikiService {
 
     @Override
     public void add(WikiDto wikiDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("WikiService-add()-Parameter: %s",
-                wikiDto.toString()));
-        }
+        log.info("WikiService-add()-params: [Wiki]={}", wikiDto.toString());
         try {
             Wiki wiki = wikiMapper.toEntity(wikiDto);
             wiki.setId(new ObjectId().toString());
@@ -74,10 +71,7 @@ public class WikiServiceImpl implements WikiService {
 
     @Override
     public void edit(WikiDto wikiDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("WikiService-edit()-Parameter: %s",
-                wikiDto.toString()));
-        }
+        log.info("WikiService-edit()-params: [Wiki]={}", wikiDto.toString());
         try {
             Wiki wiki = wikiMapper.toEntity(wikiDto);
             Optional<Wiki> wikiOptional = wikiRepository

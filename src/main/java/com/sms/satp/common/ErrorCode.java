@@ -45,6 +45,8 @@ public enum ErrorCode {
     ADD_INTERFACE_GROUP_ERROR("4037","Failed to add the Group!"),
     EDIT_INTERFACE_GROUP_ERROR("4038","Failed to edit the Group!"),
     DELETE_INTERFACE_GROUP_BY_ID_ERROR("4039","Failed to delete the Group!"),
+    IMPORT_FILE_EMPTY_ERROR("4040","Import failed, the file is empty"),
+    IMPORT_URL_EMPTY_ERROE("4041", "Import failed, the URL is empty"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

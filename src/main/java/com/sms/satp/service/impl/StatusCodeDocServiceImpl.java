@@ -58,10 +58,7 @@ public class StatusCodeDocServiceImpl implements StatusCodeDocService {
 
     @Override
     public void add(StatusCodeDocDto statusCodeDocDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("StatusCodeDocService-add()-Parameter: %s",
-                statusCodeDocDto.toString()));
-        }
+        log.info("StatusCodeDocService-add()-params: [StatusCodeDoc]={}", statusCodeDocDto.toString());
         try {
             StatusCodeDoc statusCodeDoc = statusCodeDocMapper.toEntity(statusCodeDocDto);
             statusCodeDoc.setId(new ObjectId().toString());
@@ -75,10 +72,7 @@ public class StatusCodeDocServiceImpl implements StatusCodeDocService {
 
     @Override
     public void edit(StatusCodeDocDto statusCodeDocDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("StatusCodeDocService-edit()-Parameter: %s",
-                statusCodeDocDto.toString()));
-        }
+        log.info("StatusCodeDocService-edit()-params: [StatusCodeDoc]={}", statusCodeDocDto.toString());
         try {
             StatusCodeDoc statusCodeDoc = statusCodeDocMapper.toEntity(statusCodeDocDto);
             Optional<StatusCodeDoc> statusCodeDocOptional = statusCodeDocRepository
