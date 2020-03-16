@@ -13,5 +13,6 @@ public class Constants {
     public static final String STATUS_CODE_DOC_PATH = SDK_VERSION + "/status-code-doc";
     public static final String WIKI_PATH = SDK_VERSION + "/wiki";
     public static final String SCHEMA_PATH = SDK_VERSION + "/schema";
+    public static final String COMMON_PATH = SDK_VERSION + "/common";
 
 }
