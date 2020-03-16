@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 
 public abstract class ApiSchemaUtil {
 
@@ -54,6 +55,7 @@ public abstract class ApiSchemaUtil {
         Optional<ApiSchema> apiSchemaOptional = Optional.ofNullable(apiSchema);
         if (apiSchemaOptional.isPresent()) {
             SchemaBuilder schemaBuilder = Schema.builder()
+                .id(new ObjectId().toString())
                 .name(apiSchemaOptional.map(ApiSchema::getName).orElse(null))
                 .title(apiSchemaOptional.map(ApiSchema::getTitle).orElse(null))
                 .required(apiSchemaOptional.map(ApiSchema::getRequired).orElse(null))

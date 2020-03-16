@@ -14,7 +14,7 @@ public class PageDto {
 
     @Builder.Default
     @Schema(title = "Page Number")
-    private int pageNumber = 0;
+    private int pageNumber = 1;
     @Builder.Default
     @Schema(title = "Page Size")
     private int pageSize = 10;

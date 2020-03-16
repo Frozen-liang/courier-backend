@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
+import org.bson.types.ObjectId;
 
 public abstract class ApiHeaderConverter {
 
@@ -19,6 +20,7 @@ public abstract class ApiHeaderConverter {
     private static List<Header> apiHeaderListConvert(List<ApiHeader> apiHeaders) {
         return CollectionUtils.isNotEmpty(apiHeaders)
             ? apiHeaders.stream().map(apiHeader -> Header.builder()
+            .id(new ObjectId().toString())
             .name(apiHeader.getName())
             .description(apiHeader.getDescription())
             .build())

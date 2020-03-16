@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
+import org.bson.types.ObjectId;
 
 public abstract class ApiRequestBodyConverter {
 
@@ -20,6 +21,7 @@ public abstract class ApiRequestBodyConverter {
     private static RequestBody apiRequestBodyConvert(ApiRequestBody apiRequestBody) {
         if (Objects.nonNull(apiRequestBody)) {
             RequestBodyBuilder requestBodyBuilder = RequestBody.builder()
+                .id(new ObjectId().toString())
                 .description(apiRequestBody.getDescription())
                 .mediaTypes(null)
                 .schema(ApiSchemaUtil.CONVERT_TO_SCHEMA.apply(apiRequestBody.getSchema()))

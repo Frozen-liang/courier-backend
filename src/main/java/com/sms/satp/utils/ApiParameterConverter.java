@@ -6,6 +6,7 @@ import com.sms.satp.parser.model.ApiParameter;
 
 import java.util.Objects;
 import java.util.function.Function;
+import org.bson.types.ObjectId;
 
 public abstract class ApiParameterConverter {
 
@@ -20,22 +21,24 @@ public abstract class ApiParameterConverter {
 
     private static Parameter apiParameterConvertToParameter(ApiParameter apiParameter) {
         return Objects.nonNull(apiParameter)
-                ? Parameter.builder()
+            ? Parameter.builder().id(new ObjectId().toString())
                 .name(apiParameter.getName())
                 .type(apiParameter.getSchemaType())
                 .description(apiParameter.getDescription())
                 .required(apiParameter.getRequired())
                 .deprecated(apiParameter.getDeprecated())
                 .example(apiParameter.getExample())
-                .build() : null;
+                .build()
+            : null;
     }
 
     private static Header apiParameterConvertToHeader(ApiParameter apiParameter) {
         return Objects.nonNull(apiParameter)
-                ? Header.builder()
+            ? Header.builder().id(new ObjectId().toString())
                 .name(apiParameter.getName())
                 .description(apiParameter.getDescription())
                 .required(apiParameter.getRequired())
-                .build() : null;
+                .build()
+            : null;
     }
 }
