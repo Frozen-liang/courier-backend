@@ -61,7 +61,7 @@ class ApiInterfaceControllerTest {
         PageDto pageDto = PageDto.builder().build();
         when(apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID)).thenReturn(null);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-            .get(Constants.INTERFACE_PATH + "/page/" + PROJECT_ID);
+            .get(Constants.INTERFACE_PATH + "/page/" + PROJECT_ID + "/" + GROUP_ID);
         ResultActions perform = mockMvc.perform(request);
         perform.andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -78,7 +78,7 @@ class ApiInterfaceControllerTest {
             .build();
         when(apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID)).thenReturn(null);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-            .get(Constants.INTERFACE_PATH + "/page/" + PROJECT_ID)
+            .get(Constants.INTERFACE_PATH + "/page/" + PROJECT_ID + "/" + GROUP_ID)
             .param("pageNumber", String.valueOf(PAGE_NUMBER))
             .param("pageSize", String.valueOf(PAGE_SIZE));
         ResultActions perform = mockMvc.perform(request);

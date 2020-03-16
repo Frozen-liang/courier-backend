@@ -56,7 +56,7 @@ class StatusCodeDocServiceTest {
     private final static int TOTAL_ELEMENTS = 60;
     private final static int PAGE_NUMBER = 2;
     private final static int PAGE_SIZE = 20;
-    private final static int DEFAULT_PAGE_NUMBER = 0;
+    private final static int DEFAULT_PAGE_NUMBER = 1;
     private final static int DEFAULT_PAGE_SIZE = 10;
     private final static String ID = "25";
     private final static String NOT_EXIST_ID = "30";

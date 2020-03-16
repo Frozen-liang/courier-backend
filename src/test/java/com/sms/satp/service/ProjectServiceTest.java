@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -61,7 +60,7 @@ class ProjectServiceTest {
     private final static int TOTAL_ELEMENTS = 60;
     private final static int PAGE_NUMBER = 2;
     private final static int PAGE_SIZE = 20;
-    private final static int DEFAULT_PAGE_NUMBER = 0;
+    private final static int DEFAULT_PAGE_NUMBER = 1;
     private final static int DEFAULT_PAGE_SIZE = 10;
 
     @Test

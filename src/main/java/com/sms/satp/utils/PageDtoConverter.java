@@ -6,10 +6,11 @@ public abstract class PageDtoConverter {
 
     private static final Integer FRONT_FIRST_NUMBER = 1;
 
-    private PageDtoConverter(){}
-
-    public static void frontMapping(PageDto pageDto){
-        pageDto.setPageNumber(pageDto.getPageNumber()- FRONT_FIRST_NUMBER);
+    private PageDtoConverter() {
     }
 
+    public static void frontMapping(PageDto pageDto) {
+        pageDto.setPageNumber(pageDto.getPageNumber() - FRONT_FIRST_NUMBER);
+    }
 }
+  

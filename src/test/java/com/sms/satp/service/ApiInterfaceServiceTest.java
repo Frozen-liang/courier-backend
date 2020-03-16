@@ -69,7 +69,7 @@ class ApiInterfaceServiceTest {
     private final static int TOTAL_ELEMENTS = 60;
     private final static int PAGE_NUMBER = 2;
     private final static int PAGE_SIZE = 20;
-    private final static int DEFAULT_PAGE_NUMBER = 0;
+    private final static int DEFAULT_PAGE_NUMBER = 1;
     private final static int DEFAULT_PAGE_SIZE = 10;
     private final static String FILE_NAME = "fileName";
     private final static String PROJECT_ID = "25";
@@ -79,6 +79,7 @@ class ApiInterfaceServiceTest {
     private final static String NOT_EXIST_ID = "nul";
     private final static String DOCUMENT_TYPE_SWAGGER = "SWAGGER";
     private final static String WRONG_DOCUMENT_TYPE = "wrong";
+    private final static String SAVE_MODE = "COVER";
     private final static String PATH = "/config/openapi_v3.yaml";
     private final static String URL = "https://meshdev.smsassist.com/filestorage/swagger/v1/swagger.json";
     private final static URL LOCATION = ApiInterfaceServiceTest.class.getResource(PATH);
@@ -169,6 +170,7 @@ class ApiInterfaceServiceTest {
             .file(mockMultipartFile)
             .type(DOCUMENT_TYPE_SWAGGER)
             .projectId(PROJECT_ID)
+            .saveMode(SAVE_MODE)
             .build();
         apiInterfaceService.importDocument(documentImportDto, ImportWay.FILE);
         verify(apiInterfaceRepository, atLeastOnce()).save(any(ApiInterface.class));
@@ -177,7 +179,11 @@ class ApiInterfaceServiceTest {
     @Test
     @DisplayName("Test the method of saving by URL in the apiInterface service")
     void importByUrl() {
-        DocumentImportDto documentImportDto = DocumentImportDto.builder().url(URL).type(DOCUMENT_TYPE_SWAGGER).projectId(PROJECT_ID).build();
+        DocumentImportDto documentImportDto = DocumentImportDto.builder()
+            .url(URL)
+            .type(DOCUMENT_TYPE_SWAGGER)
+            .saveMode(SAVE_MODE)
+            .projectId(PROJECT_ID).build();
         List<ApiInterface> apiInterfaces = new ArrayList<>();
         for (int i = 0; i < LIST_SIZE; i++) {
             apiInterfaces.add(
