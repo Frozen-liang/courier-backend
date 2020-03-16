@@ -47,6 +47,7 @@ public enum ErrorCode {
     DELETE_INTERFACE_GROUP_BY_ID_ERROR("4039","Failed to delete the Group!"),
     IMPORT_FILE_EMPTY_ERROR("4040","Import failed, the file is empty"),
     IMPORT_URL_EMPTY_ERROE("4041", "Import failed, the URL is empty"),
+    SAVE_MODE_ERROR("4042","Saving mode error!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

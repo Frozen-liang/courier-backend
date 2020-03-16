@@ -1,5 +1,6 @@
 package com.sms.satp.entity;
 
+import com.sms.satp.entity.dto.SaveMode;
 import com.sms.satp.parser.common.DocumentType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,5 +16,6 @@ public class DocumentImport {
     private String url;
     private String content;
     private DocumentType type;
+    private SaveMode saveMode;
     private String projectId;
 }

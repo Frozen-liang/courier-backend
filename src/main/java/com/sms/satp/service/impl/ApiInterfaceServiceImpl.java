@@ -18,6 +18,7 @@ import com.sms.satp.entity.dto.ApiInterfaceDto;
 import com.sms.satp.entity.dto.DocumentImportDto;
 import com.sms.satp.entity.dto.ImportWay;
 import com.sms.satp.entity.dto.PageDto;
+import com.sms.satp.entity.dto.SaveMode;
 import com.sms.satp.mapper.ApiInterfaceMapper;
 import com.sms.satp.mapper.DocumentImportMapper;
 import com.sms.satp.parser.DocumentFactory;
@@ -57,6 +58,7 @@ import org.springframework.stereotype.Service;
 public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     private static final Integer FIRST_TAG = 0;
+    private static final String ALL_GROUP_FLAG = "-1";
 
     private final ApiInterfaceRepository apiInterfaceRepository;
 
@@ -80,7 +82,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         try {
             ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
                 .projectId(projectId);
-            if (StringUtils.isNoneBlank(groupId)) {
+            if (!StringUtils.equals(groupId, ALL_GROUP_FLAG)) {
                 apiInterfaceBuilder.groupId(groupId);
             }
             Example<ApiInterface> example = Example.of(apiInterfaceBuilder.build());
@@ -160,10 +162,10 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             documentImport.getContent(), documentImport.getProjectId());
         ApiDocument apiDocument = importWay.getExecutor().unchecked().apply(documentImport, documentFactory);
         List<ApiInterface> apiInterfaces = parseApiDocumentToApiInterfaces(apiDocument, documentImport.getProjectId());
-        saveInterfacesByType(apiInterfaces, "cover");
+        saveInterfacesByType(apiInterfaces, documentImport.getSaveMode());
     }
 
-    private void saveInterfacesByType(List<ApiInterface> apiInterfaceList, String type) {
+    private void saveInterfacesByType(List<ApiInterface> apiInterfaceList, SaveMode saveMode) {
         apiInterfaceList.forEach(apiInterface -> {
             ApiInterface apiInterfaceExample = ApiInterface.builder()
                 .method(apiInterface.getMethod())
@@ -172,7 +174,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             Example<ApiInterface> example = Example.of(apiInterfaceExample);
             Optional<ApiInterface> apiInterfaceOptional = apiInterfaceRepository.findOne(example);
             if (apiInterfaceOptional.isPresent()) {
-                if (StringUtils.equals(type, "cover")) {
+                if (saveMode.matches(SaveMode.COVER.name())) {
                     apiInterface.setId(apiInterfaceOptional.get().getId());
                     apiInterfaceRepository.save(apiInterface);
                 }
