@@ -19,6 +19,7 @@ public class DocumentImportDto {
     private String type;
     @NotNull(message = "ProjectId cannot be empty")
     private String projectId;
+    @NotNull(message = "SaveMode cannot be empty")
     private String saveMode;
 
 }
