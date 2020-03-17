@@ -13,6 +13,7 @@ import com.sms.satp.entity.dto.WikiDto;
 import com.sms.satp.mapper.WikiMapper;
 import com.sms.satp.repository.WikiRepository;
 import com.sms.satp.service.WikiService;
+import com.sms.satp.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,7 @@ public class WikiServiceImpl implements WikiService {
     @Override
     public Page<WikiDto> page(PageDto pageDto, String projectId) {
         try {
+            PageDtoConverter.frontMapping(pageDto);
             Wiki wiki = Wiki.builder()
                 .projectId(projectId)
                 .build();

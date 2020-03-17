@@ -5,7 +5,6 @@ import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.ProjectDto;
 import com.sms.satp.service.ProjectService;
-import com.sms.satp.utils.PageDtoConverter;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,7 +28,6 @@ public class ProjectController {
 
     @GetMapping("/page")
     public Response<Page<ProjectDto>> page(PageDto pageDto) {
-        PageDtoConverter.frontMapping(pageDto);
         return Response.ok(projectService.page(pageDto));
     }
 

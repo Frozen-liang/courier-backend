@@ -41,6 +41,7 @@ class DataControllerTest {
     private static final String PARAM_INVALIDATE_CODE = "400";
     private static final String TYPE = "SWAGGER";
     private static final String PROJECT_ID = "25";
+    private static final String SAVE_MODE = "COVER";
     private final static String URL = "https://meshdev.smsassist.com/filestorage/swagger/v1/swagger.json";
 
     @Test
@@ -52,10 +53,11 @@ class DataControllerTest {
             .multipart(Constants.DATA_PATH + "/file")
             .file(mockMultipartFile)
             .param("projectId", PROJECT_ID)
+            .param("saveMode", SAVE_MODE)
             .param("type", TYPE);
         ResultActions perform = mockMvc.perform(request);
         DocumentImportDto documentImportDto = DocumentImportDto.builder()
-            .file(mockMultipartFile).projectId(PROJECT_ID).type(TYPE).build();
+            .file(mockMultipartFile).projectId(PROJECT_ID).type(TYPE).saveMode(SAVE_MODE).build();
         doNothing().when(apiInterfaceService).importDocument(documentImportDto, ImportWay.FILE);
         perform.andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -68,7 +70,7 @@ class DataControllerTest {
     @DisplayName("Import the interface through the URL")
     void importByUrl() throws Exception {
         DocumentImportDto documentImportDto = DocumentImportDto.builder()
-            .url(URL).type(TYPE).projectId(PROJECT_ID).build();
+            .url(URL).type(TYPE).projectId(PROJECT_ID).saveMode(SAVE_MODE).build();
         doNothing().when(apiInterfaceService).importDocument(documentImportDto, ImportWay.URL);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .post(Constants.DATA_PATH + "/url")
@@ -85,7 +87,7 @@ class DataControllerTest {
     @DisplayName("Import the interface through the URL with projectId empty")
     void importByUrl_withpRrojectIdEmpty() throws Exception {
         DocumentImportDto documentImportDto = DocumentImportDto.builder()
-            .type(TYPE).url(URL).build();
+            .type(TYPE).url(URL).saveMode(SAVE_MODE).build();
         doNothing().when(apiInterfaceService).importDocument(documentImportDto, ImportWay.URL);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .post(Constants.DATA_PATH + "/url")
@@ -102,7 +104,7 @@ class DataControllerTest {
     @DisplayName("Import the interface through the URL with type empty")
     void importByUrl_withTypeEmpty() throws Exception {
         DocumentImportDto documentImportDto = DocumentImportDto.builder()
-            .url(URL).projectId(PROJECT_ID).build();
+            .url(URL).projectId(PROJECT_ID).saveMode(SAVE_MODE).build();
         doNothing().when(apiInterfaceService).importDocument(documentImportDto, ImportWay.URL);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .post(Constants.DATA_PATH + "/url")
@@ -113,5 +115,22 @@ class DataControllerTest {
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.code", is(PARAM_INVALIDATE_CODE)))
             .andExpect(jsonPath("$.message", is("DocumentType cannot be empty")));
+    }
+
+    @Test
+    @DisplayName("Import the interface through the URL with saveMode empty")
+    void importByUrl_withSaveModeEmpty() throws Exception {
+        DocumentImportDto documentImportDto = DocumentImportDto.builder()
+            .url(URL).projectId(PROJECT_ID).type(TYPE).build();
+        doNothing().when(apiInterfaceService).importDocument(documentImportDto, ImportWay.URL);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+            .post(Constants.DATA_PATH + "/url")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(objectMapper, documentImportDto));
+        ResultActions perform = mockMvc.perform(request);
+        perform.andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(PARAM_INVALIDATE_CODE)))
+            .andExpect(jsonPath("$.message", is("SaveMode cannot be empty")));
     }
 }

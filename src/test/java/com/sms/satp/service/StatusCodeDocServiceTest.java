@@ -56,8 +56,9 @@ class StatusCodeDocServiceTest {
     private final static int TOTAL_ELEMENTS = 60;
     private final static int PAGE_NUMBER = 2;
     private final static int PAGE_SIZE = 20;
-    private final static int DEFAULT_PAGE_NUMBER = 1;
+    private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
+    private static final int FRONT_FIRST_NUMBER = 1;
     private final static String ID = "25";
     private final static String NOT_EXIST_ID = "30";
     private final static String PROJECT_ID = "25";
@@ -72,7 +73,7 @@ class StatusCodeDocServiceTest {
         Example<StatusCodeDoc> example = Example.of(statusCodeDoc);
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<StatusCodeDoc> statusCodeDocList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             statusCodeDocList.add(StatusCodeDoc.builder().code(CODE).build());
@@ -100,7 +101,7 @@ class StatusCodeDocServiceTest {
             .order("asc")
             .build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<StatusCodeDoc> statusCodeDocList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             statusCodeDocList.add(StatusCodeDoc.builder().code(CODE).build());
@@ -109,7 +110,7 @@ class StatusCodeDocServiceTest {
         when(statusCodeDocRepository.findAll(example, pageable)).thenReturn(statusCodeDocPage);
         Page<StatusCodeDocDto> statusCodeDocDtoPage = statusCodeDocService.page(pageDto, PROJECT_ID);
         assertThat(statusCodeDocDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
-        assertThat(statusCodeDocDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER);
+        assertThat(statusCodeDocDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER - FRONT_FIRST_NUMBER);
         assertThat(statusCodeDocDtoPage.getPageable().getPageSize()).isEqualTo(PAGE_SIZE);
         assertThat(statusCodeDocDtoPage.getContent()).allMatch(projectDto -> StringUtils.equals(projectDto.getCode(), CODE));
     }

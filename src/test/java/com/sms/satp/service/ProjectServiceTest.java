@@ -60,8 +60,9 @@ class ProjectServiceTest {
     private final static int TOTAL_ELEMENTS = 60;
     private final static int PAGE_NUMBER = 2;
     private final static int PAGE_SIZE = 20;
-    private final static int DEFAULT_PAGE_NUMBER = 1;
+    private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
+    private static final int FRONT_FIRST_NUMBER = 1;
 
     @Test
     @DisplayName("Test the query method without query criteria")
@@ -85,7 +86,7 @@ class ProjectServiceTest {
     void page_default_test() {
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<Project> projectList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             projectList.add(Project.builder().name(NAME).build());
@@ -108,7 +109,7 @@ class ProjectServiceTest {
             .order("asc")
             .build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<Project> projectList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             projectList.add(Project.builder().name(NAME).build());
@@ -117,7 +118,7 @@ class ProjectServiceTest {
         when(projectRepository.findAll(pageable)).thenReturn(projectPage);
         Page<ProjectDto> projectDtoPage = projectService.page(pageDto);
         assertThat(projectDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
-        assertThat(projectDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER);
+        assertThat(projectDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER - FRONT_FIRST_NUMBER);
         assertThat(projectDtoPage.getPageable().getPageSize()).isEqualTo(PAGE_SIZE);
         assertThat(projectDtoPage.getContent()).allMatch(projectDto -> StringUtils.equals(projectDto.getName(), NAME));
     }

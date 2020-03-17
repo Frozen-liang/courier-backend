@@ -57,8 +57,9 @@ class ProjectEnvironmentServiceTest {
     private final static int TOTAL_ELEMENTS = 60;
     private final static int PAGE_NUMBER = 2;
     private final static int PAGE_SIZE = 20;
-    private final static int DEFAULT_PAGE_NUMBER = 1;
+    private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
+    private static final int FRONT_FIRST_NUMBER = 1;
     private final static String ID = "25";
     private final static String NOT_EXIST_ID = "30";
     private final static String PROJECT_ID = "25";
@@ -73,7 +74,7 @@ class ProjectEnvironmentServiceTest {
         Example<ProjectEnvironment> example = Example.of(projectEnvironment);
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<ProjectEnvironment> projectEnvironmentList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             projectEnvironmentList.add(ProjectEnvironment.builder().name(NAME).build());
@@ -100,7 +101,7 @@ class ProjectEnvironmentServiceTest {
             .order("asc")
             .build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<ProjectEnvironment> projectEnvironmentList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             projectEnvironmentList.add(ProjectEnvironment.builder().name(NAME).build());
@@ -109,7 +110,7 @@ class ProjectEnvironmentServiceTest {
         when(projectEnvironmentRepository.findAll(example, pageable)).thenReturn(projectEnvironmentPage);
         Page<ProjectEnvironmentDto> projectEnvironmentDtos = projectEnvironmentService.page(pageDto, PROJECT_ID);
         assertThat(projectEnvironmentDtos.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
-        assertThat(projectEnvironmentDtos.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER);
+        assertThat(projectEnvironmentDtos.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER - FRONT_FIRST_NUMBER);
         assertThat(projectEnvironmentDtos.getPageable().getPageSize()).isEqualTo(PAGE_SIZE);
         assertThat(projectEnvironmentDtos.getContent()).allMatch(projectDto -> StringUtils.equals(projectDto.getName(), NAME));
     }

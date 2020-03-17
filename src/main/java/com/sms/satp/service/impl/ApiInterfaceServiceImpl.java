@@ -37,6 +37,7 @@ import com.sms.satp.utils.ApiHeaderConverter;
 import com.sms.satp.utils.ApiParameterConverter;
 import com.sms.satp.utils.ApiRequestBodyConverter;
 import com.sms.satp.utils.ApiResponseConverter;
+import com.sms.satp.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,6 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     private static final String ALL_GROUP_FLAG = "-1";
 
     private final ApiInterfaceRepository apiInterfaceRepository;
-
     private final DocumentFactory documentFactory;
     private final ApiInterfaceMapper apiInterfaceMapper;
     private final DocumentImportMapper documentImportMapper;
@@ -80,6 +80,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     @Override
     public Page<ApiInterfaceDto> page(PageDto pageDto, String projectId, String groupId) {
         try {
+            PageDtoConverter.frontMapping(pageDto);
             ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
                 .projectId(projectId);
             if (!StringUtils.equals(groupId, ALL_GROUP_FLAG)) {
@@ -188,12 +189,12 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     private List<ApiInterface> parseApiDocumentToApiInterfaces(ApiDocument apiDocument, String projectId) {
         List<ApiInterface> apiInterfaces = new ArrayList<>();
         List<ApiPath> apiPaths = apiDocument.getPaths();
-        Map<String, ApiSchema> apiSchema = apiDocument.getSchemas();
-        removeSchemaMapRef(apiSchema, apiSchema);
+        Map<String, ApiSchema> apiSchemaMap = apiDocument.getSchemas();
+        removeSchemaMapRef(apiSchemaMap, apiSchemaMap);
         apiPaths.forEach(apiPath ->
             apiPath.getOperations().forEach(apiOperation ->
                 apiInterfaces.add(
-                    apiPathOperationResolver(apiOperation, apiSchema, apiPath, projectId))
+                    apiPathOperationResolver(apiOperation, apiSchemaMap, apiPath, projectId))
             )
         );
         return apiInterfaces;

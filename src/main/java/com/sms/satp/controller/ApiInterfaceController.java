@@ -7,7 +7,6 @@ import com.sms.satp.entity.dto.InterfaceGroupDto;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.service.ApiInterfaceService;
 import com.sms.satp.service.InterfaceGroupService;
-import com.sms.satp.utils.PageDtoConverter;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -36,7 +35,6 @@ public class ApiInterfaceController {
     @GetMapping("/page/{projectId}/{groupId}")
     public Response<Page<ApiInterfaceDto>> page(PageDto pageDto, @PathVariable String projectId,
         @PathVariable String groupId) {
-        PageDtoConverter.frontMapping(pageDto);
         return Response.ok(apiInterfaceService.page(pageDto, projectId, groupId));
     }
 

@@ -56,8 +56,9 @@ class SchemaServiceTest {
     private final static int TOTAL_ELEMENTS = 60;
     private final static int PAGE_NUMBER = 2;
     private final static int PAGE_SIZE = 20;
-    private final static int DEFAULT_PAGE_NUMBER = 1;
+    private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
+    private static final int FRONT_FIRST_NUMBER = 1;
     private final static String ID = "25";
     private final static String NOT_EXIST_ID = "30";
     private final static String PROJECT_ID = "25";
@@ -72,7 +73,7 @@ class SchemaServiceTest {
         Example<Schema> example = Example.of(schema);
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<Schema> schemaList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             schemaList.add(Schema.builder().name(NAME).build());
@@ -99,7 +100,7 @@ class SchemaServiceTest {
             .order("asc")
             .build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<Schema> schemaList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             schemaList.add(Schema.builder().name(NAME).build());
@@ -108,7 +109,7 @@ class SchemaServiceTest {
         when(schemaRepository.findAll(example, pageable)).thenReturn(schemaPage);
         Page<SchemaDto> schemaDtoPage = schemaService.page(pageDto, PROJECT_ID);
         assertThat(schemaDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
-        assertThat(schemaDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER);
+        assertThat(schemaDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER - FRONT_FIRST_NUMBER);
         assertThat(schemaDtoPage.getPageable().getPageSize()).isEqualTo(PAGE_SIZE);
         assertThat(schemaDtoPage.getContent()).allMatch(projectDto -> StringUtils.equals(projectDto.getName(), NAME));
     }

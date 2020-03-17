@@ -69,8 +69,9 @@ class ApiInterfaceServiceTest {
     private final static int TOTAL_ELEMENTS = 60;
     private final static int PAGE_NUMBER = 2;
     private final static int PAGE_SIZE = 20;
-    private final static int DEFAULT_PAGE_NUMBER = 1;
+    private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
+    private static final int FRONT_FIRST_NUMBER = 1;
     private final static String FILE_NAME = "fileName";
     private final static String PROJECT_ID = "25";
     private final static String ID = "123";
@@ -95,7 +96,7 @@ class ApiInterfaceServiceTest {
         Example<ApiInterface> example = Example.of(apiInterface);
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<ApiInterface> apiInterfaceList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             apiInterfaceList.add(ApiInterface.builder().title(TITLE).build());
@@ -123,7 +124,7 @@ class ApiInterfaceServiceTest {
             .order("asc")
             .build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<ApiInterface> apiInterfaceList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             apiInterfaceList.add(ApiInterface.builder().title(TITLE).build());
@@ -132,7 +133,7 @@ class ApiInterfaceServiceTest {
         when(apiInterfaceRepository.findAll(example, pageable)).thenReturn(apiInterfacePage);
         Page<ApiInterfaceDto> projectDtoPage = apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID);
         assertThat(projectDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
-        assertThat(projectDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER);
+        assertThat(projectDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER - FRONT_FIRST_NUMBER);
         assertThat(projectDtoPage.getPageable().getPageSize()).isEqualTo(PAGE_SIZE);
         assertThat(projectDtoPage.getContent()).allMatch(projectDto -> StringUtils.equals(projectDto.getTitle(), TITLE));
 

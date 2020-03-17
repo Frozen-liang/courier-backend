@@ -5,7 +5,6 @@ import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.StatusCodeDocDto;
 import com.sms.satp.service.StatusCodeDocService;
-import com.sms.satp.utils.PageDtoConverter;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,7 +28,6 @@ public class StatusCodeDocController {
 
     @GetMapping("/page/{projectId}")
     public Response<Page<StatusCodeDocDto>> page(PageDto pageDto, @PathVariable String projectId) {
-        PageDtoConverter.frontMapping(pageDto);
         return Response.ok(statusCodeDocService.page(pageDto, projectId));
     }
 

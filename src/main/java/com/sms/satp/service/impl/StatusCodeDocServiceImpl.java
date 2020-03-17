@@ -13,6 +13,7 @@ import com.sms.satp.entity.dto.StatusCodeDocDto;
 import com.sms.satp.mapper.StatusCodeDocMapper;
 import com.sms.satp.repository.StatusCodeDocRepository;
 import com.sms.satp.service.StatusCodeDocService;
+import com.sms.satp.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,7 @@ public class StatusCodeDocServiceImpl implements StatusCodeDocService {
     @Override
     public Page<StatusCodeDocDto> page(PageDto pageDto, String projectId) {
         try {
+            PageDtoConverter.frontMapping(pageDto);
             StatusCodeDoc statusCodeDoc = StatusCodeDoc.builder()
                 .projectId(projectId)
                 .build();

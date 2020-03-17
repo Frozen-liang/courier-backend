@@ -56,8 +56,9 @@ class WikiServiceTest {
     private final static int TOTAL_ELEMENTS = 60;
     private final static int PAGE_NUMBER = 2;
     private final static int PAGE_SIZE = 20;
-    private final static int DEFAULT_PAGE_NUMBER = 1;
+    private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
+    private static final int FRONT_FIRST_NUMBER = 1;
     private final static String ID = "25";
     private final static String NOT_EXIST_ID = "30";
     private final static String PROJECT_ID = "25";
@@ -72,7 +73,7 @@ class WikiServiceTest {
         Example<Wiki> example = Example.of(wiki);
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<Wiki> wikiList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             wikiList.add(Wiki.builder().title(TITLE).build());
@@ -100,7 +101,7 @@ class WikiServiceTest {
             .order("asc")
             .build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<Wiki> wikiList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             wikiList.add(Wiki.builder().title(TITLE).build());
@@ -109,7 +110,7 @@ class WikiServiceTest {
         when(wikiRepository.findAll(example, pageable)).thenReturn(wikiPage);
         Page<WikiDto> wikiDtoPage = wikiService.page(pageDto, PROJECT_ID);
         assertThat(wikiDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
-        assertThat(wikiDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER);
+        assertThat(wikiDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER - FRONT_FIRST_NUMBER);
         assertThat(wikiDtoPage.getPageable().getPageSize()).isEqualTo(PAGE_SIZE);
         assertThat(wikiDtoPage.getContent()).allMatch(wikiDto -> StringUtils.equals(wikiDto.getTitle(),
             TITLE));
