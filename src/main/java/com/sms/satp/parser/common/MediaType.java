@@ -1,6 +1,9 @@
 package com.sms.satp.parser.common;
 
+import com.sms.satp.entity.dto.SelectDto;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
@@ -28,10 +31,14 @@ public enum MediaType {
 
     private String type;
     private static final Map<String, MediaType> mappings = new HashMap<>(16);
+    private static final List<SelectDto> SELECT_DTO_LIST = new ArrayList<>();
 
     static {
         for (MediaType mediaType : values()) {
             mappings.put(mediaType.type, mediaType);
+            SELECT_DTO_LIST.add(SelectDto.builder()
+                .id(mediaType.name())
+                .name(mediaType.type).build());
         }
     }
 
@@ -39,6 +46,10 @@ public enum MediaType {
     @Nullable
     public static MediaType resolve(@Nullable String type) {
         return (StringUtils.isNoneBlank(type) ? mappings.get(type) : null);
+    }
+
+    public static List<SelectDto> getSelectDtoList() {
+        return SELECT_DTO_LIST;
     }
 
 

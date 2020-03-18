@@ -36,4 +36,16 @@ class CommonControllerTest {
             .andExpect(jsonPath("$.message", is(Response.ok().build().getMessage())));
     }
 
+    @Test
+    @DisplayName("Get MediaType list")
+    void getMediaTypeSelectTest() throws Exception {
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+            .get(Constants.COMMON_PATH + "/media-type");
+        ResultActions perform = mockMvc.perform(request);
+        perform.andExpect(status().isOk())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(Response.ok().build().getCode())))
+            .andExpect(jsonPath("$.message", is(Response.ok().build().getMessage())));
+    }
+
 }
