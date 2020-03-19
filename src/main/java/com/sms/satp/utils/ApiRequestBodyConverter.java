@@ -28,7 +28,7 @@ public abstract class ApiRequestBodyConverter {
                 .required(apiRequestBody.getRequired());
             if (CollectionUtils.isNotEmpty(apiRequestBody.getMediaTypes())) {
                 requestBodyBuilder.mediaTypes(apiRequestBody.getMediaTypes()
-                    .stream().map(MediaType::getType).collect(Collectors.toList()));
+                    .stream().filter(Objects::nonNull).map(MediaType::getType).collect(Collectors.toList()));
             }
             return requestBodyBuilder.build();
         } else {
