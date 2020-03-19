@@ -13,6 +13,7 @@ import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.SchemaDto;
+import com.sms.satp.parser.common.SchemaType;
 import com.sms.satp.service.SchemaService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -82,6 +83,8 @@ class SchemaControllerTest {
     void addSchema() throws Exception{
         SchemaDto schemaDto = SchemaDto.builder()
             .title(TITLE)
+            .projectId(PROJECT_ID)
+            .type(SchemaType.INT)
             .build();
         doNothing().when(schemaService).add(schemaDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -101,6 +104,8 @@ class SchemaControllerTest {
         SchemaDto schemaDto = SchemaDto.builder()
             .id(PROJECT_ID)
             .title(TITLE)
+            .projectId(PROJECT_ID)
+            .type(SchemaType.INT)
             .build();
         doNothing().when(schemaService).edit(schemaDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders

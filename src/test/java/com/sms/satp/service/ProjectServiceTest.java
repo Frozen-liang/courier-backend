@@ -17,6 +17,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.ApplicationTests;
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.Project;
 import com.sms.satp.entity.dto.PageDto;
@@ -27,9 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Page;
@@ -39,7 +40,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
-@Disabled
+@SpringBootTest(classes = ApplicationTests.class)
 @DisplayName("Test cases for ProjectService")
 class ProjectServiceTest {
 
@@ -61,6 +62,7 @@ class ProjectServiceTest {
     private final static int PAGE_SIZE = 20;
     private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
+    private static final int FRONT_FIRST_NUMBER = 1;
 
     @Test
     @DisplayName("Test the query method without query criteria")
@@ -84,7 +86,7 @@ class ProjectServiceTest {
     void page_default_test() {
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<Project> projectList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             projectList.add(Project.builder().name(NAME).build());
@@ -107,7 +109,7 @@ class ProjectServiceTest {
             .order("asc")
             .build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<Project> projectList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             projectList.add(Project.builder().name(NAME).build());
@@ -116,7 +118,7 @@ class ProjectServiceTest {
         when(projectRepository.findAll(pageable)).thenReturn(projectPage);
         Page<ProjectDto> projectDtoPage = projectService.page(pageDto);
         assertThat(projectDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
-        assertThat(projectDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER);
+        assertThat(projectDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER - FRONT_FIRST_NUMBER);
         assertThat(projectDtoPage.getPageable().getPageSize()).isEqualTo(PAGE_SIZE);
         assertThat(projectDtoPage.getContent()).allMatch(projectDto -> StringUtils.equals(projectDto.getName(), NAME));
     }

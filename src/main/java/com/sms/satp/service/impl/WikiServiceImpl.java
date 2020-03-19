@@ -13,6 +13,7 @@ import com.sms.satp.entity.dto.WikiDto;
 import com.sms.satp.mapper.WikiMapper;
 import com.sms.satp.repository.WikiRepository;
 import com.sms.satp.service.WikiService;
+import com.sms.satp.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,7 @@ public class WikiServiceImpl implements WikiService {
     @Override
     public Page<WikiDto> page(PageDto pageDto, String projectId) {
         try {
+            PageDtoConverter.frontMapping(pageDto);
             Wiki wiki = Wiki.builder()
                 .projectId(projectId)
                 .build();
@@ -57,10 +59,7 @@ public class WikiServiceImpl implements WikiService {
 
     @Override
     public void add(WikiDto wikiDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("WikiService-add()-Parameter: %s",
-                wikiDto.toString()));
-        }
+        log.info("WikiService-add()-params: [Wiki]={}", wikiDto.toString());
         try {
             Wiki wiki = wikiMapper.toEntity(wikiDto);
             wiki.setId(new ObjectId().toString());
@@ -74,10 +73,7 @@ public class WikiServiceImpl implements WikiService {
 
     @Override
     public void edit(WikiDto wikiDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("WikiService-edit()-Parameter: %s",
-                wikiDto.toString()));
-        }
+        log.info("WikiService-edit()-params: [Wiki]={}", wikiDto.toString());
         try {
             Wiki wiki = wikiMapper.toEntity(wikiDto);
             Optional<Wiki> wikiOptional = wikiRepository

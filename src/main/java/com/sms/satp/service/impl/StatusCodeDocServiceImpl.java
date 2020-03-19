@@ -13,6 +13,7 @@ import com.sms.satp.entity.dto.StatusCodeDocDto;
 import com.sms.satp.mapper.StatusCodeDocMapper;
 import com.sms.satp.repository.StatusCodeDocRepository;
 import com.sms.satp.service.StatusCodeDocService;
+import com.sms.satp.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,7 @@ public class StatusCodeDocServiceImpl implements StatusCodeDocService {
     @Override
     public Page<StatusCodeDocDto> page(PageDto pageDto, String projectId) {
         try {
+            PageDtoConverter.frontMapping(pageDto);
             StatusCodeDoc statusCodeDoc = StatusCodeDoc.builder()
                 .projectId(projectId)
                 .build();
@@ -58,10 +60,7 @@ public class StatusCodeDocServiceImpl implements StatusCodeDocService {
 
     @Override
     public void add(StatusCodeDocDto statusCodeDocDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("StatusCodeDocService-add()-Parameter: %s",
-                statusCodeDocDto.toString()));
-        }
+        log.info("StatusCodeDocService-add()-params: [StatusCodeDoc]={}", statusCodeDocDto.toString());
         try {
             StatusCodeDoc statusCodeDoc = statusCodeDocMapper.toEntity(statusCodeDocDto);
             statusCodeDoc.setId(new ObjectId().toString());
@@ -75,10 +74,7 @@ public class StatusCodeDocServiceImpl implements StatusCodeDocService {
 
     @Override
     public void edit(StatusCodeDocDto statusCodeDocDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("StatusCodeDocService-edit()-Parameter: %s",
-                statusCodeDocDto.toString()));
-        }
+        log.info("StatusCodeDocService-edit()-params: [StatusCodeDoc]={}", statusCodeDocDto.toString());
         try {
             StatusCodeDoc statusCodeDoc = statusCodeDocMapper.toEntity(statusCodeDocDto);
             Optional<StatusCodeDoc> statusCodeDocOptional = statusCodeDocRepository

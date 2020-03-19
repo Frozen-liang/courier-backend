@@ -16,6 +16,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.ApplicationTests;
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.Wiki;
 import com.sms.satp.entity.dto.PageDto;
@@ -26,9 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Example;
@@ -39,7 +40,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
-@Disabled
+@SpringBootTest(classes = ApplicationTests.class)
 @DisplayName("Test cases for WikiService")
 class WikiServiceTest {
 
@@ -57,6 +58,7 @@ class WikiServiceTest {
     private final static int PAGE_SIZE = 20;
     private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
+    private static final int FRONT_FIRST_NUMBER = 1;
     private final static String ID = "25";
     private final static String NOT_EXIST_ID = "30";
     private final static String PROJECT_ID = "25";
@@ -71,7 +73,7 @@ class WikiServiceTest {
         Example<Wiki> example = Example.of(wiki);
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<Wiki> wikiList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             wikiList.add(Wiki.builder().title(TITLE).build());
@@ -99,7 +101,7 @@ class WikiServiceTest {
             .order("asc")
             .build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<Wiki> wikiList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             wikiList.add(Wiki.builder().title(TITLE).build());
@@ -108,7 +110,7 @@ class WikiServiceTest {
         when(wikiRepository.findAll(example, pageable)).thenReturn(wikiPage);
         Page<WikiDto> wikiDtoPage = wikiService.page(pageDto, PROJECT_ID);
         assertThat(wikiDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
-        assertThat(wikiDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER);
+        assertThat(wikiDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER - FRONT_FIRST_NUMBER);
         assertThat(wikiDtoPage.getPageable().getPageSize()).isEqualTo(PAGE_SIZE);
         assertThat(wikiDtoPage.getContent()).allMatch(wikiDto -> StringUtils.equals(wikiDto.getTitle(),
             TITLE));

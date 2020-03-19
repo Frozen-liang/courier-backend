@@ -1,32 +1,27 @@
 package com.sms.satp.service.impl;
 
 import static com.sms.satp.common.ErrorCode.ADD_API_INTERFACE_ERROR;
-import static com.sms.satp.common.ErrorCode.ADD_INTERFACE_GROUP_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_API_INTERFACE_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.DELETE_INTERFACE_GROUP_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.DOCUMENT_TYPE_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_API_INTERFACE_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_INTERFACE_GROUP_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_INTERFACE_GROUP_LIST_ERROR;
-import static com.sms.satp.common.ErrorCode.PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR;
-import static com.sms.satp.utils.ApiSchemaUtil.getRefKey;
-import static com.sms.satp.utils.ApiSchemaUtil.resolveApiSchemaMap;
+import static com.sms.satp.utils.ApiSchemaUtil.removeSchemaMapRef;
+import static com.sms.satp.utils.ApiSchemaUtil.splitKeyFromRef;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.ApiInterface.ApiInterfaceBuilder;
+import com.sms.satp.entity.DocumentImport;
 import com.sms.satp.entity.Header;
-import com.sms.satp.entity.InterfaceGroup;
 import com.sms.satp.entity.Parameter;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
-import com.sms.satp.entity.dto.InterfaceGroupDto;
+import com.sms.satp.entity.dto.DocumentImportDto;
+import com.sms.satp.entity.dto.ImportWay;
 import com.sms.satp.entity.dto.PageDto;
+import com.sms.satp.entity.dto.SaveMode;
 import com.sms.satp.mapper.ApiInterfaceMapper;
-import com.sms.satp.mapper.InterfaceGroupMapper;
+import com.sms.satp.mapper.DocumentImportMapper;
 import com.sms.satp.parser.DocumentFactory;
-import com.sms.satp.parser.common.DocumentType;
 import com.sms.satp.parser.common.HttpMethod;
 import com.sms.satp.parser.model.ApiDocument;
 import com.sms.satp.parser.model.ApiOperation;
@@ -36,22 +31,19 @@ import com.sms.satp.parser.model.ApiRequestBody;
 import com.sms.satp.parser.model.ApiResponse;
 import com.sms.satp.parser.schema.ApiSchema;
 import com.sms.satp.repository.ApiInterfaceRepository;
-import com.sms.satp.repository.InterfaceGroupRepository;
 import com.sms.satp.service.ApiInterfaceService;
+import com.sms.satp.service.InterfaceGroupService;
 import com.sms.satp.utils.ApiHeaderConverter;
 import com.sms.satp.utils.ApiParameterConverter;
 import com.sms.satp.utils.ApiRequestBodyConverter;
 import com.sms.satp.utils.ApiResponseConverter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import com.sms.satp.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
@@ -61,34 +53,37 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
 public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
+    private static final Integer FIRST_TAG = 0;
+    private static final String ALL_GROUP_FLAG = "-1";
+
     private final ApiInterfaceRepository apiInterfaceRepository;
-    private final InterfaceGroupRepository interfaceGroupRepository;
     private final DocumentFactory documentFactory;
     private final ApiInterfaceMapper apiInterfaceMapper;
-    private final InterfaceGroupMapper interfaceGroupMapper;
+    private final DocumentImportMapper documentImportMapper;
+    private final InterfaceGroupService interfaceGroupService;
 
     public ApiInterfaceServiceImpl(ApiInterfaceRepository apiInterfaceRepository,
         DocumentFactory documentFactory, ApiInterfaceMapper apiInterfaceMapper,
-        InterfaceGroupRepository interfaceGroupRepository, InterfaceGroupMapper interfaceGroupMapper) {
+        DocumentImportMapper documentImportMapper, InterfaceGroupService interfaceGroupService) {
         this.apiInterfaceRepository = apiInterfaceRepository;
-        this.interfaceGroupRepository = interfaceGroupRepository;
         this.documentFactory = documentFactory;
         this.apiInterfaceMapper = apiInterfaceMapper;
-        this.interfaceGroupMapper = interfaceGroupMapper;
+        this.documentImportMapper = documentImportMapper;
+        this.interfaceGroupService = interfaceGroupService;
     }
 
     @Override
     public Page<ApiInterfaceDto> page(PageDto pageDto, String projectId, String groupId) {
         try {
+            PageDtoConverter.frontMapping(pageDto);
             ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
                 .projectId(projectId);
-            if (StringUtils.isNoneBlank(groupId)) {
+            if (!StringUtils.equals(groupId, ALL_GROUP_FLAG)) {
                 apiInterfaceBuilder.groupId(groupId);
             }
             Example<ApiInterface> example = Example.of(apiInterfaceBuilder.build());
@@ -103,47 +98,11 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         }
     }
 
-    @Override
-    public void save(String contents, String documentType, String projectId) {
-        if (log.isDebugEnabled()) {
-            log.debug(
-                String.format("ApiInterfaceService-save()-Parameter: [contents]%s, [documentType]%s, [projectId]%s",
-                    contents, documentType, projectId));
-        }
-        Optional<DocumentType> documentTypeOptional = Optional.ofNullable(
-            DocumentType.resolve(documentType.toUpperCase(Locale.getDefault())));
-        if (documentTypeOptional.isPresent()) {
-            try {
-                ApiDocument apiDocument = documentFactory.buildByContents(
-                    contents, documentTypeOptional.get());
-                List<ApiInterface> apiInterfaces = convertApiPathsToApiInterfaces(
-                    apiDocument, projectId);
-                apiInterfaceRepository.insert(apiInterfaces);
-            } catch (Exception e) {
-                log.error("Failed to parse the file and save as ApiInterface!", e);
-                throw new ApiTestPlatformException(PARSE_FILE_AND_SAVE_AS_APIINTERFACE_ERROR);
-            }
-        } else {
-            throw new ApiTestPlatformException(DOCUMENT_TYPE_ERROR);
-        }
-    }
-
-    @Override
-    public void save(MultipartFile multipartFile, String documentType, String projectId) throws IOException {
-        log.info(
-            "ApiInterfaceService-save()-params: [documentType]={}, [projectId]={}",
-            documentType, projectId);
-        String contents = IOUtils.toString(multipartFile.getInputStream(), StandardCharsets.UTF_8);
-        save(contents, documentType, projectId);
-
-    }
 
     @Override
     public void add(ApiInterfaceDto apiInterfaceDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("ApiInterfaceService-add()-Parameter: %s",
-                apiInterfaceDto.toString()));
-        }
+        log.info(
+            "ApiInterfaceService-add()-params: [ApiInterface]={}", apiInterfaceDto.toString());
         try {
             ApiInterface apiInterface = apiInterfaceMapper.toEntity(apiInterfaceDto);
             apiInterface.setId(new ObjectId().toString());
@@ -157,10 +116,8 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     @Override
     public void edit(ApiInterfaceDto apiInterfaceDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("ApiInterfaceService-edit()-Parameter: %s",
-                apiInterfaceDto.toString()));
-        }
+        log.info(
+            "ApiInterfaceService-edit()-params: [ApiInterface]={}", apiInterfaceDto.toString());
         try {
             ApiInterface apiInterface = apiInterfaceMapper.toEntity(apiInterfaceDto);
             Optional<ApiInterface> apiInterfaceOptional = apiInterfaceRepository
@@ -198,107 +155,67 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     }
 
     @Override
-    public List<InterfaceGroupDto> getGroupList(String projectId) {
-        try {
-            InterfaceGroup interfaceGroup = InterfaceGroup.builder().projectId(projectId).build();
-            Example<InterfaceGroup> example = Example.of(interfaceGroup);
-            return interfaceGroupMapper.toDtoList(interfaceGroupRepository.findAll(example));
-        } catch (Exception e) {
-            log.error("Failed to get the InterfaceGroup list!", e);
-            throw new ApiTestPlatformException(GET_INTERFACE_GROUP_LIST_ERROR);
-        }
+    public void importDocument(DocumentImportDto documentImportDto, ImportWay importWay) {
+        DocumentImport documentImport = documentImportMapper.convert(documentImportDto);
+        log.info(
+            "ApiInterfaceService-importDocument()-params: [documentType]={}, [URL]={}, [Content]={}, [projectId]={}",
+            documentImport.getType(), documentImport.getUrl(),
+            documentImport.getContent(), documentImport.getProjectId());
+        ApiDocument apiDocument = importWay.getExecutor().unchecked().apply(documentImport, documentFactory);
+        List<ApiInterface> apiInterfaces = parseApiDocumentToApiInterfaces(apiDocument, documentImport.getProjectId());
+        saveInterfacesByType(apiInterfaces, documentImport.getSaveMode());
     }
 
-    @Override
-    public String addGroup(InterfaceGroupDto interfaceGroupDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("ApiInterfaceService-addGroup()-Parameter: %s",
-                interfaceGroupDto.toString()));
-        }
-        try {
-            InterfaceGroup interfaceGroup = interfaceGroupMapper.toEntity(interfaceGroupDto);
-            interfaceGroup.setId(new ObjectId().toString());
-            interfaceGroupRepository.insert(interfaceGroup);
-            return interfaceGroup.getId();
-        } catch (Exception e) {
-            log.error("Failed to add the InterfaceGroup!", e);
-            throw new ApiTestPlatformException(ADD_INTERFACE_GROUP_ERROR);
-        }
-    }
-
-    @Override
-    public void editGroup(InterfaceGroupDto interfaceGroupDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("ApiInterfaceService-editGroup()-Parameter: %s",
-                interfaceGroupDto.toString()));
-        }
-        try {
-            InterfaceGroup interfaceGroup = interfaceGroupMapper.toEntity(interfaceGroupDto);
-            Optional<InterfaceGroup> interfaceGroupOptional = interfaceGroupRepository
-                .findById(interfaceGroup.getId());
-            if (interfaceGroupOptional.isPresent()) {
-                interfaceGroupRepository.save(interfaceGroup);
+    private void saveInterfacesByType(List<ApiInterface> apiInterfaceList, SaveMode saveMode) {
+        apiInterfaceList.forEach(apiInterface -> {
+            ApiInterface apiInterfaceExample = ApiInterface.builder()
+                .method(apiInterface.getMethod())
+                .path(apiInterface.getPath())
+                .projectId(apiInterface.getProjectId()).build();
+            Example<ApiInterface> example = Example.of(apiInterfaceExample);
+            Optional<ApiInterface> apiInterfaceOptional = apiInterfaceRepository.findOne(example);
+            if (apiInterfaceOptional.isPresent()) {
+                if (saveMode.matches(SaveMode.COVER.name())) {
+                    apiInterface.setId(apiInterfaceOptional.get().getId());
+                    apiInterfaceRepository.save(apiInterface);
+                }
+            } else {
+                apiInterfaceRepository.save(apiInterface);
             }
-        } catch (Exception e) {
-            log.error("Failed to add the InterfaceGroup!", e);
-            throw new ApiTestPlatformException(EDIT_INTERFACE_GROUP_ERROR);
-        }
-    }
-
-    @Override
-    public void deleteGroup(String id) {
-        try {
-            interfaceGroupRepository.deleteById(id);
-        } catch (Exception e) {
-            log.error("Failed to delete the InterfaceGroup!", e);
-            throw new ApiTestPlatformException(DELETE_INTERFACE_GROUP_BY_ID_ERROR);
-        }
-    }
-
-    @Override
-    public String addGroupByNameAndReturnId(String groupName, String projectId) {
-        Example<InterfaceGroup> example = Example
-            .of(InterfaceGroup.builder().name(groupName).build());
-        Optional<InterfaceGroup> interfaceGroupOptional = interfaceGroupRepository.findOne(example);
-        if (interfaceGroupOptional.isPresent()) {
-            return interfaceGroupOptional.get().getId();
-        } else {
-            return addGroup(InterfaceGroupDto.builder().name(groupName).projectId(projectId).build());
-        }
+        });
     }
 
 
-    private List<ApiInterface> convertApiPathsToApiInterfaces(ApiDocument apiDocument, String projectId) {
+    private List<ApiInterface> parseApiDocumentToApiInterfaces(ApiDocument apiDocument, String projectId) {
         List<ApiInterface> apiInterfaces = new ArrayList<>();
         List<ApiPath> apiPaths = apiDocument.getPaths();
-        Map<String, ApiSchema> apiSchema = apiDocument.getSchemas();
-        resolveApiSchemaMap(apiSchema, apiSchema);
+        Map<String, ApiSchema> apiSchemaMap = apiDocument.getSchemas();
+        removeSchemaMapRef(apiSchemaMap, apiSchemaMap);
         apiPaths.forEach(apiPath ->
             apiPath.getOperations().forEach(apiOperation ->
                 apiInterfaces.add(
-                    apiPathOperationResolver(apiOperation, apiSchema, apiPath, projectId))
+                    apiPathOperationResolver(apiOperation, apiSchemaMap, apiPath, projectId))
             )
-
         );
         return apiInterfaces;
     }
 
     private ApiInterface apiPathOperationResolver(ApiOperation apiOperation,
-        Map<String, ApiSchema> apiSchema, ApiPath apiPath, String projectId) {
-        Optional<ApiRequestBody> apiRequestBodyOptional = Optional
-            .ofNullable(apiOperation.getApiRequestBody());
-        Optional<ApiResponse> apiResponseOptional = Optional
-            .ofNullable(apiOperation.getApiResponse());
-        Optional<String> requestBodyRefOptional = apiRequestBodyOptional
-            .map(ApiRequestBody::getSchema).map(ApiSchema::getRef);
-        Optional<String> responseRefOptional = apiResponseOptional
-            .map(ApiResponse::getSchema).map(ApiSchema::getRef);
-        requestBodyRefOptional.ifPresent(requestRef -> apiRequestBodyOptional.get()
-            .setSchema(apiSchema.get(getRefKey(requestRef))));
-        responseRefOptional.ifPresent(responseRdf -> apiResponseOptional.get()
-            .setSchema(apiSchema.get(getRefKey(responseRdf))));
-        List<String> tags = apiOperation.getTags();
-        String groupId = tags.isEmpty() ? null : addGroupByNameAndReturnId(tags.get(0), projectId);
+        Map<String, ApiSchema> apiSchemaMap, ApiPath apiPath, String projectId) {
+        Optional<ApiRequestBody> apiRequestBodyOptional = Optional.ofNullable(apiOperation.getApiRequestBody());
+        Optional<ApiResponse> apiResponseOptional = Optional.ofNullable(apiOperation.getApiResponse());
+        Optional<String> requestBodyRefOptional = apiRequestBodyOptional.map(
+            ApiRequestBody::getSchema).map(ApiSchema::getRef);
+        Optional<String> responseRefOptional = apiResponseOptional.map(ApiResponse::getSchema).map(ApiSchema::getRef);
+        requestBodyRefOptional.ifPresent(requestRef -> {
+            ApiSchema apiSchema = apiSchemaMap.get(splitKeyFromRef(requestRef));
+            apiRequestBodyOptional.get().setSchema(apiSchema);
+        });
+        responseRefOptional.ifPresent(responseRef -> {
+            ApiSchema apiSchema = apiSchemaMap.get(splitKeyFromRef(responseRef));
+            apiResponseOptional.get().setSchema(apiSchema);
+        });
+        String groupId = getGroupIdByOperationTags(apiOperation, projectId);
         ApiInterface.ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
             .id(new ObjectId().toString())
             .method(HttpMethod.resolve(apiOperation.getHttpMethod().name()))
@@ -317,12 +234,17 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         apiResponseOptional.map(ApiResponse::getHeaders).ifPresent(apiHeaders ->
             apiInterfaceBuilder.responseHeaders(ApiHeaderConverter.CONVERT_TO_HEADER.apply(apiHeaders))
         );
-        ApiInterface apiInterface = apiInterfaceBuilder.build();
-        apiParameterResolver(apiInterface, apiOperation.getParameters());
-        return apiInterface;
+        addParameterToInterface(apiInterfaceBuilder, apiOperation.getParameters());
+        return apiInterfaceBuilder.build();
     }
 
-    private void apiParameterResolver(ApiInterface apiInterface, List<ApiParameter> apiParameters) {
+    private String getGroupIdByOperationTags(ApiOperation apiOperation, String projectId) {
+        List<String> tags = apiOperation.getTags();
+        return tags.isEmpty() ? null : interfaceGroupService.addGroupByNameAndReturnId(
+            tags.get(FIRST_TAG), projectId);
+    }
+
+    private void addParameterToInterface(ApiInterfaceBuilder apiInterfaceBuilder, List<ApiParameter> apiParameters) {
         List<Header> requestHeaders = new ArrayList<>();
         List<Parameter> queryParams = new ArrayList<>();
         List<Parameter> pathParams = new ArrayList<>();
@@ -342,8 +264,9 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                     break;
             }
         }
-        apiInterface.setQueryParams(queryParams.isEmpty() ? null : queryParams);
-        apiInterface.setRequestHeaders(requestHeaders.isEmpty() ? null : requestHeaders);
-        apiInterface.setPathParams(pathParams.isEmpty() ? null : pathParams);
+        apiInterfaceBuilder
+            .responseHeaders(requestHeaders.isEmpty() ? null : requestHeaders)
+            .queryParams(queryParams.isEmpty() ? null : queryParams)
+            .pathParams(pathParams.isEmpty() ? null : pathParams);
     }
 }

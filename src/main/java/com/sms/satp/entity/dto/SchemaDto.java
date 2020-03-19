@@ -4,6 +4,7 @@ import com.sms.satp.entity.Schema;
 import com.sms.satp.parser.common.SchemaType;
 import java.util.List;
 import java.util.Map;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,10 +17,12 @@ import lombok.NoArgsConstructor;
 public class SchemaDto {
 
     private String id;
+    @NotNull(message = "ProjectId cannot be empty")
     private String projectId;
     private String name;
     private String title;
     private List<String> required;
+    @NotNull(message = "SchemaType cannot be empty")
     private SchemaType type;
     private Map<String, Schema> properties;
     private String description;

@@ -5,17 +5,21 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class InterfaceGroupDto {
+public class DocumentImportDto {
 
-    private String id;
+    private String url;
+    private MultipartFile file;
+    @NotNull(message = "DocumentType cannot be empty")
+    private String type;
     @NotNull(message = "ProjectId cannot be empty")
     private String projectId;
-    @NotNull(message = "GroupName cannot be empty")
-    private String name;
+    @NotNull(message = "SaveMode cannot be empty")
+    private String saveMode;
 
 }

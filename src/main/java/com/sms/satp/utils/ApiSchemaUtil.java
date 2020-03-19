@@ -16,29 +16,30 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 
 public abstract class ApiSchemaUtil {
 
     private ApiSchemaUtil() {
     }
 
-    public static void resolveApiSchemaMap(
+    public static void removeSchemaMapRef(
         Map<String, ApiSchema> apiSchemaMap, Map<String, ApiSchema> root) {
         Iterator<Entry<String, ApiSchema>> entryIterator = apiSchemaMap.entrySet().iterator();
         entryIterator.forEachRemaining(entry -> {
             if (StringUtils.isBlank(entry.getValue().getRef())) {
                 if (entry.getValue().getType().matches(SchemaType.OBJECT
                         .getType()) && Objects.nonNull(entry.getValue().getProperties())) {
-                    resolveApiSchemaMap(entry.getValue().getProperties(), root);
+                    removeSchemaMapRef(entry.getValue().getProperties(), root);
                 }
             } else {
-                String refKey = getRefKey(entry.getValue().getRef());
+                String refKey = splitKeyFromRef(entry.getValue().getRef());
                 entry.setValue(root.get(refKey));
             }
         });
     }
 
-    public static String getRefKey(String ref) {
+    public static String splitKeyFromRef(String ref) {
         if (StringUtils.isNoneBlank(ref)) {
             List<String> refs = Splitter.on("/").splitToList(ref);
             return refs.get(refs.size() - 1);
@@ -54,6 +55,7 @@ public abstract class ApiSchemaUtil {
         Optional<ApiSchema> apiSchemaOptional = Optional.ofNullable(apiSchema);
         if (apiSchemaOptional.isPresent()) {
             SchemaBuilder schemaBuilder = Schema.builder()
+                .id(new ObjectId().toString())
                 .name(apiSchemaOptional.map(ApiSchema::getName).orElse(null))
                 .title(apiSchemaOptional.map(ApiSchema::getTitle).orElse(null))
                 .required(apiSchemaOptional.map(ApiSchema::getRequired).orElse(null))

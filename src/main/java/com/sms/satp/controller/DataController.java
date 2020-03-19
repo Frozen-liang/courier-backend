@@ -2,13 +2,14 @@ package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
+import com.sms.satp.entity.dto.DocumentImportDto;
+import com.sms.satp.entity.dto.ImportWay;
 import com.sms.satp.service.ApiInterfaceService;
-import java.io.IOException;
+import javax.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(Constants.DATA_PATH)
@@ -20,10 +21,15 @@ public class DataController {
         this.apiInterfaceService = apiInterfaceService;
     }
 
-    @PostMapping()
-    public Response importData(@RequestParam("file") MultipartFile file,
-        @RequestParam("type") String type, @RequestParam("projectId") String projectId) throws IOException {
-        apiInterfaceService.save(file, type, projectId);
+    @PostMapping("/file")
+    public Response importData(@Valid DocumentImportDto documentImportDto) {
+        apiInterfaceService.importDocument(documentImportDto, ImportWay.FILE);
+        return Response.ok().build();
+    }
+
+    @PostMapping("/url")
+    public Response importByUrl(@Valid  @RequestBody DocumentImportDto documentImportDto) {
+        apiInterfaceService.importDocument(documentImportDto, ImportWay.URL);
         return Response.ok().build();
     }
 }

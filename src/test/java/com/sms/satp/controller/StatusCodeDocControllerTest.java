@@ -43,6 +43,7 @@ class StatusCodeDocControllerTest {
     private final static String ID = "30";
     private final static String PROJECT_ID = "id";
     private final static String CODE = "200";
+    private static final String PARAM_INVALIDATE_CODE = "400";
 
     @Test
     @DisplayName("Query the page data for the StatusCodeDoc by default query criteria")
@@ -82,6 +83,7 @@ class StatusCodeDocControllerTest {
     void addStatusCodeDoc() throws Exception{
         StatusCodeDocDto statusCodeDocDto = StatusCodeDocDto.builder()
             .code(CODE)
+            .projectId(PROJECT_ID)
             .build();
         doNothing().when(statusCodeDocService).add(statusCodeDocDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -101,6 +103,7 @@ class StatusCodeDocControllerTest {
         StatusCodeDocDto statusCodeDocDto = StatusCodeDocDto.builder()
             .id(PROJECT_ID)
             .code(CODE)
+            .projectId(PROJECT_ID)
             .build();
         doNothing().when(statusCodeDocService).edit(statusCodeDocDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -139,6 +142,42 @@ class StatusCodeDocControllerTest {
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.code", is(Response.ok().build().getCode())))
             .andExpect(jsonPath("$.message", is(Response.ok().build().getMessage())));
+    }
+
+    @Test
+    @DisplayName("Add a StatusCodeDoc with empty code")
+    void addStatusCodeDoc_withEmptyCode() throws Exception{
+        StatusCodeDocDto statusCodeDocDto = StatusCodeDocDto.builder()
+            .projectId(PROJECT_ID)
+            .build();
+        doNothing().when(statusCodeDocService).add(statusCodeDocDto);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+            .post(Constants.STATUS_CODE_DOC_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(objectMapper, statusCodeDocDto));
+        ResultActions perform = mockMvc.perform(request);
+        perform.andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(PARAM_INVALIDATE_CODE)))
+            .andExpect(jsonPath("$.message", is("StatusCode cannot be empty")));
+    }
+
+    @Test
+    @DisplayName("Add a StatusCodeDoc with empty projectId")
+    void addStatusCodeDoc_withEmptyProjectId() throws Exception {
+        StatusCodeDocDto statusCodeDocDto = StatusCodeDocDto.builder()
+            .code(CODE)
+            .build();
+        doNothing().when(statusCodeDocService).add(statusCodeDocDto);
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+            .post(Constants.STATUS_CODE_DOC_PATH)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(asJsonString(objectMapper, statusCodeDocDto));
+        ResultActions perform = mockMvc.perform(request);
+        perform.andExpect(status().isBadRequest())
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.code", is(PARAM_INVALIDATE_CODE)))
+            .andExpect(jsonPath("$.message", is("ProjectId cannot be empty")));
     }
 
 }

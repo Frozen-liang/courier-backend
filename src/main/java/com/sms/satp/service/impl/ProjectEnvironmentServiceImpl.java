@@ -13,6 +13,7 @@ import com.sms.satp.entity.dto.ProjectEnvironmentDto;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
 import com.sms.satp.service.ProjectEnvironmentService;
+import com.sms.satp.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     @Override
     public Page<ProjectEnvironmentDto> page(PageDto pageDto, String projectId) {
         try {
+            PageDtoConverter.frontMapping(pageDto);
             ProjectEnvironment projectEnvironment = ProjectEnvironment.builder()
                 .projectId(projectId)
                 .build();
@@ -58,10 +60,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
 
     @Override
     public void add(ProjectEnvironmentDto projectEnvironmentDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("ProjectEnvironmentService-add()-Parameter: %s",
-                projectEnvironmentDto.toString()));
-        }
+        log.info("ProjectEnvironmentService-add()-params: [ProjectEnvironment]={}", projectEnvironmentDto.toString());
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentDto);
@@ -76,10 +75,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
 
     @Override
     public void edit(ProjectEnvironmentDto projectEnvironmentDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("ProjectEnvironmentService-edit()-Parameter: %s",
-                projectEnvironmentDto.toString()));
-        }
+        log.info("ProjectEnvironmentService-edit()-params: [ProjectEnvironment]={}", projectEnvironmentDto.toString());
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentDto);

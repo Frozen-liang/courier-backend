@@ -14,6 +14,7 @@ import com.sms.satp.entity.dto.ProjectDto;
 import com.sms.satp.mapper.ProjectMapper;
 import com.sms.satp.repository.ProjectRepository;
 import com.sms.satp.service.ProjectService;
+import com.sms.satp.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +54,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Page<ProjectDto> page(PageDto pageDto) {
         try {
+            PageDtoConverter.frontMapping(pageDto);
             Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
             Pageable pageable = PageRequest.of(
                 pageDto.getPageNumber(), pageDto.getPageSize(), sort);
@@ -65,10 +67,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void add(ProjectDto projectDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("ProjectService-add()-Parameter: %s",
-                projectDto.toString()));
-        }
+        log.info("ProjectService-add()-params: [Project]={}", projectDto.toString());
         try {
             Project project = projectMapper.toEntity(projectDto);
             project.setId(new ObjectId().toString());
@@ -82,10 +81,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void edit(ProjectDto projectDto) {
-        if (log.isDebugEnabled()) {
-            log.debug(String.format("ProjectService-edit()-Parameter: %s",
-                projectDto.toString()));
-        }
+        log.info("ProjectService-edit()-params: [Project]={}", projectDto.toString());
         try {
             Project project = projectMapper.toEntity(projectDto);
             Optional<Project> projectOptional = projectRepository.findById(project.getId());

@@ -16,6 +16,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.ApplicationTests;
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.StatusCodeDoc;
 import com.sms.satp.entity.dto.PageDto;
@@ -26,9 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Example;
@@ -39,7 +40,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 
-@Disabled
+@SpringBootTest(classes = ApplicationTests.class)
 @DisplayName("Test cases for StatusCodeDocService")
 class StatusCodeDocServiceTest {
 
@@ -57,6 +58,7 @@ class StatusCodeDocServiceTest {
     private final static int PAGE_SIZE = 20;
     private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
+    private static final int FRONT_FIRST_NUMBER = 1;
     private final static String ID = "25";
     private final static String NOT_EXIST_ID = "30";
     private final static String PROJECT_ID = "25";
@@ -71,7 +73,7 @@ class StatusCodeDocServiceTest {
         Example<StatusCodeDoc> example = Example.of(statusCodeDoc);
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<StatusCodeDoc> statusCodeDocList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             statusCodeDocList.add(StatusCodeDoc.builder().code(CODE).build());
@@ -99,7 +101,7 @@ class StatusCodeDocServiceTest {
             .order("asc")
             .build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
-        Pageable pageable = PageRequest.of(pageDto.getPageNumber(), pageDto.getPageSize(), sort);
+        Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
         List<StatusCodeDoc> statusCodeDocList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             statusCodeDocList.add(StatusCodeDoc.builder().code(CODE).build());
@@ -108,7 +110,7 @@ class StatusCodeDocServiceTest {
         when(statusCodeDocRepository.findAll(example, pageable)).thenReturn(statusCodeDocPage);
         Page<StatusCodeDocDto> statusCodeDocDtoPage = statusCodeDocService.page(pageDto, PROJECT_ID);
         assertThat(statusCodeDocDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
-        assertThat(statusCodeDocDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER);
+        assertThat(statusCodeDocDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER - FRONT_FIRST_NUMBER);
         assertThat(statusCodeDocDtoPage.getPageable().getPageSize()).isEqualTo(PAGE_SIZE);
         assertThat(statusCodeDocDtoPage.getContent()).allMatch(projectDto -> StringUtils.equals(projectDto.getCode(), CODE));
     }
