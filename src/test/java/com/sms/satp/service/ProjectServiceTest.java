@@ -204,8 +204,8 @@ class ProjectServiceTest {
     }
 
     @Test
-    @DisplayName("An exception occurred while getting projectEnvironment by id")
-    void getProjectEnvironment_exception_test() {
+    @DisplayName("An exception occurred while getting project by id")
+    void getProject_exception_test() {
         doThrow(new RuntimeException()).when(projectRepository).findById(anyString());
         assertThatThrownBy(() -> projectService.findById(anyString()))
             .isInstanceOf(ApiTestPlatformException.class)

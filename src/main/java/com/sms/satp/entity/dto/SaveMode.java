@@ -6,7 +6,7 @@ import org.springframework.lang.Nullable;
 
 public enum SaveMode {
     COVER(),
-    RETAIN();
+    REMAIN();
 
     private static final Map<String, SaveMode> mappings = new HashMap<>(16);
 
