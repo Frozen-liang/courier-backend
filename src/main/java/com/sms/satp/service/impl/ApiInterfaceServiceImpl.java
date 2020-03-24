@@ -5,6 +5,7 @@ import static com.sms.satp.common.ErrorCode.DELETE_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_API_INTERFACE_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
+import static com.sms.satp.common.ErrorCode.PARSE_TO_API_INTERFACE_ERROR;
 import static com.sms.satp.utils.ApiSchemaUtil.removeSchemaMapRef;
 import static com.sms.satp.utils.ApiSchemaUtil.splitKeyFromRef;
 
@@ -187,17 +188,22 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
 
     private List<ApiInterface> parseApiDocumentToApiInterfaces(ApiDocument apiDocument, String projectId) {
-        List<ApiInterface> apiInterfaces = new ArrayList<>();
-        List<ApiPath> apiPaths = apiDocument.getPaths();
-        Map<String, ApiSchema> apiSchemaMap = apiDocument.getSchemas();
-        removeSchemaMapRef(apiSchemaMap, apiSchemaMap);
-        apiPaths.forEach(apiPath ->
-            apiPath.getOperations().forEach(apiOperation ->
-                apiInterfaces.add(
-                    apiPathOperationResolver(apiOperation, apiSchemaMap, apiPath, projectId))
-            )
-        );
-        return apiInterfaces;
+        try {
+            List<ApiInterface> apiInterfaces = new ArrayList<>();
+            List<ApiPath> apiPaths = apiDocument.getPaths();
+            Map<String, ApiSchema> apiSchemaMap = apiDocument.getSchemas();
+            removeSchemaMapRef(apiSchemaMap, apiSchemaMap);
+            apiPaths.forEach(apiPath ->
+                apiPath.getOperations().forEach(apiOperation ->
+                    apiInterfaces.add(
+                        apiPathOperationResolver(apiOperation, apiSchemaMap, apiPath, projectId))
+                )
+            );
+            return apiInterfaces;
+        } catch (Exception e) {
+            log.error("Failed to parse the ApiDocument!", e);
+            throw new ApiTestPlatformException(PARSE_TO_API_INTERFACE_ERROR);
+        }
     }
 
     private ApiInterface apiPathOperationResolver(ApiOperation apiOperation,
