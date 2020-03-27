@@ -23,6 +23,7 @@ import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.headers.Header;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
@@ -64,12 +65,22 @@ public abstract class OpenApiConverterFunction {
     }
 
     private static ApiSchema schemaConvert(Schema<?> schema) {
-        return Objects.nonNull(schema)
-            ? ApiSchema.builder()
-            .deprecated(schema.getDeprecated()).description(schema.getDescription()).name(schema.getName())
-            .title(schema.getTitle()).required(schema.getRequired()).ref(schema.get$ref())
-            .type(SchemaType.resolve(schema.getType())).properties(PROPERTIES_CONVERTER.apply(schema.getProperties()))
-            .build() : null;
+        if (Objects.nonNull(schema)) {
+            final ApiSchema apiSchema = ApiSchema.builder()
+                .deprecated(schema.getDeprecated()).description(schema.getDescription()).name(schema.getName())
+                .title(schema.getTitle()).required(schema.getRequired()).ref(schema.get$ref())
+                .type(SchemaType.resolve(schema.getType(), schema.getFormat()))
+                .properties(PROPERTIES_CONVERTER.apply(schema.getProperties()))
+                .build();
+            if (SchemaType.ARRAY.equals(apiSchema.getType())) {
+                final ArraySchema arraySchema = (ArraySchema) schema;
+                apiSchema.setItem(SCHEMA_CONVERTER.apply(arraySchema.getItems()));
+            }
+            return apiSchema;
+        } else {
+            return null;
+        }
+
     }
 
     private static ApiRequestBody requestBodyConvert(RequestBody requestBody) {
@@ -160,7 +171,7 @@ public abstract class OpenApiConverterFunction {
             .builder().deprecated(parameter.getDeprecated()).description(parameter.getDescription())
             .example(Objects.nonNull(parameter.getExample()) ? parameter.getExample().toString() : "")
             .in(In.resolve(StringUtils.upperCase(parameter.getIn())))
-            .schemaType(SchemaType.resolve(parameter.getSchema().getType()))
+            .schemaType(SchemaType.resolve(parameter.getSchema().getType(), parameter.getSchema().getFormat()))
             .name(parameter.getName()).required(parameter.getRequired()).build();
     }
 
