@@ -12,6 +12,7 @@ import lombok.Data;
 @Builder
 public class ApiSchema {
 
+    private ApiSchema item;
     private String name;
     private String title;
     private List<String> required;
