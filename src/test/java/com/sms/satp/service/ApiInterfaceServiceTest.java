@@ -275,16 +275,6 @@ class ApiInterfaceServiceTest {
             .extracting("code").isEqualTo(EDIT_API_INTERFACE_ERROR.getCode());
     }
 
-//    @Test
-//    @DisplayName("An exception occurred while adding apiInterface through URL")
-//    void addByURL_exception_test() {
-//        DocumentImportDto documentImportDto = DocumentImportDto.builder().url(URL).type(DOCUMENT_TYPE_SWAGGER).projectId(PROJECT_ID).build();
-//        doThrow(new RuntimeException()).when(apiInterfaceRepository).insert(anyList());
-//        assertThatThrownBy(() -> apiInterfaceService.importDocument(documentImportDto, ImportWay.URL))
-//            .isInstanceOf(ApiTestPlatformException.class)
-//            .extracting("code").isEqualTo(PARSE_TO_APIINTERFACE_ERROR.getCode());
-//    }
-
     @Test
     @DisplayName("An exception occurred while getting apiInterface by id")
     void getApiInterface_exception_test() {

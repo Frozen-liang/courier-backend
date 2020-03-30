@@ -28,7 +28,7 @@ public class DataController {
     }
 
     @PostMapping("/url")
-    public Response importByUrl(@Valid  @RequestBody DocumentImportDto documentImportDto) {
+    public Response importByUrl(@Valid @RequestBody DocumentImportDto documentImportDto) {
         apiInterfaceService.importDocument(documentImportDto, ImportWay.URL);
         return Response.ok().build();
     }

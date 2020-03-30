@@ -9,7 +9,7 @@ public enum ErrorCode {
     GET_REF_KEY_ERROR("40001", "The reference value cannot be null"),
     DOCUMENT_TYPE_ERROR("4002", "Document type error"),
     GET_API_INTERFACE_PAGE_ERROR("4003","Failed to get the ApiInterface page!"),
-    PARSE_TO_APIINTERFACE_ERROR("4004","Failed to parse the file or url and save as ApiInterface!"),
+    PARSE_TO_API_INTERFACE_ERROR("4004","Failed to parse the file or url and save as ApiInterface!"),
     ADD_API_INTERFACE_ERROR("4005","Failed to add the ApiInterface!"),
     GET_API_INTERFACE_BY_ID_ERROR("4006","Failed to get the ApiInterface by id!"),
     DELETE_API_INTERFACE_BY_ID_ERROR("4007","Failed to delete the ApiInterface!"),
@@ -48,6 +48,12 @@ public enum ErrorCode {
     IMPORT_FILE_EMPTY_ERROR("4040","Import failed, the file is empty"),
     IMPORT_URL_EMPTY_ERROE("4041", "Import failed, the URL is empty"),
     SAVE_MODE_ERROR("4042","Saving mode error!"),
+    GET_TEST_CASE_BY_ID_ERROR("4043","Failed to get the TestCase by id!"),
+    ADD_TEST_CASE_ERROR("4044","Failed to add the TestCase!"),
+    EDIT_TEST_CASE_ERROR("4045","Failed to edit the TestCase!"),
+    DELETE_TEST_CASE_ERROR("4046","Failed to delete the TestCase!"),
+    IMPORT_FILE_FORMAT_ERROR("4047","Illegal file"),
+    IMPORT_URL_FORMAT_ERROR("4048","Illegal URL"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

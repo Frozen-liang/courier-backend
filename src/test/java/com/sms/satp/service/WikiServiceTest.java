@@ -193,7 +193,7 @@ class WikiServiceTest {
     }
 
     @Test
-    @DisplayName("An exception occurred while getting statusCodeDoc by id")
+    @DisplayName("An exception occurred while getting wiki by id")
     void getStatusCodeDoc_exception_test() {
         doThrow(new RuntimeException()).when(wikiRepository).findById(anyString());
         assertThatThrownBy(() -> wikiService.findById(anyString()))
