@@ -175,6 +175,13 @@
             <url>http://13.228.213.232:8081/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>starlight-private-maven</id>
+            <name>Starlight Private Repository</name>
+            <url>http://13.228.213.232:8081/repository/maven-public/</url>
+        </pluginRepository>
+    </pluginRepositories>
     <build>
         <plugins>
             <plugin>
