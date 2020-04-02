@@ -1,8 +1,7 @@
 package com.sms.satp.parser.model;
 
 import com.sms.satp.parser.common.In;
-import com.sms.satp.parser.common.SchemaType;
-
+import com.sms.satp.parser.schema.ApiSchema;
 import lombok.Builder;
 import lombok.Data;
 
@@ -42,5 +41,5 @@ public class ApiParameter {
      * a string value can contain the example with escaping where necessary.
      */
     private String example;
-    private SchemaType schemaType;
+    private ApiSchema schema;
 }

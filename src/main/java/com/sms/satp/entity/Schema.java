@@ -26,6 +26,7 @@ public class Schema {
     private String projectId;
     private String name;
     private String title;
+    private Schema item;
     private List<String> required;
     private SchemaType type;
     private Map<String, Schema> properties;

@@ -29,7 +29,7 @@ public abstract class ApiResponseConverter {
                 .schema(ApiSchemaUtil.CONVERT_TO_SCHEMA.apply(apiResponse.getSchema()));
             List<MediaType> mediaTypes = apiResponse.getMediaTypes();
             if (CollectionUtils.isNotEmpty(mediaTypes)) {
-                responseBuilder.mediaTypes(mediaTypes.stream().map(MediaType::getType).collect(Collectors.toList()));
+                responseBuilder.mediaTypes(mediaTypes.stream().filter(Objects::nonNull).map(MediaType::getType).collect(Collectors.toList()));
             }
             return responseBuilder.build();
         } else {

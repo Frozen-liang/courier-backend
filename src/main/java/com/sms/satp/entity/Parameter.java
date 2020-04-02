@@ -1,7 +1,5 @@
 package com.sms.satp.entity;
 
-import com.sms.satp.parser.common.SchemaType;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +21,7 @@ public class Parameter {
      */
     private String name;
 
-    private SchemaType type;
+    private Schema schema;
 
     /**
      * A brief description of the parameter. This could contain examples of use. CommonMark syntax

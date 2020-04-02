@@ -23,7 +23,7 @@ public abstract class ApiParameterConverter {
         return Objects.nonNull(apiParameter)
             ? Parameter.builder().id(new ObjectId().toString())
                 .name(apiParameter.getName())
-                .type(apiParameter.getSchemaType())
+                .schema(ApiSchemaUtil.CONVERT_TO_SCHEMA.apply(apiParameter.getSchema()))
                 .description(apiParameter.getDescription())
                 .required(apiParameter.getRequired())
                 .deprecated(apiParameter.getDeprecated())
