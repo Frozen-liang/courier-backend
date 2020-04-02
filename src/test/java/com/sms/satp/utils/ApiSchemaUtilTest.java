@@ -100,7 +100,7 @@ class ApiSchemaUtilTest {
             .build();
         apiSchemaMap.put("Pet", pet);
         apiSchemaMap.put("Category", category);
-        removeSchemaMapRef(apiSchemaMap, apiSchemaMap);
+        removeSchemaMapRef(apiSchemaMap);
         ApiSchema categoryPropertiesAfterResolve = apiSchemaMap.get("Pet").getProperties().get("category");
         ApiSchema categorySchemaAfterResolve = apiSchemaMap.get("Category");
         assertThat(categoryPropertiesAfterResolve.getProperties().equals(categorySchemaAfterResolve.getProperties())).isEqualTo(true);

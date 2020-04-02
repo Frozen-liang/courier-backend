@@ -9,6 +9,7 @@ import static com.sms.satp.common.ErrorCode.PARSE_TO_API_INTERFACE_ERROR;
 import static com.sms.satp.utils.ApiSchemaUtil.removeSchemaMapRef;
 import static com.sms.satp.utils.ApiSchemaUtil.splitKeyFromRef;
 
+import com.google.common.base.Stopwatch;
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.ApiInterface.ApiInterfaceBuilder;
@@ -20,6 +21,7 @@ import com.sms.satp.entity.dto.DocumentImportDto;
 import com.sms.satp.entity.dto.ImportWay;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.SaveMode;
+import com.sms.satp.entity.dto.SelectDto;
 import com.sms.satp.mapper.ApiInterfaceMapper;
 import com.sms.satp.mapper.DocumentImportMapper;
 import com.sms.satp.parser.DocumentFactory;
@@ -41,13 +43,20 @@ import com.sms.satp.utils.ApiResponseConverter;
 import com.sms.satp.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -79,7 +88,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     }
 
     @Override
-    public Page<ApiInterfaceDto> page(PageDto pageDto, String projectId, String groupId) {
+    public Page<ApiInterfaceDto> page(PageDto pageDto, String projectId, String groupId, String tag) {
         try {
             PageDtoConverter.frontMapping(pageDto);
             ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
@@ -87,7 +96,14 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             if (!StringUtils.equals(groupId, ALL_GROUP_FLAG)) {
                 apiInterfaceBuilder.groupId(groupId);
             }
-            Example<ApiInterface> example = Example.of(apiInterfaceBuilder.build());
+            if (StringUtils.isNoneBlank(tag)) {
+                apiInterfaceBuilder.tag(Collections.singletonList(tag));
+            }
+            ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+                .withIgnoreNullValues()
+                .withStringMatcher(StringMatcher.EXACT)
+                .withMatcher("tag", ExampleMatcher.GenericPropertyMatchers.contains());
+            Example<ApiInterface> example = Example.of(apiInterfaceBuilder.build(), exampleMatcher);
             Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
             Pageable pageable = PageRequest.of(
                 pageDto.getPageNumber(), pageDto.getPageSize(), sort);
@@ -167,6 +183,25 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         saveInterfacesByType(apiInterfaces, documentImport.getSaveMode());
     }
 
+    @Override
+    public List<SelectDto> getAllTags(String projectId) {
+        ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder().projectId(projectId);
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+            .withIgnoreNullValues()
+            .withMatcher("project_id", ExampleMatcher.GenericPropertyMatchers.exact());
+        Example<ApiInterface> example = Example.of(apiInterfaceBuilder.build(), exampleMatcher);
+        Stopwatch stopwatch =  Stopwatch.createStarted();
+        List<ApiInterface> apiInterfaceList = apiInterfaceRepository.findAll(example);
+        long rsTime = stopwatch.elapsed(TimeUnit.MILLISECONDS);
+        log.info("apiInterfaceRepository.findAll time cost:{}",rsTime);
+        Set<String> tags = new HashSet<>();
+        apiInterfaceList.forEach(apiInterface -> tags.addAll(
+            apiInterface.getTag().stream().distinct().collect(Collectors.toList())));
+        List<SelectDto> selectDtoList = new ArrayList<>();
+        tags.forEach(tag -> selectDtoList.add(SelectDto.builder().id(tag).name(tag).build()));
+        return selectDtoList;
+    }
+
     private void saveInterfacesByType(List<ApiInterface> apiInterfaceList, SaveMode saveMode) {
         apiInterfaceList.forEach(apiInterface -> {
             ApiInterface apiInterfaceExample = ApiInterface.builder()
@@ -192,7 +227,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             List<ApiInterface> apiInterfaces = new ArrayList<>();
             List<ApiPath> apiPaths = apiDocument.getPaths();
             Map<String, ApiSchema> apiSchemaMap = apiDocument.getSchemas();
-            removeSchemaMapRef(apiSchemaMap, apiSchemaMap);
+            removeSchemaMapRef(apiSchemaMap);
             apiPaths.forEach(apiPath ->
                 apiPath.getOperations().forEach(apiOperation ->
                     apiInterfaces.add(
@@ -240,7 +275,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         apiResponseOptional.map(ApiResponse::getHeaders).ifPresent(apiHeaders ->
             apiInterfaceBuilder.responseHeaders(ApiHeaderConverter.CONVERT_TO_HEADER.apply(apiHeaders))
         );
-        addParameterToInterface(apiInterfaceBuilder, apiOperation.getParameters());
+        addParameterToInterface(apiInterfaceBuilder, apiOperation.getParameters(), apiSchemaMap);
         return apiInterfaceBuilder.build();
     }
 
@@ -250,13 +285,25 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             tags.get(FIRST_TAG), projectId);
     }
 
-    private void addParameterToInterface(ApiInterfaceBuilder apiInterfaceBuilder, List<ApiParameter> apiParameters) {
+    private void addParameterToInterface(ApiInterfaceBuilder apiInterfaceBuilder,
+        List<ApiParameter> apiParameters, Map<String, ApiSchema> apiSchemaMap) {
         List<Header> requestHeaders = new ArrayList<>();
         List<Parameter> queryParams = new ArrayList<>();
         List<Parameter> pathParams = new ArrayList<>();
+        Optional<ApiParameter> apiParameterOptional;
         for (ApiParameter apiParameter : apiParameters) {
             switch (apiParameter.getIn()) {
                 case QUERY:
+                    apiParameterOptional = Optional.of(apiParameter);
+                    apiParameterOptional.map(ApiParameter::getSchema).map(ApiSchema::getRef).ifPresent(refString -> {
+                        String refKey = splitKeyFromRef(refString);
+                        apiParameter.setSchema(apiSchemaMap.get(refKey));
+                    });
+                    apiParameterOptional.map(ApiParameter::getSchema).map(ApiSchema::getItem).map(ApiSchema::getRef)
+                        .ifPresent(refString -> {
+                            String refKey = splitKeyFromRef(refString);
+                            apiParameter.getSchema().setItem(apiSchemaMap.get(refKey));
+                    });
                     queryParams.add(ApiParameterConverter.CONVERT_TO_PARAMETER.apply(apiParameter));
                     break;
                 case PATH:
