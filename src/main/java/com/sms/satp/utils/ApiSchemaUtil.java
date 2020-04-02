@@ -25,7 +25,6 @@ public abstract class ApiSchemaUtil {
     public static void removeSchemaMapRef(Map<String, ApiSchema> apiSchemaMap) {
         ApiSchemaMapUtil apiSchemaMapUtil = new ApiSchemaMapUtil(apiSchemaMap);
         apiSchemaMapUtil.removeRef();
-        apiSchemaMapUtil = null;
     }
 
     public static String splitKeyFromRef(String ref) {
