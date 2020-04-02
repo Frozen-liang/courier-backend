@@ -299,11 +299,11 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                         String refKey = splitKeyFromRef(refString);
                         apiParameter.setSchema(apiSchemaMap.get(refKey));
                     });
-                    apiParameterOptional.map(ApiParameter::getSchema).map(ApiSchema::getItem).map(ApiSchema::getRef)
-                        .ifPresent(refString -> {
+                    apiParameterOptional.map(ApiParameter::getSchema).map(ApiSchema::getItem)
+                        .map(ApiSchema::getRef).ifPresent(refString -> {
                             String refKey = splitKeyFromRef(refString);
                             apiParameter.getSchema().setItem(apiSchemaMap.get(refKey));
-                    });
+                        });
                     queryParams.add(ApiParameterConverter.CONVERT_TO_PARAMETER.apply(apiParameter));
                     break;
                 case PATH:
