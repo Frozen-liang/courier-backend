@@ -11,6 +11,6 @@ public class CaseSchema {
 
     private String name;
     private SchemaType type;
-    private String value;
+    private Object value;
     private Map<String, CaseSchema> properties;
 }

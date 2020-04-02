@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class DocumentImportMapperRule {
 
     public DocumentType asDocumentType(String type) {
-        DocumentType documentType = DocumentType.resolve(type.toUpperCase(Locale.getDefault()));
+        DocumentType documentType = DocumentType.resolve(type.toUpperCase(Locale.US));
         if (Objects.nonNull(documentType)) {
             return documentType;
         } else {
@@ -35,7 +35,7 @@ public class DocumentImportMapperRule {
     }
 
     public SaveMode asSaveMode(String mode) {
-        SaveMode saveMode = SaveMode.resolve(mode.toUpperCase(Locale.getDefault()));
+        SaveMode saveMode = SaveMode.resolve(mode.toUpperCase(Locale.US));
         if (Objects.nonNull(saveMode)) {
             return saveMode;
         } else {

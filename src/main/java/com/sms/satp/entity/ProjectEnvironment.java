@@ -23,8 +23,8 @@ public class ProjectEnvironment {
     private String desc;
     @Field("project_id")
     private String projectId;
-    @Field("server_adress")
-    private String serverAdress;
+    @Field("server_address")
+    private String serverAddress;
     private AuthInfo authInfo;
     @Field("create_date_time")
     private LocalDateTime createDateTime;

@@ -1,5 +1,6 @@
 package com.sms.satp.entity;
 
+import com.sms.satp.engine.auth.AuthType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AuthInfo {
 
-    private String type;
+    private AuthType type;
     private OnePlatformAuthInfo onePlatformAuthInfo;
     private ServiceMeshAuthInfo serviceMeshAuthInfo;
 }
