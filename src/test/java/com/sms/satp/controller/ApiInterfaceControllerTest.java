@@ -50,6 +50,7 @@ class ApiInterfaceControllerTest {
     private final static String PROJECT_ID = "25";
     private final static String GROUP_ID = "25";
     private final static String GROUP_NAME = "name";
+    private final static String TAG = "tag";
     private final static String API_INTERFACE_ID = "25";
     private final static Integer PAGE_NUMBER = 3;
     private final static Integer PAGE_SIZE = 20;
@@ -59,9 +60,10 @@ class ApiInterfaceControllerTest {
     @DisplayName("Query the page data for the ApiInterface by projectId and default query criteria")
     void getApiInterfacePageByDefaultRequirements() throws Exception {
         PageDto pageDto = PageDto.builder().build();
-        when(apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID)).thenReturn(null);
+        when(apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID, TAG)).thenReturn(null);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-            .get(Constants.INTERFACE_PATH + "/page/" + PROJECT_ID + "/" + GROUP_ID);
+            .get(Constants.INTERFACE_PATH + "/page/" + PROJECT_ID + "/" + GROUP_ID)
+            .param("tag", TAG);
         ResultActions perform = mockMvc.perform(request);
         perform.andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -76,11 +78,12 @@ class ApiInterfaceControllerTest {
             .pageNumber(PAGE_NUMBER)
             .pageSize(PAGE_SIZE)
             .build();
-        when(apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID)).thenReturn(null);
+        when(apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID, TAG)).thenReturn(null);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .get(Constants.INTERFACE_PATH + "/page/" + PROJECT_ID + "/" + GROUP_ID)
             .param("pageNumber", String.valueOf(PAGE_NUMBER))
-            .param("pageSize", String.valueOf(PAGE_SIZE));
+            .param("pageSize", String.valueOf(PAGE_SIZE))
+            .param("tag", TAG);
         ResultActions perform = mockMvc.perform(request);
         perform.andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))

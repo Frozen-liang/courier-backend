@@ -44,6 +44,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -93,7 +95,11 @@ class ApiInterfaceServiceTest {
             .groupId(GROUP_ID)
             .projectId(PROJECT_ID)
             .build();
-        Example<ApiInterface> example = Example.of(apiInterface);
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+            .withIgnoreNullValues()
+            .withStringMatcher(StringMatcher.EXACT)
+            .withMatcher("tag", ExampleMatcher.GenericPropertyMatchers.contains());
+        Example<ApiInterface> example = Example.of(apiInterface, exampleMatcher);
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
         Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
@@ -103,7 +109,7 @@ class ApiInterfaceServiceTest {
         }
         Page<ApiInterface> apiInterfacePage = new PageImpl<>(apiInterfaceList, pageable, TOTAL_ELEMENTS);
         when(apiInterfaceRepository.findAll(example, pageable)).thenReturn(apiInterfacePage);
-        Page<ApiInterfaceDto> projectDtoPage = apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID);
+        Page<ApiInterfaceDto> projectDtoPage = apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID, null);
         assertThat(projectDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
         assertThat(projectDtoPage.getPageable().getPageNumber()).isEqualTo(DEFAULT_PAGE_NUMBER);
         assertThat(projectDtoPage.getPageable().getPageSize()).isEqualTo(DEFAULT_PAGE_SIZE);
@@ -117,7 +123,11 @@ class ApiInterfaceServiceTest {
             .projectId(PROJECT_ID)
             .groupId(GROUP_ID)
             .build();
-        Example<ApiInterface> example = Example.of(apiInterface);
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+            .withIgnoreNullValues()
+            .withStringMatcher(StringMatcher.EXACT)
+            .withMatcher("tag", ExampleMatcher.GenericPropertyMatchers.contains());
+        Example<ApiInterface> example = Example.of(apiInterface, exampleMatcher);
         PageDto pageDto = PageDto.builder()
             .pageNumber(PAGE_NUMBER)
             .pageSize(PAGE_SIZE)
@@ -131,7 +141,7 @@ class ApiInterfaceServiceTest {
         }
         Page<ApiInterface> apiInterfacePage = new PageImpl<>(apiInterfaceList, pageable, TOTAL_ELEMENTS);
         when(apiInterfaceRepository.findAll(example, pageable)).thenReturn(apiInterfacePage);
-        Page<ApiInterfaceDto> projectDtoPage = apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID);
+        Page<ApiInterfaceDto> projectDtoPage = apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID, null);
         assertThat(projectDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
         assertThat(projectDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER - FRONT_FIRST_NUMBER);
         assertThat(projectDtoPage.getPageable().getPageSize()).isEqualTo(PAGE_SIZE);
@@ -245,13 +255,17 @@ class ApiInterfaceServiceTest {
     @Test
     @DisplayName("An exception occurred while getting apiInterface page")
     void page_exception_test() {
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+            .withIgnoreNullValues()
+            .withStringMatcher(StringMatcher.EXACT)
+            .withMatcher("tag", ExampleMatcher.GenericPropertyMatchers.contains());
         ApiInterface apiInterface = ApiInterface.builder().projectId(PROJECT_ID).build();
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
         Pageable pageable = PageRequest.of(
             pageDto.getPageNumber(), pageDto.getPageSize(), sort);
-        doThrow(new RuntimeException()).when(apiInterfaceRepository).findAll(Example.of(apiInterface), pageable);
-        assertThatThrownBy(() -> apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID))
+        doThrow(new RuntimeException()).when(apiInterfaceRepository).findAll(Example.of(apiInterface, exampleMatcher), pageable);
+        assertThatThrownBy(() -> apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID, null))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_INTERFACE_PAGE_ERROR.getCode());
     }
