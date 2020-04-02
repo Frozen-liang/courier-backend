@@ -73,7 +73,7 @@ public abstract class OpenApiConverterFunction {
                 .type(SchemaType.resolve(schema.getType(), schema.getFormat()))
                 .properties(PROPERTIES_CONVERTER.apply(schema.getProperties()))
                 .build();
-            if (SchemaType.ARRAY.equals(apiSchema.getType())) {
+            if (schema instanceof ArraySchema) {
                 final ArraySchema arraySchema = (ArraySchema) schema;
                 apiSchema.setItem(SCHEMA_CONVERTER.apply(arraySchema.getItems()));
             }

@@ -5,6 +5,7 @@ import static io.restassured.RestAssured.given;
 import com.sms.satp.engine.model.ApiUnitRequest;
 import com.sms.satp.engine.model.ApiUnitResponse;
 import com.sms.satp.engine.model.MultiPart;
+import com.sms.satp.engine.model.impl.DefaultApiUnitResponse;
 import com.sms.satp.parser.common.HttpMethod;
 import io.restassured.builder.MultiPartSpecBuilder;
 import io.restassured.builder.RequestSpecBuilder;
@@ -42,7 +43,8 @@ public class RestAssuredTestEngineImpl implements TestEngine {
 
             log.debug("API {} execution result, {}", request.getPath(), response.getBody().asString());
         }
-        return ApiUnitResponse.builder().time(response.time()).build();
+
+        return new DefaultApiUnitResponse(response);
     }
 
     private Response dispatch(RequestSpecification requestSpecification, String path, HttpMethod method) {
