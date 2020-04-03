@@ -3,18 +3,19 @@ package com.sms.satp.service.impl;
 import static com.sms.satp.common.ErrorCode.ADD_API_INTERFACE_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_API_INTERFACE_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_ALL_INTERFACE_TAG_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_INTERFACE_PAGE_ERROR;
 import static com.sms.satp.common.ErrorCode.PARSE_TO_API_INTERFACE_ERROR;
 import static com.sms.satp.utils.ApiSchemaUtil.removeSchemaMapRef;
 import static com.sms.satp.utils.ApiSchemaUtil.splitKeyFromRef;
 
-import com.google.common.base.Stopwatch;
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.ApiInterface.ApiInterfaceBuilder;
 import com.sms.satp.entity.DocumentImport;
 import com.sms.satp.entity.Header;
+import com.sms.satp.entity.InterfaceWithOnlyTag;
 import com.sms.satp.entity.Parameter;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
 import com.sms.satp.entity.dto.DocumentImportDto;
@@ -44,12 +45,9 @@ import com.sms.satp.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -185,21 +183,17 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
     @Override
     public List<SelectDto> getAllTags(String projectId) {
-        ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder().projectId(projectId);
-        ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-            .withIgnoreNullValues()
-            .withMatcher("project_id", ExampleMatcher.GenericPropertyMatchers.exact());
-        Example<ApiInterface> example = Example.of(apiInterfaceBuilder.build(), exampleMatcher);
-        Stopwatch stopwatch =  Stopwatch.createStarted();
-        List<ApiInterface> apiInterfaceList = apiInterfaceRepository.findAll(example);
-        long rsTime = stopwatch.elapsed(TimeUnit.MILLISECONDS);
-        log.info("apiInterfaceRepository.findAll time cost:{}",rsTime);
-        Set<String> tags = new HashSet<>();
-        apiInterfaceList.forEach(apiInterface -> tags.addAll(
-            apiInterface.getTag().stream().distinct().collect(Collectors.toList())));
-        List<SelectDto> selectDtoList = new ArrayList<>();
-        tags.forEach(tag -> selectDtoList.add(SelectDto.builder().id(tag).name(tag).build()));
-        return selectDtoList;
+        try {
+            List<InterfaceWithOnlyTag> interfaceWithOnlyTags = apiInterfaceRepository.findByProjectId(projectId);
+            return interfaceWithOnlyTags.stream().map(InterfaceWithOnlyTag::getTag)
+                .flatMap(List::stream)
+                .distinct()
+                .map(tag -> SelectDto.builder().id(tag).name(tag).build())
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Failed to get all tags!", e);
+            throw new ApiTestPlatformException(GET_ALL_INTERFACE_TAG_ERROR);
+        }
     }
 
     private void saveInterfacesByType(List<ApiInterface> apiInterfaceList, SaveMode saveMode) {
@@ -256,12 +250,10 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             ApiSchema apiSchema = apiSchemaMap.get(splitKeyFromRef(responseRef));
             apiResponseOptional.get().setSchema(apiSchema);
         });
-        String groupId = getGroupIdByOperationTags(apiOperation, projectId);
         ApiInterface.ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
             .id(new ObjectId().toString())
             .method(HttpMethod.resolve(apiOperation.getHttpMethod().name()))
             .projectId(projectId)
-            .groupId(groupId)
             .tag(apiOperation.getTags())
             .title(StringUtils.isBlank(apiOperation.getSummary()) ? apiPath.getPath() : apiOperation.getSummary())
             .path(apiPath.getPath())
@@ -277,12 +269,6 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         );
         addParameterToInterface(apiInterfaceBuilder, apiOperation.getParameters(), apiSchemaMap);
         return apiInterfaceBuilder.build();
-    }
-
-    private String getGroupIdByOperationTags(ApiOperation apiOperation, String projectId) {
-        List<String> tags = apiOperation.getTags();
-        return tags.isEmpty() ? null : interfaceGroupService.addGroupByNameAndReturnId(
-            tags.get(FIRST_TAG), projectId);
     }
 
     private void addParameterToInterface(ApiInterfaceBuilder apiInterfaceBuilder,

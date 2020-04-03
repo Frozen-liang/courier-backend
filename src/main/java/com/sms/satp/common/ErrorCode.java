@@ -54,6 +54,7 @@ public enum ErrorCode {
     DELETE_TEST_CASE_ERROR("4046","Failed to delete the TestCase!"),
     IMPORT_FILE_FORMAT_ERROR("4047","Illegal file"),
     IMPORT_URL_FORMAT_ERROR("4048","Illegal URL"),
+    GET_ALL_INTERFACE_TAG_ERROR("4049","Failed to get all tags!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

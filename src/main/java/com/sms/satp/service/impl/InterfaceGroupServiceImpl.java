@@ -86,16 +86,4 @@ public class InterfaceGroupServiceImpl implements InterfaceGroupService {
             throw new ApiTestPlatformException(DELETE_INTERFACE_GROUP_BY_ID_ERROR);
         }
     }
-
-    @Override
-    public String addGroupByNameAndReturnId(String groupName, String projectId) {
-        Example<InterfaceGroup> example = Example
-            .of(InterfaceGroup.builder().name(groupName).build());
-        Optional<InterfaceGroup> interfaceGroupOptional = interfaceGroupRepository.findOne(example);
-        if (interfaceGroupOptional.isPresent()) {
-            return interfaceGroupOptional.get().getId();
-        } else {
-            return addGroup(InterfaceGroupDto.builder().name(groupName).projectId(projectId).build());
-        }
-    }
 }
