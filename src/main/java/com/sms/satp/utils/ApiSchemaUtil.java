@@ -5,38 +5,26 @@ import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.ErrorCode;
 import com.sms.satp.entity.Schema;
 import com.sms.satp.entity.Schema.SchemaBuilder;
-import com.sms.satp.parser.common.SchemaType;
 import com.sms.satp.parser.schema.ApiSchema;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 
+@Slf4j
 public abstract class ApiSchemaUtil {
 
     private ApiSchemaUtil() {
     }
 
-    public static void removeSchemaMapRef(
-        Map<String, ApiSchema> apiSchemaMap, Map<String, ApiSchema> root) {
-        Iterator<Entry<String, ApiSchema>> entryIterator = apiSchemaMap.entrySet().iterator();
-        entryIterator.forEachRemaining(entry -> {
-            if (StringUtils.isBlank(entry.getValue().getRef())) {
-                if (entry.getValue().getType().matches(SchemaType.OBJECT
-                        .getType()) && Objects.nonNull(entry.getValue().getProperties())) {
-                    removeSchemaMapRef(entry.getValue().getProperties(), root);
-                }
-            } else {
-                String refKey = splitKeyFromRef(entry.getValue().getRef());
-                entry.setValue(root.get(refKey));
-            }
-        });
+    public static void removeSchemaMapRef(Map<String, ApiSchema> apiSchemaMap) {
+        ApiSchemaMapUtil apiSchemaMapUtil = new ApiSchemaMapUtil(apiSchemaMap);
+        apiSchemaMapUtil.removeRef();
     }
 
     public static String splitKeyFromRef(String ref) {
@@ -63,6 +51,8 @@ public abstract class ApiSchemaUtil {
                 .properties(null)
                 .description(apiSchemaOptional.map(ApiSchema::getDescription).orElse(null))
                 .deprecated(apiSchemaOptional.map(ApiSchema::getDeprecated).orElse(null));
+            apiSchemaOptional.map(ApiSchema::getItem).ifPresent(
+                apiSchemaItem -> schemaBuilder.item(CONVERT_TO_SCHEMA.apply(apiSchemaItem)));
             apiSchemaOptional.map(ApiSchema::getProperties).ifPresent(properties -> {
                 Map<String, Schema> schemaMap = properties.entrySet().stream().collect(
                     Collectors.toMap(Entry::getKey, entry -> CONVERT_TO_SCHEMA.apply(entry.getValue())));

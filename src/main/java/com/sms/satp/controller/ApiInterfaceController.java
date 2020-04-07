@@ -34,8 +34,8 @@ public class ApiInterfaceController {
 
     @GetMapping("/page/{projectId}/{groupId}")
     public Response<Page<ApiInterfaceDto>> page(PageDto pageDto, @PathVariable("projectId") String projectId,
-        @PathVariable("groupId") String groupId) {
-        return Response.ok(apiInterfaceService.page(pageDto, projectId, groupId));
+        @PathVariable("groupId") String groupId, String tag) {
+        return Response.ok(apiInterfaceService.page(pageDto, projectId, groupId, tag));
     }
 
     @GetMapping("/{id}")

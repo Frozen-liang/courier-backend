@@ -37,6 +37,7 @@ import java.util.function.Function;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 
 public abstract class OpenApiConverterFunction {
 
@@ -171,7 +172,7 @@ public abstract class OpenApiConverterFunction {
             .builder().deprecated(parameter.getDeprecated()).description(parameter.getDescription())
             .example(Objects.nonNull(parameter.getExample()) ? parameter.getExample().toString() : "")
             .in(In.resolve(StringUtils.upperCase(parameter.getIn())))
-            .schemaType(SchemaType.resolve(parameter.getSchema().getType(), parameter.getSchema().getFormat()))
+            .schema(schemaConvert(parameter.getSchema()))
             .name(parameter.getName()).required(parameter.getRequired()).build();
     }
 
@@ -187,6 +188,6 @@ public abstract class OpenApiConverterFunction {
             .operationId(operation.getOperationId()).tags(operation.getTags()).summary(operation.getSummary())
             .parameters(PARAMETERS_CONVERTER.apply(operation.getParameters()))
             .apiRequestBody(REQUEST_BODY_CONVERTER.apply(operation.getRequestBody()))
-            .apiResponse(RESPONSE_CONVERTER.apply(operation.getResponses().getDefault()));
+            .apiResponse(RESPONSE_CONVERTER.apply(operation.getResponses().get(String.valueOf(HttpStatus.OK.value()))));
     }
 }

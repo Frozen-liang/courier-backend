@@ -13,6 +13,4 @@ public interface InterfaceGroupService {
 
     void deleteGroup(String id);
 
-    String addGroupByNameAndReturnId(String groupName, String projectId);
-
 }
