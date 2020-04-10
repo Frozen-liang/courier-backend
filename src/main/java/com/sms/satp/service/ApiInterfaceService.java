@@ -1,5 +1,6 @@
 package com.sms.satp.service;
 
+import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
 import com.sms.satp.entity.dto.DocumentImportDto;
 import com.sms.satp.entity.dto.ImportWay;
@@ -23,5 +24,7 @@ public interface ApiInterfaceService {
     void importDocument(DocumentImportDto documentImportDto, ImportWay importWay);
 
     List<SelectDto> getAllTags(String projectId);
+
+    UpdateResult updateGroupById(List ids, String groupId);
 
 }
