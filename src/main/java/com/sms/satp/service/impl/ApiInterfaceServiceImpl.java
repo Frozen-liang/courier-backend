@@ -10,6 +10,7 @@ import static com.sms.satp.common.ErrorCode.PARSE_TO_API_INTERFACE_ERROR;
 import static com.sms.satp.utils.ApiSchemaUtil.removeSchemaMapRef;
 import static com.sms.satp.utils.ApiSchemaUtil.splitKeyFromRef;
 
+import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.ApiInterface.ApiInterfaceBuilder;
@@ -47,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +62,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -74,15 +80,18 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     private final ApiInterfaceMapper apiInterfaceMapper;
     private final DocumentImportMapper documentImportMapper;
     private final InterfaceGroupService interfaceGroupService;
+    private final MongoTemplate mongoTemplate;
 
     public ApiInterfaceServiceImpl(ApiInterfaceRepository apiInterfaceRepository,
         DocumentFactory documentFactory, ApiInterfaceMapper apiInterfaceMapper,
-        DocumentImportMapper documentImportMapper, InterfaceGroupService interfaceGroupService) {
+        DocumentImportMapper documentImportMapper, InterfaceGroupService interfaceGroupService,
+        MongoTemplate mongoTemplate) {
         this.apiInterfaceRepository = apiInterfaceRepository;
         this.documentFactory = documentFactory;
         this.apiInterfaceMapper = apiInterfaceMapper;
         this.documentImportMapper = documentImportMapper;
         this.interfaceGroupService = interfaceGroupService;
+        this.mongoTemplate = mongoTemplate;
     }
 
     @Override
@@ -186,6 +195,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
         try {
             List<InterfaceWithOnlyTag> interfaceWithOnlyTags = apiInterfaceRepository.findByProjectId(projectId);
             return interfaceWithOnlyTags.stream().map(InterfaceWithOnlyTag::getTag)
+                .filter(Objects::nonNull)
                 .flatMap(List::stream)
                 .distinct()
                 .map(tag -> SelectDto.builder().id(tag).name(tag).build())
@@ -194,6 +204,12 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             log.error("Failed to get all tags!", e);
             throw new ApiTestPlatformException(GET_ALL_INTERFACE_TAG_ERROR);
         }
+    }
+
+    @Override
+    public UpdateResult updateGroupById(List ids, String groupId) {
+        return mongoTemplate.updateMulti(new Query(Criteria.where("_id").in(ids)),
+            new Update().set("group_id", groupId), ApiInterface.class);
     }
 
     private void saveInterfacesByType(List<ApiInterface> apiInterfaceList, SaveMode saveMode) {

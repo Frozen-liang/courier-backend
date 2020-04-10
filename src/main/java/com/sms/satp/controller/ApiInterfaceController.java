@@ -1,5 +1,6 @@
 package com.sms.satp.controller;
 
+import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
@@ -7,16 +8,19 @@ import com.sms.satp.entity.dto.InterfaceGroupDto;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.service.ApiInterfaceService;
 import com.sms.satp.service.InterfaceGroupService;
+import java.util.Arrays;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -53,6 +57,12 @@ public class ApiInterfaceController {
     public Response edit(@Valid @RequestBody ApiInterfaceDto apiInterfaceDto) {
         apiInterfaceService.edit(apiInterfaceDto);
         return Response.ok().build();
+    }
+
+    @PatchMapping("{ids}")
+    public Response<UpdateResult> updateGroupIdById(@PathVariable String[] ids, @RequestParam String groupId) {
+        return Response.ok(apiInterfaceService.updateGroupById(Arrays.asList(ids), groupId));
+
     }
 
     @DeleteMapping("/{ids}")
