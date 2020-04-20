@@ -11,9 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Base64Utils;
 
 @Slf4j
-public class DESUtil {
+public class DesUtil {
 
-    private DESUtil() {
+    private DesUtil() {
     }
 
     private static final String secretKeyBase64 = "QJLVDk89AqE=";

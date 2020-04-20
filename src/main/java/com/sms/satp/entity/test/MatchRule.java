@@ -3,7 +3,8 @@ package com.sms.satp.entity.test;
 import com.sms.satp.engine.rule.RuleType;
 import com.sms.satp.parser.common.SchemaType;
 import java.util.List;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @Builder
