@@ -1,5 +1,6 @@
 package com.sms.satp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 public class RequestBody {
 
+    @JsonIgnore
     private String id;
     @Field("ref_schema_id")
     private String refSchemaId;

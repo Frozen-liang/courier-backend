@@ -1,6 +1,5 @@
 package com.sms.satp.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sms.satp.parser.common.HttpMethod;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,20 +11,20 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Builder
+
+
 @Data
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
-@Document(collection = "ApiInterface")
-public class ApiInterface {
+@AllArgsConstructor
+@Document(collection = "InterfaceHistory")
+public class InterfaceHistory {
 
     @Id
-    @JsonIgnore
     @Field("_id")
     private String id;
     private HttpMethod method;
     private List<String> tag;
-    @JsonIgnore
     private String md5;
     private String title;
     private String path;
@@ -45,12 +44,9 @@ public class ApiInterface {
     @Field("request_body")
     private RequestBody requestBody;
     private Response response;
-    @JsonIgnore
     @Field("create_date_time")
     private LocalDateTime createDateTime;
-    @JsonIgnore
     @Field("modify_date_time")
     private LocalDateTime modifyDateTime;
-
 
 }

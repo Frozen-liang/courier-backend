@@ -15,5 +15,6 @@ public class Constants {
     public static final String SCHEMA_PATH = SDK_VERSION + "/schema";
     public static final String COMMON_PATH = SDK_VERSION + "/common";
     public static final String TEST_CASE_PATH = SDK_VERSION + "/test-case";
+    public static final String INTERFACE_HISTORY_PATH = SDK_VERSION + "/interface/history";
 
 }

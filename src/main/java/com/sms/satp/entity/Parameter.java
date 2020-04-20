@@ -1,5 +1,6 @@
 package com.sms.satp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Parameter {
 
+    @JsonIgnore
     private String id;
     /**
      * REQUIRED. The name of the parameter. Parameter names are case sensitive. If in is "path", the
