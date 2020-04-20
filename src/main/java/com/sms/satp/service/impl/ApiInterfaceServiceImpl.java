@@ -10,7 +10,6 @@ import static com.sms.satp.common.ErrorCode.PARSE_TO_API_INTERFACE_ERROR;
 import static com.sms.satp.utils.ApiSchemaUtil.removeSchemaMapRef;
 import static com.sms.satp.utils.ApiSchemaUtil.splitKeyFromRef;
 
-import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.ApiInterface.ApiInterfaceBuilder;
@@ -18,6 +17,7 @@ import com.sms.satp.entity.DocumentImport;
 import com.sms.satp.entity.Header;
 import com.sms.satp.entity.InterfaceWithOnlyTag;
 import com.sms.satp.entity.Parameter;
+import com.sms.satp.entity.criteria.InterfaceCriteria;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
 import com.sms.satp.entity.dto.DocumentImportDto;
 import com.sms.satp.entity.dto.ImportWay;
@@ -37,11 +37,12 @@ import com.sms.satp.parser.model.ApiResponse;
 import com.sms.satp.parser.schema.ApiSchema;
 import com.sms.satp.repository.ApiInterfaceRepository;
 import com.sms.satp.service.ApiInterfaceService;
-import com.sms.satp.service.InterfaceGroupService;
+import com.sms.satp.service.InterfaceHistoryService;
 import com.sms.satp.utils.ApiHeaderConverter;
 import com.sms.satp.utils.ApiParameterConverter;
 import com.sms.satp.utils.ApiRequestBodyConverter;
 import com.sms.satp.utils.ApiResponseConverter;
+import com.sms.satp.utils.MD5Util;
 import com.sms.satp.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -72,45 +73,50 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApiInterfaceServiceImpl implements ApiInterfaceService {
 
-    private static final Integer FIRST_TAG = 0;
     private static final String ALL_GROUP_FLAG = "-1";
+    private static final String REG_ALL = ".*";
 
     private final ApiInterfaceRepository apiInterfaceRepository;
     private final DocumentFactory documentFactory;
     private final ApiInterfaceMapper apiInterfaceMapper;
     private final DocumentImportMapper documentImportMapper;
-    private final InterfaceGroupService interfaceGroupService;
+    private final InterfaceHistoryService interfaceHistoryService;
     private final MongoTemplate mongoTemplate;
 
     public ApiInterfaceServiceImpl(ApiInterfaceRepository apiInterfaceRepository,
         DocumentFactory documentFactory, ApiInterfaceMapper apiInterfaceMapper,
-        DocumentImportMapper documentImportMapper, InterfaceGroupService interfaceGroupService,
+        DocumentImportMapper documentImportMapper, InterfaceHistoryService interfaceHistoryService,
         MongoTemplate mongoTemplate) {
         this.apiInterfaceRepository = apiInterfaceRepository;
         this.documentFactory = documentFactory;
         this.apiInterfaceMapper = apiInterfaceMapper;
         this.documentImportMapper = documentImportMapper;
-        this.interfaceGroupService = interfaceGroupService;
+        this.interfaceHistoryService = interfaceHistoryService;
         this.mongoTemplate = mongoTemplate;
     }
 
     @Override
-    public Page<ApiInterfaceDto> page(PageDto pageDto, String projectId, String groupId, String tag) {
+    public Page<ApiInterfaceDto> page(PageDto pageDto, InterfaceCriteria interfaceCriteria) {
         try {
             PageDtoConverter.frontMapping(pageDto);
-            ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
-                .projectId(projectId);
-            if (!StringUtils.equals(groupId, ALL_GROUP_FLAG)) {
-                apiInterfaceBuilder.groupId(groupId);
-            }
-            if (StringUtils.isNoneBlank(tag)) {
-                apiInterfaceBuilder.tag(Collections.singletonList(tag));
-            }
+            ApiInterface apiInterface = ApiInterface.builder()
+                .projectId(interfaceCriteria.getProjectId())
+                .groupId(!StringUtils.equals(interfaceCriteria.getGroupId(), ALL_GROUP_FLAG)
+                    ? interfaceCriteria.getGroupId() : null)
+                .tag(StringUtils.isNoneBlank(interfaceCriteria.getTag())
+                    ? Collections.singletonList(interfaceCriteria.getTag()) : null)
+                .title(StringUtils.isNotBlank(interfaceCriteria.getTitle())
+                    ? REG_ALL + interfaceCriteria.getTitle() + REG_ALL : REG_ALL)
+                .path(StringUtils.isNotBlank(interfaceCriteria.getPath())
+                    ? REG_ALL + interfaceCriteria.getPath() + REG_ALL : REG_ALL)
+                .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withIgnoreNullValues()
                 .withStringMatcher(StringMatcher.EXACT)
-                .withMatcher("tag", ExampleMatcher.GenericPropertyMatchers.contains());
-            Example<ApiInterface> example = Example.of(apiInterfaceBuilder.build(), exampleMatcher);
+                .withMatcher("tag", ExampleMatcher.GenericPropertyMatchers.contains())
+                .withMatcher("title", ExampleMatcher.GenericPropertyMatchers.regex())
+                .withMatcher("path", ExampleMatcher.GenericPropertyMatchers.regex());
+            Example<ApiInterface> example = Example.of(apiInterface, exampleMatcher);
             Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
             Pageable pageable = PageRequest.of(
                 pageDto.getPageNumber(), pageDto.getPageSize(), sort);
@@ -149,6 +155,8 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             apiInterfaceOptional.ifPresent(apiInterfaceFindById -> {
                 apiInterface.setCreateDateTime(apiInterfaceFindById.getCreateDateTime());
                 apiInterface.setModifyDateTime(LocalDateTime.now());
+                String md5 = MD5Util.getMD5(apiInterface);
+                apiInterface.setMd5(md5);
                 apiInterfaceRepository.save(apiInterface);
             });
         } catch (Exception e) {
@@ -191,13 +199,14 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     }
 
     @Override
-    public List<SelectDto> getAllTags(String projectId) {
+    public List<SelectDto> getAllTags(String projectId, String condition) {
         try {
             List<InterfaceWithOnlyTag> interfaceWithOnlyTags = apiInterfaceRepository.findByProjectId(projectId);
             return interfaceWithOnlyTags.stream().map(InterfaceWithOnlyTag::getTag)
                 .filter(Objects::nonNull)
                 .flatMap(List::stream)
                 .distinct()
+                .filter(tag -> !StringUtils.isNoneBlank(condition) || tag.contains(condition))
                 .map(tag -> SelectDto.builder().id(tag).name(tag).build())
                 .collect(Collectors.toList());
         } catch (Exception e) {
@@ -207,9 +216,14 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     }
 
     @Override
-    public UpdateResult updateGroupById(List ids, String groupId) {
-        return mongoTemplate.updateMulti(new Query(Criteria.where("_id").in(ids)),
+    public void updateGroupById(List ids, String groupId) {
+        mongoTemplate.updateMulti(new Query(Criteria.where("_id").in(ids)),
             new Update().set("group_id", groupId), ApiInterface.class);
+    }
+
+    @Override
+    public void deleteAll() {
+        apiInterfaceRepository.deleteAll();
     }
 
     private void saveInterfacesByType(List<ApiInterface> apiInterfaceList, SaveMode saveMode) {
@@ -221,10 +235,16 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             Example<ApiInterface> example = Example.of(apiInterfaceExample);
             Optional<ApiInterface> apiInterfaceOptional = apiInterfaceRepository.findOne(example);
             if (apiInterfaceOptional.isPresent()) {
-                if (saveMode.matches(SaveMode.COVER.name())) {
-                    apiInterface.setId(apiInterfaceOptional.get().getId());
+                String md5 = apiInterfaceOptional.get().getMd5();
+                if (!StringUtils.equals(md5, apiInterface.getMd5())) {
+                    interfaceHistoryService.saveAsHistory(apiInterfaceOptional.get());
+                    apiInterfaceRepository.deleteById(apiInterfaceOptional.get().getId());
                     apiInterfaceRepository.save(apiInterface);
                 }
+                // if (saveMode.matches(SaveMode.COVER.name())) {
+                //     apiInterface.setId(apiInterfaceOptional.get().getId());
+                //     apiInterfaceRepository.save(apiInterface);
+                // }
             } else {
                 apiInterfaceRepository.save(apiInterface);
             }
@@ -279,12 +299,16 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                 apiRequestBodyOptional.map(ApiRequestBodyConverter.CONVERT_TO_REQUEST_BODY).orElse(null))
             .response(
                 apiResponseOptional.map(ApiResponseConverter.CONVERT_TO_RESPONSE).orElse(null))
-            .createDateTime(LocalDateTime.now());
+            .createDateTime(LocalDateTime.now())
+            .modifyDateTime(LocalDateTime.now());
         apiResponseOptional.map(ApiResponse::getHeaders).ifPresent(apiHeaders ->
             apiInterfaceBuilder.responseHeaders(ApiHeaderConverter.CONVERT_TO_HEADER.apply(apiHeaders))
         );
         addParameterToInterface(apiInterfaceBuilder, apiOperation.getParameters(), apiSchemaMap);
-        return apiInterfaceBuilder.build();
+        ApiInterface apiInterface = apiInterfaceBuilder.build();
+        String md5 = MD5Util.getMD5(apiInterface);
+        apiInterface.setMd5(md5);
+        return apiInterface;
     }
 
     private void addParameterToInterface(ApiInterfaceBuilder apiInterfaceBuilder,

@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import com.sms.satp.ApplicationTests;
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.ApiInterface;
+import com.sms.satp.entity.criteria.InterfaceCriteria;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
 import com.sms.satp.entity.dto.DocumentImportDto;
 import com.sms.satp.entity.dto.ImportWay;
@@ -34,6 +35,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.io.IOUtils;
@@ -74,6 +76,8 @@ class ApiInterfaceServiceTest {
     private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
     private static final int FRONT_FIRST_NUMBER = 1;
+    private static final String REG_ALL = ".*";
+    private static final String ALL_GROUP_FLAG = "-1";
     private final static String FILE_NAME = "fileName";
     private final static String PROJECT_ID = "25";
     private final static String ID = "123";
@@ -91,14 +95,25 @@ class ApiInterfaceServiceTest {
     @Test
     @DisplayName("Test the paging method with no parameters in the apiInterface service")
     void page_default_test() {
+        InterfaceCriteria interfaceCriteria = InterfaceCriteria.builder()
+            .groupId(GROUP_ID).projectId(PROJECT_ID).build();
         ApiInterface apiInterface = ApiInterface.builder()
-            .groupId(GROUP_ID)
-            .projectId(PROJECT_ID)
+            .projectId(interfaceCriteria.getProjectId())
+            .groupId(!StringUtils.equals(interfaceCriteria.getGroupId(), ALL_GROUP_FLAG)
+                ? interfaceCriteria.getGroupId() : null)
+            .tag(StringUtils.isNoneBlank(interfaceCriteria.getTag())
+                ? Collections.singletonList(interfaceCriteria.getTag()) : null)
+            .title(StringUtils.isNotBlank(interfaceCriteria.getTitle())
+                ? REG_ALL + interfaceCriteria.getTitle() + REG_ALL : REG_ALL)
+            .path(StringUtils.isNotBlank(interfaceCriteria.getPath())
+                ? REG_ALL + interfaceCriteria.getPath() + REG_ALL : REG_ALL)
             .build();
         ExampleMatcher exampleMatcher = ExampleMatcher.matching()
             .withIgnoreNullValues()
             .withStringMatcher(StringMatcher.EXACT)
-            .withMatcher("tag", ExampleMatcher.GenericPropertyMatchers.contains());
+            .withMatcher("tag", ExampleMatcher.GenericPropertyMatchers.contains())
+            .withMatcher("title", ExampleMatcher.GenericPropertyMatchers.regex())
+            .withMatcher("path", ExampleMatcher.GenericPropertyMatchers.regex());
         Example<ApiInterface> example = Example.of(apiInterface, exampleMatcher);
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
@@ -109,7 +124,7 @@ class ApiInterfaceServiceTest {
         }
         Page<ApiInterface> apiInterfacePage = new PageImpl<>(apiInterfaceList, pageable, TOTAL_ELEMENTS);
         when(apiInterfaceRepository.findAll(example, pageable)).thenReturn(apiInterfacePage);
-        Page<ApiInterfaceDto> projectDtoPage = apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID, null);
+        Page<ApiInterfaceDto> projectDtoPage = apiInterfaceService.page(pageDto, interfaceCriteria);
         assertThat(projectDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
         assertThat(projectDtoPage.getPageable().getPageNumber()).isEqualTo(DEFAULT_PAGE_NUMBER);
         assertThat(projectDtoPage.getPageable().getPageSize()).isEqualTo(DEFAULT_PAGE_SIZE);
@@ -119,14 +134,25 @@ class ApiInterfaceServiceTest {
     @Test
     @DisplayName("Test the paging method with specified parameters in the apiInterface service")
     void page_test() {
+        InterfaceCriteria interfaceCriteria = InterfaceCriteria.builder()
+            .groupId(GROUP_ID).projectId(PROJECT_ID).build();
         ApiInterface apiInterface = ApiInterface.builder()
-            .projectId(PROJECT_ID)
-            .groupId(GROUP_ID)
+            .projectId(interfaceCriteria.getProjectId())
+            .groupId(!StringUtils.equals(interfaceCriteria.getGroupId(), ALL_GROUP_FLAG)
+                ? interfaceCriteria.getGroupId() : null)
+            .tag(StringUtils.isNoneBlank(interfaceCriteria.getTag())
+                ? Collections.singletonList(interfaceCriteria.getTag()) : null)
+            .title(StringUtils.isNotBlank(interfaceCriteria.getTitle())
+                ? REG_ALL + interfaceCriteria.getTitle() + REG_ALL : REG_ALL)
+            .path(StringUtils.isNotBlank(interfaceCriteria.getPath())
+                ? REG_ALL + interfaceCriteria.getPath() + REG_ALL : REG_ALL)
             .build();
         ExampleMatcher exampleMatcher = ExampleMatcher.matching()
             .withIgnoreNullValues()
             .withStringMatcher(StringMatcher.EXACT)
-            .withMatcher("tag", ExampleMatcher.GenericPropertyMatchers.contains());
+            .withMatcher("tag", ExampleMatcher.GenericPropertyMatchers.contains())
+            .withMatcher("title", ExampleMatcher.GenericPropertyMatchers.regex())
+            .withMatcher("path", ExampleMatcher.GenericPropertyMatchers.regex());
         Example<ApiInterface> example = Example.of(apiInterface, exampleMatcher);
         PageDto pageDto = PageDto.builder()
             .pageNumber(PAGE_NUMBER)
@@ -141,7 +167,7 @@ class ApiInterfaceServiceTest {
         }
         Page<ApiInterface> apiInterfacePage = new PageImpl<>(apiInterfaceList, pageable, TOTAL_ELEMENTS);
         when(apiInterfaceRepository.findAll(example, pageable)).thenReturn(apiInterfacePage);
-        Page<ApiInterfaceDto> projectDtoPage = apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID, null);
+        Page<ApiInterfaceDto> projectDtoPage = apiInterfaceService.page(pageDto, interfaceCriteria);
         assertThat(projectDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
         assertThat(projectDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER - FRONT_FIRST_NUMBER);
         assertThat(projectDtoPage.getPageable().getPageSize()).isEqualTo(PAGE_SIZE);
@@ -265,7 +291,9 @@ class ApiInterfaceServiceTest {
         Pageable pageable = PageRequest.of(
             pageDto.getPageNumber(), pageDto.getPageSize(), sort);
         doThrow(new RuntimeException()).when(apiInterfaceRepository).findAll(Example.of(apiInterface, exampleMatcher), pageable);
-        assertThatThrownBy(() -> apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID, null))
+        InterfaceCriteria interfaceCriteria = InterfaceCriteria.builder()
+            .groupId(GROUP_ID).projectId(PROJECT_ID).build();
+        assertThatThrownBy(() -> apiInterfaceService.page(pageDto, interfaceCriteria))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_INTERFACE_PAGE_ERROR.getCode());
     }

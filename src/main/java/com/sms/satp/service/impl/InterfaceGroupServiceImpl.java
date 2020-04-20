@@ -14,8 +14,10 @@ import com.sms.satp.service.InterfaceGroupService;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +27,8 @@ public class InterfaceGroupServiceImpl implements InterfaceGroupService {
     private final InterfaceGroupRepository interfaceGroupRepository;
     private final InterfaceGroupMapper interfaceGroupMapper;
 
+    private static final String REG_ALL = ".*";
+
     public InterfaceGroupServiceImpl(InterfaceGroupRepository interfaceGroupRepository,
         InterfaceGroupMapper interfaceGroupMapper) {
         this.interfaceGroupRepository = interfaceGroupRepository;
@@ -32,10 +36,14 @@ public class InterfaceGroupServiceImpl implements InterfaceGroupService {
     }
 
     @Override
-    public List<InterfaceGroupDto> getGroupList(String projectId) {
+    public List<InterfaceGroupDto> getGroupList(String projectId, String condition) {
         try {
-            InterfaceGroup interfaceGroup = InterfaceGroup.builder().projectId(projectId).build();
-            Example<InterfaceGroup> example = Example.of(interfaceGroup);
+            InterfaceGroup interfaceGroup = InterfaceGroup.builder().projectId(projectId)
+                .name(StringUtils.isNotBlank(condition) ? REG_ALL + condition + REG_ALL : REG_ALL).build();
+            ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+                .withMatcher("project_id", ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.regex());
+            Example<InterfaceGroup> example = Example.of(interfaceGroup, exampleMatcher);
             return interfaceGroupMapper.toDtoList(interfaceGroupRepository.findAll(example));
         } catch (Exception e) {
             log.error("Failed to get the InterfaceGroup list!", e);

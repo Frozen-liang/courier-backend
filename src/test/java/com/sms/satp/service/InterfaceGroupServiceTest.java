@@ -31,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 
 @SpringBootTest(classes = ApplicationTests.class)
 @DisplayName("Test cases for InterfaceGroupService")
@@ -61,10 +62,13 @@ public class InterfaceGroupServiceTest {
                     .name(GROUP_NAME)
                     .build());
         }
-        InterfaceGroup interfaceGroup = InterfaceGroup.builder().projectId(PROJECT_ID).build();
-        Example<InterfaceGroup> example = Example.of(interfaceGroup);
+        InterfaceGroup interfaceGroup = InterfaceGroup.builder().projectId(PROJECT_ID).name(".*").build();
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+            .withMatcher("project_id", ExampleMatcher.GenericPropertyMatchers.exact())
+            .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.regex());
+        Example<InterfaceGroup> example = Example.of(interfaceGroup, exampleMatcher);
         when(interfaceGroupRepository.findAll(example)).thenReturn(interfaceGroupList);
-        List<InterfaceGroupDto> interfaceGroupDtoList = interfaceGroupService.getGroupList(PROJECT_ID);
+        List<InterfaceGroupDto> interfaceGroupDtoList = interfaceGroupService.getGroupList(PROJECT_ID, null);
         assertThat(interfaceGroupDtoList).allMatch(result -> StringUtils.equals(result.getName(), GROUP_NAME));
         assertThat(interfaceGroupDtoList.size()).isEqualTo(LIST_SIZE);
     }
@@ -101,10 +105,13 @@ public class InterfaceGroupServiceTest {
     @Test
     @DisplayName("An exception occurred while getting InterfaceGroup list")
     void getGroupList_exception_test() {
-        InterfaceGroup interfaceGroup = InterfaceGroup.builder().projectId(PROJECT_ID).build();
-        Example<InterfaceGroup> example = Example.of(interfaceGroup);
+        InterfaceGroup interfaceGroup = InterfaceGroup.builder().projectId(PROJECT_ID).name(".*").build();
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+            .withMatcher("project_id", ExampleMatcher.GenericPropertyMatchers.exact())
+            .withMatcher("name", ExampleMatcher.GenericPropertyMatchers.regex());
+        Example<InterfaceGroup> example = Example.of(interfaceGroup, exampleMatcher);
         doThrow(new RuntimeException()).when(interfaceGroupRepository).findAll(example);
-        assertThatThrownBy(() -> interfaceGroupService.getGroupList(PROJECT_ID))
+        assertThatThrownBy(() -> interfaceGroupService.getGroupList(PROJECT_ID, null))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_INTERFACE_GROUP_LIST_ERROR.getCode());
     }

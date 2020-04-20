@@ -1,6 +1,6 @@
 package com.sms.satp.service;
 
-import com.mongodb.client.result.UpdateResult;
+import com.sms.satp.entity.criteria.InterfaceCriteria;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
 import com.sms.satp.entity.dto.DocumentImportDto;
 import com.sms.satp.entity.dto.ImportWay;
@@ -11,7 +11,7 @@ import org.springframework.data.domain.Page;
 
 public interface ApiInterfaceService {
 
-    Page<ApiInterfaceDto> page(PageDto pageDto, String projectId, String groupId, String tag);
+    Page<ApiInterfaceDto> page(PageDto pageDto, InterfaceCriteria interfaceCriteria);
 
     void add(ApiInterfaceDto apiInterfaceDto);
 
@@ -23,8 +23,10 @@ public interface ApiInterfaceService {
 
     void importDocument(DocumentImportDto documentImportDto, ImportWay importWay);
 
-    List<SelectDto> getAllTags(String projectId);
+    List<SelectDto> getAllTags(String projectId, String condition);
 
-    UpdateResult updateGroupById(List ids, String groupId);
+    void updateGroupById(List ids, String groupId);
+
+    void deleteAll();
 
 }

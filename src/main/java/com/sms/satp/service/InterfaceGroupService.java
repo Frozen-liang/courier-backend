@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface InterfaceGroupService {
 
-    List<InterfaceGroupDto> getGroupList(String projectId);
+    List<InterfaceGroupDto> getGroupList(String projectId, String condition);
 
     String addGroup(InterfaceGroupDto interfaceGroupDto);
 

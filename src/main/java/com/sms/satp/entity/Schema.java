@@ -1,5 +1,6 @@
 package com.sms.satp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sms.satp.parser.common.SchemaType;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Schema {
 
     @Id
+    @JsonIgnore
     @Field("_id")
     private String id;
     @Field("project_id")
@@ -32,8 +34,10 @@ public class Schema {
     private Map<String, Schema> properties;
     private String description;
     private Boolean deprecated;
+    @JsonIgnore
     @Field("create_date_time")
     private LocalDateTime createDateTime;
+    @JsonIgnore
     @Field("modify_date_time")
     private LocalDateTime modifyDateTime;
 }

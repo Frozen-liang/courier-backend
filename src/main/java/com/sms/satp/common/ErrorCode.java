@@ -55,6 +55,9 @@ public enum ErrorCode {
     IMPORT_FILE_FORMAT_ERROR("4047","Illegal file"),
     IMPORT_URL_FORMAT_ERROR("4048","Illegal URL"),
     GET_ALL_INTERFACE_TAG_ERROR("4049","Failed to get all tags!"),
+    SAVE_INTERFACE_HISTORY_ERROR("4050","Failed to save the interface history!"),
+    GET_INTERFACE_HISTORY_BY_ID_ERROR("4051","Failed to get the Interface history by id!"),
+    GET_INTERFACE_HISTORY_LIST_ERROR("4052","Failed to get the Interface history list!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 
