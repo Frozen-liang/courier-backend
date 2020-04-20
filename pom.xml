@@ -19,6 +19,7 @@
         <java.version>1.8</java.version>
         <swagger.parser.version>2.0.16</swagger.parser.version>
         <spring.doc.openapi.version>1.2.19</spring.doc.openapi.version>
+        <spring.boot.admin.version>2.2.2</spring.boot.admin.version>
         <rest.assured.version>4.1.2</rest.assured.version>
         <commons.lang.version>3.9</commons.lang.version>
         <commons.collections4.version>4.4</commons.collections4.version>
@@ -70,6 +71,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-server</artifactId>
+            <version>${spring.boot.admin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+            <version>${spring.boot.admin.version}</version>
         </dependency>
 
         <dependency>
