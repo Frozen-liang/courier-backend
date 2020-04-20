@@ -1,8 +1,8 @@
 package com.sms.satp.controller;
 
-import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
+import com.sms.satp.entity.criteria.InterfaceCriteria;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
 import com.sms.satp.entity.dto.InterfaceGroupDto;
 import com.sms.satp.entity.dto.PageDto;
@@ -38,8 +38,10 @@ public class ApiInterfaceController {
 
     @GetMapping("/page/{projectId}/{groupId}")
     public Response<Page<ApiInterfaceDto>> page(PageDto pageDto, @PathVariable("projectId") String projectId,
-        @PathVariable("groupId") String groupId, String tag) {
-        return Response.ok(apiInterfaceService.page(pageDto, projectId, groupId, tag));
+        @PathVariable("groupId") String groupId, InterfaceCriteria interfaceCriteria) {
+        interfaceCriteria.setGroupId(groupId);
+        interfaceCriteria.setProjectId(projectId);
+        return Response.ok(apiInterfaceService.page(pageDto, interfaceCriteria));
     }
 
     @GetMapping("/{id}")
@@ -60,8 +62,9 @@ public class ApiInterfaceController {
     }
 
     @PatchMapping("{ids}")
-    public Response<UpdateResult> updateGroupIdById(@PathVariable String[] ids, @RequestParam String groupId) {
-        return Response.ok(apiInterfaceService.updateGroupById(Arrays.asList(ids), groupId));
+    public Response updateGroupIdById(@PathVariable String[] ids, @RequestParam String groupId) {
+        apiInterfaceService.updateGroupById(Arrays.asList(ids), groupId);
+        return Response.ok().build();
 
     }
 
@@ -73,9 +76,16 @@ public class ApiInterfaceController {
         return Response.ok().build();
     }
 
+    @DeleteMapping
+    public Response deleteAll() {
+        apiInterfaceService.deleteAll();
+        return Response.ok().build();
+    }
+
     @GetMapping("/group/list/{projectId}")
-    public Response<List<InterfaceGroupDto>> getGroupList(@PathVariable String projectId) {
-        return Response.ok(interfaceGroupService.getGroupList(projectId));
+    public Response<List<InterfaceGroupDto>> getGroupList(@PathVariable String projectId,
+        @RequestParam(required = false) String group) {
+        return Response.ok(interfaceGroupService.getGroupList(projectId, group));
     }
 
     @PostMapping("/group")

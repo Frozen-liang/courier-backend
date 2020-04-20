@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -45,7 +46,8 @@ public class CommonController {
     }
 
     @GetMapping("tags/{projectId}")
-    public Response<List<SelectDto>> getAllTags(@PathVariable String projectId) {
-        return Response.ok(apiInterfaceService.getAllTags(projectId));
+    public Response<List<SelectDto>> getAllTags(@PathVariable String projectId,
+        @RequestParam(required = false) String tag) {
+        return Response.ok(apiInterfaceService.getAllTags(projectId, tag));
     }
 }

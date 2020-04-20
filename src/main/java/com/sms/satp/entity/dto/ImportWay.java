@@ -35,6 +35,8 @@ public enum ImportWay {
         try {
             return documentFactory.buildByContents(
                 documentImport.getContent(), documentImport.getType());
+        } catch (ApiTestPlatformException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Failed to get the ApiDocument from file!", e);
             throw new ApiTestPlatformException(IMPORT_FILE_FORMAT_ERROR);
@@ -47,6 +49,8 @@ public enum ImportWay {
         try {
             return documentFactory.buildByResource(
                 documentImport.getUrl(), documentImport.getType());
+        } catch (ApiTestPlatformException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Failed to get the ApiDocument from URL!", e);
             throw new ApiTestPlatformException(IMPORT_URL_FORMAT_ERROR);

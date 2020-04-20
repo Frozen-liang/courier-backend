@@ -1,6 +1,6 @@
 package com.sms.satp.controller;
 
-import static com.sms.satp.utils.JsonUtils.asJsonString;
+import static com.sms.satp.utils.JsonUtil.asJsonString;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
+import com.sms.satp.entity.criteria.InterfaceCriteria;
 import com.sms.satp.entity.dto.ApiInterfaceDto;
 import com.sms.satp.entity.dto.InterfaceGroupDto;
 import com.sms.satp.entity.dto.PageDto;
@@ -60,7 +61,9 @@ class ApiInterfaceControllerTest {
     @DisplayName("Query the page data for the ApiInterface by projectId and default query criteria")
     void getApiInterfacePageByDefaultRequirements() throws Exception {
         PageDto pageDto = PageDto.builder().build();
-        when(apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID, TAG)).thenReturn(null);
+        InterfaceCriteria interfaceCriteria = InterfaceCriteria.builder()
+            .groupId(GROUP_ID).projectId(PROJECT_ID).tag(TAG).build();
+        when(apiInterfaceService.page(pageDto, interfaceCriteria)).thenReturn(null);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .get(Constants.INTERFACE_PATH + "/page/" + PROJECT_ID + "/" + GROUP_ID)
             .param("tag", TAG);
@@ -78,7 +81,9 @@ class ApiInterfaceControllerTest {
             .pageNumber(PAGE_NUMBER)
             .pageSize(PAGE_SIZE)
             .build();
-        when(apiInterfaceService.page(pageDto, PROJECT_ID, GROUP_ID, TAG)).thenReturn(null);
+        InterfaceCriteria interfaceCriteria = InterfaceCriteria.builder()
+            .groupId(GROUP_ID).projectId(PROJECT_ID).tag(TAG).build();
+        when(apiInterfaceService.page(pageDto, interfaceCriteria)).thenReturn(null);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .get(Constants.INTERFACE_PATH + "/page/" + PROJECT_ID + "/" + GROUP_ID)
             .param("pageNumber", String.valueOf(PAGE_NUMBER))
@@ -165,7 +170,7 @@ class ApiInterfaceControllerTest {
                     .name(GROUP_NAME)
                     .build());
         }
-        when(interfaceGroupService.getGroupList(PROJECT_ID)).thenReturn(interfaceGroupList);
+        when(interfaceGroupService.getGroupList(PROJECT_ID, null)).thenReturn(interfaceGroupList);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .get(Constants.INTERFACE_PATH + "/group/list/" + PROJECT_ID);
         ResultActions perform = mockMvc.perform(request);

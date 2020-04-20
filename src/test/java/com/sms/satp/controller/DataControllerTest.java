@@ -1,6 +1,6 @@
 package com.sms.satp.controller;
 
-import static com.sms.satp.utils.JsonUtils.asJsonString;
+import static com.sms.satp.utils.JsonUtil.asJsonString;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
