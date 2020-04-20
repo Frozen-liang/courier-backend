@@ -1,5 +1,6 @@
 package com.sms.satp.utils;
 
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -23,7 +24,7 @@ public class DesUtil {
             Key convertSecretKey = generateKey();
             Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE,convertSecretKey);
-            byte[] bytes = cipher.doFinal(password.getBytes());
+            byte[] bytes = cipher.doFinal(password.getBytes(StandardCharsets.UTF_8));
             return Base64Utils.encodeToString(bytes);
         } catch (Exception e) {
             log.error("Failed to encrypt the password!", e);
@@ -37,7 +38,7 @@ public class DesUtil {
             Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE,convertSecretKey);
             byte[] bytes = cipher.doFinal(Base64Utils.decodeFromString(cipherText));
-            return new String(bytes);
+            return new String(bytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error("Failed to decrypt the clipherText!", e);
             throw new RuntimeException();
