@@ -3,14 +3,15 @@ package com.sms.satp.engine.rule.impl;
 import com.sms.satp.engine.rule.RuleEngine;
 import com.sms.satp.engine.rule.RuleExecutor;
 import com.sms.satp.engine.rule.RuleType;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DefaultRuleEngineImpl implements RuleEngine {
 
-    private static final Map<RuleType, RuleExecutor<?,?>> RULE_EXECUTORS = new HashMap<>();
+    private static final Map<RuleType, RuleExecutor<?,?>> RULE_EXECUTORS =
+        new EnumMap<>(RuleType.class);
 
     static {
         RULE_EXECUTORS.put(RuleType.NOT_CHECK, new NotCheckRuleExecutor());
