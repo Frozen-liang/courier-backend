@@ -26,10 +26,9 @@ public class AesUtil {
         try {
             KeyGenerator keyGenerator = KeyGenerator.getInstance(KEY_ALGORITHM);
             SecureRandom random = SecureRandom.getInstance(RANDOM_ALGORITHM);
-            random.setSeed(KEY_STR.getBytes());
+            random.setSeed(KEY_STR.getBytes(StandardCharsets.UTF_8));
             keyGenerator.init(128, random);
             key = keyGenerator.generateKey();
-            keyGenerator = null;
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
