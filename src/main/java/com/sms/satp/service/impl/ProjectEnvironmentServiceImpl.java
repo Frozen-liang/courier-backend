@@ -7,16 +7,12 @@ import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.entity.AuthInfo;
-import com.sms.satp.entity.OnePlatformAuthInfo;
 import com.sms.satp.entity.ProjectEnvironment;
-import com.sms.satp.entity.ServiceMeshAuthInfo;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.ProjectEnvironmentDto;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
 import com.sms.satp.service.ProjectEnvironmentService;
-import com.sms.satp.utils.AesUtil;
 import com.sms.satp.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -38,7 +34,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     private final ProjectEnvironmentMapper projectEnvironmentMapper;
 
     public ProjectEnvironmentServiceImpl(ProjectEnvironmentRepository
-            projectEnvironmentRepository, ProjectEnvironmentMapper projectEnvironmentMapper) {
+        projectEnvironmentRepository, ProjectEnvironmentMapper projectEnvironmentMapper) {
         this.projectEnvironmentRepository = projectEnvironmentRepository;
         this.projectEnvironmentMapper = projectEnvironmentMapper;
     }
@@ -68,13 +64,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentDto);
-            Optional<AuthInfo> authInfoOptional = Optional.ofNullable(projectEnvironment.getAuthInfo());
-            authInfoOptional.map(AuthInfo::getOnePlatformAuthInfo)
-                .map(OnePlatformAuthInfo::getPassword).ifPresent(password ->
-                authInfoOptional.get().getOnePlatformAuthInfo().setPassword(AesUtil.encrypt(password)));
-            authInfoOptional.map(AuthInfo::getServiceMeshAuthInfo)
-                .map(ServiceMeshAuthInfo::getPassword).ifPresent(password ->
-                authInfoOptional.get().getServiceMeshAuthInfo().setPassword(AesUtil.encrypt(password)));
+
             projectEnvironment.setId(new ObjectId().toString());
             projectEnvironment.setCreateDateTime(LocalDateTime.now());
             projectEnvironmentRepository.insert(projectEnvironment);
@@ -119,14 +109,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
         try {
             Optional<ProjectEnvironment> projectEnvironmentOptional
                 = projectEnvironmentRepository.findById(id);
-            projectEnvironmentOptional.map(ProjectEnvironment::getAuthInfo)
-                .map(AuthInfo::getOnePlatformAuthInfo).map(OnePlatformAuthInfo::getPassword).ifPresent(cipherText ->
-                projectEnvironmentOptional.get().getAuthInfo()
-                    .getOnePlatformAuthInfo().setPassword(AesUtil.decrypt(cipherText)));
-            projectEnvironmentOptional.map(ProjectEnvironment::getAuthInfo)
-                .map(AuthInfo::getServiceMeshAuthInfo).map(ServiceMeshAuthInfo::getPassword).ifPresent(cipherText ->
-                projectEnvironmentOptional.get().getAuthInfo()
-                    .getServiceMeshAuthInfo().setPassword(AesUtil.decrypt(cipherText)));
+
             return projectEnvironmentMapper.toDto(projectEnvironmentOptional.orElse(null));
         } catch (Exception e) {
             log.error("Failed to get the ProjectEnvironment by id!", e);

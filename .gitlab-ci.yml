@@ -1,4 +1,4 @@
-image: maven:3.6.2-jdk-8
+image: maven:3.6.3-jdk-11-openj9
 
 before_script:
   - 'source /tool/.bash_profile_docker'

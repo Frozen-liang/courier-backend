@@ -1,10 +1,31 @@
 # Version 0.0.1
-FROM openjdk:8u212-jdk-stretch
+# Dockerfile for Smsone Smart Search Core Service
+
+# Specify the base image, this is the early stage of building in stages
+FROM openjdk:11-jre-slim as builder
 MAINTAINER pader.zhang "pader.zhang@starlight-sms.com"
-ARG RELEASE_VERSION=1.0.0-SNAPSHOT
-RUN mkdir /root/sms-satp/
-WORKDIR /root/sms-satp/
-ADD ./target/sms-satp-${RELEASE_VERSION}.jar sms-satp.jar
-ADD ./target/application.properties application.properties
-EXPOSE 8080
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar sms-satp.jar --spring.config.location=./application.properties"]
+# Executive working directory
+WORKDIR application
+# Configuration parameter
+ARG JAR_FILE=target/*.jar
+# Copy the jar file obtained by compiling and building to the mirror space
+COPY ${JAR_FILE} application.jar
+# Extract the split build result from application.jar by tool spring-boot-jarmode-layertools
+RUN java -Djarmode=layertools -jar application.jar extract
+
+FROM openjdk:11-jre-slim
+MAINTAINER pader.zhang "pader.zhang@starlight-sms.com"
+WORKDIR application
+ENV TZ="Asia/Shanghai"
+
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# In the previous stage, multiple files were extracted from the jar. Here, the COPY command was executed to copy to the mirror space. Each COPY is a layer
+COPY --from=builder application/dependencies/ ./
+COPY --from=builder application/spring-boot-loader/ ./
+COPY --from=builder application/snapshot-dependencies/ ./
+COPY --from=builder application/application/ ./
+COPY ./target/application.properties ./
+# security patch - remove apt from container
+EXPOSE 5556
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom org.springframework.boot.loader.JarLauncher"]
+
