@@ -16,5 +16,6 @@ public class Constants {
     public static final String COMMON_PATH = SDK_VERSION + "/common";
     public static final String TEST_CASE_PATH = SDK_VERSION + "/test-case";
     public static final String INTERFACE_HISTORY_PATH = SDK_VERSION + "/interface/history";
+    public static final String GLOBAL_ENVIRONMENT = SDK_VERSION + "/global-environment";
 
 }

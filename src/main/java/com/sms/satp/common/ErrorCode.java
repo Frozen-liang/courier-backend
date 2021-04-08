@@ -58,6 +58,10 @@ public enum ErrorCode {
     SAVE_INTERFACE_HISTORY_ERROR("4050","Failed to save the interface history!"),
     GET_INTERFACE_HISTORY_BY_ID_ERROR("4051","Failed to get the Interface history by id!"),
     GET_INTERFACE_HISTORY_LIST_ERROR("4052","Failed to get the Interface history list!"),
+    ADD_GLOBAL_ENVIRONMENT_ERROR("4056","Failed to add the GlobalEnvironment!"),
+    GET_GLOBAL_ENVIRONMENT_BY_ID_ERROR("4057","Failed to get the GlobalEnvironment by id!"),
+    EDIT_GLOBAL_ENVIRONMENT_ERROR("4058","Failed to edit the GlobalEnvironment!"),
+    GET_GLOBAL_ENVIRONMENT_LIST_ERROR("4059","Failed to get the GlobalEnvironment list!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 
