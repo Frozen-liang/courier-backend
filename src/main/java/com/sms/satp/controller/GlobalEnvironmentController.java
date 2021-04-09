@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(Constants.GLOBAL_ENVIRONMENT)
+@RequestMapping(Constants.GLOBAL_ENVIRONMENT_PATH)
 public class GlobalEnvironmentController {
 
     private final GlobalEnvironmentService globalEnvironmentService;
