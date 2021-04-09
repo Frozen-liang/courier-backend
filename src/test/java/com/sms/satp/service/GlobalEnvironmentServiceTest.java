@@ -22,7 +22,6 @@ import com.sms.satp.service.impl.GlobalEnvironmentServiceImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
@@ -30,22 +29,16 @@ import org.springframework.data.domain.Sort;
 @DisplayName("Tests for GlobalEnvironmentService")
 class GlobalEnvironmentServiceTest {
 
-    private GlobalEnvironmentRepository globalEnvironmentRepository;
-    private GlobalEnvironmentMapper globalEnvironmentMapper;
-    private GlobalEnvironmentService globalEnvironmentService;
+    private final GlobalEnvironmentRepository globalEnvironmentRepository = mock(GlobalEnvironmentRepository.class);
+    private final GlobalEnvironmentMapper globalEnvironmentMapper = mock(GlobalEnvironmentMapper.class);
+    private final GlobalEnvironmentService globalEnvironmentService = new GlobalEnvironmentServiceImpl(
+        globalEnvironmentRepository,
+        globalEnvironmentMapper);
+    private final GlobalEnvironment globalEnvironment = GlobalEnvironment.builder().id(ID).build();
+    private final GlobalEnvironmentDto globalEnvironmentDto = GlobalEnvironmentDto.builder().id(ID).build();
     private static final String ID = "1";
     private static final String NOT_EXIST_ID = "2";
     private static final Integer TOTAL_ELEMENTS = 10;
-    private final GlobalEnvironment globalEnvironment = GlobalEnvironment.builder().id(ID).build();
-    private final GlobalEnvironmentDto globalEnvironmentDto = GlobalEnvironmentDto.builder().id(ID).build();
-
-    @BeforeEach
-    public void before() {
-        globalEnvironmentRepository = mock(GlobalEnvironmentRepository.class);
-        globalEnvironmentMapper = mock(GlobalEnvironmentMapper.class);
-        globalEnvironmentService = new GlobalEnvironmentServiceImpl(globalEnvironmentRepository,
-            globalEnvironmentMapper);
-    }
 
     @Test
     @DisplayName("Test the findById method in the GlobalEnvironment service")
@@ -122,7 +115,7 @@ class GlobalEnvironmentServiceTest {
     @DisplayName("An exception occurred while getting GlobalEnvironment list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(globalEnvironmentRepository).findAll(any(Sort.class));
-        assertThatThrownBy(() -> globalEnvironmentService.list()).isInstanceOf(ApiTestPlatformException.class)
+        assertThatThrownBy(globalEnvironmentService::list).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_GLOBAL_ENVIRONMENT_LIST_ERROR.getCode());
     }
 
