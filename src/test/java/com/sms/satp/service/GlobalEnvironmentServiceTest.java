@@ -22,6 +22,7 @@ import com.sms.satp.service.impl.GlobalEnvironmentServiceImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
@@ -35,9 +36,9 @@ class GlobalEnvironmentServiceTest {
         globalEnvironmentRepository,
         globalEnvironmentMapper);
     private final GlobalEnvironment globalEnvironment = GlobalEnvironment.builder().id(ID).build();
-    private final GlobalEnvironmentDto globalEnvironmentDto = GlobalEnvironmentDto.builder().id(ID).build();
-    private static final String ID = "1";
-    private static final String NOT_EXIST_ID = "2";
+    private final GlobalEnvironmentDto globalEnvironmentDto = GlobalEnvironmentDto.builder().id(ID.toString()).build();
+    private static final ObjectId ID = ObjectId.get();
+    private static final ObjectId NOT_EXIST_ID = ObjectId.get();
     private static final Integer TOTAL_ELEMENTS = 10;
 
     @Test
@@ -48,7 +49,7 @@ class GlobalEnvironmentServiceTest {
         GlobalEnvironmentDto result1 = globalEnvironmentService.findById(ID);
         GlobalEnvironmentDto result2 = globalEnvironmentService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
-        assertThat(result1.getId()).isEqualTo(ID);
+        assertThat(result1.getId()).isEqualTo(ID.toString());
         assertThat(result2).isNull();
     }
 

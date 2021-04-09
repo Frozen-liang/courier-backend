@@ -36,7 +36,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
-    public GlobalEnvironmentDto findById(String id) {
+    public GlobalEnvironmentDto findById(ObjectId id) {
         try {
             Optional<GlobalEnvironment> optional = globalEnvironmentRepository.findById(id);
             return globalEnvironmentMapper.toDto(optional.orElse(null));
@@ -51,7 +51,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
         log.info("GlobalEnvironmentService-add()-params: [GlobalEnvironment]={}", globalEnvironmentDto.toString());
         try {
             GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentDto);
-            globalEnvironment.setId(new ObjectId().toString());
+            globalEnvironment.setId(new ObjectId());
             globalEnvironment.setCreateDateTime(LocalDateTime.now());
             globalEnvironmentRepository.insert(globalEnvironment);
         } catch (Exception e) {
