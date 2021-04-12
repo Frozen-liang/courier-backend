@@ -93,6 +93,9 @@ class GlobalEnvironmentServiceTest {
     @Test
     @DisplayName("An exception occurred while edit GlobalEnvironment")
     public void edit_exception_test() {
+        when(globalEnvironmentMapper.toEntity(globalEnvironmentDto)).thenReturn(globalEnvironment);
+        when(globalEnvironmentRepository.findById(any()))
+            .thenReturn(Optional.of(GlobalEnvironment.builder().id(ID).build()));
         doThrow(new RuntimeException()).when(globalEnvironmentRepository).save(any(GlobalEnvironment.class));
         assertThatThrownBy(() -> globalEnvironmentService.edit(globalEnvironmentDto))
             .isInstanceOf(ApiTestPlatformException.class)
