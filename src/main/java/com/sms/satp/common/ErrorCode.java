@@ -58,6 +58,11 @@ public enum ErrorCode {
     SAVE_INTERFACE_HISTORY_ERROR("4050","Failed to save the interface history!"),
     GET_INTERFACE_HISTORY_BY_ID_ERROR("4051","Failed to get the Interface history by id!"),
     GET_INTERFACE_HISTORY_LIST_ERROR("4052","Failed to get the Interface history list!"),
+    ADD_SCENE_CASE_ERROR("4053","Failed to add the SceneCase!"),
+    DELETE_SCENE_CASE_ERROR("4054","Failed to delete the SceneCase!"),
+    EDIT_SCENE_CASE_ERROR("4055","Failed to edit the SceneCase!"),
+    GET_SCENE_CASE_PAGE_ERROR("4056","Failed to get the SceneCase page!"),
+    SEARCH_SCENE_CASE_ERROR("4057","Failed to search the SceneCase!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 
