@@ -27,7 +27,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
 
     private final GlobalEnvironmentRepository globalEnvironmentRepository;
     private final GlobalEnvironmentMapper globalEnvironmentMapper;
-    private static final String CREATE_DATE_TIME = "create_date_time";
+    private static final String CREATE_DATE_TIME = "createDateTime";
 
     public GlobalEnvironmentServiceImpl(GlobalEnvironmentRepository globalEnvironmentRepository,
         GlobalEnvironmentMapper globalEnvironmentMapper) {
