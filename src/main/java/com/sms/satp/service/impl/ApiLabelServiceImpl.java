@@ -28,8 +28,8 @@ public class ApiLabelServiceImpl implements ApiLabelService {
 
     private final ApiLabelRepository apiLabelRepository;
     private final ApiLabelMapper apiLabelMapper;
-    private static final String PROJECT_ID = "project_id";
-    private static final String LABEL_TYPE = "label_type";
+    private static final String PROJECT_ID = "projectId";
+    private static final String LABEL_TYPE = "labelType";
 
     public ApiLabelServiceImpl(ApiLabelRepository apiLabelRepository, ApiLabelMapper apiLabelMapper) {
         this.apiLabelRepository = apiLabelRepository;
