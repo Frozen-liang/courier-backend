@@ -15,7 +15,7 @@ import org.bson.types.ObjectId;
 public class UpdateSceneCaseDto {
 
     @NotNull(message = "The id can not be empty")
-    private ObjectId id;
+    private String id;
     private String name;
     private String groupId;
     private String testStatus;

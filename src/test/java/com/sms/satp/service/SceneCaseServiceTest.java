@@ -47,7 +47,7 @@ class SceneCaseServiceTest {
     private SceneCaseMapper sceneCaseMapper;
     private SceneCaseServiceImpl sceneCaseService;
 
-    private final static ObjectId MOCK_ID = new ObjectId();
+    private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
     private final static String MOCK_PROJECT_ID = "1";
     private final static String MOCK_GROUP_ID = "1";

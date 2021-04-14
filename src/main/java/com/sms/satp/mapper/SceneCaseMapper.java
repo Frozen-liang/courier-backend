@@ -17,7 +17,6 @@ public interface SceneCaseMapper {
 
     SceneCase toUpdateSceneCase(UpdateSceneCaseDto sceneCaseDto);
 
-    @Mapping(target = "id",expression = "java(sceneCase.getId().toString())")
     @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     SceneCaseDto toDto(SceneCase sceneCase);

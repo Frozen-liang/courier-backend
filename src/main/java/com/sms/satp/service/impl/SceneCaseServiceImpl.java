@@ -52,7 +52,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     public void add(AddSceneCaseDto sceneCaseDto) {
         try {
             SceneCase sceneCase = sceneCaseMapper.toAddSceneCase(sceneCaseDto);
-            sceneCase.setId(new ObjectId());
+            sceneCase.setId(new ObjectId().toString());
             sceneCase.setStatus(Constants.STATUS_VALID);
             //query user by "createUserId",write for filed createUserName.
             sceneCase.setCreateDateTime(LocalDateTime.now());
