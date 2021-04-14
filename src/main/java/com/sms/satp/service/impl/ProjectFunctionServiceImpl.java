@@ -46,7 +46,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     }
 
     @Override
-    public ProjectFunctionDto findById(ObjectId id) {
+    public ProjectFunctionDto findById(String id) {
         try {
             Optional<ProjectFunction> optional = projectFunctionRepository.findById(id);
             return projectFunctionMapper.toDto(optional.orElse(null));
@@ -84,7 +84,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         log.info("ProjectFunctionService-add()-params: [ProjectFunction]={}", projectFunctionDto.toString());
         try {
             ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionDto);
-            projectFunction.setId(new ObjectId());
+            projectFunction.setId(new ObjectId().toString());
             projectFunction.setCreateDateTime(LocalDateTime.now());
             projectFunctionRepository.insert(projectFunction);
         } catch (Exception e) {
@@ -111,7 +111,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     }
 
     @Override
-    public void delete(ObjectId id) {
+    public void delete(String id) {
         try {
             projectFunctionRepository.deleteById(id);
         } catch (Exception e) {

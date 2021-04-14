@@ -11,12 +11,9 @@ public interface GlobalFunctionMapper {
 
     @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(target = "id", expression = "java(globalFunction.getId().toString())")
     GlobalFunctionDto toDto(GlobalFunction globalFunction);
 
     @Mapping(target = "createDateTime", ignore = true)
     @Mapping(target = "modifyDateTime", ignore = true)
-    @Mapping(target = "id",
-        expression = "java(com.sms.satp.utils.ObjectIdConverter.toObjectId(globalFunctionDto.getId()))")
     GlobalFunction toEntity(GlobalFunctionDto globalFunctionDto);
 }

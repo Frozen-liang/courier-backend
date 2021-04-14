@@ -2,11 +2,10 @@ package com.sms.satp.service;
 
 import com.sms.satp.entity.dto.ProjectFunctionDto;
 import java.util.List;
-import org.bson.types.ObjectId;
 
 public interface ProjectFunctionService {
 
-    ProjectFunctionDto findById(ObjectId id);
+    ProjectFunctionDto findById(String id);
 
     List<Object> list(String projectId, String functionDesc, String functionName);
 
@@ -14,5 +13,5 @@ public interface ProjectFunctionService {
 
     void edit(ProjectFunctionDto projectFunctionDto);
 
-    void delete(ObjectId id);
+    void delete(String id);
 }

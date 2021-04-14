@@ -5,7 +5,6 @@ import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.ProjectFunctionDto;
 import com.sms.satp.service.ProjectFunctionService;
 import java.util.List;
-import org.bson.types.ObjectId;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +26,7 @@ public class ProjectFunctionController {
     }
 
     @GetMapping("/{id}")
-    public Response<ProjectFunctionDto> getById(@PathVariable("id") ObjectId id) {
+    public Response<ProjectFunctionDto> getById(@PathVariable("id") String id) {
 
         return Response.ok(projectFunctionService.findById(id));
     }
@@ -51,8 +50,8 @@ public class ProjectFunctionController {
     }
 
     @DeleteMapping("/{ids}")
-    public Response<Boolean> delete(@PathVariable ObjectId[] ids) {
-        for (ObjectId id : ids) {
+    public Response<Boolean> delete(@PathVariable String[] ids) {
+        for (String id : ids) {
             projectFunctionService.delete(id);
         }
         return Response.ok(Boolean.TRUE);

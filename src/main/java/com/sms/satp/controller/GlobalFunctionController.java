@@ -5,7 +5,6 @@ import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.GlobalFunctionDto;
 import com.sms.satp.service.GlobalFunctionService;
 import java.util.List;
-import org.bson.types.ObjectId;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +26,7 @@ public class GlobalFunctionController {
     }
 
     @GetMapping("/{id}")
-    public Response<GlobalFunctionDto> getById(@PathVariable("id") ObjectId id) {
+    public Response<GlobalFunctionDto> getById(@PathVariable("id") String id) {
         return Response.ok(globalFunctionService.findById(id));
     }
 
@@ -49,8 +48,8 @@ public class GlobalFunctionController {
     }
 
     @DeleteMapping("/{ids}")
-    public Response<Boolean> delete(@PathVariable ObjectId[] ids) {
-        for (ObjectId id : ids) {
+    public Response<Boolean> delete(@PathVariable String[] ids) {
+        for (String id : ids) {
             globalFunctionService.delete(id);
         }
         return Response.ok(Boolean.TRUE);

@@ -40,7 +40,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     }
 
     @Override
-    public GlobalFunctionDto findById(ObjectId id) {
+    public GlobalFunctionDto findById(String id) {
         try {
             Optional<GlobalFunction> optional = globalFunctionRepository.findById(id);
             return globalFunctionMapper.toDto(optional.orElse(null));
@@ -73,7 +73,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
         log.info("GlobalFunctionService-add()-params: [GlobalFunction]={}", globalFunctionDto.toString());
         try {
             GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionDto);
-            globalFunction.setId(new ObjectId());
+            globalFunction.setId(new ObjectId().toString());
             globalFunction.setCreateDateTime(LocalDateTime.now());
             globalFunctionRepository.insert(globalFunction);
         } catch (Exception e) {
@@ -100,7 +100,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     }
 
     @Override
-    public void delete(ObjectId id) {
+    public void delete(String id) {
         try {
             globalFunctionRepository.deleteById(id);
         } catch (Exception e) {
