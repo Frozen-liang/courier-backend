@@ -78,7 +78,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     public void edit(UpdateSceneCaseDto sceneCaseDto) {
         try {
             SceneCase sceneCase = sceneCaseMapper.toUpdateSceneCase(sceneCaseDto);
-            Optional<SceneCase> optionalSceneCase = sceneCaseRepository.findById(sceneCase.getId().toString());
+            Optional<SceneCase> optionalSceneCase = sceneCaseRepository.findById(sceneCase.getId());
             optionalSceneCase.ifPresent(sceneCaseFindById -> {
                 sceneCase.setCreateUserId(sceneCaseFindById.getCreateUserId());
                 sceneCase.setCreateDateTime(sceneCaseFindById.getCreateDateTime());
