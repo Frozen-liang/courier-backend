@@ -36,9 +36,9 @@ class GlobalEnvironmentServiceTest {
         globalEnvironmentRepository,
         globalEnvironmentMapper);
     private final GlobalEnvironment globalEnvironment = GlobalEnvironment.builder().id(ID).build();
-    private final GlobalEnvironmentDto globalEnvironmentDto = GlobalEnvironmentDto.builder().id(ID.toString()).build();
-    private static final ObjectId ID = ObjectId.get();
-    private static final ObjectId NOT_EXIST_ID = ObjectId.get();
+    private final GlobalEnvironmentDto globalEnvironmentDto = GlobalEnvironmentDto.builder().id(ID).build();
+    private static final String ID = ObjectId.get().toString();
+    private static final String NOT_EXIST_ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
 
     @Test

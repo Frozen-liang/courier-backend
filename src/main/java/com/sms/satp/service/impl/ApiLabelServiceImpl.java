@@ -37,7 +37,7 @@ public class ApiLabelServiceImpl implements ApiLabelService {
     }
 
     @Override
-    public ApiLabelDto findById(ObjectId id) {
+    public ApiLabelDto findById(String id) {
         try {
             Optional<ApiLabel> optional = apiLabelRepository.findById(id);
             return apiLabelMapper.toDto(optional.orElse(null));
@@ -71,7 +71,7 @@ public class ApiLabelServiceImpl implements ApiLabelService {
         log.info("ApiLabelService-add()-params: [ApiLabel]={}", apiLabelDto.toString());
         try {
             ApiLabel apiLabel = apiLabelMapper.toEntity(apiLabelDto);
-            apiLabel.setId(new ObjectId());
+            apiLabel.setId(new ObjectId().toString());
             apiLabelRepository.insert(apiLabel);
         } catch (Exception e) {
             log.error("Failed to add the ApiLabel!", e);
@@ -84,7 +84,7 @@ public class ApiLabelServiceImpl implements ApiLabelService {
         log.info("ApiLabelService-edit()-params: [ApiLabel]={}", apiLabelDto.toString());
         try {
             ApiLabel apiLabel = apiLabelMapper.toEntity(apiLabelDto);
-            Optional<ApiLabel> optional = apiLabelRepository.findById(new ObjectId(apiLabelDto.getId()));
+            Optional<ApiLabel> optional = apiLabelRepository.findById(apiLabelDto.getId());
             optional.ifPresent((oldApiLabel) -> apiLabelRepository.save(apiLabel));
         } catch (Exception e) {
             log.error("Failed to add the ApiLabel!", e);
@@ -93,7 +93,7 @@ public class ApiLabelServiceImpl implements ApiLabelService {
     }
 
     @Override
-    public void delete(ObjectId id) {
+    public void delete(String id) {
         try {
             apiLabelRepository.deleteById(id);
         } catch (Exception e) {

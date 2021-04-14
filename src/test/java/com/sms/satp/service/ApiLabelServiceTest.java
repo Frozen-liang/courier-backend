@@ -38,9 +38,9 @@ class ApiLabelServiceTest {
         apiLabelRepository,
         apiLabelMapper);
     private final ApiLabel apiLabel = ApiLabel.builder().id(ID).build();
-    private final ApiLabelDto apiLabelDto = ApiLabelDto.builder().id(ID.toString()).build();
-    private static final ObjectId ID = ObjectId.get();
-    private static final ObjectId NOT_EXIST_ID = ObjectId.get();
+    private final ApiLabelDto apiLabelDto = ApiLabelDto.builder().id(ID).build();
+    private static final String ID = ObjectId.get().toString();
+    private static final String NOT_EXIST_ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String PROJECT_ID = "10";
     private static final String LABEL_NAME = "testName";

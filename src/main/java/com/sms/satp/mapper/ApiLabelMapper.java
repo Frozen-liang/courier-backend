@@ -9,11 +9,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface ApiLabelMapper {
 
-    @Mapping(target = "id", expression = "java(apiLabel.getId().toString())")
     ApiLabelDto toDto(ApiLabel apiLabel);
 
-    @Mapping(target = "id",
-        expression = "java(com.sms.satp.utils.ObjectIdConverter.toObjectId(apiLabelDto.getId()))")
     ApiLabel toEntity(ApiLabelDto apiLabelDto);
 
 }

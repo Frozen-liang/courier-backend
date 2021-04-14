@@ -2,11 +2,10 @@ package com.sms.satp.service;
 
 import com.sms.satp.entity.dto.ApiLabelDto;
 import java.util.List;
-import org.bson.types.ObjectId;
 
 public interface ApiLabelService {
 
-    ApiLabelDto findById(ObjectId id);
+    ApiLabelDto findById(String id);
 
     List<ApiLabelDto> list(String projectId, String labelName, Short labelType);
 
@@ -14,6 +13,6 @@ public interface ApiLabelService {
 
     void edit(ApiLabelDto apiLabelDto);
 
-    void delete(ObjectId id);
+    void delete(String id);
 
 }

@@ -2,11 +2,10 @@ package com.sms.satp.service;
 
 import com.sms.satp.entity.dto.GlobalEnvironmentDto;
 import java.util.List;
-import org.bson.types.ObjectId;
 
 public interface GlobalEnvironmentService {
 
-    GlobalEnvironmentDto findById(ObjectId id);
+    GlobalEnvironmentDto findById(String id);
 
     void add(GlobalEnvironmentDto globalEnvironmentDto);
 

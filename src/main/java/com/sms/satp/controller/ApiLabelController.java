@@ -6,7 +6,6 @@ import com.sms.satp.entity.dto.ApiLabelDto;
 import com.sms.satp.service.ApiLabelService;
 import java.util.List;
 import javax.validation.Valid;
-import org.bson.types.ObjectId;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +27,7 @@ public class ApiLabelController {
 
 
     @GetMapping("/{id}")
-    public Response<ApiLabelDto> getById(@PathVariable ObjectId id) {
+    public Response<ApiLabelDto> getById(@PathVariable String id) {
         return Response.ok(apiLabelService.findById(id));
     }
 
@@ -51,8 +50,8 @@ public class ApiLabelController {
     }
 
     @DeleteMapping("/{ids}")
-    public Response<Boolean> delete(@PathVariable ObjectId[] ids) {
-        for (ObjectId id : ids) {
+    public Response<Boolean> delete(@PathVariable String[] ids) {
+        for (String id : ids) {
             apiLabelService.delete(id);
         }
         return Response.ok(Boolean.TRUE);
