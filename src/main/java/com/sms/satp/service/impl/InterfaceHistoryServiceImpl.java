@@ -9,7 +9,7 @@ import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.InterfaceHistory;
 import com.sms.satp.entity.InterfaceShowInHistory;
 import com.sms.satp.mapper.InterfaceHistoryMapper;
-import com.sms.satp.parser.common.HttpMethod;
+import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.repository.InterfaceHistoryRepository;
 import com.sms.satp.service.InterfaceHistoryService;
 import java.util.List;
@@ -58,8 +58,8 @@ public class InterfaceHistoryServiceImpl implements InterfaceHistoryService {
     @Override
     public List<InterfaceShowInHistory> getHistoryList(String projectId, String method, String path) {
         try {
-            HttpMethod httpMethod = HttpMethod.resolve(method.toUpperCase(Locale.US));
-            return interfaceHistoryRepository.findByProjectIdAndMethodAndPath(projectId, httpMethod, path);
+            RequestMethod requestMethod = RequestMethod.resolve(method.toUpperCase(Locale.US));
+            return interfaceHistoryRepository.findByProjectIdAndMethodAndPath(projectId, requestMethod, path);
         } catch (Exception e) {
             log.error("Failed to get the Interface history list!", e);
             throw new ApiTestPlatformException(GET_INTERFACE_HISTORY_LIST_ERROR);

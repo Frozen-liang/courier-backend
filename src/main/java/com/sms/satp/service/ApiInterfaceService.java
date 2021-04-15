@@ -25,7 +25,7 @@ public interface ApiInterfaceService {
 
     List<SelectDto> getAllTags(String projectId, String condition);
 
-    void updateGroupById(List ids, String groupId);
+    void updateGroupById(List<String> ids, String groupId);
 
     void deleteAll();
 

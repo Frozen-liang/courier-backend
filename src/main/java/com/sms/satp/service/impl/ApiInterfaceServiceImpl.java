@@ -27,7 +27,7 @@ import com.sms.satp.entity.dto.SelectDto;
 import com.sms.satp.mapper.ApiInterfaceMapper;
 import com.sms.satp.mapper.DocumentImportMapper;
 import com.sms.satp.parser.DocumentFactory;
-import com.sms.satp.parser.common.HttpMethod;
+import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.parser.model.ApiDocument;
 import com.sms.satp.parser.model.ApiOperation;
 import com.sms.satp.parser.model.ApiParameter;
@@ -135,7 +135,6 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             "ApiInterfaceService-add()-params: [ApiInterface]={}", apiInterfaceDto.toString());
         try {
             ApiInterface apiInterface = apiInterfaceMapper.toEntity(apiInterfaceDto);
-            apiInterface.setId(new ObjectId().toString());
             apiInterface.setCreateDateTime(LocalDateTime.now());
             apiInterfaceRepository.insert(apiInterface);
         } catch (Exception e) {
@@ -168,7 +167,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     @Override
     public ApiInterfaceDto findById(String id) {
         try {
-            Optional<ApiInterface> optionalApiInterface = apiInterfaceRepository.findById(id);
+            Optional<ApiInterface> optionalApiInterface = apiInterfaceRepository.findById(new ObjectId(id));
             return apiInterfaceMapper.toDto(optionalApiInterface.orElse(null));
         } catch (Exception e) {
             log.error("Failed to get the ApiInterface by id!", e);
@@ -179,7 +178,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     @Override
     public void deleteById(String id) {
         try {
-            apiInterfaceRepository.deleteById(id);
+            apiInterfaceRepository.deleteById(new ObjectId(id));
         } catch (Exception e) {
             log.error("Failed to delete the ApiInterface!", e);
             throw new ApiTestPlatformException(DELETE_API_INTERFACE_BY_ID_ERROR);
@@ -216,8 +215,9 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     }
 
     @Override
-    public void updateGroupById(List ids, String groupId) {
-        mongoTemplate.updateMulti(new Query(Criteria.where("_id").in(ids)),
+    public void updateGroupById(List<String> ids, String groupId) {
+        List<ObjectId> objectIds = ids.stream().map(ObjectId::new).collect(Collectors.toList());
+        mongoTemplate.updateMulti(new Query(Criteria.where("_id").in(objectIds)),
             new Update().set("group_id", groupId), ApiInterface.class);
     }
 
@@ -287,8 +287,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
             apiResponseOptional.get().setSchema(apiSchema);
         });
         ApiInterface.ApiInterfaceBuilder apiInterfaceBuilder = ApiInterface.builder()
-            .id(new ObjectId().toString())
-            .method(HttpMethod.resolve(apiOperation.getHttpMethod().name()))
+            .method(RequestMethod.resolve(apiOperation.getRequestMethod().name()))
             .projectId(projectId)
             .tag(apiOperation.getTags())
             .title(StringUtils.isBlank(apiOperation.getSummary()) ? apiPath.getPath() : apiOperation.getSummary())
@@ -327,9 +326,9 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                     });
                     apiParameterOptional.map(ApiParameter::getSchema).map(ApiSchema::getItem)
                         .map(ApiSchema::getRef).ifPresent(refString -> {
-                            String refKey = splitKeyFromRef(refString);
-                            apiParameter.getSchema().setItem(apiSchemaMap.get(refKey));
-                        });
+                        String refKey = splitKeyFromRef(refString);
+                        apiParameter.getSchema().setItem(apiSchemaMap.get(refKey));
+                    });
                     queryParams.add(ApiParameterConverter.CONVERT_TO_PARAMETER.apply(apiParameter));
                     break;
                 case PATH:

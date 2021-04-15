@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -128,7 +129,8 @@ class ApiInterfaceServiceTest {
         assertThat(projectDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
         assertThat(projectDtoPage.getPageable().getPageNumber()).isEqualTo(DEFAULT_PAGE_NUMBER);
         assertThat(projectDtoPage.getPageable().getPageSize()).isEqualTo(DEFAULT_PAGE_SIZE);
-        assertThat(projectDtoPage.getContent()).allMatch(projectDto -> StringUtils.equals(projectDto.getTitle(), TITLE));
+        assertThat(projectDtoPage.getContent())
+            .allMatch(projectDto -> StringUtils.equals(projectDto.getTitle(), TITLE));
     }
 
     @Test
@@ -171,7 +173,8 @@ class ApiInterfaceServiceTest {
         assertThat(projectDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
         assertThat(projectDtoPage.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER - FRONT_FIRST_NUMBER);
         assertThat(projectDtoPage.getPageable().getPageSize()).isEqualTo(PAGE_SIZE);
-        assertThat(projectDtoPage.getContent()).allMatch(projectDto -> StringUtils.equals(projectDto.getTitle(), TITLE));
+        assertThat(projectDtoPage.getContent())
+            .allMatch(projectDto -> StringUtils.equals(projectDto.getTitle(), TITLE));
 
     }
 
@@ -182,7 +185,7 @@ class ApiInterfaceServiceTest {
             .title(TITLE)
             .build();
         Optional<ApiInterface> apiInterfaceOptional = Optional.ofNullable(apiInterface);
-        when(apiInterfaceRepository.findById(ID)).thenReturn(apiInterfaceOptional);
+        when(apiInterfaceRepository.findById(new ObjectId(ID))).thenReturn(apiInterfaceOptional);
         ApiInterfaceDto result1 = apiInterfaceService.findById(ID);
         ApiInterfaceDto result2 = apiInterfaceService.findById(NOT_EXIST_ID);
         assertThat(result1.getTitle()).isEqualTo(TITLE);
@@ -201,8 +204,9 @@ class ApiInterfaceServiceTest {
             );
         }
         when(apiInterfaceRepository.insert(anyList())).thenReturn(apiInterfaces);
-        InputStream inputStream = IOUtils.toInputStream(IOUtils.toString(LOCATION, StandardCharsets.UTF_8));
-        MockMultipartFile mockMultipartFile = new MockMultipartFile(FILE_NAME,inputStream);
+        InputStream inputStream = IOUtils
+            .toInputStream(IOUtils.toString(LOCATION, StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile(FILE_NAME, inputStream);
         DocumentImportDto documentImportDto = DocumentImportDto.builder()
             .file(mockMultipartFile)
             .type(DOCUMENT_TYPE_SWAGGER)
@@ -238,7 +242,7 @@ class ApiInterfaceServiceTest {
     @DisplayName("Test the importDocument method with wrong type in the apiInterface service")
     void importByFile_with_wrong_type() throws IOException {
         InputStream inputStream = IOUtils.toInputStream(IOUtils.toString(LOCATION, StandardCharsets.UTF_8));
-        MockMultipartFile mockMultipartFile = new MockMultipartFile(FILE_NAME,inputStream);
+        MockMultipartFile mockMultipartFile = new MockMultipartFile(FILE_NAME, inputStream);
         DocumentImportDto documentImportDto = DocumentImportDto.builder()
             .file(mockMultipartFile)
             .type(WRONG_DOCUMENT_TYPE)
@@ -264,7 +268,7 @@ class ApiInterfaceServiceTest {
     void edit_test() {
         ApiInterfaceDto apiInterfaceDto = ApiInterfaceDto.builder().id(ID).build();
         ApiInterface apiInterface = apiInterfaceMapper.toEntity(apiInterfaceDto);
-        when(apiInterfaceRepository.findById(ID)).thenReturn(Optional.of(ApiInterface.builder().build()));
+        when(apiInterfaceRepository.findById(new ObjectId(ID))).thenReturn(Optional.of(ApiInterface.builder().build()));
         when(apiInterfaceRepository.save(apiInterface)).thenReturn(apiInterface);
         apiInterfaceService.edit(apiInterfaceDto);
         verify(apiInterfaceRepository, times(1)).save(any(ApiInterface.class));
@@ -273,9 +277,9 @@ class ApiInterfaceServiceTest {
     @Test
     @DisplayName("Test the delete method in the apiInterface service")
     void delete_test() {
-        doNothing().when(apiInterfaceRepository).deleteById(ID);
+        doNothing().when(apiInterfaceRepository).deleteById(new ObjectId(ID));
         apiInterfaceService.deleteById(ID);
-        verify(apiInterfaceRepository, times(1)).deleteById(ID);
+        verify(apiInterfaceRepository, times(1)).deleteById(new ObjectId(ID));
     }
 
     @Test
@@ -290,7 +294,8 @@ class ApiInterfaceServiceTest {
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
         Pageable pageable = PageRequest.of(
             pageDto.getPageNumber(), pageDto.getPageSize(), sort);
-        doThrow(new RuntimeException()).when(apiInterfaceRepository).findAll(Example.of(apiInterface, exampleMatcher), pageable);
+        doThrow(new RuntimeException()).when(apiInterfaceRepository)
+            .findAll(Example.of(apiInterface, exampleMatcher), pageable);
         InterfaceCriteria interfaceCriteria = InterfaceCriteria.builder()
             .groupId(GROUP_ID).projectId(PROJECT_ID).build();
         assertThatThrownBy(() -> apiInterfaceService.page(pageDto, interfaceCriteria))
@@ -310,7 +315,8 @@ class ApiInterfaceServiceTest {
     @Test
     @DisplayName("An exception occurred while edit apiInterface")
     void edit_exception_test() {
-        when(apiInterfaceRepository.findById(ID)).thenReturn(Optional.of(ApiInterface.builder().id(ID).build()));
+        when(apiInterfaceRepository.findById(new ObjectId(ID)))
+            .thenReturn(Optional.of(ApiInterface.builder().id(new ObjectId(ID)).build()));
         doThrow(new RuntimeException()).when(apiInterfaceRepository).save(argThat(t -> true));
         assertThatThrownBy(() -> apiInterfaceService.edit(ApiInterfaceDto.builder().id(ID).build()))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -320,7 +326,7 @@ class ApiInterfaceServiceTest {
     @Test
     @DisplayName("An exception occurred while getting apiInterface by id")
     void getApiInterface_exception_test() {
-        doThrow(new RuntimeException()).when(apiInterfaceRepository).findById(anyString());
+        doThrow(new RuntimeException()).when(apiInterfaceRepository).findById(any(ObjectId.class));
         assertThatThrownBy(() -> apiInterfaceService.findById(anyString()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_INTERFACE_BY_ID_ERROR.getCode());
@@ -329,7 +335,7 @@ class ApiInterfaceServiceTest {
     @Test
     @DisplayName("An exception occurred while deleting apiInterface")
     void delete_exception_test() {
-        doThrow(new RuntimeException()).when(apiInterfaceRepository).deleteById(anyString());
+        doThrow(new RuntimeException()).when(apiInterfaceRepository).deleteById(any(ObjectId.class));
         assertThatThrownBy(() -> apiInterfaceService.deleteById(anyString()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_API_INTERFACE_BY_ID_ERROR.getCode());

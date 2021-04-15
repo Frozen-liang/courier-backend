@@ -4,7 +4,7 @@ import com.sms.satp.entity.Header;
 import com.sms.satp.entity.Parameter;
 import com.sms.satp.entity.RequestBody;
 import com.sms.satp.entity.Response;
-import com.sms.satp.parser.common.HttpMethod;
+import com.sms.satp.common.enums.RequestMethod;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class ApiInterfaceDto {
 
     private String id;
-    private HttpMethod method;
+    private RequestMethod method;
     private List<String> tag;
     private String title;
     private String path;

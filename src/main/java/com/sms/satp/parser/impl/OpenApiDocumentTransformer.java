@@ -12,7 +12,7 @@ import com.sms.satp.common.ErrorCode;
 import com.sms.satp.parser.DocumentTransformer;
 import com.sms.satp.parser.annotation.Reader;
 import com.sms.satp.parser.common.DocumentType;
-import com.sms.satp.parser.common.HttpMethod;
+import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.parser.model.ApiInfo;
 import com.sms.satp.parser.model.ApiOperation;
 import com.sms.satp.parser.model.ApiPath;
@@ -88,14 +88,14 @@ public class OpenApiDocumentTransformer implements DocumentTransformer<OpenAPI> 
 
     private List<ApiOperation> collectApiOperations(Entry<String, PathItem> pathItemEntry) {
         PathItem pathItem = pathItemEntry.getValue();
-        return Arrays.stream(HttpMethod.values())
+        return Arrays.stream(RequestMethod.values())
             .map(httpMethod -> StringUtils.capitalize(httpMethod.name().toLowerCase(Locale.US))).map(methodName -> {
                 try {
                     Operation operation = (Operation) MethodUtils.invokeMethod(pathItem, "get".concat(methodName));
                     if (Objects.nonNull(operation)) {
 
                         return OPERATION_CONVERTER.apply(operation)
-                            .httpMethod(HttpMethod.resolve(StringUtils.upperCase(methodName, Locale.US))).build();
+                            .requestMethod(RequestMethod.resolve(StringUtils.upperCase(methodName, Locale.US))).build();
                     }
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                     log.warn("Parsing [OpenApi {} Operation] content,Cause by {}", methodName, e.getMessage());
