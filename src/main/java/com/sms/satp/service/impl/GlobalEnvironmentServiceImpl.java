@@ -27,7 +27,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
 
     private final GlobalEnvironmentRepository globalEnvironmentRepository;
     private final GlobalEnvironmentMapper globalEnvironmentMapper;
-    private static final String CREATE_DATE_TIME = "create_date_time";
+    private static final String CREATE_DATE_TIME = "createDateTime";
 
     public GlobalEnvironmentServiceImpl(GlobalEnvironmentRepository globalEnvironmentRepository,
         GlobalEnvironmentMapper globalEnvironmentMapper) {
@@ -36,7 +36,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
-    public GlobalEnvironmentDto findById(ObjectId id) {
+    public GlobalEnvironmentDto findById(String id) {
         try {
             Optional<GlobalEnvironment> optional = globalEnvironmentRepository.findById(id);
             return globalEnvironmentMapper.toDto(optional.orElse(null));
@@ -51,7 +51,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
         log.info("GlobalEnvironmentService-add()-params: [GlobalEnvironment]={}", globalEnvironmentDto.toString());
         try {
             GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentDto);
-            globalEnvironment.setId(new ObjectId());
+            globalEnvironment.setId(new ObjectId().toString());
             globalEnvironment.setCreateDateTime(LocalDateTime.now());
             globalEnvironmentRepository.insert(globalEnvironment);
         } catch (Exception e) {

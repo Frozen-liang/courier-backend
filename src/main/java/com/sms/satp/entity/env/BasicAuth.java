@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BasicAuth {
 
-    private String userName;
+    private String username;
     private String password;
 }
