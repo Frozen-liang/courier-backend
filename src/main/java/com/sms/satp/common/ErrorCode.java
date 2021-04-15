@@ -67,6 +67,11 @@ public enum ErrorCode {
     ADD_API_LABEL_ERROR("4059","Failed to add the ApiLabel!"),
     EDIT_API_LABEL_ERROR("4060","Failed to edit the ApiLabel!"),
     DELETE_API_LABEL_BY_ID_ERROR("4061","Failed to delete the ApiLabel!"),
+    ADD_SCENE_CASE_ERROR("4062","Failed to add the SceneCase!"),
+    DELETE_SCENE_CASE_ERROR("4063","Failed to delete the SceneCase!"),
+    EDIT_SCENE_CASE_ERROR("4064","Failed to edit the SceneCase!"),
+    GET_SCENE_CASE_PAGE_ERROR("4065","Failed to get the SceneCase page!"),
+    SEARCH_SCENE_CASE_ERROR("4066","Failed to search the SceneCase!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 
