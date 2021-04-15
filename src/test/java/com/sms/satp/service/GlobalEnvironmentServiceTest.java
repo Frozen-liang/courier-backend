@@ -49,7 +49,7 @@ class GlobalEnvironmentServiceTest {
         GlobalEnvironmentDto result1 = globalEnvironmentService.findById(ID);
         GlobalEnvironmentDto result2 = globalEnvironmentService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
-        assertThat(result1.getId()).isEqualTo(ID.toString());
+        assertThat(result1.getId()).isEqualTo(ID);
         assertThat(result2).isNull();
     }
 

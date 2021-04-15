@@ -26,8 +26,7 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Sort;
 
 @DisplayName("Tests for ApiLabelService")
 class ApiLabelServiceTest {
@@ -54,7 +53,7 @@ class ApiLabelServiceTest {
         ApiLabelDto result1 = apiLabelService.findById(ID);
         ApiLabelDto result2 = apiLabelService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
-        assertThat(result1.getId()).isEqualTo(ID.toString());
+        assertThat(result1.getId()).isEqualTo(ID);
         assertThat(result2).isNull();
     }
 
@@ -113,7 +112,7 @@ class ApiLabelServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(ApiLabel.builder().build());
         }
-        when(apiLabelRepository.findAll(ArgumentMatchers.<Example<ApiLabel>>any())).thenReturn(list);
+        when(apiLabelRepository.findAll(any(),any(Sort.class))).thenReturn(list);
         when(apiLabelMapper.toDto(apiLabel)).thenReturn(apiLabelDto);
         List<ApiLabelDto> result = apiLabelService.list(PROJECT_ID, LABEL_NAME, LABEL_TYPE);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
@@ -122,7 +121,7 @@ class ApiLabelServiceTest {
     @Test
     @DisplayName("An exception occurred while getting ApiLabel list")
     public void list_exception_test() {
-        doThrow(new RuntimeException()).when(apiLabelRepository).findAll(ArgumentMatchers.<Example<ApiLabel>>any());
+        doThrow(new RuntimeException()).when(apiLabelRepository).findAll(any(),any(Sort.class));
         assertThatThrownBy(() -> apiLabelService.list(PROJECT_ID, LABEL_NAME, LABEL_TYPE))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_LABEL_LIST_ERROR.getCode());

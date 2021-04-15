@@ -9,8 +9,12 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface ApiLabelMapper {
 
+    @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     ApiLabelDto toDto(ApiLabel apiLabel);
 
+    @Mapping(target = "createDateTime", ignore = true)
+    @Mapping(target = "modifyDateTime", ignore = true)
     ApiLabel toEntity(ApiLabelDto apiLabelDto);
 
 }
