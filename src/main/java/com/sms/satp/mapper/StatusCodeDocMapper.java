@@ -5,8 +5,10 @@ import com.sms.satp.entity.dto.StatusCodeDocDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR, unmappedTargetPolicy =
+    ReportingPolicy.IGNORE)
 public interface StatusCodeDocMapper {
 
 
@@ -14,8 +16,5 @@ public interface StatusCodeDocMapper {
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     StatusCodeDocDto toDto(StatusCodeDoc statusCodeDoc);
 
-    //  @InheritInverseConfiguration
-    @Mapping(target = "modifyDateTime", ignore = true)
-    @Mapping(target = "createDateTime", ignore = true)
     StatusCodeDoc toEntity(StatusCodeDocDto statusCodeDocDto);
 }

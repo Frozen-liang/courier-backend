@@ -1,7 +1,7 @@
 package com.sms.satp.entity.test;
 
 import com.sms.satp.entity.AuthInfo;
-import com.sms.satp.parser.common.HttpMethod;
+import com.sms.satp.common.enums.RequestMethod;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class TestCase {
     private String name;
     @Field("interface_id")
     private String interfaceId;
-    private HttpMethod method;
+    private RequestMethod method;
     private String path;
     @Field("auth_info")
     private AuthInfo authInfo;

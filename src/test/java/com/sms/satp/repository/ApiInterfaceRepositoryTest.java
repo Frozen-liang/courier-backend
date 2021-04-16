@@ -52,11 +52,10 @@ class ApiInterfaceRepositoryTest {
     @DisplayName("Test the insert method in the apiInterface repository")
     void insert() {
         ApiInterface apiInterface = ApiInterface.builder()
-            .id(ID)
             .title(TITLE)
             .build();
-        apiInterfaceRepository.insert(apiInterface);
-        Optional<ApiInterface> apiInterfaceOptional = apiInterfaceRepository.findById(ID);
+        ApiInterface save = apiInterfaceRepository.save(apiInterface);
+        Optional<ApiInterface> apiInterfaceOptional = apiInterfaceRepository.findById(save.getId());
         assertThat(apiInterfaceOptional.isPresent()).isEqualTo(true);
         assertThat(apiInterfaceOptional.get()).isEqualTo(apiInterface);
     }
@@ -91,13 +90,12 @@ class ApiInterfaceRepositoryTest {
     @DisplayName("Test the save method with in the apiInterface repository")
     void edit() {
         ApiInterface apiInterface = ApiInterface.builder()
-            .id(ID)
             .title(TITLE)
             .build();
-        apiInterfaceRepository.insert(apiInterface);
+        ApiInterface insert = apiInterfaceRepository.insert(apiInterface);
         apiInterface.setTitle(TITLE_EDIT);
         apiInterfaceRepository.save(apiInterface);
-        Optional<ApiInterface> apiInterfaceOptional = apiInterfaceRepository.findById(ID);
+        Optional<ApiInterface> apiInterfaceOptional = apiInterfaceRepository.findById(insert.getId());
         assertThat(apiInterfaceOptional.isPresent()).isEqualTo(true);
         assertThat(apiInterfaceOptional.get().getTitle()).isEqualTo(TITLE_EDIT);
     }
@@ -106,12 +104,11 @@ class ApiInterfaceRepositoryTest {
     @DisplayName("Test the deleteById method in the apiInterface repository")
     void delete_By_Id() {
         ApiInterface apiInterface = ApiInterface.builder()
-            .id(ID)
             .title(TITLE)
             .build();
-        apiInterfaceRepository.insert(apiInterface);
-        apiInterfaceRepository.deleteById(ID);
-        Optional<ApiInterface> apiInterfaceOptional = apiInterfaceRepository.findById(ID);
+        ApiInterface insert = apiInterfaceRepository.insert(apiInterface);
+        apiInterfaceRepository.deleteById(insert.getId());
+        Optional<ApiInterface> apiInterfaceOptional = apiInterfaceRepository.findById(insert.getId());
         assertThat(apiInterfaceOptional.isPresent()).isEqualTo(false);
     }
 }

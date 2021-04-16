@@ -36,9 +36,9 @@ class GlobalEnvironmentServiceTest {
         globalEnvironmentRepository,
         globalEnvironmentMapper);
     private final GlobalEnvironment globalEnvironment = GlobalEnvironment.builder().id(ID).build();
-    private final GlobalEnvironmentDto globalEnvironmentDto = GlobalEnvironmentDto.builder().id(ID.toString()).build();
-    private static final ObjectId ID = ObjectId.get();
-    private static final ObjectId NOT_EXIST_ID = ObjectId.get();
+    private final GlobalEnvironmentDto globalEnvironmentDto = GlobalEnvironmentDto.builder().id(ID).build();
+    private static final String ID = ObjectId.get().toString();
+    private static final String NOT_EXIST_ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
 
     @Test
@@ -49,7 +49,7 @@ class GlobalEnvironmentServiceTest {
         GlobalEnvironmentDto result1 = globalEnvironmentService.findById(ID);
         GlobalEnvironmentDto result2 = globalEnvironmentService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
-        assertThat(result1.getId()).isEqualTo(ID.toString());
+        assertThat(result1.getId()).isEqualTo(ID);
         assertThat(result2).isNull();
     }
 
@@ -93,6 +93,9 @@ class GlobalEnvironmentServiceTest {
     @Test
     @DisplayName("An exception occurred while edit GlobalEnvironment")
     public void edit_exception_test() {
+        when(globalEnvironmentMapper.toEntity(globalEnvironmentDto)).thenReturn(globalEnvironment);
+        when(globalEnvironmentRepository.findById(any()))
+            .thenReturn(Optional.of(GlobalEnvironment.builder().id(ID).build()));
         doThrow(new RuntimeException()).when(globalEnvironmentRepository).save(any(GlobalEnvironment.class));
         assertThatThrownBy(() -> globalEnvironmentService.edit(globalEnvironmentDto))
             .isInstanceOf(ApiTestPlatformException.class)

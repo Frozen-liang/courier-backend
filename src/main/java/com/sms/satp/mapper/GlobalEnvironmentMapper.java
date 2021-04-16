@@ -11,12 +11,9 @@ public interface GlobalEnvironmentMapper {
 
     @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(target = "id", expression = "java(globalEnvironment.getId().toString())")
     GlobalEnvironmentDto toDto(GlobalEnvironment globalEnvironment);
 
     @Mapping(target = "createDateTime", ignore = true)
     @Mapping(target = "modifyDateTime", ignore = true)
-    @Mapping(target = "id",
-        expression = "java(com.sms.satp.utils.ObjectIdConverter.toObjectId(globalEnvironmentDto.getId()))")
     GlobalEnvironment toEntity(GlobalEnvironmentDto globalEnvironmentDto);
 }

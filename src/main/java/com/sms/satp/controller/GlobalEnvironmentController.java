@@ -5,7 +5,6 @@ import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.GlobalEnvironmentDto;
 import com.sms.satp.service.GlobalEnvironmentService;
 import java.util.List;
-import org.bson.types.ObjectId;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +25,7 @@ public class GlobalEnvironmentController {
     }
 
     @GetMapping("/{id}")
-    public Response<GlobalEnvironmentDto> getById(@PathVariable("id") ObjectId id) {
+    public Response<GlobalEnvironmentDto> getById(@PathVariable("id") String id) {
         return Response.ok(globalEnvironmentService.findById(id));
     }
 

@@ -1,6 +1,6 @@
 package com.sms.satp.entity;
 
-import com.sms.satp.parser.common.HttpMethod;
+import com.sms.satp.common.enums.RequestMethod;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -23,7 +23,7 @@ public class InterfaceHistory {
     @Id
     @Field("_id")
     private String id;
-    private HttpMethod method;
+    private RequestMethod method;
     private List<String> tag;
     private String md5;
     private String title;

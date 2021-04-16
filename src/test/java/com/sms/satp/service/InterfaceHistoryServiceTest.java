@@ -18,7 +18,7 @@ import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.InterfaceHistory;
 import com.sms.satp.entity.InterfaceShowInHistory;
 import com.sms.satp.mapper.InterfaceHistoryMapper;
-import com.sms.satp.parser.common.HttpMethod;
+import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.repository.InterfaceHistoryRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public class InterfaceHistoryServiceTest {
     @DisplayName("Test the getHistoryList method in the InterfaceHistory service")
     void getHistoryListTest() {
         List<InterfaceShowInHistory> interfaceShowInHistories = new ArrayList<>();
-        when(interfaceHistoryRepository.findByProjectIdAndMethodAndPath(PROJECT_ID, HttpMethod.GET, PATH)).thenReturn(interfaceShowInHistories);
+        when(interfaceHistoryRepository.findByProjectIdAndMethodAndPath(PROJECT_ID, RequestMethod.GET, PATH)).thenReturn(interfaceShowInHistories);
         List<InterfaceShowInHistory> resultList = interfaceHistoryService.getHistoryList(PROJECT_ID, METHOD, PATH);
         assertThat(resultList).isNotNull();
     }
@@ -97,7 +97,7 @@ public class InterfaceHistoryServiceTest {
     @Test
     @DisplayName("An exception occurred while getting the InterfaceHistory List")
     void getHistoryList_exception_test() {
-        doThrow(new RuntimeException()).when(interfaceHistoryRepository).findByProjectIdAndMethodAndPath(PROJECT_ID, HttpMethod.GET, PATH);
+        doThrow(new RuntimeException()).when(interfaceHistoryRepository).findByProjectIdAndMethodAndPath(PROJECT_ID, RequestMethod.GET, PATH);
         assertThatThrownBy(() -> interfaceHistoryService.getHistoryList(PROJECT_ID, METHOD, PATH))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_INTERFACE_HISTORY_LIST_ERROR.getCode());

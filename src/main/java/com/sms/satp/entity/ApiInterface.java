@@ -1,13 +1,14 @@
 package com.sms.satp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sms.satp.parser.common.HttpMethod;
+import com.sms.satp.common.enums.RequestMethod;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -21,9 +22,8 @@ public class ApiInterface {
 
     @Id
     @JsonIgnore
-    @Field("_id")
-    private String id;
-    private HttpMethod method;
+    private ObjectId id;
+    private RequestMethod method;
     private List<String> tag;
     @JsonIgnore
     private String md5;

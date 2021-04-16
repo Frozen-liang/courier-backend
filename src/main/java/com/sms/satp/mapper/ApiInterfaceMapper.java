@@ -11,19 +11,12 @@ import org.mapstruct.ReportingPolicy;
     ReportingPolicy.IGNORE)
 public interface ApiInterfaceMapper {
 
+    @Mapping(target = "id", expression = "java(apiInterface.getId().toString())")
     ApiInterfaceDto toDto(ApiInterface apiInterface);
 
-    @Mapping(target = "modifyDateTime",  ignore = true)
-    @Mapping(target = "createDateTime",  ignore = true)
+    @Mapping(source = "id", target = "id", ignore = true)
     ApiInterface toEntity(ApiInterfaceDto apiInterfaceDto);
 
-    @Mapping(target = "groupId",  ignore = true)
-    @Mapping(target = "projectId",  ignore = true)
-    @Mapping(target = "requestHeaders",  ignore = true)
-    @Mapping(target = "responseHeaders",  ignore = true)
-    @Mapping(target = "queryParams",  ignore = true)
-    @Mapping(target = "pathParams",  ignore = true)
-    @Mapping(target = "requestBody",  ignore = true)
-    @Mapping(target = "response",  ignore = true)
-    ApiInterfaceDto toDtoPage(ApiInterface apiInterfaceDto);
+    @Mapping(target = "id", expression = "java(apiInterface.getId().toString())")
+    ApiInterfaceDto toDtoPage(ApiInterface apiInterface);
 }

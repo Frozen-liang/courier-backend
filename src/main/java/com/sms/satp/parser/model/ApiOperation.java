@@ -1,6 +1,6 @@
 package com.sms.satp.parser.model;
 
-import com.sms.satp.parser.common.HttpMethod;
+import com.sms.satp.common.enums.RequestMethod;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import lombok.Data;
 @Builder
 public class ApiOperation {
 
-    private HttpMethod httpMethod;
+    private RequestMethod requestMethod;
     private List<String> tags;
     private String summary;
     private String description;

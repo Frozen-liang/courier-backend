@@ -5,7 +5,7 @@ import com.sms.satp.entity.test.CaseHeader;
 import com.sms.satp.entity.test.CaseParameter;
 import com.sms.satp.entity.test.CaseRequestBody;
 import com.sms.satp.entity.test.VerifyResponse;
-import com.sms.satp.parser.common.HttpMethod;
+import com.sms.satp.common.enums.RequestMethod;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ public class TestCaseDto {
     private String id;
     private String name;
     private String interfaceId;
-    private HttpMethod method;
+    private RequestMethod method;
     private String path;
     private AuthInfo authInfo;
     private List<CaseHeader> cookies;
