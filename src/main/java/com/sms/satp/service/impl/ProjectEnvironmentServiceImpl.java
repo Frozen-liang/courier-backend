@@ -4,21 +4,26 @@ import static com.sms.satp.common.ErrorCode.ADD_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.ErrorCode.DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
+import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_LIST_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.entity.ProjectEnvironment;
+import com.sms.satp.entity.dto.GlobalEnvironmentDto;
+import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.ProjectEnvironmentDto;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
+import com.sms.satp.service.GlobalEnvironmentService;
 import com.sms.satp.service.ProjectEnvironmentService;
 import com.sms.satp.utils.PageDtoConverter;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,11 +36,16 @@ import org.springframework.stereotype.Service;
 public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService {
 
     private final ProjectEnvironmentRepository projectEnvironmentRepository;
+    private final GlobalEnvironmentService globalEnvironmentService;
     private final ProjectEnvironmentMapper projectEnvironmentMapper;
+    private static final String CREATE_DATE_TIME = "createDateTime";
+    private static final String PROJECT_ID = "projectId";
 
     public ProjectEnvironmentServiceImpl(ProjectEnvironmentRepository
-        projectEnvironmentRepository, ProjectEnvironmentMapper projectEnvironmentMapper) {
+        projectEnvironmentRepository, GlobalEnvironmentService globalEnvironmentService,
+        ProjectEnvironmentMapper projectEnvironmentMapper) {
         this.projectEnvironmentRepository = projectEnvironmentRepository;
+        this.globalEnvironmentService = globalEnvironmentService;
         this.projectEnvironmentMapper = projectEnvironmentMapper;
     }
 
@@ -59,14 +69,32 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
+    public List<Object> list(String projectId) {
+        try {
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
+            ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().projectId(projectId).build();
+            List<Object> result = new ArrayList<>();
+            ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+                .withMatcher(PROJECT_ID, GenericPropertyMatchers.exact())
+                .withIgnoreNullValues();
+            Example<ProjectEnvironment> example = Example.of(projectEnvironment,exampleMatcher);
+            List<GlobalEnvironmentDto> globalEnvironments = globalEnvironmentService.list();
+            List<ProjectEnvironment> projectEnvironments = projectEnvironmentRepository.findAll(example, sort);
+            result.addAll(globalEnvironments);
+            result.addAll(projectEnvironments);
+            return result;
+        } catch (Exception e) {
+            log.error("Failed to get the ProjectEnvironment list!", e);
+            throw new ApiTestPlatformException(GET_PROJECT_ENVIRONMENT_LIST_ERROR);
+        }
+    }
+
+    @Override
     public void add(ProjectEnvironmentDto projectEnvironmentDto) {
         log.info("ProjectEnvironmentService-add()-params: [ProjectEnvironment]={}", projectEnvironmentDto.toString());
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentDto);
-
-            projectEnvironment.setId(new ObjectId().toString());
-            projectEnvironment.setCreateDateTime(LocalDateTime.now());
             projectEnvironmentRepository.insert(projectEnvironment);
         } catch (Exception e) {
             log.error("Failed to add the projectEnvironment!", e);
@@ -83,9 +111,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
             Optional<ProjectEnvironment> projectEnvironmentOptional = projectEnvironmentRepository
                 .findById(projectEnvironment.getId());
             projectEnvironmentOptional.ifPresent(projectEnvironmentFindById -> {
-                projectEnvironment.setCreateDateTime(
-                    projectEnvironmentFindById.getCreateDateTime());
-                projectEnvironment.setModifyDateTime(LocalDateTime.now());
+                projectEnvironment.setCreateDateTime(projectEnvironmentFindById.getCreateDateTime());
                 projectEnvironmentRepository.save(projectEnvironment);
             });
         } catch (Exception e) {
@@ -116,4 +142,5 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
             throw new ApiTestPlatformException(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR);
         }
     }
+
 }

@@ -72,6 +72,7 @@ public enum ErrorCode {
     EDIT_SCENE_CASE_ERROR("4064","Failed to edit the SceneCase!"),
     GET_SCENE_CASE_PAGE_ERROR("4065","Failed to get the SceneCase page!"),
     SEARCH_SCENE_CASE_ERROR("4066","Failed to search the SceneCase!"),
+    GET_PROJECT_ENVIRONMENT_LIST_ERROR("4067","Failed to get the ProjectEnvironment page!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

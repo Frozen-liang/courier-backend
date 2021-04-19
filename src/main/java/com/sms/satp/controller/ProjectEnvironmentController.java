@@ -5,6 +5,7 @@ import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.ProjectEnvironmentDto;
 import com.sms.satp.service.ProjectEnvironmentService;
+import java.util.List;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,24 +37,29 @@ public class ProjectEnvironmentController {
         return Response.ok(projectEnvironmentService.findById(id));
     }
 
-    @PostMapping()
-    public Response add(@Valid @RequestBody ProjectEnvironmentDto projectEnvironmentDto) {
-        projectEnvironmentService.add(projectEnvironmentDto);
-        return Response.ok().build();
+    @GetMapping("/list/{projectId}")
+    public Response<List<Object>> list(@PathVariable String projectId) {
+        return Response.ok(projectEnvironmentService.list(projectId));
     }
 
-    @PutMapping()
-    public Response edit(@Valid @RequestBody ProjectEnvironmentDto projectEnvironmentDto) {
+    @PostMapping
+    public Response<Boolean> add(@Valid @RequestBody ProjectEnvironmentDto projectEnvironmentDto) {
+        projectEnvironmentService.add(projectEnvironmentDto);
+        return Response.ok(Boolean.TRUE);
+    }
+
+    @PutMapping
+    public Response<Boolean> edit(@Valid @RequestBody ProjectEnvironmentDto projectEnvironmentDto) {
         projectEnvironmentService.edit(projectEnvironmentDto);
-        return Response.ok().build();
+        return Response.ok(Boolean.TRUE);
     }
 
     @DeleteMapping("/{ids}")
-    public Response delete(@PathVariable String[] ids) {
+    public Response<Boolean> delete(@PathVariable String[] ids) {
         for (String id : ids) {
             projectEnvironmentService.deleteById(id);
         }
-        return Response.ok().build();
+        return Response.ok(Boolean.TRUE);
     }
 
 }

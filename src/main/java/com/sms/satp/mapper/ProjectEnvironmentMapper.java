@@ -1,6 +1,6 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.entity.ProjectEnvironment;
+import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.entity.dto.ProjectEnvironmentDto;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
