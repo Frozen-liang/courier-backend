@@ -21,6 +21,7 @@ import com.sms.satp.mapper.GlobalFunctionMapper;
 import com.sms.satp.repository.GlobalFunctionRepository;
 import com.sms.satp.service.impl.GlobalFunctionServiceImpl;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
@@ -131,15 +132,17 @@ class GlobalFunctionServiceTest {
     @Test
     @DisplayName("Test the delete method in the GlobalFunction service")
     public void delete_test() {
-        globalFunctionService.delete(ID);
-        verify(globalFunctionRepository, times(1)).deleteById(ID);
+        List<GlobalFunction> globalFunctions = Collections.singletonList(GlobalFunction.builder().build());
+        when(globalFunctionRepository.findAllById(Collections.singletonList(ID))).thenReturn(globalFunctions);
+        globalFunctionService.delete(new String[]{ID});
+        verify(globalFunctionRepository, times(1)).saveAll(globalFunctions);
     }
 
     @Test
     @DisplayName("An exception occurred while delete GlobalFunction")
     public void delete_exception_test() {
-        doThrow(new RuntimeException()).when(globalFunctionRepository).deleteById(ID);
-        assertThatThrownBy(() -> globalFunctionService.delete(ID)).isInstanceOf(ApiTestPlatformException.class)
+        doThrow(new RuntimeException()).when(globalFunctionRepository).findAllById(Collections.singletonList(ID));
+        assertThatThrownBy(() -> globalFunctionService.delete(new String[]{ID})).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_GLOBAL_FUNCTION_BY_ID_ERROR.getCode());
     }
 }

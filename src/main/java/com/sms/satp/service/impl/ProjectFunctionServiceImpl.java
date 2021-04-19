@@ -14,13 +14,12 @@ import com.sms.satp.mapper.ProjectFunctionMapper;
 import com.sms.satp.repository.ProjectFunctionRepository;
 import com.sms.satp.service.GlobalFunctionService;
 import com.sms.satp.service.ProjectFunctionService;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
@@ -37,6 +36,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     private final GlobalFunctionService globalFunctionService;
     private static final String CREATE_DATE_TIME = "createDateTime";
     private static final String PROJECT_ID = "projectId";
+    private static final String REMOVE = "remove";
 
     public ProjectFunctionServiceImpl(ProjectFunctionRepository projectFunctionRepository,
         ProjectFunctionMapper projectFunctionMapper, GlobalFunctionService globalFunctionService) {
@@ -64,10 +64,11 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
             ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID, ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher(REMOVE, ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
             Example<ProjectFunction> example = Example.of(projectFunction, matcher);
             ArrayList<Object> list = new ArrayList<>();
-            List<GlobalFunctionDto> globalFunctionList = globalFunctionService.list(functionDesc,functionName);
+            List<GlobalFunctionDto> globalFunctionList = globalFunctionService.list(functionDesc, functionName);
             List<ProjectFunction> projectFunctionList = projectFunctionRepository.findAll(example, sort);
             list.addAll(globalFunctionList);
             list.addAll(projectFunctionList.stream().map(projectFunctionMapper::toDto).collect(Collectors.toList()));
@@ -84,8 +85,6 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         log.info("ProjectFunctionService-add()-params: [ProjectFunction]={}", projectFunctionDto.toString());
         try {
             ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionDto);
-            projectFunction.setId(new ObjectId().toString());
-            projectFunction.setCreateDateTime(LocalDateTime.now());
             projectFunctionRepository.insert(projectFunction);
         } catch (Exception e) {
             log.error("Failed to add the ProjectFunction!", e);
@@ -99,11 +98,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         try {
             ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionDto);
             projectFunctionRepository.findById(projectFunction.getId())
-                .ifPresent((oldProjectFunction) -> {
-                    projectFunction.setModifyDateTime(LocalDateTime.now());
-                    projectFunction.setCreateDateTime(oldProjectFunction.getCreateDateTime());
-                    projectFunctionRepository.save(projectFunction);
-                });
+                .ifPresent((oldProjectFunction) -> projectFunctionRepository.save(projectFunction));
         } catch (Exception e) {
             log.error("Failed to add the ProjectFunction!", e);
             throw new ApiTestPlatformException(EDIT_PROJECT_FUNCTION_ERROR);
@@ -111,9 +106,11 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(String[] ids) {
         try {
-            projectFunctionRepository.deleteById(id);
+            Iterable<ProjectFunction> projectFunctions = projectFunctionRepository.findAllById(Arrays.asList(ids));
+            projectFunctions.forEach((projectFunction) -> projectFunction.setRemove(Boolean.TRUE));
+            projectFunctionRepository.saveAll(projectFunctions);
         } catch (Exception e) {
             log.error("Failed to delete the ProjectFunction!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_FUNCTION_BY_ID_ERROR);

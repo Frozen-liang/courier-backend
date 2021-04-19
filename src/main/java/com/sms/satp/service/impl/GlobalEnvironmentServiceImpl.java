@@ -11,12 +11,10 @@ import com.sms.satp.entity.env.GlobalEnvironment;
 import com.sms.satp.mapper.GlobalEnvironmentMapper;
 import com.sms.satp.repository.GlobalEnvironmentRepository;
 import com.sms.satp.service.GlobalEnvironmentService;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -51,8 +49,6 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
         log.info("GlobalEnvironmentService-add()-params: [GlobalEnvironment]={}", globalEnvironmentDto.toString());
         try {
             GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentDto);
-            globalEnvironment.setId(new ObjectId().toString());
-            globalEnvironment.setCreateDateTime(LocalDateTime.now());
             globalEnvironmentRepository.insert(globalEnvironment);
         } catch (Exception e) {
             log.error("Failed to add the globalEnvironment!", e);
@@ -66,11 +62,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
         try {
             GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentDto);
             globalEnvironmentRepository.findById(globalEnvironment.getId())
-                .ifPresent((oldGlobalEnvironment) -> {
-                    globalEnvironment.setModifyDateTime(LocalDateTime.now());
-                    globalEnvironment.setCreateDateTime(oldGlobalEnvironment.getCreateDateTime());
-                    globalEnvironmentRepository.save(globalEnvironment);
-                });
+                .ifPresent((oldGlobalEnvironment) -> globalEnvironmentRepository.save(globalEnvironment));
         } catch (Exception e) {
             log.error("Failed to add the globalEnvironment!", e);
             throw new ApiTestPlatformException(EDIT_GLOBAL_ENVIRONMENT_ERROR);

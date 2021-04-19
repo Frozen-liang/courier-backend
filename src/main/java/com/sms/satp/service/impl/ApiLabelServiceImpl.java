@@ -7,17 +7,16 @@ import static com.sms.satp.common.ErrorCode.GET_API_LABEL_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_LABEL_LIST_ERROR;
 
 import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.enums.ApiLabelType;
 import com.sms.satp.entity.ApiLabel;
 import com.sms.satp.entity.dto.ApiLabelDto;
 import com.sms.satp.mapper.ApiLabelMapper;
 import com.sms.satp.repository.ApiLabelRepository;
 import com.sms.satp.service.ApiLabelService;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
@@ -52,7 +51,7 @@ public class ApiLabelServiceImpl implements ApiLabelService {
     }
 
     @Override
-    public List<ApiLabelDto> list(String projectId, String labelName, Short labelType) {
+    public List<ApiLabelDto> list(String projectId, String labelName, ApiLabelType labelType) {
         try {
             ApiLabel apiLabel = ApiLabel.builder().projectId(projectId).labelName(labelName)
                 .labelType(labelType).build();
@@ -62,8 +61,8 @@ public class ApiLabelServiceImpl implements ApiLabelService {
                 .withStringMatcher(StringMatcher.CONTAINING)
                 .withIgnoreNullValues();
             Example<ApiLabel> example = Example.of(apiLabel, exampleMatcher);
-            Sort sort = Sort.by(Direction.DESC,CREATE_DATE_TIME);
-            List<ApiLabel> list = apiLabelRepository.findAll(example,sort);
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
+            List<ApiLabel> list = apiLabelRepository.findAll(example, sort);
             return list.stream().map(apiLabelMapper::toDto).collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Failed to get the ApiLabel list!", e);
@@ -76,8 +75,6 @@ public class ApiLabelServiceImpl implements ApiLabelService {
         log.info("ApiLabelService-add()-params: [ApiLabel]={}", apiLabelDto.toString());
         try {
             ApiLabel apiLabel = apiLabelMapper.toEntity(apiLabelDto);
-            apiLabel.setId(new ObjectId().toString());
-            apiLabel.setCreateDateTime(LocalDateTime.now());
             apiLabelRepository.insert(apiLabel);
         } catch (Exception e) {
             log.error("Failed to add the ApiLabel!", e);
@@ -91,11 +88,7 @@ public class ApiLabelServiceImpl implements ApiLabelService {
         try {
             ApiLabel apiLabel = apiLabelMapper.toEntity(apiLabelDto);
             Optional<ApiLabel> optional = apiLabelRepository.findById(apiLabelDto.getId());
-            optional.ifPresent((oldApiLabel) -> {
-                apiLabel.setCreateDateTime(oldApiLabel.getCreateDateTime());
-                apiLabel.setModifyDateTime(LocalDateTime.now());
-                apiLabelRepository.save(apiLabel);
-            });
+            optional.ifPresent((oldApiLabel) -> apiLabelRepository.save(apiLabel));
         } catch (Exception e) {
             log.error("Failed to add the ApiLabel!", e);
             throw new ApiTestPlatformException(EDIT_API_LABEL_ERROR);

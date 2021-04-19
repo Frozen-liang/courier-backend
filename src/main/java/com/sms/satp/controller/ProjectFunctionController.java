@@ -34,7 +34,7 @@ public class ProjectFunctionController {
     @GetMapping("/list/{projectId}")
     public Response<List<Object>> list(@PathVariable("projectId") String projectId, String functionDesc,
         String functionName) {
-        return Response.ok(projectFunctionService.list(projectId,functionDesc,functionName));
+        return Response.ok(projectFunctionService.list(projectId, functionDesc, functionName));
     }
 
     @PostMapping
@@ -51,9 +51,7 @@ public class ProjectFunctionController {
 
     @DeleteMapping("/{ids}")
     public Response<Boolean> delete(@PathVariable String[] ids) {
-        for (String id : ids) {
-            projectFunctionService.delete(id);
-        }
+        projectFunctionService.delete(ids);
         return Response.ok(Boolean.TRUE);
     }
 }

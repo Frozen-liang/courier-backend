@@ -32,7 +32,7 @@ public class GlobalFunctionController {
 
     @GetMapping("/list")
     public Response<List<GlobalFunctionDto>> list(String functionDesc, String functionName) {
-        return Response.ok(globalFunctionService.list(functionDesc,functionName));
+        return Response.ok(globalFunctionService.list(functionDesc, functionName));
     }
 
     @PostMapping
@@ -49,9 +49,7 @@ public class GlobalFunctionController {
 
     @DeleteMapping("/{ids}")
     public Response<Boolean> delete(@PathVariable String[] ids) {
-        for (String id : ids) {
-            globalFunctionService.delete(id);
-        }
+        globalFunctionService.delete(ids);
         return Response.ok(Boolean.TRUE);
     }
 }

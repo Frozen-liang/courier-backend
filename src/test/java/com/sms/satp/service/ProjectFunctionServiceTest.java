@@ -21,6 +21,7 @@ import com.sms.satp.mapper.ProjectFunctionMapper;
 import com.sms.satp.repository.ProjectFunctionRepository;
 import com.sms.satp.service.impl.ProjectFunctionServiceImpl;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
@@ -131,15 +132,18 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectFunction service")
     public void delete_test() {
-        projectFunctionService.delete(ID);
-        verify(projectFunctionRepository, times(1)).deleteById(ID);
+        List<ProjectFunction> projectFunctions = Collections.singletonList(ProjectFunction.builder().build());
+        when(projectFunctionRepository.findAllById(Collections.singletonList(ID))).thenReturn(projectFunctions);
+        projectFunctionService.delete(new String[]{ID});
+        verify(projectFunctionRepository, times(1)).saveAll(projectFunctions);
     }
 
     @Test
     @DisplayName("An exception occurred while delete ProjectFunction")
     public void delete_exception_test() {
-        doThrow(new RuntimeException()).when(projectFunctionRepository).deleteById(ID);
-        assertThatThrownBy(() -> projectFunctionService.delete(ID)).isInstanceOf(ApiTestPlatformException.class)
+        doThrow(new RuntimeException()).when(projectFunctionRepository).findAllById(Collections.singletonList(ID));
+        assertThatThrownBy(() -> projectFunctionService.delete(new String[]{ID}))
+            .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_PROJECT_FUNCTION_BY_ID_ERROR.getCode());
     }
 }

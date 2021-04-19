@@ -13,5 +13,5 @@ public interface ProjectFunctionService {
 
     void edit(ProjectFunctionDto projectFunctionDto);
 
-    void delete(String id);
+    void delete(String[] ids);
 }

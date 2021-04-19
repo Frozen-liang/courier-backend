@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.enums.ApiLabelType;
 import com.sms.satp.entity.dto.ApiLabelDto;
 import com.sms.satp.entity.ApiLabel;
 import com.sms.satp.mapper.ApiLabelMapper;
@@ -43,7 +44,7 @@ class ApiLabelServiceTest {
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String PROJECT_ID = "10";
     private static final String LABEL_NAME = "testName";
-    private static final Short LABEL_TYPE = 1;
+    private static final ApiLabelType LABEL_TYPE = ApiLabelType.getType(1);
 
     @Test
     @DisplayName("Test the findById method in the ApiLabel service")
@@ -77,6 +78,7 @@ class ApiLabelServiceTest {
     @Test
     @DisplayName("An exception occurred while adding ApiLabel")
     public void add_exception_test() {
+        when(apiLabelMapper.toEntity(apiLabelDto)).thenReturn(apiLabel);
         doThrow(new RuntimeException()).when(apiLabelRepository).insert(any(ApiLabel.class));
         assertThatThrownBy(() -> apiLabelService.add(apiLabelDto))
             .isInstanceOf(ApiTestPlatformException.class)

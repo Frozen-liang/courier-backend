@@ -13,5 +13,5 @@ public interface GlobalFunctionService {
 
     void edit(GlobalFunctionDto globalFunctionDto);
 
-    void delete(String id);
+    void delete(String[] ids);
 }

@@ -12,12 +12,11 @@ import com.sms.satp.entity.function.GlobalFunction;
 import com.sms.satp.mapper.GlobalFunctionMapper;
 import com.sms.satp.repository.GlobalFunctionRepository;
 import com.sms.satp.service.GlobalFunctionService;
-import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
@@ -32,6 +31,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     private final GlobalFunctionRepository globalFunctionRepository;
     private final GlobalFunctionMapper globalFunctionMapper;
     private static final String CREATE_DATE_TIME = "createDateTime";
+    private static final String REMOVE = "remove";
 
     public GlobalFunctionServiceImpl(GlobalFunctionRepository globalFunctionRepository,
         GlobalFunctionMapper globalFunctionMapper) {
@@ -56,6 +56,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
             GlobalFunction globalFunction = GlobalFunction.builder().functionDesc(functionDesc)
                 .functionName(functionName).build();
             ExampleMatcher matcher = ExampleMatcher.matching()
+                .withMatcher(REMOVE, ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
             Example<GlobalFunction> example = Example.of(globalFunction, matcher);
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
@@ -73,8 +74,6 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
         log.info("GlobalFunctionService-add()-params: [GlobalFunction]={}", globalFunctionDto.toString());
         try {
             GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionDto);
-            globalFunction.setId(new ObjectId().toString());
-            globalFunction.setCreateDateTime(LocalDateTime.now());
             globalFunctionRepository.insert(globalFunction);
         } catch (Exception e) {
             log.error("Failed to add the GlobalFunction!", e);
@@ -88,11 +87,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
         try {
             GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionDto);
             globalFunctionRepository.findById(globalFunction.getId())
-                .ifPresent((oldGlobalFunction) -> {
-                    globalFunction.setModifyDateTime(LocalDateTime.now());
-                    globalFunction.setCreateDateTime(oldGlobalFunction.getCreateDateTime());
-                    globalFunctionRepository.save(globalFunction);
-                });
+                .ifPresent((oldGlobalFunction) -> globalFunctionRepository.save(globalFunction));
         } catch (Exception e) {
             log.error("Failed to add the GlobalFunction!", e);
             throw new ApiTestPlatformException(EDIT_GLOBAL_FUNCTION_ERROR);
@@ -100,9 +95,11 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     }
 
     @Override
-    public void delete(String id) {
+    public void delete(String[] ids) {
         try {
-            globalFunctionRepository.deleteById(id);
+            Iterable<GlobalFunction> globalFunctions = globalFunctionRepository.findAllById(Arrays.asList(ids));
+            globalFunctions.forEach(globalFunction -> globalFunction.setRemove(Boolean.TRUE));
+            globalFunctionRepository.saveAll(globalFunctions);
         } catch (Exception e) {
             log.error("Failed to delete the GlobalFunction!", e);
             throw new ApiTestPlatformException(DELETE_GLOBAL_FUNCTION_BY_ID_ERROR);
