@@ -18,5 +18,5 @@ public class ParamInfo {
     private String description;
     private ParamType paramType;
     private boolean required;
-    private List<ParamType> childParam;
+    private List<ParamInfo> childParam;
 }
