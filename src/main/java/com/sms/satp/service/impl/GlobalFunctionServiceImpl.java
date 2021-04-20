@@ -86,8 +86,12 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
         log.info("GlobalFunctionService-edit()-params: [GlobalFunction]={}", globalFunctionDto.toString());
         try {
             GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionDto);
-            globalFunctionRepository.findById(globalFunction.getId())
-                .ifPresent((oldGlobalFunction) -> globalFunctionRepository.save(globalFunction));
+            Optional<GlobalFunction> optional = globalFunctionRepository.findById(globalFunction.getId());
+            optional.ifPresent((oldGlobalFunction) -> {
+                globalFunction.setCreateDateTime(oldGlobalFunction.getCreateDateTime());
+                globalFunction.setCreateUserId(oldGlobalFunction.getCreateUserId());
+                globalFunctionRepository.save(globalFunction);
+            });
         } catch (Exception e) {
             log.error("Failed to add the GlobalFunction!", e);
             throw new ApiTestPlatformException(EDIT_GLOBAL_FUNCTION_ERROR);

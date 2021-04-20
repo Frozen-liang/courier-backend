@@ -53,7 +53,7 @@ class GlobalFunctionServiceTest {
         GlobalFunctionDto result1 = globalFunctionService.findById(ID);
         GlobalFunctionDto result2 = globalFunctionService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
-        assertThat(result1.getId()).isEqualTo(ID.toString());
+        assertThat(result1.getId()).isEqualTo(ID);
         assertThat(result2).isNull();
     }
 
@@ -142,7 +142,8 @@ class GlobalFunctionServiceTest {
     @DisplayName("An exception occurred while delete GlobalFunction")
     public void delete_exception_test() {
         doThrow(new RuntimeException()).when(globalFunctionRepository).findAllById(Collections.singletonList(ID));
-        assertThatThrownBy(() -> globalFunctionService.delete(new String[]{ID})).isInstanceOf(ApiTestPlatformException.class)
+        assertThatThrownBy(() -> globalFunctionService.delete(new String[]{ID}))
+            .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_GLOBAL_FUNCTION_BY_ID_ERROR.getCode());
     }
 }

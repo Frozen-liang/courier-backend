@@ -114,7 +114,7 @@ class ApiLabelServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(ApiLabel.builder().build());
         }
-        when(apiLabelRepository.findAll(any(),any(Sort.class))).thenReturn(list);
+        when(apiLabelRepository.findAll(any(), any(Sort.class))).thenReturn(list);
         when(apiLabelMapper.toDto(apiLabel)).thenReturn(apiLabelDto);
         List<ApiLabelDto> result = apiLabelService.list(PROJECT_ID, LABEL_NAME, LABEL_TYPE);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
@@ -123,7 +123,7 @@ class ApiLabelServiceTest {
     @Test
     @DisplayName("An exception occurred while getting ApiLabel list")
     public void list_exception_test() {
-        doThrow(new RuntimeException()).when(apiLabelRepository).findAll(any(),any(Sort.class));
+        doThrow(new RuntimeException()).when(apiLabelRepository).findAll(any(), any(Sort.class));
         assertThatThrownBy(() -> apiLabelService.list(PROJECT_ID, LABEL_NAME, LABEL_TYPE))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_LABEL_LIST_ERROR.getCode());

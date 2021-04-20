@@ -61,8 +61,12 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
         log.info("GlobalEnvironmentService-edit()-params: [GlobalEnvironment]={}", globalEnvironmentDto.toString());
         try {
             GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentDto);
-            globalEnvironmentRepository.findById(globalEnvironment.getId())
-                .ifPresent((oldGlobalEnvironment) -> globalEnvironmentRepository.save(globalEnvironment));
+            Optional<GlobalEnvironment> optional = globalEnvironmentRepository.findById(globalEnvironment.getId());
+            optional.ifPresent((oldGlobalEnvironment) -> {
+                globalEnvironment.setCreateDateTime(oldGlobalEnvironment.getCreateDateTime());
+                globalEnvironment.setCreateUserId(oldGlobalEnvironment.getCreateUserId());
+                globalEnvironmentRepository.save(globalEnvironment);
+            });
         } catch (Exception e) {
             log.error("Failed to add the globalEnvironment!", e);
             throw new ApiTestPlatformException(EDIT_GLOBAL_ENVIRONMENT_ERROR);

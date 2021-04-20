@@ -88,7 +88,11 @@ public class ApiLabelServiceImpl implements ApiLabelService {
         try {
             ApiLabel apiLabel = apiLabelMapper.toEntity(apiLabelDto);
             Optional<ApiLabel> optional = apiLabelRepository.findById(apiLabelDto.getId());
-            optional.ifPresent((oldApiLabel) -> apiLabelRepository.save(apiLabel));
+            optional.ifPresent((oldApiLabel) -> {
+                apiLabel.setCreateUserId(oldApiLabel.getCreateUserId());
+                apiLabel.setCreateDateTime(oldApiLabel.getCreateDateTime());
+                apiLabelRepository.save(apiLabel);
+            });
         } catch (Exception e) {
             log.error("Failed to add the ApiLabel!", e);
             throw new ApiTestPlatformException(EDIT_API_LABEL_ERROR);

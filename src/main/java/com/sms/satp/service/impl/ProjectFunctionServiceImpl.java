@@ -97,8 +97,12 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         log.info("ProjectFunctionService-edit()-params: [ProjectFunction]={}", projectFunctionDto.toString());
         try {
             ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionDto);
-            projectFunctionRepository.findById(projectFunction.getId())
-                .ifPresent((oldProjectFunction) -> projectFunctionRepository.save(projectFunction));
+            Optional<ProjectFunction> optional = projectFunctionRepository.findById(projectFunction.getId());
+            optional.ifPresent((oldProjectFunction) -> {
+                projectFunction.setCreateDateTime(oldProjectFunction.getCreateDateTime());
+                projectFunction.setCreateUserId(oldProjectFunction.getCreateUserId());
+                projectFunctionRepository.save(projectFunction);
+            });
         } catch (Exception e) {
             log.error("Failed to add the ProjectFunction!", e);
             throw new ApiTestPlatformException(EDIT_PROJECT_FUNCTION_ERROR);
