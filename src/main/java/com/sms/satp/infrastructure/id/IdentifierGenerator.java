@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.sms.satp.infrastructure.id;
 
 
 /**
- * Id生成器接口
+ * Id生成器接口.
  *
  * @author sd-wangtaicheng@sdcncsi.com.cn nieqiuqiu
  * @since 2019-10-15
@@ -26,7 +27,7 @@ package com.sms.satp.infrastructure.id;
 public interface IdentifierGenerator {
 
     /**
-     * 生成Id
+     * 生成Id.
      *
      * @param entity 实体
      * @return id

@@ -11,6 +11,7 @@ import static com.sms.satp.utils.ApiSchemaUtil.removeSchemaMapRef;
 import static com.sms.satp.utils.ApiSchemaUtil.splitKeyFromRef;
 
 import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.ApiInterface.ApiInterfaceBuilder;
 import com.sms.satp.entity.DocumentImport;
@@ -27,7 +28,6 @@ import com.sms.satp.entity.dto.SelectDto;
 import com.sms.satp.mapper.ApiInterfaceMapper;
 import com.sms.satp.mapper.DocumentImportMapper;
 import com.sms.satp.parser.DocumentFactory;
-import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.parser.model.ApiDocument;
 import com.sms.satp.parser.model.ApiOperation;
 import com.sms.satp.parser.model.ApiParameter;
@@ -326,9 +326,9 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                     });
                     apiParameterOptional.map(ApiParameter::getSchema).map(ApiSchema::getItem)
                         .map(ApiSchema::getRef).ifPresent(refString -> {
-                        String refKey = splitKeyFromRef(refString);
-                        apiParameter.getSchema().setItem(apiSchemaMap.get(refKey));
-                    });
+                            String refKey = splitKeyFromRef(refString);
+                            apiParameter.getSchema().setItem(apiSchemaMap.get(refKey));
+                        });
                     queryParams.add(ApiParameterConverter.CONVERT_TO_PARAMETER.apply(apiParameter));
                     break;
                 case PATH:

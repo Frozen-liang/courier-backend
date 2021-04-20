@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.sms.satp.infrastructure.id;
 
 import com.sms.satp.utils.Assert;
@@ -26,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * 分布式高效有序 ID 生产黑科技(sequence)
+ * 分布式高效有序 ID 生产黑科技(sequence).
  *
  * <p>优化开源项目：https://gitee.com/yu120/sequence</p>
  *
@@ -37,24 +38,24 @@ import org.apache.commons.lang3.StringUtils;
 public class Sequence {
 
     /**
-     * 时间起始标记点，作为基准，一般取系统的最近时间（一旦确定不能变动）
+     * 时间起始标记点，作为基准，一般取系统的最近时间（一旦确定不能变动）.
      */
     private final long twepoch = 1288834974657L;
     /**
-     * 机器标识位数
+     * 机器标识位数.
      */
     private final long workerIdBits = 5L;
     private final long datacenterIdBits = 5L;
     private final long maxWorkerId = -1L ^ (-1L << workerIdBits);
     private final long maxDatacenterId = -1L ^ (-1L << datacenterIdBits);
     /**
-     * 毫秒内自增位
+     * 毫秒内自增位.
      */
     private final long sequenceBits = 12L;
     private final long workerIdShift = sequenceBits;
     private final long datacenterIdShift = sequenceBits + workerIdBits;
     /**
-     * 时间戳左移动位
+     * 时间戳左移动位.
      */
     private final long timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
     private final long sequenceMask = -1L ^ (-1L << sequenceBits);
@@ -62,15 +63,15 @@ public class Sequence {
     private final long workerId;
 
     /**
-     * 数据标识 ID 部分
+     * 数据标识 ID 部分.
      */
     private final long datacenterId;
     /**
-     * 并发控制
+     * 并发控制.
      */
     private long sequence = 0L;
     /**
-     * 上次生产 ID 时间戳
+     * 上次生产 ID 时间戳.
      */
     private long lastTimestamp = -1L;
 
@@ -80,7 +81,7 @@ public class Sequence {
     }
 
     /**
-     * 有参构造器
+     * 有参构造器.
      *
      * @param workerId     工作机器 ID
      * @param datacenterId 序列号
@@ -95,7 +96,7 @@ public class Sequence {
     }
 
     /**
-     * 获取 maxWorkerId
+     * 获取 maxWorkerId.
      */
     protected static long getMaxWorkerId(long datacenterId, long maxWorkerId) {
         StringBuilder mpid = new StringBuilder();
@@ -103,18 +104,18 @@ public class Sequence {
         String name = ManagementFactory.getRuntimeMXBean().getName();
         if (StringUtils.isNotBlank(name)) {
             /*
-             * GET jvmPid
+             * GET jvmPid.
              */
             mpid.append(name.split(StringPool.AT)[0]);
         }
         /*
-         * MAC + PID 的 hashcode 获取16个低位
+         * MAC + PID 的 hashcode 获取16个低位.
          */
         return (mpid.toString().hashCode() & 0xffff) % (maxWorkerId + 1);
     }
 
     /**
-     * 数据标识id部分
+     * 数据标识id部分.
      */
     protected static long getDatacenterId(long maxDatacenterId) {
         long id = 0L;
@@ -139,7 +140,7 @@ public class Sequence {
     }
 
     /**
-     * 获取下一个 ID
+     * 获取下一个 ID.
      *
      * @return 下一个 ID
      */
