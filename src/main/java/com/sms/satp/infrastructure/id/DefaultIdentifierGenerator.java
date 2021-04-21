@@ -17,7 +17,7 @@ package com.sms.satp.infrastructure.id;
 
 
 /**
- * 默认生成器
+ * 默认生成器.
  *
  * @author sd-wangtaicheng@sdcncsi.com.cn nieqiuqiu
  * @since 2019-10-15
