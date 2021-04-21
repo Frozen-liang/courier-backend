@@ -28,8 +28,8 @@ public enum RequestMethod implements EnumCommon {
         return (code != null ? mappings.get(code) : null);
     }
 
-    public static  RequestMethod resolve(String method){
-        return null;
+    public static RequestMethod resolve(String method) {
+        return GET;
     }
 
     @Override

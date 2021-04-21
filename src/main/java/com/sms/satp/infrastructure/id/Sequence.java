@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.sms.satp.infrastructure.id;
 
 import com.sms.satp.utils.Assert;
@@ -66,7 +67,7 @@ public class Sequence {
      */
     private final long datacenterId;
     /**
-     * 并发控制
+     * 并发控制.
      */
     private long sequence = 0L;
     /**

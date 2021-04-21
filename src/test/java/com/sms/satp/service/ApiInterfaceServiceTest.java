@@ -81,7 +81,7 @@ class ApiInterfaceServiceTest {
     private static final String ALL_GROUP_FLAG = "-1";
     private final static String FILE_NAME = "fileName";
     private final static String PROJECT_ID = "25";
-    private final static String ID = "123";
+    private final static String ID = new ObjectId().toString();
     private final static String GROUP_ID = "25";
     private final static String TITLE = "title";
     private final static String NOT_EXIST_ID = "nul";
@@ -185,8 +185,8 @@ class ApiInterfaceServiceTest {
             .title(TITLE)
             .build();
         Optional<ApiInterface> apiInterfaceOptional = Optional.ofNullable(apiInterface);
-        when(apiInterfaceRepository.findById(new ObjectId(ID))).thenReturn(apiInterfaceOptional);
-        ApiInterfaceDto result1 = apiInterfaceService.findById(ID);
+        when(apiInterfaceRepository.findById(ID)).thenReturn(apiInterfaceOptional);
+        ApiInterfaceDto result1 = apiInterfaceService.findById(ID.toString());
         ApiInterfaceDto result2 = apiInterfaceService.findById(NOT_EXIST_ID);
         assertThat(result1.getTitle()).isEqualTo(TITLE);
         assertThat(result2).isNull();
@@ -268,7 +268,7 @@ class ApiInterfaceServiceTest {
     void edit_test() {
         ApiInterfaceDto apiInterfaceDto = ApiInterfaceDto.builder().id(ID).build();
         ApiInterface apiInterface = apiInterfaceMapper.toEntity(apiInterfaceDto);
-        when(apiInterfaceRepository.findById(new ObjectId(ID))).thenReturn(Optional.of(ApiInterface.builder().build()));
+        when(apiInterfaceRepository.findById(ID)).thenReturn(Optional.of(ApiInterface.builder().build()));
         when(apiInterfaceRepository.save(apiInterface)).thenReturn(apiInterface);
         apiInterfaceService.edit(apiInterfaceDto);
         verify(apiInterfaceRepository, times(1)).save(any(ApiInterface.class));
@@ -277,9 +277,9 @@ class ApiInterfaceServiceTest {
     @Test
     @DisplayName("Test the delete method in the apiInterface service")
     void delete_test() {
-        doNothing().when(apiInterfaceRepository).deleteById(new ObjectId(ID));
+        doNothing().when(apiInterfaceRepository).deleteById(ID);
         apiInterfaceService.deleteById(ID);
-        verify(apiInterfaceRepository, times(1)).deleteById(new ObjectId(ID));
+        verify(apiInterfaceRepository, times(1)).deleteById(ID);
     }
 
     @Test
@@ -315,8 +315,8 @@ class ApiInterfaceServiceTest {
     @Test
     @DisplayName("An exception occurred while edit apiInterface")
     void edit_exception_test() {
-        when(apiInterfaceRepository.findById(new ObjectId(ID)))
-            .thenReturn(Optional.of(ApiInterface.builder().id(new ObjectId(ID)).build()));
+        when(apiInterfaceRepository.findById(ID))
+            .thenReturn(Optional.of(ApiInterface.builder().id(ID).build()));
         doThrow(new RuntimeException()).when(apiInterfaceRepository).save(argThat(t -> true));
         assertThatThrownBy(() -> apiInterfaceService.edit(ApiInterfaceDto.builder().id(ID).build()))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -326,7 +326,7 @@ class ApiInterfaceServiceTest {
     @Test
     @DisplayName("An exception occurred while getting apiInterface by id")
     void getApiInterface_exception_test() {
-        doThrow(new RuntimeException()).when(apiInterfaceRepository).findById(any(ObjectId.class));
+        doThrow(new RuntimeException()).when(apiInterfaceRepository).findById(anyString());
         assertThatThrownBy(() -> apiInterfaceService.findById(anyString()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_INTERFACE_BY_ID_ERROR.getCode());
@@ -335,7 +335,7 @@ class ApiInterfaceServiceTest {
     @Test
     @DisplayName("An exception occurred while deleting apiInterface")
     void delete_exception_test() {
-        doThrow(new RuntimeException()).when(apiInterfaceRepository).deleteById(any(ObjectId.class));
+        doThrow(new RuntimeException()).when(apiInterfaceRepository).deleteById(anyString());
         assertThatThrownBy(() -> apiInterfaceService.deleteById(anyString()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_API_INTERFACE_BY_ID_ERROR.getCode());
