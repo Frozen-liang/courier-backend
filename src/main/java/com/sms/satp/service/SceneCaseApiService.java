@@ -16,7 +16,7 @@ public interface SceneCaseApiService {
 
     void editSortOrder(UpdateSceneCaseApiSortOrderDto updateSceneCaseApiSortOrderDto);
 
-    List<SceneCaseApiDto> list(String sceneCaseId);
+    List<SceneCaseApiDto> listBySceneCaseId(String sceneCaseId);
 
     SceneCaseApiDto getSceneCaseApiById(String id);
 }

@@ -5,6 +5,7 @@ import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.AddSceneCaseDto;
+import com.sms.satp.entity.dto.SceneCaseApiDto;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.dto.SceneCaseDto;
 import com.sms.satp.entity.dto.SceneCaseSearchDto;
@@ -46,6 +47,7 @@ class SceneCaseServiceTest {
     private CustomizedSceneCaseRepository customizedSceneCaseRepository;
     private SceneCaseMapper sceneCaseMapper;
     private SceneCaseServiceImpl sceneCaseService;
+    private SceneCaseApiService sceneCaseApiService;
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -62,8 +64,9 @@ class SceneCaseServiceTest {
         sceneCaseRepository = mock(SceneCaseRepository.class);
         customizedSceneCaseRepository = mock(CustomizedSceneCaseRepository.class);
         sceneCaseMapper = mock(SceneCaseMapper.class);
+        sceneCaseApiService = mock(SceneCaseApiService.class);
         sceneCaseService = new SceneCaseServiceImpl(sceneCaseRepository, customizedSceneCaseRepository,
-            sceneCaseMapper);
+            sceneCaseMapper, sceneCaseApiService);
     }
 
     @Test
@@ -95,6 +98,9 @@ class SceneCaseServiceTest {
     @DisplayName("Test the deleteById method in the SceneCase service")
     void deleteById_test() {
         doNothing().when(sceneCaseRepository).deleteById(any());
+        List<SceneCaseApiDto> sceneCaseApiDtoList = Lists.newArrayList(SceneCaseApiDto.builder().build());
+        when(sceneCaseApiService.listBySceneCaseId(any())).thenReturn(sceneCaseApiDtoList);
+        doNothing().when(sceneCaseApiService).deleteById(any());
         sceneCaseService.deleteById(MOCK_ID);
         verify(sceneCaseRepository, times(1)).deleteById(any());
     }
@@ -117,7 +123,10 @@ class SceneCaseServiceTest {
         Optional<SceneCase> optionalSceneCase = Optional.ofNullable(SceneCase.builder().build());
         when(sceneCaseRepository.findById(any())).thenReturn(optionalSceneCase);
         when(sceneCaseRepository.save(any(SceneCase.class))).thenReturn(sceneCase);
-        sceneCaseService.edit(UpdateSceneCaseDto.builder().build());
+        List<SceneCaseApiDto> sceneCaseApiDtoList = Lists.newArrayList(SceneCaseApiDto.builder().build());
+        when(sceneCaseApiService.listBySceneCaseId(any())).thenReturn(sceneCaseApiDtoList);
+        doNothing().when(sceneCaseApiService).edit(any());
+        sceneCaseService.edit(UpdateSceneCaseDto.builder().status(Constants.STATUS_VALID).build());
         verify(sceneCaseRepository, times(1)).save(any(SceneCase.class));
     }
 

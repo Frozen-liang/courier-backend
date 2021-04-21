@@ -103,7 +103,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public List<SceneCaseApiDto> list(String sceneCaseId) {
+    public List<SceneCaseApiDto> listBySceneCaseId(String sceneCaseId) {
         try {
             Example<SceneCaseApi> example = Example.of(
                 SceneCaseApi.builder().sceneCaseId(sceneCaseId).status(Constants.STATUS_VALID).build());
@@ -131,7 +131,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     private void updateSceneCaseApiSortOrder(String sceneCaseId, String currentUserId, SortOrderDto sortOrderDto) {
         Example<SceneCaseApi> example = Example.of(
-            SceneCaseApi.builder().sceneCaseId(sceneCaseId).apiId(sortOrderDto.getSceneCaseApiId()).build());
+            SceneCaseApi.builder().sceneCaseId(sceneCaseId).id(sortOrderDto.getSceneCaseApiId()).build());
         Optional<SceneCaseApi> sceneCaseApi = sceneCaseApiRepository.findOne(example);
         sceneCaseApi.ifPresent(caseApi -> {
             caseApi.setOrderNumber(sortOrderDto.getOrderNumber());
