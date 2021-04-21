@@ -9,10 +9,10 @@ import static java.util.stream.Collectors.toList;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.ErrorCode;
+import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.parser.DocumentTransformer;
 import com.sms.satp.parser.annotation.Reader;
 import com.sms.satp.parser.common.DocumentType;
-import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.parser.model.ApiInfo;
 import com.sms.satp.parser.model.ApiOperation;
 import com.sms.satp.parser.model.ApiPath;
@@ -40,7 +40,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
-
 
 @Reader(documentType = DocumentType.SWAGGER)
 @Slf4j

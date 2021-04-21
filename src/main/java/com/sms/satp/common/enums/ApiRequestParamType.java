@@ -18,6 +18,7 @@ public enum ApiRequestParamType implements EnumCommon {
             mappings.put(apiRequestParamType.getCode(), apiRequestParamType);
         }
     }
+
     ApiRequestParamType(int code) {
         this.code = code;
     }
@@ -27,7 +28,7 @@ public enum ApiRequestParamType implements EnumCommon {
         return this.code;
     }
 
-    public static ApiRequestParamType getType(int code){
+    public static ApiRequestParamType getType(int code) {
         return mappings.get(code);
     }
 }

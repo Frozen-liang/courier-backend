@@ -26,7 +26,7 @@ public enum ApiProtocol implements EnumCommon {
         return code;
     }
 
-    public static ApiProtocol getType(int code){
+    public static ApiProtocol getType(int code) {
         return mappings.get(code);
     }
 }

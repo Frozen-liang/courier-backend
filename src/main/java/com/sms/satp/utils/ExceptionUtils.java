@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.sms.satp.utils;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.ErrorCode;
 
 /**
- * 异常辅助工具类
+ * 异常辅助工具类.
  *
  * @author HCL
  * @since 2018-07-24
@@ -30,7 +31,7 @@ public final class ExceptionUtils {
     }
 
     /**
-     * 返回一个新的异常，统一构建，方便统一处理
+     * 返回一个新的异常，统一构建，方便统一处理.
      *
      * @param errorCode 消息
      * @param t         异常信息
@@ -41,7 +42,7 @@ public final class ExceptionUtils {
     }
 
     /**
-     * 重载的方法
+     * 重载的方法.
      *
      * @param errorCode 消息
      * @return 返回异常

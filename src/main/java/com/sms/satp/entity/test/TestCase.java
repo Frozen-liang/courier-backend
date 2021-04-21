@@ -1,7 +1,7 @@
 package com.sms.satp.entity.test;
 
-import com.sms.satp.entity.AuthInfo;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.entity.AuthInfo;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;

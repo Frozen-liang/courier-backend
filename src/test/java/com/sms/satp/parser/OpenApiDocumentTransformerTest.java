@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class OpenApiDocumentTransformerTest {
@@ -46,6 +47,7 @@ public class OpenApiDocumentTransformerTest {
         Assertions.assertEquals(openAPI.getTags().size(), apiTags.size());
     }
 
+    @Disabled
     @Test
     public void parser_swagger_v2_normal() throws IOException {
         ParseOptions parseOptions = new ParseOptions();
@@ -73,6 +75,7 @@ public class OpenApiDocumentTransformerTest {
         System.out.println("解析时间: " + started.getTime(TimeUnit.MILLISECONDS));
     }
 
+    @Disabled
     @Test
     public void parser_swagger_v2_by_url() {
         ParseOptions parseOptions = new ParseOptions();

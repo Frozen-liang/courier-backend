@@ -5,11 +5,11 @@ import static com.sms.satp.common.ErrorCode.GET_INTERFACE_HISTORY_LIST_ERROR;
 import static com.sms.satp.common.ErrorCode.SAVE_INTERFACE_HISTORY_ERROR;
 
 import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.InterfaceHistory;
 import com.sms.satp.entity.InterfaceShowInHistory;
 import com.sms.satp.mapper.InterfaceHistoryMapper;
-import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.repository.InterfaceHistoryRepository;
 import com.sms.satp.service.InterfaceHistoryService;
 import java.util.List;

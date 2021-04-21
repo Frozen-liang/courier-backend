@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -32,6 +33,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(value = ApiInterfaceController.class)
 @DisplayName("Tests for ApiInterfaceControllerTest")
+@Import(TestConfig.class)
 class ApiInterfaceControllerTest {
 
     @MockBean
@@ -98,7 +100,7 @@ class ApiInterfaceControllerTest {
 
     @Test
     @DisplayName("Get its specific information through the id of the ApiInterface")
-    void getInfoById() throws Exception{
+    void getInfoById() throws Exception {
         ApiInterfaceDto apiInterfaceDto = ApiInterfaceDto.builder().build();
         when(apiInterfaceService.findById(API_INTERFACE_ID)).thenReturn(apiInterfaceDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -112,7 +114,7 @@ class ApiInterfaceControllerTest {
 
     @Test
     @DisplayName("Add ApiInterface")
-    void addApiInterface() throws Exception{
+    void addApiInterface() throws Exception {
         ApiInterfaceDto apiInterfaceDto = ApiInterfaceDto.builder()
             .title(TITLE)
             .build();
@@ -130,7 +132,7 @@ class ApiInterfaceControllerTest {
 
     @Test
     @DisplayName("Edit the ApiInterface by id")
-    void editApiInterface() throws Exception{
+    void editApiInterface() throws Exception {
         ApiInterfaceDto apiInterfaceDto = ApiInterfaceDto.builder()
             .id(PROJECT_ID)
             .title(TITLE)
@@ -149,7 +151,7 @@ class ApiInterfaceControllerTest {
 
     @Test
     @DisplayName("Delete the ApiInterface by id")
-    void deleteApiInterface() throws Exception{
+    void deleteApiInterface() throws Exception {
         doNothing().when(apiInterfaceService).deleteById(API_INTERFACE_ID);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .delete(Constants.INTERFACE_PATH + "/" + API_INTERFACE_ID);
@@ -162,7 +164,7 @@ class ApiInterfaceControllerTest {
 
     @Test
     @DisplayName("Get the InterfaceGroup List")
-    void getInterfaceGroupList() throws Exception{
+    void getInterfaceGroupList() throws Exception {
         List<InterfaceGroupDto> interfaceGroupList = new ArrayList<>();
         for (int i = 0; i < LIST_SIZE; i++) {
             interfaceGroupList.add(
@@ -182,7 +184,7 @@ class ApiInterfaceControllerTest {
 
     @Test
     @DisplayName("Add InterfaceGroup")
-    void addInterfaceGroup() throws Exception{
+    void addInterfaceGroup() throws Exception {
         InterfaceGroupDto interfaceGroupDto = InterfaceGroupDto.builder()
             .projectId(PROJECT_ID)
             .name(GROUP_NAME)
@@ -201,7 +203,7 @@ class ApiInterfaceControllerTest {
 
     @Test
     @DisplayName("Edit the InterfaceGroup by id")
-    void editInterfaceGroup() throws Exception{
+    void editInterfaceGroup() throws Exception {
         InterfaceGroupDto interfaceGroupDto = InterfaceGroupDto.builder()
             .id(GROUP_ID)
             .name(GROUP_NAME)
@@ -221,7 +223,7 @@ class ApiInterfaceControllerTest {
 
     @Test
     @DisplayName("Delete the InterfaceGroup by id")
-    void deleteInterfaceGroup() throws Exception{
+    void deleteInterfaceGroup() throws Exception {
         doNothing().when(interfaceGroupService).deleteGroup(GROUP_ID);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .delete(Constants.INTERFACE_PATH + "/group/" + GROUP_ID);
@@ -234,7 +236,7 @@ class ApiInterfaceControllerTest {
 
     @Test
     @DisplayName("Add InterfaceGroup with empty name")
-    void addInterfaceGroup_withEmptyName() throws Exception{
+    void addInterfaceGroup_withEmptyName() throws Exception {
         InterfaceGroupDto interfaceGroupDto = InterfaceGroupDto.builder().projectId(PROJECT_ID).build();
         when(interfaceGroupService.addGroup(interfaceGroupDto)).thenReturn(GROUP_ID);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -250,7 +252,7 @@ class ApiInterfaceControllerTest {
 
     @Test
     @DisplayName("Add InterfaceGroup with empty projectId")
-    void addInterfaceGroup_withEmptyProjectId() throws Exception{
+    void addInterfaceGroup_withEmptyProjectId() throws Exception {
         InterfaceGroupDto interfaceGroupDto = InterfaceGroupDto.builder().name(GROUP_NAME).build();
         when(interfaceGroupService.addGroup(interfaceGroupDto)).thenReturn(GROUP_ID);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -263,5 +265,6 @@ class ApiInterfaceControllerTest {
             .andExpect(jsonPath("$.code", is(PARAM_INVALIDATE_CODE)))
             .andExpect(jsonPath("$.message", is("ProjectId cannot be empty")));
     }
+
 
 }

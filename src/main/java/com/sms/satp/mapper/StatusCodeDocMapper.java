@@ -16,5 +16,7 @@ public interface StatusCodeDocMapper {
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     StatusCodeDocDto toDto(StatusCodeDoc statusCodeDoc);
 
+    @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     StatusCodeDoc toEntity(StatusCodeDocDto statusCodeDocDto);
 }
