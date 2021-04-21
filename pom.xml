@@ -16,17 +16,17 @@
 
     <properties>
         <java.version>11</java.version>
-        <swagger.parser.version>2.0.24</swagger.parser.version>
-        <spring.doc.openapi.version>1.5.5</spring.doc.openapi.version>
+        <swagger.parser.version>2.0.25</swagger.parser.version>
+        <spring.doc.openapi.version>1.5.7</spring.doc.openapi.version>
         <spring.boot.admin.version>2.4.0</spring.boot.admin.version>
-        <rest.assured.version>4.3.3</rest.assured.version>
-        <commons.lang.version>3.11</commons.lang.version>
+        <commons.lang.version>3.12.0</commons.lang.version>
+        <commons.io.version>2.8.0</commons.io.version>
         <commons.collections4.version>4.4</commons.collections4.version>
         <org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
-        <io.vavr.version>0.10.2</io.vavr.version>
+        <io.vavr.version>0.10.3</io.vavr.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
-        <org.projectlombok.version>1.18.18</org.projectlombok.version>
-        <groovy.version>3.0.2</groovy.version>
+        <org.projectlombok.version>1.18.20</org.projectlombok.version>
+        <groovy.version>3.0.7</groovy.version>
         <jaxb.xml.version>3.0.0</jaxb.xml.version>
         <sonar.coverage.exclusions>
             **/entity/**.java,
@@ -54,7 +54,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
-
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -96,11 +95,18 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>io.swagger.parser.v3</groupId>
             <artifactId>swagger-parser</artifactId>
             <version>${swagger.parser.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-io</artifactId>
+                    <groupId>commons-io</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -111,6 +117,13 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons.lang.version}</version>
+        </dependency>
+
+        <dependency>
+            <scope>compile</scope>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons.io.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -162,6 +175,7 @@
             <artifactId>jaxb-osgi</artifactId>
             <version>${jaxb.xml.version}</version>
         </dependency>
+
     </dependencies>
     <repositories>
         <repository>

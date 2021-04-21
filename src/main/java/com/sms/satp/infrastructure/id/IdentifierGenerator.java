@@ -16,7 +16,6 @@
 
 package com.sms.satp.infrastructure.id;
 
-
 /**
  * Id生成器接口.
  *

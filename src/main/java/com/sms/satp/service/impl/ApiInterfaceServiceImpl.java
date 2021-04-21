@@ -167,7 +167,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     @Override
     public ApiInterfaceDto findById(String id) {
         try {
-            Optional<ApiInterface> optionalApiInterface = apiInterfaceRepository.findById(new ObjectId(id));
+            Optional<ApiInterface> optionalApiInterface = apiInterfaceRepository.findById(id);
             return apiInterfaceMapper.toDto(optionalApiInterface.orElse(null));
         } catch (Exception e) {
             log.error("Failed to get the ApiInterface by id!", e);
@@ -178,7 +178,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     @Override
     public void deleteById(String id) {
         try {
-            apiInterfaceRepository.deleteById(new ObjectId(id));
+            apiInterfaceRepository.deleteById(id);
         } catch (Exception e) {
             log.error("Failed to delete the ApiInterface!", e);
             throw new ApiTestPlatformException(DELETE_API_INTERFACE_BY_ID_ERROR);
@@ -324,8 +324,8 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                         String refKey = splitKeyFromRef(refString);
                         apiParameter.setSchema(apiSchemaMap.get(refKey));
                     });
-                    apiParameterOptional.map(ApiParameter::getSchema).map(ApiSchema::getItem)
-                        .map(ApiSchema::getRef).ifPresent(refString -> {
+                    apiParameterOptional.map(ApiParameter::getSchema).map(ApiSchema::getItem).map(ApiSchema::getRef)
+                        .ifPresent(refString -> {
                             String refKey = splitKeyFromRef(refString);
                             apiParameter.getSchema().setItem(apiSchemaMap.get(refKey));
                         });

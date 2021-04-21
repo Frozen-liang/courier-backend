@@ -29,7 +29,7 @@ public enum RequestMethod implements EnumCommon {
     }
 
     public static RequestMethod resolve(String method) {
-        return null;
+        return GET;
     }
 
     @Override
