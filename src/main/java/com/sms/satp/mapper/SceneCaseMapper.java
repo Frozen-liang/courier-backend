@@ -1,9 +1,9 @@
 package com.sms.satp.mapper;
 
 import com.sms.satp.entity.dto.AddSceneCaseDto;
-import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.dto.SceneCaseDto;
 import com.sms.satp.entity.dto.UpdateSceneCaseDto;
+import com.sms.satp.entity.scenetest.SceneCase;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
