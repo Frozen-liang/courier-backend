@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * 分布式高效有序 ID 生产黑科技(sequence).
  *
- * <p>优化开源项目：https://gitee.com/yu120/sequence</p>
+ * <p>优化开源项目：https://gitee.com/yu120/sequence</p>.
  *
  * @author hubin
  * @since 2016-08-18
@@ -83,8 +83,8 @@ public class Sequence {
     /**
      * 有参构造器.
      *
-     * @param workerId     工作机器 ID
-     * @param datacenterId 序列号
+     * @param workerId     工作机器 ID.
+     * @param datacenterId 序列号.
      */
     public Sequence(long workerId, long datacenterId) {
         Assert.isFalse(workerId > maxWorkerId || workerId < 0,
@@ -142,7 +142,7 @@ public class Sequence {
     /**
      * 获取下一个 ID.
      *
-     * @return 下一个 ID
+     * @return 下一个 ID.
      */
     public synchronized long nextId() {
         long timestamp = timeGen();
@@ -167,20 +167,20 @@ public class Sequence {
         }
 
         if (lastTimestamp == timestamp) {
-            // 相同毫秒内，序列号自增
+            // 相同毫秒内，序列号自增.
             sequence = (sequence + 1) & sequenceMask;
             if (sequence == 0) {
-                // 同一毫秒的序列数已经达到最大
+                // 同一毫秒的序列数已经达到最大.
                 timestamp = tilNextMillis(lastTimestamp);
             }
         } else {
-            // 不同毫秒内，序列号置为 1 - 3 随机数
+            // 不同毫秒内，序列号置为 1 - 3 随机数.
             sequence = ThreadLocalRandom.current().nextLong(1, 3);
         }
 
         lastTimestamp = timestamp;
 
-        // 时间戳部分 | 数据中心部分 | 机器标识部分 | 序列号部分
+        // 时间戳部分 | 数据中心部分 | 机器标识部分 | 序列号部分.
         return ((timestamp - twepoch) << timestampLeftShift)
             | (datacenterId << datacenterIdShift)
             | (workerId << workerIdShift)

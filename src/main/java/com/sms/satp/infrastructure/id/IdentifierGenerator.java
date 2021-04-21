@@ -29,7 +29,7 @@ public interface IdentifierGenerator {
     /**
      * 生成Id.
      *
-     * @param entity 实体
+     * @param entity 实体.
      * @return id
      */
     Number nextId(Object entity);
