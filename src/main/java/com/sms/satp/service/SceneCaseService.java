@@ -1,10 +1,10 @@
 package com.sms.satp.service;
 
 import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.scenetest.AddSceneCaseDto;
-import com.sms.satp.entity.scenetest.SceneCaseDto;
-import com.sms.satp.entity.scenetest.SceneCaseSearchDto;
-import com.sms.satp.entity.scenetest.UpdateSceneCaseDto;
+import com.sms.satp.entity.dto.AddSceneCaseDto;
+import com.sms.satp.entity.dto.SceneCaseDto;
+import com.sms.satp.entity.dto.SceneCaseSearchDto;
+import com.sms.satp.entity.dto.UpdateSceneCaseDto;
 import org.springframework.data.domain.Page;
 
 public interface SceneCaseService {

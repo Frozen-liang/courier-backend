@@ -1,4 +1,4 @@
-package com.sms.satp.entity.scenetest;
+package com.sms.satp.entity.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;

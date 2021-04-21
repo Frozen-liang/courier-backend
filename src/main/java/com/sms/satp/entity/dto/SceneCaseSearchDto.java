@@ -1,6 +1,5 @@
-package com.sms.satp.entity.scenetest;
+package com.sms.satp.entity.dto;
 
-import com.sms.satp.entity.dto.PageDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;

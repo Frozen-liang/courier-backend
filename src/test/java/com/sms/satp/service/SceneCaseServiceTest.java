@@ -4,11 +4,11 @@ import com.google.common.collect.Lists;
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.scenetest.AddSceneCaseDto;
+import com.sms.satp.entity.dto.AddSceneCaseDto;
 import com.sms.satp.entity.scenetest.SceneCase;
-import com.sms.satp.entity.scenetest.SceneCaseDto;
-import com.sms.satp.entity.scenetest.SceneCaseSearchDto;
-import com.sms.satp.entity.scenetest.UpdateSceneCaseDto;
+import com.sms.satp.entity.dto.SceneCaseDto;
+import com.sms.satp.entity.dto.SceneCaseSearchDto;
+import com.sms.satp.entity.dto.UpdateSceneCaseDto;
 import com.sms.satp.mapper.SceneCaseMapper;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.repository.SceneCaseRepository;
@@ -95,7 +95,7 @@ class SceneCaseServiceTest {
     @DisplayName("Test the deleteById method in the SceneCase service")
     void deleteById_test() {
         doNothing().when(sceneCaseRepository).deleteById(any());
-        sceneCaseService.deleteById(MOCK_ID.toString());
+        sceneCaseService.deleteById(MOCK_ID);
         verify(sceneCaseRepository, times(1)).deleteById(any());
     }
 
@@ -103,7 +103,7 @@ class SceneCaseServiceTest {
     @DisplayName("Test the deleteById method in the SceneCase service throws exception")
     void deleteById_test_thenThrownException() {
         doThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_ERROR)).when(sceneCaseRepository).deleteById(any());
-        assertThatThrownBy(() -> sceneCaseService.deleteById(MOCK_ID.toString()))
+        assertThatThrownBy(() -> sceneCaseService.deleteById(MOCK_ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 

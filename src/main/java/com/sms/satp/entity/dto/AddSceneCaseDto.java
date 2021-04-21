@@ -1,4 +1,4 @@
-package com.sms.satp.entity.scenetest;
+package com.sms.satp.entity.dto;
 
 import java.util.List;
 import javax.validation.constraints.NotNull;
