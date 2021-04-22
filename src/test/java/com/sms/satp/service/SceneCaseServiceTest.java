@@ -99,7 +99,7 @@ class SceneCaseServiceTest {
     void deleteById_test() {
         doNothing().when(sceneCaseRepository).deleteById(any());
         List<SceneCaseApiDto> sceneCaseApiDtoList = Lists.newArrayList(SceneCaseApiDto.builder().build());
-        when(sceneCaseApiService.listBySceneCaseId(any())).thenReturn(sceneCaseApiDtoList);
+        when(sceneCaseApiService.listBySceneCaseId(any(), any())).thenReturn(sceneCaseApiDtoList);
         doNothing().when(sceneCaseApiService).deleteById(any());
         sceneCaseService.deleteById(MOCK_ID);
         verify(sceneCaseRepository, times(1)).deleteById(any());
@@ -124,7 +124,7 @@ class SceneCaseServiceTest {
         when(sceneCaseRepository.findById(any())).thenReturn(optionalSceneCase);
         when(sceneCaseRepository.save(any(SceneCase.class))).thenReturn(sceneCase);
         List<SceneCaseApiDto> sceneCaseApiDtoList = Lists.newArrayList(SceneCaseApiDto.builder().build());
-        when(sceneCaseApiService.listBySceneCaseId(any())).thenReturn(sceneCaseApiDtoList);
+        when(sceneCaseApiService.listBySceneCaseId(any(), any())).thenReturn(sceneCaseApiDtoList);
         doNothing().when(sceneCaseApiService).edit(any());
         sceneCaseService.edit(UpdateSceneCaseDto.builder().status(Constants.STATUS_VALID).build());
         verify(sceneCaseRepository, times(1)).save(any(SceneCase.class));

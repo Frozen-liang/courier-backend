@@ -103,10 +103,10 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public List<SceneCaseApiDto> listBySceneCaseId(String sceneCaseId) {
+    public List<SceneCaseApiDto> listBySceneCaseId(String sceneCaseId, Integer status) {
         try {
             Example<SceneCaseApi> example = Example.of(
-                SceneCaseApi.builder().sceneCaseId(sceneCaseId).status(Constants.STATUS_VALID).build());
+                SceneCaseApi.builder().sceneCaseId(sceneCaseId).status(status).build());
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SearchFiled.ORDER_NUMBER.getFiledName());
             List<SceneCaseApi> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
             //query template case api

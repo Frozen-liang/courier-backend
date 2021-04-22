@@ -1,6 +1,7 @@
 package com.sms.satp.service;
 
 import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.constant.Constants;
 import com.sms.satp.entity.dto.AddSceneCaseApiDto;
 import com.sms.satp.entity.dto.SceneCaseApiDto;
 import com.sms.satp.entity.dto.SortOrderDto;
@@ -143,7 +144,8 @@ class SceneCaseApiServiceImplTest {
         when(sceneCaseApiRepository.findAll(any(), any(Sort.class))).thenReturn(sceneCaseApiList);
         SceneCaseApiDto dto = SceneCaseApiDto.builder().build();
         when(sceneCaseApiMapper.toSceneCaseApiDto(any())).thenReturn(dto);
-        List<SceneCaseApiDto> dtoList = sceneCaseApiService.listBySceneCaseId(MOCK_SCENE_CASE_ID);
+        List<SceneCaseApiDto> dtoList = sceneCaseApiService
+            .listBySceneCaseId(MOCK_SCENE_CASE_ID, Constants.STATUS_VALID);
         assertThat(dtoList).isNotEmpty();
     }
 
@@ -152,7 +154,7 @@ class SceneCaseApiServiceImplTest {
     void listBySceneCaseId_thenThrowException() {
         when(sceneCaseApiRepository.findAll(any(), any(Sort.class)))
             .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR));
-        assertThatThrownBy(() -> sceneCaseApiService.listBySceneCaseId(MOCK_SCENE_CASE_ID))
+        assertThatThrownBy(() -> sceneCaseApiService.listBySceneCaseId(MOCK_SCENE_CASE_ID, Constants.STATUS_VALID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
@@ -173,7 +175,7 @@ class SceneCaseApiServiceImplTest {
     void getSceneCaseApiById_testThrowException() {
         when(sceneCaseApiRepository.findById(any()))
             .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_API_BY_ID_ERROR));
-        assertThatThrownBy(()->sceneCaseApiService.getSceneCaseApiById(MOCK_ID));
+        assertThatThrownBy(() -> sceneCaseApiService.getSceneCaseApiById(MOCK_ID));
     }
 
     private UpdateSceneCaseApiSortOrderDto getUpdateSortOrder() {

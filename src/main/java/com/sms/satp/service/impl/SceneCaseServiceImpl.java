@@ -73,7 +73,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     public void deleteById(String id) {
         try {
             sceneCaseRepository.deleteById(id);
-            List<SceneCaseApiDto> sceneCaseApiDtoList = sceneCaseApiService.listBySceneCaseId(id);
+            List<SceneCaseApiDto> sceneCaseApiDtoList = sceneCaseApiService
+                .listBySceneCaseId(id, Constants.STATUS_INVALID);
             if (!sceneCaseApiDtoList.isEmpty()) {
                 deleteSceneCaseApi(sceneCaseApiDtoList);
             }
@@ -100,12 +101,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 sceneCase.setCreateUserName(sceneCaseFindById.getCreateUserName());
                 sceneCase.setProjectId(sceneCaseFindById.getProjectId());
                 sceneCase.setModifyDateTime(LocalDateTime.now());
-                sceneCase.setStatus(
-                    Objects.isNull(sceneCase.getStatus()) ? sceneCaseFindById.getStatus() : sceneCase.getStatus());
-                sceneCaseRepository.save(sceneCase);
                 if (!Objects.equals(sceneCase.getStatus(), sceneCaseFindById.getStatus())) {
-                    editSceneCaseApiStatus(sceneCase.getId(), sceneCase.getStatus(), sceneCaseDto.getModifyUserId());
+                    editSceneCaseApiStatus(sceneCase, sceneCaseFindById.getStatus(), sceneCaseDto.getModifyUserId());
+                    sceneCase.setStatus(
+                        Objects.isNull(sceneCase.getStatus()) ? sceneCaseFindById.getStatus() : sceneCase.getStatus());
                 }
+                sceneCaseRepository.save(sceneCase);
             });
         } catch (Exception e) {
             log.error("Failed to edit the SceneCase!", e);
@@ -144,11 +145,11 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         }
     }
 
-    private void editSceneCaseApiStatus(String sceneCaseId, Integer status, String modifyUserId) {
-        List<SceneCaseApiDto> sceneCaseApiDtoList = sceneCaseApiService.listBySceneCaseId(sceneCaseId);
+    private void editSceneCaseApiStatus(SceneCase sceneCase, Integer oldStatus, String modifyUserId) {
+        List<SceneCaseApiDto> sceneCaseApiDtoList = sceneCaseApiService.listBySceneCaseId(sceneCase.getId(), oldStatus);
         if (!sceneCaseApiDtoList.isEmpty()) {
             for (SceneCaseApiDto dto : sceneCaseApiDtoList) {
-                dto.setStatus(status);
+                dto.setStatus(sceneCase.getStatus());
                 sceneCaseApiService.edit(UpdateSceneCaseApiDto.builder()
                     .sceneCaseApiDto(dto)
                     .currentUserId(modifyUserId)

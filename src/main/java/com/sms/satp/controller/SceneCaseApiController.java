@@ -54,9 +54,10 @@ public class SceneCaseApiController {
         return Response.ok().build();
     }
 
-    @GetMapping(value = "/list/{sceneCaseId}")
-    public Response<List<SceneCaseApiDto>> listBySceneCaseId(@PathVariable String sceneCaseId) {
-        return Response.ok(sceneCaseApiService.listBySceneCaseId(sceneCaseId));
+    @GetMapping(value = "/list/{sceneCaseId}/{status}")
+    public Response<List<SceneCaseApiDto>> listBySceneCaseId(@PathVariable String sceneCaseId,
+        @PathVariable Integer status) {
+        return Response.ok(sceneCaseApiService.listBySceneCaseId(sceneCaseId, status));
     }
 
     @GetMapping(value = "/{id}")
