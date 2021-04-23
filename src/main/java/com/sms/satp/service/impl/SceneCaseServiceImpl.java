@@ -83,8 +83,6 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             optionalSceneCase.ifPresent(sceneCaseFindById -> {
                 sceneCase.setCreateUserId(sceneCaseFindById.getCreateUserId());
                 sceneCase.setCreateDateTime(sceneCaseFindById.getCreateDateTime());
-                sceneCase.setCreateUserName(sceneCaseFindById.getCreateUserName());
-                sceneCase.setProjectId(sceneCaseFindById.getProjectId());
                 if (!Objects.equals(sceneCase.isRemove(), sceneCaseFindById.isRemove())) {
                     editSceneCaseApiStatus(sceneCase, sceneCaseFindById.isRemove());
                 }

@@ -85,7 +85,7 @@ public enum ErrorCode {
     ADD_SCENE_CASE_API_ERROR("4077", "Failed to add the SceneCaseApi!"),
     DELETE_SCENE_CASE_API_ERROR("4078", "Failed to delete the SceneCaseApi!"),
     EDIT_SCENE_CASE_API_ERROR("4079", "Failed to edit the SceneCaseApi!"),
-    EDIT_SCENE_CASE_API_SORT_ORDER_ERROR("4080", "Failed to edit the SceneCaseApi sort order!"),
+    BATCH_EDIT_SCENE_CASE_API_ERROR("4080", "Failed to batch edit the SceneCaseApi!"),
     GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR("4081", "Failed to get the SceneCaseApi list by sceneCaseId!"),
     GET_SCENE_CASE_API_BY_ID_ERROR("4082", "Failed to get the SceneCaseApi by id!"),
     // 60001 describes the test exception

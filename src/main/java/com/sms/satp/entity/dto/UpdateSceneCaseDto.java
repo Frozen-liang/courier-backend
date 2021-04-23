@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 
 @Builder
 @Data
@@ -17,6 +16,8 @@ public class UpdateSceneCaseDto {
     @NotNull(message = "The id can not be empty")
     private String id;
     private String name;
+    private String createUserName;
+    private String projectId;
     private String groupId;
     private String testStatus;
     private List<String> caseTag;

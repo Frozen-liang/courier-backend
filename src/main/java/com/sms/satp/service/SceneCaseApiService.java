@@ -14,7 +14,7 @@ public interface SceneCaseApiService {
 
     void edit(SceneCaseApiDto sceneCaseApiDto);
 
-    void editSortOrder(UpdateSceneCaseApiSortOrderDto updateSceneCaseApiSortOrderDto);
+    void batchEdit(UpdateSceneCaseApiSortOrderDto updateSceneCaseApiSortOrderDto);
 
     List<SceneCaseApiDto> listBySceneCaseId(String sceneCaseId, boolean remove);
 

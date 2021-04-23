@@ -47,9 +47,9 @@ public class SceneCaseApiController {
         return Response.ok().build();
     }
 
-    @PutMapping(value = "/sort-order")
-    public Response editSortOrder(@Valid @RequestBody UpdateSceneCaseApiSortOrderDto updateSceneCaseApiSortOrderDto) {
-        sceneCaseApiService.editSortOrder(updateSceneCaseApiSortOrderDto);
+    @PutMapping(value = "/batch/edit")
+    public Response batchEdit(@Valid @RequestBody UpdateSceneCaseApiSortOrderDto updateSceneCaseApiSortOrderDto) {
+        sceneCaseApiService.batchEdit(updateSceneCaseApiSortOrderDto);
         return Response.ok().build();
     }
 
