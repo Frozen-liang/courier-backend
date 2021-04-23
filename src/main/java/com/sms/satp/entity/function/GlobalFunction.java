@@ -1,4 +1,4 @@
-package com.sms.satp.entity.env;
+package com.sms.satp.entity.function;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,23 +18,16 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 @AllArgsConstructor
 @Builder
 @Data
-@Document(collection = "GlobalEnvironment")
-public class GlobalEnvironment {
+@Document(collection = "GlobalFunction")
+public class GlobalFunction {
 
     @MongoId(FieldType.OBJECT_ID)
     private String id;
-    private String envName;
-    private String envDesc;
-    private String frontUri;
-    private EnvironmentAuth envAuth;
-    private String beforeInject;
-    private String afterInject;
-    private String globalBeforeProcess;
-    private String globalAfterProcess;
-    private List<EnvironmentHeader> headers;
-    private List<EnvironmentParam> params;
-    private List<EnvironmentParam> urlParams;
-    private List<EnvironmentParam> additionalParams;
+    private String functionDesc;
+    private String functionName;
+    private List<FunctionParam> functionParams;
+    private String functionCode;
+    private boolean remove;
     @CreatedBy
     private Long createUserId;
     @LastModifiedBy

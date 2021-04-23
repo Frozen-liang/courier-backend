@@ -17,7 +17,6 @@
 package com.sms.satp.infrastructure.id;
 
 import com.sms.satp.utils.Assert;
-import com.sms.satp.utils.StringPool;
 import com.sms.satp.utils.SystemClock;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
@@ -37,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class Sequence {
 
+    public static final String AT = "@";
     /**
      * 时间起始标记点，作为基准，一般取系统的最近时间（一旦确定不能变动）.
      */
@@ -106,7 +106,7 @@ public class Sequence {
             /*
              * GET jvmPid.
              */
-            mpid.append(name.split(StringPool.AT)[0]);
+            mpid.append(name.split(AT)[0]);
         }
         /*
          * MAC + PID 的 hashcode 获取16个低位.
@@ -149,10 +149,11 @@ public class Sequence {
         //闰秒
         if (timestamp < lastTimestamp) {
             long offset = lastTimestamp - timestamp;
-            if (offset <= 5) {
+            while (offset <= 5) {
                 try {
-                    wait(offset << 1);
+                    wait();
                     timestamp = timeGen();
+                    offset = lastTimestamp - timestamp;
                     if (timestamp < lastTimestamp) {
                         throw new RuntimeException(String
                             .format("Clock moved backwards.  Refusing to generate id for %d milliseconds", offset));
@@ -160,10 +161,8 @@ public class Sequence {
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-            } else {
-                throw new RuntimeException(
-                    String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", offset));
             }
+
         }
 
         if (lastTimestamp == timestamp) {
@@ -199,4 +198,7 @@ public class Sequence {
         return SystemClock.now();
     }
 
+    public static void main(String[] args) {
+
+    }
 }

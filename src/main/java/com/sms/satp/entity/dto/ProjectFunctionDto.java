@@ -1,8 +1,7 @@
 package com.sms.satp.entity.dto;
 
-import com.sms.satp.common.enums.ApiLabelType;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import com.sms.satp.entity.function.FunctionParam;
+import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,20 +10,21 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Builder
-public class ApiLabelDto {
+@Data
+public class ProjectFunctionDto {
 
     private String id;
-    @NotEmpty(message = "The projectId cannot be empty")
+    @NotEmpty(message = "ProjectId cannot be empty")
     private String projectId;
-    private String groupId;
-    @NotEmpty(message = "The labelName cannot be empty")
-    private String labelName;
-    private ApiLabelType labelType;
+    @NotEmpty(message = "FunctionDesc cannot be empty")
+    private String functionDesc;
+    @NotEmpty(message = "FunctionName cannot be empty")
+    private String functionName;
+    private List<FunctionParam> functionParams;
+    private String functionCode;
     private String createDateTime;
     private String modifyDateTime;
     private Long createUserId;
     private Long modifyUserId;
-
 }

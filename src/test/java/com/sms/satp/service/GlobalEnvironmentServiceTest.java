@@ -73,6 +73,7 @@ class GlobalEnvironmentServiceTest {
     @Test
     @DisplayName("An exception occurred while adding GlobalEnvironment")
     public void add_exception_test() {
+        when(globalEnvironmentMapper.toEntity(globalEnvironmentDto)).thenReturn(globalEnvironment);
         doThrow(new RuntimeException()).when(globalEnvironmentRepository).insert(any(GlobalEnvironment.class));
         assertThatThrownBy(() -> globalEnvironmentService.add(globalEnvironmentDto))
             .isInstanceOf(ApiTestPlatformException.class)
