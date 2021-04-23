@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.enums.ApiLabelType;
 import com.sms.satp.entity.dto.ApiLabelDto;
 import com.sms.satp.entity.ApiLabel;
 import com.sms.satp.mapper.ApiLabelMapper;
@@ -43,7 +44,7 @@ class ApiLabelServiceTest {
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String PROJECT_ID = "10";
     private static final String LABEL_NAME = "testName";
-    private static final Short LABEL_TYPE = 1;
+    private static final ApiLabelType LABEL_TYPE = ApiLabelType.getType(1);
 
     @Test
     @DisplayName("Test the findById method in the ApiLabel service")
@@ -77,6 +78,7 @@ class ApiLabelServiceTest {
     @Test
     @DisplayName("An exception occurred while adding ApiLabel")
     public void add_exception_test() {
+        when(apiLabelMapper.toEntity(apiLabelDto)).thenReturn(apiLabel);
         doThrow(new RuntimeException()).when(apiLabelRepository).insert(any(ApiLabel.class));
         assertThatThrownBy(() -> apiLabelService.add(apiLabelDto))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -112,7 +114,7 @@ class ApiLabelServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(ApiLabel.builder().build());
         }
-        when(apiLabelRepository.findAll(any(),any(Sort.class))).thenReturn(list);
+        when(apiLabelRepository.findAll(any(), any(Sort.class))).thenReturn(list);
         when(apiLabelMapper.toDto(apiLabel)).thenReturn(apiLabelDto);
         List<ApiLabelDto> result = apiLabelService.list(PROJECT_ID, LABEL_NAME, LABEL_TYPE);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
@@ -121,7 +123,7 @@ class ApiLabelServiceTest {
     @Test
     @DisplayName("An exception occurred while getting ApiLabel list")
     public void list_exception_test() {
-        doThrow(new RuntimeException()).when(apiLabelRepository).findAll(any(),any(Sort.class));
+        doThrow(new RuntimeException()).when(apiLabelRepository).findAll(any(), any(Sort.class));
         assertThatThrownBy(() -> apiLabelService.list(PROJECT_ID, LABEL_NAME, LABEL_TYPE))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_LABEL_LIST_ERROR.getCode());

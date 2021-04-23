@@ -1,6 +1,7 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
+import com.sms.satp.common.enums.ApiLabelType;
 import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.ApiLabelDto;
 import com.sms.satp.service.ApiLabelService;
@@ -33,7 +34,7 @@ public class ApiLabelController {
 
     @GetMapping("/list/{projectId}")
     public Response<List<ApiLabelDto>> list(@PathVariable("projectId") String projectId, String labelName,
-        Short labelType) {
+        ApiLabelType labelType) {
         return Response.ok(apiLabelService.list(projectId, labelName, labelType));
     }
 
