@@ -44,7 +44,7 @@ class ProjectEnvironmentControllerTest {
     private final static Integer PAGE_SIZE = 20;
     private final static String ID = "30";
     private final static String PROJECT_ID = "id";
-    private final static String PROJECT_NAME = "name";
+    private final static String EVN_NAME = "evnName";
 
     @Test
     @DisplayName("Query the page data for the ProjectEnvironment by default query criteria")
@@ -83,7 +83,7 @@ class ProjectEnvironmentControllerTest {
     @DisplayName("Add a ProjectEnvironment")
     void addProjectEnvironmentDto() throws Exception{
         ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder()
-            .name(PROJECT_NAME)
+            .envName(EVN_NAME)
             .build();
         doNothing().when(projectEnvironmentService).add(projectEnvironmentDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -102,7 +102,7 @@ class ProjectEnvironmentControllerTest {
     void editProjectEnvironmentDto() throws Exception{
         ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder()
             .id(PROJECT_ID)
-            .name(PROJECT_NAME)
+            .envName(EVN_NAME)
             .build();
         doNothing().when(projectEnvironmentService).edit(projectEnvironmentDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders

@@ -29,6 +29,8 @@ public class ProjectEnvironmentDto {
     private String globalAfterProcess;
     private String createDateTime;
     private String modifyDateTime;
+    private String createUserId;
+    private String modifyUserId;
     private List<EnvironmentHeader> headers;
     private List<EnvironmentParam> params;
     private List<EnvironmentParam> urlParams;

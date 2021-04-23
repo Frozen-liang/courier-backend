@@ -20,6 +20,7 @@ import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -77,11 +78,12 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID, GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
-            Example<ProjectEnvironment> example = Example.of(projectEnvironment,exampleMatcher);
+            Example<ProjectEnvironment> example = Example.of(projectEnvironment, exampleMatcher);
             List<GlobalEnvironmentDto> globalEnvironments = globalEnvironmentService.list();
             List<ProjectEnvironment> projectEnvironments = projectEnvironmentRepository.findAll(example, sort);
             result.addAll(globalEnvironments);
-            result.addAll(projectEnvironments);
+            result
+                .addAll(projectEnvironments.stream().map(projectEnvironmentMapper::toDto).collect(Collectors.toList()));
             return result;
         } catch (Exception e) {
             log.error("Failed to get the ProjectEnvironment list!", e);
@@ -110,8 +112,9 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
                 .toEntity(projectEnvironmentDto);
             Optional<ProjectEnvironment> projectEnvironmentOptional = projectEnvironmentRepository
                 .findById(projectEnvironment.getId());
-            projectEnvironmentOptional.ifPresent(projectEnvironmentFindById -> {
-                projectEnvironment.setCreateDateTime(projectEnvironmentFindById.getCreateDateTime());
+            projectEnvironmentOptional.ifPresent(oldProjectEnvironment -> {
+                projectEnvironment.setCreateDateTime(oldProjectEnvironment.getCreateDateTime());
+                projectEnvironment.setCreateUserId(oldProjectEnvironment.getCreateUserId());
                 projectEnvironmentRepository.save(projectEnvironment);
             });
         } catch (Exception e) {
@@ -135,7 +138,6 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
         try {
             Optional<ProjectEnvironment> projectEnvironmentOptional
                 = projectEnvironmentRepository.findById(id);
-
             return projectEnvironmentMapper.toDto(projectEnvironmentOptional.orElse(null));
         } catch (Exception e) {
             log.error("Failed to get the ProjectEnvironment by id!", e);
