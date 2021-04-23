@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.sms.satp.utils;
 
 import java.util.Collection;
@@ -23,7 +24,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * 断言类
+ * 断言类.
  *
  * @author miemie
  * @since 2018-07-24
@@ -31,7 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 public final class Assert {
 
     /**
-     * 断言这个 boolean 为 true
+     * 断言这个 boolean 为 true.
      * <p>为 false 则抛出异常</p>
      *
      * @param expression boolean 值
@@ -44,7 +45,7 @@ public final class Assert {
     }
 
     /**
-     * 断言这个 boolean 为 false
+     * 断言这个 boolean 为 false.
      * <p>为 true 则抛出异常</p>
      *
      * @param expression boolean 值
@@ -55,7 +56,7 @@ public final class Assert {
     }
 
     /**
-     * 断言这个 object 为 null
+     * 断言这个 object 为 null.
      * <p>不为 null 则抛异常</p>
      *
      * @param object  对象
@@ -66,7 +67,7 @@ public final class Assert {
     }
 
     /**
-     * 断言这个 object 不为 null
+     * 断言这个 object 不为 null.
      * <p>为 null 则抛异常</p>
      *
      * @param object  对象
@@ -77,7 +78,7 @@ public final class Assert {
     }
 
     /**
-     * 断言这个 value 不为 empty
+     * 断言这个 value 不为 empty.
      * <p>为 empty 则抛异常</p>
      *
      * @param value   字符串
@@ -88,7 +89,7 @@ public final class Assert {
     }
 
     /**
-     * 断言这个 collection 不为 empty
+     * 断言这个 collection 不为 empty.
      * <p>为 empty 则抛异常</p>
      *
      * @param collection 集合
@@ -99,7 +100,7 @@ public final class Assert {
     }
 
     /**
-     * 断言这个 map 不为 empty
+     * 断言这个 map 不为 empty.
      * <p>为 empty 则抛异常</p>
      *
      * @param map     集合
@@ -110,7 +111,7 @@ public final class Assert {
     }
 
     /**
-     * 断言这个 数组 不为 empty
+     * 断言这个 数组 不为 empty.
      * <p>为 empty 则抛异常</p>
      *
      * @param array   数组

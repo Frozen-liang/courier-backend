@@ -30,6 +30,8 @@ public class GlobalEnvironmentDto {
     private String globalAfterProcess;
     private String createDateTime;
     private String modifyDateTime;
+    private Long createUserId;
+    private Long modifyUserId;
     private List<EnvironmentHeader> headers;
     private List<EnvironmentParam> params;
     private List<EnvironmentParam> urlParams;

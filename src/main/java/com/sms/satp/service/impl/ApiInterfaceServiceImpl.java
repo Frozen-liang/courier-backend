@@ -11,6 +11,7 @@ import static com.sms.satp.utils.ApiSchemaUtil.removeSchemaMapRef;
 import static com.sms.satp.utils.ApiSchemaUtil.splitKeyFromRef;
 
 import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.entity.ApiInterface;
 import com.sms.satp.entity.ApiInterface.ApiInterfaceBuilder;
 import com.sms.satp.entity.DocumentImport;
@@ -27,7 +28,6 @@ import com.sms.satp.entity.dto.SelectDto;
 import com.sms.satp.mapper.ApiInterfaceMapper;
 import com.sms.satp.mapper.DocumentImportMapper;
 import com.sms.satp.parser.DocumentFactory;
-import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.parser.model.ApiDocument;
 import com.sms.satp.parser.model.ApiOperation;
 import com.sms.satp.parser.model.ApiParameter;
@@ -167,7 +167,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     @Override
     public ApiInterfaceDto findById(String id) {
         try {
-            Optional<ApiInterface> optionalApiInterface = apiInterfaceRepository.findById(new ObjectId(id));
+            Optional<ApiInterface> optionalApiInterface = apiInterfaceRepository.findById(id);
             return apiInterfaceMapper.toDto(optionalApiInterface.orElse(null));
         } catch (Exception e) {
             log.error("Failed to get the ApiInterface by id!", e);
@@ -178,7 +178,7 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
     @Override
     public void deleteById(String id) {
         try {
-            apiInterfaceRepository.deleteById(new ObjectId(id));
+            apiInterfaceRepository.deleteById(id);
         } catch (Exception e) {
             log.error("Failed to delete the ApiInterface!", e);
             throw new ApiTestPlatformException(DELETE_API_INTERFACE_BY_ID_ERROR);
@@ -324,11 +324,11 @@ public class ApiInterfaceServiceImpl implements ApiInterfaceService {
                         String refKey = splitKeyFromRef(refString);
                         apiParameter.setSchema(apiSchemaMap.get(refKey));
                     });
-                    apiParameterOptional.map(ApiParameter::getSchema).map(ApiSchema::getItem)
-                        .map(ApiSchema::getRef).ifPresent(refString -> {
-                        String refKey = splitKeyFromRef(refString);
-                        apiParameter.getSchema().setItem(apiSchemaMap.get(refKey));
-                    });
+                    apiParameterOptional.map(ApiParameter::getSchema).map(ApiSchema::getItem).map(ApiSchema::getRef)
+                        .ifPresent(refString -> {
+                            String refKey = splitKeyFromRef(refString);
+                            apiParameter.getSchema().setItem(apiSchemaMap.get(refKey));
+                        });
                     queryParams.add(ApiParameterConverter.CONVERT_TO_PARAMETER.apply(apiParameter));
                     break;
                 case PATH:

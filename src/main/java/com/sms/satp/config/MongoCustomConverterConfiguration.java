@@ -1,18 +1,21 @@
 package com.sms.satp.config;
 
+import com.sms.satp.common.enums.ApiLabelType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.EnumCommon;
 import com.sms.satp.common.enums.ParamType;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sun.istack.NotNull;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 
 @Configuration
@@ -23,8 +26,15 @@ public class MongoCustomConverterConfiguration {
         List<Converter<?, ?>> converters = List
             .of(EnumCommonToIntegerConverter.INSTANCE, IntegerToApiProtocolConverter.INSTANCE,
                 IntegerToApiRequestParamTypeConverter.INSTANCE, IntegerToApiStatusConverter.INSTANCE,
-                IntegerToParamTypeConverter.INSTANCE, IntegerToRequestMethodConverter.INSTANCE);
+                IntegerToParamTypeConverter.INSTANCE, IntegerToRequestMethodConverter.INSTANCE,
+                IntegerToApiLabelTypeConverter.INSTANCE);
         return new MongoCustomConversions(converters);
+    }
+
+    @Bean
+    AuditorAware<Long> auditorAware() {
+        // get createUserId and modifyUserId
+        return () -> Optional.of(1L);
     }
 
     @WritingConverter
@@ -82,4 +92,14 @@ public class MongoCustomConverterConfiguration {
             return RequestMethod.getType(code);
         }
     }
+
+    @ReadingConverter
+    enum IntegerToApiLabelTypeConverter implements Converter<Integer, ApiLabelType> {
+        INSTANCE;
+
+        public ApiLabelType convert(@NotNull Integer code) {
+            return ApiLabelType.getType(code);
+        }
+    }
+
 }

@@ -8,10 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 @Builder
 @Data
@@ -20,9 +20,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "ApiInterface")
 public class ApiInterface {
 
-    @Id
+    @MongoId(targetType = FieldType.OBJECT_ID)
     @JsonIgnore
-    private ObjectId id;
+    private String id;
     private RequestMethod method;
     private List<String> tag;
     @JsonIgnore

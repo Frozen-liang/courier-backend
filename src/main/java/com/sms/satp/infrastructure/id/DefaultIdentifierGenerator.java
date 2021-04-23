@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.sms.satp.infrastructure.id;
 
-
 /**
- * 默认生成器
+ * 默认生成器.
  *
  * @author sd-wangtaicheng@sdcncsi.com.cn nieqiuqiu
  * @since 2019-10-15
@@ -46,6 +46,7 @@ public class DefaultIdentifierGenerator implements IdentifierGenerator {
     }
 
     private static class IdentifierGeneratorHolder {
+
 
         private static final DefaultIdentifierGenerator INSTANCE = new DefaultIdentifierGenerator();
     }

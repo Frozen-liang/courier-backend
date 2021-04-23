@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.sms.satp.utils;
 
 import java.sql.Timestamp;
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 高并发场景下System.currentTimeMillis()的性能问题的优化
+ * 高并发场景下System.currentTimeMillis()的性能问题的优化.
  *
  * <p>System.currentTimeMillis()的调用比new一个普通对象要耗时的多（具体耗时高出多少我还没测试过，有人说是100倍左右）</p>
  * <p>System.currentTimeMillis()之所以慢是因为去跟系统打了一次交道</p>
