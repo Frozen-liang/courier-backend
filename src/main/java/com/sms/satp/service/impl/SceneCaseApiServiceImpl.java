@@ -9,11 +9,9 @@ import static com.sms.satp.common.ErrorCode.GET_SCENE_CASE_API_LIST_BY_SCENE_CAS
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.SearchFiled;
-import com.sms.satp.common.constant.Constants;
 import com.sms.satp.entity.dto.AddSceneCaseApiDto;
 import com.sms.satp.entity.dto.SceneCaseApiDto;
 import com.sms.satp.entity.dto.SortOrderDto;
-import com.sms.satp.entity.dto.UpdateSceneCaseApiDto;
 import com.sms.satp.entity.dto.UpdateSceneCaseApiSortOrderDto;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.SceneCaseApiMapper;
@@ -24,7 +22,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -48,10 +45,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             for (SceneCaseApiDto dto : addSceneCaseApiDto.getSceneCaseApiList()) {
                 SceneCaseApi caseApi = sceneCaseApiMapper.toSceneCaseApi(dto);
-                caseApi.setId(new ObjectId().toString());
                 caseApi.setSceneCaseId(addSceneCaseApiDto.getSceneCaseId());
-                caseApi.setStatus(Constants.STATUS_VALID);
-                caseApi.setCreateUserId(addSceneCaseApiDto.getCurrentUserId());
                 sceneCaseApiRepository.insert(caseApi);
             }
         } catch (Exception e) {
@@ -71,11 +65,9 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public void edit(UpdateSceneCaseApiDto updateSceneCaseApiDto) {
+    public void edit(SceneCaseApiDto sceneCaseApiDto) {
         try {
-            SceneCaseApiDto dto = updateSceneCaseApiDto.getSceneCaseApiDto();
-            SceneCaseApi sceneCaseApi = sceneCaseApiMapper.toSceneCaseApi(dto);
-            sceneCaseApi.setModifyUserId(updateSceneCaseApiDto.getCurrentUserId());
+            SceneCaseApi sceneCaseApi = sceneCaseApiMapper.toSceneCaseApi(sceneCaseApiDto);
             sceneCaseApiRepository.save(sceneCaseApi);
         } catch (Exception e) {
             log.error("Failed to edit the SceneCaseApi!", e);
@@ -88,12 +80,10 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             for (SortOrderDto sortOrderDto : updateSceneCaseApiSortOrderDto.getSortOrderDtoList()) {
                 if (Objects.nonNull(sortOrderDto.getSceneCaseApiId())) {
-                    updateSceneCaseApiSortOrder(updateSceneCaseApiSortOrderDto.getSceneCaseId(),
-                        updateSceneCaseApiSortOrderDto.getCurrentUserId(), sortOrderDto);
+                    updateSceneCaseApiSortOrder(updateSceneCaseApiSortOrderDto.getSceneCaseId(), sortOrderDto);
                 }
                 if (Objects.nonNull(sortOrderDto.getTemplateApiId())) {
-                    updateTemplateApiSortOrder(updateSceneCaseApiSortOrderDto.getSceneCaseId(),
-                        updateSceneCaseApiSortOrderDto.getCurrentUserId(), sortOrderDto);
+                    updateTemplateApiSortOrder(updateSceneCaseApiSortOrderDto.getSceneCaseId(), sortOrderDto);
                 }
             }
         } catch (Exception e) {
@@ -103,15 +93,27 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public List<SceneCaseApiDto> listBySceneCaseId(String sceneCaseId, Integer status) {
+    public List<SceneCaseApiDto> listBySceneCaseId(String sceneCaseId, boolean remove) {
         try {
             Example<SceneCaseApi> example = Example.of(
-                SceneCaseApi.builder().sceneCaseId(sceneCaseId).status(status).build());
+                SceneCaseApi.builder().sceneCaseId(sceneCaseId).remove(remove).build());
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SearchFiled.ORDER_NUMBER.getFiledName());
             List<SceneCaseApi> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
             //query template case api
 
             return sceneCaseApiList.stream().map(sceneCaseApiMapper::toSceneCaseApiDto).collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);
+            throw new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR);
+        }
+    }
+
+    @Override
+    public List<SceneCaseApi> listBySceneCaseId(String sceneCaseId) {
+        try {
+            Example<SceneCaseApi> example = Example.of(
+                SceneCaseApi.builder().sceneCaseId(sceneCaseId).build());
+            return sceneCaseApiRepository.findAll(example);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);
             throw new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR);
@@ -129,18 +131,17 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         }
     }
 
-    private void updateSceneCaseApiSortOrder(String sceneCaseId, String currentUserId, SortOrderDto sortOrderDto) {
+    private void updateSceneCaseApiSortOrder(String sceneCaseId, SortOrderDto sortOrderDto) {
         Example<SceneCaseApi> example = Example.of(
             SceneCaseApi.builder().sceneCaseId(sceneCaseId).id(sortOrderDto.getSceneCaseApiId()).build());
         Optional<SceneCaseApi> sceneCaseApi = sceneCaseApiRepository.findOne(example);
         sceneCaseApi.ifPresent(caseApi -> {
             caseApi.setOrderNumber(sortOrderDto.getOrderNumber());
-            caseApi.setModifyUserId(currentUserId);
             sceneCaseApiRepository.save(caseApi);
         });
     }
 
-    private void updateTemplateApiSortOrder(String sceneCaseId, String currentUserId, SortOrderDto sortOrderDto) {
+    private void updateTemplateApiSortOrder(String sceneCaseId, SortOrderDto sortOrderDto) {
         //edit template api sort order.
     }
 

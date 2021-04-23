@@ -15,6 +15,4 @@ public class AddSceneCaseApiDto {
     private String sceneCaseId;
 
     private List<SceneCaseApiDto> sceneCaseApiList;
-
-    private String currentUserId;
 }

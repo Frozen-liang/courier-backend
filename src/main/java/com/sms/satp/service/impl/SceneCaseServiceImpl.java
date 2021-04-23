@@ -7,27 +7,24 @@ import static com.sms.satp.common.ErrorCode.GET_SCENE_CASE_PAGE_ERROR;
 import static com.sms.satp.common.ErrorCode.SEARCH_SCENE_CASE_ERROR;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.common.constant.Constants;
 import com.sms.satp.entity.dto.AddSceneCaseDto;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.SceneCaseApiDto;
 import com.sms.satp.entity.dto.SceneCaseDto;
 import com.sms.satp.entity.dto.SceneCaseSearchDto;
-import com.sms.satp.entity.dto.UpdateSceneCaseApiDto;
 import com.sms.satp.entity.dto.UpdateSceneCaseDto;
 import com.sms.satp.entity.scenetest.SceneCase;
+import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.SceneCaseMapper;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.SceneCaseApiService;
 import com.sms.satp.service.SceneCaseService;
 import com.sms.satp.utils.PageDtoConverter;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -58,10 +55,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     public void add(AddSceneCaseDto sceneCaseDto) {
         try {
             SceneCase sceneCase = sceneCaseMapper.toAddSceneCase(sceneCaseDto);
-            sceneCase.setId(new ObjectId().toString());
-            sceneCase.setStatus(Constants.STATUS_VALID);
             //query user by "createUserId",write for filed createUserName.
-            sceneCase.setCreateDateTime(LocalDateTime.now());
             sceneCaseRepository.insert(sceneCase);
         } catch (Exception e) {
             log.error("Failed to add the SceneCase!", e);
@@ -73,20 +67,11 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     public void deleteById(String id) {
         try {
             sceneCaseRepository.deleteById(id);
-            List<SceneCaseApiDto> sceneCaseApiDtoList = sceneCaseApiService
-                .listBySceneCaseId(id, Constants.STATUS_INVALID);
-            if (!sceneCaseApiDtoList.isEmpty()) {
-                deleteSceneCaseApi(sceneCaseApiDtoList);
-            }
+            List<SceneCaseApi> sceneCaseApiList = sceneCaseApiService.listBySceneCaseId(id);
+            deleteSceneCaseApi(sceneCaseApiList);
         } catch (Exception e) {
             log.error("Failed to delete the SceneCase!", e);
             throw new ApiTestPlatformException(DELETE_SCENE_CASE_ERROR);
-        }
-    }
-
-    private void deleteSceneCaseApi(List<SceneCaseApiDto> sceneCaseApiDtoList) {
-        for (SceneCaseApiDto dto : sceneCaseApiDtoList) {
-            sceneCaseApiService.deleteById(dto.getId());
         }
     }
 
@@ -100,11 +85,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 sceneCase.setCreateDateTime(sceneCaseFindById.getCreateDateTime());
                 sceneCase.setCreateUserName(sceneCaseFindById.getCreateUserName());
                 sceneCase.setProjectId(sceneCaseFindById.getProjectId());
-                sceneCase.setModifyDateTime(LocalDateTime.now());
-                if (!Objects.equals(sceneCase.getStatus(), sceneCaseFindById.getStatus())) {
-                    editSceneCaseApiStatus(sceneCase, sceneCaseFindById.getStatus(), sceneCaseDto.getModifyUserId());
-                    sceneCase.setStatus(
-                        Objects.isNull(sceneCase.getStatus()) ? sceneCaseFindById.getStatus() : sceneCase.getStatus());
+                if (!Objects.equals(sceneCase.isRemove(), sceneCaseFindById.isRemove())) {
+                    editSceneCaseApiStatus(sceneCase, sceneCaseFindById.isRemove());
                 }
                 sceneCaseRepository.save(sceneCase);
             });
@@ -120,7 +102,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             PageDtoConverter.frontMapping(pageDto);
             SceneCase sceneCase = SceneCase.builder()
                 .projectId(projectId)
-                .status(Constants.STATUS_VALID)
+                .remove(Boolean.FALSE)
                 .build();
             Example<SceneCase> example = Example.of(sceneCase);
             Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
@@ -145,16 +127,17 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         }
     }
 
-    private void editSceneCaseApiStatus(SceneCase sceneCase, Integer oldStatus, String modifyUserId) {
-        List<SceneCaseApiDto> sceneCaseApiDtoList = sceneCaseApiService.listBySceneCaseId(sceneCase.getId(), oldStatus);
-        if (!sceneCaseApiDtoList.isEmpty()) {
-            for (SceneCaseApiDto dto : sceneCaseApiDtoList) {
-                dto.setStatus(sceneCase.getStatus());
-                sceneCaseApiService.edit(UpdateSceneCaseApiDto.builder()
-                    .sceneCaseApiDto(dto)
-                    .currentUserId(modifyUserId)
-                    .build());
-            }
+    private void deleteSceneCaseApi(List<SceneCaseApi> sceneCaseApiList) {
+        for (SceneCaseApi sceneCaseApi : sceneCaseApiList) {
+            sceneCaseApiService.deleteById(sceneCaseApi.getId());
+        }
+    }
+
+    private void editSceneCaseApiStatus(SceneCase sceneCase, boolean oldRemove) {
+        List<SceneCaseApiDto> sceneCaseApiDtoList = sceneCaseApiService.listBySceneCaseId(sceneCase.getId(), oldRemove);
+        for (SceneCaseApiDto dto : sceneCaseApiDtoList) {
+            dto.setRemove(sceneCase.isRemove());
+            sceneCaseApiService.edit(dto);
         }
     }
 

@@ -39,7 +39,7 @@ public class SceneCaseApiDto {
     private String matchRule;
     private Integer orderNumber;
     private Integer isExecute;
-    private Integer status;
+    private boolean remove;
     private String createUserId;
     private LocalDateTime createDateTime;
     private String modifyUserId;

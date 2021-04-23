@@ -21,7 +21,4 @@ public class AddSceneCaseDto {
     private String groupId;
     private List<String> caseTag;
     private int priority;
-    @NotNull(message = "The createUserId can not be empty")
-    private String createUserId;
-
 }

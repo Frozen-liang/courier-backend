@@ -14,7 +14,7 @@ public class SceneCaseSearchDto extends PageDto {
 
     private String name;
     private String groupId;
-    private Integer status;
+    private boolean remove;
     private List<String> testStatus;
     private List<String> caseTag;
     private List<Integer> priority;

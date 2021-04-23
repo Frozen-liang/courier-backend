@@ -21,7 +21,5 @@ public class UpdateSceneCaseDto {
     private String testStatus;
     private List<String> caseTag;
     private Integer priority;
-    private Integer status;
-    @NotNull(message = "The modifyUserId can not be empty")
-    private String modifyUserId;
+    private boolean remove;
 }

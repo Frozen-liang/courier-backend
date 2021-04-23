@@ -21,7 +21,7 @@ public class SceneCaseDto {
     private String testStatus;
     private List<String> caseTag;
     private Integer priority;
-    private Integer status;
+    private boolean remove;
     private LocalDateTime createDateTime;
     private LocalDateTime modifyDateTime;
 }

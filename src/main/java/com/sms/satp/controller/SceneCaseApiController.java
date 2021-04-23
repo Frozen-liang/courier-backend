@@ -4,7 +4,6 @@ import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.AddSceneCaseApiDto;
 import com.sms.satp.entity.dto.SceneCaseApiDto;
-import com.sms.satp.entity.dto.UpdateSceneCaseApiDto;
 import com.sms.satp.entity.dto.UpdateSceneCaseApiSortOrderDto;
 import com.sms.satp.service.SceneCaseApiService;
 import java.util.List;
@@ -43,8 +42,8 @@ public class SceneCaseApiController {
     }
 
     @PutMapping
-    public Response edit(@Valid @RequestBody UpdateSceneCaseApiDto updateSceneCaseApiDto) {
-        sceneCaseApiService.edit(updateSceneCaseApiDto);
+    public Response edit(@Valid @RequestBody SceneCaseApiDto sceneCaseApiDto) {
+        sceneCaseApiService.edit(sceneCaseApiDto);
         return Response.ok().build();
     }
 
@@ -54,10 +53,10 @@ public class SceneCaseApiController {
         return Response.ok().build();
     }
 
-    @GetMapping(value = "/list/{sceneCaseId}/{status}")
+    @GetMapping(value = "/list/{sceneCaseId}/{remove}")
     public Response<List<SceneCaseApiDto>> listBySceneCaseId(@PathVariable String sceneCaseId,
-        @PathVariable Integer status) {
-        return Response.ok(sceneCaseApiService.listBySceneCaseId(sceneCaseId, status));
+        @PathVariable boolean remove) {
+        return Response.ok(sceneCaseApiService.listBySceneCaseId(sceneCaseId, remove));
     }
 
     @GetMapping(value = "/{id}")

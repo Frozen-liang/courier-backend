@@ -20,7 +20,4 @@ public class UpdateSceneCaseApiSortOrderDto {
     @NotNull(message = "The sceneCaseId can not be empty")
     private String sceneCaseId;
 
-    @NotNull(message = "The currentUserId can not be empty")
-    private String currentUserId;
-
 }
