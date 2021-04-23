@@ -5,7 +5,8 @@ import org.springframework.util.DigestUtils;
 
 public class MD5Util {
 
-    private MD5Util() {}
+    private MD5Util() {
+    }
 
     public static String getMD5(Object o) {
         try {

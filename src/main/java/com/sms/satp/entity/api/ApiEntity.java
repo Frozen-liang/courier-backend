@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -28,6 +29,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 public class ApiEntity {
 
     @MongoId(FieldType.OBJECT_ID)
+    @Indexed(unique = true)
     private String id;
 
     @Field(targetType = FieldType.OBJECT_ID)
@@ -59,8 +61,10 @@ public class ApiEntity {
     private String postInject;
 
     private String swaggerId;
+
     @CreatedBy
     private Long createUserId;
+
     @CreatedDate
     private LocalDateTime createTime;
     @LastModifiedDate

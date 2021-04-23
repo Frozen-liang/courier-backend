@@ -5,7 +5,8 @@ import java.io.IOException;
 
 public class JsonUtils {
 
-    private JsonUtils() {}
+    private JsonUtils() {
+    }
 
     static ObjectMapper mapper = new ObjectMapper();
 

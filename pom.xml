@@ -37,6 +37,7 @@
             **/engine/model/**.java,
             **/engine/auth/**.java,
             **/parser/schema/**.java
+            **/repository/**.java
         </sonar.coverage.exclusions>
         <sonar.issue.ignore.multicriteria>e1,e2</sonar.issue.ignore.multicriteria>
         <sonar.issue.ignore.multicriteria.e1.ruleKey>squid:S4823</sonar.issue.ignore.multicriteria.e1.ruleKey>
@@ -262,8 +263,7 @@
                     <consoleOutput>true</consoleOutput>
                     <failOnViolation>true</failOnViolation>
                     <failsOnError>true</failsOnError>
-                    <violationSeverity>warning
-                    </violationSeverity><!-- error, warning, info, ignore -->
+                    <violationSeverity>warning</violationSeverity><!-- error, warning, info, ignore -->
                 </configuration>
                 <dependencies>
                     <dependency>
