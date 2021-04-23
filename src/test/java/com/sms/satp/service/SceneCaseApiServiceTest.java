@@ -58,7 +58,7 @@ class SceneCaseApiServiceTest {
         AddSceneCaseApiDto addSceneCaseApiDto = getAddDto();
         SceneCaseApi caseApi = SceneCaseApi.builder().build();
         List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(caseApi);
-        when(sceneCaseApiMapper.toSceneCaseApi(any())).thenReturn(caseApi);
+        when(sceneCaseApiMapper.toSceneCaseApiList(any())).thenReturn(sceneCaseApiList);
         when(sceneCaseApiRepository.insert(any(List.class))).thenReturn(sceneCaseApiList);
         sceneCaseApiService.batch(addSceneCaseApiDto);
         verify(sceneCaseApiRepository, times(1)).insert(any(List.class));
@@ -69,7 +69,8 @@ class SceneCaseApiServiceTest {
     void batch_test_thenThrowException() {
         AddSceneCaseApiDto addSceneCaseApiDto = getAddDto();
         SceneCaseApi caseApi = SceneCaseApi.builder().build();
-        when(sceneCaseApiMapper.toSceneCaseApi(any())).thenReturn(caseApi);
+        List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(caseApi);
+        when(sceneCaseApiMapper.toSceneCaseApiList(any())).thenReturn(sceneCaseApiList);
         when(sceneCaseApiRepository.insert(any(List.class)))
             .thenThrow(new ApiTestPlatformException(ADD_SCENE_CASE_API_ERROR));
         assertThatThrownBy(() -> sceneCaseApiService.batch(addSceneCaseApiDto))

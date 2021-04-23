@@ -42,8 +42,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     public void batch(AddSceneCaseApiDto addSceneCaseApiDto) {
         try {
             List<SceneCaseApi> caseApiList =
-                addSceneCaseApiDto.getSceneCaseApiList().stream().map(sceneCaseApiMapper::toSceneCaseApi).collect(
-                    Collectors.toList());
+                sceneCaseApiMapper.toSceneCaseApiList(addSceneCaseApiDto.getSceneCaseApiList());
             sceneCaseApiRepository.insert(caseApiList);
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseApi!", e);
@@ -76,10 +75,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     public void batchEdit(UpdateSceneCaseApiSortOrderDto updateSceneCaseApiSortOrderDto) {
         try {
             if (!updateSceneCaseApiSortOrderDto.getSceneCaseApiDtoList().isEmpty()) {
-                List<SceneCaseApi> caseApiList =
-                    updateSceneCaseApiSortOrderDto.getSceneCaseApiDtoList().stream()
-                        .map(sceneCaseApiMapper::toSceneCaseApi).collect(
-                        Collectors.toList());
+                List<SceneCaseApi> caseApiList = sceneCaseApiMapper
+                    .toSceneCaseApiList(updateSceneCaseApiSortOrderDto.getSceneCaseApiDtoList());
                 sceneCaseApiRepository.saveAll(caseApiList);
             }
             //edit template case api list
