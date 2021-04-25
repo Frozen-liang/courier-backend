@@ -2,13 +2,14 @@ package com.sms.satp.service;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.common.constant.Constants;
+import com.sms.satp.entity.dto.AddSceneCaseDto;
 import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.scenetest.AddSceneCaseDto;
+import com.sms.satp.entity.dto.SceneCaseApiDto;
+import com.sms.satp.entity.dto.SceneCaseDto;
+import com.sms.satp.entity.dto.SceneCaseSearchDto;
+import com.sms.satp.entity.dto.UpdateSceneCaseDto;
 import com.sms.satp.entity.scenetest.SceneCase;
-import com.sms.satp.entity.scenetest.SceneCaseDto;
-import com.sms.satp.entity.scenetest.SceneCaseSearchDto;
-import com.sms.satp.entity.scenetest.UpdateSceneCaseDto;
+import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.SceneCaseMapper;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.repository.SceneCaseRepository;
@@ -32,6 +33,7 @@ import static com.sms.satp.common.ErrorCode.SEARCH_SCENE_CASE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -46,12 +48,13 @@ class SceneCaseServiceTest {
     private CustomizedSceneCaseRepository customizedSceneCaseRepository;
     private SceneCaseMapper sceneCaseMapper;
     private SceneCaseServiceImpl sceneCaseService;
+    private SceneCaseApiService sceneCaseApiService;
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
     private final static String MOCK_PROJECT_ID = "1";
     private final static String MOCK_GROUP_ID = "1";
-    private final static String MOCK_CREATE_USER_ID = "1";
+    private final static Long MOCK_CREATE_USER_ID = 1L;
     private final static Integer MOCK_PAGE = 1;
     private final static Integer MOCK_SIZE = 1;
     private final static long MOCK_TOTAL = 1L;
@@ -62,8 +65,9 @@ class SceneCaseServiceTest {
         sceneCaseRepository = mock(SceneCaseRepository.class);
         customizedSceneCaseRepository = mock(CustomizedSceneCaseRepository.class);
         sceneCaseMapper = mock(SceneCaseMapper.class);
+        sceneCaseApiService = mock(SceneCaseApiService.class);
         sceneCaseService = new SceneCaseServiceImpl(sceneCaseRepository, customizedSceneCaseRepository,
-            sceneCaseMapper);
+            sceneCaseMapper, sceneCaseApiService);
     }
 
     @Test
@@ -95,7 +99,10 @@ class SceneCaseServiceTest {
     @DisplayName("Test the deleteById method in the SceneCase service")
     void deleteById_test() {
         doNothing().when(sceneCaseRepository).deleteById(any());
-        sceneCaseService.deleteById(MOCK_ID.toString());
+        List<SceneCaseApi> sceneCaseApiDtoList = Lists.newArrayList(SceneCaseApi.builder().build());
+        when(sceneCaseApiService.listBySceneCaseId(any())).thenReturn(sceneCaseApiDtoList);
+        doNothing().when(sceneCaseApiService).deleteById(any());
+        sceneCaseService.deleteById(MOCK_ID);
         verify(sceneCaseRepository, times(1)).deleteById(any());
     }
 
@@ -103,7 +110,7 @@ class SceneCaseServiceTest {
     @DisplayName("Test the deleteById method in the SceneCase service throws exception")
     void deleteById_test_thenThrownException() {
         doThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_ERROR)).when(sceneCaseRepository).deleteById(any());
-        assertThatThrownBy(() -> sceneCaseService.deleteById(MOCK_ID.toString()))
+        assertThatThrownBy(() -> sceneCaseService.deleteById(MOCK_ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
@@ -112,12 +119,16 @@ class SceneCaseServiceTest {
     void edit_test() {
         SceneCase sceneCase =
             SceneCase.builder().id(MOCK_ID).modifyUserId(MOCK_CREATE_USER_ID).name(MOCK_NAME)
-                .status(Constants.STATUS_VALID).build();
+                .remove(Boolean.FALSE).build();
         when(sceneCaseMapper.toUpdateSceneCase(any())).thenReturn(sceneCase);
-        Optional<SceneCase> optionalSceneCase = Optional.ofNullable(SceneCase.builder().build());
+        Optional<SceneCase> optionalSceneCase = Optional.ofNullable(SceneCase.builder().remove(Boolean.TRUE).build());
         when(sceneCaseRepository.findById(any())).thenReturn(optionalSceneCase);
         when(sceneCaseRepository.save(any(SceneCase.class))).thenReturn(sceneCase);
-        sceneCaseService.edit(UpdateSceneCaseDto.builder().build());
+        List<SceneCaseApiDto> sceneCaseApiDtoList = Lists
+            .newArrayList(SceneCaseApiDto.builder().id(MOCK_ID).build());
+        when(sceneCaseApiService.listBySceneCaseId(any(), anyBoolean())).thenReturn(sceneCaseApiDtoList);
+        doNothing().when(sceneCaseApiService).edit(any());
+        sceneCaseService.edit(UpdateSceneCaseDto.builder().remove(Boolean.FALSE).build());
         verify(sceneCaseRepository, times(1)).save(any(SceneCase.class));
     }
 
@@ -126,7 +137,7 @@ class SceneCaseServiceTest {
     void edit_test_thenThrownException() {
         SceneCase sceneCase =
             SceneCase.builder().id(MOCK_ID).modifyUserId(MOCK_CREATE_USER_ID).name(MOCK_NAME)
-                .status(Constants.STATUS_VALID).build();
+                .remove(Boolean.FALSE).build();
         when(sceneCaseMapper.toUpdateSceneCase(any())).thenReturn(sceneCase);
         Optional<SceneCase> optionalSceneCase = Optional.ofNullable(SceneCase.builder().build());
         when(sceneCaseRepository.findById(any())).thenReturn(optionalSceneCase);

@@ -1,11 +1,11 @@
-package com.sms.satp.entity.api;
+package com.sms.satp.entity.scenetest;
 
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
-import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.RequestMethod;
-import com.sms.satp.entity.api.common.HeaderInfo;
-import com.sms.satp.entity.api.common.ParamInfo;
+import com.sms.satp.entity.test.CaseHeader;
+import com.sms.satp.entity.test.CaseParameter;
+import com.sms.satp.entity.test.CaseRequestBody;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -14,29 +14,28 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-@Builder
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "Api")
-public class ApiEntity {
+@Document(collection = "SceneCaseApi")
+public class SceneCaseApi {
 
-    @MongoId(FieldType.OBJECT_ID)
-    @Indexed(unique = true)
+    @MongoId(value = FieldType.OBJECT_ID)
     private String id;
 
     @Field(targetType = FieldType.OBJECT_ID)
-    private String projectId;
+    private String apiId;
 
     @Field(targetType = FieldType.OBJECT_ID)
-    private String groupId;
+    private String sceneCaseId;
 
     private String apiName;
 
@@ -48,27 +47,37 @@ public class ApiEntity {
 
     private ApiRequestParamType apiRequestParamType;
 
-    private List<HeaderInfo> headerInfo;
+    private CaseRequestBody requestBody;
 
-    private List<ParamInfo> paramInfo;
+    private List<CaseHeader> requestHeaders;
 
-    private ApiStatus apiStatus;
+    private List<CaseParameter> queryParams;
 
-    private boolean removed;
+    private List<CaseParameter> pathParams;
 
     private String preInject;
 
     private String postInject;
 
-    private String swaggerId;
+    private ApiRequestParamType apiResponseParamType;
 
+    private List<CaseHeader> responseHeaders;
+
+    private List<CaseParameter> responseParams;
+
+    private String matchRule;
+
+    private Integer orderNumber;
+
+    private Integer isExecute;
+
+    private boolean remove;
     @CreatedBy
     private Long createUserId;
-
     @CreatedDate
-    private LocalDateTime createTime;
+    private LocalDateTime createDateTime;
+    @LastModifiedBy
+    private Long modifyUserId;
     @LastModifiedDate
-    private LocalDateTime modifyTime;
-
-
+    private LocalDateTime modifyDateTime;
 }

@@ -1,4 +1,4 @@
-package com.sms.satp.entity.scenetest;
+package com.sms.satp.entity.dto;
 
 import java.util.List;
 import javax.validation.constraints.NotNull;
@@ -11,17 +11,16 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddSceneCaseDto {
+public class UpdateSceneCaseDto {
 
-    @NotNull(message = "The name can not be empty")
+    @NotNull(message = "The id can not be empty")
+    private String id;
     private String name;
-    @NotNull(message = "The projectId can not be empty")
+    private String createUserName;
     private String projectId;
-    @NotNull(message = "The groupId can not be empty")
     private String groupId;
+    private String testStatus;
     private List<String> caseTag;
-    private int priority;
-    @NotNull(message = "The createUserId can not be empty")
-    private String createUserId;
-
+    private Integer priority;
+    private boolean remove;
 }
