@@ -1,27 +1,29 @@
 package com.sms.satp.parser.common;
 
+import com.sms.satp.common.enums.ParamType;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.lang.Nullable;
 
 public enum SchemaType {
 
-    STRING("string"),
-    INT("integer"),
-    LONG("long"),
-    OBJECT("object"),
-    DOUBLE("double"),
-    BOOLEAN("boolean"),
-    DATE("date"),
-    DATETIME("datetime"),
-    FLOAT("float"),
-    JSON("json"),
-    NUMBER("number"),
-    FILE("file"),
-    ARRAY("array");
+    STRING("string", ParamType.STRING),
+    INT("integer", ParamType.INT),
+    LONG("long", ParamType.LONG),
+    OBJECT("object", ParamType.OBJECT),
+    DOUBLE("double", ParamType.DOUBLE),
+    BOOLEAN("boolean", ParamType.BOOLEAN),
+    DATE("date", ParamType.DATE),
+    DATETIME("datetime", ParamType.DATETIME),
+    FLOAT("float", ParamType.FLOAT),
+    JSON("json", ParamType.JSON),
+    NUMBER("number", ParamType.NUMBER),
+    FILE("file", ParamType.FILE),
+    ARRAY("array", ParamType.ARRAY);
 
 
     private String type;
+    private ParamType paramType;
     private static final Map<String, SchemaType> mappings = new HashMap<>(16);
     private static final Map<String, String> SPECIAL_TYPE = new HashMap<>();
 
@@ -46,16 +48,21 @@ public enum SchemaType {
         return resolve(SPECIAL_TYPE.getOrDefault(format, type));
     }
 
+    SchemaType(String type, ParamType paramType) {
+        this.type = type;
+        this.paramType = paramType;
+    }
+
     public boolean matches(String type) {
         return (this == resolve(type));
     }
 
-    SchemaType(String type) {
-        this.type = type;
-    }
 
     public String getType() {
         return type;
     }
 
+    public ParamType getParamType() {
+        return paramType;
+    }
 }
