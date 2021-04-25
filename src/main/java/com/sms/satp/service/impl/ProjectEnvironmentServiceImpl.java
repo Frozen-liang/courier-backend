@@ -42,6 +42,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     private final ProjectEnvironmentMapper projectEnvironmentMapper;
     private static final String CREATE_DATE_TIME = "createDateTime";
     private static final String PROJECT_ID = "projectId";
+    private static final String REMOVE = "remove";
 
     public ProjectEnvironmentServiceImpl(ProjectEnvironmentRepository
         projectEnvironmentRepository, GlobalEnvironmentService globalEnvironmentService,
@@ -78,6 +79,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
             List<Object> result = new ArrayList<>();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID, GenericPropertyMatchers.exact())
+                .withMatcher(REMOVE, GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
             Example<ProjectEnvironment> example = Example.of(projectEnvironment, exampleMatcher);
             List<GlobalEnvironmentDto> globalEnvironments = globalEnvironmentService.list();

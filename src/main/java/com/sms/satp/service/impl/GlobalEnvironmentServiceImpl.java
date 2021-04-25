@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,7 +25,6 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
 
     private final GlobalEnvironmentRepository globalEnvironmentRepository;
     private final GlobalEnvironmentMapper globalEnvironmentMapper;
-    private static final String CREATE_DATE_TIME = "createDateTime";
 
     public GlobalEnvironmentServiceImpl(GlobalEnvironmentRepository globalEnvironmentRepository,
         GlobalEnvironmentMapper globalEnvironmentMapper) {
@@ -78,9 +75,9 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     @Override
     public List<GlobalEnvironmentDto> list() {
         try {
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
-            return globalEnvironmentRepository.findAll(sort).stream().map(globalEnvironmentMapper::toDto).collect(
-                Collectors.toList());
+            List<GlobalEnvironment> globalEnvironments = globalEnvironmentRepository
+                .findByRemoveOrderByCreateDateTimeDesc(Boolean.FALSE);
+            return globalEnvironments.stream().map(globalEnvironmentMapper::toDto).collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Failed to get the GlobalEnvironment list!", e);
             throw new ApiTestPlatformException(GET_GLOBAL_ENVIRONMENT_LIST_ERROR);
