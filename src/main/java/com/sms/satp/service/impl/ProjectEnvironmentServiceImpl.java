@@ -9,15 +9,16 @@ import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.dto.GlobalEnvironmentDto;
-import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.ProjectEnvironmentDto;
+import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
 import com.sms.satp.service.GlobalEnvironmentService;
 import com.sms.satp.service.ProjectEnvironmentService;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -124,9 +125,12 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
-    public void deleteById(String id) {
+    public void delete(String[] ids) {
         try {
-            projectEnvironmentRepository.deleteById(id);
+            Iterable<ProjectEnvironment> projectEnvironments = projectEnvironmentRepository
+                .findAllById(Arrays.asList(ids));
+            projectEnvironments.forEach(projectEnvironment -> projectEnvironment.setRemove(Boolean.TRUE));
+            projectEnvironmentRepository.saveAll(projectEnvironments);
         } catch (Exception e) {
             log.error("Failed to delete the projectEnvironment!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR);

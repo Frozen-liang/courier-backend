@@ -89,6 +89,7 @@ public enum ErrorCode {
     GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR("4081", "Failed to get the SceneCaseApi list by sceneCaseId!"),
     GET_SCENE_CASE_API_BY_ID_ERROR("4082", "Failed to get the SceneCaseApi by id!"),
     GET_PROJECT_ENVIRONMENT_LIST_ERROR("4083","Failed to get the ProjectEnvironment page!"),
+    DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID("4084","Failed to delete the GlobalEnvironment!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

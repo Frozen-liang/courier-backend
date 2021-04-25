@@ -11,6 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
@@ -23,7 +24,9 @@ public class ApiLabel {
 
     @MongoId(FieldType.OBJECT_ID)
     private String id;
+    @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
+    @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
     private String labelName;
     private ApiLabelType labelType;

@@ -1,6 +1,7 @@
 package com.sms.satp.service.impl;
 
 import static com.sms.satp.common.ErrorCode.ADD_GLOBAL_ENVIRONMENT_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID;
 import static com.sms.satp.common.ErrorCode.EDIT_GLOBAL_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_GLOBAL_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_GLOBAL_ENVIRONMENT_LIST_ERROR;
@@ -11,6 +12,7 @@ import com.sms.satp.entity.env.GlobalEnvironment;
 import com.sms.satp.mapper.GlobalEnvironmentMapper;
 import com.sms.satp.repository.GlobalEnvironmentRepository;
 import com.sms.satp.service.GlobalEnvironmentService;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -82,6 +84,19 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
         } catch (Exception e) {
             log.error("Failed to get the GlobalEnvironment list!", e);
             throw new ApiTestPlatformException(GET_GLOBAL_ENVIRONMENT_LIST_ERROR);
+        }
+    }
+
+    @Override
+    public void delete(String[] ids) {
+        try {
+            Iterable<GlobalEnvironment> globalEnvironments = globalEnvironmentRepository
+                .findAllById(Arrays.asList(ids));
+            globalEnvironments.forEach(globalEnvironment -> globalEnvironment.setRemove(Boolean.TRUE));
+            globalEnvironmentRepository.saveAll(globalEnvironments);
+        } catch (Exception e) {
+            log.error("Failed to delete the GlobalEnvironment!", e);
+            throw new ApiTestPlatformException(DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID);
         }
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
@@ -23,6 +24,7 @@ public class ProjectEnvironment {
 
     @MongoId(FieldType.OBJECT_ID)
     private String id;
+    @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
     private String envName;
     private String envDesc;
@@ -32,6 +34,7 @@ public class ProjectEnvironment {
     private String afterInject;
     private String globalBeforeProcess;
     private String globalAfterProcess;
+    private boolean remove;
     private List<EnvironmentHeader> headers;
     private List<EnvironmentParam> params;
     private List<EnvironmentParam> urlParams;

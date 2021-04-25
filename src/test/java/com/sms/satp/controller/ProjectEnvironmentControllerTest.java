@@ -42,7 +42,7 @@ class ProjectEnvironmentControllerTest {
 
     private final static Integer PAGE_NUMBER = 3;
     private final static Integer PAGE_SIZE = 20;
-    private final static String ID = "30";
+    private final static String ID = "607cebb2fbe53628bf14a2a2";
     private final static String PROJECT_ID = "id";
     private final static String EVN_NAME = "evnName";
 
@@ -133,9 +133,9 @@ class ProjectEnvironmentControllerTest {
     @Test
     @DisplayName("Delete the ProjectEnvironment by id")
     void deleteProjectEnvironmentDto() throws Exception{
-        doNothing().when(projectEnvironmentService).deleteById(PROJECT_ID);
+        doNothing().when(projectEnvironmentService).delete(new String[]{ID});
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-            .delete(Constants.PROJECT_ENVIRONMENT_PATH + "/" + PROJECT_ID);
+            .delete(Constants.PROJECT_ENVIRONMENT_PATH + "/" + ID);
         ResultActions perform = mockMvc.perform(request);
         perform.andExpect(status().isOk())
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))

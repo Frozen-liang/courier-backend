@@ -56,9 +56,7 @@ public class ProjectEnvironmentController {
 
     @DeleteMapping("/{ids}")
     public Response<Boolean> delete(@PathVariable String[] ids) {
-        for (String id : ids) {
-            projectEnvironmentService.deleteById(id);
-        }
+        projectEnvironmentService.delete(ids);
         return Response.ok(Boolean.TRUE);
     }
 

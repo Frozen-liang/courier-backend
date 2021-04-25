@@ -13,9 +13,9 @@ public interface ProjectEnvironmentService {
 
     void edit(ProjectEnvironmentDto projectEnvironmentDto);
 
-    void deleteById(String id);
-
     ProjectEnvironmentDto findById(String id);
 
     List<Object> list(String projectId);
+
+    void delete(String[] ids);
 }

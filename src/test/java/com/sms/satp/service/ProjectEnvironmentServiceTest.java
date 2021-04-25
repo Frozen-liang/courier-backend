@@ -59,8 +59,8 @@ class ProjectEnvironmentServiceTest {
     private final static int DEFAULT_PAGE_NUMBER = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
     private static final int FRONT_FIRST_NUMBER = 1;
-    private final static String ID = "25";
-    private final static String NOT_EXIST_ID = "30";
+    private final static String ID = "607cebb2fbe52328bf14a2a2";
+    private final static String NOT_EXIST_ID = "607cebb223552328bf14a2a2";
     private final static String PROJECT_ID = "25";
     private final static String EVN_NAME = "evnName";
 
@@ -163,9 +163,12 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectEnvironment service")
     void delete_test() {
-        doNothing().when(projectEnvironmentRepository).deleteById(PROJECT_ID);
-        projectEnvironmentService.deleteById(PROJECT_ID);
-        verify(projectEnvironmentRepository, times(1)).deleteById(PROJECT_ID);
+        List<ProjectEnvironment> projectEnvironments = Collections.singletonList(
+            ProjectEnvironment.builder().build());
+        when(projectEnvironmentRepository.findAllById(Collections.singletonList(ID)))
+            .thenReturn(projectEnvironments);
+        projectEnvironmentService.delete(new String[]{ID});
+        verify(projectEnvironmentRepository, times(1)).saveAll(projectEnvironments);
     }
 
     @Test
@@ -216,8 +219,12 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("An exception occurred while delete ProjectEnvironment")
     void delete_exception_test() {
-        doThrow(new RuntimeException()).when(projectEnvironmentRepository).deleteById(anyString());
-        assertThatThrownBy(() -> projectEnvironmentService.deleteById(anyString()))
+        List<ProjectEnvironment> projectEnvironments = Collections.singletonList(
+            ProjectEnvironment.builder().build());
+        when(projectEnvironmentRepository.findAllById(Collections.singletonList(ID)))
+            .thenReturn(projectEnvironments);
+        doThrow(new RuntimeException()).when(projectEnvironmentRepository).saveAll(projectEnvironments);
+        assertThatThrownBy(() -> projectEnvironmentService.delete(new String[]{ID}))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR.getCode());
     }
@@ -229,9 +236,10 @@ class ProjectEnvironmentServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(ProjectEnvironment.builder().build());
         }
-        when(projectEnvironmentRepository.findAll(any(),any(Sort.class))).thenReturn(list);
+        when(projectEnvironmentRepository.findAll(any(), any(Sort.class))).thenReturn(list);
         when(projectEnvironmentMapper.toDto(projectEnvironment)).thenReturn(projectEnvironmentDto);
-        when(globalEnvironmentService.list()).thenReturn(Collections.singletonList(GlobalEnvironmentDto.builder().build()));
+        when(globalEnvironmentService.list())
+            .thenReturn(Collections.singletonList(GlobalEnvironmentDto.builder().build()));
         List<Object> result = projectEnvironmentService.list(PROJECT_ID);
         assertThat(result).hasSize(TOTAL_ELEMENTS + 1);
     }
@@ -240,8 +248,9 @@ class ProjectEnvironmentServiceTest {
     @DisplayName("An exception occurred while getting ProjectEnvironment list")
     public void list_exception_test() {
         when(globalEnvironmentService.list()).thenReturn(null);
-        doThrow(new RuntimeException()).when(projectEnvironmentRepository).findAll(any(),any(Sort.class));
-        assertThatThrownBy(() -> projectEnvironmentService.list(PROJECT_ID)).isInstanceOf(ApiTestPlatformException.class)
+        doThrow(new RuntimeException()).when(projectEnvironmentRepository).findAll(any(), any(Sort.class));
+        assertThatThrownBy(() -> projectEnvironmentService.list(PROJECT_ID))
+            .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_PROJECT_ENVIRONMENT_LIST_ERROR.getCode());
     }
 }

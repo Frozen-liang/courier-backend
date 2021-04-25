@@ -1,6 +1,7 @@
 package com.sms.satp.service;
 
 import static com.sms.satp.common.ErrorCode.ADD_GLOBAL_ENVIRONMENT_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID;
 import static com.sms.satp.common.ErrorCode.EDIT_GLOBAL_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_GLOBAL_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_GLOBAL_ENVIRONMENT_LIST_ERROR;
@@ -20,6 +21,7 @@ import com.sms.satp.mapper.GlobalEnvironmentMapper;
 import com.sms.satp.repository.GlobalEnvironmentRepository;
 import com.sms.satp.service.impl.GlobalEnvironmentServiceImpl;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
@@ -122,6 +124,30 @@ class GlobalEnvironmentServiceTest {
         doThrow(new RuntimeException()).when(globalEnvironmentRepository).findAll(any(Sort.class));
         assertThatThrownBy(globalEnvironmentService::list).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_GLOBAL_ENVIRONMENT_LIST_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the delete method in the ProjectEnvironment service")
+    void delete_test() {
+        List<GlobalEnvironment> projectEnvironments = Collections.singletonList(
+            GlobalEnvironment.builder().build());
+        when(globalEnvironmentRepository.findAllById(Collections.singletonList(ID)))
+            .thenReturn(projectEnvironments);
+        globalEnvironmentService.delete(new String[]{ID});
+        verify(globalEnvironmentRepository, times(1)).saveAll(projectEnvironments);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while delete GlobalEnvironment")
+    void delete_exception_test() {
+        List<GlobalEnvironment> projectEnvironments = Collections.singletonList(
+            GlobalEnvironment.builder().build());
+        when(globalEnvironmentRepository.findAllById(Collections.singletonList(ID)))
+            .thenReturn(projectEnvironments);
+        doThrow(new RuntimeException()).when(globalEnvironmentRepository).saveAll(projectEnvironments);
+        assertThatThrownBy(() -> globalEnvironmentService.delete(new String[]{ID}))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID.getCode());
     }
 
 }
