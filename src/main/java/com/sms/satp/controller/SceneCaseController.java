@@ -2,11 +2,11 @@ package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
+import com.sms.satp.entity.dto.AddSceneCaseDto;
 import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.scenetest.AddSceneCaseDto;
-import com.sms.satp.entity.scenetest.SceneCaseDto;
-import com.sms.satp.entity.scenetest.SceneCaseSearchDto;
-import com.sms.satp.entity.scenetest.UpdateSceneCaseDto;
+import com.sms.satp.entity.dto.SceneCaseDto;
+import com.sms.satp.entity.dto.SceneCaseSearchDto;
+import com.sms.satp.entity.dto.UpdateSceneCaseDto;
 import com.sms.satp.service.SceneCaseService;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -35,9 +35,11 @@ public class SceneCaseController {
         return Response.ok().build();
     }
 
-    @DeleteMapping("/{id}")
-    public Response deleteById(@PathVariable String id) {
-        sceneCaseService.deleteById(id);
+    @DeleteMapping("/{ids}")
+    public Response deleteByIds(@PathVariable String[] ids) {
+        for (String id : ids) {
+            sceneCaseService.deleteById(id);
+        }
         return Response.ok().build();
     }
 

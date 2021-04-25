@@ -21,7 +21,6 @@ public class Constants {
     public static final String SCENE_CASE_PATH = SDK_VERSION + "/scene-case";
     public static final String GLOBAL_FUNCTION_PATH = SDK_VERSION + "/global-function";
     public static final String PROJECT_FUNCTION_PATH = SDK_VERSION + "/project-function";
-    public static final Integer STATUS_VALID = 1;
-    public static final Integer STATUS_INVALID = 0;
+    public static final String SCENE_CASE_API_PATH = SDK_VERSION + "/scene-case-api";
 
 }

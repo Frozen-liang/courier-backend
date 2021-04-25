@@ -1,4 +1,4 @@
-package com.sms.satp.entity.scenetest;
+package com.sms.satp.entity.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,7 +21,7 @@ public class SceneCaseDto {
     private String testStatus;
     private List<String> caseTag;
     private Integer priority;
-    private Integer status;
+    private boolean remove;
     private LocalDateTime createDateTime;
     private LocalDateTime modifyDateTime;
 }

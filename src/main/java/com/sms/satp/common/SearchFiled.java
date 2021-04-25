@@ -9,7 +9,8 @@ public enum SearchFiled {
     CASE_TAG("caseTag"),
     PRIORITY("priority"),
     CREATE_USER_NAME("createUserName"),
-    STATUS("status");
+    STATUS("status"),
+    ORDER_NUMBER("orderNumber");
 
     private String filedName;
 
