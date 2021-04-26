@@ -1,6 +1,7 @@
 package com.sms.satp.service;
 
 import static com.sms.satp.common.ErrorCode.ADD_GLOBAL_ENVIRONMENT_ERROR;
+import static com.sms.satp.common.ErrorCode.DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID;
 import static com.sms.satp.common.ErrorCode.EDIT_GLOBAL_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_GLOBAL_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_GLOBAL_ENVIRONMENT_LIST_ERROR;
@@ -25,16 +26,19 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.UpdateDefinition;
 
 @DisplayName("Tests for GlobalEnvironmentService")
 class GlobalEnvironmentServiceTest {
 
     private final GlobalEnvironmentRepository globalEnvironmentRepository = mock(GlobalEnvironmentRepository.class);
     private final GlobalEnvironmentMapper globalEnvironmentMapper = mock(GlobalEnvironmentMapper.class);
+    private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
     private final GlobalEnvironmentService globalEnvironmentService = new GlobalEnvironmentServiceImpl(
         globalEnvironmentRepository,
-        globalEnvironmentMapper);
+        globalEnvironmentMapper, mongoTemplate);
     private final GlobalEnvironment globalEnvironment = GlobalEnvironment.builder().id(ID).build();
     private final GlobalEnvironmentDto globalEnvironmentDto = GlobalEnvironmentDto.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
@@ -110,8 +114,13 @@ class GlobalEnvironmentServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(GlobalEnvironment.builder().build());
         }
-        when(globalEnvironmentRepository.findAll(any(Sort.class))).thenReturn(list);
-        when(globalEnvironmentMapper.toDto(globalEnvironment)).thenReturn(globalEnvironmentDto);
+        ArrayList<GlobalEnvironmentDto> globalEnvironmentDtos = new ArrayList<>();
+        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
+            globalEnvironmentDtos.add(GlobalEnvironmentDto.builder().build());
+        }
+
+        when(globalEnvironmentRepository.findByRemoveOrderByCreateDateTimeDesc(Boolean.FALSE)).thenReturn(list);
+        when(globalEnvironmentMapper.toDtoList(list)).thenReturn(globalEnvironmentDtos);
         List<GlobalEnvironmentDto> result = globalEnvironmentService.list();
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
@@ -119,9 +128,28 @@ class GlobalEnvironmentServiceTest {
     @Test
     @DisplayName("An exception occurred while getting GlobalEnvironment list")
     public void list_exception_test() {
-        doThrow(new RuntimeException()).when(globalEnvironmentRepository).findAll(any(Sort.class));
+        doThrow(new RuntimeException()).when(globalEnvironmentRepository)
+            .findByRemoveOrderByCreateDateTimeDesc(Boolean.FALSE);
         assertThatThrownBy(globalEnvironmentService::list).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_GLOBAL_ENVIRONMENT_LIST_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the delete method in the ProjectEnvironment service")
+    void delete_test() {
+        globalEnvironmentService.delete(new String[]{ID});
+        verify(mongoTemplate, times(1))
+            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
+    }
+
+    @Test
+    @DisplayName("An exception occurred while delete GlobalEnvironment")
+    void delete_exception_test() {
+        doThrow(new RuntimeException()).when(mongoTemplate)
+            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
+        assertThatThrownBy(() -> globalEnvironmentService.delete(new String[]{ID}))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID.getCode());
     }
 
 }

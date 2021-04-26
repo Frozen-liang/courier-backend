@@ -31,6 +31,7 @@ public class GlobalEnvironment {
     private String afterInject;
     private String globalBeforeProcess;
     private String globalAfterProcess;
+    private boolean remove;
     private List<EnvironmentHeader> headers;
     private List<EnvironmentParam> params;
     private List<EnvironmentParam> urlParams;
