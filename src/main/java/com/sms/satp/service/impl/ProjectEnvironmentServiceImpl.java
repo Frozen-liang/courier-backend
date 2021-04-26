@@ -6,6 +6,11 @@ import static com.sms.satp.common.ErrorCode.EDIT_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_LIST_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
+import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.ID;
+import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.dto.GlobalEnvironmentDto;
@@ -17,11 +22,11 @@ import com.sms.satp.repository.ProjectEnvironmentRepository;
 import com.sms.satp.service.GlobalEnvironmentService;
 import com.sms.satp.service.ProjectEnvironmentService;
 import com.sms.satp.utils.PageDtoConverter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -31,6 +36,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -39,16 +48,16 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
 
     private final ProjectEnvironmentRepository projectEnvironmentRepository;
     private final GlobalEnvironmentService globalEnvironmentService;
+    private final MongoTemplate mongoTemplate;
     private final ProjectEnvironmentMapper projectEnvironmentMapper;
-    private static final String CREATE_DATE_TIME = "createDateTime";
-    private static final String PROJECT_ID = "projectId";
-    private static final String REMOVE = "remove";
 
     public ProjectEnvironmentServiceImpl(ProjectEnvironmentRepository
         projectEnvironmentRepository, GlobalEnvironmentService globalEnvironmentService,
+        MongoTemplate mongoTemplate,
         ProjectEnvironmentMapper projectEnvironmentMapper) {
         this.projectEnvironmentRepository = projectEnvironmentRepository;
         this.globalEnvironmentService = globalEnvironmentService;
+        this.mongoTemplate = mongoTemplate;
         this.projectEnvironmentMapper = projectEnvironmentMapper;
     }
 
@@ -85,8 +94,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
             List<GlobalEnvironmentDto> globalEnvironments = globalEnvironmentService.list();
             List<ProjectEnvironment> projectEnvironments = projectEnvironmentRepository.findAll(example, sort);
             result.addAll(globalEnvironments);
-            result
-                .addAll(projectEnvironments.stream().map(projectEnvironmentMapper::toDto).collect(Collectors.toList()));
+            result.addAll(projectEnvironmentMapper.toDtoList(projectEnvironments));
             return result;
         } catch (Exception e) {
             log.error("Failed to get the ProjectEnvironment list!", e);
@@ -129,10 +137,10 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     @Override
     public void delete(String[] ids) {
         try {
-            Iterable<ProjectEnvironment> projectEnvironments = projectEnvironmentRepository
-                .findAllById(Arrays.asList(ids));
-            projectEnvironments.forEach(projectEnvironment -> projectEnvironment.setRemove(Boolean.TRUE));
-            projectEnvironmentRepository.saveAll(projectEnvironments);
+            Query query = new Query(Criteria.where(ID).in(Arrays.asList(ids)));
+            Update update = Update.update(REMOVE, Boolean.TRUE);
+            update.set(MODIFY_DATE_TIME, LocalDateTime.now());
+            mongoTemplate.updateMulti(query, update, ProjectEnvironment.class);
         } catch (Exception e) {
             log.error("Failed to delete the projectEnvironment!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR);

@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -40,6 +39,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.UpdateDefinition;
 
 @DisplayName("Test cases for ProjectEnvironmentService")
 class ProjectEnvironmentServiceTest {
@@ -47,9 +49,10 @@ class ProjectEnvironmentServiceTest {
     private ProjectEnvironmentRepository projectEnvironmentRepository = mock(ProjectEnvironmentRepository.class);
     private GlobalEnvironmentService globalEnvironmentService = mock(GlobalEnvironmentService.class);
     private ProjectEnvironmentMapper projectEnvironmentMapper = mock(ProjectEnvironmentMapper.class);
+    private MongoTemplate mongoTemplate = mock(MongoTemplate.class);
     private ProjectEnvironmentService projectEnvironmentService =
         new ProjectEnvironmentServiceImpl(projectEnvironmentRepository, globalEnvironmentService,
-            projectEnvironmentMapper);
+            mongoTemplate, projectEnvironmentMapper);
 
     private final ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().id(ID).build();
     private final ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder().id(ID).build();
@@ -163,12 +166,9 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectEnvironment service")
     void delete_test() {
-        List<ProjectEnvironment> projectEnvironments = Collections.singletonList(
-            ProjectEnvironment.builder().build());
-        when(projectEnvironmentRepository.findAllById(Collections.singletonList(ID)))
-            .thenReturn(projectEnvironments);
         projectEnvironmentService.delete(new String[]{ID});
-        verify(projectEnvironmentRepository, times(1)).saveAll(projectEnvironments);
+        verify(mongoTemplate, times(1))
+            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
     }
 
     @Test
@@ -219,11 +219,8 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("An exception occurred while delete ProjectEnvironment")
     void delete_exception_test() {
-        List<ProjectEnvironment> projectEnvironments = Collections.singletonList(
-            ProjectEnvironment.builder().build());
-        when(projectEnvironmentRepository.findAllById(Collections.singletonList(ID)))
-            .thenReturn(projectEnvironments);
-        doThrow(new RuntimeException()).when(projectEnvironmentRepository).saveAll(projectEnvironments);
+        doThrow(new RuntimeException()).when(mongoTemplate)
+            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
         assertThatThrownBy(() -> projectEnvironmentService.delete(new String[]{ID}))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR.getCode());
@@ -236,8 +233,12 @@ class ProjectEnvironmentServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(ProjectEnvironment.builder().build());
         }
+        ArrayList<ProjectEnvironmentDto> projectEnvironmentDtos = new ArrayList<>();
+        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
+            projectEnvironmentDtos.add(ProjectEnvironmentDto.builder().build());
+        }
         when(projectEnvironmentRepository.findAll(any(), any(Sort.class))).thenReturn(list);
-        when(projectEnvironmentMapper.toDto(projectEnvironment)).thenReturn(projectEnvironmentDto);
+        when(projectEnvironmentMapper.toDtoList(list)).thenReturn(projectEnvironmentDtos);
         when(globalEnvironmentService.list())
             .thenReturn(Collections.singletonList(GlobalEnvironmentDto.builder().build()));
         List<Object> result = projectEnvironmentService.list(PROJECT_ID);

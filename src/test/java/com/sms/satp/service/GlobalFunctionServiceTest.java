@@ -21,22 +21,25 @@ import com.sms.satp.mapper.GlobalFunctionMapper;
 import com.sms.satp.repository.GlobalFunctionRepository;
 import com.sms.satp.service.impl.GlobalFunctionServiceImpl;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.UpdateDefinition;
 
 @DisplayName("Tests for GlobalFunctionService")
 class GlobalFunctionServiceTest {
 
     private final GlobalFunctionRepository globalFunctionRepository = mock(GlobalFunctionRepository.class);
     private final GlobalFunctionMapper globalFunctionMapper = mock(GlobalFunctionMapper.class);
+    private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
     private final GlobalFunctionService globalFunctionService = new GlobalFunctionServiceImpl(
         globalFunctionRepository,
-        globalFunctionMapper);
+        globalFunctionMapper, mongoTemplate);
     private final GlobalFunction globalFunction = GlobalFunction.builder().id(ID).build();
     private final GlobalFunctionDto globalFunctionDto = GlobalFunctionDto.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
@@ -113,8 +116,12 @@ class GlobalFunctionServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(GlobalFunction.builder().build());
         }
+        ArrayList<GlobalFunctionDto> globalEnvironmentDtos = new ArrayList<>();
+        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
+            globalEnvironmentDtos.add(GlobalFunctionDto.builder().build());
+        }
         when(globalFunctionRepository.findAll(any(), any(Sort.class))).thenReturn(list);
-        when(globalFunctionMapper.toDto(globalFunction)).thenReturn(globalFunctionDto);
+        when(globalFunctionMapper.toDtoList(list)).thenReturn(globalEnvironmentDtos);
         List<GlobalFunctionDto> result = globalFunctionService.list(FUNCTION_NAME, FUNCTION_DESC);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
@@ -132,16 +139,16 @@ class GlobalFunctionServiceTest {
     @Test
     @DisplayName("Test the delete method in the GlobalFunction service")
     public void delete_test() {
-        List<GlobalFunction> globalFunctions = Collections.singletonList(GlobalFunction.builder().build());
-        when(globalFunctionRepository.findAllById(Collections.singletonList(ID))).thenReturn(globalFunctions);
         globalFunctionService.delete(new String[]{ID});
-        verify(globalFunctionRepository, times(1)).saveAll(globalFunctions);
+        verify(mongoTemplate, times(1))
+            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
     }
 
     @Test
     @DisplayName("An exception occurred while delete GlobalFunction")
     public void delete_exception_test() {
-        doThrow(new RuntimeException()).when(globalFunctionRepository).findAllById(Collections.singletonList(ID));
+        doThrow(new RuntimeException()).when(mongoTemplate)
+            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
         assertThatThrownBy(() -> globalFunctionService.delete(new String[]{ID}))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_GLOBAL_FUNCTION_BY_ID_ERROR.getCode());

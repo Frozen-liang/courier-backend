@@ -21,22 +21,24 @@ import com.sms.satp.mapper.GlobalEnvironmentMapper;
 import com.sms.satp.repository.GlobalEnvironmentRepository;
 import com.sms.satp.service.impl.GlobalEnvironmentServiceImpl;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.UpdateDefinition;
 
 @DisplayName("Tests for GlobalEnvironmentService")
 class GlobalEnvironmentServiceTest {
 
     private final GlobalEnvironmentRepository globalEnvironmentRepository = mock(GlobalEnvironmentRepository.class);
     private final GlobalEnvironmentMapper globalEnvironmentMapper = mock(GlobalEnvironmentMapper.class);
+    private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
     private final GlobalEnvironmentService globalEnvironmentService = new GlobalEnvironmentServiceImpl(
         globalEnvironmentRepository,
-        globalEnvironmentMapper);
+        globalEnvironmentMapper, mongoTemplate);
     private final GlobalEnvironment globalEnvironment = GlobalEnvironment.builder().id(ID).build();
     private final GlobalEnvironmentDto globalEnvironmentDto = GlobalEnvironmentDto.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
@@ -112,8 +114,13 @@ class GlobalEnvironmentServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(GlobalEnvironment.builder().build());
         }
+        ArrayList<GlobalEnvironmentDto> globalEnvironmentDtos = new ArrayList<>();
+        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
+            globalEnvironmentDtos.add(GlobalEnvironmentDto.builder().build());
+        }
+
         when(globalEnvironmentRepository.findByRemoveOrderByCreateDateTimeDesc(Boolean.FALSE)).thenReturn(list);
-        when(globalEnvironmentMapper.toDto(globalEnvironment)).thenReturn(globalEnvironmentDto);
+        when(globalEnvironmentMapper.toDtoList(list)).thenReturn(globalEnvironmentDtos);
         List<GlobalEnvironmentDto> result = globalEnvironmentService.list();
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
@@ -121,7 +128,8 @@ class GlobalEnvironmentServiceTest {
     @Test
     @DisplayName("An exception occurred while getting GlobalEnvironment list")
     public void list_exception_test() {
-        doThrow(new RuntimeException()).when(globalEnvironmentRepository).findByRemoveOrderByCreateDateTimeDesc(Boolean.FALSE);
+        doThrow(new RuntimeException()).when(globalEnvironmentRepository)
+            .findByRemoveOrderByCreateDateTimeDesc(Boolean.FALSE);
         assertThatThrownBy(globalEnvironmentService::list).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_GLOBAL_ENVIRONMENT_LIST_ERROR.getCode());
     }
@@ -129,22 +137,16 @@ class GlobalEnvironmentServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectEnvironment service")
     void delete_test() {
-        List<GlobalEnvironment> projectEnvironments = Collections.singletonList(
-            GlobalEnvironment.builder().build());
-        when(globalEnvironmentRepository.findAllById(Collections.singletonList(ID)))
-            .thenReturn(projectEnvironments);
         globalEnvironmentService.delete(new String[]{ID});
-        verify(globalEnvironmentRepository, times(1)).saveAll(projectEnvironments);
+        verify(mongoTemplate, times(1))
+            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
     }
 
     @Test
     @DisplayName("An exception occurred while delete GlobalEnvironment")
     void delete_exception_test() {
-        List<GlobalEnvironment> projectEnvironments = Collections.singletonList(
-            GlobalEnvironment.builder().build());
-        when(globalEnvironmentRepository.findAllById(Collections.singletonList(ID)))
-            .thenReturn(projectEnvironments);
-        doThrow(new RuntimeException()).when(globalEnvironmentRepository).saveAll(projectEnvironments);
+        doThrow(new RuntimeException()).when(mongoTemplate)
+            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
         assertThatThrownBy(() -> globalEnvironmentService.delete(new String[]{ID}))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID.getCode());

@@ -5,6 +5,10 @@ import static com.sms.satp.common.ErrorCode.DELETE_GLOBAL_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_GLOBAL_FUNCTION_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_GLOBAL_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_GLOBAL_FUNCTION_LIST_ERROR;
+import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.ID;
+import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.dto.GlobalFunctionDto;
@@ -12,16 +16,20 @@ import com.sms.satp.entity.function.GlobalFunction;
 import com.sms.satp.mapper.GlobalFunctionMapper;
 import com.sms.satp.repository.GlobalFunctionRepository;
 import com.sms.satp.service.GlobalFunctionService;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,13 +38,13 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
 
     private final GlobalFunctionRepository globalFunctionRepository;
     private final GlobalFunctionMapper globalFunctionMapper;
-    private static final String CREATE_DATE_TIME = "createDateTime";
-    private static final String REMOVE = "remove";
+    private final MongoTemplate mongoTemplate;
 
     public GlobalFunctionServiceImpl(GlobalFunctionRepository globalFunctionRepository,
-        GlobalFunctionMapper globalFunctionMapper) {
+        GlobalFunctionMapper globalFunctionMapper, MongoTemplate mongoTemplate) {
         this.globalFunctionRepository = globalFunctionRepository;
         this.globalFunctionMapper = globalFunctionMapper;
+        this.mongoTemplate = mongoTemplate;
     }
 
     @Override
@@ -60,8 +68,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
                 .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
             Example<GlobalFunction> example = Example.of(globalFunction, matcher);
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
-            return globalFunctionRepository.findAll(example, sort).stream().map(globalFunctionMapper::toDto).collect(
-                Collectors.toList());
+            return globalFunctionMapper.toDtoList(globalFunctionRepository.findAll(example, sort));
         } catch (Exception e) {
             log.error("Failed to get the GlobalFunction list!", e);
             throw new ApiTestPlatformException(GET_GLOBAL_FUNCTION_LIST_ERROR);
@@ -101,9 +108,10 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     @Override
     public void delete(String[] ids) {
         try {
-            Iterable<GlobalFunction> globalFunctions = globalFunctionRepository.findAllById(Arrays.asList(ids));
-            globalFunctions.forEach(globalFunction -> globalFunction.setRemove(Boolean.TRUE));
-            globalFunctionRepository.saveAll(globalFunctions);
+            Query query = new Query(Criteria.where(ID).in(Arrays.asList(ids)));
+            Update update = Update.update(REMOVE, Boolean.TRUE);
+            update.set(MODIFY_DATE_TIME, LocalDateTime.now());
+            mongoTemplate.updateMulti(query, update, GlobalFunction.class);
         } catch (Exception e) {
             log.error("Failed to delete the GlobalFunction!", e);
             throw new ApiTestPlatformException(DELETE_GLOBAL_FUNCTION_BY_ID_ERROR);
