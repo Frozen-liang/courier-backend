@@ -28,6 +28,9 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.UpdateDefinition;
 
 @DisplayName("Tests for ProjectFunctionService")
 class ProjectFunctionServiceTest {
@@ -35,8 +38,9 @@ class ProjectFunctionServiceTest {
     private final ProjectFunctionRepository projectFunctionRepository = mock(ProjectFunctionRepository.class);
     private final ProjectFunctionMapper projectFunctionMapper = mock(ProjectFunctionMapper.class);
     private final GlobalFunctionService globalFunctionService = mock(GlobalFunctionService.class);
+    private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
     private final ProjectFunctionService projectFunctionService = new ProjectFunctionServiceImpl(
-        projectFunctionRepository, projectFunctionMapper, globalFunctionService);
+        projectFunctionRepository, projectFunctionMapper, globalFunctionService, mongoTemplate);
     private final ProjectFunction projectFunction = ProjectFunction.builder().id(ID).build();
     private final ProjectFunctionDto projectFunctionDto = ProjectFunctionDto.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
@@ -132,16 +136,16 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectFunction service")
     public void delete_test() {
-        List<ProjectFunction> projectFunctions = Collections.singletonList(ProjectFunction.builder().build());
-        when(projectFunctionRepository.findAllById(Collections.singletonList(ID))).thenReturn(projectFunctions);
         projectFunctionService.delete(new String[]{ID});
-        verify(projectFunctionRepository, times(1)).saveAll(projectFunctions);
+        verify(mongoTemplate, times(1))
+            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
     }
 
     @Test
     @DisplayName("An exception occurred while delete ProjectFunction")
     public void delete_exception_test() {
-        doThrow(new RuntimeException()).when(projectFunctionRepository).findAllById(Collections.singletonList(ID));
+        doThrow(new RuntimeException()).when(mongoTemplate)
+            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
         assertThatThrownBy(() -> projectFunctionService.delete(new String[]{ID}))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_PROJECT_FUNCTION_BY_ID_ERROR.getCode());

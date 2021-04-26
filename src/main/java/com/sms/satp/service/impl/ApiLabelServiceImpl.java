@@ -5,6 +5,8 @@ import static com.sms.satp.common.ErrorCode.DELETE_API_LABEL_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_API_LABEL_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_LABEL_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_API_LABEL_LIST_ERROR;
+import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.enums.ApiLabelType;
@@ -30,8 +32,6 @@ public class ApiLabelServiceImpl implements ApiLabelService {
 
     private final ApiLabelRepository apiLabelRepository;
     private final ApiLabelMapper apiLabelMapper;
-    private static final String CREATE_DATE_TIME = "createDateTime";
-    private static final String PROJECT_ID = "projectId";
     private static final String LABEL_TYPE = "labelType";
 
     public ApiLabelServiceImpl(ApiLabelRepository apiLabelRepository, ApiLabelMapper apiLabelMapper) {
@@ -63,7 +63,7 @@ public class ApiLabelServiceImpl implements ApiLabelService {
             Example<ApiLabel> example = Example.of(apiLabel, exampleMatcher);
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
             List<ApiLabel> list = apiLabelRepository.findAll(example, sort);
-            return list.stream().map(apiLabelMapper::toDto).collect(Collectors.toList());
+            return apiLabelMapper.toDtoList(list);
         } catch (Exception e) {
             log.error("Failed to get the ApiLabel list!", e);
             throw new ApiTestPlatformException(GET_API_LABEL_LIST_ERROR);

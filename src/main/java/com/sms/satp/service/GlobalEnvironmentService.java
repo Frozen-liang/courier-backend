@@ -12,4 +12,7 @@ public interface GlobalEnvironmentService {
     void edit(GlobalEnvironmentDto globalEnvironmentDto);
 
     List<GlobalEnvironmentDto> list();
+
+    void delete(String[] ids);
+
 }
