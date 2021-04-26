@@ -13,12 +13,12 @@ import com.sms.satp.entity.dto.DataCollectionDto;
 import com.sms.satp.mapper.DataCollectionMapper;
 import com.sms.satp.repository.DataCollectionRepository;
 import com.sms.satp.service.DataCollectionService;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -29,6 +29,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -40,6 +41,7 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     private final MongoTemplate mongoTemplate;
     private static final String PROJECT_ID = "projectId";
     private static final String CREATE_DATE_TIME = "createDataTime";
+    private static final String MODIFY_DATE_TIME = "modifyDateTime";
     private static final String REMOVE = "remove";
     private static final String PARAM_LIST = "paramList";
     private static final String ID = "id";
@@ -73,8 +75,7 @@ public class DataCollectionServiceImpl implements DataCollectionService {
                 .withMatcher(REMOVE, GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING);
             Example<DataCollection> example = Example.of(dataCollection, exampleMatcher);
-            return dataCollectionRepository.findAll(example, sort).stream().map(dataCollectionMapper::toDto).collect(
-                Collectors.toList());
+            return dataCollectionMapper.toDtoList(dataCollectionRepository.findAll(example, sort));
         } catch (Exception e) {
             log.error("Failed to get the DataCollection list!", e);
             throw new ApiTestPlatformException(GET_DATA_COLLECTION_LIST_ERROR);
@@ -114,9 +115,10 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     @Override
     public void delete(String[] ids) {
         try {
-            Iterable<DataCollection> dataCollections = dataCollectionRepository.findAllById(Arrays.asList(ids));
-            dataCollections.forEach(dataCollection -> dataCollection.setRemove(Boolean.TRUE));
-            dataCollectionRepository.saveAll(dataCollections);
+            Query query = new Query(Criteria.where(ID).in(Arrays.asList(ids)));
+            Update update = Update.update(REMOVE, Boolean.TRUE);
+            update.set(MODIFY_DATE_TIME, LocalDateTime.now());
+            mongoTemplate.updateMulti(query, update, DataCollection.class);
         } catch (Exception e) {
             log.error("Failed to delete the DataCollection!", e);
             throw new ApiTestPlatformException(DELETE_DATA_COLLECTION_BY_ID_ERROR);
