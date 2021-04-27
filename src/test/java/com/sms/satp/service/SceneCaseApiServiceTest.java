@@ -5,6 +5,7 @@ import com.sms.satp.entity.dto.AddSceneCaseApiDto;
 import com.sms.satp.entity.dto.SceneCaseApiDto;
 import com.sms.satp.entity.dto.UpdateSceneCaseApiSortOrderDto;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.mapper.SceneCaseApiLogMapper;
 import com.sms.satp.mapper.SceneCaseApiMapper;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.service.impl.SceneCaseApiServiceImpl;
@@ -15,6 +16,7 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 
@@ -40,6 +42,8 @@ class SceneCaseApiServiceTest {
     private SceneCaseApiRepository sceneCaseApiRepository;
     private SceneCaseApiMapper sceneCaseApiMapper;
     private SceneCaseApiServiceImpl sceneCaseApiService;
+    private ApplicationEventPublisher applicationEventPublisher;
+    private SceneCaseApiLogMapper sceneCaseApiLogMapper;
 
     private final static String MOCK_SCENE_CASE_ID = "1";
     private final static String MOCK_ID = new ObjectId().toString();
@@ -49,7 +53,10 @@ class SceneCaseApiServiceTest {
     void setUpBean() {
         sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
         sceneCaseApiMapper = mock(SceneCaseApiMapper.class);
-        sceneCaseApiService = new SceneCaseApiServiceImpl(sceneCaseApiRepository, sceneCaseApiMapper);
+        applicationEventPublisher = mock(ApplicationEventPublisher.class);
+        sceneCaseApiLogMapper = mock(SceneCaseApiLogMapper.class);
+        sceneCaseApiService = new SceneCaseApiServiceImpl(sceneCaseApiRepository, sceneCaseApiMapper,
+            applicationEventPublisher, sceneCaseApiLogMapper);
     }
 
     @Test
@@ -80,6 +87,8 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the batch method in the SceneCaseApi service")
     void deleteById_test() {
+        Optional<SceneCaseApi> sceneCaseApi = Optional.ofNullable(SceneCaseApi.builder().id(MOCK_ID).build());
+        when(sceneCaseApiRepository.findById(any())).thenReturn(sceneCaseApi);
         doNothing().when(sceneCaseApiRepository).deleteById(any());
         sceneCaseApiService.deleteById(MOCK_ID);
         verify(sceneCaseApiRepository, times(1)).deleteById(any());
@@ -88,6 +97,8 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the batch method in the SceneCaseApi service throws exception")
     void deleteById_test_thenThrowException() {
+        Optional<SceneCaseApi> sceneCaseApi = Optional.ofNullable(SceneCaseApi.builder().id(MOCK_ID).build());
+        when(sceneCaseApiRepository.findById(any())).thenReturn(sceneCaseApi);
         doThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_API_ERROR)).when(sceneCaseApiRepository)
             .deleteById(any());
         assertThatThrownBy(() -> sceneCaseApiService.deleteById(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);

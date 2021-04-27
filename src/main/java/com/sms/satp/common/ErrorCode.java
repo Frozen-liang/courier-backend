@@ -88,6 +88,8 @@ public enum ErrorCode {
     BATCH_EDIT_SCENE_CASE_API_ERROR("4080", "Failed to batch edit the SceneCaseApi!"),
     GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR("4081", "Failed to get the SceneCaseApi list by sceneCaseId!"),
     GET_SCENE_CASE_API_BY_ID_ERROR("4082", "Failed to get the SceneCaseApi by id!"),
+    GET_SCENE_CASE_API_LOG_PAGE_ERROR("4083","Failed to get the SceneCaseApiLog page!"),
+    ADD_SCENE_CASE_API_LOG_ERROR("4084","Failed to add the SceneCaseApiLog!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

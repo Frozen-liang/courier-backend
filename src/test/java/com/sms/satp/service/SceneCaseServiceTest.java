@@ -10,6 +10,7 @@ import com.sms.satp.entity.dto.SceneCaseSearchDto;
 import com.sms.satp.entity.dto.UpdateSceneCaseDto;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.mapper.SceneCaseApiLogMapper;
 import com.sms.satp.mapper.SceneCaseMapper;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.repository.SceneCaseRepository;
@@ -20,6 +21,7 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -49,6 +51,8 @@ class SceneCaseServiceTest {
     private SceneCaseMapper sceneCaseMapper;
     private SceneCaseServiceImpl sceneCaseService;
     private SceneCaseApiService sceneCaseApiService;
+    private ApplicationEventPublisher applicationEventPublisher;
+    private SceneCaseApiLogMapper sceneCaseApiLogMapper;
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -66,8 +70,10 @@ class SceneCaseServiceTest {
         customizedSceneCaseRepository = mock(CustomizedSceneCaseRepository.class);
         sceneCaseMapper = mock(SceneCaseMapper.class);
         sceneCaseApiService = mock(SceneCaseApiService.class);
+        applicationEventPublisher = mock(ApplicationEventPublisher.class);
+        sceneCaseApiLogMapper = mock(SceneCaseApiLogMapper.class);
         sceneCaseService = new SceneCaseServiceImpl(sceneCaseRepository, customizedSceneCaseRepository,
-            sceneCaseMapper, sceneCaseApiService);
+            sceneCaseMapper, sceneCaseApiService, applicationEventPublisher, sceneCaseApiLogMapper);
     }
 
     @Test
@@ -98,6 +104,8 @@ class SceneCaseServiceTest {
     @Test
     @DisplayName("Test the deleteById method in the SceneCase service")
     void deleteById_test() {
+        Optional<SceneCase> sceneCase = Optional.ofNullable(SceneCase.builder().id(MOCK_ID).build());
+        when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
         doNothing().when(sceneCaseRepository).deleteById(any());
         List<SceneCaseApi> sceneCaseApiDtoList = Lists.newArrayList(SceneCaseApi.builder().build());
         when(sceneCaseApiService.listBySceneCaseId(any())).thenReturn(sceneCaseApiDtoList);
@@ -109,6 +117,8 @@ class SceneCaseServiceTest {
     @Test
     @DisplayName("Test the deleteById method in the SceneCase service throws exception")
     void deleteById_test_thenThrownException() {
+        Optional<SceneCase> sceneCase = Optional.ofNullable(SceneCase.builder().id(MOCK_ID).build());
+        when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
         doThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_ERROR)).when(sceneCaseRepository).deleteById(any());
         assertThatThrownBy(() -> sceneCaseService.deleteById(MOCK_ID))
             .isInstanceOf(ApiTestPlatformException.class);
