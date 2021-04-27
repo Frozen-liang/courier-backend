@@ -22,6 +22,7 @@ public class SceneCaseApiDto {
     private String id;
     private String apiId;
     private String sceneCaseId;
+    private String projectId;
     private String apiName;
     private String apiUrl;
     private ApiProtocol apiProtocol;
