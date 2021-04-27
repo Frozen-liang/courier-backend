@@ -6,6 +6,7 @@ import com.sms.satp.entity.dto.GlobalEnvironmentDto;
 import com.sms.satp.service.GlobalEnvironmentService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +45,12 @@ public class GlobalEnvironmentController {
     @GetMapping("/list")
     public Response<List<GlobalEnvironmentDto>> list() {
         return Response.ok(globalEnvironmentService.list());
+    }
+
+    @DeleteMapping("/{ids}")
+    public Response<Boolean> delete(@PathVariable("ids") String[] ids) {
+        globalEnvironmentService.delete(ids);
+        return Response.ok(Boolean.TRUE);
     }
 
 }

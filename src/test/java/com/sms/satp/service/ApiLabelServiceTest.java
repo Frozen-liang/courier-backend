@@ -114,8 +114,12 @@ class ApiLabelServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(ApiLabel.builder().build());
         }
+        ArrayList<ApiLabelDto> apiLabelDtos = new ArrayList<>();
+        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
+            apiLabelDtos.add(ApiLabelDto.builder().build());
+        }
         when(apiLabelRepository.findAll(any(), any(Sort.class))).thenReturn(list);
-        when(apiLabelMapper.toDto(apiLabel)).thenReturn(apiLabelDto);
+        when(apiLabelMapper.toDtoList(list)).thenReturn(apiLabelDtos);
         List<ApiLabelDto> result = apiLabelService.list(PROJECT_ID, LABEL_NAME, LABEL_TYPE);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }

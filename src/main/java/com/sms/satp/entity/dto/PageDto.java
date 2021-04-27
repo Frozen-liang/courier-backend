@@ -20,7 +20,7 @@ public class PageDto {
     private int pageSize = 10;
     @Builder.Default
     @Schema(title = "Sorted fields")
-    private String sort = "create_date_time";
+    private String sort = "createDateTime";
     @Builder.Default
     @Schema(title = "Way of sorting(asc/desc)")
     private String order = "desc";

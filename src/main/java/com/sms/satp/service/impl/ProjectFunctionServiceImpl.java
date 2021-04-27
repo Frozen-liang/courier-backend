@@ -5,6 +5,11 @@ import static com.sms.satp.common.ErrorCode.DELETE_PROJECT_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.EDIT_PROJECT_FUNCTION_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_PROJECT_FUNCTION_LIST_ERROR;
+import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.ID;
+import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.dto.GlobalFunctionDto;
@@ -14,6 +19,7 @@ import com.sms.satp.mapper.ProjectFunctionMapper;
 import com.sms.satp.repository.ProjectFunctionRepository;
 import com.sms.satp.service.GlobalFunctionService;
 import com.sms.satp.service.ProjectFunctionService;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +31,10 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,15 +44,15 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     private final ProjectFunctionRepository projectFunctionRepository;
     private final ProjectFunctionMapper projectFunctionMapper;
     private final GlobalFunctionService globalFunctionService;
-    private static final String CREATE_DATE_TIME = "createDateTime";
-    private static final String PROJECT_ID = "projectId";
-    private static final String REMOVE = "remove";
+    private final MongoTemplate mongoTemplate;
 
     public ProjectFunctionServiceImpl(ProjectFunctionRepository projectFunctionRepository,
-        ProjectFunctionMapper projectFunctionMapper, GlobalFunctionService globalFunctionService) {
+        ProjectFunctionMapper projectFunctionMapper, GlobalFunctionService globalFunctionService,
+        MongoTemplate mongoTemplate) {
         this.projectFunctionRepository = projectFunctionRepository;
         this.projectFunctionMapper = projectFunctionMapper;
         this.globalFunctionService = globalFunctionService;
+        this.mongoTemplate = mongoTemplate;
     }
 
     @Override
@@ -112,9 +122,10 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     @Override
     public void delete(String[] ids) {
         try {
-            Iterable<ProjectFunction> projectFunctions = projectFunctionRepository.findAllById(Arrays.asList(ids));
-            projectFunctions.forEach((projectFunction) -> projectFunction.setRemove(Boolean.TRUE));
-            projectFunctionRepository.saveAll(projectFunctions);
+            Query query = new Query(Criteria.where(ID).in(Arrays.asList(ids)));
+            Update update = Update.update(REMOVE, Boolean.TRUE);
+            update.set(MODIFY_DATE_TIME, LocalDateTime.now());
+            mongoTemplate.updateMulti(query, update, ProjectFunction.class);
         } catch (Exception e) {
             log.error("Failed to delete the ProjectFunction!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_FUNCTION_BY_ID_ERROR);
