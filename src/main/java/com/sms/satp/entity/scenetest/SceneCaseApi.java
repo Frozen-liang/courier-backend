@@ -37,6 +37,9 @@ public class SceneCaseApi {
     @Field(targetType = FieldType.OBJECT_ID)
     private String sceneCaseId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String projectId;
+
     private String apiName;
 
     private String apiUrl;
