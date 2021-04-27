@@ -7,6 +7,8 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 public class SceneCaseApiLogEvent extends ApplicationEvent {
 
+    private static final long serialVersionUID = 1L;
+
     private SceneCaseApiLogDto sceneCaseApiLogDto;
 
     public SceneCaseApiLogEvent(Object source,SceneCaseApiLogDto sceneCaseApiLogDto) {
