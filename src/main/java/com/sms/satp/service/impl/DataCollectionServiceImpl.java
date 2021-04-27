@@ -6,6 +6,11 @@ import static com.sms.satp.common.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_DATA_COLLECTION_LIST_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
+import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.ID;
+import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.datacollection.DataCollection;
@@ -39,12 +44,7 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     private final DataCollectionRepository dataCollectionRepository;
     private final DataCollectionMapper dataCollectionMapper;
     private final MongoTemplate mongoTemplate;
-    private static final String PROJECT_ID = "projectId";
-    private static final String CREATE_DATE_TIME = "createDataTime";
-    private static final String MODIFY_DATE_TIME = "modifyDateTime";
-    private static final String REMOVE = "remove";
     private static final String PARAM_LIST = "paramList";
-    private static final String ID = "id";
 
     public DataCollectionServiceImpl(DataCollectionRepository dataCollectionRepository,
         DataCollectionMapper dataCollectionMapper, MongoTemplate mongoTemplate) {
@@ -81,7 +81,6 @@ public class DataCollectionServiceImpl implements DataCollectionService {
             throw new ApiTestPlatformException(GET_DATA_COLLECTION_LIST_ERROR);
         }
     }
-
 
     @Override
     public void add(DataCollectionDto dataCollectionDto) {

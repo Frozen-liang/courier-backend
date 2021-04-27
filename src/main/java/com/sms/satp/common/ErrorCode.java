@@ -88,14 +88,14 @@ public enum ErrorCode {
     BATCH_EDIT_SCENE_CASE_API_ERROR("4080", "Failed to batch edit the SceneCaseApi!"),
     GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR("4081", "Failed to get the SceneCaseApi list by sceneCaseId!"),
     GET_SCENE_CASE_API_BY_ID_ERROR("4082", "Failed to get the SceneCaseApi by id!"),
-    GET_PROJECT_ENVIRONMENT_LIST_ERROR("4083","Failed to get the ProjectEnvironment page!"),
-    DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID("4084","Failed to delete the GlobalEnvironment!"),
+    GET_PROJECT_ENVIRONMENT_LIST_ERROR("4083", "Failed to get the ProjectEnvironment page!"),
+    DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID("4084", "Failed to delete the GlobalEnvironment!"),
     GET_DATA_COLLECTION_BY_ID_ERROR("4085", "Failed to get the DataCollection by id!"),
     GET_DATA_COLLECTION_LIST_ERROR("4086", "Failed to get the DataCollection list!"),
     ADD_DATA_COLLECTION_ERROR("4087", "Failed to add the DataCollection!"),
     EDIT_DATA_COLLECTION_ERROR("4088", "Failed to edit the DataCollection!"),
     DELETE_DATA_COLLECTION_BY_ID_ERROR("4089", "Failed to delete the DataCollection!"),
-    GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR("4089", "Failed to delete the DataCollection!"),
+    GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR("4090", "Failed to delete the DataCollection!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

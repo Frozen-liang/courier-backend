@@ -28,7 +28,6 @@ public class DataCollectionController {
 
     @GetMapping("/{id}")
     public Response<DataCollectionDto> getById(@PathVariable("id") String id) {
-
         return Response.ok(dataCollectionService.findById(id));
     }
 
@@ -49,7 +48,7 @@ public class DataCollectionController {
         return Response.ok(dataCollectionService.list(projectId, collectionName));
     }
 
-    @GetMapping("/paramList/{id}")
+    @GetMapping("/param-list/{id}")
     public Response<List<String>> getParamListById(@PathVariable String id) {
         return Response.ok(dataCollectionService.getParamListById(id));
     }
