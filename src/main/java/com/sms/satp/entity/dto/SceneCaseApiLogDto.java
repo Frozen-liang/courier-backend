@@ -1,6 +1,7 @@
 package com.sms.satp.entity.dto;
 
 import com.sms.satp.common.enums.OperationType;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +12,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SceneCaseApiLogDto {
+public class SceneCaseApiLogDto implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String projectId;
 
