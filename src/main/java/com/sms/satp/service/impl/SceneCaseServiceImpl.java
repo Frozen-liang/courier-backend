@@ -7,24 +7,29 @@ import static com.sms.satp.common.ErrorCode.GET_SCENE_CASE_PAGE_ERROR;
 import static com.sms.satp.common.ErrorCode.SEARCH_SCENE_CASE_ERROR;
 
 import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.entity.dto.AddSceneCaseDto;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.SceneCaseApiDto;
+import com.sms.satp.entity.dto.SceneCaseApiLogDto;
 import com.sms.satp.entity.dto.SceneCaseDto;
 import com.sms.satp.entity.dto.SceneCaseSearchDto;
 import com.sms.satp.entity.dto.UpdateSceneCaseDto;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.mapper.SceneCaseApiLogMapper;
 import com.sms.satp.mapper.SceneCaseMapper;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.SceneCaseApiService;
 import com.sms.satp.service.SceneCaseService;
+import com.sms.satp.service.event.entity.SceneCaseApiLogEvent;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,14 +46,20 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private final CustomizedSceneCaseRepository customizedSceneCaseRepository;
     private final SceneCaseMapper sceneCaseMapper;
     private final SceneCaseApiService sceneCaseApiService;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final SceneCaseApiLogMapper sceneCaseApiLogMapper;
 
     public SceneCaseServiceImpl(SceneCaseRepository sceneCaseRepository,
         CustomizedSceneCaseRepository customizedSceneCaseRepository,
-        SceneCaseMapper sceneCaseMapper, SceneCaseApiService sceneCaseApiService) {
+        SceneCaseMapper sceneCaseMapper, SceneCaseApiService sceneCaseApiService,
+        ApplicationEventPublisher applicationEventPublisher,
+        SceneCaseApiLogMapper sceneCaseApiLogMapper) {
         this.sceneCaseRepository = sceneCaseRepository;
         this.customizedSceneCaseRepository = customizedSceneCaseRepository;
         this.sceneCaseMapper = sceneCaseMapper;
         this.sceneCaseApiService = sceneCaseApiService;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.sceneCaseApiLogMapper = sceneCaseApiLogMapper;
     }
 
     @Override
@@ -57,6 +68,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             SceneCase sceneCase = sceneCaseMapper.toAddSceneCase(sceneCaseDto);
             //query user by "createUserId",write for filed createUserName.
             sceneCaseRepository.insert(sceneCase);
+            publishSceneCaseEvent(sceneCase, OperationType.ADD);
         } catch (Exception e) {
             log.error("Failed to add the SceneCase!", e);
             throw new ApiTestPlatformException(ADD_SCENE_CASE_ERROR);
@@ -66,9 +78,13 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     @Override
     public void deleteById(String id) {
         try {
-            sceneCaseRepository.deleteById(id);
-            List<SceneCaseApi> sceneCaseApiList = sceneCaseApiService.listBySceneCaseId(id);
-            deleteSceneCaseApi(sceneCaseApiList);
+            Optional<SceneCase> sceneCase = sceneCaseRepository.findById(id);
+            sceneCase.ifPresent(scene -> {
+                sceneCaseRepository.deleteById(id);
+                List<SceneCaseApi> sceneCaseApiList = sceneCaseApiService.listBySceneCaseId(id);
+                deleteSceneCaseApi(sceneCaseApiList);
+                publishSceneCaseEvent(scene, OperationType.DELETE);
+            });
         } catch (Exception e) {
             log.error("Failed to delete the SceneCase!", e);
             throw new ApiTestPlatformException(DELETE_SCENE_CASE_ERROR);
@@ -87,6 +103,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                     editSceneCaseApiStatus(sceneCase, sceneCaseFindById.isRemove());
                 }
                 sceneCaseRepository.save(sceneCase);
+                publishSceneCaseEvent(sceneCase, OperationType.EDIT);
             });
         } catch (Exception e) {
             log.error("Failed to edit the SceneCase!", e);
@@ -137,6 +154,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             dto.setRemove(sceneCase.isRemove());
             sceneCaseApiService.edit(dto);
         }
+    }
+
+    private void publishSceneCaseEvent(SceneCase sceneCase, OperationType operationType) {
+        SceneCaseApiLogDto sceneCaseApiLogDto = sceneCaseApiLogMapper.toDtoBySceneCase(sceneCase, operationType);
+        SceneCaseApiLogEvent event = new SceneCaseApiLogEvent(this, sceneCaseApiLogDto);
+        applicationEventPublisher.publishEvent(event);
     }
 
 }
