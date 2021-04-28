@@ -27,7 +27,6 @@ public class ProjectFunctionController {
 
     @GetMapping("/{id}")
     public Response<ProjectFunctionDto> getById(@PathVariable("id") String id) {
-
         return Response.ok(projectFunctionService.findById(id));
     }
 
