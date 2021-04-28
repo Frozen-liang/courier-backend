@@ -1,4 +1,4 @@
-package com.sms.satp.parser.common;
+package com.sms.satp.common.enums;
 
 import java.util.HashMap;
 import java.util.Map;

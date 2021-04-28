@@ -12,7 +12,7 @@ public enum SearchFiled {
     STATUS("status"),
     ORDER_NUMBER("orderNumber");
 
-    private String filedName;
+    private final String filedName;
 
     SearchFiled(String filedName) {
         this.filedName = filedName;

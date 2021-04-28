@@ -1,6 +1,5 @@
-package com.sms.satp.parser.common;
+package com.sms.satp.common.enums;
 
-import com.sms.satp.common.enums.ParamType;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.lang.Nullable;
