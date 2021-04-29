@@ -81,7 +81,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
             List<GlobalFunctionDto> globalFunctionList = globalFunctionService.list(functionDesc, functionName);
             List<ProjectFunction> projectFunctionList = projectFunctionRepository.findAll(example, sort);
             list.addAll(globalFunctionList);
-            list.addAll(projectFunctionList.stream().map(projectFunctionMapper::toDto).collect(Collectors.toList()));
+            list.addAll(projectFunctionMapper.toDtoList(projectFunctionList));
             return list;
         } catch (Exception e) {
             log.error("Failed to get the ProjectFunction list!", e);

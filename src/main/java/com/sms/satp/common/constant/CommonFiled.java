@@ -2,7 +2,7 @@ package com.sms.satp.common.constant;
 
 public class CommonFiled {
 
-    public CommonFiled() {
+    private CommonFiled() {
     }
 
     public static final String ID = "id";

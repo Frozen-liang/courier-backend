@@ -3,9 +3,7 @@ package com.sms.satp.entity.scenetest;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.RequestMethod;
-import com.sms.satp.entity.test.CaseHeader;
-import com.sms.satp.entity.test.CaseParameter;
-import com.sms.satp.entity.test.CaseRequestBody;
+import com.sms.satp.entity.api.common.ParamInfo;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -50,13 +48,13 @@ public class SceneCaseApi {
 
     private ApiRequestParamType apiRequestParamType;
 
-    private CaseRequestBody requestBody;
+    private List<ParamInfo> requestBody;
 
-    private List<CaseHeader> requestHeaders;
+    private List<ParamInfo> requestHeaders;
 
-    private List<CaseParameter> queryParams;
+    private List<ParamInfo> queryParams;
 
-    private List<CaseParameter> pathParams;
+    private List<ParamInfo> pathParams;
 
     private String preInject;
 
@@ -64,9 +62,9 @@ public class SceneCaseApi {
 
     private ApiRequestParamType apiResponseParamType;
 
-    private List<CaseHeader> responseHeaders;
+    private List<ParamInfo> responseHeaders;
 
-    private List<CaseParameter> responseParams;
+    private List<ParamInfo> responseParams;
 
     private String matchRule;
 

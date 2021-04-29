@@ -1,10 +1,7 @@
 package com.sms.satp.parser;
 
-import com.sms.satp.parser.impl.OpenApiDocumentTransformer;
-import com.sms.satp.parser.model.ApiInfo;
-import com.sms.satp.parser.model.ApiPath;
-import com.sms.satp.parser.model.ApiTag;
-import com.sms.satp.parser.schema.ApiSchema;
+import com.sms.satp.entity.api.ApiEntity;
+import com.sms.satp.parser.impl.SwaggerApiDocumentTransformer;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.core.models.ParseOptions;
@@ -13,11 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -36,15 +30,9 @@ public class OpenApiDocumentTransformerTest {
             .readLocation(OpenApiDocumentTransformerTest.class.getResource(CONFIG_OPEN_API_V_3_YAML).toString(),
                 null,
                 parseOptions).getOpenAPI();
-        OpenApiDocumentTransformer openApiDocumentTransform = new OpenApiDocumentTransformer();
-        ApiInfo apiInfo = openApiDocumentTransform.transformInfo(openAPI);
-        List<ApiPath> apiPaths = openApiDocumentTransform.transformPaths(openAPI);
-        Map<String, ApiSchema> apiSchema = openApiDocumentTransform.transformSchemas(openAPI);
-        List<ApiTag> apiTags = openApiDocumentTransform.transformTags(openAPI);
-        Assertions.assertSame(openAPI.getInfo().getTitle(), apiInfo.getTitle());
-        Assertions.assertEquals(openAPI.getPaths().size(), apiPaths.size());
-        Assertions.assertEquals(openAPI.getComponents().getSchemas().size(), apiSchema.size());
-        Assertions.assertEquals(openAPI.getTags().size(), apiTags.size());
+        SwaggerApiDocumentTransformer swaggerApiDocumentTransformer = new SwaggerApiDocumentTransformer();
+        List<ApiEntity> apiEntities = swaggerApiDocumentTransformer.toApiEntities(openAPI, null);
+
     }
 
     @Disabled
@@ -54,23 +42,17 @@ public class OpenApiDocumentTransformerTest {
         parseOptions.setResolve(true);
         String contents =
             Files.readString(
-                Paths.get(OpenApiDocumentTransformerTest.class.getResource(SWAGGER_V2_ONE_BIG_JSON).getPath()),
+                Paths.get(OpenApiDocumentTransformerTest.class.getResource(SWAGGER_V2_ONE_JSON).getPath()),
                 StandardCharsets.UTF_8);
         OpenAPI openAPI = new OpenAPIParser()
             .readContents(contents, null,
                 parseOptions).getOpenAPI();
+        SwaggerApiDocumentTransformer swaggerApiDocumentTransformer = new SwaggerApiDocumentTransformer();
+        List<ApiEntity> apiEntities = swaggerApiDocumentTransformer.toApiEntities(openAPI, null);
 //        OpenAPI openAPI = new OpenAPIParser()
 //            .readLocation("https://onedev.smsassist.com/swagger/docs/v1", null, parseOptions).getOpenAPI();
         StopWatch started = StopWatch.createStarted();
-        OpenApiDocumentTransformer openApiDocumentTransform = new OpenApiDocumentTransformer();
-        ApiInfo apiInfo = openApiDocumentTransform.transformInfo(openAPI);
-        List<ApiPath> apiPaths = openApiDocumentTransform.transformPaths(openAPI);
-        Map<String, ApiSchema> apiSchema = openApiDocumentTransform.transformSchemas(openAPI);
-        List<ApiTag> apiTags = openApiDocumentTransform.transformTags(openAPI);
-        Assertions.assertSame(openAPI.getInfo().getTitle(), apiInfo.getTitle());
-        Assertions.assertEquals(openAPI.getPaths().size(), apiPaths.size());
-        Assertions.assertEquals(openAPI.getComponents().getSchemas().size(), apiSchema.size());
-        Assertions.assertEquals(CollectionUtils.isEmpty(openAPI.getTags()), CollectionUtils.isEmpty(apiTags));
+
         started.stop();
         System.out.println("解析时间: " + started.getTime(TimeUnit.MILLISECONDS));
     }
@@ -83,15 +65,6 @@ public class OpenApiDocumentTransformerTest {
         OpenAPI openAPI = new OpenAPIParser()
             .readLocation("https://onedev.smsassist.com/swagger/docs/v1", null, parseOptions).getOpenAPI();
         StopWatch started = StopWatch.createStarted();
-        OpenApiDocumentTransformer openApiDocumentTransform = new OpenApiDocumentTransformer();
-        ApiInfo apiInfo = openApiDocumentTransform.transformInfo(openAPI);
-        List<ApiPath> apiPaths = openApiDocumentTransform.transformPaths(openAPI);
-        Map<String, ApiSchema> apiSchema = openApiDocumentTransform.transformSchemas(openAPI);
-        List<ApiTag> apiTags = openApiDocumentTransform.transformTags(openAPI);
-        Assertions.assertSame(openAPI.getInfo().getTitle(), apiInfo.getTitle());
-        Assertions.assertEquals(openAPI.getPaths().size(), apiPaths.size());
-        Assertions.assertEquals(openAPI.getComponents().getSchemas().size(), apiSchema.size());
-        Assertions.assertEquals(CollectionUtils.isEmpty(openAPI.getTags()), CollectionUtils.isEmpty(apiTags));
         started.stop();
         System.out.println("解析时间: " + started.getTime(TimeUnit.MILLISECONDS));
 
@@ -108,15 +81,7 @@ public class OpenApiDocumentTransformerTest {
         OpenAPI openAPI = new OpenAPIParser()
             .readContents(contents, null,
                 parseOptions).getOpenAPI();
-
-        OpenApiDocumentTransformer openApiDocumentTransform = new OpenApiDocumentTransformer();
-        ApiInfo apiInfo = openApiDocumentTransform.transformInfo(openAPI);
-        List<ApiPath> apiPaths = openApiDocumentTransform.transformPaths(openAPI);
-        Map<String, ApiSchema> apiSchema = openApiDocumentTransform.transformSchemas(openAPI);
-        List<ApiTag> apiTags = openApiDocumentTransform.transformTags(openAPI);
-        Assertions.assertSame(openAPI.getInfo().getTitle(), apiInfo.getTitle());
-        Assertions.assertEquals(openAPI.getPaths().size(), apiPaths.size());
-        Assertions.assertEquals(openAPI.getComponents().getSchemas().size(), apiSchema.size());
-        Assertions.assertEquals(CollectionUtils.isEmpty(openAPI.getTags()), CollectionUtils.isEmpty(apiTags));
+        SwaggerApiDocumentTransformer swaggerApiDocumentTransformer = new SwaggerApiDocumentTransformer();
+        List<ApiEntity> apiEntities = swaggerApiDocumentTransformer.toApiEntities(openAPI, null);
     }
 }

@@ -23,6 +23,7 @@ public class Constants {
     public static final String PROJECT_FUNCTION_PATH = SDK_VERSION + "/project-function";
     public static final String SCENE_CASE_API_PATH = SDK_VERSION + "/scene-case-api";
     public static final String SCENE_CASE_API_LOG_PATH = SDK_VERSION + "/scene-case-api-log";
+    public static final String DATA_COLLECTION_PATH = SDK_VERSION + "/data-collection";
     public static final String CASE_TEMPLATE_PATH = SDK_VERSION + "/case-template";
     public static final String CASE_TEMPLATE_API_PATH = SDK_VERSION + "/case-template-api";
     public static final String CASE_TEMPLATE_CONN_PATH = SDK_VERSION + "/case-template-conn";

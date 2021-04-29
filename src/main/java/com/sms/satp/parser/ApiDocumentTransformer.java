@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ApiDocumentTransformer<T> {
 
-    List<ApiEntity> toApiEntities(T sourceDocument);
+    List<ApiEntity> toApiEntities(T sourceDocument, String projectId);
 
     ProjectEntity toProjectEntity(T sourceDocument);
 

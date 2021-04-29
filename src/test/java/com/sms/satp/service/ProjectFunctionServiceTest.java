@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.entity.dto.ProjectEnvironmentDto;
 import com.sms.satp.entity.dto.ProjectFunctionDto;
 import com.sms.satp.entity.function.ProjectFunction;
 import com.sms.satp.mapper.ProjectFunctionMapper;
@@ -118,8 +119,12 @@ class ProjectFunctionServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(ProjectFunction.builder().build());
         }
+        ArrayList<ProjectFunctionDto> projectEnvironmentDtoList = new ArrayList<>();
+        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
+            projectEnvironmentDtoList.add(ProjectFunctionDto.builder().build());
+        }
         when(projectFunctionRepository.findAll(any(), any(Sort.class))).thenReturn(list);
-        when(projectFunctionMapper.toDto(projectFunction)).thenReturn(projectFunctionDto);
+        when(projectFunctionMapper.toDtoList(list)).thenReturn(projectEnvironmentDtoList);
         List<Object> result = projectFunctionService.list(PROJECT_ID, FUNCTION_NAME, FUNCTION_DESC);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }

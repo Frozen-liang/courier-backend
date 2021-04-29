@@ -1,32 +1,35 @@
-package com.sms.satp.entity.project;
+package com.sms.satp.entity.datacollection;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
-@Builder
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "Project")
-public class ProjectEntity {
+@AllArgsConstructor
+@Data
+@Builder
+@Document(collection = "DataCollection")
+public class DataCollection {
 
-    @Id
-    @Field(targetType = FieldType.OBJECT_ID)
+    @MongoId(FieldType.OBJECT_ID)
     private String id;
-    private String name;
-    private String description;
-    private boolean removed;
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String projectId;
+    private String collectionName;
+    private List<String> paramList;
+    private List<TestData> dataList;
+    private boolean remove;
     @CreatedBy
     private Long createUserId;
     @LastModifiedBy
@@ -35,6 +38,4 @@ public class ProjectEntity {
     private LocalDateTime createDateTime;
     @LastModifiedDate
     private LocalDateTime modifyDateTime;
-
-
 }

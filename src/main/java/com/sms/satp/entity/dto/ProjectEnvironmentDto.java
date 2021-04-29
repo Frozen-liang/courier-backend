@@ -1,10 +1,8 @@
 package com.sms.satp.entity.dto;
 
-import com.sms.satp.entity.AuthInfo;
 import com.sms.satp.entity.env.EnvironmentAuth;
 import com.sms.satp.entity.env.EnvironmentHeader;
 import com.sms.satp.entity.env.EnvironmentParam;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

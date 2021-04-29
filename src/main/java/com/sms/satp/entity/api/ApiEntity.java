@@ -1,10 +1,10 @@
 package com.sms.satp.entity.api;
 
+import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.RequestMethod;
-import com.sms.satp.entity.api.common.HeaderInfo;
 import com.sms.satp.entity.api.common.ParamInfo;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,9 +38,15 @@ public class ApiEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private List<String> tagId;
+
+    @Indexed(unique = true)
     private String apiName;
 
-    private String apiUrl;
+    private String description;
+
+    private String apiPath;
 
     private ApiProtocol apiProtocol;
 
@@ -48,9 +54,13 @@ public class ApiEntity {
 
     private ApiRequestParamType apiRequestParamType;
 
-    private List<HeaderInfo> headerInfo;
 
-    private List<ParamInfo> paramInfo;
+    private List<ParamInfo> requestHeaders;
+    private List<ParamInfo> responseHeaders;
+    private List<ParamInfo> pathParams;
+    private List<ParamInfo> restfulParams;
+    private List<ParamInfo> requestParams;
+    private List<ParamInfo> responseParams;
 
     private ApiStatus apiStatus;
 
@@ -61,6 +71,9 @@ public class ApiEntity {
     private String postInject;
 
     private String swaggerId;
+
+    private ApiJsonType apiResponseJsonType;
+    private ApiJsonType apiRequestJsonType;
 
     @CreatedBy
     private Long createUserId;
