@@ -22,7 +22,9 @@ public class SceneCaseApiLogDto implements Serializable {
 
     private String sceneCaseApiId;
 
-    private String templateCaseApiId;
+    private String caseTemplateId;
+
+    private String caseTemplateApiId;
 
     private OperationType operationType;
 

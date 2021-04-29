@@ -2,6 +2,8 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.entity.dto.SceneCaseApiLogDto;
+import com.sms.satp.entity.scenetest.CaseTemplate;
+import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.entity.scenetest.SceneCaseApiLog;
@@ -29,4 +31,17 @@ public interface SceneCaseApiLogMapper {
     @Mapping(source = "sceneCase.name", target = "operationTarget")
     @Mapping(source = "sceneCase.id", target = "sceneCaseId")
     SceneCaseApiLogDto toDtoBySceneCase(SceneCase sceneCase, OperationType operationType);
+
+    @Mapping(target = "caseTemplate.createDateTime", ignore = true)
+    @Mapping(target = "caseTemplate.createUserId", ignore = true)
+    @Mapping(source = "caseTemplate.name", target = "operationTarget")
+    @Mapping(source = "caseTemplate.id", target = "caseTemplateId")
+    SceneCaseApiLogDto toDtoBySceneCaseTemplate(CaseTemplate caseTemplate, OperationType operationType);
+
+    @Mapping(target = "caseTemplateApi.createDateTime", ignore = true)
+    @Mapping(target = "caseTemplateApi.createUserId", ignore = true)
+    @Mapping(source = "caseTemplateApi.apiName", target = "operationTarget")
+    @Mapping(source = "caseTemplateApi.id", target = "caseTemplateApiId")
+    SceneCaseApiLogDto toDtoBySceneCaseTemplateApi(CaseTemplateApi caseTemplateApi, OperationType operationType);
+
 }

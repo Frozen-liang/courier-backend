@@ -92,6 +92,20 @@ public enum ErrorCode {
     DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID("4084","Failed to delete the GlobalEnvironment!"),
     GET_SCENE_CASE_API_LOG_PAGE_ERROR("4085","Failed to get the SceneCaseApiLog page!"),
     ADD_SCENE_CASE_API_LOG_ERROR("4086","Failed to add the SceneCaseApiLog!"),
+    ADD_CASE_TEMPLATE_ERROR("4087","Failed to add the CaseTemplate!"),
+    DELETE_CASE_TEMPLATE_ERROR("4088","Failed to delete the CaseTemplate!"),
+    EDIT_CASE_TEMPLATE_ERROR("4089","Failed to edit the CaseTemplate!"),
+    GET_CASE_TEMPLATE_PAGE_ERROR("4090","Failed to get the CaseTemplate page!"),
+    SEARCH_CASE_TEMPLATE_ERROR("4091","Failed to search the CaseTemplate!"),
+    ADD_CASE_TEMPLATE_API_ERROR("4092", "Failed to add the CaseTemplateApi!"),
+    DELETE_CASE_TEMPLATE_API_ERROR("4093", "Failed to delete the CaseTemplateApi!"),
+    EDIT_CASE_TEMPLATE_API_ERROR("4094", "Failed to edit the CaseTemplateApi!"),
+    BATCH_EDIT_CASE_TEMPLATE_API_ERROR("4095", "Failed to batch edit the CaseTemplateApi!"),
+    GET_CASE_TEMPLATE_API_LIST_BY_CASE_TEMPLATE_ID_ERROR("4081", "Failed to get the CaseTemplateApi "
+        + "list by caseTemplateId!"),
+    GET_CASE_TEMPLATE_API_BY_ID_ERROR("4096", "Failed to get the CaseTemplateApi by id!"),
+    DELETE_CASE_TEMPLATE_CONN_ERROR("4097", "Failed to delete the CaseTemplateConn!"),
+    GET_CASE_TEMPLATE_CONN_LIST_ERROR("4098", "Failed to get the CaseTemplateConn list!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 
