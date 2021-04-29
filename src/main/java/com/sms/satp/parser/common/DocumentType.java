@@ -21,11 +21,11 @@ public enum DocumentType {
 
 
     private final int type;
-    private final ApiDocumentTransformer<DocumentParserResult> transformer;
-    private final DocumentReader<DocumentParserResult> reader;
+    private final ApiDocumentTransformer transformer;
+    private final DocumentReader reader;
 
-    DocumentType(int type, ApiDocumentTransformer<DocumentParserResult> transformer,
-        DocumentReader<DocumentParserResult> reader) {
+    DocumentType(int type, ApiDocumentTransformer transformer,
+        DocumentReader reader) {
 
         this.type = type;
         this.transformer = transformer;
@@ -37,11 +37,11 @@ public enum DocumentType {
         return type;
     }
 
-    public ApiDocumentTransformer<DocumentParserResult> getTransformer() {
+    public ApiDocumentTransformer getTransformer() {
         return transformer;
     }
 
-    public DocumentReader<DocumentParserResult> getReader() {
+    public DocumentReader getReader() {
         return reader;
     }
 

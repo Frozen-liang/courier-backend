@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DocumentParserResult {
 
-    private OpenAPI openAPI;
+    private OpenAPI openApi;
 }

@@ -6,9 +6,9 @@ import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.core.models.ParseOptions;
 
-public enum SwaggerDocumentReader implements DocumentReader<DocumentParserResult> {
+public enum SwaggerDocumentReader implements DocumentReader {
     INSTANCE;
-    private final static ParseOptions PARSE_OPTIONS = new ParseOptions();
+    private static final ParseOptions PARSE_OPTIONS = new ParseOptions();
 
     static {
         PARSE_OPTIONS.setResolve(true);
@@ -16,19 +16,19 @@ public enum SwaggerDocumentReader implements DocumentReader<DocumentParserResult
 
     @Override
     public DocumentParserResult readLocation(String location) {
-        OpenAPI openAPI = new OpenAPIParser()
+        OpenAPI openApi = new OpenAPIParser()
             .readLocation(location,
                 null,
                 PARSE_OPTIONS).getOpenAPI();
-        return new DocumentParserResult(openAPI);
+        return new DocumentParserResult(openApi);
     }
 
     @Override
     public DocumentParserResult readContents(String content) {
-        OpenAPI openAPI = new OpenAPIParser()
+        OpenAPI openApi = new OpenAPIParser()
             .readContents(content,
                 null,
                 PARSE_OPTIONS).getOpenAPI();
-        return new DocumentParserResult(openAPI);
+        return new DocumentParserResult(openApi);
     }
 }

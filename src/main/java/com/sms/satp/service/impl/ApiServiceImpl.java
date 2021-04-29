@@ -34,8 +34,8 @@ public class ApiServiceImpl implements ApiService {
     @Override
     public boolean importDocument(ApiImportRequest apiImportRequest) {
         DocumentType documentType = DocumentType.resolve(apiImportRequest.getDocumentType());
-        DocumentReader<DocumentParserResult> reader = documentType.getReader();
-        ApiDocumentTransformer<DocumentParserResult> transformer = documentType.getTransformer();
+        DocumentReader reader = documentType.getReader();
+        ApiDocumentTransformer transformer = documentType.getTransformer();
         String documentUrl = apiImportRequest.getDocumentUrl();
         MultipartFile file = apiImportRequest.getFile();
         DocumentParserResult content;

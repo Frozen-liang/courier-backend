@@ -10,8 +10,8 @@ import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.enums.ApiLabelType;
-import com.sms.satp.entity.ApiLabel;
 import com.sms.satp.dto.ApiLabelDto;
+import com.sms.satp.entity.ApiLabel;
 import com.sms.satp.mapper.ApiLabelMapper;
 import com.sms.satp.repository.ApiLabelRepository;
 import com.sms.satp.service.ApiLabelService;

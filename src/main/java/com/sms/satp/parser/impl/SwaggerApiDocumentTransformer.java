@@ -53,7 +53,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 
 @Slf4j
-public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer<DocumentParserResult> {
+public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer {
 
     INSTANCE;
 
@@ -63,7 +63,7 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Docu
 
     @Override
     public List<ApiEntity> toApiEntities(DocumentParserResult parserResult, String projectId) {
-        OpenAPI result = parserResult.getOpenAPI();
+        OpenAPI result = parserResult.getOpenApi();
         Map<String, Schema> schemas = result.getComponents().getSchemas();
         final Map<String, List<ParamInfo>> componentReference = prepareComponentReference(schemas);
         return result.getPaths().entrySet().stream()
@@ -73,7 +73,7 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Docu
 
     @Override
     public ProjectEntity toProjectEntity(DocumentParserResult parserResult) {
-        OpenAPI result = parserResult.getOpenAPI();
+        OpenAPI result = parserResult.getOpenApi();
         Info info = result.getInfo();
         return ProjectEntity.builder().name(info.getTitle()).description(info.getDescription()).build();
 
