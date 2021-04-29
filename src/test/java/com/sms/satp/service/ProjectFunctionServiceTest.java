@@ -15,14 +15,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.entity.dto.ProjectEnvironmentDto;
-import com.sms.satp.entity.dto.ProjectFunctionDto;
+import com.sms.satp.dto.ProjectFunctionDto;
 import com.sms.satp.entity.function.ProjectFunction;
 import com.sms.satp.mapper.ProjectFunctionMapper;
 import com.sms.satp.repository.ProjectFunctionRepository;
 import com.sms.satp.service.impl.ProjectFunctionServiceImpl;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;

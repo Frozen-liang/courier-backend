@@ -11,8 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
-import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.dto.ProjectDto;
+import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.ProjectDto;
 import com.sms.satp.service.ProjectService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

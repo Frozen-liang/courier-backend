@@ -1,7 +1,7 @@
 package com.sms.satp.service;
 
 import com.sms.satp.common.enums.ApiLabelType;
-import com.sms.satp.entity.dto.ApiLabelDto;
+import com.sms.satp.dto.ApiLabelDto;
 import java.util.List;
 
 public interface ApiLabelService {

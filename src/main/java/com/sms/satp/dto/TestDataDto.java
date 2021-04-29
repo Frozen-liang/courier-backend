@@ -1,4 +1,4 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
 import java.util.Map;
 import javax.validation.constraints.NotEmpty;

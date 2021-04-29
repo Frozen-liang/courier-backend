@@ -1,7 +1,7 @@
 package com.sms.satp.mapper;
 
 import com.sms.satp.entity.ApiLabel;
-import com.sms.satp.entity.dto.ApiLabelDto;
+import com.sms.satp.dto.ApiLabelDto;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;

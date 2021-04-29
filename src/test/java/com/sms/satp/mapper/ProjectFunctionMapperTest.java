@@ -3,7 +3,7 @@ package com.sms.satp.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.ApplicationTests;
-import com.sms.satp.entity.dto.ProjectFunctionDto;
+import com.sms.satp.dto.ProjectFunctionDto;
 import com.sms.satp.entity.function.ProjectFunction;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

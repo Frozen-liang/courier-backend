@@ -15,7 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.entity.dto.GlobalEnvironmentDto;
+import com.sms.satp.dto.GlobalEnvironmentDto;
 import com.sms.satp.entity.env.GlobalEnvironment;
 import com.sms.satp.mapper.GlobalEnvironmentMapper;
 import com.sms.satp.repository.GlobalEnvironmentRepository;

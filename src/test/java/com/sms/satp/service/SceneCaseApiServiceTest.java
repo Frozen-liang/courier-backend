@@ -1,9 +1,9 @@
 package com.sms.satp.service;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.entity.dto.AddSceneCaseApiDto;
-import com.sms.satp.entity.dto.SceneCaseApiDto;
-import com.sms.satp.entity.dto.UpdateSceneCaseApiSortOrderDto;
+import com.sms.satp.dto.AddSceneCaseApiDto;
+import com.sms.satp.dto.SceneCaseApiDto;
+import com.sms.satp.dto.UpdateSceneCaseApiSortOrderDto;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.SceneCaseApiLogMapper;
 import com.sms.satp.mapper.SceneCaseApiMapper;

@@ -1,8 +1,6 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
 import com.sms.satp.common.enums.ApiLabelType;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

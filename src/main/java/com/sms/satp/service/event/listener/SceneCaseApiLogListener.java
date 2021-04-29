@@ -1,6 +1,6 @@
 package com.sms.satp.service.event.listener;
 
-import com.sms.satp.entity.dto.SceneCaseApiLogDto;
+import com.sms.satp.dto.SceneCaseApiLogDto;
 import com.sms.satp.service.SceneCaseApiLogService;
 import com.sms.satp.service.event.entity.SceneCaseApiLogEvent;
 import org.springframework.context.event.EventListener;

@@ -1,6 +1,6 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.entity.dto.SceneCaseApiDto;
+import com.sms.satp.dto.SceneCaseApiDto;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;

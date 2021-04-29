@@ -1,6 +1,6 @@
 package com.sms.satp.utils;
 
-import com.sms.satp.entity.dto.PageDto;
+import com.sms.satp.dto.PageDto;
 
 public abstract class PageDtoConverter {
 

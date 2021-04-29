@@ -1,6 +1,6 @@
 package com.sms.satp.service;
 
-import com.sms.satp.entity.dto.GlobalEnvironmentDto;
+import com.sms.satp.dto.GlobalEnvironmentDto;
 import java.util.List;
 
 public interface GlobalEnvironmentService {

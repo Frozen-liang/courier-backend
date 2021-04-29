@@ -1,7 +1,7 @@
 package com.sms.satp.service;
 
-import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.dto.ProjectEnvironmentDto;
+import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.ProjectEnvironmentDto;
 import java.util.List;
 import org.springframework.data.domain.Page;
 

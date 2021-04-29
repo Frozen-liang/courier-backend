@@ -4,10 +4,10 @@ import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.project.ProjectEntity;
 import java.util.List;
 
-public interface ApiDocumentTransformer<T> {
+public interface ApiDocumentTransformer<DocumentParserResult> {
 
-    List<ApiEntity> toApiEntities(T sourceDocument, String projectId);
+    List<ApiEntity> toApiEntities(DocumentParserResult result, String projectId);
 
-    ProjectEntity toProjectEntity(T sourceDocument);
+    ProjectEntity toProjectEntity(DocumentParserResult result);
 
 }

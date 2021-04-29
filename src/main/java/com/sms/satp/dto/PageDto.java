@@ -1,4 +1,4 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

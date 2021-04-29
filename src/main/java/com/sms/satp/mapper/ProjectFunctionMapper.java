@@ -1,6 +1,6 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.entity.dto.ProjectFunctionDto;
+import com.sms.satp.dto.ProjectFunctionDto;
 import com.sms.satp.entity.function.ProjectFunction;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;

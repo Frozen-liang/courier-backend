@@ -14,7 +14,7 @@ import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.datacollection.DataCollection;
-import com.sms.satp.entity.dto.DataCollectionDto;
+import com.sms.satp.dto.DataCollectionDto;
 import com.sms.satp.mapper.DataCollectionMapper;
 import com.sms.satp.repository.DataCollectionRepository;
 import com.sms.satp.service.DataCollectionService;
