@@ -4,7 +4,6 @@ import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.AddCaseTemplateApiDto;
 import com.sms.satp.entity.dto.CaseTemplateApiDto;
-import com.sms.satp.entity.dto.UpdateCaseTemplateApiDto;
 import com.sms.satp.service.CaseTemplateApiService;
 import java.util.List;
 import javax.validation.Valid;
@@ -44,12 +43,6 @@ public class CaseTemplateApiController {
     @PutMapping
     public Response edit(@Valid @RequestBody CaseTemplateApiDto caseTemplateApiDto) {
         caseTemplateApiService.edit(caseTemplateApiDto);
-        return Response.ok().build();
-    }
-
-    @PutMapping(value = "/batch/edit")
-    public Response batchEdit(@Valid @RequestBody UpdateCaseTemplateApiDto updateCaseTemplateApiDto) {
-        caseTemplateApiService.batchEdit(updateCaseTemplateApiDto);
         return Response.ok().build();
     }
 

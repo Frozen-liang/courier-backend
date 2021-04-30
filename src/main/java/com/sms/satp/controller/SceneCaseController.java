@@ -6,8 +6,10 @@ import com.sms.satp.entity.dto.AddSceneCaseDto;
 import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.dto.SceneCaseDto;
 import com.sms.satp.entity.dto.SceneCaseSearchDto;
+import com.sms.satp.entity.dto.SceneTemplateDto;
 import com.sms.satp.entity.dto.UpdateSceneCaseDto;
 import com.sms.satp.service.SceneCaseService;
+import java.util.List;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -59,4 +61,14 @@ public class SceneCaseController {
         return Response.ok(sceneCaseService.search(searchDto, projectId));
     }
 
+    @GetMapping("/conn/{id}")
+    public Response<SceneTemplateDto> getConn(@PathVariable String id) {
+        return Response.ok(sceneCaseService.getConn(id));
+    }
+
+    @PutMapping("/conn/edit")
+    public Response editConn(@RequestBody SceneTemplateDto dto) {
+        sceneCaseService.editConn(dto);
+        return Response.ok().build();
+    }
 }

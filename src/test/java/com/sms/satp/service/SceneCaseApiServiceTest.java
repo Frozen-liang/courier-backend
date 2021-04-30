@@ -3,7 +3,7 @@ package com.sms.satp.service;
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.entity.dto.AddSceneCaseApiDto;
 import com.sms.satp.entity.dto.SceneCaseApiDto;
-import com.sms.satp.entity.dto.UpdateSceneCaseApiSortOrderDto;
+import com.sms.satp.entity.dto.UpdateSceneCaseApiDto;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.SceneCaseApiLogMapper;
 import com.sms.satp.mapper.SceneCaseApiMapper;
@@ -127,7 +127,7 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the editSortOrder method in the SceneCaseApi service")
     void batchEdit_test() {
-        UpdateSceneCaseApiSortOrderDto dto = getUpdateSortOrder();
+        UpdateSceneCaseApiDto dto = getUpdateSortOrder();
         SceneCaseApi sceneCaseApi = SceneCaseApi.builder().id(MOCK_ID).build();
         List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(sceneCaseApi);
         when(sceneCaseApiRepository.saveAll(any())).thenReturn(sceneCaseApiList);
@@ -138,7 +138,7 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the editSortOrder method in the SceneCaseApi service throws exception")
     void batchEdit_thenThrowException() {
-        UpdateSceneCaseApiSortOrderDto dto = getUpdateSortOrder();
+        UpdateSceneCaseApiDto dto = getUpdateSortOrder();
         when(sceneCaseApiRepository.saveAll(any()))
             .thenThrow(new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR));
         assertThatThrownBy(() -> sceneCaseApiService.batchEdit(dto)).isInstanceOf(ApiTestPlatformException.class);
@@ -203,8 +203,8 @@ class SceneCaseApiServiceTest {
         assertThatThrownBy(() -> sceneCaseApiService.getSceneCaseApiById(MOCK_ID));
     }
 
-    private UpdateSceneCaseApiSortOrderDto getUpdateSortOrder() {
-        return UpdateSceneCaseApiSortOrderDto.builder()
+    private UpdateSceneCaseApiDto getUpdateSortOrder() {
+        return UpdateSceneCaseApiDto.builder()
             .sceneCaseApiDtoList(Lists.newArrayList(SceneCaseApiDto.builder()
                 .sceneCaseId(MOCK_SCENE_CASE_ID)
                 .orderNumber(MOCK_ORDER_NUMBER)

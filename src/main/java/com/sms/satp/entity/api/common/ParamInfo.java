@@ -21,6 +21,7 @@ public class ParamInfo {
     private ParamType paramType;
     private Boolean reference;
     private Boolean required;
+    private Boolean checkbox;
     @Builder.Default
     @ToString.Exclude
     private List<ParamInfo> childParam = new ArrayList<>();

@@ -21,4 +21,6 @@ public interface CaseTemplateApiService {
     List<CaseTemplateApi> listByCaseTemplateId(String caseTemplateId);
 
     CaseTemplateApiDto getSceneCaseApiById(String id);
+
+
 }

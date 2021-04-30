@@ -2,7 +2,7 @@ package com.sms.satp.service;
 
 import com.sms.satp.entity.dto.AddSceneCaseApiDto;
 import com.sms.satp.entity.dto.SceneCaseApiDto;
-import com.sms.satp.entity.dto.UpdateSceneCaseApiSortOrderDto;
+import com.sms.satp.entity.dto.UpdateSceneCaseApiDto;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import java.util.List;
 
@@ -14,7 +14,7 @@ public interface SceneCaseApiService {
 
     void edit(SceneCaseApiDto sceneCaseApiDto);
 
-    void batchEdit(UpdateSceneCaseApiSortOrderDto updateSceneCaseApiSortOrderDto);
+    void batchEdit(UpdateSceneCaseApiDto updateSceneCaseApiSortOrderDto);
 
     List<SceneCaseApiDto> listBySceneCaseId(String sceneCaseId, boolean remove);
 

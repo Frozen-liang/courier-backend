@@ -1,11 +1,10 @@
 package com.sms.satp.entity.scenetest;
 
+import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.RequestMethod;
-import com.sms.satp.entity.test.CaseHeader;
-import com.sms.satp.entity.test.CaseParameter;
-import com.sms.satp.entity.test.CaseRequestBody;
+import com.sms.satp.entity.api.common.ParamInfo;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -42,7 +41,9 @@ public class CaseTemplateApi {
 
     private String apiName;
 
-    private String apiUrl;
+    private String description;
+
+    private String apiPath;
 
     private ApiProtocol apiProtocol;
 
@@ -50,25 +51,33 @@ public class CaseTemplateApi {
 
     private ApiRequestParamType apiRequestParamType;
 
-    private CaseRequestBody requestBody;
+    private ApiRequestParamType apiResponseParamType;
 
-    private List<CaseHeader> requestHeaders;
+    private List<ParamInfo> requestBody;
 
-    private List<CaseParameter> queryParams;
+    private List<ParamInfo> requestHeaders;
 
-    private List<CaseParameter> pathParams;
+    private List<ParamInfo> requestParams;
+
+    private List<ParamInfo> restfulParams;
+
+    private List<ParamInfo> pathParams;
+
+    private List<ParamInfo> responseHeaders;
+
+    private List<ParamInfo> responseParams;
 
     private String preInject;
 
     private String postInject;
 
-    private ApiRequestParamType apiResponseParamType;
+    private ApiJsonType apiResponseJsonType;
 
-    private List<CaseHeader> responseHeaders;
-
-    private List<CaseParameter> responseParams;
+    private ApiJsonType apiRequestJsonType;
 
     private String matchRule;
+
+    private Integer timeoutLimit;
 
     private Integer orderNumber;
 

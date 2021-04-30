@@ -1,5 +1,6 @@
 package com.sms.satp.entity.scenetest;
 
+import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.RequestMethod;
@@ -40,7 +41,9 @@ public class SceneCaseApi {
 
     private String apiName;
 
-    private String apiUrl;
+    private String description;
+
+    private String apiPath;
 
     private ApiProtocol apiProtocol;
 
@@ -48,25 +51,33 @@ public class SceneCaseApi {
 
     private ApiRequestParamType apiRequestParamType;
 
+    private ApiRequestParamType apiResponseParamType;
+
     private List<ParamInfo> requestBody;
 
     private List<ParamInfo> requestHeaders;
 
-    private List<ParamInfo> queryParams;
+    private List<ParamInfo> requestParams;
+
+    private List<ParamInfo> restfulParams;
 
     private List<ParamInfo> pathParams;
-
-    private String preInject;
-
-    private String postInject;
-
-    private ApiRequestParamType apiResponseParamType;
 
     private List<ParamInfo> responseHeaders;
 
     private List<ParamInfo> responseParams;
 
+    private String preInject;
+
+    private String postInject;
+
+    private ApiJsonType apiResponseJsonType;
+
+    private ApiJsonType apiRequestJsonType;
+
     private String matchRule;
+
+    private Integer timeoutLimit;
 
     private Integer orderNumber;
 

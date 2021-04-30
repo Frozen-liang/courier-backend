@@ -4,9 +4,7 @@ import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
 import com.sms.satp.entity.dto.AddSceneCaseApiDto;
 import com.sms.satp.entity.dto.SceneCaseApiDto;
-import com.sms.satp.entity.dto.UpdateSceneCaseApiSortOrderDto;
 import com.sms.satp.service.SceneCaseApiService;
-import java.util.List;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,18 +43,6 @@ public class SceneCaseApiController {
     public Response edit(@Valid @RequestBody SceneCaseApiDto sceneCaseApiDto) {
         sceneCaseApiService.edit(sceneCaseApiDto);
         return Response.ok().build();
-    }
-
-    @PutMapping(value = "/batch/edit")
-    public Response batchEdit(@Valid @RequestBody UpdateSceneCaseApiSortOrderDto updateSceneCaseApiSortOrderDto) {
-        sceneCaseApiService.batchEdit(updateSceneCaseApiSortOrderDto);
-        return Response.ok().build();
-    }
-
-    @GetMapping(value = "/list/{sceneCaseId}/{remove}")
-    public Response<List<SceneCaseApiDto>> listBySceneCaseId(@PathVariable String sceneCaseId,
-        @PathVariable boolean remove) {
-        return Response.ok(sceneCaseApiService.listBySceneCaseId(sceneCaseId, remove));
     }
 
     @GetMapping(value = "/{id}")

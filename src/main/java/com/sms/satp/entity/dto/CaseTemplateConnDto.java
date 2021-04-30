@@ -1,6 +1,7 @@
-package com.sms.satp.entity.scenetest;
+package com.sms.satp.entity.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,25 +10,17 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.data.mongodb.core.mapping.FieldType;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "CaseTemplateConn")
-public class CaseTemplateConn {
+public class CaseTemplateConnDto {
 
-    @MongoId(value = FieldType.OBJECT_ID)
     private String id;
 
-    @Field(targetType = FieldType.OBJECT_ID)
     private String sceneCaseId;
 
-    @Field(targetType = FieldType.OBJECT_ID)
     private String caseTemplateId;
 
     private Integer orderNumber;
@@ -47,4 +40,6 @@ public class CaseTemplateConn {
 
     @LastModifiedDate
     private LocalDateTime modifyDateTime;
+
+    private List<CaseTemplateApiDto> caseTemplateApiDtoList;
 }

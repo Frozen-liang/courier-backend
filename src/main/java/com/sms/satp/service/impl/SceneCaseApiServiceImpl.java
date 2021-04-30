@@ -13,7 +13,7 @@ import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.entity.dto.AddSceneCaseApiDto;
 import com.sms.satp.entity.dto.SceneCaseApiDto;
 import com.sms.satp.entity.dto.SceneCaseApiLogDto;
-import com.sms.satp.entity.dto.UpdateSceneCaseApiSortOrderDto;
+import com.sms.satp.entity.dto.UpdateSceneCaseApiDto;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.SceneCaseApiLogMapper;
 import com.sms.satp.mapper.SceneCaseApiMapper;
@@ -92,7 +92,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public void batchEdit(UpdateSceneCaseApiSortOrderDto updateSceneCaseApiSortOrderDto) {
+    public void batchEdit(UpdateSceneCaseApiDto updateSceneCaseApiSortOrderDto) {
         log.info("SceneCaseApiService-batchEdit()-params: [SceneCaseApi]={}",
             updateSceneCaseApiSortOrderDto.toString());
         try {
@@ -102,7 +102,6 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
                 sceneCaseApiRepository.saveAll(caseApiList);
                 publishBatchSceneCaseApiEvent(caseApiList, OperationType.EDIT);
             }
-            //edit template case api list
         } catch (Exception e) {
             log.error("Failed to batch edit the SceneCaseApi!", e);
             throw new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR);
@@ -116,8 +115,6 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
                 SceneCaseApi.builder().sceneCaseId(sceneCaseId).remove(remove).build());
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SearchFiled.ORDER_NUMBER.getFiledName());
             List<SceneCaseApi> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
-            //query template case api
-
             return sceneCaseApiList.stream().map(sceneCaseApiMapper::toSceneCaseApiDto).collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);

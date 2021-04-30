@@ -10,7 +10,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateSceneCaseApiSortOrderDto {
+public class SceneTemplateDto {
+
+    private SceneCaseDto sceneCaseDto;
 
     private List<SceneCaseApiDto> sceneCaseApiDtoList;
+
+    private List<CaseTemplateConnDto> caseTemplateConnDtoList;
 }
