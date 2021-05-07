@@ -1,6 +1,6 @@
 package com.sms.satp.service;
 
-import com.sms.satp.entity.dto.GlobalFunctionDto;
+import com.sms.satp.dto.GlobalFunctionDto;
 import java.util.List;
 
 public interface GlobalFunctionService {

@@ -1,8 +1,10 @@
 package com.sms.satp.parser;
 
-public interface DocumentReader<T> {
+import com.sms.satp.parser.common.DocumentParserResult;
 
-    public T readLocation(String location);
+public interface DocumentReader {
 
-    public T readContents(String content);
+    public DocumentParserResult readLocation(String location);
+
+    public DocumentParserResult readContents(String content);
 }

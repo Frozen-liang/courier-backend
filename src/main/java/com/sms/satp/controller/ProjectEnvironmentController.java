@@ -2,8 +2,8 @@ package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
-import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.dto.ProjectEnvironmentDto;
+import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.ProjectEnvironmentDto;
 import com.sms.satp.service.ProjectEnvironmentService;
 import java.util.List;
 import javax.validation.Valid;

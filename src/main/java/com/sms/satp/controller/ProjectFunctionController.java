@@ -2,7 +2,7 @@ package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
-import com.sms.satp.entity.dto.ProjectFunctionDto;
+import com.sms.satp.dto.ProjectFunctionDto;
 import com.sms.satp.service.ProjectFunctionService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;

@@ -1,4 +1,4 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;

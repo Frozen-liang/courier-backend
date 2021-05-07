@@ -3,7 +3,7 @@ package com.sms.satp.controller;
 import static com.sms.satp.common.constant.Constants.DATA_COLLECTION_PATH;
 
 import com.sms.satp.common.response.Response;
-import com.sms.satp.entity.dto.DataCollectionDto;
+import com.sms.satp.dto.DataCollectionDto;
 import com.sms.satp.service.DataCollectionService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;

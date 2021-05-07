@@ -4,8 +4,8 @@ import static com.sms.satp.common.ErrorCode.ADD_SCENE_CASE_API_LOG_ERROR;
 import static com.sms.satp.common.ErrorCode.GET_SCENE_CASE_API_LOG_PAGE_ERROR;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.dto.SceneCaseApiLogDto;
+import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.SceneCaseApiLogDto;
 import com.sms.satp.entity.scenetest.SceneCaseApiLog;
 import com.sms.satp.mapper.SceneCaseApiLogMapper;
 import com.sms.satp.repository.SceneCaseApiLogRepository;

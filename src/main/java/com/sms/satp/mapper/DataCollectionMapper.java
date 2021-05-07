@@ -1,7 +1,7 @@
 package com.sms.satp.mapper;
 
+import com.sms.satp.dto.DataCollectionDto;
 import com.sms.satp.entity.datacollection.DataCollection;
-import com.sms.satp.entity.dto.DataCollectionDto;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;

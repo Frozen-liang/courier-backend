@@ -2,7 +2,7 @@ package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
-import com.sms.satp.entity.dto.GlobalEnvironmentDto;
+import com.sms.satp.dto.GlobalEnvironmentDto;
 import com.sms.satp.service.GlobalEnvironmentService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;

@@ -1,7 +1,7 @@
 package com.sms.satp.mapper;
 
 import com.sms.satp.common.enums.OperationType;
-import com.sms.satp.entity.dto.SceneCaseApiLogDto;
+import com.sms.satp.dto.SceneCaseApiLogDto;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.entity.scenetest.SceneCaseApiLog;

@@ -10,14 +10,13 @@ import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.enums.ApiLabelType;
+import com.sms.satp.dto.ApiLabelDto;
 import com.sms.satp.entity.ApiLabel;
-import com.sms.satp.entity.dto.ApiLabelDto;
 import com.sms.satp.mapper.ApiLabelMapper;
 import com.sms.satp.repository.ApiLabelRepository;
 import com.sms.satp.service.ApiLabelService;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;

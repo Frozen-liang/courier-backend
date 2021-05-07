@@ -1,18 +1,19 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @Builder
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-public class SceneCaseDto {
+@AllArgsConstructor
+public class UpdateSceneCaseDto {
 
+    @NotNull(message = "The id can not be empty")
     private String id;
     private String name;
     private String createUserName;
@@ -22,6 +23,4 @@ public class SceneCaseDto {
     private List<String> caseTag;
     private Integer priority;
     private boolean remove;
-    private LocalDateTime createDateTime;
-    private LocalDateTime modifyDateTime;
 }

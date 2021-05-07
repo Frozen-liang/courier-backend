@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.enums.ApiLabelType;
-import com.sms.satp.entity.dto.ApiLabelDto;
+import com.sms.satp.dto.ApiLabelDto;
 import com.sms.satp.entity.ApiLabel;
 import com.sms.satp.mapper.ApiLabelMapper;
 import com.sms.satp.repository.ApiLabelRepository;

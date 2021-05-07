@@ -8,9 +8,9 @@ import static java.util.stream.Collectors.toList;
 
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
-import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.In;
+import com.sms.satp.common.enums.Media;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.enums.SchemaType;
 import com.sms.satp.entity.api.ApiEntity;
@@ -18,6 +18,7 @@ import com.sms.satp.entity.api.ApiEntity.ApiEntityBuilder;
 import com.sms.satp.entity.api.common.ParamInfo;
 import com.sms.satp.entity.project.ProjectEntity;
 import com.sms.satp.parser.ApiDocumentTransformer;
+import com.sms.satp.parser.common.DocumentParserResult;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -47,23 +48,35 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 
 @Slf4j
-public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<OpenAPI> {
+public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer {
+
+    INSTANCE;
 
     private static final String COMPONENT_KEY_PATTERN = "#/components/schemas/";
     public static final String GET = "get";
     public static final String DEFAULT_RESPONSE_KEY = "200";
 
     @Override
-    public List<ApiEntity> toApiEntities(OpenAPI sourceDocument, String projectId) {
-        Map<String, Schema> schemas = sourceDocument.getComponents().getSchemas();
+    public List<ApiEntity> toApiEntities(DocumentParserResult parserResult, String projectId) {
+        OpenAPI result = parserResult.getOpenApi();
+        Map<String, Schema> schemas = result.getComponents().getSchemas();
         final Map<String, List<ParamInfo>> componentReference = prepareComponentReference(schemas);
-        return sourceDocument.getPaths().entrySet().stream()
+        return result.getPaths().entrySet().stream()
             .map(entry -> buildApiEntities(entry, componentReference, projectId))
             .flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public ProjectEntity toProjectEntity(DocumentParserResult parserResult) {
+        OpenAPI result = parserResult.getOpenApi();
+        Info info = result.getInfo();
+        return ProjectEntity.builder().name(info.getTitle()).description(info.getDescription()).build();
+
     }
 
     private List<ApiEntity> buildApiEntities(Entry<String, PathItem> entry,
@@ -89,7 +102,6 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
             .swaggerId(operation.getOperationId())
             .apiProtocol(ApiProtocol.HTTPS)
             .apiStatus(ApiStatus.DEVELOP)
-            .apiRequestParamType(ApiRequestParamType.JSON)
             .description(operation.getDescription());
 
         // Build request Header/PathParam/QueryParam.
@@ -103,7 +115,10 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
 
         // Build request body.
         Optional.ofNullable(operation.getRequestBody())
-            .flatMap(requestBody -> requestBody.getContent().values().stream().findFirst()).stream()
+            .flatMap(requestBody -> requestBody.getContent().entrySet().stream().findFirst()).stream()
+            // set api request param type.
+            .peek(entry -> apiEntityBuilder.apiRequestParamType(Media.resolve(entry.getKey()).getApiRequestParamType()))
+            .map(Entry::getValue)
             .peek(mediaType -> ifRequestOrResponseEqualArray(mediaType, apiEntityBuilder::apiRequestJsonType))
             .findFirst()
             .ifPresent(
@@ -138,10 +153,22 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
     private void buildRequestOrResponse(Map<String, List<ParamInfo>> componentReference,
         MediaType mediaType, Consumer<List<ParamInfo>> callback) {
         Schema<?> schema = mediaType.getSchema();
-        String componentKey = (schema instanceof ArraySchema)
-            ? ((ArraySchema) schema).getItems().get$ref() :
-            schema.get$ref();
-        callback.accept(componentReference.get(getKey(componentKey)));
+        Map<String, Schema> properties = schema.getProperties();
+        List<ParamInfo> paramInfos;
+        if (MapUtils.isNotEmpty(properties)) {
+            paramInfos = properties.entrySet().stream()
+                .map(entry -> buildChildParamInfo(null, componentReference, entry))
+                .collect(toList());
+
+        } else {
+            String componentKey = (schema instanceof ArraySchema)
+                ? ((ArraySchema) schema).getItems().get$ref() :
+                schema.get$ref();
+            paramInfos = componentReference.get(getKey(componentKey));
+        }
+        callback.accept(paramInfos);
+
+
     }
 
     private void buildResponseHeaders(Map<String, Header> headers, Consumer<List<ParamInfo>> callback) {
@@ -246,10 +273,4 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
         return StringUtils.substringAfterLast(ref, COMPONENT_KEY_PATTERN);
     }
 
-    @Override
-    public ProjectEntity toProjectEntity(OpenAPI sourceDocument) {
-        Info info = sourceDocument.getInfo();
-        return ProjectEntity.builder().name(info.getTitle()).description(info.getDescription()).build();
-
-    }
 }

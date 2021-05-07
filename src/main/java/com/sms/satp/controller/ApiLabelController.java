@@ -3,7 +3,7 @@ package com.sms.satp.controller;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.enums.ApiLabelType;
 import com.sms.satp.common.response.Response;
-import com.sms.satp.entity.dto.ApiLabelDto;
+import com.sms.satp.dto.ApiLabelDto;
 import com.sms.satp.service.ApiLabelService;
 import java.util.List;
 import javax.validation.Valid;

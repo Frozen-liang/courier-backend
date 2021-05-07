@@ -1,6 +1,6 @@
 package com.sms.satp.service;
 
-import com.sms.satp.entity.dto.DataCollectionDto;
+import com.sms.satp.dto.DataCollectionDto;
 import java.util.List;
 
 public interface DataCollectionService {

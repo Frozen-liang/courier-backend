@@ -1,4 +1,4 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

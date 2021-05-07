@@ -2,12 +2,12 @@ package com.sms.satp.service;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.entity.dto.AddSceneCaseDto;
-import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.dto.SceneCaseApiDto;
-import com.sms.satp.entity.dto.SceneCaseDto;
-import com.sms.satp.entity.dto.SceneCaseSearchDto;
-import com.sms.satp.entity.dto.UpdateSceneCaseDto;
+import com.sms.satp.dto.AddSceneCaseDto;
+import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.SceneCaseApiDto;
+import com.sms.satp.dto.SceneCaseDto;
+import com.sms.satp.dto.SceneCaseSearchDto;
+import com.sms.satp.dto.UpdateSceneCaseDto;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.SceneCaseApiLogMapper;

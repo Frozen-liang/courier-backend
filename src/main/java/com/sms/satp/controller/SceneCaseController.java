@@ -2,11 +2,11 @@ package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
-import com.sms.satp.entity.dto.AddSceneCaseDto;
-import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.dto.SceneCaseDto;
-import com.sms.satp.entity.dto.SceneCaseSearchDto;
-import com.sms.satp.entity.dto.UpdateSceneCaseDto;
+import com.sms.satp.dto.AddSceneCaseDto;
+import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.SceneCaseDto;
+import com.sms.satp.dto.SceneCaseSearchDto;
+import com.sms.satp.dto.UpdateSceneCaseDto;
 import com.sms.satp.service.SceneCaseService;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;

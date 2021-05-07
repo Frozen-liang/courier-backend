@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.ApplicationTests;
 import com.sms.satp.entity.datacollection.DataCollection;
-import com.sms.satp.entity.dto.DataCollectionDto;
+import com.sms.satp.dto.DataCollectionDto;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

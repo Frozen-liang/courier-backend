@@ -1,6 +1,6 @@
 package com.sms.satp.service;
 
-import com.sms.satp.entity.dto.ProjectFunctionDto;
+import com.sms.satp.dto.ProjectFunctionDto;
 import java.util.List;
 
 public interface ProjectFunctionService {

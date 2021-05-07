@@ -1,27 +1,24 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
 import com.sms.satp.entity.env.EnvironmentAuth;
 import com.sms.satp.entity.env.EnvironmentHeader;
 import com.sms.satp.entity.env.EnvironmentParam;
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @Data
-public class GlobalEnvironmentDto {
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProjectEnvironmentDto {
 
     private String id;
-    @NotEmpty(message = "EvnName cannot be empty")
+    private String projectId;
     private String envName;
     private String envDesc;
-    @NotEmpty(message = "FrontUri cannot be empty")
     private String frontUri;
     private EnvironmentAuth envAuth;
     private String beforeInject;
@@ -30,8 +27,8 @@ public class GlobalEnvironmentDto {
     private String globalAfterProcess;
     private String createDateTime;
     private String modifyDateTime;
-    private Long createUserId;
-    private Long modifyUserId;
+    private String createUserId;
+    private String modifyUserId;
     private List<EnvironmentHeader> headers;
     private List<EnvironmentParam> params;
     private List<EnvironmentParam> urlParams;
