@@ -15,8 +15,8 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 @EnableMongoAuditing
 public class SatpApplication implements CommandLineRunner {
 
-    @Autowired
-    private ApiService apiService;
+    /*@Autowired
+    private ApiService apiService;*/
 
     public static void main(String[] args) {
         SpringApplication.run(SatpApplication.class, args);
@@ -24,9 +24,9 @@ public class SatpApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        ApiImportRequest apiImportRequest = ApiImportRequest.builder().documentType(DocumentType.SWAGGER.getType())
+        /*ApiImportRequest apiImportRequest = ApiImportRequest.builder().documentType(DocumentType.SWAGGER.getType())
             .documentUrl("https://petstore.swagger"
                 + ".io/v2/swagger.json").build();
-        apiService.importDocument(apiImportRequest);
+        apiService.importDocument(apiImportRequest);*/
     }
 }

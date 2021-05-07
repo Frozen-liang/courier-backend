@@ -31,7 +31,7 @@ class ApiTagMapperTest {
             .modifyDateTime(MODIFY_TIME)
             .build();
         ApiTagDto apiTagDto = apiTagMapper.toDto(apiTag);
-        assertThat(apiTagDto.getTagType()).isEqualTo(TAG_NAME);
+        assertThat(apiTagDto.getTagName()).isEqualTo(TAG_NAME);
     }
 
     @Test
