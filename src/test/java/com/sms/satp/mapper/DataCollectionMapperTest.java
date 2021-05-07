@@ -15,12 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
 @DisplayName("Tests for DataCollectionMapper")
-@SpringBootTest(classes = ApplicationTests.class,
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class DataCollectionMapperTest {
 
-    @SpyBean
-    DataCollectionMapper dataCollectionMapper;
+    private DataCollectionMapper dataCollectionMapper = new DataCollectionMapperImpl();
 
     private static final Integer SIZE = 10;
     private static final String COLLECTION_NAME = "testName";

@@ -15,12 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
 @DisplayName("Tests for GlobalFunctionMapper")
-@SpringBootTest(classes = ApplicationTests.class,
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class GlobalFunctionMapperTest {
 
-    @SpyBean
-    GlobalFunctionMapper globalFunctionMapper;
+    private GlobalFunctionMapper globalFunctionMapper = new GlobalFunctionMapperImpl();
 
     private static final Integer SIZE = 10;
     private static final String FUNCTION_NAME = "globalFunction";

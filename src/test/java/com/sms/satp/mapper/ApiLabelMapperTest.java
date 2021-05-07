@@ -15,12 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
 @DisplayName("Tests for ApiLabelMapper")
-@SpringBootTest(classes = ApplicationTests.class,
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ApiLabelMapperTest {
 
-    @SpyBean
-    ApiLabelMapper apiLabelMapper;
+    private ApiLabelMapper apiLabelMapper = new ApiLabelMapperImpl();
 
     private static final Integer SIZE = 10;
     private static final String LABEL_NAME = "testName";

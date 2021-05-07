@@ -15,12 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
 @DisplayName("Tests for ProjectFunctionMapper")
-@SpringBootTest(classes = ApplicationTests.class,
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProjectFunctionMapperTest {
 
-    @SpyBean
-    ProjectFunctionMapper projectFunctionMapper;
+    private ProjectFunctionMapper projectFunctionMapper = new ProjectFunctionMapperImpl();
 
     private static final Integer SIZE = 10;
     private static final String FUNCTION_CODE = "var a = 1";
