@@ -1,10 +1,10 @@
 package com.sms.satp.config;
 
 import com.sms.satp.common.enums.ApiJsonType;
-import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
+import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.enums.EnumCommon;
 import com.sms.satp.common.enums.ParamType;
 import com.sms.satp.common.enums.RequestMethod;
