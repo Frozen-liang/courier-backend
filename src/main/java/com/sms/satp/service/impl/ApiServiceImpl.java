@@ -38,6 +38,15 @@ public class ApiServiceImpl implements ApiService {
         ApiDocumentTransformer transformer = documentType.getTransformer();
         String documentUrl = apiImportRequest.getDocumentUrl();
         MultipartFile file = apiImportRequest.getFile();
+        DocumentParserResult content = getDocumentParserResult(reader, documentUrl, file);
+        ProjectEntity projectEntity = projectEntityRepository.insert(transformer.toProjectEntity(content));
+        List<ApiEntity> apiEntities = transformer.toApiEntities(content, projectEntity.getId());
+        apiRepository.insert(apiEntities);
+        return true;
+    }
+
+    private DocumentParserResult getDocumentParserResult(DocumentReader reader, String documentUrl,
+        MultipartFile file) {
         DocumentParserResult content;
         if (StringUtils.isNotBlank(documentUrl)) {
             content = reader.readLocation(documentUrl);
@@ -51,9 +60,6 @@ public class ApiServiceImpl implements ApiService {
             throw ExceptionUtils
                 .mpe("Not in the supported range(DocumentType=%s)", new Object[]{DocumentType.values()});
         }
-        ProjectEntity projectEntity = projectEntityRepository.insert(transformer.toProjectEntity(content));
-        List<ApiEntity> apiEntities = transformer.toApiEntities(content, projectEntity.getId());
-        apiRepository.insert(apiEntities);
-        return false;
+        return content;
     }
 }

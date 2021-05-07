@@ -24,5 +24,6 @@ public class Constants {
     public static final String SCENE_CASE_API_PATH = SDK_VERSION + "/scene-case-api";
     public static final String SCENE_CASE_API_LOG_PATH = SDK_VERSION + "/scene-case-api-log";
     public static final String DATA_COLLECTION_PATH = SDK_VERSION + "/data-collection";
+    public static final String API_PATH = SDK_VERSION + "/api";
 
 }

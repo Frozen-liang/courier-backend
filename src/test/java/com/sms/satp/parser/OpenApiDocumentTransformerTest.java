@@ -34,7 +34,7 @@ public class OpenApiDocumentTransformerTest {
                     .toString(),
                 null,
                 parseOptions).getOpenAPI();
-        ApiDocumentTransformer<DocumentParserResult> swaggerApiDocumentTransformer = SwaggerApiDocumentTransformer.INSTANCE;
+        ApiDocumentTransformer swaggerApiDocumentTransformer = SwaggerApiDocumentTransformer.INSTANCE;
         List<ApiEntity> apiEntities = swaggerApiDocumentTransformer
             .toApiEntities(new DocumentParserResult(openAPI), null);
 
@@ -52,7 +52,7 @@ public class OpenApiDocumentTransformerTest {
         OpenAPI openAPI = new OpenAPIParser()
             .readContents(contents, null,
                 parseOptions).getOpenAPI();
-        ApiDocumentTransformer<DocumentParserResult> swaggerApiDocumentTransformer = SwaggerApiDocumentTransformer.INSTANCE;
+        ApiDocumentTransformer swaggerApiDocumentTransformer = SwaggerApiDocumentTransformer.INSTANCE;
         List<ApiEntity> apiEntities = swaggerApiDocumentTransformer
             .toApiEntities(new DocumentParserResult(openAPI), null);
 //        OpenAPI openAPI = new OpenAPIParser()
@@ -87,7 +87,7 @@ public class OpenApiDocumentTransformerTest {
         OpenAPI openAPI = new OpenAPIParser()
             .readContents(contents, null,
                 parseOptions).getOpenAPI();
-        ApiDocumentTransformer<DocumentParserResult> swaggerApiDocumentTransformer = SwaggerApiDocumentTransformer.INSTANCE;
+        ApiDocumentTransformer swaggerApiDocumentTransformer = SwaggerApiDocumentTransformer.INSTANCE;
         List<ApiEntity> apiEntities = swaggerApiDocumentTransformer
             .toApiEntities(new DocumentParserResult(openAPI), null);
     }
