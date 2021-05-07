@@ -1,5 +1,6 @@
 package com.sms.satp.dto;
 
+import com.sms.satp.entity.dto.DataParamDto;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;

@@ -1,7 +1,7 @@
 package com.sms.satp.config;
 
 import com.sms.satp.common.enums.ApiJsonType;
-import com.sms.satp.common.enums.ApiLabelType;
+import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
@@ -28,7 +28,7 @@ public class MongoCustomConverterConfiguration {
             .of(EnumCommonToIntegerConverter.INSTANCE, IntegerToApiProtocolConverter.INSTANCE,
                 IntegerToApiRequestParamTypeConverter.INSTANCE, IntegerToApiStatusConverter.INSTANCE,
                 IntegerToParamTypeConverter.INSTANCE, IntegerToRequestMethodConverter.INSTANCE,
-                IntegerToApiLabelTypeConverter.INSTANCE, IntegerToApiJsonTypeConverter.INSTANCE);
+                IntegerToApiTagTypeConverter.INSTANCE, IntegerToApiJsonTypeConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -95,11 +95,11 @@ public class MongoCustomConverterConfiguration {
     }
 
     @ReadingConverter
-    enum IntegerToApiLabelTypeConverter implements Converter<Integer, ApiLabelType> {
+    enum IntegerToApiTagTypeConverter implements Converter<Integer, ApiTagType> {
         INSTANCE;
 
-        public ApiLabelType convert(@NotNull Integer code) {
-            return ApiLabelType.getType(code);
+        public ApiTagType convert(@NotNull Integer code) {
+            return ApiTagType.getType(code);
         }
     }
 

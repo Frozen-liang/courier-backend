@@ -1,6 +1,6 @@
-package com.sms.satp.entity;
+package com.sms.satp.entity.tag;
 
-import com.sms.satp.common.enums.ApiLabelType;
+import com.sms.satp.common.enums.ApiTagType;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,8 +19,8 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 @AllArgsConstructor
 @Data
 @Builder
-@Document(collection = "ApiLabel")
-public class ApiLabel {
+@Document(collection = "ApiTag")
+public class ApiTag {
 
     @MongoId(FieldType.OBJECT_ID)
     private String id;
@@ -28,8 +28,8 @@ public class ApiLabel {
     private String projectId;
     @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
-    private String labelName;
-    private ApiLabelType labelType;
+    private String tagName;
+    private ApiTagType tagType;
     @CreatedBy
     private Long createUserId;
     @LastModifiedBy

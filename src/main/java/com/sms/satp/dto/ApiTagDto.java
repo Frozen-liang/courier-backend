@@ -1,6 +1,6 @@
 package com.sms.satp.dto;
 
-import com.sms.satp.common.enums.ApiLabelType;
+import com.sms.satp.common.enums.ApiTagType;
 import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,15 +11,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class ApiLabelDto {
+public class ApiTagDto {
 
     private String id;
     @NotEmpty(message = "The projectId cannot be empty")
     private String projectId;
     private String groupId;
-    @NotEmpty(message = "The labelName cannot be empty")
-    private String labelName;
-    private ApiLabelType labelType;
+    @NotEmpty(message = "The tagName cannot be empty")
+    private String tagName;
+    private ApiTagType tagType;
     private String createDateTime;
     private String modifyDateTime;
     private Long createUserId;

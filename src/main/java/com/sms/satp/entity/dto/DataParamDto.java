@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataParamDto {
 
-    @NotEmpty(message = "The paramKey connot by empty")
+    @NotEmpty(message = "The paramKey cannot by empty")
     private String paramKey;
     private Object paramValue;
 }

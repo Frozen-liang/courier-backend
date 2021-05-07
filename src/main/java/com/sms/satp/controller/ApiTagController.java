@@ -1,10 +1,10 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.enums.ApiLabelType;
+import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.response.Response;
-import com.sms.satp.dto.ApiLabelDto;
-import com.sms.satp.service.ApiLabelService;
+import com.sms.satp.dto.ApiTagDto;
+import com.sms.satp.service.ApiTagService;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,43 +17,43 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(Constants.API_LABEL_PATH)
-public class ApiLabelController {
+@RequestMapping(Constants.API_TAG_PATH)
+public class ApiTagController {
 
-    private final ApiLabelService apiLabelService;
+    private final ApiTagService apiTagService;
 
-    public ApiLabelController(ApiLabelService apiLabelService) {
-        this.apiLabelService = apiLabelService;
+    public ApiTagController(ApiTagService apiTagService) {
+        this.apiTagService = apiTagService;
     }
 
 
     @GetMapping("/{id}")
-    public Response<ApiLabelDto> getById(@PathVariable String id) {
-        return Response.ok(apiLabelService.findById(id));
+    public Response<ApiTagDto> getById(@PathVariable String id) {
+        return Response.ok(apiTagService.findById(id));
     }
 
     @GetMapping("/list/{projectId}")
-    public Response<List<ApiLabelDto>> list(@PathVariable("projectId") String projectId, String labelName,
-        ApiLabelType labelType) {
-        return Response.ok(apiLabelService.list(projectId, labelName, labelType));
+    public Response<List<ApiTagDto>> list(@PathVariable("projectId") String projectId, String tagName,
+        ApiTagType tagType) {
+        return Response.ok(apiTagService.list(projectId, tagName, tagType));
     }
 
     @PostMapping
-    public Response<Boolean> add(@Valid @RequestBody ApiLabelDto apiLabelDto) {
-        apiLabelService.add(apiLabelDto);
+    public Response<Boolean> add(@Valid @RequestBody ApiTagDto apiTagDto) {
+        apiTagService.add(apiTagDto);
         return Response.ok(Boolean.TRUE);
     }
 
     @PutMapping
-    public Response<Boolean> edit(@Valid @RequestBody ApiLabelDto apiLabelDto) {
-        apiLabelService.edit(apiLabelDto);
+    public Response<Boolean> edit(@Valid @RequestBody ApiTagDto apiTagDto) {
+        apiTagService.edit(apiTagDto);
         return Response.ok(Boolean.TRUE);
     }
 
     @DeleteMapping("/{ids}")
     public Response<Boolean> delete(@PathVariable String[] ids) {
         for (String id : ids) {
-            apiLabelService.delete(id);
+            apiTagService.delete(id);
         }
         return Response.ok(Boolean.TRUE);
     }
