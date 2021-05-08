@@ -14,5 +14,4 @@ public class SatpApplication {
         SpringApplication.run(SatpApplication.class, args);
     }
 
-
 }

@@ -1,23 +1,23 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.ApiLabelDto;
-import com.sms.satp.entity.ApiLabel;
+import com.sms.satp.dto.ApiTagDto;
+import com.sms.satp.entity.tag.ApiTag;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
-public interface ApiLabelMapper {
+public interface ApiTagMapper {
 
     @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    ApiLabelDto toDto(ApiLabel apiLabel);
+    ApiTagDto toDto(ApiTag apiTag);
 
-    List<ApiLabelDto> toDtoList(List<ApiLabel> apiLabels);
+    List<ApiTagDto> toDtoList(List<ApiTag> apiTags);
 
     @Mapping(target = "createDateTime", ignore = true)
     @Mapping(target = "modifyDateTime", ignore = true)
-    ApiLabel toEntity(ApiLabelDto apiLabelDto);
+    ApiTag toEntity(ApiTagDto apiTagDto);
 
 }
