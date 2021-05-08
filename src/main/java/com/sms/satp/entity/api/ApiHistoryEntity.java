@@ -23,12 +23,12 @@ public class ApiHistoryEntity {
     private String id;
 
     /**
-     * 历史记录
+     * 历史记录.
      */
     private ApiEntity record;
 
     /**
-     * 修改描述
+     * 修改描述.
      */
     private String description;
 
