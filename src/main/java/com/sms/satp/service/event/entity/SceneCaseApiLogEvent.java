@@ -1,6 +1,6 @@
 package com.sms.satp.service.event.entity;
 
-import com.sms.satp.entity.dto.SceneCaseApiLogDto;
+import com.sms.satp.dto.SceneCaseApiLogDto;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 

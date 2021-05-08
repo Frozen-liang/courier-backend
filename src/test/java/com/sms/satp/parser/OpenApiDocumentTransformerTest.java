@@ -1,6 +1,7 @@
 package com.sms.satp.parser;
 
 import com.sms.satp.entity.api.ApiEntity;
+import com.sms.satp.parser.common.DocumentParserResult;
 import com.sms.satp.parser.impl.SwaggerApiDocumentTransformer;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -10,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.jupiter.api.Disabled;
@@ -27,11 +29,14 @@ public class OpenApiDocumentTransformerTest {
         ParseOptions parseOptions = new ParseOptions();
         parseOptions.setResolve(true);
         OpenAPI openAPI = new OpenAPIParser()
-            .readLocation(OpenApiDocumentTransformerTest.class.getResource(CONFIG_OPEN_API_V_3_YAML).toString(),
+            .readLocation(
+                Objects.requireNonNull(OpenApiDocumentTransformerTest.class.getResource(CONFIG_OPEN_API_V_3_YAML))
+                    .toString(),
                 null,
                 parseOptions).getOpenAPI();
-        SwaggerApiDocumentTransformer swaggerApiDocumentTransformer = new SwaggerApiDocumentTransformer();
-        List<ApiEntity> apiEntities = swaggerApiDocumentTransformer.toApiEntities(openAPI, null);
+        ApiDocumentTransformer swaggerApiDocumentTransformer = SwaggerApiDocumentTransformer.INSTANCE;
+        List<ApiEntity> apiEntities = swaggerApiDocumentTransformer
+            .toApiEntities(new DocumentParserResult(openAPI), null);
 
     }
 
@@ -47,8 +52,9 @@ public class OpenApiDocumentTransformerTest {
         OpenAPI openAPI = new OpenAPIParser()
             .readContents(contents, null,
                 parseOptions).getOpenAPI();
-        SwaggerApiDocumentTransformer swaggerApiDocumentTransformer = new SwaggerApiDocumentTransformer();
-        List<ApiEntity> apiEntities = swaggerApiDocumentTransformer.toApiEntities(openAPI, null);
+        ApiDocumentTransformer swaggerApiDocumentTransformer = SwaggerApiDocumentTransformer.INSTANCE;
+        List<ApiEntity> apiEntities = swaggerApiDocumentTransformer
+            .toApiEntities(new DocumentParserResult(openAPI), null);
 //        OpenAPI openAPI = new OpenAPIParser()
 //            .readLocation("https://onedev.smsassist.com/swagger/docs/v1", null, parseOptions).getOpenAPI();
         StopWatch started = StopWatch.createStarted();
@@ -81,7 +87,8 @@ public class OpenApiDocumentTransformerTest {
         OpenAPI openAPI = new OpenAPIParser()
             .readContents(contents, null,
                 parseOptions).getOpenAPI();
-        SwaggerApiDocumentTransformer swaggerApiDocumentTransformer = new SwaggerApiDocumentTransformer();
-        List<ApiEntity> apiEntities = swaggerApiDocumentTransformer.toApiEntities(openAPI, null);
+        ApiDocumentTransformer swaggerApiDocumentTransformer = SwaggerApiDocumentTransformer.INSTANCE;
+        List<ApiEntity> apiEntities = swaggerApiDocumentTransformer
+            .toApiEntities(new DocumentParserResult(openAPI), null);
     }
 }

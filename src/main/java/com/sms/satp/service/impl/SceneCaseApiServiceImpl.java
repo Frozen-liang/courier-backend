@@ -10,9 +10,9 @@ import static com.sms.satp.common.ErrorCode.GET_SCENE_CASE_API_LIST_BY_SCENE_CAS
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.SearchFiled;
 import com.sms.satp.common.enums.OperationType;
-import com.sms.satp.entity.dto.AddSceneCaseApiDto;
-import com.sms.satp.entity.dto.SceneCaseApiDto;
-import com.sms.satp.entity.dto.SceneCaseApiLogDto;
+import com.sms.satp.dto.AddSceneCaseApiDto;
+import com.sms.satp.dto.SceneCaseApiDto;
+import com.sms.satp.dto.SceneCaseApiLogDto;
 import com.sms.satp.entity.dto.UpdateSceneCaseApiDto;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.SceneCaseApiLogMapper;

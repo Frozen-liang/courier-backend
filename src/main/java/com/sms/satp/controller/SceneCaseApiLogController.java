@@ -2,8 +2,8 @@ package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
-import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.dto.SceneCaseApiLogDto;
+import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.SceneCaseApiLogDto;
 import com.sms.satp.service.SceneCaseApiLogService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;

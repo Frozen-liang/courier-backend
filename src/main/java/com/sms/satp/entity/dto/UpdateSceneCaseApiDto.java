@@ -1,5 +1,6 @@
 package com.sms.satp.entity.dto;
 
+import com.sms.satp.dto.SceneCaseApiDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

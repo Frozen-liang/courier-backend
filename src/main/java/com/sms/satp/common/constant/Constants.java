@@ -17,7 +17,7 @@ public class Constants {
     public static final String TEST_CASE_PATH = SDK_VERSION + "/test-case";
     public static final String INTERFACE_HISTORY_PATH = SDK_VERSION + "/interface/history";
     public static final String GLOBAL_ENVIRONMENT_PATH = SDK_VERSION + "/global-environment";
-    public static final String API_LABEL_PATH = SDK_VERSION + "/api-label";
+    public static final String API_TAG_PATH = SDK_VERSION + "/api-tag";
     public static final String SCENE_CASE_PATH = SDK_VERSION + "/scene-case";
     public static final String GLOBAL_FUNCTION_PATH = SDK_VERSION + "/global-function";
     public static final String PROJECT_FUNCTION_PATH = SDK_VERSION + "/project-function";
@@ -27,5 +27,6 @@ public class Constants {
     public static final String CASE_TEMPLATE_PATH = SDK_VERSION + "/case-template";
     public static final String CASE_TEMPLATE_API_PATH = SDK_VERSION + "/case-template-api";
     public static final String CASE_TEMPLATE_CONN_PATH = SDK_VERSION + "/case-template-conn";
+    public static final String API_PATH = SDK_VERSION + "/api";
 
 }

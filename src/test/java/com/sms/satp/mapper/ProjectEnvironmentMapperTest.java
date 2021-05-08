@@ -3,7 +3,7 @@ package com.sms.satp.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.ApplicationTests;
-import com.sms.satp.entity.dto.ProjectEnvironmentDto;
+import com.sms.satp.dto.ProjectEnvironmentDto;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,12 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
 @DisplayName("Tests for ProjectEnvironmentMapper")
-@SpringBootTest(classes = ApplicationTests.class,
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProjectEnvironmentMapperTest {
 
-    @SpyBean
-    ProjectEnvironmentMapper projectEnvironmentMapper;
+    private ProjectEnvironmentMapper projectEnvironmentMapper = new ProjectEnvironmentMapperImpl();
 
     private static final Integer SIZE = 10;
     private static final String ENV_DESC = "projectEnvironment";

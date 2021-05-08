@@ -1,7 +1,10 @@
 package com.sms.satp.common.enums;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 
 public enum SchemaType {
@@ -21,30 +24,22 @@ public enum SchemaType {
     ARRAY("array", ParamType.ARRAY);
 
 
-    private String type;
-    private ParamType paramType;
-    private static final Map<String, SchemaType> mappings = new HashMap<>(16);
-    private static final Map<String, String> SPECIAL_TYPE = new HashMap<>();
-
-    static {
-
-        SPECIAL_TYPE.put("date-time", DATETIME.getType());
-        SPECIAL_TYPE.put(DATE.getType(), DATE.getType());
-        SPECIAL_TYPE.put("binary", FILE.getType());
-
-        for (SchemaType schemaType : values()) {
-            mappings.put(schemaType.type, schemaType);
-        }
-    }
+    private final String type;
+    private final ParamType paramType;
+    private static final Map<String, String> SPECIAL_TYPE = Map
+        .of("date-time", DATETIME.getType(), "binary", FILE.getType());
+    private static final Map<String, SchemaType> SCHEMA_TYPE_MAP
+        = Arrays.stream(values()).collect(Collectors.toMap(SchemaType::getType, Function.identity()));
 
 
     @Nullable
     public static SchemaType resolve(@Nullable String type) {
-        return mappings.get(type);
+        return SCHEMA_TYPE_MAP.get(type);
     }
 
     public static SchemaType resolve(@Nullable String type, String format) {
-        return resolve(SPECIAL_TYPE.getOrDefault(format, type));
+
+        return resolve(SPECIAL_TYPE.getOrDefault(StringUtils.defaultIfBlank(format, ""), type));
     }
 
     SchemaType(String type, ParamType paramType) {

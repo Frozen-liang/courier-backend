@@ -18,10 +18,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.entity.dto.GlobalEnvironmentDto;
+import com.sms.satp.dto.GlobalEnvironmentDto;
 import com.sms.satp.entity.env.ProjectEnvironment;
-import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.dto.ProjectEnvironmentDto;
+import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.ProjectEnvironmentDto;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
 import com.sms.satp.service.impl.ProjectEnvironmentServiceImpl;

@@ -2,8 +2,8 @@ package com.sms.satp.service;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.ErrorCode;
-import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.dto.SceneCaseApiLogDto;
+import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.SceneCaseApiLogDto;
 import com.sms.satp.entity.scenetest.SceneCaseApiLog;
 import com.sms.satp.mapper.SceneCaseApiLogMapper;
 import com.sms.satp.repository.SceneCaseApiLogRepository;

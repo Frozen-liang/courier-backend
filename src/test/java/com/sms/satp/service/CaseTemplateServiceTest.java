@@ -2,10 +2,10 @@ package com.sms.satp.service;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.dto.PageDto;
 import com.sms.satp.entity.dto.CaseTemplateApiDto;
 import com.sms.satp.entity.dto.CaseTemplateDto;
 import com.sms.satp.entity.dto.CaseTemplateSearchDto;
-import com.sms.satp.entity.dto.PageDto;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.mapper.CaseTemplateMapper;

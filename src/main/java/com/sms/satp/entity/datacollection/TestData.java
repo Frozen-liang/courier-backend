@@ -1,5 +1,6 @@
 package com.sms.satp.entity.datacollection;
 
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,5 +14,5 @@ import lombok.NoArgsConstructor;
 public class TestData {
 
     private String dataName;
-    private Map<String,Object> data;
+    private List<DataParam> data;
 }

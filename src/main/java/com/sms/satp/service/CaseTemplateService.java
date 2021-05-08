@@ -1,8 +1,8 @@
 package com.sms.satp.service;
 
+import com.sms.satp.dto.PageDto;
 import com.sms.satp.entity.dto.CaseTemplateDto;
 import com.sms.satp.entity.dto.CaseTemplateSearchDto;
-import com.sms.satp.entity.dto.PageDto;
 import org.springframework.data.domain.Page;
 
 public interface CaseTemplateService {

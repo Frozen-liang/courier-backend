@@ -13,9 +13,9 @@ import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.entity.dto.GlobalEnvironmentDto;
-import com.sms.satp.entity.dto.PageDto;
-import com.sms.satp.entity.dto.ProjectEnvironmentDto;
+import com.sms.satp.dto.GlobalEnvironmentDto;
+import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.ProjectEnvironmentDto;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
