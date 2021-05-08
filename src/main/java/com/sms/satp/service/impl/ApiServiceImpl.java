@@ -2,11 +2,13 @@ package com.sms.satp.service.impl;
 
 import com.sms.satp.dto.ApiImportRequest;
 import com.sms.satp.entity.api.ApiEntity;
+import com.sms.satp.entity.api.ApiHistoryEntity;
 import com.sms.satp.entity.project.ProjectEntity;
 import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.DocumentReader;
 import com.sms.satp.parser.common.DocumentParserResult;
 import com.sms.satp.parser.common.DocumentType;
+import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.ProjectEntityRepository;
 import com.sms.satp.service.ApiService;
@@ -14,6 +16,7 @@ import com.sms.satp.utils.ExceptionUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -24,11 +27,13 @@ public class ApiServiceImpl implements ApiService {
 
     private final ProjectEntityRepository projectEntityRepository;
     private final ApiRepository apiRepository;
+    private final ApiHistoryRepository apiHistoryRepository;
 
     public ApiServiceImpl(ProjectEntityRepository projectEntityRepository,
-        ApiRepository apiRepository) {
+        ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository) {
         this.projectEntityRepository = projectEntityRepository;
         this.apiRepository = apiRepository;
+        this.apiHistoryRepository = apiHistoryRepository;
     }
 
     @Override
@@ -38,6 +43,18 @@ public class ApiServiceImpl implements ApiService {
         ApiDocumentTransformer transformer = documentType.getTransformer();
         String documentUrl = apiImportRequest.getDocumentUrl();
         MultipartFile file = apiImportRequest.getFile();
+        DocumentParserResult content = getDocumentParserResult(reader, documentUrl, file);
+        ProjectEntity projectEntity = projectEntityRepository.insert(transformer.toProjectEntity(content));
+        List<ApiEntity> apiEntities = transformer.toApiEntities(content, projectEntity.getId());
+        List<ApiHistoryEntity> apiHistoryEntities = apiRepository.insert(apiEntities).stream()
+            .map(apiEntity -> ApiHistoryEntity.builder().record(apiEntity).build()).collect(
+                Collectors.toList());
+        apiHistoryRepository.insert(apiHistoryEntities);
+        return true;
+    }
+
+    private DocumentParserResult getDocumentParserResult(DocumentReader reader, String documentUrl,
+        MultipartFile file) {
         DocumentParserResult content;
         if (StringUtils.isNotBlank(documentUrl)) {
             content = reader.readLocation(documentUrl);
@@ -51,9 +68,6 @@ public class ApiServiceImpl implements ApiService {
             throw ExceptionUtils
                 .mpe("Not in the supported range(DocumentType=%s)", new Object[]{DocumentType.values()});
         }
-        ProjectEntity projectEntity = projectEntityRepository.insert(transformer.toProjectEntity(content));
-        List<ApiEntity> apiEntities = transformer.toApiEntities(content, projectEntity.getId());
-        apiRepository.insert(apiEntities);
-        return false;
+        return content;
     }
 }

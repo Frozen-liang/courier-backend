@@ -1,6 +1,6 @@
-package com.sms.satp.entity.api.common;
+package com.sms.satp.dto;
 
-import com.sms.satp.common.enums.ParamType;
+import com.sms.satp.entity.api.common.ParamInfo;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -9,11 +9,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@Builder
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class ParamInfo {
+@AllArgsConstructor
+@Builder
+public class ParamInfoDto {
 
     /**
      * 字段名.
@@ -29,8 +29,9 @@ public class ParamInfo {
     private String description;
     /**
      * 字段类型.
+     * @link ParamType
      */
-    private ParamType paramType;
+    private Integer paramType;
     /**
      * 是否递归引用自己.
      */
