@@ -8,9 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.data.mongodb.core.mapping.FieldType;
 
 @Data
 @NoArgsConstructor
@@ -18,12 +15,10 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @Builder
 public class ProjectImportSourceResponse {
 
-    @Id
-    @Field(targetType = FieldType.OBJECT_ID)
+
     private String id;
     private Integer documentType;
     private Integer saveMode;
-    @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
     private String documentUrl;
     /**

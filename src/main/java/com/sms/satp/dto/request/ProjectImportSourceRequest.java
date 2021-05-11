@@ -20,10 +20,10 @@ public class ProjectImportSourceRequest {
     @NotBlank(groups = UpdateGroup.class)
     private String id;
     @NotNull(message = "The documentType must not be null.")
-    @Range(min = 0, max = 1)
+    @Range(min = 0, max = 1, message = "The documentType only either 0 or 1.")
     private Integer documentType;
     @NotNull(message = "The saveMode must not be null.")
-    @Range(min = 1, max = 3)
+    @Range(min = 1, max = 3, message = "The saveMode must be in (1|2|3).")
     private Integer saveMode;
     @NotNull(message = "The projectId must not be null.")
     private String projectId;
