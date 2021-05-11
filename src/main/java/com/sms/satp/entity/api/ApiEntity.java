@@ -79,9 +79,9 @@ public class ApiEntity {
     private Long createUserId;
 
     @CreatedDate
-    private LocalDateTime createTime;
+    private LocalDateTime createDateTime;
     @LastModifiedDate
-    private LocalDateTime modifyTime;
+    private LocalDateTime modifyDateTime;
 
 
 }

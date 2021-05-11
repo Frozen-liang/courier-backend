@@ -17,7 +17,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 @DisplayName("Tests for GlobalEnvironmentMapper")
 class GlobalEnvironmentMapperTest {
 
-    private GlobalEnvironmentMapper globalEnvironmentMapper = new GlobalEnvironmentMapperImpl();
+    private GlobalEnvironmentMapper globalEnvironmentMapper = new GlobalEnvironmentMapperImpl(new ParamInfoMapperImpl());
 
     private static final Integer SIZE = 10;
     private static final String EVN_NAME = "evnName";

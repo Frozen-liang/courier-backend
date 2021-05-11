@@ -33,5 +33,5 @@ public class ApiHistoryEntity {
     private String description;
 
     @CreatedDate
-    private LocalDateTime createTime;
+    private LocalDateTime createDateTime;
 }

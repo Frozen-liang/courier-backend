@@ -1,5 +1,6 @@
 package com.sms.satp.entity.function;
 
+import com.sms.satp.entity.api.common.ParamInfo;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -28,9 +29,9 @@ public class ProjectFunction {
     private String projectId;
     private String functionDesc;
     private String functionName;
-    private List<FunctionParam> functionParams;
+    private List<ParamInfo> functionParams;
     private String functionCode;
-    private boolean remove;
+    private boolean removed;
     @CreatedBy
     private Long createUserId;
     @LastModifiedBy

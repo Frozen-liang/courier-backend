@@ -1,9 +1,10 @@
 package com.sms.satp.dto;
 
+import com.sms.satp.entity.api.common.HeaderInfo;
 import com.sms.satp.entity.env.EnvironmentAuth;
-import com.sms.satp.entity.env.EnvironmentHeader;
-import com.sms.satp.entity.env.EnvironmentParam;
 import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,9 +17,12 @@ import lombok.NoArgsConstructor;
 public class ProjectEnvironmentDto {
 
     private String id;
+    @NotEmpty(message = "The projectId must not be empty")
     private String projectId;
+    @NotEmpty(message = "The envName must not be empty")
     private String envName;
     private String envDesc;
+    @NotEmpty(message = "The frontUri must not be empty")
     private String frontUri;
     private EnvironmentAuth envAuth;
     private String beforeInject;
@@ -29,8 +33,11 @@ public class ProjectEnvironmentDto {
     private String modifyDateTime;
     private String createUserId;
     private String modifyUserId;
-    private List<EnvironmentHeader> headers;
-    private List<EnvironmentParam> params;
-    private List<EnvironmentParam> urlParams;
-    private List<EnvironmentParam> additionalParams;
+    private List<HeaderInfo> headers;
+    @Valid
+    private List<ParamInfoDto> params;
+    @Valid
+    private List<ParamInfoDto> urlParams;
+    @Valid
+    private List<ParamInfoDto> additionalParams;
 }

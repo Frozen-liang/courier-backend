@@ -1,7 +1,7 @@
 package com.sms.satp.dto;
 
-import com.sms.satp.entity.function.FunctionParam;
 import java.util.List;
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,13 +15,14 @@ import lombok.NoArgsConstructor;
 public class ProjectFunctionDto {
 
     private String id;
-    @NotEmpty(message = "ProjectId cannot be empty")
+    @NotEmpty(message = "The projectId cannot be empty")
     private String projectId;
-    @NotEmpty(message = "FunctionDesc cannot be empty")
+    @NotEmpty(message = "The functionDesc cannot be empty")
     private String functionDesc;
-    @NotEmpty(message = "FunctionName cannot be empty")
+    @NotEmpty(message = "The functionName cannot be empty")
     private String functionName;
-    private List<FunctionParam> functionParams;
+    @Valid
+    private List<ParamInfoDto> functionParams;
     private String functionCode;
     private String createDateTime;
     private String modifyDateTime;

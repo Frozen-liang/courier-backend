@@ -8,11 +8,11 @@ public enum ErrorCode {
     FILE_READ_ERROR("30003","File has been read to fail"),
     GET_REF_KEY_ERROR("40001", "The reference value cannot be null"),
     DOCUMENT_TYPE_ERROR("4002", "Document type error"),
-    GET_API_INTERFACE_PAGE_ERROR("4003","Failed to get the ApiInterface page!"),
-    PARSE_TO_API_INTERFACE_ERROR("4004","Failed to parse the file or url and save as ApiInterface!"),
-    ADD_API_INTERFACE_ERROR("4005","Failed to add the ApiInterface!"),
-    GET_API_INTERFACE_BY_ID_ERROR("4006","Failed to get the ApiInterface by id!"),
-    DELETE_API_INTERFACE_BY_ID_ERROR("4007","Failed to delete the ApiInterface!"),
+    GET_API_PAGE_ERROR("4003","Failed to get the Api page!"),
+    PARSE_TO_API_INTERFACE_ERROR("4004","Failed to parse the file or url and save as Api!"),
+    ADD_API_ERROR("4005","Failed to add the Api!"),
+    GET_API_BY_ID_ERROR("4006","Failed to get the Api by id!"),
+    DELETE_API_BY_ID_ERROR("4007","Failed to delete the Api!"),
     GET_PROJECT_ENVIRONMENT_PAGE_ERROR("4008","Failed to get the ProjectEnvironment page!"),
     ADD_PROJECT_ENVIRONMENT_ERROR("4009","Failed to add the ProjectEnvironment!"),
     EDIT_PROJECT_ENVIRONMENT_ERROR("4010","Failed to edit the ProjectEnvironment!"),
@@ -98,6 +98,7 @@ public enum ErrorCode {
     EDIT_DATA_COLLECTION_ERROR("4090", "Failed to edit the DataCollection!"),
     DELETE_DATA_COLLECTION_BY_ID_ERROR("4091", "Failed to delete the DataCollection!"),
     GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR("4092", "Failed to delete the DataCollection!"),
+    EDIT_API_ERROR("4093", "Failed to edit the Api!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

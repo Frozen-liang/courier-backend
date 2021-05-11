@@ -26,7 +26,7 @@ public class ProjectEntity {
     private String id;
     private String name;
     private String description;
-    private boolean removed;
+    private boolean removedd;
     @CreatedBy
     private Long createUserId;
     @LastModifiedBy

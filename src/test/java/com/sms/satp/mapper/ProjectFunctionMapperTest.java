@@ -17,7 +17,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 @DisplayName("Tests for ProjectFunctionMapper")
 class ProjectFunctionMapperTest {
 
-    private ProjectFunctionMapper projectFunctionMapper = new ProjectFunctionMapperImpl();
+    private ProjectFunctionMapper projectFunctionMapper = new ProjectFunctionMapperImpl(new ParamInfoMapperImpl());
 
     private static final Integer SIZE = 10;
     private static final String FUNCTION_CODE = "var a = 1";

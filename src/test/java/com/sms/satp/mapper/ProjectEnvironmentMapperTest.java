@@ -17,7 +17,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 @DisplayName("Tests for ProjectEnvironmentMapper")
 class ProjectEnvironmentMapperTest {
 
-    private ProjectEnvironmentMapper projectEnvironmentMapper = new ProjectEnvironmentMapperImpl();
+    private ProjectEnvironmentMapper projectEnvironmentMapper = new ProjectEnvironmentMapperImpl(new ParamInfoMapperImpl());
 
     private static final Integer SIZE = 10;
     private static final String ENV_DESC = "projectEnvironment";
