@@ -1,5 +1,6 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +18,8 @@ public class ApiImportRequest {
     @NotNull(message = "The documentType must not be null.")
     @Range(min = 0, max = 1)
     private Integer documentType;
+    @NotBlank(message = "The projectId must not be null.")
+    private String projectId;
     private String documentUrl;
     private MultipartFile file;
-    private SaveMode saveMode;
 }

@@ -5,9 +5,11 @@ import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.ApiTagType;
+import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.enums.EnumCommon;
 import com.sms.satp.common.enums.ParamType;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.common.enums.SaveMode;
 import com.sun.istack.NotNull;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +30,8 @@ public class MongoCustomConverterConfiguration {
             .of(EnumCommonToIntegerConverter.INSTANCE, IntegerToApiProtocolConverter.INSTANCE,
                 IntegerToApiRequestParamTypeConverter.INSTANCE, IntegerToApiStatusConverter.INSTANCE,
                 IntegerToParamTypeConverter.INSTANCE, IntegerToRequestMethodConverter.INSTANCE,
-                IntegerToApiTagTypeConverter.INSTANCE, IntegerToApiJsonTypeConverter.INSTANCE);
+                IntegerToApiTagTypeConverter.INSTANCE, IntegerToApiJsonTypeConverter.INSTANCE,
+                IntegerToSaveModeConverter.INSTANCE, IntegerToDocumentTypeConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -109,6 +112,24 @@ public class MongoCustomConverterConfiguration {
 
         public ApiJsonType convert(@NotNull Integer code) {
             return ApiJsonType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToSaveModeConverter implements Converter<Integer, SaveMode> {
+        INSTANCE;
+
+        public SaveMode convert(@NotNull Integer code) {
+            return SaveMode.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToDocumentTypeConverter implements Converter<Integer, DocumentType> {
+        INSTANCE;
+
+        public DocumentType convert(@NotNull Integer code) {
+            return DocumentType.getType(code);
         }
     }
 

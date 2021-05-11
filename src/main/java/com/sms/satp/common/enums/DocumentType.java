@@ -1,4 +1,4 @@
-package com.sms.satp.parser.common;
+package com.sms.satp.common.enums;
 
 import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.DocumentReader;
@@ -11,30 +11,30 @@ import java.util.stream.Collectors;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
-public enum DocumentType {
+public enum DocumentType implements EnumCommon {
     SWAGGER(0, SwaggerApiDocumentTransformer.INSTANCE, SwaggerDocumentReader.INSTANCE),
     POSTMAN(1, null, null);
 
 
     private static final Map<Integer, DocumentType> MAPPINGS =
-        Arrays.stream(values()).collect(Collectors.toMap(DocumentType::getType, Function.identity()));
+        Arrays.stream(values()).collect(Collectors.toMap(DocumentType::getCode, Function.identity()));
 
 
-    private final int type;
+    private final int code;
     private final ApiDocumentTransformer transformer;
     private final DocumentReader reader;
 
-    DocumentType(int type, ApiDocumentTransformer transformer,
+    DocumentType(int code, ApiDocumentTransformer transformer,
         DocumentReader reader) {
 
-        this.type = type;
+        this.code = code;
         this.transformer = transformer;
         this.reader = reader;
     }
 
 
-    public int getType() {
-        return type;
+    public int getCode() {
+        return code;
     }
 
     public ApiDocumentTransformer getTransformer() {
@@ -46,12 +46,12 @@ public enum DocumentType {
     }
 
     @NonNull
-    public static DocumentType resolve(@Nullable Integer documentType) {
-        return MAPPINGS.getOrDefault(documentType, null);
+    public static DocumentType getType(@Nullable Integer code) {
+        return MAPPINGS.getOrDefault(code, null);
     }
 
 
-    public boolean matches(Integer documentType) {
-        return (this == resolve(documentType));
+    public boolean matches(Integer code) {
+        return (this == getType(code));
     }
 }

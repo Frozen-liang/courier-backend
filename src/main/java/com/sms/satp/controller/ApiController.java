@@ -3,10 +3,10 @@ package com.sms.satp.controller;
 import static com.sms.satp.common.constant.Constants.API_PATH;
 
 import com.sms.satp.common.response.Response;
-import com.sms.satp.dto.ApiImportRequest;
 import com.sms.satp.dto.ApiPageRequest;
 import com.sms.satp.dto.ApiRequest;
 import com.sms.satp.dto.ApiResponse;
+import com.sms.satp.dto.request.ApiImportRequest;
 import com.sms.satp.service.ApiService;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
@@ -58,5 +58,5 @@ public class ApiController {
     public Response<Boolean> delete(@PathVariable("ids") String[] ids) {
         return Response.ok(apiService.delete(ids));
     }
-    
+
 }

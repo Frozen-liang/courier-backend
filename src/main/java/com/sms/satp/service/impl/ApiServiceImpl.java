@@ -11,10 +11,11 @@ import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.dto.ApiImportRequest;
+import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.dto.ApiPageRequest;
 import com.sms.satp.dto.ApiRequest;
 import com.sms.satp.dto.ApiResponse;
+import com.sms.satp.dto.request.ApiImportRequest;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
 import com.sms.satp.entity.project.ProjectEntity;
@@ -22,7 +23,6 @@ import com.sms.satp.mapper.ApiMapper;
 import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.DocumentReader;
 import com.sms.satp.parser.common.DocumentParserResult;
-import com.sms.satp.parser.common.DocumentType;
 import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.ProjectEntityRepository;
@@ -79,7 +79,7 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public boolean importDocument(ApiImportRequest apiImportRequest) {
-        DocumentType documentType = DocumentType.resolve(apiImportRequest.getDocumentType());
+        DocumentType documentType = DocumentType.getType(apiImportRequest.getDocumentType());
         DocumentReader reader = documentType.getReader();
         ApiDocumentTransformer transformer = documentType.getTransformer();
         String documentUrl = apiImportRequest.getDocumentUrl();

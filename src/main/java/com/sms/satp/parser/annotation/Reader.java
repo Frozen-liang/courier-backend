@@ -1,6 +1,6 @@
 package com.sms.satp.parser.annotation;
 
-import com.sms.satp.parser.common.DocumentType;
+import com.sms.satp.common.enums.DocumentType;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
