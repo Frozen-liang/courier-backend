@@ -1,4 +1,4 @@
-package com.sms.satp.common;
+package com.sms.satp.common.exception;
 
 import com.sms.satp.common.response.Response;
 import java.util.Objects;

@@ -1,16 +1,16 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.ErrorCode.ADD_API_ERROR;
-import static com.sms.satp.common.ErrorCode.DELETE_API_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_API_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_API_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_API_PAGE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.ADD_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_API_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_API_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_API_PAGE_ERROR;
 import static com.sms.satp.common.constant.CommonFiled.ID;
 import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
-import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.dto.ApiPageRequest;
 import com.sms.satp.dto.ApiRequest;

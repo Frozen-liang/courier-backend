@@ -1,7 +1,6 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.GlobalFunctionRequest;
 import com.sms.satp.dto.GlobalFunctionResponse;
 import com.sms.satp.service.GlobalFunctionService;
@@ -27,30 +26,30 @@ public class GlobalFunctionController {
     }
 
     @GetMapping("/{id}")
-    public Response<GlobalFunctionResponse> getById(@PathVariable("id") String id) {
-        return Response.ok(globalFunctionService.findById(id));
+    public GlobalFunctionResponse getById(@PathVariable("id") String id) {
+        return globalFunctionService.findById(id);
     }
 
     @GetMapping("/list")
-    public Response<List<GlobalFunctionResponse>> list(String functionKey, String functionName) {
-        return Response.ok(globalFunctionService.list(functionKey, functionName));
+    public List<GlobalFunctionResponse> list(String functionKey, String functionName) {
+        return globalFunctionService.list(functionKey, functionName);
     }
 
     @PostMapping
-    public Response<Boolean> add(@Validated @RequestBody GlobalFunctionRequest globalFunctionRequest) {
+    public Boolean add(@Validated @RequestBody GlobalFunctionRequest globalFunctionRequest) {
         globalFunctionService.add(globalFunctionRequest);
-        return Response.ok(Boolean.TRUE);
+        return Boolean.TRUE;
     }
 
     @PutMapping
-    public Response<Boolean> edit(@Validated @RequestBody GlobalFunctionRequest globalFunctionRequest) {
+    public Boolean edit(@Validated @RequestBody GlobalFunctionRequest globalFunctionRequest) {
         globalFunctionService.edit(globalFunctionRequest);
-        return Response.ok(Boolean.TRUE);
+        return Boolean.TRUE;
     }
 
     @DeleteMapping("/{ids}")
-    public Response<Boolean> delete(@PathVariable String[] ids) {
+    public Boolean delete(@PathVariable String[] ids) {
         globalFunctionService.delete(ids);
-        return Response.ok(Boolean.TRUE);
+        return Boolean.TRUE;
     }
 }

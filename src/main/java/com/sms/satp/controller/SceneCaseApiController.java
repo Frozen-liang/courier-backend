@@ -1,7 +1,6 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.AddSceneCaseApiDto;
 import com.sms.satp.dto.SceneCaseApiDto;
 import com.sms.satp.dto.UpdateSceneCaseApiSortOrderDto;
@@ -28,40 +27,40 @@ public class SceneCaseApiController {
     }
 
     @PostMapping(value = "/batch")
-    public Response batch(@Valid @RequestBody AddSceneCaseApiDto addSceneCaseApiDto) {
+    public Boolean batch(@Valid @RequestBody AddSceneCaseApiDto addSceneCaseApiDto) {
         sceneCaseApiService.batch(addSceneCaseApiDto);
-        return Response.ok().build();
+        return Boolean.TRUE;
     }
 
     @DeleteMapping(value = "/{ids}")
-    public Response deleteByIds(@PathVariable String[] ids) {
+    public Boolean deleteByIds(@PathVariable String[] ids) {
         for (String id : ids) {
             sceneCaseApiService.deleteById(id);
         }
-        return Response.ok().build();
+        return Boolean.TRUE;
     }
 
     @PutMapping
-    public Response edit(@Valid @RequestBody SceneCaseApiDto sceneCaseApiDto) {
+    public Boolean edit(@Valid @RequestBody SceneCaseApiDto sceneCaseApiDto) {
         sceneCaseApiService.edit(sceneCaseApiDto);
-        return Response.ok().build();
+        return Boolean.TRUE;
     }
 
     @PutMapping(value = "/batch/edit")
-    public Response batchEdit(@Valid @RequestBody UpdateSceneCaseApiSortOrderDto updateSceneCaseApiSortOrderDto) {
+    public Boolean batchEdit(@Valid @RequestBody UpdateSceneCaseApiSortOrderDto updateSceneCaseApiSortOrderDto) {
         sceneCaseApiService.batchEdit(updateSceneCaseApiSortOrderDto);
-        return Response.ok().build();
+        return Boolean.TRUE;
     }
 
     @GetMapping(value = "/list/{sceneCaseId}/{remove}")
-    public Response<List<SceneCaseApiDto>> listBySceneCaseId(@PathVariable String sceneCaseId,
+    public List<SceneCaseApiDto> listBySceneCaseId(@PathVariable String sceneCaseId,
         @PathVariable boolean remove) {
-        return Response.ok(sceneCaseApiService.listBySceneCaseId(sceneCaseId, remove));
+        return sceneCaseApiService.listBySceneCaseId(sceneCaseId, remove);
     }
 
     @GetMapping(value = "/{id}")
-    public Response<SceneCaseApiDto> getSceneCaseApiById(@PathVariable String id) {
-        return Response.ok(sceneCaseApiService.getSceneCaseApiById(id));
+    public SceneCaseApiDto getSceneCaseApiById(@PathVariable String id) {
+        return sceneCaseApiService.getSceneCaseApiById(id);
     }
 
 }

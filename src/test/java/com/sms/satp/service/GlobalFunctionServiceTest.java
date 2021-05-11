@@ -1,10 +1,10 @@
 package com.sms.satp.service;
 
-import static com.sms.satp.common.ErrorCode.ADD_GLOBAL_FUNCTION_ERROR;
-import static com.sms.satp.common.ErrorCode.DELETE_GLOBAL_FUNCTION_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_GLOBAL_FUNCTION_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_GLOBAL_FUNCTION_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_GLOBAL_FUNCTION_LIST_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.ADD_GLOBAL_FUNCTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_GLOBAL_FUNCTION_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_GLOBAL_FUNCTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_LIST_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.GlobalFunctionRequest;
 import com.sms.satp.dto.GlobalFunctionResponse;
 import com.sms.satp.entity.function.GlobalFunction;

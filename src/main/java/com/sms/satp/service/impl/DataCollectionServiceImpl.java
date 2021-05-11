@@ -1,18 +1,18 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.ErrorCode.ADD_DATA_COLLECTION_ERROR;
-import static com.sms.satp.common.ErrorCode.DELETE_DATA_COLLECTION_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_DATA_COLLECTION_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_DATA_COLLECTION_LIST_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.ADD_DATA_COLLECTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_DATA_COLLECTION_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_LIST_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
 import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.ID;
 import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
-import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.DataCollectionRequest;
 import com.sms.satp.dto.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;

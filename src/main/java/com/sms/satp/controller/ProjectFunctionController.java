@@ -1,7 +1,6 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.ProjectFunctionRequest;
 import com.sms.satp.dto.ProjectFunctionResponse;
 import com.sms.satp.service.ProjectFunctionService;
@@ -27,31 +26,31 @@ public class ProjectFunctionController {
     }
 
     @GetMapping("/{id}")
-    public Response<ProjectFunctionResponse> getById(@PathVariable("id") String id) {
-        return Response.ok(projectFunctionService.findById(id));
+    public ProjectFunctionResponse getById(@PathVariable("id") String id) {
+        return projectFunctionService.findById(id);
     }
 
     @GetMapping("/list/{projectId}")
-    public Response<List<Object>> list(@PathVariable("projectId") String projectId, String functionKey,
+    public List<Object> list(@PathVariable("projectId") String projectId, String functionKey,
         String functionName) {
-        return Response.ok(projectFunctionService.list(projectId, functionKey, functionName));
+        return projectFunctionService.list(projectId, functionKey, functionName);
     }
 
     @PostMapping
-    public Response<Boolean> add(@Validated @RequestBody ProjectFunctionRequest projectFunctionRequest) {
+    public Boolean add(@Validated @RequestBody ProjectFunctionRequest projectFunctionRequest) {
         projectFunctionService.add(projectFunctionRequest);
-        return Response.ok(Boolean.TRUE);
+        return Boolean.TRUE;
     }
 
     @PutMapping
-    public Response<Boolean> edit(@Validated @RequestBody ProjectFunctionRequest projectFunctionRequest) {
+    public Boolean edit(@Validated @RequestBody ProjectFunctionRequest projectFunctionRequest) {
         projectFunctionService.edit(projectFunctionRequest);
-        return Response.ok(Boolean.TRUE);
+        return Boolean.TRUE;
     }
 
     @DeleteMapping("/{ids}")
-    public Response<Boolean> delete(@PathVariable String[] ids) {
+    public Boolean delete(@PathVariable String[] ids) {
         projectFunctionService.delete(ids);
-        return Response.ok(Boolean.TRUE);
+        return Boolean.TRUE;
     }
 }

@@ -1,7 +1,7 @@
 package com.sms.satp.service;
 
-import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.common.ErrorCode;
+import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.common.exception.ErrorCode;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.SceneCaseApiLogDto;
 import com.sms.satp.entity.scenetest.SceneCaseApiLog;
@@ -19,7 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import static com.sms.satp.common.ErrorCode.ADD_SCENE_CASE_API_LOG_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_API_LOG_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

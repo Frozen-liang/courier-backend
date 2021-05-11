@@ -2,7 +2,6 @@ package com.sms.satp.controller;
 
 import static com.sms.satp.common.constant.Constants.API_PATH;
 
-import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.ApiPageRequest;
 import com.sms.satp.dto.ApiRequest;
 import com.sms.satp.dto.ApiResponse;
@@ -30,33 +29,33 @@ public class ApiController {
     }
 
     @PostMapping("/import")
-    public Response<Boolean> importDocument(ApiImportRequest apiImportRequest) {
-        return Response.ok(apiService.importDocument(apiImportRequest));
+    public Boolean importDocument(@Validated ApiImportRequest apiImportRequest) {
+        return apiService.importDocument(apiImportRequest);
     }
 
     @GetMapping("{id}")
-    public Response<ApiResponse> getById(@PathVariable("id") String id) {
-        return Response.ok(apiService.findById(id));
+    public ApiResponse getById(@PathVariable("id") String id) {
+        return apiService.findById(id);
     }
 
     @GetMapping("/page")
-    public Response<Page<ApiResponse>> page(@Validated ApiPageRequest apiPageRequest) {
-        return Response.ok(apiService.page(apiPageRequest));
+    public Page<ApiResponse> page(@Validated ApiPageRequest apiPageRequest) {
+        return apiService.page(apiPageRequest);
     }
 
     @PostMapping
-    public Response<Boolean> add(@Validated @RequestBody ApiRequest apiRequest) {
-        return Response.ok(apiService.add(apiRequest));
+    public Boolean add(@Validated @RequestBody ApiRequest apiRequest) {
+        return apiService.add(apiRequest);
     }
 
     @PutMapping
-    public Response<Boolean> edit(@Validated @RequestBody ApiRequest apiRequest) {
-        return Response.ok(apiService.edit(apiRequest));
+    public Boolean edit(@Validated @RequestBody ApiRequest apiRequest) {
+        return apiService.edit(apiRequest);
     }
 
     @DeleteMapping("{ids}")
-    public Response<Boolean> delete(@PathVariable("ids") String[] ids) {
-        return Response.ok(apiService.delete(ids));
+    public Boolean delete(@PathVariable("ids") String[] ids) {
+        return apiService.delete(ids);
     }
 
 }

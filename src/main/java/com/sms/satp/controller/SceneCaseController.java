@@ -1,7 +1,6 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.AddSceneCaseDto;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.SceneCaseDto;
@@ -30,33 +29,33 @@ public class SceneCaseController {
     }
 
     @PostMapping
-    public Response add(@Valid @RequestBody AddSceneCaseDto sceneCaseDto) {
+    public Boolean add(@Valid @RequestBody AddSceneCaseDto sceneCaseDto) {
         sceneCaseService.add(sceneCaseDto);
-        return Response.ok().build();
+        return Boolean.TRUE;
     }
 
     @DeleteMapping("/{ids}")
-    public Response deleteByIds(@PathVariable String[] ids) {
+    public Boolean deleteByIds(@PathVariable String[] ids) {
         for (String id : ids) {
             sceneCaseService.deleteById(id);
         }
-        return Response.ok().build();
+        return Boolean.TRUE;
     }
 
     @PutMapping
-    public Response edit(@Valid @RequestBody UpdateSceneCaseDto sceneCaseDto) {
+    public Boolean edit(@Valid @RequestBody UpdateSceneCaseDto sceneCaseDto) {
         sceneCaseService.edit(sceneCaseDto);
-        return Response.ok().build();
+        return Boolean.TRUE;
     }
 
     @GetMapping("/page/{projectId}")
-    public Response<Page<SceneCaseDto>> page(PageDto pageDto, @PathVariable String projectId) {
-        return Response.ok(sceneCaseService.page(pageDto, projectId));
+    public Page<SceneCaseDto> page(PageDto pageDto, @PathVariable String projectId) {
+        return sceneCaseService.page(pageDto, projectId);
     }
 
     @GetMapping("/search/{projectId}")
-    public Response<Page<SceneCaseDto>> search(SceneCaseSearchDto searchDto, @PathVariable String projectId) {
-        return Response.ok(sceneCaseService.search(searchDto, projectId));
+    public Page<SceneCaseDto> search(SceneCaseSearchDto searchDto, @PathVariable String projectId) {
+        return sceneCaseService.search(searchDto, projectId);
     }
 
 }

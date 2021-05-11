@@ -2,7 +2,6 @@ package com.sms.satp.controller;
 
 import static com.sms.satp.common.constant.Constants.DATA_COLLECTION_PATH;
 
-import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.DataCollectionRequest;
 import com.sms.satp.dto.DataCollectionResponse;
 import com.sms.satp.service.DataCollectionService;
@@ -28,36 +27,36 @@ public class DataCollectionController {
     }
 
     @GetMapping("/{id}")
-    public Response<DataCollectionResponse> getById(@PathVariable("id") String id) {
-        return Response.ok(dataCollectionService.findById(id));
+    public DataCollectionResponse getById(@PathVariable("id") String id) {
+        return dataCollectionService.findById(id);
     }
 
     @PostMapping
-    public Response<Boolean> add(@Validated @RequestBody DataCollectionRequest dataCollectionRequest) {
+    public Boolean add(@Validated @RequestBody DataCollectionRequest dataCollectionRequest) {
         dataCollectionService.add(dataCollectionRequest);
-        return Response.ok(Boolean.TRUE);
+        return Boolean.TRUE;
     }
 
     @PutMapping
-    public Response<Boolean> edit(@Validated @RequestBody DataCollectionRequest dataCollectionRequest) {
+    public Boolean edit(@Validated @RequestBody DataCollectionRequest dataCollectionRequest) {
         dataCollectionService.edit(dataCollectionRequest);
-        return Response.ok(Boolean.TRUE);
+        return Boolean.TRUE;
     }
 
     @GetMapping("/list/{projectId}")
-    public Response<List<DataCollectionResponse>> list(@PathVariable String projectId, String collectionName) {
-        return Response.ok(dataCollectionService.list(projectId, collectionName));
+    public List<DataCollectionResponse> list(@PathVariable String projectId, String collectionName) {
+        return dataCollectionService.list(projectId, collectionName);
     }
 
     @GetMapping("/param-list/{id}")
-    public Response<List<String>> getParamListById(@PathVariable String id) {
-        return Response.ok(dataCollectionService.getParamListById(id));
+    public List<String> getParamListById(@PathVariable String id) {
+        return dataCollectionService.getParamListById(id);
     }
 
     @DeleteMapping("/{ids}")
-    public Response<Boolean> delete(@PathVariable String[] ids) {
+    public Boolean delete(@PathVariable String[] ids) {
         dataCollectionService.delete(ids);
-        return Response.ok(Boolean.TRUE);
+        return Boolean.TRUE;
     }
 
 }

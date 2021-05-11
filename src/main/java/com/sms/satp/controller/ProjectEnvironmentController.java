@@ -1,7 +1,6 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.ProjectEnvironmentRequest;
 import com.sms.satp.dto.ProjectEnvironmentResponse;
@@ -29,36 +28,36 @@ public class ProjectEnvironmentController {
     }
 
     @GetMapping("/page/{projectId}")
-    public Response<Page<ProjectEnvironmentResponse>> page(PageDto pageDto, @PathVariable String projectId) {
-        return Response.ok(projectEnvironmentService.page(pageDto, projectId));
+    public Page<ProjectEnvironmentResponse> page(PageDto pageDto, @PathVariable String projectId) {
+        return projectEnvironmentService.page(pageDto, projectId);
     }
 
     @GetMapping("/{id}")
-    public Response<ProjectEnvironmentResponse> getById(@PathVariable String id) {
-        return Response.ok(projectEnvironmentService.findById(id));
+    public ProjectEnvironmentResponse getById(@PathVariable String id) {
+        return projectEnvironmentService.findById(id);
     }
 
     @GetMapping("/list/{projectId}")
-    public Response<List<Object>> list(@PathVariable String projectId) {
-        return Response.ok(projectEnvironmentService.list(projectId));
+    public List<Object> list(@PathVariable String projectId) {
+        return projectEnvironmentService.list(projectId);
     }
 
     @PostMapping
-    public Response<Boolean> add(@Valid @RequestBody ProjectEnvironmentRequest projectEnvironmentRequest) {
+    public Boolean add(@Valid @RequestBody ProjectEnvironmentRequest projectEnvironmentRequest) {
         projectEnvironmentService.add(projectEnvironmentRequest);
-        return Response.ok(Boolean.TRUE);
+        return Boolean.TRUE;
     }
 
     @PutMapping
-    public Response<Boolean> edit(@Valid @RequestBody ProjectEnvironmentRequest projectEnvironmentRequest) {
+    public Boolean edit(@Valid @RequestBody ProjectEnvironmentRequest projectEnvironmentRequest) {
         projectEnvironmentService.edit(projectEnvironmentRequest);
-        return Response.ok(Boolean.TRUE);
+        return Boolean.TRUE;
     }
 
     @DeleteMapping("/{ids}")
-    public Response<Boolean> delete(@PathVariable String[] ids) {
+    public Boolean delete(@PathVariable String[] ids) {
         projectEnvironmentService.delete(ids);
-        return Response.ok(Boolean.TRUE);
+        return Boolean.TRUE;
     }
 
 }

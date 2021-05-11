@@ -1,7 +1,6 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.SceneCaseApiLogDto;
 import com.sms.satp.service.SceneCaseApiLogService;
@@ -22,8 +21,8 @@ public class SceneCaseApiLogController {
     }
 
     @GetMapping(value = "/page/{projectId}")
-    public Response<Page<SceneCaseApiLogDto>> page(PageDto pageDto, @PathVariable String projectId) {
-        return Response.ok(sceneCaseApiLogService.page(pageDto, projectId));
+    public Page<SceneCaseApiLogDto> page(PageDto pageDto, @PathVariable String projectId) {
+        return sceneCaseApiLogService.page(pageDto, projectId);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.sms.satp.common;
+package com.sms.satp.common.exception;
 
 public enum ErrorCode {
 

@@ -1,9 +1,9 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.ErrorCode.ADD_SCENE_CASE_API_LOG_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_SCENE_CASE_API_LOG_PAGE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_API_LOG_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_LOG_PAGE_ERROR;
 
-import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.SceneCaseApiLogDto;
 import com.sms.satp.entity.scenetest.SceneCaseApiLog;

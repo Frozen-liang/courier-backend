@@ -1,10 +1,10 @@
 package com.sms.satp.service;
 
-import static com.sms.satp.common.ErrorCode.ADD_API_TAG_ERROR;
-import static com.sms.satp.common.ErrorCode.DELETE_API_TAG_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_API_TAG_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_API_TAG_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_API_TAG_LIST_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.ADD_API_TAG_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_API_TAG_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TAG_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_LIST_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.dto.ApiTagRequest;
 import com.sms.satp.dto.ApiTagResponse;

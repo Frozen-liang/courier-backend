@@ -2,7 +2,6 @@ package com.sms.satp.controller;
 
 import static com.sms.satp.common.constant.Constants.PROJECT_IMPORT_SOURCE;
 
-import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.request.ProjectImportSourceRequest;
 import com.sms.satp.service.ProjectImportSourceService;
 import org.springframework.validation.annotation.Validated;
@@ -22,8 +21,8 @@ public class ProjectImportSourceController {
     }
 
     @PostMapping
-    public Response<Boolean> importDocument(@Validated @RequestBody ProjectImportSourceRequest request) {
-        return Response.ok(projectImportSourceService.create(request));
+    public Boolean importDocument(@Validated @RequestBody ProjectImportSourceRequest request) {
+        return projectImportSourceService.create(request);
     }
 
 }
