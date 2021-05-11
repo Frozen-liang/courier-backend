@@ -1,6 +1,7 @@
 package com.sms.satp.dto;
 
 import java.util.List;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -41,11 +42,17 @@ public class ApiRequestDto {
     private Integer apiRequestParamType;
 
 
+    @Valid
     private List<ParamInfoDto> requestHeaders;
+    @Valid
     private List<ParamInfoDto> responseHeaders;
+    @Valid
     private List<ParamInfoDto> pathParams;
+    @Valid
     private List<ParamInfoDto> restfulParams;
+    @Valid
     private List<ParamInfoDto> requestParams;
+    @Valid
     private List<ParamInfoDto> responseParams;
 
     @NotNull(message = "The apiStatus must not be null.")
