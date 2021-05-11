@@ -3,7 +3,8 @@ package com.sms.satp.controller;
 import static com.sms.satp.common.constant.Constants.DATA_COLLECTION_PATH;
 
 import com.sms.satp.common.response.Response;
-import com.sms.satp.dto.DataCollectionDto;
+import com.sms.satp.dto.DataCollectionRequest;
+import com.sms.satp.dto.DataCollectionResponse;
 import com.sms.satp.service.DataCollectionService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
@@ -27,24 +28,24 @@ public class DataCollectionController {
     }
 
     @GetMapping("/{id}")
-    public Response<DataCollectionDto> getById(@PathVariable("id") String id) {
+    public Response<DataCollectionResponse> getById(@PathVariable("id") String id) {
         return Response.ok(dataCollectionService.findById(id));
     }
 
     @PostMapping
-    public Response<Boolean> add(@Validated @RequestBody DataCollectionDto dataCollectionDto) {
-        dataCollectionService.add(dataCollectionDto);
+    public Response<Boolean> add(@Validated @RequestBody DataCollectionRequest dataCollectionRequest) {
+        dataCollectionService.add(dataCollectionRequest);
         return Response.ok(Boolean.TRUE);
     }
 
     @PutMapping
-    public Response<Boolean> edit(@Validated @RequestBody DataCollectionDto dataCollectionDto) {
-        dataCollectionService.edit(dataCollectionDto);
+    public Response<Boolean> edit(@Validated @RequestBody DataCollectionRequest dataCollectionRequest) {
+        dataCollectionService.edit(dataCollectionRequest);
         return Response.ok(Boolean.TRUE);
     }
 
     @GetMapping("/list/{projectId}")
-    public Response<List<DataCollectionDto>> list(@PathVariable String projectId, String collectionName) {
+    public Response<List<DataCollectionResponse>> list(@PathVariable String projectId, String collectionName) {
         return Response.ok(dataCollectionService.list(projectId, collectionName));
     }
 

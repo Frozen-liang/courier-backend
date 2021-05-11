@@ -12,15 +12,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-public class GlobalFunctionDto {
+public class GlobalFunctionRequest {
 
     private String id;
-    @NotEmpty(message = "The functionDesc cannot be empty")
-    private String functionDesc;
+    @NotEmpty(message = "The functionKey cannot be empty")
+    private String functionKey;
     @NotEmpty(message = "The functionName cannot be empty")
     private String functionName;
     @Valid
-    private List<ParamInfoDto> functionParams;
+    private List<ParamInfoRequest> functionParams;
     private String functionCode;
     private String createDateTime;
     private String modifyDateTime;

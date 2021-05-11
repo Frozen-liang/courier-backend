@@ -10,7 +10,8 @@ import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalEnvironmentDto;
+import com.sms.satp.dto.GlobalEnvironmentRequest;
+import com.sms.satp.dto.GlobalEnvironmentResponse;
 import com.sms.satp.entity.env.GlobalEnvironment;
 import com.sms.satp.mapper.GlobalEnvironmentMapper;
 import com.sms.satp.repository.GlobalEnvironmentRepository;
@@ -43,7 +44,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
-    public GlobalEnvironmentDto findById(String id) {
+    public GlobalEnvironmentResponse findById(String id) {
         try {
             Optional<GlobalEnvironment> optional = globalEnvironmentRepository.findById(id);
             return globalEnvironmentMapper.toDto(optional.orElse(null));
@@ -54,10 +55,10 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
-    public void add(GlobalEnvironmentDto globalEnvironmentDto) {
-        log.info("GlobalEnvironmentService-add()-params: [GlobalEnvironment]={}", globalEnvironmentDto.toString());
+    public void add(GlobalEnvironmentRequest globalEnvironmentRequest) {
+        log.info("GlobalEnvironmentService-add()-params: [GlobalEnvironment]={}", globalEnvironmentRequest.toString());
         try {
-            GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentDto);
+            GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentRequest);
             globalEnvironmentRepository.insert(globalEnvironment);
         } catch (Exception e) {
             log.error("Failed to add the globalEnvironment!", e);
@@ -66,10 +67,10 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
-    public void edit(GlobalEnvironmentDto globalEnvironmentDto) {
-        log.info("GlobalEnvironmentService-edit()-params: [GlobalEnvironment]={}", globalEnvironmentDto.toString());
+    public void edit(GlobalEnvironmentRequest globalEnvironmentRequest) {
+        log.info("GlobalEnvironmentService-edit()-params: [GlobalEnvironment]={}", globalEnvironmentRequest.toString());
         try {
-            GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentDto);
+            GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentRequest);
             Optional<GlobalEnvironment> optional = globalEnvironmentRepository.findById(globalEnvironment.getId());
             optional.ifPresent((oldGlobalEnvironment) -> {
                 globalEnvironment.setCreateDateTime(oldGlobalEnvironment.getCreateDateTime());
@@ -83,7 +84,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
-    public List<GlobalEnvironmentDto> list() {
+    public List<GlobalEnvironmentResponse> list() {
         try {
             List<GlobalEnvironment> globalEnvironments = globalEnvironmentRepository
                 .findByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE);

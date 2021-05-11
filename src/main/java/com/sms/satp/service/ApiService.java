@@ -1,9 +1,9 @@
 package com.sms.satp.service;
 
 import com.sms.satp.dto.ApiImportRequest;
-import com.sms.satp.dto.ApiPageRequestDto;
-import com.sms.satp.dto.ApiRequestDto;
-import com.sms.satp.dto.ApiResponseDto;
+import com.sms.satp.dto.ApiPageRequest;
+import com.sms.satp.dto.ApiRequest;
+import com.sms.satp.dto.ApiResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -12,13 +12,13 @@ public interface ApiService {
 
     boolean importDocument(ApiImportRequest apiImportRequest);
 
-    ApiResponseDto findById(String id);
+    ApiResponse findById(String id);
 
-    Page<ApiResponseDto> page(ApiPageRequestDto apiPageRequestDto);
+    Page<ApiResponse> page(ApiPageRequest apiPageRequest);
 
-    Boolean add(ApiRequestDto apiRequestDto);
+    Boolean add(ApiRequest apiRequestDto);
 
-    Boolean edit(ApiRequestDto apiRequestDto);
+    Boolean edit(ApiRequest apiRequestDto);
 
     Boolean delete(String[] ids);
 

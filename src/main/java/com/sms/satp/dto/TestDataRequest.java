@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-public class TestDataDto {
+public class TestDataRequest {
 
     @NotEmpty(message = "The dataName cannot be empty")
     private String dataName;
     @Valid
     @NotNull(message = "The data cannot be null")
     @Size(min = 1, message = "The data cannot be empty")
-    private List<DataParamDto> data;
+    private List<DataParamRequest> data;
 }

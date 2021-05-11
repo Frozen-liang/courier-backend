@@ -1,5 +1,6 @@
-package com.sms.satp.entity.datacollection;
+package com.sms.satp.dto;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-public class DataParam {
+public class TestDataResponse {
 
-    private String key;
-    private Object value;
+    private String dataName;
+    private List<DataParamResponse> data;
 }

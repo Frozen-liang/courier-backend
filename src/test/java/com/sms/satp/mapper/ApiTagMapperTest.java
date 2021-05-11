@@ -3,8 +3,9 @@ package com.sms.satp.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.common.enums.ApiTagType;
+import com.sms.satp.dto.ApiTagRequest;
+import com.sms.satp.dto.ApiTagResponse;
 import com.sms.satp.entity.tag.ApiTag;
-import com.sms.satp.dto.ApiTagDto;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ class ApiTagMapperTest {
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
             .build();
-        ApiTagDto apiTagDto = apiTagMapper.toDto(apiTag);
+        ApiTagResponse apiTagDto = apiTagMapper.toDto(apiTag);
         assertThat(apiTagDto.getTagName()).isEqualTo(TAG_NAME);
         assertThat(apiTagDto.getTagType()).isEqualTo(ApiTagType.API.getCode());
     }
@@ -44,7 +45,7 @@ class ApiTagMapperTest {
         for (int i = 0; i < SIZE; i++) {
             apiTags.add(ApiTag.builder().tagName(TAG_NAME).tagType(ApiTagType.API).build());
         }
-        List<ApiTagDto> apiTagDtoList = apiTagMapper.toDtoList(apiTags);
+        List<ApiTagResponse> apiTagDtoList = apiTagMapper.toDtoList(apiTags);
         assertThat(apiTagDtoList).hasSize(SIZE);
         assertThat(apiTagDtoList).allMatch(result -> StringUtils.equals(result.getTagName(), TAG_NAME));
     }
@@ -52,7 +53,7 @@ class ApiTagMapperTest {
     @Test
     @DisplayName("Test the method to convert the ApiTag's dto object to a entity object")
     void dto_to_entity() {
-        ApiTagDto apiTagDto = ApiTagDto.builder()
+        ApiTagRequest apiTagDto = ApiTagRequest.builder()
             .tagName(TAG_NAME)
             .tagType(ApiTagType.CASE.getCode())
             .createDateTime(CREATE_TIME_STRING)
@@ -65,7 +66,7 @@ class ApiTagMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method to convert the ApiTag's entity object to a dto object")
     void null_entity_to_dto() {
-        ApiTagDto apiTagDto = apiTagMapper.toDto(null);
+        ApiTagResponse apiTagDto = apiTagMapper.toDto(null);
         assertThat(apiTagDto).isNull();
     }
 
@@ -79,7 +80,7 @@ class ApiTagMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method for converting an ApiTag entity list object to a dto list object")
     void null_entityList_to_dtoList() {
-        List<ApiTagDto> apiTagDtoList = apiTagMapper.toDtoList(null);
+        List<ApiTagResponse> apiTagDtoList = apiTagMapper.toDtoList(null);
         assertThat(apiTagDtoList).isNull();
     }
 

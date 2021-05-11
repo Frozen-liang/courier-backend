@@ -10,7 +10,8 @@ import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.enums.ApiTagType;
-import com.sms.satp.dto.ApiTagDto;
+import com.sms.satp.dto.ApiTagRequest;
+import com.sms.satp.dto.ApiTagResponse;
 import com.sms.satp.entity.tag.ApiTag;
 import com.sms.satp.mapper.ApiTagMapper;
 import com.sms.satp.repository.ApiTagRepository;
@@ -39,7 +40,7 @@ public class ApiTagServiceImpl implements ApiTagService {
     }
 
     @Override
-    public ApiTagDto findById(String id) {
+    public ApiTagResponse findById(String id) {
         try {
             Optional<ApiTag> optional = apiTagRepository.findById(id);
             return apiTagMapper.toDto(optional.orElse(null));
@@ -50,7 +51,7 @@ public class ApiTagServiceImpl implements ApiTagService {
     }
 
     @Override
-    public List<ApiTagDto> list(String projectId, String tagName, ApiTagType tagType) {
+    public List<ApiTagResponse> list(String projectId, String tagName, ApiTagType tagType) {
         try {
             ApiTag apiTag = ApiTag.builder().projectId(projectId).tagName(tagName)
                 .tagType(tagType).build();
@@ -70,10 +71,10 @@ public class ApiTagServiceImpl implements ApiTagService {
     }
 
     @Override
-    public void add(ApiTagDto apiTagDto) {
-        log.info("ApiTagService-add()-params: [ApiTag]={}", apiTagDto.toString());
+    public void add(ApiTagRequest apiTagRequest) {
+        log.info("ApiTagService-add()-params: [ApiTag]={}", apiTagRequest.toString());
         try {
-            ApiTag apiTag = apiTagMapper.toEntity(apiTagDto);
+            ApiTag apiTag = apiTagMapper.toEntity(apiTagRequest);
             apiTagRepository.insert(apiTag);
         } catch (Exception e) {
             log.error("Failed to add the ApiTag!", e);
@@ -82,11 +83,11 @@ public class ApiTagServiceImpl implements ApiTagService {
     }
 
     @Override
-    public void edit(ApiTagDto apiTagDto) {
-        log.info("ApiTagService-edit()-params: [ApiTag]={}", apiTagDto.toString());
+    public void edit(ApiTagRequest apiTagRequest) {
+        log.info("ApiTagService-edit()-params: [ApiTag]={}", apiTagRequest.toString());
         try {
-            ApiTag apiTag = apiTagMapper.toEntity(apiTagDto);
-            Optional<ApiTag> optional = apiTagRepository.findById(apiTagDto.getId());
+            ApiTag apiTag = apiTagMapper.toEntity(apiTagRequest);
+            Optional<ApiTag> optional = apiTagRepository.findById(apiTagRequest.getId());
             optional.ifPresent((oldApiTag) -> {
                 apiTag.setCreateUserId(oldApiTag.getCreateUserId());
                 apiTag.setCreateDateTime(oldApiTag.getCreateDateTime());

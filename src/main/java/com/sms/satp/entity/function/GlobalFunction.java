@@ -24,7 +24,7 @@ public class GlobalFunction {
 
     @MongoId(FieldType.OBJECT_ID)
     private String id;
-    private String functionDesc;
+    private String functionKey;
     private String functionName;
     private List<ParamInfo> functionParams;
     private String functionCode;

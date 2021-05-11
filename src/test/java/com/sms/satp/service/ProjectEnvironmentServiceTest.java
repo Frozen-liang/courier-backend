@@ -18,10 +18,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalEnvironmentDto;
+import com.sms.satp.dto.GlobalEnvironmentResponse;
+import com.sms.satp.dto.ProjectEnvironmentRequest;
+import com.sms.satp.dto.ProjectEnvironmentResponse;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.ProjectEnvironmentDto;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
 import com.sms.satp.service.impl.ProjectEnvironmentServiceImpl;
@@ -55,7 +56,10 @@ class ProjectEnvironmentServiceTest {
             mongoTemplate, projectEnvironmentMapper);
 
     private final ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().id(ID).build();
-    private final ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder().id(ID).build();
+    private final ProjectEnvironmentResponse projectEnvironmentResponse = ProjectEnvironmentResponse
+        .builder().id(ID).build();
+    private final ProjectEnvironmentRequest projectEnvironmentRequest = ProjectEnvironmentRequest
+        .builder().id(ID).build();
     private final static int TOTAL_ELEMENTS = 60;
     private final static int PAGE_NUMBER = 2;
     private final static int PAGE_SIZE = 20;
@@ -85,8 +89,9 @@ class ProjectEnvironmentServiceTest {
             TOTAL_ELEMENTS);
         when(projectEnvironmentRepository.findAll(example, pageable)).thenReturn(projectEnvironmentPage);
         when(projectEnvironmentMapper.toDto(any()))
-            .thenReturn(ProjectEnvironmentDto.builder().envName(EVN_NAME).build());
-        Page<ProjectEnvironmentDto> projectEnvironmentDtoPage = projectEnvironmentService.page(pageDto, PROJECT_ID);
+            .thenReturn(ProjectEnvironmentResponse.builder().envName(EVN_NAME).build());
+        Page<ProjectEnvironmentResponse> projectEnvironmentDtoPage = projectEnvironmentService
+            .page(pageDto, PROJECT_ID);
         assertThat(projectEnvironmentDtoPage.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
         assertThat(projectEnvironmentDtoPage.getPageable().getPageNumber()).isEqualTo(DEFAULT_PAGE_NUMBER);
         assertThat(projectEnvironmentDtoPage.getPageable().getPageSize()).isEqualTo(DEFAULT_PAGE_SIZE);
@@ -117,8 +122,8 @@ class ProjectEnvironmentServiceTest {
             TOTAL_ELEMENTS);
         when(projectEnvironmentRepository.findAll(example, pageable)).thenReturn(projectEnvironmentPage);
         when(projectEnvironmentMapper.toDto(any()))
-            .thenReturn(ProjectEnvironmentDto.builder().envName(EVN_NAME).build());
-        Page<ProjectEnvironmentDto> projectEnvironmentDtos = projectEnvironmentService.page(pageDto, PROJECT_ID);
+            .thenReturn(ProjectEnvironmentResponse.builder().envName(EVN_NAME).build());
+        Page<ProjectEnvironmentResponse> projectEnvironmentDtos = projectEnvironmentService.page(pageDto, PROJECT_ID);
         assertThat(projectEnvironmentDtos.getTotalElements()).isEqualTo(TOTAL_ELEMENTS);
         assertThat(projectEnvironmentDtos.getPageable().getPageNumber()).isEqualTo(PAGE_NUMBER - FRONT_FIRST_NUMBER);
         assertThat(projectEnvironmentDtos.getPageable().getPageSize()).isEqualTo(PAGE_SIZE);
@@ -129,23 +134,21 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("Test the add method in the ProjectEnvironment service")
     void add_test() {
-        ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder().build();
         ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().build();
-        when(projectEnvironmentMapper.toEntity(projectEnvironmentDto)).thenReturn(projectEnvironment);
+        when(projectEnvironmentMapper.toEntity(projectEnvironmentRequest)).thenReturn(projectEnvironment);
         when(projectEnvironmentRepository.insert(projectEnvironment)).thenReturn(projectEnvironment);
-        projectEnvironmentService.add(projectEnvironmentDto);
+        projectEnvironmentService.add(projectEnvironmentRequest);
         verify(projectEnvironmentRepository, times(1)).insert(any(ProjectEnvironment.class));
     }
 
     @Test
     @DisplayName("Test the edit method in the ProjectEnvironment service")
     void edit_test() {
-        ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder().id(ID).build();
         ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().id(ID).build();
-        when(projectEnvironmentMapper.toEntity(projectEnvironmentDto)).thenReturn(projectEnvironment);
+        when(projectEnvironmentMapper.toEntity(projectEnvironmentRequest)).thenReturn(projectEnvironment);
         when(projectEnvironmentRepository.findById(ID)).thenReturn(Optional.of(ProjectEnvironment.builder().build()));
         when(projectEnvironmentRepository.save(projectEnvironment)).thenReturn(projectEnvironment);
-        projectEnvironmentService.edit(projectEnvironmentDto);
+        projectEnvironmentService.edit(projectEnvironmentRequest);
         verify(projectEnvironmentRepository, times(1)).save(any(ProjectEnvironment.class));
     }
 
@@ -153,12 +156,13 @@ class ProjectEnvironmentServiceTest {
     @DisplayName("Test the method of querying the ProjectEnvironment by id")
     void findProjectEnvironmentById() {
         ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().envName(EVN_NAME).build();
-        ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder().envName(EVN_NAME).build();
+        ProjectEnvironmentResponse projectEnvironmentResponse = ProjectEnvironmentResponse
+            .builder().envName(EVN_NAME).build();
         Optional<ProjectEnvironment> projectEnvironmentOptional = Optional.ofNullable(projectEnvironment);
         when(projectEnvironmentRepository.findById(ID)).thenReturn(projectEnvironmentOptional);
-        when(projectEnvironmentMapper.toDto(projectEnvironment)).thenReturn(projectEnvironmentDto);
-        ProjectEnvironmentDto result1 = projectEnvironmentService.findById(ID);
-        ProjectEnvironmentDto result2 = projectEnvironmentService.findById(NOT_EXIST_ID);
+        when(projectEnvironmentMapper.toDto(projectEnvironment)).thenReturn(projectEnvironmentResponse);
+        ProjectEnvironmentResponse result1 = projectEnvironmentService.findById(ID);
+        ProjectEnvironmentResponse result2 = projectEnvironmentService.findById(NOT_EXIST_ID);
         assertThat(result1.getEnvName()).isEqualTo(EVN_NAME);
         assertThat(result2).isNull();
     }
@@ -191,7 +195,7 @@ class ProjectEnvironmentServiceTest {
     void add_exception_test() {
         when(projectEnvironmentMapper.toEntity(any())).thenReturn(ProjectEnvironment.builder().build());
         doThrow(new RuntimeException()).when(projectEnvironmentRepository).insert(any(ProjectEnvironment.class));
-        assertThatThrownBy(() -> projectEnvironmentService.add(ProjectEnvironmentDto.builder().build()))
+        assertThatThrownBy(() -> projectEnvironmentService.add(ProjectEnvironmentRequest.builder().build()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_PROJECT_ENVIRONMENT_ERROR.getCode());
     }
@@ -202,7 +206,7 @@ class ProjectEnvironmentServiceTest {
         when(projectEnvironmentMapper.toEntity(any())).thenReturn(ProjectEnvironment.builder().id(ID).build());
         when(projectEnvironmentRepository.findById(ID)).thenReturn(Optional.of(ProjectEnvironment.builder().build()));
         doThrow(new RuntimeException()).when(projectEnvironmentRepository).save(argThat(t -> true));
-        assertThatThrownBy(() -> projectEnvironmentService.edit(ProjectEnvironmentDto.builder().id(ID).build()))
+        assertThatThrownBy(() -> projectEnvironmentService.edit(ProjectEnvironmentRequest.builder().id(ID).build()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_PROJECT_ENVIRONMENT_ERROR.getCode());
     }
@@ -233,14 +237,14 @@ class ProjectEnvironmentServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(ProjectEnvironment.builder().build());
         }
-        ArrayList<ProjectEnvironmentDto> projectEnvironmentDtos = new ArrayList<>();
+        ArrayList<ProjectEnvironmentResponse> projectEnvironmentDtos = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            projectEnvironmentDtos.add(ProjectEnvironmentDto.builder().build());
+            projectEnvironmentDtos.add(ProjectEnvironmentResponse.builder().build());
         }
         when(projectEnvironmentRepository.findAll(any(), any(Sort.class))).thenReturn(list);
         when(projectEnvironmentMapper.toDtoList(list)).thenReturn(projectEnvironmentDtos);
         when(globalEnvironmentService.list())
-            .thenReturn(Collections.singletonList(GlobalEnvironmentDto.builder().build()));
+            .thenReturn(Collections.singletonList(GlobalEnvironmentResponse.builder().build()));
         List<Object> result = projectEnvironmentService.list(PROJECT_ID);
         assertThat(result).hasSize(TOTAL_ELEMENTS + 1);
     }

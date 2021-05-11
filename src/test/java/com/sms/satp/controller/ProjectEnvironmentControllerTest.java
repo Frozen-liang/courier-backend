@@ -12,8 +12,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.ParamInfoDto;
-import com.sms.satp.dto.ProjectEnvironmentDto;
+import com.sms.satp.dto.ParamInfoRequest;
+import com.sms.satp.dto.ProjectEnvironmentRequest;
+import com.sms.satp.dto.ProjectEnvironmentResponse;
 import com.sms.satp.service.ProjectEnvironmentService;
 import java.util.Collections;
 import org.bson.types.ObjectId;
@@ -86,11 +87,11 @@ class ProjectEnvironmentControllerTest {
     @Test
     @DisplayName("Add a ProjectEnvironment")
     void addProjectEnvironmentDto() throws Exception {
-        ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder()
+        ProjectEnvironmentRequest projectEnvironmentDto = ProjectEnvironmentRequest.builder()
             .projectId(PROJECT_ID)
             .frontUri(FRONT_URI)
             .envName(EVN_NAME)
-            .params(Collections.singletonList(ParamInfoDto.builder().key("key").paramType(14).build()))
+            .params(Collections.singletonList(ParamInfoRequest.builder().key("key").paramType(14).build()))
             .build();
         doNothing().when(projectEnvironmentService).add(projectEnvironmentDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -107,7 +108,7 @@ class ProjectEnvironmentControllerTest {
     @Test
     @DisplayName("Edit the ProjectEnvironment by id")
     void editProjectEnvironmentDto() throws Exception {
-        ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder().id(ID)
+        ProjectEnvironmentRequest projectEnvironmentDto = ProjectEnvironmentRequest.builder().id(ID)
             .projectId(PROJECT_ID)
             .frontUri(FRONT_URI)
             .envName(EVN_NAME)
@@ -127,8 +128,8 @@ class ProjectEnvironmentControllerTest {
     @Test
     @DisplayName("Get its specific information through the id of the ProjectEnvironment")
     void getInfoById() throws Exception {
-        ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder().build();
-        when(projectEnvironmentService.findById(ID)).thenReturn(projectEnvironmentDto);
+        ProjectEnvironmentResponse projectEnvironmentResponse = ProjectEnvironmentResponse.builder().build();
+        when(projectEnvironmentService.findById(ID)).thenReturn(projectEnvironmentResponse);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .get(Constants.PROJECT_ENVIRONMENT_PATH + "/" + ID);
         ResultActions perform = mockMvc.perform(request);

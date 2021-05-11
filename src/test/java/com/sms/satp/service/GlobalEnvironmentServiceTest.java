@@ -15,7 +15,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalEnvironmentDto;
+import com.sms.satp.dto.GlobalEnvironmentRequest;
+import com.sms.satp.dto.GlobalEnvironmentResponse;
 import com.sms.satp.entity.env.GlobalEnvironment;
 import com.sms.satp.mapper.GlobalEnvironmentMapper;
 import com.sms.satp.repository.GlobalEnvironmentRepository;
@@ -40,7 +41,10 @@ class GlobalEnvironmentServiceTest {
         globalEnvironmentRepository,
         globalEnvironmentMapper, mongoTemplate);
     private final GlobalEnvironment globalEnvironment = GlobalEnvironment.builder().id(ID).build();
-    private final GlobalEnvironmentDto globalEnvironmentDto = GlobalEnvironmentDto.builder().id(ID).build();
+    private final GlobalEnvironmentResponse globalEnvironmentResponse = GlobalEnvironmentResponse
+        .builder().id(ID).build();
+    private final GlobalEnvironmentRequest globalEnvironmentRequest = GlobalEnvironmentRequest
+        .builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final String NOT_EXIST_ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
@@ -49,9 +53,9 @@ class GlobalEnvironmentServiceTest {
     @DisplayName("Test the findById method in the GlobalEnvironment service")
     public void findById_test() {
         when(globalEnvironmentRepository.findById(ID)).thenReturn(Optional.of(globalEnvironment));
-        when(globalEnvironmentMapper.toDto(globalEnvironment)).thenReturn(globalEnvironmentDto);
-        GlobalEnvironmentDto result1 = globalEnvironmentService.findById(ID);
-        GlobalEnvironmentDto result2 = globalEnvironmentService.findById(NOT_EXIST_ID);
+        when(globalEnvironmentMapper.toDto(globalEnvironment)).thenReturn(globalEnvironmentResponse);
+        GlobalEnvironmentResponse result1 = globalEnvironmentService.findById(ID);
+        GlobalEnvironmentResponse result2 = globalEnvironmentService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
         assertThat(result2).isNull();
@@ -68,18 +72,18 @@ class GlobalEnvironmentServiceTest {
     @Test
     @DisplayName("Test the add method in the GlobalEnvironment service")
     public void add_test() {
-        when(globalEnvironmentMapper.toEntity(globalEnvironmentDto)).thenReturn(globalEnvironment);
+        when(globalEnvironmentMapper.toEntity(globalEnvironmentRequest)).thenReturn(globalEnvironment);
         when(globalEnvironmentRepository.insert(any(GlobalEnvironment.class))).thenReturn(globalEnvironment);
-        globalEnvironmentService.add(globalEnvironmentDto);
+        globalEnvironmentService.add(globalEnvironmentRequest);
         verify(globalEnvironmentRepository, times(1)).insert(any(GlobalEnvironment.class));
     }
 
     @Test
     @DisplayName("An exception occurred while adding GlobalEnvironment")
     public void add_exception_test() {
-        when(globalEnvironmentMapper.toEntity(globalEnvironmentDto)).thenReturn(globalEnvironment);
+        when(globalEnvironmentMapper.toEntity(globalEnvironmentRequest)).thenReturn(globalEnvironment);
         doThrow(new RuntimeException()).when(globalEnvironmentRepository).insert(any(GlobalEnvironment.class));
-        assertThatThrownBy(() -> globalEnvironmentService.add(globalEnvironmentDto))
+        assertThatThrownBy(() -> globalEnvironmentService.add(globalEnvironmentRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_GLOBAL_ENVIRONMENT_ERROR.getCode());
     }
@@ -87,22 +91,22 @@ class GlobalEnvironmentServiceTest {
     @Test
     @DisplayName("Test the edit method in the GlobalEnvironment service")
     public void edit_test() {
-        when(globalEnvironmentMapper.toEntity(globalEnvironmentDto)).thenReturn(globalEnvironment);
+        when(globalEnvironmentMapper.toEntity(globalEnvironmentRequest)).thenReturn(globalEnvironment);
         when(globalEnvironmentRepository.findById(any()))
             .thenReturn(Optional.of(GlobalEnvironment.builder().id(ID).build()));
         when(globalEnvironmentRepository.save(any(GlobalEnvironment.class))).thenReturn(globalEnvironment);
-        globalEnvironmentService.edit(globalEnvironmentDto);
+        globalEnvironmentService.edit(globalEnvironmentRequest);
         verify(globalEnvironmentRepository, times(1)).save(any(GlobalEnvironment.class));
     }
 
     @Test
     @DisplayName("An exception occurred while edit GlobalEnvironment")
     public void edit_exception_test() {
-        when(globalEnvironmentMapper.toEntity(globalEnvironmentDto)).thenReturn(globalEnvironment);
+        when(globalEnvironmentMapper.toEntity(globalEnvironmentRequest)).thenReturn(globalEnvironment);
         when(globalEnvironmentRepository.findById(any()))
             .thenReturn(Optional.of(GlobalEnvironment.builder().id(ID).build()));
         doThrow(new RuntimeException()).when(globalEnvironmentRepository).save(any(GlobalEnvironment.class));
-        assertThatThrownBy(() -> globalEnvironmentService.edit(globalEnvironmentDto))
+        assertThatThrownBy(() -> globalEnvironmentService.edit(globalEnvironmentRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_GLOBAL_ENVIRONMENT_ERROR.getCode());
     }
@@ -114,14 +118,14 @@ class GlobalEnvironmentServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(GlobalEnvironment.builder().build());
         }
-        ArrayList<GlobalEnvironmentDto> globalEnvironmentDtos = new ArrayList<>();
+        ArrayList<GlobalEnvironmentResponse> globalEnvironmentDtos = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            globalEnvironmentDtos.add(GlobalEnvironmentDto.builder().build());
+            globalEnvironmentDtos.add(GlobalEnvironmentResponse.builder().build());
         }
 
         when(globalEnvironmentRepository.findByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE)).thenReturn(list);
         when(globalEnvironmentMapper.toDtoList(list)).thenReturn(globalEnvironmentDtos);
-        List<GlobalEnvironmentDto> result = globalEnvironmentService.list();
+        List<GlobalEnvironmentResponse> result = globalEnvironmentService.list();
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 

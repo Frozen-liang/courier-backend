@@ -2,7 +2,8 @@ package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
-import com.sms.satp.dto.GlobalFunctionDto;
+import com.sms.satp.dto.GlobalFunctionRequest;
+import com.sms.satp.dto.GlobalFunctionResponse;
 import com.sms.satp.service.GlobalFunctionService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
@@ -26,24 +27,24 @@ public class GlobalFunctionController {
     }
 
     @GetMapping("/{id}")
-    public Response<GlobalFunctionDto> getById(@PathVariable("id") String id) {
+    public Response<GlobalFunctionResponse> getById(@PathVariable("id") String id) {
         return Response.ok(globalFunctionService.findById(id));
     }
 
     @GetMapping("/list")
-    public Response<List<GlobalFunctionDto>> list(String functionDesc, String functionName) {
-        return Response.ok(globalFunctionService.list(functionDesc, functionName));
+    public Response<List<GlobalFunctionResponse>> list(String functionKey, String functionName) {
+        return Response.ok(globalFunctionService.list(functionKey, functionName));
     }
 
     @PostMapping
-    public Response<Boolean> add(@Validated @RequestBody GlobalFunctionDto globalFunctionDto) {
-        globalFunctionService.add(globalFunctionDto);
+    public Response<Boolean> add(@Validated @RequestBody GlobalFunctionRequest globalFunctionRequest) {
+        globalFunctionService.add(globalFunctionRequest);
         return Response.ok(Boolean.TRUE);
     }
 
     @PutMapping
-    public Response<Boolean> edit(@Validated @RequestBody GlobalFunctionDto globalFunctionDto) {
-        globalFunctionService.edit(globalFunctionDto);
+    public Response<Boolean> edit(@Validated @RequestBody GlobalFunctionRequest globalFunctionRequest) {
+        globalFunctionService.edit(globalFunctionRequest);
         return Response.ok(Boolean.TRUE);
     }
 

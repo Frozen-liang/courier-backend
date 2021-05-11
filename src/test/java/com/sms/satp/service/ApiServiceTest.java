@@ -15,9 +15,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.dto.ApiPageRequestDto;
-import com.sms.satp.dto.ApiRequestDto;
-import com.sms.satp.dto.ApiResponseDto;
+import com.sms.satp.dto.ApiPageRequest;
+import com.sms.satp.dto.ApiRequest;
+import com.sms.satp.dto.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
 import com.sms.satp.mapper.ApiMapper;
@@ -48,8 +48,8 @@ class ApiServiceTest {
     private final ApiService apiService = new ApiServiceImpl(projectEntityRepository,
         apiRepository, apiHistoryRepository, apiMapper, mongoTemplate);
     private final ApiEntity api = ApiEntity.builder().id(ID).build();
-    private final ApiResponseDto apiResponseDto = ApiResponseDto.builder().id(ID).build();
-    private final ApiRequestDto apiRequestDto = ApiRequestDto.builder().id(ID).build();
+    private final ApiResponse apiResponseDto = ApiResponse.builder().id(ID).build();
+    private final ApiRequest apiRequestDto = ApiRequest.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final String NOT_EXIST_ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
@@ -59,8 +59,8 @@ class ApiServiceTest {
     public void findById_test() {
         when(apiRepository.findById(ID)).thenReturn(Optional.of(api));
         when(apiMapper.toDto(api)).thenReturn(apiResponseDto);
-        ApiResponseDto result1 = apiService.findById(ID);
-        ApiResponseDto result2 = apiService.findById(NOT_EXIST_ID);
+        ApiResponse result1 = apiService.findById(ID);
+        ApiResponse result2 = apiService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
         assertThat(result2).isNull();
@@ -120,25 +120,25 @@ class ApiServiceTest {
     @Test
     @DisplayName("Test the page method in the Api service")
     public void page_test() {
-        ArrayList<ApiResponseDto> apiDtoList = new ArrayList<>();
+        ArrayList<ApiResponse> apiDtoList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            apiDtoList.add(new ApiResponseDto());
+            apiDtoList.add(new ApiResponse());
         }
-        ApiPageRequestDto apiPageRequestDto = new ApiPageRequestDto();
-        apiPageRequestDto.setApiProtocol(Arrays.asList(1, 2));
-        apiPageRequestDto.setApiRequestParamType(Arrays.asList(1, 2));
-        apiPageRequestDto.setApiStatus(Arrays.asList(1, 2));
-        apiPageRequestDto.setProjectId(new ObjectId());
-        apiPageRequestDto.setGroupId(Arrays.asList(new ObjectId(), new ObjectId()));
-        apiPageRequestDto.setRequestMethod(Arrays.asList(1, 2));
-        apiPageRequestDto.setApiProtocol(Arrays.asList(1, 2));
-        apiPageRequestDto.setTagId(Arrays.asList(new ObjectId(), new ObjectId()));
+        ApiPageRequest apiPageRequest = new ApiPageRequest();
+        apiPageRequest.setApiProtocol(Arrays.asList(1, 2));
+        apiPageRequest.setApiRequestParamType(Arrays.asList(1, 2));
+        apiPageRequest.setApiStatus(Arrays.asList(1, 2));
+        apiPageRequest.setProjectId(new ObjectId());
+        apiPageRequest.setGroupId(Arrays.asList(new ObjectId(), new ObjectId()));
+        apiPageRequest.setRequestMethod(Arrays.asList(1, 2));
+        apiPageRequest.setApiProtocol(Arrays.asList(1, 2));
+        apiPageRequest.setTagId(Arrays.asList(new ObjectId(), new ObjectId()));
         when(mongoTemplate.count(any(Query.class), any(Class.class))).thenReturn(Long.valueOf(TOTAL_ELEMENTS));
         AggregationResults aggregationResults = mock(AggregationResults.class);
         when(mongoTemplate.aggregate(any(), any(Class.class), any(Class.class)))
             .thenReturn(aggregationResults);
         when(aggregationResults.getMappedResults()).thenReturn(apiDtoList);
-        Page<ApiResponseDto> page = apiService.page(apiPageRequestDto);
+        Page<ApiResponse> page = apiService.page(apiPageRequest);
         assertThat(page.getTotalElements()).isEqualTo(Long.valueOf(TOTAL_ELEMENTS));
     }
 
@@ -148,7 +148,7 @@ class ApiServiceTest {
         when(mongoTemplate.count(any(Query.class), any(Class.class))).thenReturn(Long.valueOf(TOTAL_ELEMENTS));
         doThrow(new RuntimeException()).when(mongoTemplate)
             .count(any(Query.class), any(Class.class));
-        assertThatThrownBy(() -> apiService.page(new ApiPageRequestDto()))
+        assertThatThrownBy(() -> apiService.page(new ApiPageRequest()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_PAGE_ERROR.getCode());
     }

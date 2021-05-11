@@ -16,7 +16,7 @@ import org.hibernate.validator.constraints.Range;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ParamInfoDto {
+public class ParamInfoRequest {
 
     /**
      * 字段名.
@@ -53,5 +53,5 @@ public class ParamInfoDto {
     @Builder.Default
     @ToString.Exclude
     @Valid
-    private List<ParamInfoDto> childParam = new ArrayList<>();
+    private List<ParamInfoRequest> childParam = new ArrayList<>();
 }

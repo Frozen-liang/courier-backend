@@ -1,4 +1,4 @@
-package com.sms.satp.entity.datacollection;
+package com.sms.satp.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-public class DataParam {
+public class DataParamResponse {
 
     private String key;
     private Object value;

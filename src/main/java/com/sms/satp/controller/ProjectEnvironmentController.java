@@ -3,7 +3,8 @@ package com.sms.satp.controller;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.ProjectEnvironmentDto;
+import com.sms.satp.dto.ProjectEnvironmentRequest;
+import com.sms.satp.dto.ProjectEnvironmentResponse;
 import com.sms.satp.service.ProjectEnvironmentService;
 import java.util.List;
 import javax.validation.Valid;
@@ -28,12 +29,12 @@ public class ProjectEnvironmentController {
     }
 
     @GetMapping("/page/{projectId}")
-    public Response<Page<ProjectEnvironmentDto>> page(PageDto pageDto, @PathVariable String projectId) {
+    public Response<Page<ProjectEnvironmentResponse>> page(PageDto pageDto, @PathVariable String projectId) {
         return Response.ok(projectEnvironmentService.page(pageDto, projectId));
     }
 
     @GetMapping("/{id}")
-    public Response<ProjectEnvironmentDto> getById(@PathVariable String id) {
+    public Response<ProjectEnvironmentResponse> getById(@PathVariable String id) {
         return Response.ok(projectEnvironmentService.findById(id));
     }
 
@@ -43,14 +44,14 @@ public class ProjectEnvironmentController {
     }
 
     @PostMapping
-    public Response<Boolean> add(@Valid @RequestBody ProjectEnvironmentDto projectEnvironmentDto) {
-        projectEnvironmentService.add(projectEnvironmentDto);
+    public Response<Boolean> add(@Valid @RequestBody ProjectEnvironmentRequest projectEnvironmentRequest) {
+        projectEnvironmentService.add(projectEnvironmentRequest);
         return Response.ok(Boolean.TRUE);
     }
 
     @PutMapping
-    public Response<Boolean> edit(@Valid @RequestBody ProjectEnvironmentDto projectEnvironmentDto) {
-        projectEnvironmentService.edit(projectEnvironmentDto);
+    public Response<Boolean> edit(@Valid @RequestBody ProjectEnvironmentRequest projectEnvironmentRequest) {
+        projectEnvironmentService.edit(projectEnvironmentRequest);
         return Response.ok(Boolean.TRUE);
     }
 

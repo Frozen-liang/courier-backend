@@ -2,16 +2,15 @@ package com.sms.satp.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sms.satp.dto.DataCollectionRequest;
+import com.sms.satp.dto.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
-import com.sms.satp.dto.DataCollectionDto;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 
 @DisplayName("Tests for DataCollectionMapper")
 class DataCollectionMapperTest {
@@ -32,7 +31,7 @@ class DataCollectionMapperTest {
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
             .build();
-        DataCollectionDto dataCollectionDto = dataCollectionMapper.toDto(dataCollection);
+        DataCollectionResponse dataCollectionDto = dataCollectionMapper.toDto(dataCollection);
         assertThat(dataCollectionDto.getCollectionName()).isEqualTo(COLLECTION_NAME);
     }
 
@@ -43,7 +42,7 @@ class DataCollectionMapperTest {
         for (int i = 0; i < SIZE; i++) {
             dataCollections.add(DataCollection.builder().collectionName(COLLECTION_NAME).build());
         }
-        List<DataCollectionDto> dataCollectionDtoList = dataCollectionMapper.toDtoList(dataCollections);
+        List<DataCollectionResponse> dataCollectionDtoList = dataCollectionMapper.toDtoList(dataCollections);
         assertThat(dataCollectionDtoList).hasSize(SIZE);
         assertThat(dataCollectionDtoList).allMatch(result -> StringUtils
             .equals(result.getCollectionName(), COLLECTION_NAME));
@@ -52,7 +51,7 @@ class DataCollectionMapperTest {
     @Test
     @DisplayName("Test the method to convert the DataCollection's dto object to a entity object")
     void dto_to_entity() {
-        DataCollectionDto dataCollectionDto = DataCollectionDto.builder()
+        DataCollectionRequest dataCollectionDto = DataCollectionRequest.builder()
             .collectionName(COLLECTION_NAME)
             .createDateTime(CREATE_TIME_STRING)
             .build();
@@ -63,7 +62,7 @@ class DataCollectionMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method to convert the DataCollection's entity object to a dto object")
     void null_entity_to_dto() {
-        DataCollectionDto dataCollectionDto = dataCollectionMapper.toDto(null);
+        DataCollectionResponse dataCollectionDto = dataCollectionMapper.toDto(null);
         assertThat(dataCollectionDto).isNull();
     }
 
@@ -77,7 +76,7 @@ class DataCollectionMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method for converting an DataCollection entity list object to a dto list object")
     void null_entityList_to_dtoList() {
-        List<DataCollectionDto> dataCollectionDtoList = dataCollectionMapper.toDtoList(null);
+        List<DataCollectionResponse> dataCollectionDtoList = dataCollectionMapper.toDtoList(null);
         assertThat(dataCollectionDtoList).isNull();
     }
 

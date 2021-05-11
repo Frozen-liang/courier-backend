@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.Range;
 @AllArgsConstructor
 @Data
 @Builder
-public class ApiTagDto {
+public class ApiTagRequest {
 
     private String id;
     @NotEmpty(message = "The projectId cannot be empty.")

@@ -3,8 +3,6 @@ package com.sms.satp.dto;
 import com.sms.satp.entity.api.common.HeaderInfo;
 import com.sms.satp.entity.env.EnvironmentAuth;
 import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,13 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-public class GlobalEnvironmentDto {
+public class GlobalEnvironmentResponse {
 
     private String id;
-    @NotEmpty(message = "The evnName cannot be empty")
     private String envName;
     private String envDesc;
-    @NotEmpty(message = "The frontUri cannot be empty")
     private String frontUri;
     private EnvironmentAuth envAuth;
     private String beforeInject;
@@ -32,10 +28,7 @@ public class GlobalEnvironmentDto {
     private Long createUserId;
     private Long modifyUserId;
     private List<HeaderInfo> headers;
-    @Valid
-    private List<ParamInfoDto> params;
-    @Valid
-    private List<ParamInfoDto> urlParams;
-    @Valid
-    private List<ParamInfoDto> additionalParams;
+    private List<ParamInfoResponse> params;
+    private List<ParamInfoResponse> urlParams;
+    private List<ParamInfoResponse> additionalParams;
 }

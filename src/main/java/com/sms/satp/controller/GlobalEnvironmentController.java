@@ -2,7 +2,8 @@ package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
-import com.sms.satp.dto.GlobalEnvironmentDto;
+import com.sms.satp.dto.GlobalEnvironmentRequest;
+import com.sms.satp.dto.GlobalEnvironmentResponse;
 import com.sms.satp.service.GlobalEnvironmentService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
@@ -26,24 +27,24 @@ public class GlobalEnvironmentController {
     }
 
     @GetMapping("/{id}")
-    public Response<GlobalEnvironmentDto> getById(@PathVariable("id") String id) {
+    public Response<GlobalEnvironmentResponse> getById(@PathVariable("id") String id) {
         return Response.ok(globalEnvironmentService.findById(id));
     }
 
     @PostMapping
-    public Response<Boolean> add(@Validated @RequestBody GlobalEnvironmentDto globalEnvironmentDto) {
-        globalEnvironmentService.add(globalEnvironmentDto);
+    public Response<Boolean> add(@Validated @RequestBody GlobalEnvironmentRequest globalEnvironmentRequest) {
+        globalEnvironmentService.add(globalEnvironmentRequest);
         return Response.ok(Boolean.TRUE);
     }
 
     @PutMapping
-    public Response<Boolean> edit(@Validated @RequestBody GlobalEnvironmentDto globalEnvironmentDto) {
-        globalEnvironmentService.edit(globalEnvironmentDto);
+    public Response<Boolean> edit(@Validated @RequestBody GlobalEnvironmentRequest globalEnvironmentRequest) {
+        globalEnvironmentService.edit(globalEnvironmentRequest);
         return Response.ok(Boolean.TRUE);
     }
 
     @GetMapping("/list")
-    public Response<List<GlobalEnvironmentDto>> list() {
+    public Response<List<GlobalEnvironmentResponse>> list() {
         return Response.ok(globalEnvironmentService.list());
     }
 

@@ -1,17 +1,18 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.ProjectFunctionDto;
+import com.sms.satp.dto.ProjectFunctionRequest;
+import com.sms.satp.dto.ProjectFunctionResponse;
 import java.util.List;
 
 public interface ProjectFunctionService {
 
-    ProjectFunctionDto findById(String id);
+    ProjectFunctionResponse findById(String id);
 
     List<Object> list(String projectId, String functionDesc, String functionName);
 
-    void add(ProjectFunctionDto projectFunctionDto);
+    void add(ProjectFunctionRequest projectFunctionRequest);
 
-    void edit(ProjectFunctionDto projectFunctionDto);
+    void edit(ProjectFunctionRequest projectFunctionRequest);
 
     void delete(String[] ids);
 }

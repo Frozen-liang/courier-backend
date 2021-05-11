@@ -12,9 +12,9 @@ import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.dto.ApiImportRequest;
-import com.sms.satp.dto.ApiPageRequestDto;
-import com.sms.satp.dto.ApiRequestDto;
-import com.sms.satp.dto.ApiResponseDto;
+import com.sms.satp.dto.ApiPageRequest;
+import com.sms.satp.dto.ApiRequest;
+import com.sms.satp.dto.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
 import com.sms.satp.entity.project.ProjectEntity;
@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -50,13 +49,8 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.LimitOperation;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
-import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
-import org.springframework.data.mongodb.core.aggregation.ProjectionOperation.ProjectionOperationBuilder;
-import org.springframework.data.mongodb.core.aggregation.SkipOperation;
-import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -101,7 +95,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public ApiResponseDto findById(String id) {
+    public ApiResponse findById(String id) {
         try {
             Optional<ApiEntity> optional = apiRepository.findById(id);
             return apiMapper.toDto(optional.orElse(null));
@@ -112,9 +106,9 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Page<ApiResponseDto> page(ApiPageRequestDto apiPageRequestDto) {
+    public Page<ApiResponse> page(ApiPageRequest apiPageRequest) {
         try {
-            PageDtoConverter.frontMapping(apiPageRequestDto);
+            PageDtoConverter.frontMapping(apiPageRequest);
             ArrayList<AggregationOperation> aggregationOperations = new ArrayList<>();
             Query query = new Query();
 
@@ -122,16 +116,16 @@ public class ApiServiceImpl implements ApiService {
                 LookupOperation.newLookup().from("ApiTag").localField("tagId").foreignField("_id").as("apiTag");
             aggregationOperations.add(apiTagLookupOperation);
 
-            buildCriteria(apiPageRequestDto, query, aggregationOperations);
+            buildCriteria(apiPageRequest, query, aggregationOperations);
 
-            Sort sort = Sort.by(Direction.fromString(apiPageRequestDto.getOrder()), apiPageRequestDto.getSort());
+            Sort sort = Sort.by(Direction.fromString(apiPageRequest.getOrder()), apiPageRequest.getSort());
             aggregationOperations.add(Aggregation.sort(sort));
 
-            int skipRecord = apiPageRequestDto.getPageNumber() * apiPageRequestDto.getPageSize();
+            int skipRecord = apiPageRequest.getPageNumber() * apiPageRequest.getPageSize();
             aggregationOperations.add(Aggregation.skip(Long.valueOf(skipRecord)));
-            aggregationOperations.add(Aggregation.limit(apiPageRequestDto.getPageSize()));
+            aggregationOperations.add(Aggregation.limit(apiPageRequest.getPageSize()));
 
-            ProjectionOperation project = Aggregation.project(ApiResponseDto.class);
+            ProjectionOperation project = Aggregation.project(ApiResponse.class);
             ProjectionOperation projectionOperation = project.andInclude("apiTag.tagName");
             aggregationOperations.add(projectionOperation);
 
@@ -140,10 +134,10 @@ public class ApiServiceImpl implements ApiService {
             if (count == 0L || skipRecord >= count) {
                 return Page.empty();
             }
-            List<ApiResponseDto> records = mongoTemplate.aggregate(aggregation, ApiEntity.class, ApiResponseDto.class)
+            List<ApiResponse> records = mongoTemplate.aggregate(aggregation, ApiEntity.class, ApiResponse.class)
                 .getMappedResults();
-            return new PageImpl<ApiResponseDto>(records,
-                PageRequest.of(apiPageRequestDto.getPageNumber(), apiPageRequestDto.getPageSize(), sort), count);
+            return new PageImpl<ApiResponse>(records,
+                PageRequest.of(apiPageRequest.getPageNumber(), apiPageRequest.getPageSize(), sort), count);
         } catch (Exception e) {
             log.error("Failed to get the Api page!", e);
             throw new ApiTestPlatformException(GET_API_PAGE_ERROR);
@@ -152,7 +146,7 @@ public class ApiServiceImpl implements ApiService {
 
 
     @Override
-    public Boolean add(ApiRequestDto apiRequestDto) {
+    public Boolean add(ApiRequest apiRequestDto) {
         log.info("ApiService-add()-params: [Api]={}", apiRequestDto.toString());
         try {
             ApiEntity apiEntity = apiMapper.toEntity(apiRequestDto);
@@ -167,7 +161,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Boolean edit(ApiRequestDto apiRequestDto) {
+    public Boolean edit(ApiRequest apiRequestDto) {
         log.info("ApiService-edit()-params: [Api]={}", apiRequestDto.toString());
         try {
             ApiEntity apiEntity = apiMapper.toEntity(apiRequestDto);
@@ -218,44 +212,44 @@ public class ApiServiceImpl implements ApiService {
         return content;
     }
 
-    private void buildCriteria(ApiPageRequestDto apiPageRequestDto, Query query,
+    private void buildCriteria(ApiPageRequest apiPageRequest, Query query,
         List<AggregationOperation> aggregationOperations) {
-        Criteria projectIdCriteria = Criteria.where(PROJECT_ID).is(apiPageRequestDto.getProjectId());
+        Criteria projectIdCriteria = Criteria.where(PROJECT_ID).is(apiPageRequest.getProjectId());
         Criteria removedCriteria = Criteria.where(REMOVE).is(Boolean.FALSE);
         query.addCriteria(projectIdCriteria);
         query.addCriteria(removedCriteria);
         aggregationOperations.add(Aggregation.match(projectIdCriteria));
         aggregationOperations.add(Aggregation.match(removedCriteria));
 
-        if (Objects.nonNull(apiPageRequestDto.getApiProtocol())) {
-            Criteria criteria = Criteria.where(ApiFiled.API_PROTOCOL.getFiled()).in(apiPageRequestDto.getApiProtocol());
+        if (Objects.nonNull(apiPageRequest.getApiProtocol())) {
+            Criteria criteria = Criteria.where(ApiFiled.API_PROTOCOL.getFiled()).in(apiPageRequest.getApiProtocol());
             aggregationOperations.add(Aggregation.match(criteria));
             query.addCriteria(criteria);
         }
-        if (Objects.nonNull(apiPageRequestDto.getApiRequestParamType())) {
+        if (Objects.nonNull(apiPageRequest.getApiRequestParamType())) {
             Criteria criteria = Criteria.where(ApiFiled.API_REQUEST_PARAM_TYPE.getFiled())
-                .in(apiPageRequestDto.getApiRequestParamType());
+                .in(apiPageRequest.getApiRequestParamType());
             aggregationOperations.add(Aggregation.match(criteria));
             query.addCriteria(criteria);
         }
-        if (Objects.nonNull(apiPageRequestDto.getApiStatus())) {
-            Criteria criteria = Criteria.where(ApiFiled.API_STATUS.getFiled()).in(apiPageRequestDto.getApiStatus());
+        if (Objects.nonNull(apiPageRequest.getApiStatus())) {
+            Criteria criteria = Criteria.where(ApiFiled.API_STATUS.getFiled()).in(apiPageRequest.getApiStatus());
             aggregationOperations.add(Aggregation.match(criteria));
             query.addCriteria(criteria);
         }
-        if (Objects.nonNull(apiPageRequestDto.getGroupId())) {
-            Criteria criteria = Criteria.where(ApiFiled.GROUP_ID.getFiled()).in(apiPageRequestDto.getGroupId());
+        if (Objects.nonNull(apiPageRequest.getGroupId())) {
+            Criteria criteria = Criteria.where(ApiFiled.GROUP_ID.getFiled()).in(apiPageRequest.getGroupId());
             aggregationOperations.add(Aggregation.match(criteria));
             query.addCriteria(criteria);
         }
-        if (Objects.nonNull(apiPageRequestDto.getRequestMethod())) {
+        if (Objects.nonNull(apiPageRequest.getRequestMethod())) {
             Criteria criteria = Criteria.where(ApiFiled.REQUEST_METHOD.getFiled())
-                .in(apiPageRequestDto.getRequestMethod());
+                .in(apiPageRequest.getRequestMethod());
             aggregationOperations.add(Aggregation.match(criteria));
             query.addCriteria(criteria);
         }
-        if (Objects.nonNull(apiPageRequestDto.getTagId())) {
-            Criteria criteria = Criteria.where(ApiFiled.TAG_ID.getFiled()).in(apiPageRequestDto.getTagId());
+        if (Objects.nonNull(apiPageRequest.getTagId())) {
+            Criteria criteria = Criteria.where(ApiFiled.TAG_ID.getFiled()).in(apiPageRequest.getTagId());
             aggregationOperations.add(Aggregation.match(criteria));
             query.addCriteria(criteria);
         }
