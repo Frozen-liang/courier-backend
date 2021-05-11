@@ -36,7 +36,8 @@ public interface ApiMapper {
     @Mapping(target = "requestMethod",
         expression = "java(com.sms.satp.common.enums.RequestMethod.getType(apiRequestDto.getRequestMethod()))")
     @Mapping(target = "apiRequestParamType",
-        expression = "java(com.sms.satp.common.enums.ApiRequestParamTypegetType(apiRequestDto.getApiRequestParamType()))")
+        expression = "java(com.sms.satp.common.enums.ApiRequestParamType"
+            + ".getType(apiRequestDto.getApiRequestParamType()))")
     @Mapping(target = "apiStatus",
         expression = "java(com.sms.satp.common.enums.ApiStatus.getType(apiRequestDto.getApiStatus()))")
     @Mapping(target = "apiResponseJsonType",

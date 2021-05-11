@@ -19,7 +19,8 @@ public interface ApiTagMapper {
 
     @Mapping(target = "createDateTime", ignore = true)
     @Mapping(target = "modifyDateTime", ignore = true)
-    @Mapping(target = "tagType", expression = "java(com.sms.satp.common.enums.ApiTagType.getType(apiTagDto.getTagType()))")
+    @Mapping(target = "tagType",
+        expression = "java(com.sms.satp.common.enums.ApiTagType.getType(apiTagDto.getTagType()))")
     ApiTag toEntity(ApiTagDto apiTagDto);
 
 }
