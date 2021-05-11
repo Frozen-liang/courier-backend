@@ -119,7 +119,7 @@ class GlobalEnvironmentServiceTest {
             globalEnvironmentDtos.add(GlobalEnvironmentDto.builder().build());
         }
 
-        when(globalEnvironmentRepository.findByRemoveOrderByCreateDateTimeDesc(Boolean.FALSE)).thenReturn(list);
+        when(globalEnvironmentRepository.findByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE)).thenReturn(list);
         when(globalEnvironmentMapper.toDtoList(list)).thenReturn(globalEnvironmentDtos);
         List<GlobalEnvironmentDto> result = globalEnvironmentService.list();
         assertThat(result).hasSize(TOTAL_ELEMENTS);
@@ -129,7 +129,7 @@ class GlobalEnvironmentServiceTest {
     @DisplayName("An exception occurred while getting GlobalEnvironment list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(globalEnvironmentRepository)
-            .findByRemoveOrderByCreateDateTimeDesc(Boolean.FALSE);
+            .findByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE);
         assertThatThrownBy(globalEnvironmentService::list).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_GLOBAL_ENVIRONMENT_LIST_ERROR.getCode());
     }

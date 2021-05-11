@@ -1,7 +1,9 @@
 package com.sms.satp.dto;
 
 import java.util.List;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,38 +15,47 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ApiRequestDto {
 
+    private String id;
+
     @NotBlank(message = "The projectId must not be null.")
     private String projectId;
 
-    private Integer groupId;
+    private String groupId;
 
-    private List<Integer> tagId;
+    private List<String> tagId;
 
     @NotBlank(message = "The apiName must not be null.")
     private String apiName;
 
     private String description;
 
-    @NotBlank(message = "The apiPath must not be null.")
+    @NotNull(message = "The apiPath must not be null.")
     private String apiPath;
 
-    @NotBlank(message = "The apiProtocol must not be null.")
+    @NotNull(message = "The apiProtocol must not be null.")
     private Integer apiProtocol;
 
+    @NotNull(message = "The requestMethod must not be null.")
     private Integer requestMethod;
 
-    @NotBlank(message = "The apiRequestParamType must not be null.")
+    @NotNull(message = "The apiRequestParamType must not be null.")
     private Integer apiRequestParamType;
 
 
+    @Valid
     private List<ParamInfoDto> requestHeaders;
+    @Valid
     private List<ParamInfoDto> responseHeaders;
+    @Valid
     private List<ParamInfoDto> pathParams;
+    @Valid
     private List<ParamInfoDto> restfulParams;
+    @Valid
     private List<ParamInfoDto> requestParams;
+    @Valid
     private List<ParamInfoDto> responseParams;
 
-    @NotBlank(message = "The apiStatus must not be null.")
+    @NotNull(message = "The apiStatus must not be null.")
     private Integer apiStatus;
 
     private boolean removed;
@@ -53,7 +64,9 @@ public class ApiRequestDto {
 
     private String postInject;
 
+    @NotNull(message = "The apiResponseJsonType must not be null.")
     private Integer apiResponseJsonType;
 
+    @NotNull(message = "The apiRequestJsonType must not be null.")
     private Integer apiRequestJsonType;
 }

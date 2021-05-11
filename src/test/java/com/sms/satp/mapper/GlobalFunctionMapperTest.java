@@ -2,7 +2,6 @@ package com.sms.satp.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sms.satp.ApplicationTests;
 import com.sms.satp.dto.GlobalFunctionDto;
 import com.sms.satp.entity.function.GlobalFunction;
 import java.time.LocalDateTime;
@@ -11,13 +10,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 
 @DisplayName("Tests for GlobalFunctionMapper")
 class GlobalFunctionMapperTest {
 
-    private GlobalFunctionMapper globalFunctionMapper = new GlobalFunctionMapperImpl();
+    private GlobalFunctionMapper globalFunctionMapper = new GlobalFunctionMapperImpl(new ParamInfoMapperImpl());
 
     private static final Integer SIZE = 10;
     private static final String FUNCTION_NAME = "globalFunction";

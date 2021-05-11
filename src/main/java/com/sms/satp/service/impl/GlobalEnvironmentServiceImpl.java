@@ -86,7 +86,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     public List<GlobalEnvironmentDto> list() {
         try {
             List<GlobalEnvironment> globalEnvironments = globalEnvironmentRepository
-                .findByRemoveOrderByCreateDateTimeDesc(Boolean.FALSE);
+                .findByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE);
             return globalEnvironmentMapper.toDtoList(globalEnvironments);
         } catch (Exception e) {
             log.error("Failed to get the GlobalEnvironment list!", e);

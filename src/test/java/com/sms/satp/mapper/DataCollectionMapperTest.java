@@ -2,7 +2,6 @@ package com.sms.satp.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sms.satp.ApplicationTests;
 import com.sms.satp.entity.datacollection.DataCollection;
 import com.sms.satp.dto.DataCollectionDto;
 import java.time.LocalDateTime;

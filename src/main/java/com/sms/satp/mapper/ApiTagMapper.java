@@ -12,12 +12,15 @@ public interface ApiTagMapper {
 
     @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(target = "tagType", expression = "java(apiTag.getTagType().getCode())")
     ApiTagDto toDto(ApiTag apiTag);
 
     List<ApiTagDto> toDtoList(List<ApiTag> apiTags);
 
     @Mapping(target = "createDateTime", ignore = true)
     @Mapping(target = "modifyDateTime", ignore = true)
+    @Mapping(target = "tagType",
+        expression = "java(com.sms.satp.common.enums.ApiTagType.getType(apiTagDto.getTagType()))")
     ApiTag toEntity(ApiTagDto apiTagDto);
 
 }

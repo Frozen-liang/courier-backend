@@ -12,8 +12,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.ParamInfoDto;
 import com.sms.satp.dto.ProjectEnvironmentDto;
 import com.sms.satp.service.ProjectEnvironmentService;
+import java.util.Collections;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +45,9 @@ class ProjectEnvironmentControllerTest {
 
     private final static Integer PAGE_NUMBER = 3;
     private final static Integer PAGE_SIZE = 20;
-    private final static String ID = "607cebb2fbe53628bf14a2a2";
-    private final static String PROJECT_ID = "id";
+    private final static String ID = ObjectId.get().toString();
+    private final static String FRONT_URI = "127.0.0.1";
+    private final static String PROJECT_ID = ObjectId.get().toString();
     private final static String EVN_NAME = "evnName";
 
     @Test
@@ -81,9 +85,12 @@ class ProjectEnvironmentControllerTest {
 
     @Test
     @DisplayName("Add a ProjectEnvironment")
-    void addProjectEnvironmentDto() throws Exception{
+    void addProjectEnvironmentDto() throws Exception {
         ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder()
+            .projectId(PROJECT_ID)
+            .frontUri(FRONT_URI)
             .envName(EVN_NAME)
+            .params(Collections.singletonList(ParamInfoDto.builder().key("key").paramType(14).build()))
             .build();
         doNothing().when(projectEnvironmentService).add(projectEnvironmentDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -99,9 +106,10 @@ class ProjectEnvironmentControllerTest {
 
     @Test
     @DisplayName("Edit the ProjectEnvironment by id")
-    void editProjectEnvironmentDto() throws Exception{
-        ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder()
-            .id(PROJECT_ID)
+    void editProjectEnvironmentDto() throws Exception {
+        ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder().id(ID)
+            .projectId(PROJECT_ID)
+            .frontUri(FRONT_URI)
             .envName(EVN_NAME)
             .build();
         doNothing().when(projectEnvironmentService).edit(projectEnvironmentDto);
@@ -118,7 +126,7 @@ class ProjectEnvironmentControllerTest {
 
     @Test
     @DisplayName("Get its specific information through the id of the ProjectEnvironment")
-    void getInfoById() throws Exception{
+    void getInfoById() throws Exception {
         ProjectEnvironmentDto projectEnvironmentDto = ProjectEnvironmentDto.builder().build();
         when(projectEnvironmentService.findById(ID)).thenReturn(projectEnvironmentDto);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -132,7 +140,7 @@ class ProjectEnvironmentControllerTest {
 
     @Test
     @DisplayName("Delete the ProjectEnvironment by id")
-    void deleteProjectEnvironmentDto() throws Exception{
+    void deleteProjectEnvironmentDto() throws Exception {
         doNothing().when(projectEnvironmentService).delete(new String[]{ID});
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .delete(Constants.PROJECT_ENVIRONMENT_PATH + "/" + ID);

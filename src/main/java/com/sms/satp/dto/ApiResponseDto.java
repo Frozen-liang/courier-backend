@@ -1,5 +1,6 @@
 package com.sms.satp.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -17,9 +18,9 @@ public class ApiResponseDto {
 
     private String projectId;
 
-    private String group;
+    private String groupName;
 
-    private List<String> tag;
+    private List<String> tagName;
 
     private String apiName;
 
@@ -51,14 +52,15 @@ public class ApiResponseDto {
 
     private String swaggerId;
 
-
     private Integer apiResponseJsonType;
 
     private Integer apiRequestJsonType;
 
     private String createUser;
 
-    private LocalDateTime createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createDateTime;
 
-    private LocalDateTime modifyTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime modifyDateTime;
 }

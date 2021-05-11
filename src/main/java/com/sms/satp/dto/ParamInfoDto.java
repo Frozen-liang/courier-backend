@@ -1,13 +1,16 @@
 package com.sms.satp.dto;
 
-import com.sms.satp.entity.api.common.ParamInfo;
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.validator.constraints.Range;
 
 @Data
 @NoArgsConstructor
@@ -18,6 +21,7 @@ public class ParamInfoDto {
     /**
      * 字段名.
      */
+    @NotBlank(message = "The key must not be empty.")
     private String key;
     /**
      * 字段值 eg. 数组[1,2,3,4,5] 字符串 abc Json字段值在childParam里面.
@@ -29,8 +33,11 @@ public class ParamInfoDto {
     private String description;
     /**
      * 字段类型.
+     *
      * @link ParamType
      */
+    @NotNull(message = "The paramType must not be null.")
+    @Range(min = 0, max = 14, message = "The tayType must between 0 and 14.")
     private Integer paramType;
     /**
      * 是否递归引用自己.
@@ -45,5 +52,6 @@ public class ParamInfoDto {
      */
     @Builder.Default
     @ToString.Exclude
-    private List<ParamInfo> childParam = new ArrayList<>();
+    @Valid
+    private List<ParamInfoDto> childParam = new ArrayList<>();
 }
