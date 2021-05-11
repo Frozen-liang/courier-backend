@@ -2,9 +2,7 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.dto.ApiRequestDto;
 import com.sms.satp.dto.ApiResponseDto;
-import com.sms.satp.dto.ParamInfoDto;
 import com.sms.satp.entity.api.ApiEntity;
-import com.sms.satp.entity.api.common.ParamInfo;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
