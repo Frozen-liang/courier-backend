@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ApiRequestDto {
+public class ApiRequest {
 
     private String id;
 
@@ -43,17 +43,17 @@ public class ApiRequestDto {
 
 
     @Valid
-    private List<ParamInfoDto> requestHeaders;
+    private List<ParamInfoRequest> requestHeaders;
     @Valid
-    private List<ParamInfoDto> responseHeaders;
+    private List<ParamInfoRequest> responseHeaders;
     @Valid
-    private List<ParamInfoDto> pathParams;
+    private List<ParamInfoRequest> pathParams;
     @Valid
-    private List<ParamInfoDto> restfulParams;
+    private List<ParamInfoRequest> restfulParams;
     @Valid
-    private List<ParamInfoDto> requestParams;
+    private List<ParamInfoRequest> requestParams;
     @Valid
-    private List<ParamInfoDto> responseParams;
+    private List<ParamInfoRequest> responseParams;
 
     @NotNull(message = "The apiStatus must not be null.")
     private Integer apiStatus;

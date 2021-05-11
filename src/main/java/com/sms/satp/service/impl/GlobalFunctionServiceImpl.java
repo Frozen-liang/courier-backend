@@ -11,7 +11,8 @@ import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalFunctionDto;
+import com.sms.satp.dto.GlobalFunctionRequest;
+import com.sms.satp.dto.GlobalFunctionResponse;
 import com.sms.satp.entity.function.GlobalFunction;
 import com.sms.satp.mapper.GlobalFunctionMapper;
 import com.sms.satp.repository.GlobalFunctionRepository;
@@ -39,6 +40,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     private final GlobalFunctionRepository globalFunctionRepository;
     private final GlobalFunctionMapper globalFunctionMapper;
     private final MongoTemplate mongoTemplate;
+    private static final String FUNCTION_KEY = "functionKey";
 
     public GlobalFunctionServiceImpl(GlobalFunctionRepository globalFunctionRepository,
         GlobalFunctionMapper globalFunctionMapper, MongoTemplate mongoTemplate) {
@@ -48,7 +50,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     }
 
     @Override
-    public GlobalFunctionDto findById(String id) {
+    public GlobalFunctionResponse findById(String id) {
         try {
             Optional<GlobalFunction> optional = globalFunctionRepository.findById(id);
             return globalFunctionMapper.toDto(optional.orElse(null));
@@ -59,12 +61,13 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     }
 
     @Override
-    public List<GlobalFunctionDto> list(String functionDesc, String functionName) {
+    public List<GlobalFunctionResponse> list(String functionKey, String functionName) {
         try {
-            GlobalFunction globalFunction = GlobalFunction.builder().functionDesc(functionDesc)
+            GlobalFunction globalFunction = GlobalFunction.builder().functionKey(functionKey)
                 .functionName(functionName).build();
             ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher(REMOVE, ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher(FUNCTION_KEY,ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
             Example<GlobalFunction> example = Example.of(globalFunction, matcher);
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
@@ -77,10 +80,10 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
 
 
     @Override
-    public void add(GlobalFunctionDto globalFunctionDto) {
-        log.info("GlobalFunctionService-add()-params: [GlobalFunction]={}", globalFunctionDto.toString());
+    public void add(GlobalFunctionRequest globalFunctionRequest) {
+        log.info("GlobalFunctionService-add()-params: [GlobalFunction]={}", globalFunctionRequest.toString());
         try {
-            GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionDto);
+            GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionRequest);
             globalFunctionRepository.insert(globalFunction);
         } catch (Exception e) {
             log.error("Failed to add the GlobalFunction!", e);
@@ -89,10 +92,10 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     }
 
     @Override
-    public void edit(GlobalFunctionDto globalFunctionDto) {
-        log.info("GlobalFunctionService-edit()-params: [GlobalFunction]={}", globalFunctionDto.toString());
+    public void edit(GlobalFunctionRequest globalFunctionRequest) {
+        log.info("GlobalFunctionService-edit()-params: [GlobalFunction]={}", globalFunctionRequest.toString());
         try {
-            GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionDto);
+            GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionRequest);
             Optional<GlobalFunction> optional = globalFunctionRepository.findById(globalFunction.getId());
             optional.ifPresent((oldGlobalFunction) -> {
                 globalFunction.setCreateDateTime(oldGlobalFunction.getCreateDateTime());

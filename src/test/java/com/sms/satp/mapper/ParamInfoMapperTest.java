@@ -3,7 +3,8 @@ package com.sms.satp.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.common.enums.ParamType;
-import com.sms.satp.dto.ParamInfoDto;
+import com.sms.satp.dto.ParamInfoRequest;
+import com.sms.satp.dto.ParamInfoResponse;
 import com.sms.satp.entity.api.common.ParamInfo;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class ParamInfoMapperTest {
     @DisplayName("Test the method to convert the ParamInfo's dto object to a entity object")
     void entity_to_dto() {
         ParamInfo paramInfo = ParamInfo.builder().description(DESCRIPTION).paramType(ParamType.OBJECT).build();
-        ParamInfoDto paramInfoDto = paramInfoMapper.toDto(paramInfo);
+        ParamInfoResponse paramInfoDto = paramInfoMapper.toDto(paramInfo);
         assertThat(paramInfoDto.getDescription()).isEqualTo(DESCRIPTION);
         assertThat(paramInfoDto.getParamType()).isEqualTo(ParamType.OBJECT.getCode());
     }
@@ -32,7 +33,7 @@ public class ParamInfoMapperTest {
     @Test
     @DisplayName("Test the method to convert the ParamInfo's dto object to a entity object")
     void dto_to_entity() {
-        ParamInfoDto paramInfoDto = ParamInfoDto.builder()
+        ParamInfoRequest paramInfoDto = ParamInfoRequest.builder()
             .description(DESCRIPTION).paramType(1).build();
         ParamInfo paramInfo = paramInfoMapper.toEntity(paramInfoDto);
         assertThat(paramInfo.getDescription()).isEqualTo(DESCRIPTION);
@@ -46,7 +47,7 @@ public class ParamInfoMapperTest {
         for (int i = 0; i < SIZE; i++) {
             paramInfos.add(paramInfo);
         }
-        List<ParamInfoDto> paramInfoDtoList = paramInfoMapper.toDtoList(paramInfos);
+        List<ParamInfoResponse> paramInfoDtoList = paramInfoMapper.toDtoList(paramInfos);
         assertThat(paramInfoDtoList).hasSize(SIZE);
         assertThat(paramInfoDtoList).allMatch(result -> StringUtils.equals(result.getDescription(), DESCRIPTION));
     }
@@ -61,7 +62,7 @@ public class ParamInfoMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method to convert the ParamInfo's dto object to a entity object")
     void null_dto_to_entity() {
-        ParamInfoDto paramInfoDto = paramInfoMapper.toDto(null);
+        ParamInfoResponse paramInfoDto = paramInfoMapper.toDto(null);
         assertThat(paramInfoDto).isNull();
     }
 
@@ -69,7 +70,7 @@ public class ParamInfoMapperTest {
     @DisplayName("[Null Input Parameter]Test the method for converting an ParamInfo entity list object to a dto list "
         + "object")
     void null_entityList_to_dtoList() {
-        List<ParamInfoDto> paramInfoDtoList = paramInfoMapper.toDtoList(null);
+        List<ParamInfoResponse> paramInfoDtoList = paramInfoMapper.toDtoList(null);
         assertThat(paramInfoDtoList).isNull();
     }
 

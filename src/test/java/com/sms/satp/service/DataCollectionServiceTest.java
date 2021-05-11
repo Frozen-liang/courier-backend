@@ -16,8 +16,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.dto.DataCollectionRequest;
+import com.sms.satp.dto.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
-import com.sms.satp.dto.DataCollectionDto;
 import com.sms.satp.mapper.DataCollectionMapper;
 import com.sms.satp.repository.DataCollectionRepository;
 import com.sms.satp.service.impl.DataCollectionServiceImpl;
@@ -42,7 +43,8 @@ class DataCollectionServiceTest {
     private final DataCollectionService dataCollectionService = new DataCollectionServiceImpl(
         dataCollectionRepository, dataCollectionMapper, mongoTemplate);
     private final DataCollection dataCollection = DataCollection.builder().id(ID).build();
-    private final DataCollectionDto dataCollectionDto = DataCollectionDto.builder().id(ID).build();
+    private final DataCollectionResponse dataCollectionResponse = DataCollectionResponse.builder().id(ID).build();
+    private final DataCollectionRequest dataCollectionRequest = DataCollectionRequest.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final String NOT_EXIST_ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
@@ -53,9 +55,9 @@ class DataCollectionServiceTest {
     @DisplayName("Test the findById method in the DataCollection service")
     public void findById_test() {
         when(dataCollectionRepository.findById(ID)).thenReturn(Optional.of(dataCollection));
-        when(dataCollectionMapper.toDto(dataCollection)).thenReturn(dataCollectionDto);
-        DataCollectionDto result1 = dataCollectionService.findById(ID);
-        DataCollectionDto result2 = dataCollectionService.findById(NOT_EXIST_ID);
+        when(dataCollectionMapper.toDto(dataCollection)).thenReturn(dataCollectionResponse);
+        DataCollectionResponse result1 = dataCollectionService.findById(ID);
+        DataCollectionResponse result2 = dataCollectionService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
         assertThat(result2).isNull();
@@ -72,9 +74,9 @@ class DataCollectionServiceTest {
     @Test
     @DisplayName("Test the add method in the DataCollection service")
     public void add_test() {
-        when(dataCollectionMapper.toEntity(dataCollectionDto)).thenReturn(dataCollection);
+        when(dataCollectionMapper.toEntity(dataCollectionRequest)).thenReturn(dataCollection);
         when(dataCollectionRepository.insert(any(DataCollection.class))).thenReturn(dataCollection);
-        dataCollectionService.add(dataCollectionDto);
+        dataCollectionService.add(dataCollectionRequest);
         verify(dataCollectionRepository, times(1)).insert(any(DataCollection.class));
     }
 
@@ -83,7 +85,7 @@ class DataCollectionServiceTest {
     public void add_exception_test() {
         when(dataCollectionMapper.toEntity(any())).thenReturn(DataCollection.builder().build());
         doThrow(new RuntimeException()).when(dataCollectionRepository).insert(any(DataCollection.class));
-        assertThatThrownBy(() -> dataCollectionService.add(dataCollectionDto))
+        assertThatThrownBy(() -> dataCollectionService.add(dataCollectionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_DATA_COLLECTION_ERROR.getCode());
     }
@@ -91,21 +93,21 @@ class DataCollectionServiceTest {
     @Test
     @DisplayName("Test the edit method in the DataCollection service")
     public void edit_test() {
-        when(dataCollectionMapper.toEntity(dataCollectionDto)).thenReturn(dataCollection);
+        when(dataCollectionMapper.toEntity(dataCollectionRequest)).thenReturn(dataCollection);
         when(dataCollectionRepository.findById(any()))
             .thenReturn(Optional.of(DataCollection.builder().id(ID).build()));
         when(dataCollectionRepository.save(any(DataCollection.class))).thenReturn(dataCollection);
-        dataCollectionService.edit(dataCollectionDto);
+        dataCollectionService.edit(dataCollectionRequest);
         verify(dataCollectionRepository, times(1)).save(any(DataCollection.class));
     }
 
     @Test
     @DisplayName("An exception occurred while edit DataCollection")
     public void edit_exception_test() {
-        when(dataCollectionMapper.toEntity(dataCollectionDto)).thenReturn(dataCollection);
+        when(dataCollectionMapper.toEntity(dataCollectionRequest)).thenReturn(dataCollection);
         when(dataCollectionRepository.findById(any())).thenReturn(Optional.of(dataCollection));
         doThrow(new RuntimeException()).when(dataCollectionRepository).save(any(DataCollection.class));
-        assertThatThrownBy(() -> dataCollectionService.edit(dataCollectionDto))
+        assertThatThrownBy(() -> dataCollectionService.edit(dataCollectionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_DATA_COLLECTION_ERROR.getCode());
     }
@@ -117,13 +119,13 @@ class DataCollectionServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             dataCollectionList.add(DataCollection.builder().build());
         }
-        ArrayList<DataCollectionDto> dataCollectionDtoList = new ArrayList<>();
+        ArrayList<DataCollectionResponse> dataCollectionDtoList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            dataCollectionDtoList.add(DataCollectionDto.builder().build());
+            dataCollectionDtoList.add(DataCollectionResponse.builder().build());
         }
         when(dataCollectionRepository.findAll(any(), any(Sort.class))).thenReturn(dataCollectionList);
         when(dataCollectionMapper.toDtoList(dataCollectionList)).thenReturn(dataCollectionDtoList);
-        List<DataCollectionDto> result = dataCollectionService.list(PROJECT_ID, COLLECTION_NAME);
+        List<DataCollectionResponse> result = dataCollectionService.list(PROJECT_ID, COLLECTION_NAME);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 

@@ -1,7 +1,7 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.ApiRequestDto;
-import com.sms.satp.dto.ApiResponseDto;
+import com.sms.satp.dto.ApiRequest;
+import com.sms.satp.dto.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -25,9 +25,9 @@ public interface ApiMapper {
         expression = "java(apiEntity.getApiResponseJsonType().getCode())")
     @Mapping(target = "apiRequestJsonType",
         expression = "java(apiEntity.getApiRequestJsonType().getCode())")
-    ApiResponseDto toDto(ApiEntity apiEntity);
+    ApiResponse toDto(ApiEntity apiEntity);
 
-    List<ApiResponseDto> toDtoList(List<ApiEntity> apiEntityList);
+    List<ApiResponse> toDtoList(List<ApiEntity> apiEntityList);
 
     @Mapping(target = "createDateTime", ignore = true)
     @Mapping(target = "modifyDateTime", ignore = true)
@@ -44,6 +44,6 @@ public interface ApiMapper {
         expression = "java(com.sms.satp.common.enums.ApiJsonType.getType(apiRequestDto.getApiResponseJsonType()))")
     @Mapping(target = "apiRequestJsonType",
         expression = "java(com.sms.satp.common.enums.ApiJsonType.getType(apiRequestDto.getApiRequestJsonType()))")
-    ApiEntity toEntity(ApiRequestDto apiRequestDto);
+    ApiEntity toEntity(ApiRequest apiRequestDto);
 
 }

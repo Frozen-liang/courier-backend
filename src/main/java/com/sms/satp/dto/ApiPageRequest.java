@@ -14,7 +14,7 @@ import org.bson.types.ObjectId;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApiPageRequestDto extends PageDto {
+public class ApiPageRequest extends PageDto {
 
     @NotNull(message = "The projectId must not be null.")
     private ObjectId projectId;

@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class DataCollectionDto {
+public class DataCollectionRequest {
 
     private String id;
     @NotEmpty(message = "The projectId cannot be empty")
@@ -27,7 +27,7 @@ public class DataCollectionDto {
     @Valid
     @NotNull(message = "The dataList cannot be null")
     @Size(min = 1, message = "The dataList cannot be empty")
-    private List<TestDataDto> dataList;
+    private List<TestDataRequest> dataList;
     private String createDateTime;
     private String modifyDateTime;
     private Long createUserId;

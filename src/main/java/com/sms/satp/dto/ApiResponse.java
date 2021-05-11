@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ApiResponseDto {
+public class ApiResponse {
 
     private String id;
 
@@ -35,12 +35,12 @@ public class ApiResponseDto {
     private Integer apiRequestParamType;
 
 
-    private List<ParamInfoDto> requestHeaders;
-    private List<ParamInfoDto> responseHeaders;
-    private List<ParamInfoDto> pathParams;
-    private List<ParamInfoDto> restfulParams;
-    private List<ParamInfoDto> requestParams;
-    private List<ParamInfoDto> responseParams;
+    private List<ParamInfoResponse> requestHeaders;
+    private List<ParamInfoResponse> responseHeaders;
+    private List<ParamInfoResponse> pathParams;
+    private List<ParamInfoResponse> restfulParams;
+    private List<ParamInfoResponse> requestParams;
+    private List<ParamInfoResponse> responseParams;
 
     private Integer apiStatus;
 

@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-public class DataParamDto {
+public class DataParamRequest {
 
-    @NotEmpty(message = "The paramKey cannot by empty")
-    private String paramKey;
-    private Object paramValue;
+    @NotEmpty(message = "The key cannot by empty")
+    private String key;
+    private Object value;
 }

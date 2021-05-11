@@ -1,17 +1,18 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.GlobalFunctionDto;
+import com.sms.satp.dto.GlobalFunctionRequest;
+import com.sms.satp.dto.GlobalFunctionResponse;
 import java.util.List;
 
 public interface GlobalFunctionService {
 
-    GlobalFunctionDto findById(String id);
+    GlobalFunctionResponse findById(String id);
 
-    List<GlobalFunctionDto> list(String functionDesc, String functionName);
+    List<GlobalFunctionResponse> list(String functionDesc, String functionName);
 
-    void add(GlobalFunctionDto globalFunctionDto);
+    void add(GlobalFunctionRequest globalFunctionRequest);
 
-    void edit(GlobalFunctionDto globalFunctionDto);
+    void edit(GlobalFunctionRequest globalFunctionRequest);
 
     void delete(String[] ids);
 }

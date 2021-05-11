@@ -7,8 +7,8 @@ import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.RequestMethod;
-import com.sms.satp.dto.ApiRequestDto;
-import com.sms.satp.dto.ApiResponseDto;
+import com.sms.satp.dto.ApiRequest;
+import com.sms.satp.dto.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ class ApiMapperTest {
     @Test
     @DisplayName("Test the method to convert the Api's entity object to a dto object")
     void entity_to_dto() {
-        ApiResponseDto apiDto = apiMapper.toDto(api);
+        ApiResponse apiDto = apiMapper.toDto(api);
         assertThat(apiDto.getApiProtocol()).isEqualTo(ApiProtocol.HTTPS.getCode());
         assertThat(apiDto.getRequestMethod()).isEqualTo(RequestMethod.DELETE.getCode());
         assertThat(apiDto.getApiStatus()).isEqualTo(ApiStatus.DEVELOP.getCode());
@@ -50,7 +50,7 @@ class ApiMapperTest {
         for (int i = 0; i < SIZE; i++) {
             apis.add(api);
         }
-        List<ApiResponseDto> apiDtoList = apiMapper.toDtoList(apis);
+        List<ApiResponse> apiDtoList = apiMapper.toDtoList(apis);
         assertThat(apiDtoList).hasSize(SIZE);
         assertThat(apiDtoList).allMatch(result -> StringUtils.equals(result.getApiName(), API_NAME));
     }
@@ -58,7 +58,7 @@ class ApiMapperTest {
     @Test
     @DisplayName("Test the method to convert the Api's dto object to a entity object")
     void dto_to_entity() {
-        ApiRequestDto apiDto = ApiRequestDto.builder()
+        ApiRequest apiDto = ApiRequest.builder()
             .apiProtocol(1).apiRequestJsonType(1).apiRequestParamType(1)
             .apiStatus(1).apiResponseJsonType(1).requestMethod(1).build();
         ApiEntity api = apiMapper.toEntity(apiDto);
@@ -73,7 +73,7 @@ class ApiMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method to convert the Api's entity object to a dto object")
     void null_entity_to_dto() {
-        ApiResponseDto apiDto = apiMapper.toDto(null);
+        ApiResponse apiDto = apiMapper.toDto(null);
         assertThat(apiDto).isNull();
     }
 
@@ -87,7 +87,7 @@ class ApiMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method for converting an Api entity list object to a dto list object")
     void null_entityList_to_dtoList() {
-        List<ApiResponseDto> apiDtoList = apiMapper.toDtoList(null);
+        List<ApiResponse> apiDtoList = apiMapper.toDtoList(null);
         assertThat(apiDtoList).isNull();
     }
 

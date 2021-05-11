@@ -1,6 +1,7 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.ParamInfoDto;
+import com.sms.satp.dto.ParamInfoRequest;
+import com.sms.satp.dto.ParamInfoResponse;
 import com.sms.satp.entity.api.common.ParamInfo;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -15,13 +16,13 @@ public interface ParamInfoMapper {
 
     @Mapping(target = "paramType", expression = "java(com.sms.satp.common.enums.ParamType"
         + ".getType(paramInfoDto.getParamType()))")
-    ParamInfo toEntity(ParamInfoDto paramInfoDto);
+    ParamInfo toEntity(ParamInfoRequest paramInfoDto);
 
-    List<ParamInfo> toEntityList(List<ParamInfoDto> paramInfoDtoList);
+    List<ParamInfo> toEntityList(List<ParamInfoRequest> paramInfoDtoList);
 
     @Mapping(target = "paramType", expression = "java(paramInfo.getParamType().getCode())")
-    ParamInfoDto toDto(ParamInfo paramInfo);
+    ParamInfoResponse toDto(ParamInfo paramInfo);
 
-    List<ParamInfoDto> toDtoList(List<ParamInfo> paramInfoList);
+    List<ParamInfoResponse> toDtoList(List<ParamInfo> paramInfoList);
 
 }

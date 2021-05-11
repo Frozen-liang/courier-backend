@@ -27,7 +27,7 @@ public class ProjectFunction {
     private String id;
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
-    private String functionDesc;
+    private String functionKey;
     private String functionName;
     private List<ParamInfo> functionParams;
     private String functionCode;

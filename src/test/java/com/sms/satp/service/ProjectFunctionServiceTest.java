@@ -15,7 +15,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.dto.ProjectFunctionDto;
+import com.sms.satp.dto.ProjectFunctionRequest;
+import com.sms.satp.dto.ProjectFunctionResponse;
 import com.sms.satp.entity.function.ProjectFunction;
 import com.sms.satp.mapper.ProjectFunctionMapper;
 import com.sms.satp.repository.ProjectFunctionRepository;
@@ -41,7 +42,10 @@ class ProjectFunctionServiceTest {
     private final ProjectFunctionService projectFunctionService = new ProjectFunctionServiceImpl(
         projectFunctionRepository, projectFunctionMapper, globalFunctionService, mongoTemplate);
     private final ProjectFunction projectFunction = ProjectFunction.builder().id(ID).build();
-    private final ProjectFunctionDto projectFunctionDto = ProjectFunctionDto.builder().id(ID).build();
+    private final ProjectFunctionResponse projectFunctionResponse = ProjectFunctionResponse
+        .builder().id(ID).build();
+    private final ProjectFunctionRequest projectFunctionRequest = ProjectFunctionRequest
+        .builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final String NOT_EXIST_ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
@@ -53,9 +57,9 @@ class ProjectFunctionServiceTest {
     @DisplayName("Test the findById method in the ProjectFunction service")
     public void findById_test() {
         when(projectFunctionRepository.findById(ID)).thenReturn(Optional.of(projectFunction));
-        when(projectFunctionMapper.toDto(projectFunction)).thenReturn(projectFunctionDto);
-        ProjectFunctionDto result1 = projectFunctionService.findById(ID);
-        ProjectFunctionDto result2 = projectFunctionService.findById(NOT_EXIST_ID);
+        when(projectFunctionMapper.toDto(projectFunction)).thenReturn(projectFunctionResponse);
+        ProjectFunctionResponse result1 = projectFunctionService.findById(ID);
+        ProjectFunctionResponse result2 = projectFunctionService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID.toString());
         assertThat(result2).isNull();
@@ -72,9 +76,9 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("Test the add method in the ProjectFunction service")
     public void add_test() {
-        when(projectFunctionMapper.toEntity(projectFunctionDto)).thenReturn(projectFunction);
+        when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
         when(projectFunctionRepository.insert(any(ProjectFunction.class))).thenReturn(projectFunction);
-        projectFunctionService.add(projectFunctionDto);
+        projectFunctionService.add(projectFunctionRequest);
         verify(projectFunctionRepository, times(1)).insert(any(ProjectFunction.class));
     }
 
@@ -83,7 +87,7 @@ class ProjectFunctionServiceTest {
     public void add_exception_test() {
         when(projectFunctionMapper.toEntity(any())).thenReturn(ProjectFunction.builder().build());
         doThrow(new RuntimeException()).when(projectFunctionRepository).insert(any(ProjectFunction.class));
-        assertThatThrownBy(() -> projectFunctionService.add(projectFunctionDto))
+        assertThatThrownBy(() -> projectFunctionService.add(projectFunctionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_PROJECT_FUNCTION_ERROR.getCode());
     }
@@ -91,21 +95,21 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("Test the edit method in the ProjectFunction service")
     public void edit_test() {
-        when(projectFunctionMapper.toEntity(projectFunctionDto)).thenReturn(projectFunction);
+        when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
         when(projectFunctionRepository.findById(any()))
             .thenReturn(Optional.of(ProjectFunction.builder().id(ID).build()));
         when(projectFunctionRepository.save(any(ProjectFunction.class))).thenReturn(projectFunction);
-        projectFunctionService.edit(projectFunctionDto);
+        projectFunctionService.edit(projectFunctionRequest);
         verify(projectFunctionRepository, times(1)).save(any(ProjectFunction.class));
     }
 
     @Test
     @DisplayName("An exception occurred while edit ProjectFunction")
     public void edit_exception_test() {
-        when(projectFunctionMapper.toEntity(projectFunctionDto)).thenReturn(projectFunction);
+        when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
         when(projectFunctionRepository.findById(any())).thenReturn(Optional.of(projectFunction));
         doThrow(new RuntimeException()).when(projectFunctionRepository).save(any(ProjectFunction.class));
-        assertThatThrownBy(() -> projectFunctionService.edit(projectFunctionDto))
+        assertThatThrownBy(() -> projectFunctionService.edit(projectFunctionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_PROJECT_FUNCTION_ERROR.getCode());
     }
@@ -117,9 +121,9 @@ class ProjectFunctionServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(ProjectFunction.builder().build());
         }
-        ArrayList<ProjectFunctionDto> projectEnvironmentDtoList = new ArrayList<>();
+        ArrayList<ProjectFunctionResponse> projectEnvironmentDtoList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            projectEnvironmentDtoList.add(ProjectFunctionDto.builder().build());
+            projectEnvironmentDtoList.add(ProjectFunctionResponse.builder().build());
         }
         when(projectFunctionRepository.findAll(any(), any(Sort.class))).thenReturn(list);
         when(projectFunctionMapper.toDtoList(list)).thenReturn(projectEnvironmentDtoList);
