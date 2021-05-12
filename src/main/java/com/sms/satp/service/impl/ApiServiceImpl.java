@@ -162,14 +162,9 @@ public class ApiServiceImpl implements ApiService {
         log.info("ApiService-edit()-params: [Api]={}", apiRequestDto.toString());
         try {
             ApiEntity apiEntity = apiMapper.toEntity(apiRequestDto);
-            apiRepository.findById(apiEntity.getId())
-                .ifPresent((oldApiEntity) -> {
-                    apiEntity.setCreateUserId(oldApiEntity.getCreateUserId());
-                    apiEntity.setCreateDateTime(oldApiEntity.getCreateDateTime());
-                    ApiEntity newApiEntity = apiRepository.save(apiEntity);
-                    ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder().record(newApiEntity).build();
-                    apiHistoryRepository.insert(apiHistoryEntity);
-                });
+            ApiEntity newApiEntity = apiRepository.save(apiEntity);
+            ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder().record(newApiEntity).build();
+            apiHistoryRepository.insert(apiHistoryEntity);
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
             throw new ApiTestPlatformException(EDIT_API_ERROR);
