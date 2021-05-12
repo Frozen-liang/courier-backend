@@ -14,9 +14,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalFunctionRequest;
-import com.sms.satp.dto.GlobalFunctionResponse;
+import com.sms.satp.dto.request.GlobalFunctionRequest;
+import com.sms.satp.dto.response.GlobalFunctionResponse;
 import com.sms.satp.entity.function.GlobalFunction;
 import com.sms.satp.mapper.GlobalFunctionMapper;
 import com.sms.satp.repository.GlobalFunctionRepository;
@@ -96,8 +97,7 @@ class GlobalFunctionServiceTest {
         when(globalFunctionRepository.findById(any()))
             .thenReturn(Optional.of(GlobalFunction.builder().id(ID).build()));
         when(globalFunctionRepository.save(any(GlobalFunction.class))).thenReturn(globalFunction);
-        globalFunctionService.edit(globalFunctionRequest);
-        verify(globalFunctionRepository, times(1)).save(any(GlobalFunction.class));
+        assertThat(globalFunctionService.edit(globalFunctionRequest)).isTrue();
     }
 
     @Test
@@ -141,9 +141,9 @@ class GlobalFunctionServiceTest {
     @Test
     @DisplayName("Test the delete method in the GlobalFunction service")
     public void delete_test() {
-        globalFunctionService.delete(new String[]{ID});
-        verify(mongoTemplate, times(1))
-            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
+        when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
+            UpdateResult.acknowledged(1, 1L, null));
+        assertThat(globalFunctionService.delete(new String[]{ID})).isTrue();
     }
 
     @Test

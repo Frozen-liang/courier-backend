@@ -2,10 +2,12 @@ package com.sms.satp.controller;
 
 import static com.sms.satp.common.constant.Constants.API_PATH;
 
-import com.sms.satp.dto.ApiPageRequest;
-import com.sms.satp.dto.ApiRequest;
-import com.sms.satp.dto.ApiResponse;
+import com.sms.satp.common.validate.InsertGroup;
+import com.sms.satp.common.validate.UpdateGroup;
 import com.sms.satp.dto.request.ApiImportRequest;
+import com.sms.satp.dto.request.ApiPageRequest;
+import com.sms.satp.dto.request.ApiRequest;
+import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.service.ApiService;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
@@ -44,12 +46,12 @@ public class ApiController {
     }
 
     @PostMapping
-    public Boolean add(@Validated @RequestBody ApiRequest apiRequest) {
+    public Boolean add(@Validated(InsertGroup.class) @RequestBody ApiRequest apiRequest) {
         return apiService.add(apiRequest);
     }
 
     @PutMapping
-    public Boolean edit(@Validated @RequestBody ApiRequest apiRequest) {
+    public Boolean edit(@Validated(UpdateGroup.class) @RequestBody ApiRequest apiRequest) {
         return apiService.edit(apiRequest);
     }
 

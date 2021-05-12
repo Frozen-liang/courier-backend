@@ -17,10 +17,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalEnvironmentResponse;
-import com.sms.satp.dto.ProjectEnvironmentRequest;
-import com.sms.satp.dto.ProjectEnvironmentResponse;
+import com.sms.satp.dto.response.GlobalEnvironmentResponse;
+import com.sms.satp.dto.request.ProjectEnvironmentRequest;
+import com.sms.satp.dto.response.ProjectEnvironmentResponse;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
@@ -148,8 +149,7 @@ class ProjectEnvironmentServiceTest {
         when(projectEnvironmentMapper.toEntity(projectEnvironmentRequest)).thenReturn(projectEnvironment);
         when(projectEnvironmentRepository.findById(ID)).thenReturn(Optional.of(ProjectEnvironment.builder().build()));
         when(projectEnvironmentRepository.save(projectEnvironment)).thenReturn(projectEnvironment);
-        projectEnvironmentService.edit(projectEnvironmentRequest);
-        verify(projectEnvironmentRepository, times(1)).save(any(ProjectEnvironment.class));
+        assertThat(projectEnvironmentService.edit(projectEnvironmentRequest)).isTrue();
     }
 
     @Test
@@ -170,9 +170,9 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectEnvironment service")
     void delete_test() {
-        projectEnvironmentService.delete(new String[]{ID});
-        verify(mongoTemplate, times(1))
-            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
+        when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
+            UpdateResult.acknowledged(1, 1L, null));
+        assertThat(projectEnvironmentService.delete(new String[]{ID})).isTrue();
     }
 
     @Test

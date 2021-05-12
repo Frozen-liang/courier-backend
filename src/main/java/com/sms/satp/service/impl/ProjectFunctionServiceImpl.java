@@ -1,20 +1,21 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_FUNCTION_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.DELETE_PROJECT_FUNCTION_BY_ID_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_FUNCTION_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_BY_ID_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_LIST_ERROR;
 import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.ID;
 import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.constant.CommonFiled.REMOVE;
+import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_FUNCTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_PROJECT_FUNCTION_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_FUNCTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_LIST_ERROR;
 
+import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalFunctionResponse;
-import com.sms.satp.dto.ProjectFunctionRequest;
-import com.sms.satp.dto.ProjectFunctionResponse;
+import com.sms.satp.dto.request.ProjectFunctionRequest;
+import com.sms.satp.dto.response.GlobalFunctionResponse;
+import com.sms.satp.dto.response.ProjectFunctionResponse;
 import com.sms.satp.entity.function.ProjectFunction;
 import com.sms.satp.mapper.ProjectFunctionMapper;
 import com.sms.satp.repository.ProjectFunctionRepository;
@@ -75,7 +76,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
             ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID, ExampleMatcher.GenericPropertyMatchers.exact())
-                .withMatcher(FUNCTION_KEY,ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher(FUNCTION_KEY, ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher(REMOVE, ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
             Example<ProjectFunction> example = Example.of(projectFunction, matcher);
@@ -93,7 +94,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
 
 
     @Override
-    public void add(ProjectFunctionRequest projectFunctionRequest) {
+    public Boolean add(ProjectFunctionRequest projectFunctionRequest) {
         log.info("ProjectFunctionService-add()-params: [ProjectFunction]={}", projectFunctionRequest.toString());
         try {
             ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
@@ -102,14 +103,18 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
             log.error("Failed to add the ProjectFunction!", e);
             throw new ApiTestPlatformException(ADD_PROJECT_FUNCTION_ERROR);
         }
+        return Boolean.TRUE;
     }
 
     @Override
-    public void edit(ProjectFunctionRequest projectFunctionRequest) {
+    public Boolean edit(ProjectFunctionRequest projectFunctionRequest) {
         log.info("ProjectFunctionService-edit()-params: [ProjectFunction]={}", projectFunctionRequest.toString());
         try {
             ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
             Optional<ProjectFunction> optional = projectFunctionRepository.findById(projectFunction.getId());
+            if (optional.isEmpty()) {
+                return Boolean.FALSE;
+            }
             optional.ifPresent((oldProjectFunction) -> {
                 projectFunction.setCreateDateTime(oldProjectFunction.getCreateDateTime());
                 projectFunction.setCreateUserId(oldProjectFunction.getCreateUserId());
@@ -119,19 +124,24 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
             log.error("Failed to add the ProjectFunction!", e);
             throw new ApiTestPlatformException(EDIT_PROJECT_FUNCTION_ERROR);
         }
+        return Boolean.TRUE;
     }
 
     @Override
-    public void delete(String[] ids) {
+    public Boolean delete(String[] ids) {
         try {
             Query query = new Query(Criteria.where(ID).in(Arrays.asList(ids)));
             Update update = Update.update(REMOVE, Boolean.TRUE);
             update.set(MODIFY_DATE_TIME, LocalDateTime.now());
-            mongoTemplate.updateMulti(query, update, ProjectFunction.class);
+            UpdateResult updateResult = mongoTemplate.updateMulti(query, update, ProjectFunction.class);
+            if (updateResult.getModifiedCount() > 0) {
+                return Boolean.TRUE;
+            }
         } catch (Exception e) {
             log.error("Failed to delete the ProjectFunction!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_FUNCTION_BY_ID_ERROR);
         }
+        return Boolean.FALSE;
     }
 
 }

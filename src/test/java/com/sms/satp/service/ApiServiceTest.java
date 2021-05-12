@@ -15,9 +15,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.ApiPageRequest;
-import com.sms.satp.dto.ApiRequest;
-import com.sms.satp.dto.ApiResponse;
+import com.sms.satp.dto.request.ApiPageRequest;
+import com.sms.satp.dto.request.ApiRequest;
+import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
 import com.sms.satp.mapper.ApiMapper;

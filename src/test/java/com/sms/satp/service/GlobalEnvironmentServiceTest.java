@@ -14,9 +14,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalEnvironmentRequest;
-import com.sms.satp.dto.GlobalEnvironmentResponse;
+import com.sms.satp.dto.request.GlobalEnvironmentRequest;
+import com.sms.satp.dto.response.GlobalEnvironmentResponse;
 import com.sms.satp.entity.env.GlobalEnvironment;
 import com.sms.satp.mapper.GlobalEnvironmentMapper;
 import com.sms.satp.repository.GlobalEnvironmentRepository;
@@ -95,8 +96,7 @@ class GlobalEnvironmentServiceTest {
         when(globalEnvironmentRepository.findById(any()))
             .thenReturn(Optional.of(GlobalEnvironment.builder().id(ID).build()));
         when(globalEnvironmentRepository.save(any(GlobalEnvironment.class))).thenReturn(globalEnvironment);
-        globalEnvironmentService.edit(globalEnvironmentRequest);
-        verify(globalEnvironmentRepository, times(1)).save(any(GlobalEnvironment.class));
+        assertThat(globalEnvironmentService.edit(globalEnvironmentRequest)).isTrue();
     }
 
     @Test
@@ -141,9 +141,9 @@ class GlobalEnvironmentServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectEnvironment service")
     void delete_test() {
-        globalEnvironmentService.delete(new String[]{ID});
-        verify(mongoTemplate, times(1))
-            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
+        when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
+            UpdateResult.acknowledged(1, 1L, null));
+        assertThat(globalEnvironmentService.delete(new String[]{ID})).isTrue();
     }
 
     @Test

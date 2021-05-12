@@ -1,7 +1,7 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.DataCollectionRequest;
-import com.sms.satp.dto.DataCollectionResponse;
+import com.sms.satp.dto.request.DataCollectionRequest;
+import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -19,8 +19,6 @@ public interface DataCollectionMapper {
 
     List<DataCollectionResponse> toDtoList(List<DataCollection> dataCollections);
 
-    @Mapping(target = "createDateTime", ignore = true)
-    @Mapping(target = "modifyDateTime", ignore = true)
     DataCollection toEntity(DataCollectionRequest dataCollectionDto);
 
 }

@@ -2,8 +2,8 @@ package com.sms.satp.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sms.satp.dto.GlobalFunctionRequest;
-import com.sms.satp.dto.GlobalFunctionResponse;
+import com.sms.satp.dto.request.GlobalFunctionRequest;
+import com.sms.satp.dto.response.GlobalFunctionResponse;
 import com.sms.satp.entity.function.GlobalFunction;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,7 +19,6 @@ class GlobalFunctionMapperTest {
 
     private static final Integer SIZE = 10;
     private static final String FUNCTION_NAME = "globalFunction";
-    private static final String CREATE_TIME_STRING = "2021-04-27 15:21:18";
     private static final LocalDateTime CREATE_TIME = LocalDateTime.now();
     private static final LocalDateTime MODIFY_TIME = LocalDateTime.now();
 
@@ -52,7 +51,6 @@ class GlobalFunctionMapperTest {
     void dto_to_entity() {
         GlobalFunctionRequest globalFunctionDto = GlobalFunctionRequest.builder()
             .functionName(FUNCTION_NAME)
-            .createDateTime(CREATE_TIME_STRING)
             .build();
         GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionDto);
         assertThat(globalFunction.getFunctionName()).isEqualTo(FUNCTION_NAME);

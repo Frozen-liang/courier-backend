@@ -1,5 +1,7 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
+import com.sms.satp.common.validate.InsertGroup;
+import com.sms.satp.common.validate.UpdateGroup;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -16,10 +18,11 @@ import lombok.NoArgsConstructor;
 @Data
 public class TestDataRequest {
 
-    @NotEmpty(message = "The dataName cannot be empty")
+    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The dataName cannot be empty")
     private String dataName;
+
     @Valid
-    @NotNull(message = "The data cannot be null")
-    @Size(min = 1, message = "The data cannot be empty")
+    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The data cannot be null")
+    @Size(min = 1, groups = {InsertGroup.class, UpdateGroup.class}, message = "The data cannot be empty")
     private List<DataParamRequest> data;
 }

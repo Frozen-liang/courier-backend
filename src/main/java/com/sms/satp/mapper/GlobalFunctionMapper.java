@@ -1,7 +1,7 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.GlobalFunctionRequest;
-import com.sms.satp.dto.GlobalFunctionResponse;
+import com.sms.satp.dto.request.GlobalFunctionRequest;
+import com.sms.satp.dto.response.GlobalFunctionResponse;
 import com.sms.satp.entity.function.GlobalFunction;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -19,7 +19,5 @@ public interface GlobalFunctionMapper {
 
     List<GlobalFunctionResponse> toDtoList(List<GlobalFunction> globalFunctions);
 
-    @Mapping(target = "createDateTime", ignore = true)
-    @Mapping(target = "modifyDateTime", ignore = true)
     GlobalFunction toEntity(GlobalFunctionRequest globalFunctionDto);
 }

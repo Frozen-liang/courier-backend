@@ -1,7 +1,7 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.GlobalEnvironmentRequest;
-import com.sms.satp.dto.GlobalEnvironmentResponse;
+import com.sms.satp.dto.request.GlobalEnvironmentRequest;
+import com.sms.satp.dto.response.GlobalEnvironmentResponse;
 import com.sms.satp.entity.env.GlobalEnvironment;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -19,7 +19,5 @@ public interface GlobalEnvironmentMapper {
 
     List<GlobalEnvironmentResponse> toDtoList(List<GlobalEnvironment> globalEnvironments);
 
-    @Mapping(target = "createDateTime", ignore = true)
-    @Mapping(target = "modifyDateTime", ignore = true)
     GlobalEnvironment toEntity(GlobalEnvironmentRequest globalEnvironmentDto);
 }

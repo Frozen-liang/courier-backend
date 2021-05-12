@@ -1,7 +1,7 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.GlobalFunctionRequest;
-import com.sms.satp.dto.GlobalFunctionResponse;
+import com.sms.satp.dto.request.GlobalFunctionRequest;
+import com.sms.satp.dto.response.GlobalFunctionResponse;
 import java.util.List;
 
 public interface GlobalFunctionService {
@@ -10,9 +10,9 @@ public interface GlobalFunctionService {
 
     List<GlobalFunctionResponse> list(String functionDesc, String functionName);
 
-    void add(GlobalFunctionRequest globalFunctionRequest);
+    Boolean add(GlobalFunctionRequest globalFunctionRequest);
 
-    void edit(GlobalFunctionRequest globalFunctionRequest);
+    Boolean edit(GlobalFunctionRequest globalFunctionRequest);
 
-    void delete(String[] ids);
+    Boolean delete(String[] ids);
 }

@@ -1,7 +1,7 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.ProjectEnvironmentRequest;
-import com.sms.satp.dto.ProjectEnvironmentResponse;
+import com.sms.satp.dto.request.ProjectEnvironmentRequest;
+import com.sms.satp.dto.response.ProjectEnvironmentResponse;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -20,7 +20,5 @@ public interface ProjectEnvironmentMapper {
 
     List<ProjectEnvironmentResponse> toDtoList(List<ProjectEnvironment> projectEnvironments);
 
-    @Mapping(target = "modifyDateTime", ignore = true)
-    @Mapping(target = "createDateTime", ignore = true)
     ProjectEnvironment toEntity(ProjectEnvironmentRequest projectEnvironmentDto);
 }

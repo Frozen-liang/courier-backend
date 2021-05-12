@@ -1,8 +1,10 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.dto.GlobalEnvironmentRequest;
-import com.sms.satp.dto.GlobalEnvironmentResponse;
+import com.sms.satp.common.validate.InsertGroup;
+import com.sms.satp.common.validate.UpdateGroup;
+import com.sms.satp.dto.request.GlobalEnvironmentRequest;
+import com.sms.satp.dto.response.GlobalEnvironmentResponse;
 import com.sms.satp.service.GlobalEnvironmentService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
@@ -32,30 +34,23 @@ public class GlobalEnvironmentController {
     }
 
     @PostMapping
-    public Boolean add(@Validated @RequestBody GlobalEnvironmentRequest globalEnvironmentRequest) {
-        globalEnvironmentService.add(globalEnvironmentRequest);
-        return
-            Boolean.TRUE;
+    public Boolean add(@Validated(InsertGroup.class) @RequestBody GlobalEnvironmentRequest globalEnvironmentRequest) {
+        return globalEnvironmentService.add(globalEnvironmentRequest);
     }
 
     @PutMapping
-    public Boolean edit(@Validated @RequestBody GlobalEnvironmentRequest globalEnvironmentRequest) {
-        globalEnvironmentService.edit(globalEnvironmentRequest);
-        return
-            Boolean.TRUE;
+    public Boolean edit(@Validated(UpdateGroup.class) @RequestBody GlobalEnvironmentRequest globalEnvironmentRequest) {
+        return globalEnvironmentService.edit(globalEnvironmentRequest);
     }
 
     @GetMapping("/list")
     public List<GlobalEnvironmentResponse> list() {
-        return
-            globalEnvironmentService.list();
+        return globalEnvironmentService.list();
     }
 
     @DeleteMapping("/{ids}")
     public Boolean delete(@PathVariable("ids") String[] ids) {
-        globalEnvironmentService.delete(ids);
-        return
-            Boolean.TRUE;
+        return globalEnvironmentService.delete(ids);
     }
 
 }

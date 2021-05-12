@@ -2,8 +2,8 @@ package com.sms.satp.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sms.satp.dto.ProjectFunctionRequest;
-import com.sms.satp.dto.ProjectFunctionResponse;
+import com.sms.satp.dto.request.ProjectFunctionRequest;
+import com.sms.satp.dto.response.ProjectFunctionResponse;
 import com.sms.satp.entity.function.ProjectFunction;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,7 +19,6 @@ class ProjectFunctionMapperTest {
 
     private static final Integer SIZE = 10;
     private static final String FUNCTION_CODE = "var a = 1";
-    private static final String CREATE_TIME_STRING = "2021-04-27 15:21:21";
     private static final LocalDateTime CREATE_TIME = LocalDateTime.now();
     private static final LocalDateTime MODIFY_TIME = LocalDateTime.now();
 
@@ -52,7 +51,6 @@ class ProjectFunctionMapperTest {
     void dto_to_entity() {
         ProjectFunctionRequest projectFunctionDto = ProjectFunctionRequest.builder()
             .functionCode(FUNCTION_CODE)
-            .createDateTime(CREATE_TIME_STRING)
             .build();
         ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionDto);
         assertThat(projectFunction.getFunctionCode()).isEqualTo(FUNCTION_CODE);

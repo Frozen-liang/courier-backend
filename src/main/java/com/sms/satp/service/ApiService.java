@@ -1,9 +1,9 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.ApiPageRequest;
-import com.sms.satp.dto.ApiRequest;
-import com.sms.satp.dto.ApiResponse;
 import com.sms.satp.dto.request.ApiImportRequest;
+import com.sms.satp.dto.request.ApiPageRequest;
+import com.sms.satp.dto.request.ApiRequest;
+import com.sms.satp.dto.response.ApiResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 

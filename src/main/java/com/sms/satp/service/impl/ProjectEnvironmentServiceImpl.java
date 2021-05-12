@@ -1,22 +1,23 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.ID;
+import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
-import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.ID;
-import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
-import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
+import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalEnvironmentResponse;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.ProjectEnvironmentRequest;
-import com.sms.satp.dto.ProjectEnvironmentResponse;
+import com.sms.satp.dto.request.ProjectEnvironmentRequest;
+import com.sms.satp.dto.response.GlobalEnvironmentResponse;
+import com.sms.satp.dto.response.ProjectEnvironmentResponse;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
@@ -104,7 +105,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
-    public void add(ProjectEnvironmentRequest projectEnvironmentRequest) {
+    public Boolean add(ProjectEnvironmentRequest projectEnvironmentRequest) {
         log.info("ProjectEnvironmentService-add()-params: [ProjectEnvironment]={}",
             projectEnvironmentRequest.toString());
         try {
@@ -115,18 +116,21 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
             log.error("Failed to add the projectEnvironment!", e);
             throw new ApiTestPlatformException(ADD_PROJECT_ENVIRONMENT_ERROR);
         }
+        return Boolean.TRUE;
     }
 
     @Override
-    public void edit(ProjectEnvironmentRequest projectEnvironmentRequest) {
+    public Boolean edit(ProjectEnvironmentRequest projectEnvironmentRequest) {
         log.info("ProjectEnvironmentService-edit()-params: [ProjectEnvironment]={}",
             projectEnvironmentRequest.toString());
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentRequest);
-            Optional<ProjectEnvironment> projectEnvironmentOptional = projectEnvironmentRepository
-                .findById(projectEnvironment.getId());
-            projectEnvironmentOptional.ifPresent(oldProjectEnvironment -> {
+            Optional<ProjectEnvironment> optional = projectEnvironmentRepository.findById(projectEnvironment.getId());
+            if (optional.isEmpty()) {
+                return Boolean.FALSE;
+            }
+            optional.ifPresent(oldProjectEnvironment -> {
                 projectEnvironment.setCreateDateTime(oldProjectEnvironment.getCreateDateTime());
                 projectEnvironment.setCreateUserId(oldProjectEnvironment.getCreateUserId());
                 projectEnvironmentRepository.save(projectEnvironment);
@@ -135,19 +139,24 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
             log.error("Failed to edit the projectEnvironment!", e);
             throw new ApiTestPlatformException(EDIT_PROJECT_ENVIRONMENT_ERROR);
         }
+        return Boolean.TRUE;
     }
 
     @Override
-    public void delete(String[] ids) {
+    public Boolean delete(String[] ids) {
         try {
             Query query = new Query(Criteria.where(ID).in(Arrays.asList(ids)));
             Update update = Update.update(REMOVE, Boolean.TRUE);
             update.set(MODIFY_DATE_TIME, LocalDateTime.now());
-            mongoTemplate.updateMulti(query, update, ProjectEnvironment.class);
+            UpdateResult updateResult = mongoTemplate.updateMulti(query, update, ProjectEnvironment.class);
+            if (updateResult.getModifiedCount() > 0) {
+                return Boolean.TRUE;
+            }
         } catch (Exception e) {
             log.error("Failed to delete the projectEnvironment!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR);
         }
+        return Boolean.FALSE;
     }
 
     @Override

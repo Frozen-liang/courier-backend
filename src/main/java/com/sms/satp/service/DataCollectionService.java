@@ -1,7 +1,7 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.DataCollectionRequest;
-import com.sms.satp.dto.DataCollectionResponse;
+import com.sms.satp.dto.request.DataCollectionRequest;
+import com.sms.satp.dto.response.DataCollectionResponse;
 import java.util.List;
 
 public interface DataCollectionService {
@@ -10,11 +10,11 @@ public interface DataCollectionService {
 
     List<DataCollectionResponse> list(String projectId, String collectionName);
 
-    void add(DataCollectionRequest dataCollectionRequest);
+    Boolean add(DataCollectionRequest dataCollectionRequest);
 
-    void edit(DataCollectionRequest dataCollectionRequest);
+    Boolean edit(DataCollectionRequest dataCollectionRequest);
 
-    void delete(String[] ids);
+    Boolean delete(String[] ids);
 
     List<String> getParamListById(String id);
 }

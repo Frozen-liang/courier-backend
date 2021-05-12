@@ -1,7 +1,7 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.ProjectFunctionRequest;
-import com.sms.satp.dto.ProjectFunctionResponse;
+import com.sms.satp.dto.request.ProjectFunctionRequest;
+import com.sms.satp.dto.response.ProjectFunctionResponse;
 import com.sms.satp.entity.function.ProjectFunction;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -19,7 +19,5 @@ public interface ProjectFunctionMapper {
 
     List<ProjectFunctionResponse> toDtoList(List<ProjectFunction> projectFunctions);
 
-    @Mapping(target = "createDateTime", ignore = true)
-    @Mapping(target = "modifyDateTime", ignore = true)
     ProjectFunction toEntity(ProjectFunctionRequest projectFunctionDto);
 }

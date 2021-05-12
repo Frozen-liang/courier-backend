@@ -1,5 +1,7 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
+import com.sms.satp.common.validate.InsertGroup;
+import com.sms.satp.common.validate.UpdateGroup;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
@@ -21,7 +23,7 @@ public class ParamInfoRequest {
     /**
      * 字段名.
      */
-    @NotBlank(message = "The key must not be empty.")
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The key must not be empty.")
     private String key;
     /**
      * 字段值 eg. 数组[1,2,3,4,5] 字符串 abc Json字段值在childParam里面.
@@ -36,8 +38,9 @@ public class ParamInfoRequest {
      *
      * @link ParamType
      */
-    @NotNull(message = "The paramType must not be null.")
-    @Range(min = 0, max = 14, message = "The tayType must between 0 and 14.")
+    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The paramType must not be null.")
+    @Range(min = 0, max = 14, groups = {InsertGroup.class,
+        UpdateGroup.class}, message = "The tayType must between 0 and 14.")
     private Integer paramType;
     /**
      * 是否递归引用自己.

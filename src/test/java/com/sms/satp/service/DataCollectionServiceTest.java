@@ -15,9 +15,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.DataCollectionRequest;
-import com.sms.satp.dto.DataCollectionResponse;
+import com.sms.satp.dto.request.DataCollectionRequest;
+import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
 import com.sms.satp.mapper.DataCollectionMapper;
 import com.sms.satp.repository.DataCollectionRepository;
@@ -97,8 +98,7 @@ class DataCollectionServiceTest {
         when(dataCollectionRepository.findById(any()))
             .thenReturn(Optional.of(DataCollection.builder().id(ID).build()));
         when(dataCollectionRepository.save(any(DataCollection.class))).thenReturn(dataCollection);
-        dataCollectionService.edit(dataCollectionRequest);
-        verify(dataCollectionRepository, times(1)).save(any(DataCollection.class));
+        assertThat(dataCollectionService.edit(dataCollectionRequest)).isTrue();
     }
 
     @Test
@@ -141,9 +141,9 @@ class DataCollectionServiceTest {
     @Test
     @DisplayName("Test the delete method in the DataCollection service")
     public void delete_test() {
-        dataCollectionService.delete(new String[]{ID});
-        verify(mongoTemplate, times(1))
-            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
+        when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
+            UpdateResult.acknowledged(1, 1L, null));
+        assertThat(dataCollectionService.delete(new String[]{ID})).isTrue();
     }
 
     @Test

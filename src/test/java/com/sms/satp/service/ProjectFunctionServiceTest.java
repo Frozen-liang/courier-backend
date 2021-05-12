@@ -14,9 +14,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.ProjectFunctionRequest;
-import com.sms.satp.dto.ProjectFunctionResponse;
+import com.sms.satp.dto.request.ProjectFunctionRequest;
+import com.sms.satp.dto.response.ProjectFunctionResponse;
 import com.sms.satp.entity.function.ProjectFunction;
 import com.sms.satp.mapper.ProjectFunctionMapper;
 import com.sms.satp.repository.ProjectFunctionRepository;
@@ -61,7 +62,7 @@ class ProjectFunctionServiceTest {
         ProjectFunctionResponse result1 = projectFunctionService.findById(ID);
         ProjectFunctionResponse result2 = projectFunctionService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
-        assertThat(result1.getId()).isEqualTo(ID.toString());
+        assertThat(result1.getId()).isEqualTo(ID);
         assertThat(result2).isNull();
     }
 
@@ -99,8 +100,7 @@ class ProjectFunctionServiceTest {
         when(projectFunctionRepository.findById(any()))
             .thenReturn(Optional.of(ProjectFunction.builder().id(ID).build()));
         when(projectFunctionRepository.save(any(ProjectFunction.class))).thenReturn(projectFunction);
-        projectFunctionService.edit(projectFunctionRequest);
-        verify(projectFunctionRepository, times(1)).save(any(ProjectFunction.class));
+        assertThat(projectFunctionService.edit(projectFunctionRequest)).isTrue();
     }
 
     @Test
@@ -143,9 +143,9 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectFunction service")
     public void delete_test() {
-        projectFunctionService.delete(new String[]{ID});
-        verify(mongoTemplate, times(1))
-            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
+        when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
+            UpdateResult.acknowledged(1, 1L, null));
+        assertThat(projectFunctionService.delete(new String[]{ID})).isTrue();
     }
 
     @Test

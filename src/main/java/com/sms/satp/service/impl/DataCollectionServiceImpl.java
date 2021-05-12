@@ -1,20 +1,21 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.ID;
+import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_DATA_COLLECTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
-import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.ID;
-import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
-import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
+import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.DataCollectionRequest;
-import com.sms.satp.dto.DataCollectionResponse;
+import com.sms.satp.dto.request.DataCollectionRequest;
+import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
 import com.sms.satp.mapper.DataCollectionMapper;
 import com.sms.satp.repository.DataCollectionRepository;
@@ -84,7 +85,7 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
-    public void add(DataCollectionRequest dataCollectionRequest) {
+    public Boolean add(DataCollectionRequest dataCollectionRequest) {
         log.info("DataCollectionService-add()-params: [DataCollection]={}", dataCollectionRequest.toString());
         try {
             DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
@@ -93,36 +94,45 @@ public class DataCollectionServiceImpl implements DataCollectionService {
             log.error("Failed to add the DataCollection!", e);
             throw new ApiTestPlatformException(ADD_DATA_COLLECTION_ERROR);
         }
+        return Boolean.TRUE;
     }
 
     @Override
-    public void edit(DataCollectionRequest dataCollectionRequest) {
+    public Boolean edit(DataCollectionRequest dataCollectionRequest) {
         log.info("DataCollectionService-edit()-params: [DataCollection]={}", dataCollectionRequest.toString());
         try {
             DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
-            dataCollectionRepository.findById(dataCollection.getId())
-                .ifPresent((oldDataCollection) -> {
-                    dataCollection.setCreateUserId(oldDataCollection.getCreateUserId());
-                    dataCollection.setCreateDateTime(oldDataCollection.getCreateDateTime());
-                    dataCollectionRepository.save(dataCollection);
-                });
+            Optional<DataCollection> optional = dataCollectionRepository.findById(dataCollection.getId());
+            if (optional.isEmpty()) {
+                return Boolean.FALSE;
+            }
+            optional.ifPresent((oldDataCollection) -> {
+                dataCollection.setCreateUserId(oldDataCollection.getCreateUserId());
+                dataCollection.setCreateDateTime(oldDataCollection.getCreateDateTime());
+                dataCollectionRepository.save(dataCollection);
+            });
         } catch (Exception e) {
             log.error("Failed to add the DataCollection!", e);
             throw new ApiTestPlatformException(EDIT_DATA_COLLECTION_ERROR);
         }
+        return Boolean.TRUE;
     }
 
     @Override
-    public void delete(String[] ids) {
+    public Boolean delete(String[] ids) {
         try {
             Query query = new Query(Criteria.where(ID).in(Arrays.asList(ids)));
             Update update = Update.update(REMOVE, Boolean.TRUE);
             update.set(MODIFY_DATE_TIME, LocalDateTime.now());
-            mongoTemplate.updateMulti(query, update, DataCollection.class);
+            UpdateResult updateResult = mongoTemplate.updateMulti(query, update, DataCollection.class);
+            if (updateResult.getModifiedCount() > 0) {
+                return Boolean.TRUE;
+            }
         } catch (Exception e) {
             log.error("Failed to delete the DataCollection!", e);
             throw new ApiTestPlatformException(DELETE_DATA_COLLECTION_BY_ID_ERROR);
         }
+        return Boolean.FALSE;
     }
 
     @Override

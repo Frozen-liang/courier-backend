@@ -6,8 +6,8 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_PAGE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
 
-import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.common.enums.OperationType;
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.AddSceneCaseDto;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.SceneCaseApiDto;

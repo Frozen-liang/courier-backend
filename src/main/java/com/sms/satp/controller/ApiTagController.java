@@ -2,11 +2,13 @@ package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.enums.ApiTagType;
-import com.sms.satp.dto.ApiTagRequest;
-import com.sms.satp.dto.ApiTagResponse;
+import com.sms.satp.common.validate.InsertGroup;
+import com.sms.satp.common.validate.UpdateGroup;
+import com.sms.satp.dto.request.ApiTagRequest;
+import com.sms.satp.dto.response.ApiTagResponse;
 import com.sms.satp.service.ApiTagService;
 import java.util.List;
-import javax.validation.Valid;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +28,6 @@ public class ApiTagController {
         this.apiTagService = apiTagService;
     }
 
-
     @GetMapping("/{id}")
     public ApiTagResponse getById(@PathVariable String id) {
         return apiTagService.findById(id);
@@ -34,28 +35,24 @@ public class ApiTagController {
 
     @GetMapping("/list/{projectId}")
     public List<ApiTagResponse> list(@PathVariable("projectId") String projectId, String tagName,
-        ApiTagType tagType) {
+        Integer tagType) {
         return apiTagService.list(projectId, tagName, tagType);
     }
 
     @PostMapping
-    public Boolean add(@Valid @RequestBody ApiTagRequest apiTagRequest) {
+    public Boolean add(@Validated(InsertGroup.class) @RequestBody ApiTagRequest apiTagRequest) {
         apiTagService.add(apiTagRequest);
         return Boolean.TRUE;
     }
 
     @PutMapping
-    public Boolean edit(@Valid @RequestBody ApiTagRequest apiTagRequest) {
-        apiTagService.edit(apiTagRequest);
-        return Boolean.TRUE;
+    public Boolean edit(@Validated(UpdateGroup.class) @RequestBody ApiTagRequest apiTagRequest) {
+        return apiTagService.edit(apiTagRequest);
     }
 
     @DeleteMapping("/{ids}")
     public Boolean delete(@PathVariable String[] ids) {
-        for (String id : ids) {
-            apiTagService.delete(id);
-        }
-        return Boolean.TRUE;
+        return apiTagService.delete(ids);
     }
 
 
