@@ -2,7 +2,6 @@ package com.sms.satp.controller;
 
 import static com.sms.satp.utils.JsonUtil.asJsonString;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -93,7 +92,7 @@ class ProjectEnvironmentControllerTest {
             .envName(EVN_NAME)
             .params(Collections.singletonList(ParamInfoRequest.builder().key("key").paramType(14).build()))
             .build();
-        doNothing().when(projectEnvironmentService).add(projectEnvironmentDto);
+        when(projectEnvironmentService.add(projectEnvironmentDto)).thenReturn(Boolean.TRUE);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .post(Constants.PROJECT_ENVIRONMENT_PATH)
             .contentType(MediaType.APPLICATION_JSON)
@@ -113,7 +112,7 @@ class ProjectEnvironmentControllerTest {
             .frontUri(FRONT_URI)
             .envName(EVN_NAME)
             .build();
-        doNothing().when(projectEnvironmentService).edit(projectEnvironmentDto);
+        when(projectEnvironmentService.edit(projectEnvironmentDto)).thenReturn(Boolean.TRUE);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .put(Constants.PROJECT_ENVIRONMENT_PATH)
             .contentType(MediaType.APPLICATION_JSON)
@@ -142,7 +141,7 @@ class ProjectEnvironmentControllerTest {
     @Test
     @DisplayName("Delete the ProjectEnvironment by id")
     void deleteProjectEnvironmentDto() throws Exception {
-        doNothing().when(projectEnvironmentService).delete(new String[]{ID});
+        when(projectEnvironmentService.delete(new String[]{ID})).thenReturn(Boolean.TRUE);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .delete(Constants.PROJECT_ENVIRONMENT_PATH + "/" + ID);
         ResultActions perform = mockMvc.perform(request);
