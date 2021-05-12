@@ -1,14 +1,14 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.ErrorCode.ADD_CASE_TEMPLATE_API_ERROR;
-import static com.sms.satp.common.ErrorCode.BATCH_EDIT_CASE_TEMPLATE_API_ERROR;
-import static com.sms.satp.common.ErrorCode.DELETE_CASE_TEMPLATE_API_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_CASE_TEMPLATE_API_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_CASE_TEMPLATE_API_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_CASE_TEMPLATE_API_LIST_BY_CASE_TEMPLATE_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.BATCH_EDIT_CASE_TEMPLATE_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_API_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_API_LIST_BY_CASE_TEMPLATE_ID_ERROR;
 
-import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.SearchFiled;
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.BatchAddCaseTemplateApiRequest;
 import com.sms.satp.dto.BatchUpdateCaseTemplateApiRequest;
 import com.sms.satp.dto.CaseTemplateApiResponse;
@@ -114,8 +114,8 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     @Override
     public List<CaseTemplateApiResponse> listByCaseTemplateId(String caseTemplateId, boolean remove) {
         try {
-            Example<CaseTemplateApi> example = Example.of(
-                CaseTemplateApi.builder().caseTemplateId(caseTemplateId).remove(remove).build());
+            Example<CaseTemplateApi> example = Example
+                .of(CaseTemplateApi.builder().caseTemplateId(caseTemplateId).removed(remove).build());
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SearchFiled.ORDER_NUMBER.getFiledName());
             List<CaseTemplateApi> sceneCaseApiList = caseTemplateApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(aseTemplateApiMapper::toCaseTemplateApiDto)

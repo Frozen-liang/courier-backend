@@ -1,7 +1,6 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.BatchAddSceneCaseApiRequest;
 import com.sms.satp.dto.SceneCaseApiResponse;
 import com.sms.satp.dto.UpdateSceneCaseApiRequest;
@@ -28,26 +27,23 @@ public class SceneCaseApiController {
     }
 
     @PostMapping(value = "/batch")
-    public Response batchAdd(@Valid @RequestBody BatchAddSceneCaseApiRequest addSceneCaseApiDto) {
-        sceneCaseApiService.batchAdd(addSceneCaseApiDto);
-        return Response.ok().build();
+    public Boolean batchAdd(@Valid @RequestBody BatchAddSceneCaseApiRequest addSceneCaseApiDto) {
+        return sceneCaseApiService.batchAdd(addSceneCaseApiDto);
     }
 
     @DeleteMapping(value = "/{ids}")
-    public Response deleteByIds(@PathVariable List<String> ids) {
-        sceneCaseApiService.deleteByIds(ids);
-        return Response.ok().build();
+    public Boolean deleteByIds(@PathVariable List<String> ids) {
+        return sceneCaseApiService.deleteByIds(ids);
     }
 
     @PutMapping
-    public Response edit(@Valid @RequestBody UpdateSceneCaseApiRequest updateSceneCaseApiRequest) {
-        sceneCaseApiService.edit(updateSceneCaseApiRequest);
-        return Response.ok().build();
+    public Boolean edit(@Valid @RequestBody UpdateSceneCaseApiRequest updateSceneCaseApiRequest) {
+        return sceneCaseApiService.edit(updateSceneCaseApiRequest);
     }
 
     @GetMapping(value = "/{id}")
-    public Response<SceneCaseApiResponse> getSceneCaseApiById(@PathVariable String id) {
-        return Response.ok(sceneCaseApiService.getSceneCaseApiById(id));
+    public SceneCaseApiResponse getSceneCaseApiById(@PathVariable String id) {
+        return sceneCaseApiService.getSceneCaseApiById(id);
     }
 
 }

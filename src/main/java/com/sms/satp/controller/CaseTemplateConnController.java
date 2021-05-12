@@ -1,7 +1,6 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.response.Response;
 import com.sms.satp.service.CaseTemplateConnService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,9 +18,8 @@ public class CaseTemplateConnController {
     }
 
     @DeleteMapping("/{id}")
-    public Response deleteById(@PathVariable String id) {
-        caseTemplateConnService.deleteById(id);
-        return Response.ok().build();
+    public Boolean deleteById(@PathVariable String id) {
+        return caseTemplateConnService.deleteById(id);
     }
 
 }

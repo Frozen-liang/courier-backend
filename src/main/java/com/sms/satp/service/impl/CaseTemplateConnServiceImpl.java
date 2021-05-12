@@ -1,11 +1,11 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.ErrorCode.DELETE_CASE_TEMPLATE_CONN_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_CASE_TEMPLATE_CONN_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_LIST_CASE_TEMPLATE_CONN_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_CASE_TEMPLATE_CONN_LIST_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_CONN_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_CONN_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_LIST_CASE_TEMPLATE_CONN_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_CONN_LIST_ERROR;
 
-import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import com.sms.satp.repository.CaseTemplateConnRepository;
 import com.sms.satp.service.CaseTemplateConnService;
@@ -52,8 +52,8 @@ public class CaseTemplateConnServiceImpl implements CaseTemplateConnService {
     @Override
     public List<CaseTemplateConn> listBySceneCaseId(String sceneCaseId, boolean remove) {
         try {
-            Example<CaseTemplateConn> example =
-                Example.of(CaseTemplateConn.builder().sceneCaseId(sceneCaseId).remove(remove).build());
+            CaseTemplateConn conn = CaseTemplateConn.builder().sceneCaseId(sceneCaseId).remove(remove).build();
+            Example<CaseTemplateConn> example = Example.of(conn);
             return caseTemplateConnRepository.findAll(example);
         } catch (Exception e) {
             log.error("Failed to listBySceneCaseId the CaseTemplateConn!", e);

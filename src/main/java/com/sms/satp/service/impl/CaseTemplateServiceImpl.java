@@ -1,12 +1,12 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.ErrorCode.ADD_CASE_TEMPLATE_ERROR;
-import static com.sms.satp.common.ErrorCode.DELETE_CASE_TEMPLATE_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_CASE_TEMPLATE_PAGE_ERROR;
-import static com.sms.satp.common.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_PAGE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
 
-import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.AddCaseTemplateRequest;
 import com.sms.satp.dto.CaseTemplateApiResponse;
 import com.sms.satp.dto.CaseTemplateResponse;

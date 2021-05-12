@@ -1,7 +1,6 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.AddCaseTemplateRequest;
 import com.sms.satp.dto.CaseTemplateResponse;
 import com.sms.satp.dto.CaseTemplateSearchDto;
@@ -31,32 +30,29 @@ public class CaseTemplateController {
     }
 
     @PostMapping
-    public Response add(@Valid @RequestBody AddCaseTemplateRequest addCaseTemplateRequest) {
-        caseTemplateService.add(addCaseTemplateRequest);
-        return Response.ok().build();
+    public Boolean add(@Valid @RequestBody AddCaseTemplateRequest addCaseTemplateRequest) {
+        return caseTemplateService.add(addCaseTemplateRequest);
     }
 
     @DeleteMapping("/{ids}")
-    public Response deleteByIds(@PathVariable List<String> ids) {
-        caseTemplateService.deleteByIds(ids);
-        return Response.ok().build();
+    public Boolean deleteByIds(@PathVariable List<String> ids) {
+        return caseTemplateService.deleteByIds(ids);
     }
 
     @PutMapping
-    public Response edit(@Valid @RequestBody UpdateCaseTemplateRequest updateCaseTemplateRequest) {
-        caseTemplateService.edit(updateCaseTemplateRequest);
-        return Response.ok().build();
+    public Boolean edit(@Valid @RequestBody UpdateCaseTemplateRequest updateCaseTemplateRequest) {
+        return caseTemplateService.edit(updateCaseTemplateRequest);
     }
 
     @GetMapping("/page/{projectId}")
-    public Response<Page<CaseTemplateResponse>> page(PageDto pageDto, @PathVariable String projectId) {
-        return Response.ok(caseTemplateService.page(pageDto, projectId));
+    public Page<CaseTemplateResponse> page(PageDto pageDto, @PathVariable String projectId) {
+        return caseTemplateService.page(pageDto, projectId);
     }
 
     @GetMapping("/search/{projectId}")
-    public Response<Page<CaseTemplateResponse>> search(CaseTemplateSearchDto searchDto,
+    public Page<CaseTemplateResponse> search(CaseTemplateSearchDto searchDto,
         @PathVariable String projectId) {
-        return Response.ok(caseTemplateService.search(searchDto, projectId));
+        return caseTemplateService.search(searchDto, projectId);
     }
 
 }

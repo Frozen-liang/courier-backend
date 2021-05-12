@@ -1,7 +1,6 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.AddSceneCaseRequest;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.SceneCaseResponse;
@@ -33,41 +32,37 @@ public class SceneCaseController {
     }
 
     @PostMapping
-    public Response add(@Valid @RequestBody AddSceneCaseRequest sceneCaseDto) {
-        sceneCaseService.add(sceneCaseDto);
-        return Boolean.TRUE;
+    public Boolean add(@Valid @RequestBody AddSceneCaseRequest sceneCaseDto) {
+        return sceneCaseService.add(sceneCaseDto);
     }
 
     @DeleteMapping("/{ids}")
-    public Response deleteByIds(@PathVariable List<String> ids) {
-        sceneCaseService.deleteByIds(ids);
-        return Response.ok().build();
+    public Boolean deleteByIds(@PathVariable List<String> ids) {
+        return sceneCaseService.deleteByIds(ids);
     }
 
     @PutMapping
-    public Response edit(@Valid @RequestBody UpdateSceneCaseRequest sceneCaseDto) {
-        sceneCaseService.edit(sceneCaseDto);
-        return Boolean.TRUE;
+    public Boolean edit(@Valid @RequestBody UpdateSceneCaseRequest sceneCaseDto) {
+        return sceneCaseService.edit(sceneCaseDto);
     }
 
     @GetMapping("/page/{projectId}")
-    public Response<Page<SceneCaseResponse>> page(PageDto pageDto, @PathVariable String projectId) {
-        return Response.ok(sceneCaseService.page(pageDto, projectId));
+    public Page<SceneCaseResponse> page(PageDto pageDto, @PathVariable String projectId) {
+        return sceneCaseService.page(pageDto, projectId);
     }
 
     @GetMapping("/search/{projectId}")
-    public Response<Page<SceneCaseResponse>> search(SearchSceneCaseRequest searchDto, @PathVariable String projectId) {
-        return Response.ok(sceneCaseService.search(searchDto, projectId));
+    public Page<SceneCaseResponse> search(SearchSceneCaseRequest searchDto, @PathVariable String projectId) {
+        return sceneCaseService.search(searchDto, projectId);
     }
 
     @GetMapping("/conn/{id}")
-    public Response<SceneTemplateResponse> getConn(@PathVariable String id) {
-        return Response.ok(sceneCaseService.getConn(id));
+    public SceneTemplateResponse getConn(@PathVariable String id) {
+        return sceneCaseService.getConn(id);
     }
 
     @PutMapping("/conn/edit")
-    public Response editConn(@RequestBody UpdateSceneTemplateRequest updateSceneTemplateRequest) {
-        sceneCaseService.editConn(updateSceneTemplateRequest);
-        return Response.ok().build();
+    public Boolean editConn(@RequestBody UpdateSceneTemplateRequest updateSceneTemplateRequest) {
+        return sceneCaseService.editConn(updateSceneTemplateRequest);
     }
 }
