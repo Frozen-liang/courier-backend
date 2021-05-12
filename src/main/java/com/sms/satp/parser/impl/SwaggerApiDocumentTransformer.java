@@ -86,7 +86,7 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer {
         RequestMethod requestMethod = tuple._1;
         Operation operation = tuple._2;
 
-        ApiEntityBuilder apiEntityBuilder = ApiEntity.builder().apiPath(apiPath)
+        ApiEntityBuilder<?, ?> apiEntityBuilder = ApiEntity.builder().apiPath(apiPath)
             .requestMethod(requestMethod)
             .apiName(operation.getSummary())
             .swaggerId(operation.getOperationId())

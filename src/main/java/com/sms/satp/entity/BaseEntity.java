@@ -12,8 +12,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-@SuperBuilder
 @NoArgsConstructor
+@SuperBuilder
 @Data
 public class BaseEntity {
 
