@@ -2,8 +2,9 @@ package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
-import com.sms.satp.entity.dto.AddCaseTemplateApiDto;
-import com.sms.satp.entity.dto.CaseTemplateApiDto;
+import com.sms.satp.dto.BatchAddCaseTemplateApiRequest;
+import com.sms.satp.dto.CaseTemplateApiResponse;
+import com.sms.satp.dto.UpdateCaseTemplateApiRequest;
 import com.sms.satp.service.CaseTemplateApiService;
 import java.util.List;
 import javax.validation.Valid;
@@ -27,33 +28,31 @@ public class CaseTemplateApiController {
     }
 
     @PostMapping(value = "/batch")
-    public Response batch(@Valid @RequestBody AddCaseTemplateApiDto addSceneCaseApiDto) {
-        caseTemplateApiService.batch(addSceneCaseApiDto);
+    public Response batchAdd(@Valid @RequestBody BatchAddCaseTemplateApiRequest addCaseTemplateApiRequest) {
+        caseTemplateApiService.batchAdd(addCaseTemplateApiRequest);
         return Response.ok().build();
     }
 
     @DeleteMapping(value = "/{ids}")
-    public Response deleteByIds(@PathVariable String[] ids) {
-        for (String id : ids) {
-            caseTemplateApiService.deleteById(id);
-        }
+    public Response deleteByIds(@PathVariable List<String> ids) {
+        caseTemplateApiService.deleteByIds(ids);
         return Response.ok().build();
     }
 
     @PutMapping
-    public Response edit(@Valid @RequestBody CaseTemplateApiDto caseTemplateApiDto) {
-        caseTemplateApiService.edit(caseTemplateApiDto);
+    public Response edit(@Valid @RequestBody UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest) {
+        caseTemplateApiService.edit(updateCaseTemplateApiRequest);
         return Response.ok().build();
     }
 
     @GetMapping(value = "/list/{caseTemplateId}/{remove}")
-    public Response<List<CaseTemplateApiDto>> listByCaseTemplateId(@PathVariable String caseTemplateId,
+    public Response<List<CaseTemplateApiResponse>> listByCaseTemplateId(@PathVariable String caseTemplateId,
         @PathVariable boolean remove) {
         return Response.ok(caseTemplateApiService.listByCaseTemplateId(caseTemplateId, remove));
     }
 
     @GetMapping(value = "/{id}")
-    public Response<CaseTemplateApiDto> getSceneCaseApiById(@PathVariable String id) {
+    public Response<CaseTemplateApiResponse> getSceneCaseApiById(@PathVariable String id) {
         return Response.ok(caseTemplateApiService.getSceneCaseApiById(id));
     }
 

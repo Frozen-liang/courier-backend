@@ -20,12 +20,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Test cases for CaseTemplateConnServiceTest")
-public class CaseTemplateConnServiceTest {
+class CaseTemplateConnServiceTest {
 
     private CaseTemplateConnRepository caseTemplateConnRepository;
     private CaseTemplateConnServiceImpl caseTemplateConnService;
@@ -44,8 +43,8 @@ public class CaseTemplateConnServiceTest {
         Optional<CaseTemplateConn> optional = Optional.ofNullable(CaseTemplateConn.builder().build());
         when(caseTemplateConnRepository.findById(any())).thenReturn(optional);
         doNothing().when(caseTemplateConnRepository).deleteById(any());
-        caseTemplateConnService.deleteById(MOCK_ID);
-        verify(caseTemplateConnRepository, times(1)).deleteById(any());
+        Boolean isSuccess = caseTemplateConnService.deleteById(MOCK_ID);
+        assertTrue(isSuccess);
     }
 
     @Test
@@ -71,6 +70,61 @@ public class CaseTemplateConnServiceTest {
         when(caseTemplateConnRepository.findAll(any(Example.class)))
             .thenThrow(new ApiTestPlatformException(GET_CASE_TEMPLATE_CONN_LIST_ERROR));
         assertThatThrownBy(() -> caseTemplateConnService.listBySceneCaseId(MOCK_ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the listBySceneCaseIdIsRemove method in the CaseTemplateConn service")
+    void listBySceneCaseIdIsRemove_test() {
+        List<CaseTemplateConn> caseTemplateConnList = Lists.newArrayList(CaseTemplateConn.builder().build());
+        when(caseTemplateConnRepository.findAll(any(Example.class))).thenReturn(caseTemplateConnList);
+        List<CaseTemplateConn> dto = caseTemplateConnService.listBySceneCaseId(MOCK_ID, Boolean.TRUE);
+        assertThat(dto).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Test the listBySceneCaseIdIsRemove method in the CaseTemplateConn service thrown exception")
+    void listBySceneCaseIdIsRemove_test_thrownException() {
+        when(caseTemplateConnRepository.findAll(any(Example.class)))
+            .thenThrow(new ApiTestPlatformException(GET_CASE_TEMPLATE_CONN_LIST_ERROR));
+        assertThatThrownBy(() -> caseTemplateConnService.listBySceneCaseId(MOCK_ID, Boolean.TRUE))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the edit method in the CaseTemplateConn service")
+    void edit_test() {
+        CaseTemplateConn conn = CaseTemplateConn.builder().id(MOCK_ID).build();
+        when(caseTemplateConnRepository.save(any())).thenReturn(conn);
+        Boolean isSuccess = caseTemplateConnService.edit(conn);
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the edit method in the CaseTemplateConn service thrown exception")
+    void edit_test_thrownException() {
+        CaseTemplateConn conn = CaseTemplateConn.builder().id(MOCK_ID).build();
+        when(caseTemplateConnRepository.save(any()))
+            .thenThrow(new ApiTestPlatformException(GET_CASE_TEMPLATE_CONN_LIST_ERROR));
+        assertThatThrownBy(() -> caseTemplateConnService.edit(conn)).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the editList method in the CaseTemplateConn service")
+    void editList_test() {
+        List<CaseTemplateConn> caseTemplateConn = Lists.newArrayList(CaseTemplateConn.builder().id(MOCK_ID).build());
+        when(caseTemplateConnRepository.saveAll(any())).thenReturn(caseTemplateConn);
+        Boolean isSuccess = caseTemplateConnService.editList(caseTemplateConn);
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the editList method in the CaseTemplateConn service thrown exception")
+    void editList_test_thrownException() {
+        List<CaseTemplateConn> caseTemplateConn = Lists.newArrayList(CaseTemplateConn.builder().id(MOCK_ID).build());
+        when(caseTemplateConnRepository.saveAll(any()))
+            .thenThrow(new ApiTestPlatformException(GET_CASE_TEMPLATE_CONN_LIST_ERROR));
+        assertThatThrownBy(() -> caseTemplateConnService.editList(caseTemplateConn))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 

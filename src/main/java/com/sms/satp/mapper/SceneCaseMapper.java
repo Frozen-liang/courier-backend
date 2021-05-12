@@ -1,8 +1,8 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.AddSceneCaseDto;
-import com.sms.satp.dto.SceneCaseDto;
-import com.sms.satp.dto.UpdateSceneCaseDto;
+import com.sms.satp.dto.AddSceneCaseRequest;
+import com.sms.satp.dto.SceneCaseResponse;
+import com.sms.satp.dto.UpdateSceneCaseRequest;
 import com.sms.satp.entity.scenetest.SceneCase;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -13,11 +13,11 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SceneCaseMapper {
 
-    SceneCase toAddSceneCase(AddSceneCaseDto sceneCaseDto);
+    SceneCase toAddSceneCase(AddSceneCaseRequest sceneCaseDto);
 
-    SceneCase toUpdateSceneCase(UpdateSceneCaseDto sceneCaseDto);
+    SceneCase toUpdateSceneCase(UpdateSceneCaseRequest sceneCaseDto);
 
     @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    SceneCaseDto toDto(SceneCase sceneCase);
+    SceneCaseResponse toDto(SceneCase sceneCase);
 }

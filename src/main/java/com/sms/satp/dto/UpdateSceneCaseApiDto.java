@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddSceneCaseApiDto {
+public class UpdateSceneCaseApiDto {
 
-    private List<SceneCaseApiDto> sceneCaseApiList;
+    private List<SceneCaseApiResponse> sceneCaseApiDtoList;
 }

@@ -26,11 +26,12 @@ public class CaseTemplateConnServiceImpl implements CaseTemplateConnService {
     }
 
     @Override
-    public void deleteById(String id) {
+    public Boolean deleteById(String id) {
         log.info("CaseTemplateConnService-deleteById()-params: [id]={}", id);
         try {
             Optional<CaseTemplateConn> optional = caseTemplateConnRepository.findById(id);
             optional.ifPresent(conn -> caseTemplateConnRepository.deleteById(conn.getId()));
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to deleteById the CaseTemplateConn!", e);
             throw new ApiTestPlatformException(DELETE_CASE_TEMPLATE_CONN_ERROR);
@@ -61,10 +62,11 @@ public class CaseTemplateConnServiceImpl implements CaseTemplateConnService {
     }
 
     @Override
-    public void edit(CaseTemplateConn caseTemplateConn) {
+    public Boolean edit(CaseTemplateConn caseTemplateConn) {
         log.info("CaseTemplateConnService-edit()-params: [CaseTemplateConn]={}", caseTemplateConn.toString());
         try {
             caseTemplateConnRepository.save(caseTemplateConn);
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to edit the CaseTemplateConn!", e);
             throw new ApiTestPlatformException(EDIT_CASE_TEMPLATE_CONN_ERROR);
@@ -72,15 +74,15 @@ public class CaseTemplateConnServiceImpl implements CaseTemplateConnService {
     }
 
     @Override
-    public void editList(List<CaseTemplateConn> caseTemplateConn) {
+    public Boolean editList(List<CaseTemplateConn> caseTemplateConn) {
         log.info("CaseTemplateConnService-editList()-params: [CaseTemplateConn]={}", caseTemplateConn.toString());
         try {
             caseTemplateConnRepository.saveAll(caseTemplateConn);
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to editList the CaseTemplateConn!", e);
             throw new ApiTestPlatformException(EDIT_LIST_CASE_TEMPLATE_CONN_ERROR);
         }
     }
-
 
 }

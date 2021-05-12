@@ -2,14 +2,16 @@ package com.sms.satp.service;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.dto.AddCaseTemplateRequest;
+import com.sms.satp.dto.CaseTemplateApiResponse;
+import com.sms.satp.dto.CaseTemplateResponse;
+import com.sms.satp.dto.CaseTemplateSearchDto;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.entity.dto.CaseTemplateApiDto;
-import com.sms.satp.entity.dto.CaseTemplateDto;
-import com.sms.satp.entity.dto.CaseTemplateSearchDto;
+import com.sms.satp.dto.UpdateCaseTemplateRequest;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
+import com.sms.satp.mapper.CaseTemplateApiMapper;
 import com.sms.satp.mapper.CaseTemplateMapper;
-import com.sms.satp.mapper.SceneCaseApiLogMapper;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
 import com.sms.satp.service.impl.CaseTemplateServiceImpl;
@@ -19,7 +21,6 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -37,9 +38,8 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Test cases for CaseTemplateServiceTest")
 class CaseTemplateServiceTest {
@@ -49,8 +49,7 @@ class CaseTemplateServiceTest {
     private CaseTemplateMapper caseTemplateMapper;
     private CaseTemplateServiceImpl caseTemplateService;
     private CaseTemplateApiService caseTemplateApiService;
-    private ApplicationEventPublisher applicationEventPublisher;
-    private SceneCaseApiLogMapper sceneCaseApiLogMapper;
+    private CaseTemplateApiMapper caseTemplateApiMapper;
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -61,17 +60,15 @@ class CaseTemplateServiceTest {
     private final static Integer MOCK_SIZE = 1;
     private final static long MOCK_TOTAL = 1L;
 
-
     @BeforeEach
     void setBean() {
         caseTemplateRepository = mock(CaseTemplateRepository.class);
         customizedCaseTemplateRepository = mock(CustomizedCaseTemplateRepository.class);
         caseTemplateMapper = mock(CaseTemplateMapper.class);
         caseTemplateApiService = mock(CaseTemplateApiService.class);
-        applicationEventPublisher = mock(ApplicationEventPublisher.class);
-        sceneCaseApiLogMapper = mock(SceneCaseApiLogMapper.class);
+        caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
         caseTemplateService = new CaseTemplateServiceImpl(caseTemplateRepository, customizedCaseTemplateRepository,
-            caseTemplateMapper, caseTemplateApiService, applicationEventPublisher, sceneCaseApiLogMapper);
+            caseTemplateMapper, caseTemplateApiService, caseTemplateApiMapper);
     }
 
     @Test
@@ -80,10 +77,10 @@ class CaseTemplateServiceTest {
         CaseTemplate caseTemplate =
             CaseTemplate.builder().name(MOCK_NAME).projectId(MOCK_PROJECT_ID).groupId(MOCK_GROUP_ID)
                 .createUserId(MOCK_CREATE_USER_ID).build();
-        when(caseTemplateMapper.toAddCaseTemplate(any())).thenReturn(caseTemplate);
+        when(caseTemplateMapper.toCaseTemplateByAddRequest(any())).thenReturn(caseTemplate);
         when(caseTemplateRepository.insert(any(CaseTemplate.class))).thenReturn(caseTemplate);
-        caseTemplateService.add(CaseTemplateDto.builder().build());
-        verify(caseTemplateRepository, times(1)).insert(any(CaseTemplate.class));
+        Boolean isSuccess = caseTemplateService.add(AddCaseTemplateRequest.builder().build());
+        assertTrue(isSuccess);
     }
 
     @Test
@@ -92,34 +89,30 @@ class CaseTemplateServiceTest {
         CaseTemplate caseTemplate =
             CaseTemplate.builder().name(MOCK_NAME).projectId(MOCK_PROJECT_ID).groupId(MOCK_GROUP_ID)
                 .createUserId(MOCK_CREATE_USER_ID).build();
-        when(caseTemplateMapper.toAddCaseTemplate(any())).thenReturn(caseTemplate);
+        when(caseTemplateMapper.toCaseTemplateByAddRequest(any())).thenReturn(caseTemplate);
         when(caseTemplateRepository.insert(any(CaseTemplate.class)))
             .thenThrow(new ApiTestPlatformException(ADD_CASE_TEMPLATE_ERROR));
-        assertThatThrownBy(() -> caseTemplateService.add(CaseTemplateDto.builder().build()))
+        assertThatThrownBy(() -> caseTemplateService.add(AddCaseTemplateRequest.builder().build()))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test
-    @DisplayName("Test the deleteById method in the CaseTemplate service")
-    void deleteById_test() {
-        Optional<CaseTemplate> caseTemplate = Optional.ofNullable(CaseTemplate.builder().id(MOCK_ID).build());
-        when(caseTemplateRepository.findById(any())).thenReturn(caseTemplate);
+    @DisplayName("Test the deleteByIds method in the CaseTemplate service")
+    void deleteByIds_test() {
         doNothing().when(caseTemplateRepository).deleteById(any());
         List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList(CaseTemplateApi.builder().build());
         when(caseTemplateApiService.listByCaseTemplateId(any())).thenReturn(caseTemplateApiList);
-        doNothing().when(caseTemplateApiService).deleteById(any());
-        caseTemplateService.deleteById(MOCK_ID);
-        verify(caseTemplateRepository, times(1)).deleteById(any());
+        when(caseTemplateApiService.deleteByIds(any())).thenReturn(Boolean.TRUE);
+        Boolean isSuccess = caseTemplateService.deleteByIds(Lists.newArrayList(MOCK_ID));
+        assertTrue(isSuccess);
     }
 
     @Test
     @DisplayName("Test the deleteById method in the CaseTemplate service throws exception")
-    void deleteById_test_thenThrownException() {
-        Optional<CaseTemplate> caseTemplate = Optional.ofNullable(CaseTemplate.builder().id(MOCK_ID).build());
-        when(caseTemplateRepository.findById(any())).thenReturn(caseTemplate);
+    void deleteByIds_test_thenThrownException() {
         doThrow(new ApiTestPlatformException(DELETE_CASE_TEMPLATE_ERROR)).when(caseTemplateRepository)
             .deleteById(any());
-        assertThatThrownBy(() -> caseTemplateService.deleteById(MOCK_ID))
+        assertThatThrownBy(() -> caseTemplateService.deleteByIds(Lists.newArrayList(MOCK_ID)))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
@@ -129,17 +122,19 @@ class CaseTemplateServiceTest {
         CaseTemplate caseTemplate =
             CaseTemplate.builder().id(MOCK_ID).modifyUserId(MOCK_CREATE_USER_ID).name(MOCK_NAME)
                 .remove(Boolean.FALSE).build();
-        when(caseTemplateMapper.toUpdateCaseTemplate(any())).thenReturn(caseTemplate);
+        when(caseTemplateMapper.toCaseTemplateByUpdateRequest(any())).thenReturn(caseTemplate);
         Optional<CaseTemplate> optionalSceneCase = Optional
             .ofNullable(CaseTemplate.builder().remove(Boolean.TRUE).build());
         when(caseTemplateRepository.findById(any())).thenReturn(optionalSceneCase);
         when(caseTemplateRepository.save(any(CaseTemplate.class))).thenReturn(caseTemplate);
-        List<CaseTemplateApiDto> caseTemplateApiDtoList = Lists
-            .newArrayList(CaseTemplateApiDto.builder().id(MOCK_ID).build());
+        List<CaseTemplateApiResponse> caseTemplateApiDtoList = Lists
+            .newArrayList(CaseTemplateApiResponse.builder().id(MOCK_ID).build());
         when(caseTemplateApiService.listByCaseTemplateId(any(), anyBoolean())).thenReturn(caseTemplateApiDtoList);
-        doNothing().when(caseTemplateApiService).edit(any());
-        caseTemplateService.edit(CaseTemplateDto.builder().remove(Boolean.FALSE).build());
-        verify(caseTemplateRepository, times(1)).save(any(CaseTemplate.class));
+        List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList(CaseTemplateApi.builder().id(MOCK_ID).build());
+        when(caseTemplateApiMapper.toCaseTemplateApiByResponseList(any())).thenReturn(caseTemplateApiList);
+        when(caseTemplateApiService.editAll(any())).thenReturn(Boolean.TRUE);
+        Boolean isSuccess = caseTemplateService.edit(UpdateCaseTemplateRequest.builder().remove(Boolean.FALSE).build());
+        assertTrue(isSuccess);
     }
 
     @Test
@@ -148,13 +143,13 @@ class CaseTemplateServiceTest {
         CaseTemplate caseTemplate =
             CaseTemplate.builder().id(MOCK_ID).modifyUserId(MOCK_CREATE_USER_ID).name(MOCK_NAME)
                 .remove(Boolean.FALSE).build();
-        when(caseTemplateMapper.toUpdateCaseTemplate(any())).thenReturn(caseTemplate);
+        when(caseTemplateMapper.toCaseTemplate(any())).thenReturn(caseTemplate);
         Optional<CaseTemplate> optionalSceneCase = Optional
             .ofNullable(CaseTemplate.builder().remove(Boolean.TRUE).build());
         when(caseTemplateRepository.findById(any())).thenReturn(optionalSceneCase);
         when(caseTemplateRepository.save(any(CaseTemplate.class)))
             .thenThrow(new ApiTestPlatformException(EDIT_CASE_TEMPLATE_ERROR));
-        assertThatThrownBy(() -> caseTemplateService.edit(CaseTemplateDto.builder().build()))
+        assertThatThrownBy(() -> caseTemplateService.edit(UpdateCaseTemplateRequest.builder().build()))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
@@ -165,7 +160,7 @@ class CaseTemplateServiceTest {
         Pageable pageable = PageRequest.of(MOCK_PAGE, MOCK_SIZE);
         Page<CaseTemplate> caseTemplatePage = new PageImpl<>(dtoList, pageable, MOCK_TOTAL);
         when(caseTemplateRepository.findAll(any(), (Pageable) any())).thenReturn(caseTemplatePage);
-        Page<CaseTemplateDto> pageDto = caseTemplateService.page(PageDto.builder().build(), MOCK_PROJECT_ID);
+        Page<CaseTemplateResponse> pageDto = caseTemplateService.page(PageDto.builder().build(), MOCK_PROJECT_ID);
         assertThat(pageDto).isNotNull();
     }
 
@@ -187,7 +182,7 @@ class CaseTemplateServiceTest {
         Pageable pageable = PageRequest.of(MOCK_PAGE, MOCK_SIZE);
         Page<CaseTemplate> caseTemplatePage = new PageImpl<>(dtoList, pageable, MOCK_TOTAL);
         when(customizedCaseTemplateRepository.search(any(), any())).thenReturn(caseTemplatePage);
-        Page<CaseTemplateDto> pageDto = caseTemplateService.search(dto, MOCK_PROJECT_ID);
+        Page<CaseTemplateResponse> pageDto = caseTemplateService.search(dto, MOCK_PROJECT_ID);
         assertThat(pageDto).isNotNull();
     }
 

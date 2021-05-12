@@ -1,6 +1,8 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.SceneCaseApiDto;
+import com.sms.satp.dto.AddSceneCaseApiRequest;
+import com.sms.satp.dto.SceneCaseApiResponse;
+import com.sms.satp.dto.UpdateSceneCaseApiRequest;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -11,9 +13,13 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SceneCaseApiMapper {
 
-    SceneCaseApi toSceneCaseApi(SceneCaseApiDto dto);
+    SceneCaseApi toSceneCaseApi(SceneCaseApiResponse dto);
 
-    SceneCaseApiDto toSceneCaseApiDto(SceneCaseApi sceneCaseApi);
+    SceneCaseApi toSceneCaseApiByUpdateRequest(UpdateSceneCaseApiRequest updateSceneCaseApiRequest);
 
-    List<SceneCaseApi> toSceneCaseApiList(List<SceneCaseApiDto> sceneCaseApiList);
+    SceneCaseApiResponse toSceneCaseApiDto(SceneCaseApi sceneCaseApi);
+
+    List<SceneCaseApi> toSceneCaseApiList(List<SceneCaseApiResponse> sceneCaseApiList);
+
+    List<SceneCaseApi> toSceneCaseApiListByAddRequest(List<AddSceneCaseApiRequest> addSceneCaseApiRequestList);
 }

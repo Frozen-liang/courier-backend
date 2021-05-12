@@ -1,26 +1,28 @@
 package com.sms.satp.service;
 
-import com.sms.satp.entity.dto.AddCaseTemplateApiDto;
-import com.sms.satp.entity.dto.CaseTemplateApiDto;
-import com.sms.satp.entity.dto.UpdateCaseTemplateApiDto;
+import com.sms.satp.dto.BatchAddCaseTemplateApiRequest;
+import com.sms.satp.dto.BatchUpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.CaseTemplateApiResponse;
+import com.sms.satp.dto.UpdateCaseTemplateApiRequest;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import java.util.List;
 
 public interface CaseTemplateApiService {
 
-    void batch(AddCaseTemplateApiDto addSceneCaseApiDto);
+    Boolean batchAdd(BatchAddCaseTemplateApiRequest addCaseTemplateApiRequest);
 
-    void deleteById(String id);
+    Boolean deleteByIds(List<String> ids);
 
-    void edit(CaseTemplateApiDto caseTemplateApiDto);
+    Boolean edit(UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest);
 
-    void batchEdit(UpdateCaseTemplateApiDto updateCaseTemplateApiDto);
+    Boolean editAll(List<CaseTemplateApi> caseTemplateApiList);
 
-    List<CaseTemplateApiDto> listByCaseTemplateId(String caseTemplateId, boolean remove);
+    Boolean batchEdit(BatchUpdateCaseTemplateApiRequest updateCaseTemplateApiDto);
+
+    List<CaseTemplateApiResponse> listByCaseTemplateId(String caseTemplateId, boolean remove);
 
     List<CaseTemplateApi> listByCaseTemplateId(String caseTemplateId);
 
-    CaseTemplateApiDto getSceneCaseApiById(String id);
-
+    CaseTemplateApiResponse getSceneCaseApiById(String id);
 
 }

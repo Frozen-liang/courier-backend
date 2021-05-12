@@ -1,19 +1,22 @@
 package com.sms.satp.service;
 
+import com.sms.satp.dto.AddCaseTemplateRequest;
+import com.sms.satp.dto.CaseTemplateResponse;
+import com.sms.satp.dto.CaseTemplateSearchDto;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.entity.dto.CaseTemplateDto;
-import com.sms.satp.entity.dto.CaseTemplateSearchDto;
+import com.sms.satp.dto.UpdateCaseTemplateRequest;
+import java.util.List;
 import org.springframework.data.domain.Page;
 
 public interface CaseTemplateService {
 
-    void add(CaseTemplateDto sceneCaseTemplateDto);
+    Boolean add(AddCaseTemplateRequest addCaseTemplateRequest);
 
-    void deleteById(String id);
+    Boolean deleteByIds(List<String> ids);
 
-    void edit(CaseTemplateDto sceneCaseTemplateDto);
+    Boolean edit(UpdateCaseTemplateRequest updateCaseTemplateRequest);
 
-    Page<CaseTemplateDto> page(PageDto pageDto, String projectId);
+    Page<CaseTemplateResponse> page(PageDto pageDto, String projectId);
 
-    Page<CaseTemplateDto> search(CaseTemplateSearchDto searchDto, String projectId);
+    Page<CaseTemplateResponse> search(CaseTemplateSearchDto searchDto, String projectId);
 }

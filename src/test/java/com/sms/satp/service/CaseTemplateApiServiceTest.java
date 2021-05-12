@@ -1,12 +1,13 @@
 package com.sms.satp.service;
 
 import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.entity.dto.AddCaseTemplateApiDto;
-import com.sms.satp.entity.dto.CaseTemplateApiDto;
-import com.sms.satp.entity.dto.UpdateCaseTemplateApiDto;
+import com.sms.satp.dto.AddCaseTemplateApiRequest;
+import com.sms.satp.dto.BatchAddCaseTemplateApiRequest;
+import com.sms.satp.dto.BatchUpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.CaseTemplateApiResponse;
+import com.sms.satp.dto.UpdateCaseTemplateApiRequest;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.mapper.CaseTemplateApiMapper;
-import com.sms.satp.mapper.SceneCaseApiLogMapper;
 import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.service.impl.CaseTemplateApiServiceImpl;
 import java.util.List;
@@ -16,7 +17,6 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 
@@ -32,9 +32,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Test cases for CaseTemplateApiServiceTest")
 class CaseTemplateApiServiceTest {
@@ -42,8 +41,6 @@ class CaseTemplateApiServiceTest {
     private CaseTemplateApiRepository caseTemplateApiRepository;
     private CaseTemplateApiMapper caseTemplateApiMapper;
     private CaseTemplateApiServiceImpl caseTemplateApiService;
-    private ApplicationEventPublisher applicationEventPublisher;
-    private SceneCaseApiLogMapper sceneCaseApiLogMapper;
 
     private final static String MOCK_SCENE_CASE_ID = "1";
     private final static String MOCK_ID = new ObjectId().toString();
@@ -53,55 +50,53 @@ class CaseTemplateApiServiceTest {
     void setUpBean() {
         caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
         caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
-        applicationEventPublisher = mock(ApplicationEventPublisher.class);
-        sceneCaseApiLogMapper = mock(SceneCaseApiLogMapper.class);
-        caseTemplateApiService = new CaseTemplateApiServiceImpl(caseTemplateApiRepository, caseTemplateApiMapper,
-            applicationEventPublisher, sceneCaseApiLogMapper);
+        caseTemplateApiService = new CaseTemplateApiServiceImpl(caseTemplateApiRepository, caseTemplateApiMapper);
     }
 
     @Test
-    @DisplayName("Test the batch method in the CaseTemplateApi service")
-    void batch_test() {
-        AddCaseTemplateApiDto addCaseTemplateApiDto = getAddDto();
+    @DisplayName("Test the batchAdd method in the CaseTemplateApi service")
+    void batchAdd_test() {
+        BatchAddCaseTemplateApiRequest addCaseTemplateApiDto = getAddDto();
         CaseTemplateApi caseApi = CaseTemplateApi.builder().build();
         List<CaseTemplateApi> sceneCaseApiList = Lists.newArrayList(caseApi);
-        when(caseTemplateApiMapper.toCaseTemplateApiList(any())).thenReturn(sceneCaseApiList);
+        when(caseTemplateApiMapper.toCaseTemplateApiListByUpdateRequestList(any())).thenReturn(sceneCaseApiList);
         when(caseTemplateApiRepository.insert(any(List.class))).thenReturn(sceneCaseApiList);
-        caseTemplateApiService.batch(addCaseTemplateApiDto);
-        verify(caseTemplateApiRepository, times(1)).insert(any(List.class));
+        Boolean isSuccess = caseTemplateApiService.batchAdd(addCaseTemplateApiDto);
+        assertTrue(isSuccess);
     }
 
     @Test
-    @DisplayName("Test the batch method in the CaseTemplateApi service throws exception")
-    void batch_test_thenThrowException() {
-        AddCaseTemplateApiDto addCaseTemplateApiDto = getAddDto();
+    @DisplayName("Test the batchAdd method in the CaseTemplateApi service throws exception")
+    void batchAdd_test_thenThrowException() {
+        BatchAddCaseTemplateApiRequest addCaseTemplateApiDto = getAddDto();
         CaseTemplateApi caseApi = CaseTemplateApi.builder().build();
         List<CaseTemplateApi> sceneCaseApiList = Lists.newArrayList(caseApi);
-        when(caseTemplateApiMapper.toCaseTemplateApiList(any())).thenReturn(sceneCaseApiList);
+        when(caseTemplateApiMapper.toCaseTemplateApiListByUpdateRequestList(any())).thenReturn(sceneCaseApiList);
         when(caseTemplateApiRepository.insert(any(List.class)))
             .thenThrow(new ApiTestPlatformException(ADD_SCENE_CASE_API_ERROR));
-        assertThatThrownBy(() -> caseTemplateApiService.batch(addCaseTemplateApiDto))
+        assertThatThrownBy(() -> caseTemplateApiService.batchAdd(addCaseTemplateApiDto))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test
-    @DisplayName("Test the batch method in the CaseTemplateApi service")
-    void deleteById_test() {
+    @DisplayName("Test the deleteByIds method in the CaseTemplateApi service")
+    void deleteByIds_test() {
         Optional<CaseTemplateApi> caseTemplateApi = Optional.ofNullable(CaseTemplateApi.builder().id(MOCK_ID).build());
         when(caseTemplateApiRepository.findById(any())).thenReturn(caseTemplateApi);
         doNothing().when(caseTemplateApiRepository).deleteById(any());
-        caseTemplateApiService.deleteById(MOCK_ID);
-        verify(caseTemplateApiRepository, times(1)).deleteById(any());
+        Boolean isSuccess = caseTemplateApiService.deleteByIds(Lists.newArrayList(MOCK_ID));
+        assertTrue(isSuccess);
     }
 
     @Test
-    @DisplayName("Test the batch method in the CaseTemplateApi service throws exception")
-    void deleteById_test_thenThrowException() {
+    @DisplayName("Test the deleteByIds method in the CaseTemplateApi service throws exception")
+    void deleteByIds_test_thenThrowException() {
         Optional<CaseTemplateApi> caseTemplateApi = Optional.ofNullable(CaseTemplateApi.builder().id(MOCK_ID).build());
         when(caseTemplateApiRepository.findById(any())).thenReturn(caseTemplateApi);
         doThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_API_ERROR)).when(caseTemplateApiRepository)
             .deleteById(any());
-        assertThatThrownBy(() -> caseTemplateApiService.deleteById(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
+        assertThatThrownBy(() -> caseTemplateApiService.deleteByIds(Lists.newArrayList(MOCK_ID)))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test
@@ -110,8 +105,8 @@ class CaseTemplateApiServiceTest {
         CaseTemplateApi sceneCaseApi = CaseTemplateApi.builder().build();
         when(caseTemplateApiMapper.toCaseTemplateApi(any())).thenReturn(sceneCaseApi);
         when(caseTemplateApiRepository.save(any())).thenReturn(sceneCaseApi);
-        caseTemplateApiService.edit(CaseTemplateApiDto.builder().build());
-        verify(caseTemplateApiRepository, times(1)).save(any());
+        Boolean isSuccess = caseTemplateApiService.edit(UpdateCaseTemplateApiRequest.builder().build());
+        assertTrue(isSuccess);
     }
 
     @Test
@@ -120,25 +115,43 @@ class CaseTemplateApiServiceTest {
         CaseTemplateApi sceneCaseApi = CaseTemplateApi.builder().build();
         when(caseTemplateApiMapper.toCaseTemplateApi(any())).thenReturn(sceneCaseApi);
         when(caseTemplateApiRepository.save(any())).thenThrow(new ApiTestPlatformException(EDIT_SCENE_CASE_API_ERROR));
-        assertThatThrownBy(() -> caseTemplateApiService.edit(CaseTemplateApiDto.builder().build()))
+        assertThatThrownBy(() -> caseTemplateApiService.edit(UpdateCaseTemplateApiRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the editAll method in the CaseTemplateApi service")
+    void editAll_test() {
+        List<CaseTemplateApi> sceneCaseApi = Lists.newArrayList(CaseTemplateApi.builder().build());
+        when(caseTemplateApiRepository.saveAll(any())).thenReturn(sceneCaseApi);
+        Boolean isSuccess = caseTemplateApiService.editAll(sceneCaseApi);
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the editAll method in the CaseTemplateApi service throws exception")
+    void editAll_thenThrowException() {
+        List<CaseTemplateApi> sceneCaseApi = Lists.newArrayList(CaseTemplateApi.builder().build());
+        when(caseTemplateApiRepository.saveAll(any())).thenThrow(new ApiTestPlatformException(EDIT_SCENE_CASE_API_ERROR));
+        assertThatThrownBy(() -> caseTemplateApiService.editAll(sceneCaseApi))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test
     @DisplayName("Test the batchEdit method in the CaseTemplateApi service")
     void batchEdit_test() {
-        UpdateCaseTemplateApiDto dto = getUpdateSortOrder();
+        BatchUpdateCaseTemplateApiRequest dto = getUpdateSortOrder();
         CaseTemplateApi caseTemplateApi = CaseTemplateApi.builder().id(MOCK_ID).build();
         List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList(caseTemplateApi);
         when(caseTemplateApiRepository.saveAll(any())).thenReturn(caseTemplateApiList);
-        caseTemplateApiService.batchEdit(dto);
-        verify(caseTemplateApiRepository, times(1)).saveAll(any());
+        Boolean isSuccess = caseTemplateApiService.batchEdit(dto);
+        assertTrue(isSuccess);
     }
 
     @Test
     @DisplayName("Test the batchEdit method in the CaseTemplateApi service throws exception")
     void batchEdit_thenThrowException() {
-        UpdateCaseTemplateApiDto dto = getUpdateSortOrder();
+        BatchUpdateCaseTemplateApiRequest dto = getUpdateSortOrder();
         when(caseTemplateApiRepository.saveAll(any()))
             .thenThrow(new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR));
         assertThatThrownBy(() -> caseTemplateApiService.batchEdit(dto)).isInstanceOf(ApiTestPlatformException.class);
@@ -149,9 +162,9 @@ class CaseTemplateApiServiceTest {
     void listBySceneCaseId_test() {
         List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList(CaseTemplateApi.builder().build());
         when(caseTemplateApiRepository.findAll(any(), any(Sort.class))).thenReturn(caseTemplateApiList);
-        CaseTemplateApiDto dto = CaseTemplateApiDto.builder().build();
+        CaseTemplateApiResponse dto = CaseTemplateApiResponse.builder().build();
         when(caseTemplateApiMapper.toCaseTemplateApiDto(any())).thenReturn(dto);
-        List<CaseTemplateApiDto> dtoList = caseTemplateApiService
+        List<CaseTemplateApiResponse> dtoList = caseTemplateApiService
             .listByCaseTemplateId(MOCK_SCENE_CASE_ID, Boolean.FALSE);
         assertThat(dtoList).isNotEmpty();
     }
@@ -189,9 +202,9 @@ class CaseTemplateApiServiceTest {
         CaseTemplateApi caseTemplateApi = CaseTemplateApi.builder().id(MOCK_ID).build();
         Optional<CaseTemplateApi> caseTemplateApiOptional = Optional.ofNullable(caseTemplateApi);
         when(caseTemplateApiRepository.findById(any())).thenReturn(caseTemplateApiOptional);
-        CaseTemplateApiDto caseTemplateApiDto = CaseTemplateApiDto.builder().build();
+        CaseTemplateApiResponse caseTemplateApiDto = CaseTemplateApiResponse.builder().build();
         when(caseTemplateApiMapper.toCaseTemplateApiDto(any())).thenReturn(caseTemplateApiDto);
-        CaseTemplateApiDto dto = caseTemplateApiService.getSceneCaseApiById(MOCK_ID);
+        CaseTemplateApiResponse dto = caseTemplateApiService.getSceneCaseApiById(MOCK_ID);
         assertThat(dto).isNotNull();
     }
 
@@ -203,17 +216,17 @@ class CaseTemplateApiServiceTest {
         assertThatThrownBy(() -> caseTemplateApiService.getSceneCaseApiById(MOCK_ID));
     }
 
-    private UpdateCaseTemplateApiDto getUpdateSortOrder() {
-        return UpdateCaseTemplateApiDto.builder()
-            .apiDtoList(Lists.newArrayList(CaseTemplateApiDto.builder()
+    private BatchUpdateCaseTemplateApiRequest getUpdateSortOrder() {
+        return BatchUpdateCaseTemplateApiRequest.builder()
+            .updateCaseTemplateApiRequestList(Lists.newArrayList(UpdateCaseTemplateApiRequest.builder()
                 .caseTemplateId(MOCK_SCENE_CASE_ID)
                 .orderNumber(MOCK_ORDER_NUMBER)
                 .build())).build();
     }
 
-    private AddCaseTemplateApiDto getAddDto() {
-        return AddCaseTemplateApiDto.builder()
-            .apiDtoList(Lists.newArrayList(CaseTemplateApiDto.builder().build()))
+    private BatchAddCaseTemplateApiRequest getAddDto() {
+        return BatchAddCaseTemplateApiRequest.builder()
+            .addCaseTemplateApiRequestList(Lists.newArrayList(AddCaseTemplateApiRequest.builder().build()))
             .build();
     }
 

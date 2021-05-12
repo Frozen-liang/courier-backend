@@ -1,11 +1,12 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
+import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.entity.api.common.ParamInfo;
-import java.time.LocalDateTime;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,32 +16,32 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CaseTemplateApiDto {
+public class UpdateCaseTemplateApiRequest {
 
+    @NotNull(message = "The id can not be empty")
     private String id;
     private String apiId;
     private String caseTemplateId;
     private String projectId;
     private String apiName;
-    private String apiUrl;
+    private String description;
+    private String apiPath;
     private ApiProtocol apiProtocol;
     private RequestMethod requestMethod;
     private ApiRequestParamType apiRequestParamType;
-    private List<ParamInfo> requestBody;
     private List<ParamInfo> requestHeaders;
-    private List<ParamInfo> queryParams;
+    private List<ParamInfo> responseHeaders;
     private List<ParamInfo> pathParams;
+    private List<ParamInfo> restfulParams;
+    private List<ParamInfo> requestParams;
+    private List<ParamInfo> responseParams;
     private String preInject;
     private String postInject;
-    private ApiRequestParamType apiResponseParamType;
-    private List<ParamInfo> responseHeaders;
-    private List<ParamInfo> responseParams;
+    private ApiJsonType apiResponseJsonType;
+    private ApiJsonType apiRequestJsonType;
     private String matchRule;
+    private Integer timeoutLimit;
     private Integer orderNumber;
     private Integer isExecute;
     private boolean remove;
-    private String createUserId;
-    private LocalDateTime createDateTime;
-    private String modifyUserId;
-    private LocalDateTime modifyDateTime;
 }

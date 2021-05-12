@@ -1,6 +1,5 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
-import com.sms.satp.dto.PageDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;

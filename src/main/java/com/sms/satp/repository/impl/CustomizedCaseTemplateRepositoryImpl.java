@@ -1,7 +1,7 @@
 package com.sms.satp.repository.impl;
 
 import com.sms.satp.common.SearchFiled;
-import com.sms.satp.entity.dto.CaseTemplateSearchDto;
+import com.sms.satp.dto.CaseTemplateSearchDto;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;

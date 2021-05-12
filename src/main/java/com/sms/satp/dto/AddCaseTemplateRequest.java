@@ -1,7 +1,7 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,18 +11,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaseTemplateDto {
+public class AddCaseTemplateRequest {
 
-    private String id;
+    @NotNull(message = "The name can not be empty")
     private String name;
     private String createUserName;
+    @NotNull(message = "The projectId can not be empty")
     private String projectId;
     private String groupId;
     private String testStatus;
     private List<String> caseTag;
     private boolean remove;
-    private String createUserId;
-    private LocalDateTime createDateTime;
-    private String modifyUserId;
-    private LocalDateTime modifyDateTime;
 }

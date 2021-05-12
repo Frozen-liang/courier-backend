@@ -1,7 +1,5 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
-import com.sms.satp.dto.SceneCaseApiDto;
-import com.sms.satp.dto.SceneCaseDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,11 +10,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SceneTemplateDto {
+public class UpdateSceneTemplateRequest {
 
-    private SceneCaseDto sceneCaseDto;
+    private SceneCaseResponse sceneCaseDto;
 
-    private List<SceneCaseApiDto> sceneCaseApiDtoList;
+    private List<SceneCaseApiResponse> sceneCaseApiDtoList;
 
     private List<CaseTemplateConnDto> caseTemplateConnDtoList;
 }

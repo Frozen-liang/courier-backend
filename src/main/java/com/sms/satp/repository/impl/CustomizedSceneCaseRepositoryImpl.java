@@ -1,7 +1,7 @@
 package com.sms.satp.repository.impl;
 
 import com.sms.satp.common.SearchFiled;
-import com.sms.satp.dto.SceneCaseSearchDto;
+import com.sms.satp.dto.SearchSceneCaseRequest;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.utils.PageDtoConverter;
@@ -29,7 +29,7 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
     }
 
     @Override
-    public Page<SceneCase> search(SceneCaseSearchDto searchDto, String projectId) {
+    public Page<SceneCase> search(SearchSceneCaseRequest searchDto, String projectId) {
         PageDtoConverter.frontMapping(searchDto);
         Query query = new Query();
         query.addCriteria(Criteria.where(SearchFiled.PROJECT_ID.getFiledName()).is(projectId));

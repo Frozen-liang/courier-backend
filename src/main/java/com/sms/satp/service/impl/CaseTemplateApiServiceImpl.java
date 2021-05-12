@@ -9,22 +9,18 @@ import static com.sms.satp.common.ErrorCode.GET_CASE_TEMPLATE_API_LIST_BY_CASE_T
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.SearchFiled;
-import com.sms.satp.common.enums.OperationType;
-import com.sms.satp.dto.SceneCaseApiLogDto;
-import com.sms.satp.entity.dto.AddCaseTemplateApiDto;
-import com.sms.satp.entity.dto.CaseTemplateApiDto;
-import com.sms.satp.entity.dto.UpdateCaseTemplateApiDto;
+import com.sms.satp.dto.BatchAddCaseTemplateApiRequest;
+import com.sms.satp.dto.BatchUpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.CaseTemplateApiResponse;
+import com.sms.satp.dto.UpdateCaseTemplateApiRequest;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.mapper.CaseTemplateApiMapper;
-import com.sms.satp.mapper.SceneCaseApiLogMapper;
 import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.service.CaseTemplateApiService;
-import com.sms.satp.service.event.entity.SceneCaseApiLogEvent;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -36,27 +32,22 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
 
     private final CaseTemplateApiRepository caseTemplateApiRepository;
     private final CaseTemplateApiMapper aseTemplateApiMapper;
-    private final ApplicationEventPublisher applicationEventPublisher;
-    private final SceneCaseApiLogMapper sceneCaseApiLogMapper;
 
     public CaseTemplateApiServiceImpl(CaseTemplateApiRepository sceneCaseApiRepository,
-        CaseTemplateApiMapper sceneCaseApiMapper,
-        ApplicationEventPublisher applicationEventPublisher,
-        SceneCaseApiLogMapper sceneCaseApiLogMapper) {
+        CaseTemplateApiMapper sceneCaseApiMapper) {
         this.caseTemplateApiRepository = sceneCaseApiRepository;
         this.aseTemplateApiMapper = sceneCaseApiMapper;
-        this.applicationEventPublisher = applicationEventPublisher;
-        this.sceneCaseApiLogMapper = sceneCaseApiLogMapper;
     }
 
     @Override
-    public void batch(AddCaseTemplateApiDto addCaseTemplateApiDto) {
-        log.info("CaseTemplateApiService-batch()-params: [CaseTemplateApi]={}", addCaseTemplateApiDto.toString());
+    public Boolean batchAdd(BatchAddCaseTemplateApiRequest addCaseTemplateApiRequest) {
+        log.info("CaseTemplateApiService-batchAdd()-params: [CaseTemplateApi]={}",
+            addCaseTemplateApiRequest.toString());
         try {
-            List<CaseTemplateApi> caseApiList =
-                aseTemplateApiMapper.toCaseTemplateApiList(addCaseTemplateApiDto.getApiDtoList());
+            List<CaseTemplateApi> caseApiList = aseTemplateApiMapper.toCaseTemplateApiListByAddRequestList(
+                addCaseTemplateApiRequest.getAddCaseTemplateApiRequestList());
             caseTemplateApiRepository.insert(caseApiList);
-            publishBatchCaseTemplateApiEvent(caseApiList, OperationType.ADD);
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to add the CaseTemplateApi!", e);
             throw new ApiTestPlatformException(ADD_CASE_TEMPLATE_API_ERROR);
@@ -64,14 +55,13 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    public void deleteById(String id) {
-        log.info("CaseTemplateApiService-deleteById()-params: [id]={}", id);
+    public Boolean deleteByIds(List<String> ids) {
+        log.info("CaseTemplateApiService-deleteById()-params: [id]={}", ids);
         try {
-            Optional<CaseTemplateApi> sceneCaseApi = caseTemplateApiRepository.findById(id);
-            sceneCaseApi.ifPresent(api -> {
+            for (String id : ids) {
                 caseTemplateApiRepository.deleteById(id);
-                publishCaseTemplateApiEvent(api, OperationType.DELETE);
-            });
+            }
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to delete the CaseTemplateApi!", e);
             throw new ApiTestPlatformException(DELETE_CASE_TEMPLATE_API_ERROR);
@@ -79,12 +69,13 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    public void edit(CaseTemplateApiDto caseTemplateApiDto) {
-        log.info("CaseTemplateApiService-edit()-params: [CaseTemplateApi]={}", caseTemplateApiDto.toString());
+    public Boolean edit(UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest) {
+        log.info("CaseTemplateApiService-edit()-params: [CaseTemplateApi]={}", updateCaseTemplateApiRequest.toString());
         try {
-            CaseTemplateApi caseTemplateApi = aseTemplateApiMapper.toCaseTemplateApi(caseTemplateApiDto);
+            CaseTemplateApi caseTemplateApi = aseTemplateApiMapper
+                .toCaseTemplateApiByUpdateRequest(updateCaseTemplateApiRequest);
             caseTemplateApiRepository.save(caseTemplateApi);
-            publishCaseTemplateApiEvent(caseTemplateApi, OperationType.EDIT);
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to edit the CaseTemplateApi!", e);
             throw new ApiTestPlatformException(EDIT_CASE_TEMPLATE_API_ERROR);
@@ -92,16 +83,28 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    public void batchEdit(UpdateCaseTemplateApiDto updateCaseTemplateApiDto) {
+    public Boolean editAll(List<CaseTemplateApi> caseTemplateApiList) {
+        log.info("CaseTemplateApiService-edit()-params: [CaseTemplateApi]={}", caseTemplateApiList.toString());
+        try {
+            caseTemplateApiRepository.saveAll(caseTemplateApiList);
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to edit the CaseTemplateApi!", e);
+            throw new ApiTestPlatformException(EDIT_CASE_TEMPLATE_API_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean batchEdit(BatchUpdateCaseTemplateApiRequest updateCaseTemplateApiDto) {
         log.info("CaseTemplateApiService-batchEdit()-params: [CaseTemplateApi]={}",
             updateCaseTemplateApiDto.toString());
         try {
-            if (!updateCaseTemplateApiDto.getApiDtoList().isEmpty()) {
-                List<CaseTemplateApi> caseApiList = aseTemplateApiMapper
-                    .toCaseTemplateApiList(updateCaseTemplateApiDto.getApiDtoList());
+            if (!updateCaseTemplateApiDto.getUpdateCaseTemplateApiRequestList().isEmpty()) {
+                List<CaseTemplateApi> caseApiList = aseTemplateApiMapper.toCaseTemplateApiListByUpdateRequestList(
+                    updateCaseTemplateApiDto.getUpdateCaseTemplateApiRequestList());
                 caseTemplateApiRepository.saveAll(caseApiList);
-                publishBatchCaseTemplateApiEvent(caseApiList, OperationType.EDIT);
             }
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to batch edit the CaseTemplateApi!", e);
             throw new ApiTestPlatformException(BATCH_EDIT_CASE_TEMPLATE_API_ERROR);
@@ -109,7 +112,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    public List<CaseTemplateApiDto> listByCaseTemplateId(String caseTemplateId, boolean remove) {
+    public List<CaseTemplateApiResponse> listByCaseTemplateId(String caseTemplateId, boolean remove) {
         try {
             Example<CaseTemplateApi> example = Example.of(
                 CaseTemplateApi.builder().caseTemplateId(caseTemplateId).remove(remove).build());
@@ -136,7 +139,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    public CaseTemplateApiDto getSceneCaseApiById(String id) {
+    public CaseTemplateApiResponse getSceneCaseApiById(String id) {
         try {
             Optional<CaseTemplateApi> sceneCaseApi = caseTemplateApiRepository.findById(id);
             return sceneCaseApi.map(aseTemplateApiMapper::toCaseTemplateApiDto).orElse(null);
@@ -144,20 +147,6 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
             log.error("Failed to get the CaseTemplateApi by id!", e);
             throw new ApiTestPlatformException(GET_CASE_TEMPLATE_API_BY_ID_ERROR);
         }
-    }
-
-    private void publishBatchCaseTemplateApiEvent(List<CaseTemplateApi> caseApiList,
-        OperationType operationType) {
-        for (CaseTemplateApi sceneCaseTemplateApi : caseApiList) {
-            publishCaseTemplateApiEvent(sceneCaseTemplateApi, operationType);
-        }
-    }
-
-    private void publishCaseTemplateApiEvent(CaseTemplateApi sceneCaseApi, OperationType operationType) {
-        SceneCaseApiLogDto sceneCaseApiLogDto = sceneCaseApiLogMapper
-            .toDtoBySceneCaseTemplateApi(sceneCaseApi, operationType);
-        SceneCaseApiLogEvent event = new SceneCaseApiLogEvent(this, sceneCaseApiLogDto);
-        applicationEventPublisher.publishEvent(event);
     }
 
 }

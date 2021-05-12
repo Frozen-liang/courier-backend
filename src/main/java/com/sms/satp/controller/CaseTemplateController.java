@@ -2,10 +2,13 @@ package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.response.Response;
+import com.sms.satp.dto.AddCaseTemplateRequest;
+import com.sms.satp.dto.CaseTemplateResponse;
+import com.sms.satp.dto.CaseTemplateSearchDto;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.entity.dto.CaseTemplateDto;
-import com.sms.satp.entity.dto.CaseTemplateSearchDto;
+import com.sms.satp.dto.UpdateCaseTemplateRequest;
 import com.sms.satp.service.CaseTemplateService;
+import java.util.List;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,32 +31,31 @@ public class CaseTemplateController {
     }
 
     @PostMapping
-    public Response add(@Valid @RequestBody CaseTemplateDto caseTemplateDto) {
-        caseTemplateService.add(caseTemplateDto);
+    public Response add(@Valid @RequestBody AddCaseTemplateRequest addCaseTemplateRequest) {
+        caseTemplateService.add(addCaseTemplateRequest);
         return Response.ok().build();
     }
 
     @DeleteMapping("/{ids}")
-    public Response deleteByIds(@PathVariable String[] ids) {
-        for (String id : ids) {
-            caseTemplateService.deleteById(id);
-        }
+    public Response deleteByIds(@PathVariable List<String> ids) {
+        caseTemplateService.deleteByIds(ids);
         return Response.ok().build();
     }
 
     @PutMapping
-    public Response edit(@Valid @RequestBody CaseTemplateDto caseTemplateDto) {
-        caseTemplateService.edit(caseTemplateDto);
+    public Response edit(@Valid @RequestBody UpdateCaseTemplateRequest updateCaseTemplateRequest) {
+        caseTemplateService.edit(updateCaseTemplateRequest);
         return Response.ok().build();
     }
 
     @GetMapping("/page/{projectId}")
-    public Response<Page<CaseTemplateDto>> page(PageDto pageDto, @PathVariable String projectId) {
+    public Response<Page<CaseTemplateResponse>> page(PageDto pageDto, @PathVariable String projectId) {
         return Response.ok(caseTemplateService.page(pageDto, projectId));
     }
 
     @GetMapping("/search/{projectId}")
-    public Response<Page<CaseTemplateDto>> search(CaseTemplateSearchDto searchDto, @PathVariable String projectId) {
+    public Response<Page<CaseTemplateResponse>> search(CaseTemplateSearchDto searchDto,
+        @PathVariable String projectId) {
         return Response.ok(caseTemplateService.search(searchDto, projectId));
     }
 

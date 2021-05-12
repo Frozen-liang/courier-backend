@@ -40,9 +40,12 @@ public class ParamInfo {
      */
     private Boolean required;
     /**
-     * 对象子属性. JSON/Object/JsonArray.
+     * 是否传输.
      */
     private Boolean checkbox;
+    /**
+     * 对象子属性. JSON/Object/JsonArray.
+     */
     @Builder.Default
     @ToString.Exclude
     private List<ParamInfo> childParam = new ArrayList<>();

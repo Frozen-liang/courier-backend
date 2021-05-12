@@ -1,6 +1,8 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.entity.dto.CaseTemplateApiDto;
+import com.sms.satp.dto.AddCaseTemplateApiRequest;
+import com.sms.satp.dto.CaseTemplateApiResponse;
+import com.sms.satp.dto.UpdateCaseTemplateApiRequest;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -11,9 +13,17 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CaseTemplateApiMapper {
 
-    CaseTemplateApi toCaseTemplateApi(CaseTemplateApiDto dto);
+    CaseTemplateApi toCaseTemplateApi(CaseTemplateApiResponse dto);
 
-    CaseTemplateApiDto toCaseTemplateApiDto(CaseTemplateApi sceneCaseTemplateApi);
+    List<CaseTemplateApi> toCaseTemplateApiByResponseList(List<CaseTemplateApiResponse> caseTemplateApiResponseList);
 
-    List<CaseTemplateApi> toCaseTemplateApiList(List<CaseTemplateApiDto> caseTemplateApiDtoList);
+    CaseTemplateApi toCaseTemplateApiByUpdateRequest(UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest);
+
+    CaseTemplateApiResponse toCaseTemplateApiDto(CaseTemplateApi sceneCaseTemplateApi);
+
+    List<CaseTemplateApi> toCaseTemplateApiListByUpdateRequestList(
+        List<UpdateCaseTemplateApiRequest> updateCaseTemplateApiRequestList);
+
+    List<CaseTemplateApi> toCaseTemplateApiListByAddRequestList(
+        List<AddCaseTemplateApiRequest> addCaseTemplateApiRequestList);
 }

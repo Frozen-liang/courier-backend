@@ -1,4 +1,4 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -6,10 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 
 @Data
 @Builder
@@ -29,17 +25,13 @@ public class CaseTemplateConnDto {
 
     private boolean remove;
 
-    @CreatedBy
     private Long createUserId;
 
-    @CreatedDate
     private LocalDateTime createDateTime;
 
-    @LastModifiedBy
     private Long modifyUserId;
 
-    @LastModifiedDate
     private LocalDateTime modifyDateTime;
 
-    private List<CaseTemplateApiDto> caseTemplateApiDtoList;
+    private List<CaseTemplateApiResponse> caseTemplateApiDtoList;
 }

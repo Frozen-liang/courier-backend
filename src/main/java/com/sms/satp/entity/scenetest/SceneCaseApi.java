@@ -51,20 +51,11 @@ public class SceneCaseApi {
 
     private ApiRequestParamType apiRequestParamType;
 
-    private ApiRequestParamType apiResponseParamType;
-
-    private List<ParamInfo> requestBody;
-
     private List<ParamInfo> requestHeaders;
-
-    private List<ParamInfo> requestParams;
-
-    private List<ParamInfo> restfulParams;
-
-    private List<ParamInfo> pathParams;
-
     private List<ParamInfo> responseHeaders;
-
+    private List<ParamInfo> pathParams;
+    private List<ParamInfo> restfulParams;
+    private List<ParamInfo> requestParams;
     private List<ParamInfo> responseParams;
 
     private String preInject;

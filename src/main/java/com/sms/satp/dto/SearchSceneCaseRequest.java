@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SceneCaseSearchDto extends PageDto {
+public class SearchSceneCaseRequest extends PageDto {
 
     private String name;
     private String groupId;

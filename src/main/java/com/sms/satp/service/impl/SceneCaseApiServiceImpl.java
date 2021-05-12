@@ -9,22 +9,18 @@ import static com.sms.satp.common.ErrorCode.GET_SCENE_CASE_API_LIST_BY_SCENE_CAS
 
 import com.sms.satp.common.ApiTestPlatformException;
 import com.sms.satp.common.SearchFiled;
-import com.sms.satp.common.enums.OperationType;
-import com.sms.satp.dto.AddSceneCaseApiDto;
-import com.sms.satp.dto.SceneCaseApiDto;
-import com.sms.satp.dto.SceneCaseApiLogDto;
-import com.sms.satp.entity.dto.UpdateSceneCaseApiDto;
+import com.sms.satp.dto.BatchAddSceneCaseApiRequest;
+import com.sms.satp.dto.SceneCaseApiResponse;
+import com.sms.satp.dto.UpdateSceneCaseApiDto;
+import com.sms.satp.dto.UpdateSceneCaseApiRequest;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
-import com.sms.satp.mapper.SceneCaseApiLogMapper;
 import com.sms.satp.mapper.SceneCaseApiMapper;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.service.SceneCaseApiService;
-import com.sms.satp.service.event.entity.SceneCaseApiLogEvent;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -36,27 +32,21 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     private final SceneCaseApiRepository sceneCaseApiRepository;
     private final SceneCaseApiMapper sceneCaseApiMapper;
-    private final ApplicationEventPublisher applicationEventPublisher;
-    private final SceneCaseApiLogMapper sceneCaseApiLogMapper;
 
     public SceneCaseApiServiceImpl(SceneCaseApiRepository sceneCaseApiRepository,
-        SceneCaseApiMapper sceneCaseApiMapper,
-        ApplicationEventPublisher applicationEventPublisher,
-        SceneCaseApiLogMapper sceneCaseApiLogMapper) {
+        SceneCaseApiMapper sceneCaseApiMapper) {
         this.sceneCaseApiRepository = sceneCaseApiRepository;
         this.sceneCaseApiMapper = sceneCaseApiMapper;
-        this.applicationEventPublisher = applicationEventPublisher;
-        this.sceneCaseApiLogMapper = sceneCaseApiLogMapper;
     }
 
     @Override
-    public void batch(AddSceneCaseApiDto addSceneCaseApiDto) {
-        log.info("SceneCaseApiService-batch()-params: [SceneCaseApi]={}", addSceneCaseApiDto.toString());
+    public Boolean batchAdd(BatchAddSceneCaseApiRequest addSceneCaseApiDto) {
+        log.info("SceneCaseApiService-batchAdd()-params: [SceneCaseApi]={}", addSceneCaseApiDto.toString());
         try {
             List<SceneCaseApi> caseApiList =
-                sceneCaseApiMapper.toSceneCaseApiList(addSceneCaseApiDto.getSceneCaseApiList());
+                sceneCaseApiMapper.toSceneCaseApiListByAddRequest(addSceneCaseApiDto.getAddSceneCaseApiRequestList());
             sceneCaseApiRepository.insert(caseApiList);
-            publishBatchSceneCaseApiEvent(caseApiList, OperationType.ADD);
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseApi!", e);
             throw new ApiTestPlatformException(ADD_SCENE_CASE_API_ERROR);
@@ -64,14 +54,13 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public void deleteById(String id) {
-        log.info("SceneCaseApiService-deleteById()-params: [id]={}", id);
+    public Boolean deleteByIds(List<String> ids) {
+        log.info("SceneCaseApiService-deleteByIds()-params: [ids]={}", ids);
         try {
-            Optional<SceneCaseApi> sceneCaseApi = sceneCaseApiRepository.findById(id);
-            sceneCaseApi.ifPresent(api -> {
+            for (String id : ids) {
                 sceneCaseApiRepository.deleteById(id);
-                publishSceneCaseApiEvent(api, OperationType.DELETE);
-            });
+            }
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to delete the SceneCaseApi!", e);
             throw new ApiTestPlatformException(DELETE_SCENE_CASE_API_ERROR);
@@ -79,12 +68,12 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public void edit(SceneCaseApiDto sceneCaseApiDto) {
-        log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", sceneCaseApiDto.toString());
+    public Boolean edit(UpdateSceneCaseApiRequest updateSceneCaseApiRequest) {
+        log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", updateSceneCaseApiRequest.toString());
         try {
-            SceneCaseApi sceneCaseApi = sceneCaseApiMapper.toSceneCaseApi(sceneCaseApiDto);
+            SceneCaseApi sceneCaseApi = sceneCaseApiMapper.toSceneCaseApiByUpdateRequest(updateSceneCaseApiRequest);
             sceneCaseApiRepository.save(sceneCaseApi);
-            publishSceneCaseApiEvent(sceneCaseApi, OperationType.EDIT);
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to edit the SceneCaseApi!", e);
             throw new ApiTestPlatformException(EDIT_SCENE_CASE_API_ERROR);
@@ -92,7 +81,19 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public void batchEdit(UpdateSceneCaseApiDto updateSceneCaseApiSortOrderDto) {
+    public Boolean editAll(List<SceneCaseApi> sceneCaseApiList) {
+        log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", sceneCaseApiList.toString());
+        try {
+            sceneCaseApiRepository.saveAll(sceneCaseApiList);
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to edit the SceneCaseApi!", e);
+            throw new ApiTestPlatformException(EDIT_SCENE_CASE_API_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean batchEdit(UpdateSceneCaseApiDto updateSceneCaseApiSortOrderDto) {
         log.info("SceneCaseApiService-batchEdit()-params: [SceneCaseApi]={}",
             updateSceneCaseApiSortOrderDto.toString());
         try {
@@ -100,8 +101,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
                 List<SceneCaseApi> caseApiList = sceneCaseApiMapper
                     .toSceneCaseApiList(updateSceneCaseApiSortOrderDto.getSceneCaseApiDtoList());
                 sceneCaseApiRepository.saveAll(caseApiList);
-                publishBatchSceneCaseApiEvent(caseApiList, OperationType.EDIT);
             }
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to batch edit the SceneCaseApi!", e);
             throw new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR);
@@ -109,7 +110,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public List<SceneCaseApiDto> listBySceneCaseId(String sceneCaseId, boolean remove) {
+    public List<SceneCaseApiResponse> listBySceneCaseId(String sceneCaseId, boolean remove) {
         try {
             Example<SceneCaseApi> example = Example.of(
                 SceneCaseApi.builder().sceneCaseId(sceneCaseId).remove(remove).build());
@@ -135,7 +136,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public SceneCaseApiDto getSceneCaseApiById(String id) {
+    public SceneCaseApiResponse getSceneCaseApiById(String id) {
         try {
             Optional<SceneCaseApi> sceneCaseApi = sceneCaseApiRepository.findById(id);
             return sceneCaseApi.map(sceneCaseApiMapper::toSceneCaseApiDto).orElse(null);
@@ -143,18 +144,6 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
             log.error("Failed to get the SceneCaseApi by id!", e);
             throw new ApiTestPlatformException(GET_SCENE_CASE_API_BY_ID_ERROR);
         }
-    }
-
-    private void publishBatchSceneCaseApiEvent(List<SceneCaseApi> caseApiList, OperationType operationType) {
-        for (SceneCaseApi sceneCaseApi : caseApiList) {
-            publishSceneCaseApiEvent(sceneCaseApi, operationType);
-        }
-    }
-
-    private void publishSceneCaseApiEvent(SceneCaseApi sceneCaseApi, OperationType operationType) {
-        SceneCaseApiLogDto sceneCaseApiLogDto = sceneCaseApiLogMapper.toDtoBySceneCaseApi(sceneCaseApi, operationType);
-        SceneCaseApiLogEvent event = new SceneCaseApiLogEvent(this, sceneCaseApiLogDto);
-        applicationEventPublisher.publishEvent(event);
     }
 
 }

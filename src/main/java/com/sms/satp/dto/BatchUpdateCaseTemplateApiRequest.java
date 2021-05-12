@@ -1,4 +1,4 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddCaseTemplateApiDto {
+public class BatchUpdateCaseTemplateApiRequest {
 
-    private List<CaseTemplateApiDto> apiDtoList;
+    private List<UpdateCaseTemplateApiRequest> updateCaseTemplateApiRequestList;
 }

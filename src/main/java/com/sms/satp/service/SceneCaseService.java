@@ -1,26 +1,28 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.AddSceneCaseDto;
+import com.sms.satp.dto.AddSceneCaseRequest;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.SceneCaseDto;
-import com.sms.satp.dto.SceneCaseSearchDto;
-import com.sms.satp.dto.UpdateSceneCaseDto;
-import com.sms.satp.entity.dto.SceneTemplateDto;
+import com.sms.satp.dto.SceneCaseResponse;
+import com.sms.satp.dto.SceneTemplateResponse;
+import com.sms.satp.dto.SearchSceneCaseRequest;
+import com.sms.satp.dto.UpdateSceneCaseRequest;
+import com.sms.satp.dto.UpdateSceneTemplateRequest;
+import java.util.List;
 import org.springframework.data.domain.Page;
 
 public interface SceneCaseService {
 
-    void add(AddSceneCaseDto sceneCaseDto);
+    Boolean add(AddSceneCaseRequest addSceneCaseRequest);
 
-    void deleteById(String id);
+    Boolean deleteByIds(List<String> ids);
 
-    void edit(UpdateSceneCaseDto sceneCaseDto);
+    Boolean edit(UpdateSceneCaseRequest updateSceneCaseRequest);
 
-    Page<SceneCaseDto> page(PageDto pageDto, String projectId);
+    Page<SceneCaseResponse> page(PageDto pageDto, String projectId);
 
-    Page<SceneCaseDto> search(SceneCaseSearchDto searchDto, String projectId);
+    Page<SceneCaseResponse> search(SearchSceneCaseRequest searchDto, String projectId);
 
-    SceneTemplateDto getConn(String id);
+    SceneTemplateResponse getConn(String id);
 
-    void editConn(SceneTemplateDto dto);
+    Boolean editConn(UpdateSceneTemplateRequest updateSceneTemplateRequest);
 }

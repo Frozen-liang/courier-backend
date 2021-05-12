@@ -5,13 +5,13 @@ import java.util.List;
 
 public interface CaseTemplateConnService {
 
-    void deleteById(String id);
+    Boolean deleteById(String id);
 
     List<CaseTemplateConn> listBySceneCaseId(String sceneCaseId);
 
     List<CaseTemplateConn> listBySceneCaseId(String sceneCaseId, boolean remove);
 
-    void edit(CaseTemplateConn caseTemplateConn);
+    Boolean edit(CaseTemplateConn caseTemplateConn);
 
-    void editList(List<CaseTemplateConn> caseTemplateConn);
+    Boolean editList(List<CaseTemplateConn> caseTemplateConn);
 }

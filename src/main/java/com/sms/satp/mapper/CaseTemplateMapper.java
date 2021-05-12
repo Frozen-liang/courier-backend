@@ -1,6 +1,8 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.entity.dto.CaseTemplateDto;
+import com.sms.satp.dto.AddCaseTemplateRequest;
+import com.sms.satp.dto.CaseTemplateResponse;
+import com.sms.satp.dto.UpdateCaseTemplateRequest;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -11,11 +13,13 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CaseTemplateMapper {
 
-    CaseTemplate toAddCaseTemplate(CaseTemplateDto caseTemplateDto);
+    CaseTemplate toCaseTemplate(CaseTemplateResponse caseTemplateDto);
 
-    CaseTemplate toUpdateCaseTemplate(CaseTemplateDto caseTemplateDto);
+    CaseTemplate toCaseTemplateByUpdateRequest(UpdateCaseTemplateRequest updateCaseTemplateRequest);
+
+    CaseTemplate toCaseTemplateByAddRequest(AddCaseTemplateRequest addCaseTemplateRequest);
 
     @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    CaseTemplateDto toDto(CaseTemplate caseTemplate);
+    CaseTemplateResponse toDto(CaseTemplate caseTemplate);
 }

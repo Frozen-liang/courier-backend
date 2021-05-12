@@ -1,6 +1,5 @@
-package com.sms.satp.entity.dto;
+package com.sms.satp.dto;
 
-import com.sms.satp.dto.SceneCaseApiDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateSceneCaseApiDto {
+public class BatchAddSceneCaseApiRequest {
 
-    private List<SceneCaseApiDto> sceneCaseApiDtoList;
+    private List<AddSceneCaseApiRequest> addSceneCaseApiRequestList;
 }
