@@ -6,6 +6,7 @@ import com.sms.satp.entity.project.ProjectImportSourceEntity;
 import com.sms.satp.mapper.ProjectImportSourceMapper;
 import com.sms.satp.repository.ProjectImportSourceRepository;
 import com.sms.satp.service.ProjectImportSourceService;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
@@ -46,5 +47,10 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
         return this.projectImportSourceRepository.findById(id)
             .map(projectImportSourceMapper::toProjectImportSourceResponse).orElse(null);
 
+    }
+
+    @Override
+    public List<ProjectImportSourceResponse> findByProjectId(String projectId) {
+        return this.projectImportSourceRepository.findByProjectId(projectId);
     }
 }
