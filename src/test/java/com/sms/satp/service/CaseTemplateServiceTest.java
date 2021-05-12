@@ -1,7 +1,7 @@
 package com.sms.satp.service;
 
 import com.google.common.collect.Lists;
-import com.sms.satp.common.ApiTestPlatformException;
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.AddCaseTemplateRequest;
 import com.sms.satp.dto.CaseTemplateApiResponse;
 import com.sms.satp.dto.CaseTemplateResponse;
@@ -26,11 +26,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import static com.sms.satp.common.ErrorCode.ADD_CASE_TEMPLATE_ERROR;
-import static com.sms.satp.common.ErrorCode.DELETE_CASE_TEMPLATE_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_CASE_TEMPLATE_PAGE_ERROR;
-import static com.sms.satp.common.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_PAGE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -121,10 +121,10 @@ class CaseTemplateServiceTest {
     void edit_test() {
         CaseTemplate caseTemplate =
             CaseTemplate.builder().id(MOCK_ID).modifyUserId(MOCK_CREATE_USER_ID).name(MOCK_NAME)
-                .remove(Boolean.FALSE).build();
+                .removed(Boolean.FALSE).build();
         when(caseTemplateMapper.toCaseTemplateByUpdateRequest(any())).thenReturn(caseTemplate);
         Optional<CaseTemplate> optionalSceneCase = Optional
-            .ofNullable(CaseTemplate.builder().remove(Boolean.TRUE).build());
+            .ofNullable(CaseTemplate.builder().removed(Boolean.TRUE).build());
         when(caseTemplateRepository.findById(any())).thenReturn(optionalSceneCase);
         when(caseTemplateRepository.save(any(CaseTemplate.class))).thenReturn(caseTemplate);
         List<CaseTemplateApiResponse> caseTemplateApiDtoList = Lists
@@ -142,10 +142,10 @@ class CaseTemplateServiceTest {
     void edit_test_thenThrownException() {
         CaseTemplate caseTemplate =
             CaseTemplate.builder().id(MOCK_ID).modifyUserId(MOCK_CREATE_USER_ID).name(MOCK_NAME)
-                .remove(Boolean.FALSE).build();
+                .removed(Boolean.FALSE).build();
         when(caseTemplateMapper.toCaseTemplate(any())).thenReturn(caseTemplate);
         Optional<CaseTemplate> optionalSceneCase = Optional
-            .ofNullable(CaseTemplate.builder().remove(Boolean.TRUE).build());
+            .ofNullable(CaseTemplate.builder().removed(Boolean.TRUE).build());
         when(caseTemplateRepository.findById(any())).thenReturn(optionalSceneCase);
         when(caseTemplateRepository.save(any(CaseTemplate.class)))
             .thenThrow(new ApiTestPlatformException(EDIT_CASE_TEMPLATE_ERROR));

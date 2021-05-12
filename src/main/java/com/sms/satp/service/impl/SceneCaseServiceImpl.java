@@ -116,9 +116,9 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             optionalSceneCase.ifPresent(sceneCaseFindById -> {
                 sceneCase.setCreateUserId(sceneCaseFindById.getCreateUserId());
                 sceneCase.setCreateDateTime(sceneCaseFindById.getCreateDateTime());
-                if (!Objects.equals(sceneCase.isRemove(), sceneCaseFindById.isRemove())) {
-                    editSceneCaseApiStatus(sceneCase, sceneCaseFindById.isRemove());
-                    editCaseTemplateStatus(sceneCase, sceneCaseFindById.isRemove());
+                if (!Objects.equals(sceneCase.getRemoved(), sceneCaseFindById.getRemoved())) {
+                    editSceneCaseApiStatus(sceneCase, sceneCaseFindById.getRemoved());
+                    editCaseTemplateStatus(sceneCase, sceneCaseFindById.getRemoved());
                 }
                 sceneCaseRepository.save(sceneCase);
             });
@@ -135,7 +135,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             PageDtoConverter.frontMapping(pageDto);
             SceneCase sceneCase = SceneCase.builder()
                 .projectId(projectId)
-                .remove(Boolean.FALSE)
+                .removed(Boolean.FALSE)
                 .build();
             Example<SceneCase> example = Example.of(sceneCase);
             Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
@@ -205,11 +205,11 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         }
     }
 
-    private void editCaseTemplateStatus(SceneCase sceneCase, boolean oldRemove) {
+    private void editCaseTemplateStatus(SceneCase sceneCase, Boolean oldRemove) {
         List<CaseTemplateConn> caseTemplateConnList = caseTemplateConnService
             .listBySceneCaseId(sceneCase.getId(), oldRemove);
         for (CaseTemplateConn conn : caseTemplateConnList) {
-            conn.setRemove(sceneCase.isRemove());
+            conn.setRemoved(sceneCase.getRemoved());
             caseTemplateConnService.edit(conn);
         }
     }
@@ -227,12 +227,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         }
     }
 
-    private void editSceneCaseApiStatus(SceneCase sceneCase, boolean oldRemove) {
+    private void editSceneCaseApiStatus(SceneCase sceneCase, Boolean oldRemove) {
         List<SceneCaseApiResponse> sceneCaseApiResponseList = sceneCaseApiService
             .listBySceneCaseId(sceneCase.getId(), oldRemove);
         List<SceneCaseApi> sceneCaseApiList = sceneCaseApiMapper.toSceneCaseApiList(sceneCaseApiResponseList);
         for (SceneCaseApi sceneCaseApi : sceneCaseApiList) {
-            sceneCaseApi.setRemove(sceneCase.isRemove());
+            sceneCaseApi.setRemoved(sceneCase.getRemoved());
         }
         sceneCaseApiService.editAll(sceneCaseApiList);
     }

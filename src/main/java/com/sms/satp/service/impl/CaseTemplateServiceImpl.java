@@ -96,8 +96,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             optionalSceneCase.ifPresent(sceneCaseFindById -> {
                 sceneCaseTemplate.setCreateUserId(sceneCaseFindById.getCreateUserId());
                 sceneCaseTemplate.setCreateDateTime(sceneCaseFindById.getCreateDateTime());
-                if (!Objects.equals(sceneCaseTemplate.isRemove(), sceneCaseFindById.isRemove())) {
-                    editCaseTemplateApiStatus(sceneCaseTemplate, sceneCaseFindById.isRemove());
+                if (!Objects.equals(sceneCaseTemplate.getRemoved(), sceneCaseFindById.getRemoved())) {
+                    editCaseTemplateApiStatus(sceneCaseTemplate, sceneCaseFindById.getRemoved());
                 }
                 sceneCaseTemplateRepository.save(sceneCaseTemplate);
             });
@@ -114,7 +114,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             PageDtoConverter.frontMapping(pageDto);
             CaseTemplate caseTemplate = CaseTemplate.builder()
                 .projectId(projectId)
-                .remove(Boolean.FALSE)
+                .removed(Boolean.FALSE)
                 .build();
             Example<CaseTemplate> example = Example.of(caseTemplate);
             Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
@@ -144,13 +144,13 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         caseTemplateApiService.deleteByIds(ids);
     }
 
-    private void editCaseTemplateApiStatus(CaseTemplate caseTemplate, boolean oldRemove) {
+    private void editCaseTemplateApiStatus(CaseTemplate caseTemplate, Boolean oldRemove) {
         List<CaseTemplateApiResponse> caseTemplateApiResponseList = caseTemplateApiService
             .listByCaseTemplateId(caseTemplate.getId(), oldRemove);
         List<CaseTemplateApi> caseTemplateApiList =
             caseTemplateApiMapper.toCaseTemplateApiByResponseList(caseTemplateApiResponseList);
         for (CaseTemplateApi caseTemplateApi : caseTemplateApiList) {
-            caseTemplateApi.setRemove(caseTemplate.isRemove());
+            caseTemplateApi.setRemoved(caseTemplate.getRemoved());
         }
         caseTemplateApiService.editAll(caseTemplateApiList);
     }

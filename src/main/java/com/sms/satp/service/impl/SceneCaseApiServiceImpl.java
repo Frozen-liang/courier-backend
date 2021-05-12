@@ -113,7 +113,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     public List<SceneCaseApiResponse> listBySceneCaseId(String sceneCaseId, boolean remove) {
         try {
             Example<SceneCaseApi> example = Example.of(
-                SceneCaseApi.builder().sceneCaseId(sceneCaseId).remove(remove).build());
+                SceneCaseApi.builder().sceneCaseId(sceneCaseId).removed(remove).build());
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SearchFiled.ORDER_NUMBER.getFiledName());
             List<SceneCaseApi> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(sceneCaseApiMapper::toSceneCaseApiDto).collect(Collectors.toList());

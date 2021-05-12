@@ -52,7 +52,7 @@ public class CaseTemplateConnServiceImpl implements CaseTemplateConnService {
     @Override
     public List<CaseTemplateConn> listBySceneCaseId(String sceneCaseId, boolean remove) {
         try {
-            CaseTemplateConn conn = CaseTemplateConn.builder().sceneCaseId(sceneCaseId).remove(remove).build();
+            CaseTemplateConn conn = CaseTemplateConn.builder().sceneCaseId(sceneCaseId).removed(remove).build();
             Example<CaseTemplateConn> example = Example.of(conn);
             return caseTemplateConnRepository.findAll(example);
         } catch (Exception e) {
