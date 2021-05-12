@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DocumentParserResult {
+public class DocumentDefinition {
 
     private OpenAPI openApi;
+    private String projectId;
 }

@@ -1,32 +1,26 @@
-package com.sms.satp.entity.project;
+package com.sms.satp.entity;
 
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
-@Builder
-@Data
-@AllArgsConstructor
+@SuperBuilder
 @NoArgsConstructor
-@Document(collection = "Project")
-public class ProjectEntity {
+@Data
+public class BaseEntity {
 
-    @Id
-    @Field(targetType = FieldType.OBJECT_ID)
+    @MongoId(FieldType.OBJECT_ID)
+    @Indexed(unique = true)
     private String id;
-    private String name;
-    private String description;
-    private boolean removed;
+    private Boolean removed;
     @CreatedBy
     private Long createUserId;
     @LastModifiedBy
@@ -35,6 +29,4 @@ public class ProjectEntity {
     private LocalDateTime createDateTime;
     @LastModifiedDate
     private LocalDateTime modifyDateTime;
-
-
 }

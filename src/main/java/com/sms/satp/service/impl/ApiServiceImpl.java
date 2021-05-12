@@ -1,28 +1,27 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.constant.CommonFiled.ID;
+import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
+import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_PAGE_ERROR;
-import static com.sms.satp.common.constant.CommonFiled.ID;
-import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
-import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
-import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.common.enums.DocumentType;
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.ApiPageRequest;
 import com.sms.satp.dto.ApiRequest;
 import com.sms.satp.dto.ApiResponse;
 import com.sms.satp.dto.request.ApiImportRequest;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
-import com.sms.satp.entity.project.ProjectEntity;
 import com.sms.satp.mapper.ApiMapper;
 import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.DocumentReader;
-import com.sms.satp.parser.common.DocumentParserResult;
+import com.sms.satp.parser.common.DocumentDefinition;
 import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.ProjectEntityRepository;
@@ -80,13 +79,11 @@ public class ApiServiceImpl implements ApiService {
     @Override
     public boolean importDocument(ApiImportRequest apiImportRequest) {
         DocumentType documentType = DocumentType.getType(apiImportRequest.getDocumentType());
-        DocumentReader reader = documentType.getReader();
+        DocumentDefinition definition = getDocumentParserResult(apiImportRequest);
         ApiDocumentTransformer transformer = documentType.getTransformer();
-        String documentUrl = apiImportRequest.getDocumentUrl();
-        MultipartFile file = apiImportRequest.getFile();
-        DocumentParserResult content = getDocumentParserResult(reader, documentUrl, file);
-        ProjectEntity projectEntity = projectEntityRepository.insert(transformer.toProjectEntity(content));
-        List<ApiEntity> apiEntities = transformer.toApiEntities(content, projectEntity.getId());
+        List<ApiEntity> apiEntities = transformer.toApiEntities(definition);
+//        List<ApiEntity> oldApiEntities = apiRepository
+//            .findApiEntitiesByProjectId(apiImportRequest);
         List<ApiHistoryEntity> apiHistoryEntities = apiRepository.insert(apiEntities).stream()
             .map(apiEntity -> ApiHistoryEntity.builder().record(apiEntity).build()).collect(
                 Collectors.toList());
@@ -194,14 +191,19 @@ public class ApiServiceImpl implements ApiService {
         return true;
     }
 
-    private DocumentParserResult getDocumentParserResult(DocumentReader reader, String documentUrl,
-        MultipartFile file) {
-        DocumentParserResult content;
+    private DocumentDefinition getDocumentParserResult(ApiImportRequest apiImportRequest) {
+        DocumentDefinition content;
+        DocumentType documentType = DocumentType.getType(apiImportRequest.getDocumentType());
+        DocumentReader reader = documentType.getReader();
+        String documentUrl = apiImportRequest.getDocumentUrl();
+        MultipartFile file = apiImportRequest.getFile();
+        String projectId = apiImportRequest.getProjectId();
         if (StringUtils.isNotBlank(documentUrl)) {
-            content = reader.readLocation(documentUrl);
+            content = reader.readLocation(documentUrl, projectId);
         } else if (Objects.nonNull(file)) {
             try {
-                content = reader.readContents(IOUtils.toString(file.getInputStream(), StandardCharsets.UTF_8));
+                content = reader
+                    .readContents(IOUtils.toString(file.getInputStream(), StandardCharsets.UTF_8), projectId);
             } catch (Exception e) {
                 throw ExceptionUtils.mpe("Failed to read the file in DocumentType", e);
             }

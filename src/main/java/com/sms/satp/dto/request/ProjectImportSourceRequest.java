@@ -17,7 +17,7 @@ import org.hibernate.validator.constraints.Range;
 @NoArgsConstructor
 public class ProjectImportSourceRequest {
 
-    @NotBlank(groups = UpdateGroup.class)
+    @NotBlank(groups = UpdateGroup.class,message = "The id must not be null.")
     private String id;
     @NotNull(message = "The documentType must not be null.")
     @Range(min = 0, max = 1, message = "The documentType only either 0 or 1.")

@@ -1,14 +1,14 @@
 package com.sms.satp.parser;
 
 import com.sms.satp.entity.api.ApiEntity;
-import com.sms.satp.entity.project.ProjectEntity;
-import com.sms.satp.parser.common.DocumentParserResult;
+import com.sms.satp.parser.common.DocumentDefinition;
 import com.sms.satp.parser.impl.SwaggerApiDocumentTransformer;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import java.util.List;
 import java.util.Objects;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -29,13 +29,10 @@ public class OpenApiDocumentTransformerTest {
                     .toString(),
                 null,
                 parseOptions).getOpenAPI();
-        DocumentParserResult documentParserResult = new DocumentParserResult(openAPI);
+        DocumentDefinition documentDefinition = new DocumentDefinition(openAPI, new ObjectId().toString());
         ApiDocumentTransformer swaggerApiDocumentTransformer = SwaggerApiDocumentTransformer.INSTANCE;
-        ProjectEntity projectEntity = swaggerApiDocumentTransformer.toProjectEntity(documentParserResult);
         List<ApiEntity> apiEntities = swaggerApiDocumentTransformer
-            .toApiEntities(documentParserResult, null);
-        Assertions.assertTrue(Objects.nonNull(projectEntity));
-        Assertions.assertEquals(openAPI.getInfo().getTitle(), projectEntity.getName());
+            .toApiEntities(documentDefinition);
         Assertions.assertTrue(apiEntities.size() > 0);
 
     }

@@ -1,7 +1,7 @@
 package com.sms.satp.parser.impl;
 
 import com.sms.satp.parser.DocumentReader;
-import com.sms.satp.parser.common.DocumentParserResult;
+import com.sms.satp.parser.common.DocumentDefinition;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.core.models.ParseOptions;
@@ -15,20 +15,20 @@ public enum SwaggerDocumentReader implements DocumentReader {
     }
 
     @Override
-    public DocumentParserResult readLocation(String location) {
+    public DocumentDefinition readLocation(String location, String projectId) {
         OpenAPI openApi = new OpenAPIParser()
             .readLocation(location,
                 null,
                 PARSE_OPTIONS).getOpenAPI();
-        return new DocumentParserResult(openApi);
+        return new DocumentDefinition(openApi, projectId);
     }
 
     @Override
-    public DocumentParserResult readContents(String content) {
+    public DocumentDefinition readContents(String content, String projectId) {
         OpenAPI openApi = new OpenAPIParser()
             .readContents(content,
                 null,
                 PARSE_OPTIONS).getOpenAPI();
-        return new DocumentParserResult(openApi);
+        return new DocumentDefinition(openApi, projectId);
     }
 }

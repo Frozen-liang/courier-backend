@@ -16,14 +16,12 @@ import com.sms.satp.common.enums.SchemaType;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiEntity.ApiEntityBuilder;
 import com.sms.satp.entity.api.common.ParamInfo;
-import com.sms.satp.entity.project.ProjectEntity;
 import com.sms.satp.parser.ApiDocumentTransformer;
-import com.sms.satp.parser.common.DocumentParserResult;
+import com.sms.satp.parser.common.DocumentDefinition;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.headers.Header;
-import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.ArraySchema;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
@@ -62,21 +60,13 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer {
     public static final String DEFAULT_RESPONSE_KEY = "200";
 
     @Override
-    public List<ApiEntity> toApiEntities(DocumentParserResult parserResult, String projectId) {
-        OpenAPI result = parserResult.getOpenApi();
-        Map<String, Schema> schemas = result.getComponents().getSchemas();
+    public List<ApiEntity> toApiEntities(DocumentDefinition definition) {
+        OpenAPI openAPI = definition.getOpenApi();
+        Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
         final Map<String, List<ParamInfo>> componentReference = prepareComponentReference(schemas);
-        return result.getPaths().entrySet().stream()
-            .map(entry -> buildApiEntities(entry, componentReference, projectId))
+        return openAPI.getPaths().entrySet().stream()
+            .map(entry -> buildApiEntities(entry, componentReference, definition.getProjectId()))
             .flatMap(Collection::stream).collect(Collectors.toList());
-    }
-
-    @Override
-    public ProjectEntity toProjectEntity(DocumentParserResult parserResult) {
-        OpenAPI result = parserResult.getOpenApi();
-        Info info = result.getInfo();
-        return ProjectEntity.builder().name(info.getTitle()).description(info.getDescription()).build();
-
     }
 
     private List<ApiEntity> buildApiEntities(Entry<String, PathItem> entry,

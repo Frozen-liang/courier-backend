@@ -1,10 +1,10 @@
 package com.sms.satp.parser;
 
-import com.sms.satp.parser.common.DocumentParserResult;
+import com.sms.satp.parser.common.DocumentDefinition;
 
 public interface DocumentReader {
 
-    public DocumentParserResult readLocation(String location);
+    public DocumentDefinition readLocation(String location, String projectId);
 
-    public DocumentParserResult readContents(String content);
+    public DocumentDefinition readContents(String content, String projectId);
 }
