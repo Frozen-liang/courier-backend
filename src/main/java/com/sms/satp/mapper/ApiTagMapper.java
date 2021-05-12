@@ -1,6 +1,7 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.ApiTagDto;
+import com.sms.satp.dto.ApiTagRequest;
+import com.sms.satp.dto.ApiTagResponse;
 import com.sms.satp.entity.tag.ApiTag;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -12,12 +13,15 @@ public interface ApiTagMapper {
 
     @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    ApiTagDto toDto(ApiTag apiTag);
+    @Mapping(target = "tagType", expression = "java(apiTag.getTagType().getCode())")
+    ApiTagResponse toDto(ApiTag apiTag);
 
-    List<ApiTagDto> toDtoList(List<ApiTag> apiTags);
+    List<ApiTagResponse> toDtoList(List<ApiTag> apiTags);
 
     @Mapping(target = "createDateTime", ignore = true)
     @Mapping(target = "modifyDateTime", ignore = true)
-    ApiTag toEntity(ApiTagDto apiTagDto);
+    @Mapping(target = "tagType",
+        expression = "java(com.sms.satp.common.enums.ApiTagType.getType(apiTagDto.getTagType()))")
+    ApiTag toEntity(ApiTagRequest apiTagDto);
 
 }

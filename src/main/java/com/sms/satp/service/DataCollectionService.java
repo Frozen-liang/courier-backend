@@ -1,17 +1,18 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.DataCollectionDto;
+import com.sms.satp.dto.DataCollectionRequest;
+import com.sms.satp.dto.DataCollectionResponse;
 import java.util.List;
 
 public interface DataCollectionService {
 
-    DataCollectionDto findById(String id);
+    DataCollectionResponse findById(String id);
 
-    List<DataCollectionDto> list(String projectId, String collectionName);
+    List<DataCollectionResponse> list(String projectId, String collectionName);
 
-    void add(DataCollectionDto dataCollectionDto);
+    void add(DataCollectionRequest dataCollectionRequest);
 
-    void edit(DataCollectionDto dataCollectionDto);
+    void edit(DataCollectionRequest dataCollectionRequest);
 
     void delete(String[] ids);
 

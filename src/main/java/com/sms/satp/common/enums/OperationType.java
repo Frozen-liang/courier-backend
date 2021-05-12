@@ -6,7 +6,7 @@ public enum OperationType {
     EDIT(1),
     DELETE(2);
 
-    private Integer type;
+    private final Integer type;
 
     OperationType(Integer type) {
         this.type = type;

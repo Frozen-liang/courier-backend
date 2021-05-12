@@ -20,12 +20,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 
-import static com.sms.satp.common.ErrorCode.ADD_SCENE_CASE_API_ERROR;
-import static com.sms.satp.common.ErrorCode.BATCH_EDIT_SCENE_CASE_API_ERROR;
-import static com.sms.satp.common.ErrorCode.DELETE_SCENE_CASE_API_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_SCENE_CASE_API_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_SCENE_CASE_API_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.BATCH_EDIT_SCENE_CASE_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

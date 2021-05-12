@@ -1,18 +1,19 @@
 package com.sms.satp.service;
 
 import com.sms.satp.common.enums.ApiTagType;
-import com.sms.satp.dto.ApiTagDto;
+import com.sms.satp.dto.ApiTagRequest;
+import com.sms.satp.dto.ApiTagResponse;
 import java.util.List;
 
 public interface ApiTagService {
 
-    ApiTagDto findById(String id);
+    ApiTagResponse findById(String id);
 
-    List<ApiTagDto> list(String projectId, String tagName, ApiTagType tagType);
+    List<ApiTagResponse> list(String projectId, String tagName, ApiTagType tagType);
 
-    void add(ApiTagDto apiTagDto);
+    void add(ApiTagRequest apiTagRequest);
 
-    void edit(ApiTagDto apiTagDto);
+    void edit(ApiTagRequest apiTagRequest);
 
     void delete(String id);
 

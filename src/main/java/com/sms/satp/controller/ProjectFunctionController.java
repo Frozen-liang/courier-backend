@@ -1,8 +1,8 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.response.Response;
-import com.sms.satp.dto.ProjectFunctionDto;
+import com.sms.satp.dto.ProjectFunctionRequest;
+import com.sms.satp.dto.ProjectFunctionResponse;
 import com.sms.satp.service.ProjectFunctionService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
@@ -26,31 +26,31 @@ public class ProjectFunctionController {
     }
 
     @GetMapping("/{id}")
-    public Response<ProjectFunctionDto> getById(@PathVariable("id") String id) {
-        return Response.ok(projectFunctionService.findById(id));
+    public ProjectFunctionResponse getById(@PathVariable("id") String id) {
+        return projectFunctionService.findById(id);
     }
 
     @GetMapping("/list/{projectId}")
-    public Response<List<Object>> list(@PathVariable("projectId") String projectId, String functionDesc,
+    public List<Object> list(@PathVariable("projectId") String projectId, String functionKey,
         String functionName) {
-        return Response.ok(projectFunctionService.list(projectId, functionDesc, functionName));
+        return projectFunctionService.list(projectId, functionKey, functionName);
     }
 
     @PostMapping
-    public Response<Boolean> add(@Validated @RequestBody ProjectFunctionDto projectFunctionDto) {
-        projectFunctionService.add(projectFunctionDto);
-        return Response.ok(Boolean.TRUE);
+    public Boolean add(@Validated @RequestBody ProjectFunctionRequest projectFunctionRequest) {
+        projectFunctionService.add(projectFunctionRequest);
+        return Boolean.TRUE;
     }
 
     @PutMapping
-    public Response<Boolean> edit(@Validated @RequestBody ProjectFunctionDto projectFunctionDto) {
-        projectFunctionService.edit(projectFunctionDto);
-        return Response.ok(Boolean.TRUE);
+    public Boolean edit(@Validated @RequestBody ProjectFunctionRequest projectFunctionRequest) {
+        projectFunctionService.edit(projectFunctionRequest);
+        return Boolean.TRUE;
     }
 
     @DeleteMapping("/{ids}")
-    public Response<Boolean> delete(@PathVariable String[] ids) {
+    public Boolean delete(@PathVariable String[] ids) {
         projectFunctionService.delete(ids);
-        return Response.ok(Boolean.TRUE);
+        return Boolean.TRUE;
     }
 }

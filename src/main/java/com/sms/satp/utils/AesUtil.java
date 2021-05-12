@@ -15,7 +15,7 @@ public class AesUtil {
     private AesUtil() {
     }
 
-    private static Key key;
+    private static final Key key;
     private static final String KEY_STR = "sms-stap";
     private static final String KEY_ALGORITHM = "AES";
     private static final String CIPHER_ALGORITHM = "AES/ECB/PKCS5Padding";

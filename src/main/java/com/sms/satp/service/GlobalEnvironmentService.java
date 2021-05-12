@@ -1,17 +1,18 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.GlobalEnvironmentDto;
+import com.sms.satp.dto.GlobalEnvironmentRequest;
+import com.sms.satp.dto.GlobalEnvironmentResponse;
 import java.util.List;
 
 public interface GlobalEnvironmentService {
 
-    GlobalEnvironmentDto findById(String id);
+    GlobalEnvironmentResponse findById(String id);
 
-    void add(GlobalEnvironmentDto globalEnvironmentDto);
+    void add(GlobalEnvironmentRequest globalEnvironmentRequest);
 
-    void edit(GlobalEnvironmentDto globalEnvironmentDto);
+    void edit(GlobalEnvironmentRequest globalEnvironmentRequest);
 
-    List<GlobalEnvironmentDto> list();
+    List<GlobalEnvironmentResponse> list();
 
     void delete(String[] ids);
 

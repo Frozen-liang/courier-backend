@@ -29,7 +29,7 @@ public class DataCollection {
     private String collectionName;
     private List<String> paramList;
     private List<TestData> dataList;
-    private boolean remove;
+    private boolean removed;
     @CreatedBy
     private Long createUserId;
     @LastModifiedBy

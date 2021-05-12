@@ -1,19 +1,20 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.ErrorCode.ADD_PROJECT_FUNCTION_ERROR;
-import static com.sms.satp.common.ErrorCode.DELETE_PROJECT_FUNCTION_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_PROJECT_FUNCTION_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_PROJECT_FUNCTION_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_PROJECT_FUNCTION_LIST_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_FUNCTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_PROJECT_FUNCTION_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_FUNCTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_LIST_ERROR;
 import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.ID;
 import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
-import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalFunctionDto;
-import com.sms.satp.dto.ProjectFunctionDto;
+import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.dto.GlobalFunctionResponse;
+import com.sms.satp.dto.ProjectFunctionRequest;
+import com.sms.satp.dto.ProjectFunctionResponse;
 import com.sms.satp.entity.function.ProjectFunction;
 import com.sms.satp.mapper.ProjectFunctionMapper;
 import com.sms.satp.repository.ProjectFunctionRepository;
@@ -44,6 +45,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     private final ProjectFunctionMapper projectFunctionMapper;
     private final GlobalFunctionService globalFunctionService;
     private final MongoTemplate mongoTemplate;
+    private static final String FUNCTION_KEY = "functionKey";
 
     public ProjectFunctionServiceImpl(ProjectFunctionRepository projectFunctionRepository,
         ProjectFunctionMapper projectFunctionMapper, GlobalFunctionService globalFunctionService,
@@ -55,7 +57,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     }
 
     @Override
-    public ProjectFunctionDto findById(String id) {
+    public ProjectFunctionResponse findById(String id) {
         try {
             Optional<ProjectFunction> optional = projectFunctionRepository.findById(id);
             return projectFunctionMapper.toDto(optional.orElse(null));
@@ -66,18 +68,19 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     }
 
     @Override
-    public List<Object> list(String projectId, String functionDesc, String functionName) {
+    public List<Object> list(String projectId, String functionKey, String functionName) {
         try {
             ProjectFunction projectFunction = ProjectFunction.builder()
-                .projectId(projectId).functionDesc(functionDesc).functionName(functionName).build();
+                .projectId(projectId).functionKey(functionKey).functionName(functionName).build();
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
             ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID, ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher(FUNCTION_KEY,ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher(REMOVE, ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
             Example<ProjectFunction> example = Example.of(projectFunction, matcher);
             ArrayList<Object> list = new ArrayList<>();
-            List<GlobalFunctionDto> globalFunctionList = globalFunctionService.list(functionDesc, functionName);
+            List<GlobalFunctionResponse> globalFunctionList = globalFunctionService.list(functionKey, functionName);
             List<ProjectFunction> projectFunctionList = projectFunctionRepository.findAll(example, sort);
             list.addAll(globalFunctionList);
             list.addAll(projectFunctionMapper.toDtoList(projectFunctionList));
@@ -90,10 +93,10 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
 
 
     @Override
-    public void add(ProjectFunctionDto projectFunctionDto) {
-        log.info("ProjectFunctionService-add()-params: [ProjectFunction]={}", projectFunctionDto.toString());
+    public void add(ProjectFunctionRequest projectFunctionRequest) {
+        log.info("ProjectFunctionService-add()-params: [ProjectFunction]={}", projectFunctionRequest.toString());
         try {
-            ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionDto);
+            ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
             projectFunctionRepository.insert(projectFunction);
         } catch (Exception e) {
             log.error("Failed to add the ProjectFunction!", e);
@@ -102,10 +105,10 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     }
 
     @Override
-    public void edit(ProjectFunctionDto projectFunctionDto) {
-        log.info("ProjectFunctionService-edit()-params: [ProjectFunction]={}", projectFunctionDto.toString());
+    public void edit(ProjectFunctionRequest projectFunctionRequest) {
+        log.info("ProjectFunctionService-edit()-params: [ProjectFunction]={}", projectFunctionRequest.toString());
         try {
-            ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionDto);
+            ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
             Optional<ProjectFunction> optional = projectFunctionRepository.findById(projectFunction.getId());
             optional.ifPresent((oldProjectFunction) -> {
                 projectFunction.setCreateDateTime(oldProjectFunction.getCreateDateTime());

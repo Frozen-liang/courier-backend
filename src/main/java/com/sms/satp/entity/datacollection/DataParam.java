@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class DataParam {
 
-    private String paramKey;
-    private Object paramValue;
+    private String key;
+    private Object value;
 }

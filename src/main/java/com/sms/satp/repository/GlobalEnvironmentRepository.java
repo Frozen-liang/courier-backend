@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface GlobalEnvironmentRepository extends MongoRepository<GlobalEnvironment, String> {
 
-    List<GlobalEnvironment> findByRemoveOrderByCreateDateTimeDesc(boolean remove);
+    List<GlobalEnvironment> findByRemovedOrderByCreateDateTimeDesc(boolean removed);
 }

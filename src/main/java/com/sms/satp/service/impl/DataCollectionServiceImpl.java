@@ -1,19 +1,20 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.ErrorCode.ADD_DATA_COLLECTION_ERROR;
-import static com.sms.satp.common.ErrorCode.DELETE_DATA_COLLECTION_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_DATA_COLLECTION_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_DATA_COLLECTION_LIST_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.ADD_DATA_COLLECTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_DATA_COLLECTION_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_LIST_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
 import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.ID;
 import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
-import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.dto.DataCollectionDto;
+import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.dto.DataCollectionRequest;
+import com.sms.satp.dto.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
 import com.sms.satp.mapper.DataCollectionMapper;
 import com.sms.satp.repository.DataCollectionRepository;
@@ -54,7 +55,7 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
-    public DataCollectionDto findById(String id) {
+    public DataCollectionResponse findById(String id) {
         try {
             Optional<DataCollection> optional = dataCollectionRepository.findById(id);
             return dataCollectionMapper.toDto(optional.orElse(null));
@@ -65,7 +66,7 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
-    public List<DataCollectionDto> list(String projectId, String collectionName) {
+    public List<DataCollectionResponse> list(String projectId, String collectionName) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
             DataCollection dataCollection = DataCollection.builder().projectId(projectId).collectionName(collectionName)
@@ -83,10 +84,10 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
-    public void add(DataCollectionDto dataCollectionDto) {
-        log.info("DataCollectionService-add()-params: [DataCollection]={}", dataCollectionDto.toString());
+    public void add(DataCollectionRequest dataCollectionRequest) {
+        log.info("DataCollectionService-add()-params: [DataCollection]={}", dataCollectionRequest.toString());
         try {
-            DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionDto);
+            DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
             dataCollectionRepository.insert(dataCollection);
         } catch (Exception e) {
             log.error("Failed to add the DataCollection!", e);
@@ -95,10 +96,10 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
-    public void edit(DataCollectionDto dataCollectionDto) {
-        log.info("DataCollectionService-edit()-params: [DataCollection]={}", dataCollectionDto.toString());
+    public void edit(DataCollectionRequest dataCollectionRequest) {
+        log.info("DataCollectionService-edit()-params: [DataCollection]={}", dataCollectionRequest.toString());
         try {
-            DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionDto);
+            DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
             dataCollectionRepository.findById(dataCollection.getId())
                 .ifPresent((oldDataCollection) -> {
                     dataCollection.setCreateUserId(oldDataCollection.getCreateUserId());

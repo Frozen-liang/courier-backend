@@ -1,6 +1,7 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.DataCollectionDto;
+import com.sms.satp.dto.DataCollectionRequest;
+import com.sms.satp.dto.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -14,12 +15,12 @@ public interface DataCollectionMapper {
 
     @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    DataCollectionDto toDto(DataCollection dataCollection);
+    DataCollectionResponse toDto(DataCollection dataCollection);
 
-    List<DataCollectionDto> toDtoList(List<DataCollection> dataCollections);
+    List<DataCollectionResponse> toDtoList(List<DataCollection> dataCollections);
 
     @Mapping(target = "createDateTime", ignore = true)
     @Mapping(target = "modifyDateTime", ignore = true)
-    DataCollection toEntity(DataCollectionDto dataCollectionDto);
+    DataCollection toEntity(DataCollectionRequest dataCollectionDto);
 
 }

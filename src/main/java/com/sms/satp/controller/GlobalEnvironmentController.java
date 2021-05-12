@@ -1,8 +1,8 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.response.Response;
-import com.sms.satp.dto.GlobalEnvironmentDto;
+import com.sms.satp.dto.GlobalEnvironmentRequest;
+import com.sms.satp.dto.GlobalEnvironmentResponse;
 import com.sms.satp.service.GlobalEnvironmentService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
@@ -26,31 +26,36 @@ public class GlobalEnvironmentController {
     }
 
     @GetMapping("/{id}")
-    public Response<GlobalEnvironmentDto> getById(@PathVariable("id") String id) {
-        return Response.ok(globalEnvironmentService.findById(id));
+    public GlobalEnvironmentResponse getById(@PathVariable("id") String id) {
+        return
+            globalEnvironmentService.findById(id);
     }
 
     @PostMapping
-    public Response<Boolean> add(@Validated @RequestBody GlobalEnvironmentDto globalEnvironmentDto) {
-        globalEnvironmentService.add(globalEnvironmentDto);
-        return Response.ok(Boolean.TRUE);
+    public Boolean add(@Validated @RequestBody GlobalEnvironmentRequest globalEnvironmentRequest) {
+        globalEnvironmentService.add(globalEnvironmentRequest);
+        return
+            Boolean.TRUE;
     }
 
     @PutMapping
-    public Response<Boolean> edit(@Validated @RequestBody GlobalEnvironmentDto globalEnvironmentDto) {
-        globalEnvironmentService.edit(globalEnvironmentDto);
-        return Response.ok(Boolean.TRUE);
+    public Boolean edit(@Validated @RequestBody GlobalEnvironmentRequest globalEnvironmentRequest) {
+        globalEnvironmentService.edit(globalEnvironmentRequest);
+        return
+            Boolean.TRUE;
     }
 
     @GetMapping("/list")
-    public Response<List<GlobalEnvironmentDto>> list() {
-        return Response.ok(globalEnvironmentService.list());
+    public List<GlobalEnvironmentResponse> list() {
+        return
+            globalEnvironmentService.list();
     }
 
     @DeleteMapping("/{ids}")
-    public Response<Boolean> delete(@PathVariable("ids") String[] ids) {
+    public Boolean delete(@PathVariable("ids") String[] ids) {
         globalEnvironmentService.delete(ids);
-        return Response.ok(Boolean.TRUE);
+        return
+            Boolean.TRUE;
     }
 
 }

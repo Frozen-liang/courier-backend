@@ -1,21 +1,22 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.ErrorCode.ADD_PROJECT_ENVIRONMENT_ERROR;
-import static com.sms.satp.common.ErrorCode.DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.EDIT_PROJECT_ENVIRONMENT_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_LIST_ERROR;
-import static com.sms.satp.common.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_ENVIRONMENT_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_ENVIRONMENT_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_LIST_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
 import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.ID;
 import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
-import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalEnvironmentDto;
+import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.dto.GlobalEnvironmentResponse;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.ProjectEnvironmentDto;
+import com.sms.satp.dto.ProjectEnvironmentRequest;
+import com.sms.satp.dto.ProjectEnvironmentResponse;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
@@ -62,7 +63,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
-    public Page<ProjectEnvironmentDto> page(PageDto pageDto, String projectId) {
+    public Page<ProjectEnvironmentResponse> page(PageDto pageDto, String projectId) {
         try {
             PageDtoConverter.frontMapping(pageDto);
             ProjectEnvironment projectEnvironment = ProjectEnvironment.builder()
@@ -91,7 +92,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
                 .withMatcher(REMOVE, GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
             Example<ProjectEnvironment> example = Example.of(projectEnvironment, exampleMatcher);
-            List<GlobalEnvironmentDto> globalEnvironments = globalEnvironmentService.list();
+            List<GlobalEnvironmentResponse> globalEnvironments = globalEnvironmentService.list();
             List<ProjectEnvironment> projectEnvironments = projectEnvironmentRepository.findAll(example, sort);
             result.addAll(globalEnvironments);
             result.addAll(projectEnvironmentMapper.toDtoList(projectEnvironments));
@@ -103,11 +104,12 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
-    public void add(ProjectEnvironmentDto projectEnvironmentDto) {
-        log.info("ProjectEnvironmentService-add()-params: [ProjectEnvironment]={}", projectEnvironmentDto.toString());
+    public void add(ProjectEnvironmentRequest projectEnvironmentRequest) {
+        log.info("ProjectEnvironmentService-add()-params: [ProjectEnvironment]={}",
+            projectEnvironmentRequest.toString());
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentMapper
-                .toEntity(projectEnvironmentDto);
+                .toEntity(projectEnvironmentRequest);
             projectEnvironmentRepository.insert(projectEnvironment);
         } catch (Exception e) {
             log.error("Failed to add the projectEnvironment!", e);
@@ -116,11 +118,12 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
-    public void edit(ProjectEnvironmentDto projectEnvironmentDto) {
-        log.info("ProjectEnvironmentService-edit()-params: [ProjectEnvironment]={}", projectEnvironmentDto.toString());
+    public void edit(ProjectEnvironmentRequest projectEnvironmentRequest) {
+        log.info("ProjectEnvironmentService-edit()-params: [ProjectEnvironment]={}",
+            projectEnvironmentRequest.toString());
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentMapper
-                .toEntity(projectEnvironmentDto);
+                .toEntity(projectEnvironmentRequest);
             Optional<ProjectEnvironment> projectEnvironmentOptional = projectEnvironmentRepository
                 .findById(projectEnvironment.getId());
             projectEnvironmentOptional.ifPresent(oldProjectEnvironment -> {
@@ -148,7 +151,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
-    public ProjectEnvironmentDto findById(String id) {
+    public ProjectEnvironmentResponse findById(String id) {
         try {
             Optional<ProjectEnvironment> projectEnvironmentOptional
                 = projectEnvironmentRepository.findById(id);

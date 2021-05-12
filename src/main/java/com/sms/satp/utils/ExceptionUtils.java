@@ -16,8 +16,8 @@
 
 package com.sms.satp.utils;
 
-import com.sms.satp.common.ApiTestPlatformException;
-import com.sms.satp.common.ErrorCode;
+import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.common.exception.ErrorCode;
 
 /**
  * 异常辅助工具类.

@@ -1,19 +1,20 @@
 package com.sms.satp.service;
 
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.ProjectEnvironmentDto;
+import com.sms.satp.dto.ProjectEnvironmentRequest;
+import com.sms.satp.dto.ProjectEnvironmentResponse;
 import java.util.List;
 import org.springframework.data.domain.Page;
 
 public interface ProjectEnvironmentService {
 
-    Page<ProjectEnvironmentDto> page(PageDto pageDto, String projectId);
+    Page<ProjectEnvironmentResponse> page(PageDto pageDto, String projectId);
 
-    void add(ProjectEnvironmentDto projectEnvironmentDto);
+    void add(ProjectEnvironmentRequest projectEnvironmentRequest);
 
-    void edit(ProjectEnvironmentDto projectEnvironmentDto);
+    void edit(ProjectEnvironmentRequest projectEnvironmentRequest);
 
-    ProjectEnvironmentDto findById(String id);
+    ProjectEnvironmentResponse findById(String id);
 
     List<Object> list(String projectId);
 

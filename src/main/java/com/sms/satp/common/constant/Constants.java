@@ -28,5 +28,6 @@ public class Constants {
     public static final String CASE_TEMPLATE_API_PATH = SDK_VERSION + "/case-template-api";
     public static final String CASE_TEMPLATE_CONN_PATH = SDK_VERSION + "/case-template-conn";
     public static final String API_PATH = SDK_VERSION + "/api";
+    public static final String PROJECT_IMPORT_SOURCE = SDK_VERSION + "/project/import/source";
 
 }

@@ -35,7 +35,7 @@ public class SceneCaseController {
     @PostMapping
     public Response add(@Valid @RequestBody AddSceneCaseRequest sceneCaseDto) {
         sceneCaseService.add(sceneCaseDto);
-        return Response.ok().build();
+        return Boolean.TRUE;
     }
 
     @DeleteMapping("/{ids}")
@@ -47,7 +47,7 @@ public class SceneCaseController {
     @PutMapping
     public Response edit(@Valid @RequestBody UpdateSceneCaseRequest sceneCaseDto) {
         sceneCaseService.edit(sceneCaseDto);
-        return Response.ok().build();
+        return Boolean.TRUE;
     }
 
     @GetMapping("/page/{projectId}")
