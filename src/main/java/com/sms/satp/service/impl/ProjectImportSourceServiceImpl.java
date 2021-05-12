@@ -2,12 +2,10 @@ package com.sms.satp.service.impl;
 
 import com.sms.satp.dto.request.ProjectImportSourceRequest;
 import com.sms.satp.dto.response.ProjectImportSourceResponse;
-import com.sms.satp.entity.project.ProjectImportSourceEntity;
 import com.sms.satp.mapper.ProjectImportSourceMapper;
 import com.sms.satp.repository.ProjectImportSourceRepository;
 import com.sms.satp.service.ProjectImportSourceService;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,18 +24,15 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
     @Override
     public Boolean create(ProjectImportSourceRequest projectImportSourceRequest) {
         this.projectImportSourceRepository
-            .insert(projectImportSourceMapper.toProjectImportSourceEntity(projectImportSourceRequest,
-                Optional.empty()));
+            .insert(projectImportSourceMapper.toProjectImportSourceEntity(projectImportSourceRequest));
         return true;
     }
 
     @Override
     public Boolean update(ProjectImportSourceRequest projectImportSourceRequest) {
-        Optional<ProjectImportSourceEntity> oldSourceEntity = this.projectImportSourceRepository
-            .findById(projectImportSourceRequest.getId());
+
         this.projectImportSourceRepository
-            .save(projectImportSourceMapper.toProjectImportSourceEntity(projectImportSourceRequest,
-                oldSourceEntity));
+            .save(projectImportSourceMapper.toProjectImportSourceEntity(projectImportSourceRequest));
         return true;
     }
 

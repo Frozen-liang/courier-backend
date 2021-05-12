@@ -18,11 +18,10 @@ import com.sms.satp.dto.request.ApiRequest;
 import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
-import com.sms.satp.entity.project.ProjectEntity;
 import com.sms.satp.mapper.ApiMapper;
 import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.DocumentReader;
-import com.sms.satp.parser.common.DocumentParserResult;
+import com.sms.satp.parser.common.DocumentDefinition;
 import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.ProjectEntityRepository;
@@ -80,13 +79,11 @@ public class ApiServiceImpl implements ApiService {
     @Override
     public boolean importDocument(ApiImportRequest apiImportRequest) {
         DocumentType documentType = DocumentType.getType(apiImportRequest.getDocumentType());
-        DocumentReader reader = documentType.getReader();
+        DocumentDefinition definition = getDocumentParserResult(apiImportRequest);
         ApiDocumentTransformer transformer = documentType.getTransformer();
-        String documentUrl = apiImportRequest.getDocumentUrl();
-        MultipartFile file = apiImportRequest.getFile();
-        DocumentParserResult content = getDocumentParserResult(reader, documentUrl, file);
-        ProjectEntity projectEntity = projectEntityRepository.insert(transformer.toProjectEntity(content));
-        List<ApiEntity> apiEntities = transformer.toApiEntities(content, projectEntity.getId());
+        List<ApiEntity> apiEntities = transformer.toApiEntities(definition);
+//        List<ApiEntity> oldApiEntities = apiRepository
+//            .findApiEntitiesByProjectId(apiImportRequest);
         List<ApiHistoryEntity> apiHistoryEntities = apiRepository.insert(apiEntities).stream()
             .map(apiEntity -> ApiHistoryEntity.builder().record(apiEntity).build()).collect(
                 Collectors.toList());

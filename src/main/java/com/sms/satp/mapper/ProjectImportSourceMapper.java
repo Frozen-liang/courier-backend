@@ -3,17 +3,15 @@ package com.sms.satp.mapper;
 import com.sms.satp.dto.request.ProjectImportSourceRequest;
 import com.sms.satp.dto.response.ProjectImportSourceResponse;
 import com.sms.satp.entity.project.ProjectImportSourceEntity;
-import java.util.Optional;
-import org.mapstruct.AfterMapping;
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS, unmappedTargetPolicy =
-    ReportingPolicy.IGNORE)
-public interface ProjectImportSourceMapper {
+    ReportingPolicy.IGNORE, builder = @Builder(disableBuilder = true))
+public interface ProjectImportSourceMapper  {
 
     @Mapping(target = "documentType", expression = "java(com.sms.satp.common.enums.DocumentType.getType(request"
         + ".getDocumentType()))")
@@ -23,8 +21,7 @@ public interface ProjectImportSourceMapper {
         + ".getApiPresetStatus()))")
     @Mapping(target = "apiChangeStatus", expression = "java(com.sms.satp.common.enums.ApiStatus.getType(request"
         + ".getApiChangeStatus()))")
-    ProjectImportSourceEntity toProjectImportSourceEntity(ProjectImportSourceRequest request,
-        Optional<ProjectImportSourceEntity> oldImportSource);
+    ProjectImportSourceEntity toProjectImportSourceEntity(ProjectImportSourceRequest request);
 
 
     @Mapping(target = "documentType", expression = "java(entity.getDocumentType().getCode())")
@@ -33,14 +30,5 @@ public interface ProjectImportSourceMapper {
     @Mapping(target = "apiChangeStatus", expression = "java(entity.getApiChangeStatus().getCode())")
     ProjectImportSourceResponse toProjectImportSourceResponse(ProjectImportSourceEntity entity);
 
-
-    @AfterMapping
-    default void after(@MappingTarget ProjectImportSourceEntity newSourceEntity,
-        Optional<ProjectImportSourceEntity> oldImportSource) {
-        oldImportSource.ifPresent(sourceEntity -> {
-            newSourceEntity.setCreateUserId(sourceEntity.getCreateUserId());
-            newSourceEntity.setCreateDateTime(sourceEntity.getCreateDateTime());
-        });
-    }
 
 }
