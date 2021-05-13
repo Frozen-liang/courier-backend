@@ -84,7 +84,7 @@ public class ApiServiceImpl implements ApiService {
 
         List<ApiEntity> oldApiEntities = apiRepository
             .findApiEntitiesByProjectId(apiImportRequest.getProjectId());
-        Collection<ApiEntity> subtract = CollectionUtils.subtract(apiEntities, oldApiEntities);
+        //Collection<ApiEntity> subtract = CollectionUtils.subtract(apiEntities, oldApiEntities);
 
         List<ApiHistoryEntity> apiHistoryEntities = apiRepository.insert(apiEntities).stream()
             .map(apiEntity -> ApiHistoryEntity.builder().record(apiEntity).build()).collect(
