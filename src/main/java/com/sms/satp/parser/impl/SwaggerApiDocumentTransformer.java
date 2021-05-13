@@ -19,7 +19,6 @@ import com.sms.satp.entity.api.common.ParamInfo;
 import com.sms.satp.entity.group.ApiGroupEntity;
 import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.common.DocumentDefinition;
-import com.sms.satp.utils.MD5Util;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -159,7 +158,7 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Open
         apiResponse.map(ApiResponse::getHeaders)
             .ifPresent(headers -> buildResponseHeaders(headers, apiEntityBuilder::responseHeaders));
         ApiEntity apiEntity = apiEntityBuilder.build();
-        apiEntity.setMd5(MD5Util.getMD5(apiEntity));
+        // apiEntity.setMd5(MD5Util.getMD5(apiEntity));
         return apiEntity;
 
     }
