@@ -1,8 +1,8 @@
 package com.sms.satp.repository.impl;
 
-import static com.sms.satp.common.constant.CommonFiled.ID;
-import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.REMOVE;
+import static com.sms.satp.common.field.CommonFiled.ID;
+import static com.sms.satp.common.field.CommonFiled.MODIFY_DATE_TIME;
+import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
 import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.repository.CommonDeleteRepository;
@@ -26,9 +26,9 @@ public class CommonDeleteRepositoryImpl implements CommonDeleteRepository {
 
     @Override
     public Boolean deleteById(String id, Class<?> entityClass) {
-        Query query = new Query(Criteria.where(ID).is(id));
-        Update update = Update.update(REMOVE, Boolean.TRUE);
-        update.set(MODIFY_DATE_TIME, LocalDateTime.now());
+        Query query = new Query(Criteria.where(ID.getFiled()).is(id));
+        Update update = Update.update(REMOVE.getFiled(), Boolean.TRUE);
+        update.set(MODIFY_DATE_TIME.getFiled(), LocalDateTime.now());
         UpdateResult updateResult = mongoTemplate.updateFirst(query, update, entityClass);
         if (updateResult.getModifiedCount() == MODIFY_COUNT) {
             return Boolean.TRUE;
@@ -38,9 +38,9 @@ public class CommonDeleteRepositoryImpl implements CommonDeleteRepository {
 
     @Override
     public Boolean deleteByIds(List<String> ids, Class<?> entityClass) {
-        Query query = new Query(Criteria.where(ID).in(ids));
-        Update update = Update.update(REMOVE, Boolean.TRUE);
-        update.set(MODIFY_DATE_TIME, LocalDateTime.now());
+        Query query = new Query(Criteria.where(ID.getFiled()).in(ids));
+        Update update = Update.update(REMOVE.getFiled(), Boolean.TRUE);
+        update.set(MODIFY_DATE_TIME.getFiled(), LocalDateTime.now());
         UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
         if (updateResult.getModifiedCount() > 0) {
             return Boolean.TRUE;

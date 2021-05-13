@@ -1,6 +1,7 @@
 package com.sms.satp.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.sms.satp.common.constant.TimePatternConstant;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -58,9 +59,9 @@ public class ApiResponse {
 
     private String createUser;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = TimePatternConstant.DEFAULT_PATTERN)
     private LocalDateTime createDateTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = TimePatternConstant.DEFAULT_PATTERN)
     private LocalDateTime modifyDateTime;
 }

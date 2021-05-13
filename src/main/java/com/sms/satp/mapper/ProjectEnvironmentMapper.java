@@ -1,5 +1,6 @@
 package com.sms.satp.mapper;
 
+import com.sms.satp.common.constant.TimePatternConstant;
 import com.sms.satp.dto.request.ProjectEnvironmentRequest;
 import com.sms.satp.dto.response.ProjectEnvironmentResponse;
 import com.sms.satp.entity.env.ProjectEnvironment;
@@ -14,8 +15,8 @@ import org.mapstruct.ReportingPolicy;
 public interface ProjectEnvironmentMapper {
 
 
-    @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
+    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
     ProjectEnvironmentResponse toDto(ProjectEnvironment projectEnvironment);
 
     List<ProjectEnvironmentResponse> toDtoList(List<ProjectEnvironment> projectEnvironments);

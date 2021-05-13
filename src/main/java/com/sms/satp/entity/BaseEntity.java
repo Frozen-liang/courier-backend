@@ -1,6 +1,7 @@
 package com.sms.satp.entity;
 
 import java.time.LocalDateTime;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -20,7 +21,8 @@ public class BaseEntity {
     @MongoId(FieldType.OBJECT_ID)
     @Indexed(unique = true)
     private String id;
-    private Boolean removed;
+    @Builder.Default
+    private Boolean removed = false;
     @CreatedBy
     private Long createUserId;
     @LastModifiedBy

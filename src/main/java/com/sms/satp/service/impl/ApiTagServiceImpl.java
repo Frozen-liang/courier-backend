@@ -1,12 +1,12 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_TAG_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_TAG_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TAG_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_LIST_ERROR;
+import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 
 import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
@@ -61,12 +61,12 @@ public class ApiTagServiceImpl implements ApiTagService {
             ApiTag apiTag = ApiTag.builder().projectId(projectId).tagName(tagName)
                 .tagType(Objects.nonNull(tagType) ? ApiTagType.getType(tagType) : null).build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(PROJECT_ID, ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher(PROJECT_ID.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher(TAG_TYPE, ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING)
                 .withIgnoreNullValues();
             Example<ApiTag> example = Example.of(apiTag, exampleMatcher);
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
             List<ApiTag> list = apiTagRepository.findAll(example, sort);
             return apiTagMapper.toDtoList(list);
         } catch (Exception e) {

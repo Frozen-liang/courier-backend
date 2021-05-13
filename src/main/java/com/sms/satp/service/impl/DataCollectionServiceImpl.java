@@ -1,21 +1,20 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
-import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_DATA_COLLECTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
+import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
 import com.sms.satp.mapper.DataCollectionMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedDataCollectionRepository;
 import com.sms.satp.repository.DataCollectionRepository;
 import com.sms.satp.service.DataCollectionService;
@@ -60,12 +59,12 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     @Override
     public List<DataCollectionResponse> list(String projectId, String collectionName) {
         try {
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
             DataCollection dataCollection = DataCollection.builder().projectId(projectId).collectionName(collectionName)
                 .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(PROJECT_ID, GenericPropertyMatchers.exact())
-                .withMatcher(REMOVE, GenericPropertyMatchers.exact())
+                .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
+                .withMatcher(REMOVE.getFiled(), GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING);
             Example<DataCollection> example = Example.of(dataCollection, exampleMatcher);
             return dataCollectionMapper.toDtoList(dataCollectionRepository.findAll(example, sort));

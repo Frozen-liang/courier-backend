@@ -1,7 +1,6 @@
 package com.sms.satp.repository.impl;
 
-import static com.sms.satp.common.constant.CommonFiled.ID;
-
+import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.entity.datacollection.DataCollection;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedDataCollectionRepository;
@@ -29,7 +28,7 @@ public class CustomizedDataCollectionRepositoryImpl implements CustomizedDataCol
 
     @Override
     public List<String> getParamListById(String id) {
-        Query query = new Query(Criteria.where(ID).is(id));
+        Query query = new Query(Criteria.where(CommonFiled.ID.getFiled()).is(id));
         query.fields().include(PARAM_LIST);
         DataCollection dataCollection = mongoTemplate.findOne(query, DataCollection.class);
         if (Objects.nonNull(dataCollection)) {

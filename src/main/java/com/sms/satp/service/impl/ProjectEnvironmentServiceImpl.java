@@ -1,14 +1,14 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
-import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
+import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.PageDto;
@@ -77,12 +77,12 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     @Override
     public List<Object> list(String projectId) {
         try {
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
             ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().projectId(projectId).build();
             List<Object> result = new ArrayList<>();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(PROJECT_ID, GenericPropertyMatchers.exact())
-                .withMatcher(REMOVE, GenericPropertyMatchers.exact())
+                .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
+                .withMatcher(REMOVE.getFiled(), GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
             Example<ProjectEnvironment> example = Example.of(projectEnvironment, exampleMatcher);
             List<GlobalEnvironmentResponse> globalEnvironments = globalEnvironmentService.list();

@@ -1,12 +1,12 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_GLOBAL_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_GLOBAL_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_GLOBAL_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_LIST_ERROR;
+import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.GlobalFunctionRequest;
@@ -60,11 +60,11 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
             GlobalFunction globalFunction = GlobalFunction.builder().functionKey(functionKey)
                 .functionName(functionName).build();
             ExampleMatcher matcher = ExampleMatcher.matching()
-                .withMatcher(REMOVE, ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher(REMOVE.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher(FUNCTION_KEY, ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
             Example<GlobalFunction> example = Example.of(globalFunction, matcher);
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
             return globalFunctionMapper.toDtoList(globalFunctionRepository.findAll(example, sort));
         } catch (Exception e) {
             log.error("Failed to get the GlobalFunction list!", e);

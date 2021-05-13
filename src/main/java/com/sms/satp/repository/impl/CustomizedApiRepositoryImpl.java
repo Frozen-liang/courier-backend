@@ -1,14 +1,20 @@
 package com.sms.satp.repository.impl;
 
-import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
-import static com.sms.satp.common.constant.CommonFiled.REMOVE;
+import static com.sms.satp.common.field.ApiFiled.API_PROTOCOL;
+import static com.sms.satp.common.field.ApiFiled.API_REQUEST_PARAM_TYPE;
+import static com.sms.satp.common.field.ApiFiled.API_STATUS;
+import static com.sms.satp.common.field.ApiFiled.GROUP_ID;
+import static com.sms.satp.common.field.ApiFiled.REQUEST_METHOD;
+import static com.sms.satp.common.field.ApiFiled.TAG_ID;
+import static com.sms.satp.common.field.CommonFiled.ID;
+import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
 import com.sms.satp.dto.request.ApiPageRequest;
 import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
-import com.sms.satp.service.condition.ApiFiled;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -44,8 +50,15 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         Query query = new Query();
 
         LookupOperation apiTagLookupOperation =
-            LookupOperation.newLookup().from("ApiTag").localField("tagId").foreignField("_id").as("apiTag");
+            LookupOperation.newLookup().from("ApiTag").localField(TAG_ID.getFiled())
+                .foreignField(ID.getFiled())
+                .as("apiTag");
+        LookupOperation apiGroupLookupOperation =
+            LookupOperation.newLookup().from("ApiGroup").localField(GROUP_ID.getFiled())
+                .foreignField(ID.getFiled())
+                .as("ApiGroup");
         aggregationOperations.add(apiTagLookupOperation);
+        aggregationOperations.add(apiGroupLookupOperation);
 
         buildCriteria(apiPageRequest, query, aggregationOperations);
 
@@ -57,7 +70,7 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         aggregationOperations.add(Aggregation.limit(apiPageRequest.getPageSize()));
 
         ProjectionOperation project = Aggregation.project(ApiResponse.class);
-        ProjectionOperation projectionOperation = project.andInclude("apiTag.tagName");
+        ProjectionOperation projectionOperation = project.andInclude("apiTag.tagName", "ApiGroup.groupName");
         aggregationOperations.add(projectionOperation);
 
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
@@ -83,42 +96,42 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
 
     private void buildCriteria(ApiPageRequest apiPageRequest, Query query,
         List<AggregationOperation> aggregationOperations) {
-        Criteria projectIdCriteria = Criteria.where(PROJECT_ID).is(apiPageRequest.getProjectId());
-        Criteria removedCriteria = Criteria.where(REMOVE).is(Boolean.FALSE);
+        Criteria projectIdCriteria = Criteria.where(PROJECT_ID.getFiled()).is(apiPageRequest.getProjectId());
+        Criteria removedCriteria = Criteria.where(REMOVE.getFiled()).is(Boolean.FALSE);
         query.addCriteria(projectIdCriteria);
         query.addCriteria(removedCriteria);
         aggregationOperations.add(Aggregation.match(projectIdCriteria));
         aggregationOperations.add(Aggregation.match(removedCriteria));
 
         if (Objects.nonNull(apiPageRequest.getApiProtocol())) {
-            Criteria criteria = Criteria.where(ApiFiled.API_PROTOCOL.getFiled()).in(apiPageRequest.getApiProtocol());
+            Criteria criteria = Criteria.where(API_PROTOCOL.getFiled()).in(apiPageRequest.getApiProtocol());
             aggregationOperations.add(Aggregation.match(criteria));
             query.addCriteria(criteria);
         }
         if (Objects.nonNull(apiPageRequest.getApiRequestParamType())) {
-            Criteria criteria = Criteria.where(ApiFiled.API_REQUEST_PARAM_TYPE.getFiled())
+            Criteria criteria = Criteria.where(API_REQUEST_PARAM_TYPE.getFiled())
                 .in(apiPageRequest.getApiRequestParamType());
             aggregationOperations.add(Aggregation.match(criteria));
             query.addCriteria(criteria);
         }
         if (Objects.nonNull(apiPageRequest.getApiStatus())) {
-            Criteria criteria = Criteria.where(ApiFiled.API_STATUS.getFiled()).in(apiPageRequest.getApiStatus());
+            Criteria criteria = Criteria.where(API_STATUS.getFiled()).in(apiPageRequest.getApiStatus());
             aggregationOperations.add(Aggregation.match(criteria));
             query.addCriteria(criteria);
         }
         if (Objects.nonNull(apiPageRequest.getGroupId())) {
-            Criteria criteria = Criteria.where(ApiFiled.GROUP_ID.getFiled()).in(apiPageRequest.getGroupId());
+            Criteria criteria = Criteria.where(GROUP_ID.getFiled()).in(apiPageRequest.getGroupId());
             aggregationOperations.add(Aggregation.match(criteria));
             query.addCriteria(criteria);
         }
         if (Objects.nonNull(apiPageRequest.getRequestMethod())) {
-            Criteria criteria = Criteria.where(ApiFiled.REQUEST_METHOD.getFiled())
+            Criteria criteria = Criteria.where(REQUEST_METHOD.getFiled())
                 .in(apiPageRequest.getRequestMethod());
             aggregationOperations.add(Aggregation.match(criteria));
             query.addCriteria(criteria);
         }
         if (Objects.nonNull(apiPageRequest.getTagId())) {
-            Criteria criteria = Criteria.where(ApiFiled.TAG_ID.getFiled()).in(apiPageRequest.getTagId());
+            Criteria criteria = Criteria.where(TAG_ID.getFiled()).in(apiPageRequest.getTagId());
             aggregationOperations.add(Aggregation.match(criteria));
             query.addCriteria(criteria);
         }
