@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Document("ApiGroup")
-public class ApiGroup extends BaseEntity {
+public class ApiGroupEntity extends BaseEntity {
 
     private String projectId;
     private String name;

@@ -5,32 +5,26 @@ import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.api.common.ParamInfo;
-import java.time.LocalDateTime;
 import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 
-@Builder
+
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @Document(collection = "Api")
-public class ApiEntity {
+public class ApiEntity extends BaseEntity {
 
-    @MongoId(FieldType.OBJECT_ID)
-    @Indexed(unique = true)
-    private String id;
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
@@ -64,8 +58,6 @@ public class ApiEntity {
 
     private ApiStatus apiStatus;
 
-    private boolean removed;
-
     private String preInject;
 
     private String postInject;
@@ -75,13 +67,9 @@ public class ApiEntity {
     private ApiJsonType apiResponseJsonType;
     private ApiJsonType apiRequestJsonType;
 
-    @CreatedBy
-    private Long createUserId;
 
-    @CreatedDate
-    private LocalDateTime createDateTime;
-    @LastModifiedDate
-    private LocalDateTime modifyDateTime;
+    public static void main(String[] args) {
 
+    }
 
 }
