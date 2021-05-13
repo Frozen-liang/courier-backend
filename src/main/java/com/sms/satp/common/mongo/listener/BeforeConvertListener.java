@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.event.BeforeConvertEvent;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,13 +20,12 @@ public class BeforeConvertListener {
     }
 
     @EventListener
-    public void listener(BeforeConvertEvent<Object> beforeSaveEvent) {
+    public void listener(@NonNull BeforeConvertEvent<Object> beforeSaveEvent) {
         if (beforeSaveEvent.getSource() instanceof BaseEntity) {
             BaseEntity baseEntity = (BaseEntity) beforeSaveEvent.getSource();
-            String collectionName = Objects.requireNonNull(beforeSaveEvent.getCollectionName());
             Optional.ofNullable(baseEntity.getId()).ifPresent(id -> {
                 BaseEntity oldBaseEntity = mongoTemplate
-                    .findById(id, BaseEntity.class, collectionName);
+                    .findById(id, BaseEntity.class, Objects.requireNonNull(beforeSaveEvent.getCollectionName()));
                 Optional.ofNullable(oldBaseEntity).ifPresent(entity -> {
                     baseEntity.setCreateUserId(entity.getCreateUserId());
                     baseEntity.setCreateDateTime(entity.getCreateDateTime());
