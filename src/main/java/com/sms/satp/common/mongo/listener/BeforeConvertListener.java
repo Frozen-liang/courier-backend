@@ -24,8 +24,10 @@ public class BeforeConvertListener {
         Optional.ofNullable(baseEntity.getId()).ifPresent(id -> {
             BaseEntity oldBaseEntity = mongoTemplate
                 .findById(id, BaseEntity.class, Objects.requireNonNull(beforeSaveEvent.getCollectionName()));
-            baseEntity.setCreateUserId(oldBaseEntity.getCreateUserId());
-            baseEntity.setCreateDateTime(oldBaseEntity.getCreateDateTime());
+            Optional.ofNullable(oldBaseEntity).ifPresent(entity -> {
+                baseEntity.setCreateUserId(entity.getCreateUserId());
+                baseEntity.setCreateDateTime(entity.getCreateDateTime());
+            });
         });
     }
 }

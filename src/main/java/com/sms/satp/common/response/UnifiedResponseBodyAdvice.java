@@ -23,7 +23,7 @@ public class UnifiedResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     }
 
     @Override
-    @Nullable
+    @NonNull
     public Object beforeBodyWrite(Object body, @Nullable MethodParameter returnType,
         @Nullable MediaType selectedContentType,
         @Nullable Class<? extends HttpMessageConverter<?>> selectedConverterType, @Nullable ServerHttpRequest request,

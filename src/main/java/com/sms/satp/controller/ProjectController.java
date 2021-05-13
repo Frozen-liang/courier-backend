@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(Constants.PROJECT_PATH)
 public class ProjectController {
 
-    private final ProjectService projectService;
+    /*private final ProjectService projectService;
 
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
-    }
+    }*/
 
 }
