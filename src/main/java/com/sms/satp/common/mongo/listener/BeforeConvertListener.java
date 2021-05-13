@@ -1,6 +1,7 @@
 package com.sms.satp.common.mongo.listener;
 
 import com.sms.satp.entity.BaseEntity;
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.context.event.EventListener;
@@ -20,12 +21,14 @@ public class BeforeConvertListener {
     }
 
     @EventListener
-    public void listener(@NonNull BeforeConvertEvent<Object> beforeSaveEvent) {
+    @SuppressWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+    public void listener(@NonNull BeforeConvertEvent<BaseEntity> beforeSaveEvent) {
         if (beforeSaveEvent.getSource() instanceof BaseEntity) {
-            BaseEntity baseEntity = (BaseEntity) beforeSaveEvent.getSource();
+            BaseEntity baseEntity = beforeSaveEvent.getSource();
+            String collectionName = Objects.requireNonNull(beforeSaveEvent.getCollectionName());
             Optional.ofNullable(baseEntity.getId()).ifPresent(id -> {
                 BaseEntity oldBaseEntity = mongoTemplate
-                    .findById(id, BaseEntity.class, Objects.requireNonNull(beforeSaveEvent.getCollectionName()));
+                    .findById(id, BaseEntity.class, collectionName);
                 Optional.ofNullable(oldBaseEntity).ifPresent(entity -> {
                     baseEntity.setCreateUserId(entity.getCreateUserId());
                     baseEntity.setCreateDateTime(entity.getCreateDateTime());

@@ -1,5 +1,6 @@
 package com.sms.satp.common.response;
 
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import java.util.Objects;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 public class UnifiedResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
+    @SuppressWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public boolean supports(@NonNull MethodParameter returnType,
         @NonNull Class<? extends HttpMessageConverter<?>> converterType) {
         return !returnType.hasMethodAnnotation(IgnoreWrap.class) && !Objects.requireNonNull(returnType.getMethod())
