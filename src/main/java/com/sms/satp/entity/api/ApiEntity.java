@@ -7,6 +7,7 @@ import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.api.common.ParamInfo;
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,7 +22,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
 
-
+@SuppressWarnings("EQ_OVERRIDING_EQUALS_NOT_SYMMETRIC")
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
@@ -64,7 +65,6 @@ public class ApiEntity extends BaseEntity {
     private List<ParamInfo> restfulParams;
     @Include
     private List<ParamInfo> requestParams;
-    @Include
     private List<ParamInfo> responseParams;
     @JsonIgnore
     private ApiStatus apiStatus;
