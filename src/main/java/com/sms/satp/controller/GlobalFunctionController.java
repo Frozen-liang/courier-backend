@@ -48,7 +48,7 @@ public class GlobalFunctionController {
     }
 
     @DeleteMapping("/{ids}")
-    public Boolean delete(@PathVariable String[] ids) {
+    public Boolean delete(@PathVariable List<String> ids) {
         return globalFunctionService.delete(ids);
     }
 }

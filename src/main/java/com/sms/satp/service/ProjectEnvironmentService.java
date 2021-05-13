@@ -18,5 +18,5 @@ public interface ProjectEnvironmentService {
 
     List<Object> list(String projectId);
 
-    Boolean delete(String[] ids);
+    Boolean delete(List<String> ids);
 }

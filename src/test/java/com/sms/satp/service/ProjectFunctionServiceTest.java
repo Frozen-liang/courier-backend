@@ -14,24 +14,22 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ProjectFunctionRequest;
 import com.sms.satp.dto.response.ProjectFunctionResponse;
 import com.sms.satp.entity.function.ProjectFunction;
 import com.sms.satp.mapper.ProjectFunctionMapper;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.ProjectFunctionRepository;
 import com.sms.satp.service.impl.ProjectFunctionServiceImpl;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.UpdateDefinition;
 
 @DisplayName("Tests for ProjectFunctionService")
 class ProjectFunctionServiceTest {
@@ -39,9 +37,9 @@ class ProjectFunctionServiceTest {
     private final ProjectFunctionRepository projectFunctionRepository = mock(ProjectFunctionRepository.class);
     private final ProjectFunctionMapper projectFunctionMapper = mock(ProjectFunctionMapper.class);
     private final GlobalFunctionService globalFunctionService = mock(GlobalFunctionService.class);
-    private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
+    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
     private final ProjectFunctionService projectFunctionService = new ProjectFunctionServiceImpl(
-        projectFunctionRepository, projectFunctionMapper, globalFunctionService, mongoTemplate);
+        projectFunctionRepository, projectFunctionMapper, globalFunctionService, commonDeleteRepository);
     private final ProjectFunction projectFunction = ProjectFunction.builder().id(ID).build();
     private final ProjectFunctionResponse projectFunctionResponse = ProjectFunctionResponse
         .builder().id(ID).build();
@@ -49,6 +47,7 @@ class ProjectFunctionServiceTest {
         .builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final String NOT_EXIST_ID = ObjectId.get().toString();
+    private static final List<String> ID_LIST = Collections.singletonList(ID);
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String PROJECT_ID = "10";
     private static final String FUNCTION_NAME = "functionName";
@@ -143,17 +142,16 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectFunction service")
     public void delete_test() {
-        when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
-            UpdateResult.acknowledged(1, 1L, null));
-        assertThat(projectFunctionService.delete(new String[]{ID})).isTrue();
+        when(commonDeleteRepository.deleteByIds(ID_LIST, ProjectFunction.class)).thenReturn(Boolean.TRUE);
+        assertThat(projectFunctionService.delete(ID_LIST)).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while delete ProjectFunction")
     public void delete_exception_test() {
-        doThrow(new RuntimeException()).when(mongoTemplate)
-            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
-        assertThatThrownBy(() -> projectFunctionService.delete(new String[]{ID}))
+        doThrow(new RuntimeException()).when(commonDeleteRepository)
+            .deleteByIds(ID_LIST, ProjectFunction.class);
+        assertThatThrownBy(() -> projectFunctionService.delete(Collections.singletonList(ID)))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_PROJECT_FUNCTION_BY_ID_ERROR.getCode());
     }

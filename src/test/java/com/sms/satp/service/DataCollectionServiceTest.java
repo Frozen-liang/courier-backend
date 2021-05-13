@@ -15,34 +15,33 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
 import com.sms.satp.mapper.DataCollectionMapper;
+import com.sms.satp.repository.CustomizedDataCollectionRepository;
 import com.sms.satp.repository.DataCollectionRepository;
 import com.sms.satp.service.impl.DataCollectionServiceImpl;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.UpdateDefinition;
 
 @DisplayName("Tests for DataCollectionService")
 class DataCollectionServiceTest {
 
     private final DataCollectionRepository dataCollectionRepository = mock(DataCollectionRepository.class);
     private final DataCollectionMapper dataCollectionMapper = mock(DataCollectionMapper.class);
-    private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
+    private final CustomizedDataCollectionRepository customizedDataCollectionRepository = mock(
+        CustomizedDataCollectionRepository.class);
     private final DataCollectionService dataCollectionService = new DataCollectionServiceImpl(
-        dataCollectionRepository, dataCollectionMapper, mongoTemplate);
+        dataCollectionRepository, dataCollectionMapper, customizedDataCollectionRepository);
     private final DataCollection dataCollection = DataCollection.builder().id(ID).build();
     private final DataCollectionResponse dataCollectionResponse = DataCollectionResponse.builder().id(ID).build();
     private final DataCollectionRequest dataCollectionRequest = DataCollectionRequest.builder().id(ID).build();
@@ -141,17 +140,18 @@ class DataCollectionServiceTest {
     @Test
     @DisplayName("Test the delete method in the DataCollection service")
     public void delete_test() {
-        when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
-            UpdateResult.acknowledged(1, 1L, null));
-        assertThat(dataCollectionService.delete(new String[]{ID})).isTrue();
+        List<String> ids = Collections.singletonList(ID);
+        when(customizedDataCollectionRepository.deleteByIds(ids)).thenReturn(Boolean.TRUE);
+        assertThat(dataCollectionService.delete(Collections.singletonList(ID))).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while delete DataCollection")
     public void delete_exception_test() {
-        doThrow(new RuntimeException()).when(mongoTemplate)
-            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
-        assertThatThrownBy(() -> dataCollectionService.delete(new String[]{ID}))
+        List<String> ids = Collections.singletonList(ID);
+        doThrow(new RuntimeException()).when(customizedDataCollectionRepository)
+            .deleteByIds(ids);
+        assertThatThrownBy(() -> dataCollectionService.delete(ids))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_DATA_COLLECTION_BY_ID_ERROR.getCode());
     }
@@ -160,7 +160,7 @@ class DataCollectionServiceTest {
     @DisplayName("Test the getParamList method in the DataCollection service")
     public void getParamList_test() {
         List<String> paramList = Arrays.asList("active", "city", "code");
-        when(mongoTemplate.findOne(any(), any())).thenReturn(DataCollection.builder().paramList(paramList).build());
+        when(customizedDataCollectionRepository.getParamListById(any())).thenReturn(paramList);
         List<String> result = dataCollectionService.getParamListById(ID);
         assertThat(result).hasSize(paramList.size());
     }
@@ -168,7 +168,7 @@ class DataCollectionServiceTest {
     @Test
     @DisplayName("An exception occurred while getting DataCollectionParamList")
     public void getParamList_exception_test() {
-        doThrow(new RuntimeException()).when(mongoTemplate).findOne(any(), any());
+        doThrow(new RuntimeException()).when(customizedDataCollectionRepository).getParamListById(any());
         assertThatThrownBy(() -> dataCollectionService.getParamListById(ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR.getCode());

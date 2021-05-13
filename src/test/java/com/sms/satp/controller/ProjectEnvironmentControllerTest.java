@@ -141,7 +141,7 @@ class ProjectEnvironmentControllerTest {
     @Test
     @DisplayName("Delete the ProjectEnvironment by id")
     void deleteProjectEnvironmentDto() throws Exception {
-        when(projectEnvironmentService.delete(new String[]{ID})).thenReturn(Boolean.TRUE);
+        when(projectEnvironmentService.delete(Collections.singletonList(ID))).thenReturn(Boolean.TRUE);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
             .delete(Constants.PROJECT_ENVIRONMENT_PATH + "/" + ID);
         ResultActions perform = mockMvc.perform(request);

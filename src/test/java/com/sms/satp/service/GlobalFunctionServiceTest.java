@@ -14,38 +14,37 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.GlobalFunctionRequest;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
 import com.sms.satp.entity.function.GlobalFunction;
 import com.sms.satp.mapper.GlobalFunctionMapper;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.GlobalFunctionRepository;
 import com.sms.satp.service.impl.GlobalFunctionServiceImpl;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.UpdateDefinition;
 
 @DisplayName("Tests for GlobalFunctionService")
 class GlobalFunctionServiceTest {
 
     private final GlobalFunctionRepository globalFunctionRepository = mock(GlobalFunctionRepository.class);
     private final GlobalFunctionMapper globalFunctionMapper = mock(GlobalFunctionMapper.class);
-    private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
+    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
     private final GlobalFunctionService globalFunctionService = new GlobalFunctionServiceImpl(
         globalFunctionRepository,
-        globalFunctionMapper, mongoTemplate);
+        globalFunctionMapper, commonDeleteRepository);
     private final GlobalFunction globalFunction = GlobalFunction.builder().id(ID).build();
     private final GlobalFunctionResponse globalFunctionResponse = GlobalFunctionResponse.builder().id(ID).build();
     private final GlobalFunctionRequest globalFunctionRequest = GlobalFunctionRequest.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
+    private static final List<String> ID_LIST = Collections.singletonList(ID);;
     private static final String NOT_EXIST_ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String FUNCTION_NAME = "functionName";
@@ -141,17 +140,16 @@ class GlobalFunctionServiceTest {
     @Test
     @DisplayName("Test the delete method in the GlobalFunction service")
     public void delete_test() {
-        when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
-            UpdateResult.acknowledged(1, 1L, null));
-        assertThat(globalFunctionService.delete(new String[]{ID})).isTrue();
+        when(commonDeleteRepository.deleteByIds(ID_LIST, GlobalFunction.class)).thenReturn(Boolean.TRUE);
+        assertThat(globalFunctionService.delete(Collections.singletonList(ID))).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while delete GlobalFunction")
     public void delete_exception_test() {
-        doThrow(new RuntimeException()).when(mongoTemplate)
-            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
-        assertThatThrownBy(() -> globalFunctionService.delete(new String[]{ID}))
+        doThrow(new RuntimeException()).when(commonDeleteRepository)
+            .deleteByIds(ID_LIST, GlobalFunction.class);
+        assertThatThrownBy(() -> globalFunctionService.delete(ID_LIST))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_GLOBAL_FUNCTION_BY_ID_ERROR.getCode());
     }

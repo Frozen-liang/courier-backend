@@ -4,6 +4,7 @@ import com.sms.satp.dto.request.ApiImportRequest;
 import com.sms.satp.dto.request.ApiPageRequest;
 import com.sms.satp.dto.request.ApiRequest;
 import com.sms.satp.dto.response.ApiResponse;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,6 @@ public interface ApiService {
 
     Boolean edit(ApiRequest apiRequestDto);
 
-    Boolean delete(String[] ids);
+    Boolean delete(List<String> ids);
 
 }

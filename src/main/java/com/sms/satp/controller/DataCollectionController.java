@@ -54,7 +54,7 @@ public class DataCollectionController {
     }
 
     @DeleteMapping("/{ids}")
-    public Boolean delete(@PathVariable String[] ids) {
+    public Boolean delete(@PathVariable List<String> ids) {
         return dataCollectionService.delete(ids);
     }
 

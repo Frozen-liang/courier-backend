@@ -1,8 +1,6 @@
 package com.sms.satp.service.impl;
 
 import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.ID;
-import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
 import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_GLOBAL_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_GLOBAL_FUNCTION_BY_ID_ERROR;
@@ -10,16 +8,14 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_GLOBAL_FUNCTION_ERROR
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_LIST_ERROR;
 
-import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.GlobalFunctionRequest;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
 import com.sms.satp.entity.function.GlobalFunction;
 import com.sms.satp.mapper.GlobalFunctionMapper;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.GlobalFunctionRepository;
 import com.sms.satp.service.GlobalFunctionService;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +24,6 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -40,14 +32,15 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
 
     private final GlobalFunctionRepository globalFunctionRepository;
     private final GlobalFunctionMapper globalFunctionMapper;
-    private final MongoTemplate mongoTemplate;
+    private final CommonDeleteRepository commonDeleteRepository;
     private static final String FUNCTION_KEY = "functionKey";
 
     public GlobalFunctionServiceImpl(GlobalFunctionRepository globalFunctionRepository,
-        GlobalFunctionMapper globalFunctionMapper, MongoTemplate mongoTemplate) {
+        GlobalFunctionMapper globalFunctionMapper,
+        CommonDeleteRepository commonDeleteRepository) {
         this.globalFunctionRepository = globalFunctionRepository;
         this.globalFunctionMapper = globalFunctionMapper;
-        this.mongoTemplate = mongoTemplate;
+        this.commonDeleteRepository = commonDeleteRepository;
     }
 
     @Override
@@ -102,11 +95,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
             if (optional.isEmpty()) {
                 return Boolean.FALSE;
             }
-            optional.ifPresent((oldGlobalFunction) -> {
-                globalFunction.setCreateDateTime(oldGlobalFunction.getCreateDateTime());
-                globalFunction.setCreateUserId(oldGlobalFunction.getCreateUserId());
-                globalFunctionRepository.save(globalFunction);
-            });
+            globalFunctionRepository.save(globalFunction);
         } catch (Exception e) {
             log.error("Failed to add the GlobalFunction!", e);
             throw new ApiTestPlatformException(EDIT_GLOBAL_FUNCTION_ERROR);
@@ -115,20 +104,13 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     }
 
     @Override
-    public Boolean delete(String[] ids) {
+    public Boolean delete(List<String> ids) {
         try {
-            Query query = new Query(Criteria.where(ID).in(Arrays.asList(ids)));
-            Update update = Update.update(REMOVE, Boolean.TRUE);
-            update.set(MODIFY_DATE_TIME, LocalDateTime.now());
-            UpdateResult updateResult = mongoTemplate.updateMulti(query, update, GlobalFunction.class);
-            if (updateResult.getModifiedCount() > 0) {
-                return Boolean.TRUE;
-            }
+            return commonDeleteRepository.deleteByIds(ids, GlobalFunction.class);
         } catch (Exception e) {
             log.error("Failed to delete the GlobalFunction!", e);
             throw new ApiTestPlatformException(DELETE_GLOBAL_FUNCTION_BY_ID_ERROR);
         }
-        return Boolean.FALSE;
     }
 
 }

@@ -9,6 +9,7 @@ import com.sms.satp.dto.request.ApiPageRequest;
 import com.sms.satp.dto.request.ApiRequest;
 import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.service.ApiService;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -56,7 +57,7 @@ public class ApiController {
     }
 
     @DeleteMapping("{ids}")
-    public Boolean delete(@PathVariable("ids") String[] ids) {
+    public Boolean delete(@PathVariable("ids") List<String> ids) {
         return apiService.delete(ids);
     }
 

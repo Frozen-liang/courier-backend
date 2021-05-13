@@ -17,7 +17,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.response.GlobalEnvironmentResponse;
 import com.sms.satp.dto.request.ProjectEnvironmentRequest;
@@ -25,6 +24,7 @@ import com.sms.satp.dto.response.ProjectEnvironmentResponse;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
 import com.sms.satp.service.impl.ProjectEnvironmentServiceImpl;
 import java.util.ArrayList;
@@ -42,8 +42,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.UpdateDefinition;
 
 @DisplayName("Test cases for ProjectEnvironmentService")
 class ProjectEnvironmentServiceTest {
@@ -51,14 +49,10 @@ class ProjectEnvironmentServiceTest {
     private ProjectEnvironmentRepository projectEnvironmentRepository = mock(ProjectEnvironmentRepository.class);
     private GlobalEnvironmentService globalEnvironmentService = mock(GlobalEnvironmentService.class);
     private ProjectEnvironmentMapper projectEnvironmentMapper = mock(ProjectEnvironmentMapper.class);
-    private MongoTemplate mongoTemplate = mock(MongoTemplate.class);
+    private CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
     private ProjectEnvironmentService projectEnvironmentService =
         new ProjectEnvironmentServiceImpl(projectEnvironmentRepository, globalEnvironmentService,
-            mongoTemplate, projectEnvironmentMapper);
-
-    private final ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().id(ID).build();
-    private final ProjectEnvironmentResponse projectEnvironmentResponse = ProjectEnvironmentResponse
-        .builder().id(ID).build();
+            commonDeleteRepository, projectEnvironmentMapper);
     private final ProjectEnvironmentRequest projectEnvironmentRequest = ProjectEnvironmentRequest
         .builder().id(ID).build();
     private final static int TOTAL_ELEMENTS = 60;
@@ -69,6 +63,7 @@ class ProjectEnvironmentServiceTest {
     private static final int FRONT_FIRST_NUMBER = 1;
     private final static String ID = "607cebb2fbe52328bf14a2a2";
     private final static String NOT_EXIST_ID = "607cebb223552328bf14a2a2";
+    private static final List<String> ID_LIST = Collections.singletonList(ID);
     private final static String PROJECT_ID = "25";
     private final static String EVN_NAME = "evnName";
 
@@ -170,9 +165,8 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectEnvironment service")
     void delete_test() {
-        when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
-            UpdateResult.acknowledged(1, 1L, null));
-        assertThat(projectEnvironmentService.delete(new String[]{ID})).isTrue();
+        when(commonDeleteRepository.deleteByIds(ID_LIST, ProjectEnvironment.class)).thenReturn(Boolean.TRUE);
+        assertThat(projectEnvironmentService.delete(ID_LIST)).isTrue();
     }
 
     @Test
@@ -223,9 +217,9 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("An exception occurred while delete ProjectEnvironment")
     void delete_exception_test() {
-        doThrow(new RuntimeException()).when(mongoTemplate)
-            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
-        assertThatThrownBy(() -> projectEnvironmentService.delete(new String[]{ID}))
+        doThrow(new RuntimeException()).when(commonDeleteRepository)
+            .deleteByIds(ID_LIST, ProjectEnvironment.class);
+        assertThatThrownBy(() -> projectEnvironmentService.delete(ID_LIST))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR.getCode());
     }

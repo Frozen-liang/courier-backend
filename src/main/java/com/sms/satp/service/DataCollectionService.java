@@ -14,7 +14,7 @@ public interface DataCollectionService {
 
     Boolean edit(DataCollectionRequest dataCollectionRequest);
 
-    Boolean delete(String[] ids);
+    Boolean delete(List<String> ids);
 
     List<String> getParamListById(String id);
 }

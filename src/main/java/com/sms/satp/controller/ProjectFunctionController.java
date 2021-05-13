@@ -49,7 +49,7 @@ public class ProjectFunctionController {
     }
 
     @DeleteMapping("/{ids}")
-    public Boolean delete(@PathVariable String[] ids) {
+    public Boolean delete(@PathVariable List<String> ids) {
         return projectFunctionService.delete(ids);
     }
 }

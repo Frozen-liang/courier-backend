@@ -49,7 +49,7 @@ public class GlobalEnvironmentController {
     }
 
     @DeleteMapping("/{ids}")
-    public Boolean delete(@PathVariable("ids") String[] ids) {
+    public Boolean delete(@PathVariable("ids") List<String> ids) {
         return globalEnvironmentService.delete(ids);
     }
 

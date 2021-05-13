@@ -14,35 +14,32 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.mongodb.client.result.DeleteResult;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.dto.request.ApiTagRequest;
 import com.sms.satp.dto.response.ApiTagResponse;
 import com.sms.satp.entity.tag.ApiTag;
 import com.sms.satp.mapper.ApiTagMapper;
 import com.sms.satp.repository.ApiTagRepository;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.service.impl.ApiTagServiceImpl;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
 
 @DisplayName("Tests for ApiTagService")
 class ApiTagServiceTest {
 
     private final ApiTagRepository apiTagRepository = mock(ApiTagRepository.class);
     private final ApiTagMapper apiTagMapper = mock(ApiTagMapper.class);
-    private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
+    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
     private final ApiTagService apiTagService = new ApiTagServiceImpl(
         apiTagRepository,
-        apiTagMapper, mongoTemplate);
+        apiTagMapper,commonDeleteRepository);
     private final ApiTag apiTag = ApiTag.builder().id(ID).build();
     private final ApiTagResponse apiTagResponse = ApiTagResponse.builder().id(ID).build();
     private final ApiTagRequest apiTagRequest = ApiTagRequest.builder().id(ID).build();
@@ -143,15 +140,15 @@ class ApiTagServiceTest {
     @Test
     @DisplayName("Test the delete method in the ApiTag service")
     public void delete_test() {
-        when(mongoTemplate.remove(any(Query.class), any(Class.class))).thenReturn(DeleteResult.acknowledged(1));
-        assertThat(apiTagService.delete(new String[]{ID})).isTrue();
+        when(apiTagRepository.deleteAllByIdIsIn(any())).thenReturn(1L);
+        assertThat(apiTagService.delete(Collections.singletonList(ID))).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while delete ApiTag")
     public void delete_exception_test() {
-        doThrow(new RuntimeException()).when(mongoTemplate).remove(any(Query.class), any(Class.class));
-        assertThatThrownBy(() -> apiTagService.delete(new String[]{ID})).isInstanceOf(ApiTestPlatformException.class)
+        doThrow(new RuntimeException()).when(apiTagRepository).deleteAllByIdIsIn(any());
+        assertThatThrownBy(() -> apiTagService.delete(Collections.singletonList(ID))).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_API_TAG_BY_ID_ERROR.getCode());
     }
 }

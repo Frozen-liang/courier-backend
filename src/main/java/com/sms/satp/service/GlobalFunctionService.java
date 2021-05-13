@@ -14,5 +14,5 @@ public interface GlobalFunctionService {
 
     Boolean edit(GlobalFunctionRequest globalFunctionRequest);
 
-    Boolean delete(String[] ids);
+    Boolean delete(List<String> ids);
 }

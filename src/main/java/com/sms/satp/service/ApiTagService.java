@@ -1,6 +1,5 @@
 package com.sms.satp.service;
 
-import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.dto.request.ApiTagRequest;
 import com.sms.satp.dto.response.ApiTagResponse;
 import java.util.List;
@@ -15,6 +14,6 @@ public interface ApiTagService {
 
     Boolean edit(ApiTagRequest apiTagRequest);
 
-    Boolean delete(String[] ids);
+    Boolean delete(List<String> ids);
 
 }

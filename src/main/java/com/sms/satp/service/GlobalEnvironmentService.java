@@ -14,6 +14,6 @@ public interface GlobalEnvironmentService {
 
     List<GlobalEnvironmentResponse> list();
 
-    Boolean delete(String[] ids);
+    Boolean delete(List<String> ids);
 
 }

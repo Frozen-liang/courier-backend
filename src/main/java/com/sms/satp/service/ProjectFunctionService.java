@@ -14,5 +14,5 @@ public interface ProjectFunctionService {
 
     Boolean edit(ProjectFunctionRequest projectFunctionRequest);
 
-    Boolean delete(String[] ids);
+    Boolean delete(List<String> ids);
 }
