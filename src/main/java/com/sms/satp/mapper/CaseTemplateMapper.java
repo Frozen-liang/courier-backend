@@ -1,8 +1,8 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.AddCaseTemplateRequest;
-import com.sms.satp.dto.CaseTemplateResponse;
-import com.sms.satp.dto.UpdateCaseTemplateRequest;
+import com.sms.satp.dto.request.AddCaseTemplateRequest;
+import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
+import com.sms.satp.dto.response.CaseTemplateResponse;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;

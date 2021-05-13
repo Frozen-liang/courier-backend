@@ -48,6 +48,10 @@ public class ParamInfoRequest {
      */
     private Boolean required;
     /**
+     * 是否传输.
+     */
+    private Boolean checkbox;
+    /**
      * 对象子属性. JSON/Object/JsonArray.
      */
     @Builder.Default

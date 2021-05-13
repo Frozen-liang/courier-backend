@@ -1,9 +1,9 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.dto.BatchAddSceneCaseApiRequest;
-import com.sms.satp.dto.SceneCaseApiResponse;
-import com.sms.satp.dto.UpdateSceneCaseApiRequest;
+import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
+import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
+import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.service.SceneCaseApiService;
 import java.util.List;
 import javax.validation.Valid;

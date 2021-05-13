@@ -1,7 +1,7 @@
 package com.sms.satp.repository.impl;
 
 import com.sms.satp.common.SearchFiled;
-import com.sms.satp.dto.SearchSceneCaseRequest;
+import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.utils.PageDtoConverter;

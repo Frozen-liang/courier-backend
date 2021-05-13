@@ -1,11 +1,11 @@
 package com.sms.satp.service;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.AddCaseTemplateApiRequest;
-import com.sms.satp.dto.BatchAddCaseTemplateApiRequest;
-import com.sms.satp.dto.BatchUpdateCaseTemplateApiRequest;
-import com.sms.satp.dto.CaseTemplateApiResponse;
-import com.sms.satp.dto.UpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.request.AddCaseTemplateApiRequest;
+import com.sms.satp.dto.request.BatchAddCaseTemplateApiRequest;
+import com.sms.satp.dto.request.BatchUpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.response.CaseTemplateApiResponse;
+import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.mapper.CaseTemplateApiMapper;
 import com.sms.satp.repository.CaseTemplateApiRepository;

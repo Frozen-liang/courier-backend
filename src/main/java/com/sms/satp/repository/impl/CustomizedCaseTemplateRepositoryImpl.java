@@ -1,9 +1,8 @@
 package com.sms.satp.repository.impl;
 
 import com.sms.satp.common.SearchFiled;
-import com.sms.satp.dto.CaseTemplateSearchDto;
+import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.entity.scenetest.CaseTemplate;
-import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.List;
@@ -30,7 +29,7 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
     }
 
     @Override
-    public Page<CaseTemplate> search(CaseTemplateSearchDto searchDto, String projectId) {
+    public Page<CaseTemplate> search(CaseTemplateSearchRequest searchDto, String projectId) {
         PageDtoConverter.frontMapping(searchDto);
         Query query = new Query();
         query.addCriteria(Criteria.where(SearchFiled.PROJECT_ID.getFiledName()).is(projectId));
@@ -50,7 +49,7 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
         if (StringUtils.isNotBlank(searchDto.getGroupId())) {
             query.addCriteria(Criteria.where(SearchFiled.GROUP_ID.getFiledName()).is(searchDto.getGroupId()));
         }
-        long total = mongoTemplate.count(query, SceneCase.class);
+        long total = mongoTemplate.count(query, CaseTemplate.class);
         Sort sort = Sort.by(Direction.fromString(searchDto.getOrder()), searchDto.getSort());
         Pageable pageable = PageRequest.of(searchDto.getPageNumber(), searchDto.getPageSize(), sort);
         List<CaseTemplate> caseTemplateList = mongoTemplate.find(query.with(pageable), CaseTemplate.class);

@@ -1,9 +1,9 @@
 package com.sms.satp.mapper;
 
 import com.google.common.collect.Lists;
-import com.sms.satp.dto.AddSceneCaseApiRequest;
-import com.sms.satp.dto.SceneCaseApiResponse;
-import com.sms.satp.dto.UpdateSceneCaseApiRequest;
+import com.sms.satp.dto.request.AddSceneCaseApiRequest;
+import com.sms.satp.dto.response.SceneCaseApiResponse;
+import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

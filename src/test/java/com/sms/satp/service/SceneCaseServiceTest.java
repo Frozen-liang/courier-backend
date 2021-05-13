@@ -2,15 +2,15 @@ package com.sms.satp.service;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.AddSceneCaseRequest;
-import com.sms.satp.dto.CaseTemplateConnDto;
+import com.sms.satp.dto.response.CaseTemplateConnResponse;
+import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.SceneCaseApiResponse;
-import com.sms.satp.dto.SceneCaseResponse;
-import com.sms.satp.dto.SceneTemplateResponse;
-import com.sms.satp.dto.SearchSceneCaseRequest;
-import com.sms.satp.dto.UpdateSceneCaseRequest;
-import com.sms.satp.dto.UpdateSceneTemplateRequest;
+import com.sms.satp.dto.response.SceneCaseApiResponse;
+import com.sms.satp.dto.response.SceneCaseResponse;
+import com.sms.satp.dto.response.SceneTemplateResponse;
+import com.sms.satp.dto.request.SearchSceneCaseRequest;
+import com.sms.satp.dto.request.UpdateSceneCaseRequest;
+import com.sms.satp.dto.request.UpdateSceneTemplateRequest;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
@@ -157,7 +157,7 @@ class SceneCaseServiceTest {
             Lists.newArrayList(CaseTemplateConn.builder().id(MOCK_ID).build());
         when(caseTemplateConnService.listBySceneCaseId(any(), anyBoolean())).thenReturn(caseTemplateConnList);
         when(caseTemplateConnService.edit(any())).thenReturn(Boolean.TRUE);
-        Boolean isSuccess = sceneCaseService.edit(UpdateSceneCaseRequest.builder().remove(Boolean.FALSE).build());
+        Boolean isSuccess = sceneCaseService.edit(UpdateSceneCaseRequest.builder().removed(Boolean.FALSE).build());
         assertTrue(isSuccess);
     }
 
@@ -232,7 +232,7 @@ class SceneCaseServiceTest {
         List<CaseTemplateConn> caseTemplateConnList =
             Lists.newArrayList(CaseTemplateConn.builder().id(MOCK_ID).build());
         when(caseTemplateConnService.listBySceneCaseId(any(), anyBoolean())).thenReturn(caseTemplateConnList);
-        CaseTemplateConnDto connDto = CaseTemplateConnDto.builder().build();
+        CaseTemplateConnResponse connDto = CaseTemplateConnResponse.builder().build();
         when(caseTemplateConnMapper.toCaseTemplateConnDto(any())).thenReturn(connDto);
         when(caseTemplateApiService.listByCaseTemplateId(any(), anyBoolean())).thenReturn(Lists.newArrayList());
         SceneTemplateResponse dto = sceneCaseService.getConn(MOCK_ID);
@@ -255,7 +255,7 @@ class SceneCaseServiceTest {
         when(caseTemplateConnMapper.toCaseTemplateConnList(any())).thenReturn(caseTemplateConnList);
         when(caseTemplateConnService.editList(any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = sceneCaseService.editConn(UpdateSceneTemplateRequest.builder()
-            .caseTemplateConnDtoList(Lists.newArrayList(CaseTemplateConnDto.builder().build()))
+            .caseTemplateConnDtoList(Lists.newArrayList(CaseTemplateConnResponse.builder().build()))
             .sceneCaseApiDtoList(Lists.newArrayList(SceneCaseApiResponse.builder().build())).build());
         assertTrue(isSuccess);
     }
@@ -268,7 +268,7 @@ class SceneCaseServiceTest {
             .thenThrow(new ApiTestPlatformException(EDIT_SCENE_CASE_CONN_ERROR));
         when(caseTemplateConnService.editList(any())).thenReturn(Boolean.TRUE);
         assertThatThrownBy(() -> sceneCaseService.editConn(UpdateSceneTemplateRequest.builder()
-            .caseTemplateConnDtoList(Lists.newArrayList(CaseTemplateConnDto.builder().build()))
+            .caseTemplateConnDtoList(Lists.newArrayList(CaseTemplateConnResponse.builder().build()))
             .sceneCaseApiDtoList(Lists.newArrayList(SceneCaseApiResponse.builder().build())).build()))
             .isInstanceOf(ApiTestPlatformException.class);
     }

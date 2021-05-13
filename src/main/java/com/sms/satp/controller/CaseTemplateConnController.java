@@ -1,9 +1,13 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
+import com.sms.satp.dto.request.AddCaseTemplateConnRequest;
 import com.sms.satp.service.CaseTemplateConnService;
+import javax.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,4 +26,8 @@ public class CaseTemplateConnController {
         return caseTemplateConnService.deleteById(id);
     }
 
+    @PostMapping
+    public Boolean add(@Valid @RequestBody AddCaseTemplateConnRequest addCaseTemplateConnRequest) {
+        return caseTemplateConnService.add(addCaseTemplateConnRequest);
+    }
 }

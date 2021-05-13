@@ -1,4 +1,4 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

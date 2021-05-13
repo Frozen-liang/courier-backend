@@ -1,5 +1,8 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
+import com.sms.satp.dto.response.CaseTemplateConnResponse;
+import com.sms.satp.dto.response.SceneCaseApiResponse;
+import com.sms.satp.dto.response.SceneCaseResponse;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,5 +19,5 @@ public class UpdateSceneTemplateRequest {
 
     private List<SceneCaseApiResponse> sceneCaseApiDtoList;
 
-    private List<CaseTemplateConnDto> caseTemplateConnDtoList;
+    private List<CaseTemplateConnResponse> caseTemplateConnDtoList;
 }

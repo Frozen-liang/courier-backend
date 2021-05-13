@@ -1,12 +1,12 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.AddSceneCaseRequest;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.SceneCaseResponse;
-import com.sms.satp.dto.SceneTemplateResponse;
-import com.sms.satp.dto.SearchSceneCaseRequest;
-import com.sms.satp.dto.UpdateSceneCaseRequest;
-import com.sms.satp.dto.UpdateSceneTemplateRequest;
+import com.sms.satp.dto.request.AddSceneCaseRequest;
+import com.sms.satp.dto.request.SearchSceneCaseRequest;
+import com.sms.satp.dto.request.UpdateSceneCaseRequest;
+import com.sms.satp.dto.request.UpdateSceneTemplateRequest;
+import com.sms.satp.dto.response.SceneCaseResponse;
+import com.sms.satp.dto.response.SceneTemplateResponse;
 import java.util.List;
 import org.springframework.data.domain.Page;
 

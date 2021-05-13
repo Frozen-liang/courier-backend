@@ -1,4 +1,4 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
 import java.util.List;
 import javax.validation.constraints.NotNull;
@@ -22,5 +22,5 @@ public class UpdateSceneCaseRequest {
     private String testStatus;
     private List<String> caseTag;
     private Integer priority;
-    private boolean remove;
+    private Boolean removed;
 }

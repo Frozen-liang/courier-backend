@@ -1,11 +1,11 @@
 package com.sms.satp.service;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.AddSceneCaseApiRequest;
-import com.sms.satp.dto.BatchAddSceneCaseApiRequest;
-import com.sms.satp.dto.SceneCaseApiResponse;
-import com.sms.satp.dto.UpdateSceneCaseApiDto;
-import com.sms.satp.dto.UpdateSceneCaseApiRequest;
+import com.sms.satp.dto.request.AddSceneCaseApiRequest;
+import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
+import com.sms.satp.dto.response.SceneCaseApiResponse;
+import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
+import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.SceneCaseApiMapper;
 import com.sms.satp.repository.SceneCaseApiRepository;
@@ -141,7 +141,7 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the batchEdit method in the SceneCaseApi service")
     void batchEdit_test() {
-        UpdateSceneCaseApiDto dto = getUpdateSortOrder();
+        BatchUpdateSceneCaseApiRequest dto = getUpdateSortOrder();
         SceneCaseApi sceneCaseApi = SceneCaseApi.builder().id(MOCK_ID).build();
         List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(sceneCaseApi);
         when(sceneCaseApiRepository.saveAll(any())).thenReturn(sceneCaseApiList);
@@ -152,7 +152,7 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the batchEdit method in the SceneCaseApi service throws exception")
     void batchEdit_thenThrowException() {
-        UpdateSceneCaseApiDto dto = getUpdateSortOrder();
+        BatchUpdateSceneCaseApiRequest dto = getUpdateSortOrder();
         when(sceneCaseApiRepository.saveAll(any()))
             .thenThrow(new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR));
         assertThatThrownBy(() -> sceneCaseApiService.batchEdit(dto)).isInstanceOf(ApiTestPlatformException.class);
@@ -217,9 +217,9 @@ class SceneCaseApiServiceTest {
         assertThatThrownBy(() -> sceneCaseApiService.getSceneCaseApiById(MOCK_ID));
     }
 
-    private UpdateSceneCaseApiDto getUpdateSortOrder() {
-        return UpdateSceneCaseApiDto.builder()
-            .sceneCaseApiDtoList(Lists.newArrayList(SceneCaseApiResponse.builder()
+    private BatchUpdateSceneCaseApiRequest getUpdateSortOrder() {
+        return BatchUpdateSceneCaseApiRequest.builder()
+            .sceneCaseApiRequestList(Lists.newArrayList(SceneCaseApiResponse.builder()
                 .sceneCaseId(MOCK_SCENE_CASE_ID)
                 .orderNumber(MOCK_ORDER_NUMBER)
                 .build())).build();

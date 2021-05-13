@@ -1,7 +1,9 @@
 package com.sms.satp.service;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.dto.request.AddCaseTemplateConnRequest;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
+import com.sms.satp.mapper.CaseTemplateConnMapper;
 import com.sms.satp.repository.CaseTemplateConnRepository;
 import com.sms.satp.service.impl.CaseTemplateConnServiceImpl;
 import java.util.List;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Example;
 
+import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_CONN_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_CONN_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_CONN_LIST_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +30,7 @@ import static org.wildfly.common.Assert.assertTrue;
 class CaseTemplateConnServiceTest {
 
     private CaseTemplateConnRepository caseTemplateConnRepository;
+    private CaseTemplateConnMapper caseTemplateConnMapper;
     private CaseTemplateConnServiceImpl caseTemplateConnService;
 
     private final static String MOCK_ID = new ObjectId().toString();
@@ -34,7 +38,8 @@ class CaseTemplateConnServiceTest {
     @BeforeEach
     void setUpBean() {
         caseTemplateConnRepository = mock(CaseTemplateConnRepository.class);
-        caseTemplateConnService = new CaseTemplateConnServiceImpl(caseTemplateConnRepository);
+        caseTemplateConnMapper = mock(CaseTemplateConnMapper.class);
+        caseTemplateConnService = new CaseTemplateConnServiceImpl(caseTemplateConnRepository, caseTemplateConnMapper);
     }
 
     @Test
@@ -128,4 +133,25 @@ class CaseTemplateConnServiceTest {
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
+    @Test
+    @DisplayName("Test the add method in the CaseTemplateConn service")
+    void add_test() {
+        AddCaseTemplateConnRequest request = AddCaseTemplateConnRequest.builder().build();
+        CaseTemplateConn caseTemplateConn = CaseTemplateConn.builder().id(MOCK_ID).build();
+        when(caseTemplateConnMapper.toCaseTemplateConn(any())).thenReturn(caseTemplateConn);
+        when(caseTemplateConnRepository.insert(any(CaseTemplateConn.class))).thenReturn(caseTemplateConn);
+        Boolean isSuccess = caseTemplateConnService.add(request);
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the add method in the CaseTemplateConn service thrown exception")
+    void add_test_thrownException() {
+        AddCaseTemplateConnRequest request = AddCaseTemplateConnRequest.builder().build();
+        CaseTemplateConn caseTemplateConn = CaseTemplateConn.builder().id(MOCK_ID).build();
+        when(caseTemplateConnMapper.toCaseTemplateConn(any())).thenReturn(caseTemplateConn);
+        when(caseTemplateConnRepository.insert(any(CaseTemplateConn.class)))
+            .thenThrow(new ApiTestPlatformException(ADD_CASE_TEMPLATE_CONN_ERROR));
+        assertThatThrownBy(()->caseTemplateConnService.add(request)).isInstanceOf(ApiTestPlatformException.class);
+    }
 }

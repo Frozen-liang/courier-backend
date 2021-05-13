@@ -1,4 +1,4 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CaseTemplateConnDto {
+public class CaseTemplateConnResponse {
 
     private String id;
 
@@ -21,9 +21,9 @@ public class CaseTemplateConnDto {
 
     private Integer orderNumber;
 
-    private Integer isExecute;
+    private Boolean isExecute;
 
-    private boolean remove;
+    private Boolean removed;
 
     private Long createUserId;
 

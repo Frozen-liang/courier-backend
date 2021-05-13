@@ -1,12 +1,12 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.response;
 
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.entity.api.common.ParamInfo;
+import java.time.LocalDateTime;
 import java.util.List;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,9 +16,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateSceneCaseApiRequest {
+public class SceneCaseApiResponse {
 
-    @NotNull(message = "The id can not be empty")
     private String id;
     private String apiId;
     private String sceneCaseId;
@@ -42,6 +41,10 @@ public class UpdateSceneCaseApiRequest {
     private String matchRule;
     private Integer timeoutLimit;
     private Integer orderNumber;
-    private Integer isExecute;
-    private boolean remove;
+    private Boolean isExecute;
+    private Boolean removed;
+    private Long createUserId;
+    private LocalDateTime createDateTime;
+    private Long modifyUserId;
+    private LocalDateTime modifyDateTime;
 }

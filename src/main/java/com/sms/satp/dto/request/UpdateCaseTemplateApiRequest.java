@@ -1,4 +1,4 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
@@ -42,6 +42,6 @@ public class UpdateCaseTemplateApiRequest {
     private String matchRule;
     private Integer timeoutLimit;
     private Integer orderNumber;
-    private Integer isExecute;
-    private boolean remove;
+    private Boolean isExecute;
+    private Boolean removed;
 }

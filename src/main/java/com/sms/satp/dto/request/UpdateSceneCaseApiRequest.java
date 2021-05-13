@@ -1,4 +1,4 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
@@ -16,49 +16,32 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddCaseTemplateApiRequest {
+public class UpdateSceneCaseApiRequest {
 
-    @NotNull(message = "The apiId can not be empty")
+    @NotNull(message = "The id can not be empty")
+    private String id;
     private String apiId;
-    @NotNull(message = "The caseTemplateId can not be empty")
-    private String caseTemplateId;
-    @NotNull(message = "The projectId can not be empty")
+    private String sceneCaseId;
     private String projectId;
-    @NotNull(message = "The apiName can not be empty")
     private String apiName;
-
     private String description;
-    @NotNull(message = "The apiPath can not be empty")
     private String apiPath;
-
     private ApiProtocol apiProtocol;
-
     private RequestMethod requestMethod;
-
     private ApiRequestParamType apiRequestParamType;
-
     private List<ParamInfo> requestHeaders;
     private List<ParamInfo> responseHeaders;
     private List<ParamInfo> pathParams;
     private List<ParamInfo> restfulParams;
     private List<ParamInfo> requestParams;
     private List<ParamInfo> responseParams;
-
     private String preInject;
-
     private String postInject;
-
     private ApiJsonType apiResponseJsonType;
-
     private ApiJsonType apiRequestJsonType;
-
     private String matchRule;
-
     private Integer timeoutLimit;
-
     private Integer orderNumber;
-
-    private Integer isExecute;
-
-    private boolean remove;
+    private Boolean isExecute;
+    private Boolean removed;
 }

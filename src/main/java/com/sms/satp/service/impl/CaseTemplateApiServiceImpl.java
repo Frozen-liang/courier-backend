@@ -9,10 +9,10 @@ import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_API_LIST
 
 import com.sms.satp.common.SearchFiled;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.BatchAddCaseTemplateApiRequest;
-import com.sms.satp.dto.BatchUpdateCaseTemplateApiRequest;
-import com.sms.satp.dto.CaseTemplateApiResponse;
-import com.sms.satp.dto.UpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.request.BatchAddCaseTemplateApiRequest;
+import com.sms.satp.dto.request.BatchUpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.mapper.CaseTemplateApiMapper;
 import com.sms.satp.repository.CaseTemplateApiRepository;

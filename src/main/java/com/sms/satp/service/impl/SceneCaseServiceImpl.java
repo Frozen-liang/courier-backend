@@ -10,17 +10,17 @@ import static com.sms.satp.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.AddSceneCaseRequest;
-import com.sms.satp.dto.CaseTemplateApiResponse;
-import com.sms.satp.dto.CaseTemplateConnDto;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.SceneCaseApiResponse;
-import com.sms.satp.dto.SceneCaseResponse;
-import com.sms.satp.dto.SceneTemplateResponse;
-import com.sms.satp.dto.SearchSceneCaseRequest;
-import com.sms.satp.dto.UpdateSceneCaseApiDto;
-import com.sms.satp.dto.UpdateSceneCaseRequest;
-import com.sms.satp.dto.UpdateSceneTemplateRequest;
+import com.sms.satp.dto.request.AddSceneCaseRequest;
+import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
+import com.sms.satp.dto.request.SearchSceneCaseRequest;
+import com.sms.satp.dto.request.UpdateSceneCaseRequest;
+import com.sms.satp.dto.request.UpdateSceneTemplateRequest;
+import com.sms.satp.dto.response.CaseTemplateApiResponse;
+import com.sms.satp.dto.response.CaseTemplateConnResponse;
+import com.sms.satp.dto.response.SceneCaseApiResponse;
+import com.sms.satp.dto.response.SceneCaseResponse;
+import com.sms.satp.dto.response.SceneTemplateResponse;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
@@ -114,8 +114,6 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             SceneCase sceneCase = sceneCaseMapper.toUpdateSceneCase(updateSceneCaseRequest);
             Optional<SceneCase> optionalSceneCase = sceneCaseRepository.findById(sceneCase.getId());
             optionalSceneCase.ifPresent(sceneCaseFindById -> {
-                sceneCase.setCreateUserId(sceneCaseFindById.getCreateUserId());
-                sceneCase.setCreateDateTime(sceneCaseFindById.getCreateDateTime());
                 if (!Objects.equals(sceneCase.getRemoved(), sceneCaseFindById.getRemoved())) {
                     editSceneCaseApiStatus(sceneCase, sceneCaseFindById.getRemoved());
                     editCaseTemplateStatus(sceneCase, sceneCaseFindById.getRemoved());
@@ -167,9 +165,9 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             SceneCaseResponse dto = sceneCaseMapper.toDto(optional.orElse(null));
             List<SceneCaseApiResponse> sceneCaseApiDtoList = sceneCaseApiService.listBySceneCaseId(id, Boolean.FALSE);
             List<CaseTemplateConn> caseTemplateConnList = caseTemplateConnService.listBySceneCaseId(id, Boolean.FALSE);
-            List<CaseTemplateConnDto> caseTemplateConnDtoList = Lists.newArrayList();
+            List<CaseTemplateConnResponse> caseTemplateConnDtoList = Lists.newArrayList();
             for (CaseTemplateConn conn : caseTemplateConnList) {
-                CaseTemplateConnDto connDto = caseTemplateConnMapper.toCaseTemplateConnDto(conn);
+                CaseTemplateConnResponse connDto = caseTemplateConnMapper.toCaseTemplateConnDto(conn);
                 List<CaseTemplateApiResponse> caseTemplateApiDtoList =
                     caseTemplateApiService.listByCaseTemplateId(conn.getCaseTemplateId(), Boolean.FALSE);
                 connDto.setCaseTemplateApiDtoList(caseTemplateApiDtoList);
@@ -189,8 +187,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         try {
             if (!updateSceneTemplateRequest.getSceneCaseApiDtoList().isEmpty()) {
                 sceneCaseApiService.batchEdit(
-                    UpdateSceneCaseApiDto.builder()
-                        .sceneCaseApiDtoList(updateSceneTemplateRequest.getSceneCaseApiDtoList()).build());
+                    BatchUpdateSceneCaseApiRequest.builder()
+                        .sceneCaseApiRequestList(updateSceneTemplateRequest.getSceneCaseApiDtoList()).build());
             }
             if (!updateSceneTemplateRequest.getCaseTemplateConnDtoList().isEmpty()) {
                 List<CaseTemplateConn> caseTemplateConnList =

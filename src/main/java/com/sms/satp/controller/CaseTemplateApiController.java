@@ -1,9 +1,9 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.dto.BatchAddCaseTemplateApiRequest;
-import com.sms.satp.dto.CaseTemplateApiResponse;
-import com.sms.satp.dto.UpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.request.BatchAddCaseTemplateApiRequest;
+import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.service.CaseTemplateApiService;
 import java.util.List;
 import javax.validation.Valid;

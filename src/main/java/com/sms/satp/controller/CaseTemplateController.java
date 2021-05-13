@@ -1,11 +1,11 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.dto.AddCaseTemplateRequest;
-import com.sms.satp.dto.CaseTemplateResponse;
-import com.sms.satp.dto.CaseTemplateSearchDto;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.UpdateCaseTemplateRequest;
+import com.sms.satp.dto.request.AddCaseTemplateRequest;
+import com.sms.satp.dto.request.CaseTemplateSearchRequest;
+import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
+import com.sms.satp.dto.response.CaseTemplateResponse;
 import com.sms.satp.service.CaseTemplateService;
 import java.util.List;
 import javax.validation.Valid;
@@ -50,7 +50,7 @@ public class CaseTemplateController {
     }
 
     @GetMapping("/search/{projectId}")
-    public Page<CaseTemplateResponse> search(CaseTemplateSearchDto searchDto,
+    public Page<CaseTemplateResponse> search(CaseTemplateSearchRequest searchDto,
         @PathVariable String projectId) {
         return caseTemplateService.search(searchDto, projectId);
     }

@@ -1,9 +1,9 @@
 package com.sms.satp.mapper;
 
 import com.google.common.collect.Lists;
-import com.sms.satp.dto.AddCaseTemplateApiRequest;
-import com.sms.satp.dto.CaseTemplateApiResponse;
-import com.sms.satp.dto.UpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.request.AddCaseTemplateApiRequest;
+import com.sms.satp.dto.response.CaseTemplateApiResponse;
+import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

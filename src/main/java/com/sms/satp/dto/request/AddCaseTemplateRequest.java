@@ -1,27 +1,25 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @Builder
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-public class SceneCaseResponse {
+@AllArgsConstructor
+public class AddCaseTemplateRequest {
 
-    private String id;
+    @NotNull(message = "The name can not be empty")
     private String name;
     private String createUserName;
+    @NotNull(message = "The projectId can not be empty")
     private String projectId;
     private String groupId;
     private String testStatus;
     private List<String> caseTag;
-    private Integer priority;
-    private boolean remove;
-    private LocalDateTime createDateTime;
-    private LocalDateTime modifyDateTime;
+    private Boolean removed;
 }

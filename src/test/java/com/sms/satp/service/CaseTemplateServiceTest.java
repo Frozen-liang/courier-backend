@@ -2,12 +2,12 @@ package com.sms.satp.service;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.AddCaseTemplateRequest;
-import com.sms.satp.dto.CaseTemplateApiResponse;
-import com.sms.satp.dto.CaseTemplateResponse;
-import com.sms.satp.dto.CaseTemplateSearchDto;
+import com.sms.satp.dto.request.AddCaseTemplateRequest;
+import com.sms.satp.dto.response.CaseTemplateApiResponse;
+import com.sms.satp.dto.response.CaseTemplateResponse;
+import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.UpdateCaseTemplateRequest;
+import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.mapper.CaseTemplateApiMapper;
@@ -133,7 +133,7 @@ class CaseTemplateServiceTest {
         List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList(CaseTemplateApi.builder().id(MOCK_ID).build());
         when(caseTemplateApiMapper.toCaseTemplateApiByResponseList(any())).thenReturn(caseTemplateApiList);
         when(caseTemplateApiService.editAll(any())).thenReturn(Boolean.TRUE);
-        Boolean isSuccess = caseTemplateService.edit(UpdateCaseTemplateRequest.builder().remove(Boolean.FALSE).build());
+        Boolean isSuccess = caseTemplateService.edit(UpdateCaseTemplateRequest.builder().removed(Boolean.FALSE).build());
         assertTrue(isSuccess);
     }
 
@@ -176,7 +176,7 @@ class CaseTemplateServiceTest {
     @Test
     @DisplayName("Test the search method in the CaseTemplate service")
     void search_test() {
-        CaseTemplateSearchDto dto = new CaseTemplateSearchDto();
+        CaseTemplateSearchRequest dto = new CaseTemplateSearchRequest();
         dto.setName(MOCK_NAME);
         List<CaseTemplate> dtoList = Lists.newArrayList(CaseTemplate.builder().build());
         Pageable pageable = PageRequest.of(MOCK_PAGE, MOCK_SIZE);
@@ -189,7 +189,7 @@ class CaseTemplateServiceTest {
     @Test
     @DisplayName("Test the search method in the CaseTemplate service thrown exception")
     void search_test_thenThrownException() {
-        CaseTemplateSearchDto dto = new CaseTemplateSearchDto();
+        CaseTemplateSearchRequest dto = new CaseTemplateSearchRequest();
         dto.setName(MOCK_NAME);
         when(customizedCaseTemplateRepository.search(any(), any()))
             .thenThrow(new ApiTestPlatformException(SEARCH_CASE_TEMPLATE_ERROR));

@@ -26,5 +26,5 @@ public class CaseTemplateConn extends BaseEntity {
 
     private Integer orderNumber;
 
-    private Integer isExecute;
+    private Boolean isExecute;
 }

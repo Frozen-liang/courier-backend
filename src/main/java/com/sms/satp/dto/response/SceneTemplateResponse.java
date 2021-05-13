@@ -1,4 +1,4 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.response;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateSceneCaseApiDto {
+public class SceneTemplateResponse {
+
+    private SceneCaseResponse sceneCaseDto;
 
     private List<SceneCaseApiResponse> sceneCaseApiDtoList;
+
+    private List<CaseTemplateConnResponse> caseTemplateConnDtoList;
 }

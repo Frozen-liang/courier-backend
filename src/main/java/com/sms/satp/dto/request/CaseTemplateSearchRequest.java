@@ -1,5 +1,6 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
+import com.sms.satp.dto.PageDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CaseTemplateSearchDto extends PageDto {
+public class CaseTemplateSearchRequest extends PageDto {
 
     private String name;
     private String groupId;

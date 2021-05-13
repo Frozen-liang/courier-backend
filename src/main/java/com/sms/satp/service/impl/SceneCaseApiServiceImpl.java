@@ -9,10 +9,10 @@ import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST_BY
 
 import com.sms.satp.common.SearchFiled;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.BatchAddSceneCaseApiRequest;
-import com.sms.satp.dto.SceneCaseApiResponse;
-import com.sms.satp.dto.UpdateSceneCaseApiDto;
-import com.sms.satp.dto.UpdateSceneCaseApiRequest;
+import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
+import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
+import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
+import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.SceneCaseApiMapper;
 import com.sms.satp.repository.SceneCaseApiRepository;
@@ -93,13 +93,13 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public Boolean batchEdit(UpdateSceneCaseApiDto updateSceneCaseApiSortOrderDto) {
+    public Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiSortOrderDto) {
         log.info("SceneCaseApiService-batchEdit()-params: [SceneCaseApi]={}",
             updateSceneCaseApiSortOrderDto.toString());
         try {
-            if (!updateSceneCaseApiSortOrderDto.getSceneCaseApiDtoList().isEmpty()) {
+            if (!updateSceneCaseApiSortOrderDto.getSceneCaseApiRequestList().isEmpty()) {
                 List<SceneCaseApi> caseApiList = sceneCaseApiMapper
-                    .toSceneCaseApiList(updateSceneCaseApiSortOrderDto.getSceneCaseApiDtoList());
+                    .toSceneCaseApiList(updateSceneCaseApiSortOrderDto.getSceneCaseApiRequestList());
                 sceneCaseApiRepository.saveAll(caseApiList);
             }
             return Boolean.TRUE;

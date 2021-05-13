@@ -7,12 +7,12 @@ import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_PAGE_ERR
 import static com.sms.satp.common.exception.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.AddCaseTemplateRequest;
-import com.sms.satp.dto.CaseTemplateApiResponse;
-import com.sms.satp.dto.CaseTemplateResponse;
-import com.sms.satp.dto.CaseTemplateSearchDto;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.UpdateCaseTemplateRequest;
+import com.sms.satp.dto.request.AddCaseTemplateRequest;
+import com.sms.satp.dto.request.CaseTemplateSearchRequest;
+import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
+import com.sms.satp.dto.response.CaseTemplateApiResponse;
+import com.sms.satp.dto.response.CaseTemplateResponse;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.mapper.CaseTemplateApiMapper;
@@ -129,7 +129,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     @Override
-    public Page<CaseTemplateResponse> search(CaseTemplateSearchDto searchDto, String projectId) {
+    public Page<CaseTemplateResponse> search(CaseTemplateSearchRequest searchDto, String projectId) {
         try {
             Page<CaseTemplate> resultPage = customizedCaseTemplateRepository.search(searchDto, projectId);
             return resultPage.map(caseTemplateMapper::toDto);

@@ -1,4 +1,4 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
 import java.util.List;
 import javax.validation.constraints.NotNull;
@@ -21,5 +21,5 @@ public class UpdateCaseTemplateRequest {
     private String groupId;
     private String testStatus;
     private List<String> caseTag;
-    private boolean remove;
+    private Boolean removed;
 }

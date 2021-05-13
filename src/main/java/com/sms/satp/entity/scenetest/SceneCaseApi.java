@@ -66,6 +66,6 @@ public class SceneCaseApi extends BaseEntity {
 
     private Integer orderNumber;
 
-    private Integer isExecute;
+    private Boolean isExecute;
 
 }

@@ -1,10 +1,10 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.AddCaseTemplateRequest;
-import com.sms.satp.dto.CaseTemplateResponse;
-import com.sms.satp.dto.CaseTemplateSearchDto;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.UpdateCaseTemplateRequest;
+import com.sms.satp.dto.request.AddCaseTemplateRequest;
+import com.sms.satp.dto.request.CaseTemplateSearchRequest;
+import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
+import com.sms.satp.dto.response.CaseTemplateResponse;
 import java.util.List;
 import org.springframework.data.domain.Page;
 
@@ -18,5 +18,5 @@ public interface CaseTemplateService {
 
     Page<CaseTemplateResponse> page(PageDto pageDto, String projectId);
 
-    Page<CaseTemplateResponse> search(CaseTemplateSearchDto searchDto, String projectId);
+    Page<CaseTemplateResponse> search(CaseTemplateSearchRequest searchDto, String projectId);
 }
