@@ -18,7 +18,7 @@ public class UnifiedResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     public boolean supports(@NonNull MethodParameter returnType,
         @Nullable Class<? extends HttpMessageConverter<?>> converterType) {
         return !returnType.hasMethodAnnotation(IgnoreWrap.class) && Objects.nonNull(returnType.getMethod())
-            && Objects.nonNull(returnType.getMethod().getReturnType()) && returnType.getMethod().getReturnType()
+            && Objects.nonNull(returnType.getMethod().getReturnType()) && !returnType.getMethod().getReturnType()
             .isAssignableFrom(Void.TYPE);
     }
 
