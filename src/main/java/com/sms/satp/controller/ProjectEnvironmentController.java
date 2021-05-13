@@ -1,13 +1,15 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
+import com.sms.satp.common.validate.InsertGroup;
+import com.sms.satp.common.validate.UpdateGroup;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.ProjectEnvironmentRequest;
-import com.sms.satp.dto.ProjectEnvironmentResponse;
+import com.sms.satp.dto.request.ProjectEnvironmentRequest;
+import com.sms.satp.dto.response.ProjectEnvironmentResponse;
 import com.sms.satp.service.ProjectEnvironmentService;
 import java.util.List;
-import javax.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,21 +45,19 @@ public class ProjectEnvironmentController {
     }
 
     @PostMapping
-    public Boolean add(@Valid @RequestBody ProjectEnvironmentRequest projectEnvironmentRequest) {
-        projectEnvironmentService.add(projectEnvironmentRequest);
-        return Boolean.TRUE;
+    public Boolean add(@Validated(InsertGroup.class) @RequestBody ProjectEnvironmentRequest projectEnvironmentRequest) {
+        return projectEnvironmentService.add(projectEnvironmentRequest);
     }
 
     @PutMapping
-    public Boolean edit(@Valid @RequestBody ProjectEnvironmentRequest projectEnvironmentRequest) {
-        projectEnvironmentService.edit(projectEnvironmentRequest);
-        return Boolean.TRUE;
+    public Boolean edit(
+        @Validated(UpdateGroup.class) @RequestBody ProjectEnvironmentRequest projectEnvironmentRequest) {
+        return projectEnvironmentService.edit(projectEnvironmentRequest);
     }
 
     @DeleteMapping("/{ids}")
-    public Boolean delete(@PathVariable String[] ids) {
-        projectEnvironmentService.delete(ids);
-        return Boolean.TRUE;
+    public Boolean delete(@PathVariable List<String> ids) {
+        return projectEnvironmentService.delete(ids);
     }
 
 }

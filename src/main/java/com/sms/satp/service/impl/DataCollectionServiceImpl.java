@@ -6,24 +6,19 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_DATA_COLLECTION_ERROR
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
-import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.ID;
-import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
-import static com.sms.satp.common.constant.CommonFiled.REMOVE;
+import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.DataCollectionRequest;
-import com.sms.satp.dto.DataCollectionResponse;
+import com.sms.satp.dto.request.DataCollectionRequest;
+import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
 import com.sms.satp.mapper.DataCollectionMapper;
+import com.sms.satp.repository.CustomizedDataCollectionRepository;
 import com.sms.satp.repository.DataCollectionRepository;
 import com.sms.satp.service.DataCollectionService;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
@@ -32,10 +27,6 @@ import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -44,14 +35,14 @@ public class DataCollectionServiceImpl implements DataCollectionService {
 
     private final DataCollectionRepository dataCollectionRepository;
     private final DataCollectionMapper dataCollectionMapper;
-    private final MongoTemplate mongoTemplate;
-    private static final String PARAM_LIST = "paramList";
+    private final CustomizedDataCollectionRepository customizedDataCollectionRepository;
 
     public DataCollectionServiceImpl(DataCollectionRepository dataCollectionRepository,
-        DataCollectionMapper dataCollectionMapper, MongoTemplate mongoTemplate) {
+        DataCollectionMapper dataCollectionMapper,
+        CustomizedDataCollectionRepository customizedDataCollectionRepository) {
         this.dataCollectionRepository = dataCollectionRepository;
         this.dataCollectionMapper = dataCollectionMapper;
-        this.mongoTemplate = mongoTemplate;
+        this.customizedDataCollectionRepository = customizedDataCollectionRepository;
     }
 
     @Override
@@ -68,12 +59,12 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     @Override
     public List<DataCollectionResponse> list(String projectId, String collectionName) {
         try {
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
             DataCollection dataCollection = DataCollection.builder().projectId(projectId).collectionName(collectionName)
                 .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(PROJECT_ID, GenericPropertyMatchers.exact())
-                .withMatcher(REMOVE, GenericPropertyMatchers.exact())
+                .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
+                .withMatcher(REMOVE.getFiled(), GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING);
             Example<DataCollection> example = Example.of(dataCollection, exampleMatcher);
             return dataCollectionMapper.toDtoList(dataCollectionRepository.findAll(example, sort));
@@ -84,7 +75,7 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
-    public void add(DataCollectionRequest dataCollectionRequest) {
+    public Boolean add(DataCollectionRequest dataCollectionRequest) {
         log.info("DataCollectionService-add()-params: [DataCollection]={}", dataCollectionRequest.toString());
         try {
             DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
@@ -93,32 +84,30 @@ public class DataCollectionServiceImpl implements DataCollectionService {
             log.error("Failed to add the DataCollection!", e);
             throw new ApiTestPlatformException(ADD_DATA_COLLECTION_ERROR);
         }
+        return Boolean.TRUE;
     }
 
     @Override
-    public void edit(DataCollectionRequest dataCollectionRequest) {
+    public Boolean edit(DataCollectionRequest dataCollectionRequest) {
         log.info("DataCollectionService-edit()-params: [DataCollection]={}", dataCollectionRequest.toString());
         try {
             DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
-            dataCollectionRepository.findById(dataCollection.getId())
-                .ifPresent((oldDataCollection) -> {
-                    dataCollection.setCreateUserId(oldDataCollection.getCreateUserId());
-                    dataCollection.setCreateDateTime(oldDataCollection.getCreateDateTime());
-                    dataCollectionRepository.save(dataCollection);
-                });
+            Optional<DataCollection> optional = dataCollectionRepository.findById(dataCollection.getId());
+            if (optional.isEmpty()) {
+                return Boolean.FALSE;
+            }
+            dataCollectionRepository.save(dataCollection);
         } catch (Exception e) {
             log.error("Failed to add the DataCollection!", e);
             throw new ApiTestPlatformException(EDIT_DATA_COLLECTION_ERROR);
         }
+        return Boolean.TRUE;
     }
 
     @Override
-    public void delete(String[] ids) {
+    public Boolean delete(List<String> ids) {
         try {
-            Query query = new Query(Criteria.where(ID).in(Arrays.asList(ids)));
-            Update update = Update.update(REMOVE, Boolean.TRUE);
-            update.set(MODIFY_DATE_TIME, LocalDateTime.now());
-            mongoTemplate.updateMulti(query, update, DataCollection.class);
+            return customizedDataCollectionRepository.deleteByIds(ids);
         } catch (Exception e) {
             log.error("Failed to delete the DataCollection!", e);
             throw new ApiTestPlatformException(DELETE_DATA_COLLECTION_BY_ID_ERROR);
@@ -128,13 +117,7 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     @Override
     public List<String> getParamListById(String id) {
         try {
-            Query query = new Query(Criteria.where(ID).is(id));
-            query.fields().include(PARAM_LIST);
-            DataCollection dataCollection = mongoTemplate.findOne(query, DataCollection.class);
-            if (Objects.nonNull(dataCollection)) {
-                return dataCollection.getParamList();
-            }
-            return Collections.emptyList();
+            return customizedDataCollectionRepository.getParamListById(id);
         } catch (Exception e) {
             log.error("Failed to get the DataCollectionParamList by Id!", e);
             throw new ApiTestPlatformException(GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR);

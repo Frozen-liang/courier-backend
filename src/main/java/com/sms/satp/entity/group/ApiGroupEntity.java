@@ -13,5 +13,5 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ApiGroupEntity extends BaseEntity {
 
     private String projectId;
-    private String name;
+    private String groupName;
 }

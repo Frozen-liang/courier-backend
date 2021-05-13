@@ -5,26 +5,18 @@ import static com.sms.satp.common.exception.ErrorCode.DELETE_GLOBAL_ENVIRONMENT_
 import static com.sms.satp.common.exception.ErrorCode.EDIT_GLOBAL_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_ENVIRONMENT_LIST_ERROR;
-import static com.sms.satp.common.constant.CommonFiled.ID;
-import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.REMOVE;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalEnvironmentRequest;
-import com.sms.satp.dto.GlobalEnvironmentResponse;
+import com.sms.satp.dto.request.GlobalEnvironmentRequest;
+import com.sms.satp.dto.response.GlobalEnvironmentResponse;
 import com.sms.satp.entity.env.GlobalEnvironment;
 import com.sms.satp.mapper.GlobalEnvironmentMapper;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.GlobalEnvironmentRepository;
 import com.sms.satp.service.GlobalEnvironmentService;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,14 +25,14 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
 
     private final GlobalEnvironmentRepository globalEnvironmentRepository;
     private final GlobalEnvironmentMapper globalEnvironmentMapper;
-    private final MongoTemplate mongoTemplate;
+    private final CommonDeleteRepository commonDeleteRepository;
 
     public GlobalEnvironmentServiceImpl(GlobalEnvironmentRepository globalEnvironmentRepository,
         GlobalEnvironmentMapper globalEnvironmentMapper,
-        MongoTemplate mongoTemplate) {
+        CommonDeleteRepository commonDeleteRepository) {
         this.globalEnvironmentRepository = globalEnvironmentRepository;
         this.globalEnvironmentMapper = globalEnvironmentMapper;
-        this.mongoTemplate = mongoTemplate;
+        this.commonDeleteRepository = commonDeleteRepository;
     }
 
     @Override
@@ -55,7 +47,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
-    public void add(GlobalEnvironmentRequest globalEnvironmentRequest) {
+    public Boolean add(GlobalEnvironmentRequest globalEnvironmentRequest) {
         log.info("GlobalEnvironmentService-add()-params: [GlobalEnvironment]={}", globalEnvironmentRequest.toString());
         try {
             GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentRequest);
@@ -64,23 +56,24 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
             log.error("Failed to add the globalEnvironment!", e);
             throw new ApiTestPlatformException(ADD_GLOBAL_ENVIRONMENT_ERROR);
         }
+        return Boolean.TRUE;
     }
 
     @Override
-    public void edit(GlobalEnvironmentRequest globalEnvironmentRequest) {
+    public Boolean edit(GlobalEnvironmentRequest globalEnvironmentRequest) {
         log.info("GlobalEnvironmentService-edit()-params: [GlobalEnvironment]={}", globalEnvironmentRequest.toString());
         try {
             GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentRequest);
             Optional<GlobalEnvironment> optional = globalEnvironmentRepository.findById(globalEnvironment.getId());
-            optional.ifPresent((oldGlobalEnvironment) -> {
-                globalEnvironment.setCreateDateTime(oldGlobalEnvironment.getCreateDateTime());
-                globalEnvironment.setCreateUserId(oldGlobalEnvironment.getCreateUserId());
-                globalEnvironmentRepository.save(globalEnvironment);
-            });
+            if (optional.isEmpty()) {
+                return Boolean.FALSE;
+            }
+            globalEnvironmentRepository.save(globalEnvironment);
         } catch (Exception e) {
             log.error("Failed to add the globalEnvironment!", e);
             throw new ApiTestPlatformException(EDIT_GLOBAL_ENVIRONMENT_ERROR);
         }
+        return Boolean.TRUE;
     }
 
     @Override
@@ -96,12 +89,9 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
-    public void delete(String[] ids) {
+    public Boolean delete(List<String> ids) {
         try {
-            Query query = new Query(Criteria.where(ID).in(Arrays.asList(ids)));
-            Update update = Update.update(REMOVE, Boolean.TRUE);
-            update.set(MODIFY_DATE_TIME, LocalDateTime.now());
-            mongoTemplate.updateMulti(query, update, GlobalEnvironment.class);
+            return commonDeleteRepository.deleteByIds(ids, GlobalEnvironment.class);
         } catch (Exception e) {
             log.error("Failed to delete the GlobalEnvironment!", e);
             throw new ApiTestPlatformException(DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID);

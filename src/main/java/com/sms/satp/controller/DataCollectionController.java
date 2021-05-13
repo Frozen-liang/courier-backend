@@ -2,8 +2,10 @@ package com.sms.satp.controller;
 
 import static com.sms.satp.common.constant.Constants.DATA_COLLECTION_PATH;
 
-import com.sms.satp.dto.DataCollectionRequest;
-import com.sms.satp.dto.DataCollectionResponse;
+import com.sms.satp.common.validate.InsertGroup;
+import com.sms.satp.common.validate.UpdateGroup;
+import com.sms.satp.dto.request.DataCollectionRequest;
+import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.service.DataCollectionService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
@@ -32,15 +34,13 @@ public class DataCollectionController {
     }
 
     @PostMapping
-    public Boolean add(@Validated @RequestBody DataCollectionRequest dataCollectionRequest) {
-        dataCollectionService.add(dataCollectionRequest);
-        return Boolean.TRUE;
+    public Boolean add(@Validated(InsertGroup.class) @RequestBody DataCollectionRequest dataCollectionRequest) {
+        return dataCollectionService.add(dataCollectionRequest);
     }
 
     @PutMapping
-    public Boolean edit(@Validated @RequestBody DataCollectionRequest dataCollectionRequest) {
-        dataCollectionService.edit(dataCollectionRequest);
-        return Boolean.TRUE;
+    public Boolean edit(@Validated(UpdateGroup.class) @RequestBody DataCollectionRequest dataCollectionRequest) {
+        return dataCollectionService.edit(dataCollectionRequest);
     }
 
     @GetMapping("/list/{projectId}")
@@ -54,9 +54,8 @@ public class DataCollectionController {
     }
 
     @DeleteMapping("/{ids}")
-    public Boolean delete(@PathVariable String[] ids) {
-        dataCollectionService.delete(ids);
-        return Boolean.TRUE;
+    public Boolean delete(@PathVariable List<String> ids) {
+        return dataCollectionService.delete(ids);
     }
 
 }

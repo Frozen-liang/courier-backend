@@ -6,26 +6,23 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_ENVIRONMENT_E
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
-import static com.sms.satp.common.constant.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.ID;
-import static com.sms.satp.common.constant.CommonFiled.MODIFY_DATE_TIME;
-import static com.sms.satp.common.constant.CommonFiled.PROJECT_ID;
-import static com.sms.satp.common.constant.CommonFiled.REMOVE;
+import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalEnvironmentResponse;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.ProjectEnvironmentRequest;
-import com.sms.satp.dto.ProjectEnvironmentResponse;
+import com.sms.satp.dto.request.ProjectEnvironmentRequest;
+import com.sms.satp.dto.response.GlobalEnvironmentResponse;
+import com.sms.satp.dto.response.ProjectEnvironmentResponse;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
 import com.sms.satp.service.GlobalEnvironmentService;
 import com.sms.satp.service.ProjectEnvironmentService;
 import com.sms.satp.utils.PageDtoConverter;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -37,10 +34,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -49,16 +42,16 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
 
     private final ProjectEnvironmentRepository projectEnvironmentRepository;
     private final GlobalEnvironmentService globalEnvironmentService;
-    private final MongoTemplate mongoTemplate;
+    private final CommonDeleteRepository commonDeleteRepository;
     private final ProjectEnvironmentMapper projectEnvironmentMapper;
 
     public ProjectEnvironmentServiceImpl(ProjectEnvironmentRepository
         projectEnvironmentRepository, GlobalEnvironmentService globalEnvironmentService,
-        MongoTemplate mongoTemplate,
+        CommonDeleteRepository commonDeleteRepository,
         ProjectEnvironmentMapper projectEnvironmentMapper) {
         this.projectEnvironmentRepository = projectEnvironmentRepository;
         this.globalEnvironmentService = globalEnvironmentService;
-        this.mongoTemplate = mongoTemplate;
+        this.commonDeleteRepository = commonDeleteRepository;
         this.projectEnvironmentMapper = projectEnvironmentMapper;
     }
 
@@ -84,12 +77,12 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     @Override
     public List<Object> list(String projectId) {
         try {
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME);
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
             ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().projectId(projectId).build();
             List<Object> result = new ArrayList<>();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(PROJECT_ID, GenericPropertyMatchers.exact())
-                .withMatcher(REMOVE, GenericPropertyMatchers.exact())
+                .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
+                .withMatcher(REMOVE.getFiled(), GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
             Example<ProjectEnvironment> example = Example.of(projectEnvironment, exampleMatcher);
             List<GlobalEnvironmentResponse> globalEnvironments = globalEnvironmentService.list();
@@ -104,7 +97,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
-    public void add(ProjectEnvironmentRequest projectEnvironmentRequest) {
+    public Boolean add(ProjectEnvironmentRequest projectEnvironmentRequest) {
         log.info("ProjectEnvironmentService-add()-params: [ProjectEnvironment]={}",
             projectEnvironmentRequest.toString());
         try {
@@ -115,35 +108,32 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
             log.error("Failed to add the projectEnvironment!", e);
             throw new ApiTestPlatformException(ADD_PROJECT_ENVIRONMENT_ERROR);
         }
+        return Boolean.TRUE;
     }
 
     @Override
-    public void edit(ProjectEnvironmentRequest projectEnvironmentRequest) {
+    public Boolean edit(ProjectEnvironmentRequest projectEnvironmentRequest) {
         log.info("ProjectEnvironmentService-edit()-params: [ProjectEnvironment]={}",
             projectEnvironmentRequest.toString());
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentRequest);
-            Optional<ProjectEnvironment> projectEnvironmentOptional = projectEnvironmentRepository
-                .findById(projectEnvironment.getId());
-            projectEnvironmentOptional.ifPresent(oldProjectEnvironment -> {
-                projectEnvironment.setCreateDateTime(oldProjectEnvironment.getCreateDateTime());
-                projectEnvironment.setCreateUserId(oldProjectEnvironment.getCreateUserId());
-                projectEnvironmentRepository.save(projectEnvironment);
-            });
+            Optional<ProjectEnvironment> optional = projectEnvironmentRepository.findById(projectEnvironment.getId());
+            if (optional.isEmpty()) {
+                return Boolean.FALSE;
+            }
+            projectEnvironmentRepository.save(projectEnvironment);
         } catch (Exception e) {
             log.error("Failed to edit the projectEnvironment!", e);
             throw new ApiTestPlatformException(EDIT_PROJECT_ENVIRONMENT_ERROR);
         }
+        return Boolean.TRUE;
     }
 
     @Override
-    public void delete(String[] ids) {
+    public Boolean delete(List<String> ids) {
         try {
-            Query query = new Query(Criteria.where(ID).in(Arrays.asList(ids)));
-            Update update = Update.update(REMOVE, Boolean.TRUE);
-            update.set(MODIFY_DATE_TIME, LocalDateTime.now());
-            mongoTemplate.updateMulti(query, update, ProjectEnvironment.class);
+            return commonDeleteRepository.deleteByIds(ids, ProjectEnvironment.class);
         } catch (Exception e) {
             log.error("Failed to delete the projectEnvironment!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR);

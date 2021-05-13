@@ -1,7 +1,8 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.GlobalFunctionRequest;
-import com.sms.satp.dto.GlobalFunctionResponse;
+import com.sms.satp.common.constant.TimePatternConstant;
+import com.sms.satp.dto.request.GlobalFunctionRequest;
+import com.sms.satp.dto.response.GlobalFunctionResponse;
 import com.sms.satp.entity.function.GlobalFunction;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -13,13 +14,11 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = ParamInfoMapper.class)
 public interface GlobalFunctionMapper {
 
-    @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
+    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
     GlobalFunctionResponse toDto(GlobalFunction globalFunction);
 
     List<GlobalFunctionResponse> toDtoList(List<GlobalFunction> globalFunctions);
 
-    @Mapping(target = "createDateTime", ignore = true)
-    @Mapping(target = "modifyDateTime", ignore = true)
     GlobalFunction toEntity(GlobalFunctionRequest globalFunctionDto);
 }

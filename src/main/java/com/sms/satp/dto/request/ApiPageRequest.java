@@ -1,5 +1,6 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
+import com.sms.satp.dto.PageDto;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

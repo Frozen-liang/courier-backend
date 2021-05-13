@@ -61,10 +61,10 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer {
 
     @Override
     public List<ApiEntity> toApiEntities(DocumentDefinition definition) {
-        OpenAPI openAPI = definition.getOpenApi();
-        Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
+        OpenAPI openApi = definition.getOpenApi();
+        Map<String, Schema> schemas = openApi.getComponents().getSchemas();
         final Map<String, List<ParamInfo>> componentReference = prepareComponentReference(schemas);
-        return openAPI.getPaths().entrySet().stream()
+        return openApi.getPaths().entrySet().stream()
             .map(entry -> buildApiEntities(entry, componentReference, definition.getProjectId()))
             .flatMap(Collection::stream).collect(Collectors.toList());
     }

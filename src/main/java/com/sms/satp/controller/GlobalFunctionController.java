@@ -1,8 +1,10 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.dto.GlobalFunctionRequest;
-import com.sms.satp.dto.GlobalFunctionResponse;
+import com.sms.satp.common.validate.InsertGroup;
+import com.sms.satp.common.validate.UpdateGroup;
+import com.sms.satp.dto.request.GlobalFunctionRequest;
+import com.sms.satp.dto.response.GlobalFunctionResponse;
 import com.sms.satp.service.GlobalFunctionService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
@@ -36,20 +38,17 @@ public class GlobalFunctionController {
     }
 
     @PostMapping
-    public Boolean add(@Validated @RequestBody GlobalFunctionRequest globalFunctionRequest) {
-        globalFunctionService.add(globalFunctionRequest);
-        return Boolean.TRUE;
+    public Boolean add(@Validated(InsertGroup.class) @RequestBody GlobalFunctionRequest globalFunctionRequest) {
+        return globalFunctionService.add(globalFunctionRequest);
     }
 
     @PutMapping
-    public Boolean edit(@Validated @RequestBody GlobalFunctionRequest globalFunctionRequest) {
-        globalFunctionService.edit(globalFunctionRequest);
-        return Boolean.TRUE;
+    public Boolean edit(@Validated(UpdateGroup.class) @RequestBody GlobalFunctionRequest globalFunctionRequest) {
+        return globalFunctionService.edit(globalFunctionRequest);
     }
 
     @DeleteMapping("/{ids}")
-    public Boolean delete(@PathVariable String[] ids) {
-        globalFunctionService.delete(ids);
-        return Boolean.TRUE;
+    public Boolean delete(@PathVariable List<String> ids) {
+        return globalFunctionService.delete(ids);
     }
 }

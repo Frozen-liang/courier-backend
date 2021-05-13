@@ -3,8 +3,8 @@ package com.sms.satp.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.common.enums.ParamType;
-import com.sms.satp.dto.ParamInfoRequest;
-import com.sms.satp.dto.ParamInfoResponse;
+import com.sms.satp.dto.request.ParamInfoRequest;
+import com.sms.satp.dto.response.ParamInfoResponse;
 import com.sms.satp.entity.api.common.ParamInfo;
 import java.util.ArrayList;
 import java.util.List;

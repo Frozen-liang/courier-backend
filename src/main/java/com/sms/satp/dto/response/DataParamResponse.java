@@ -1,6 +1,5 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.response;
 
-import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,9 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Data
-public class DataParamRequest {
+public class DataParamResponse {
 
-    @NotEmpty(message = "The key cannot by empty")
     private String key;
     private Object value;
 }

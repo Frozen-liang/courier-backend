@@ -1,7 +1,7 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.ProjectFunctionRequest;
-import com.sms.satp.dto.ProjectFunctionResponse;
+import com.sms.satp.dto.request.ProjectFunctionRequest;
+import com.sms.satp.dto.response.ProjectFunctionResponse;
 import java.util.List;
 
 public interface ProjectFunctionService {
@@ -10,9 +10,9 @@ public interface ProjectFunctionService {
 
     List<Object> list(String projectId, String functionDesc, String functionName);
 
-    void add(ProjectFunctionRequest projectFunctionRequest);
+    Boolean add(ProjectFunctionRequest projectFunctionRequest);
 
-    void edit(ProjectFunctionRequest projectFunctionRequest);
+    Boolean edit(ProjectFunctionRequest projectFunctionRequest);
 
-    void delete(String[] ids);
+    Boolean delete(List<String> ids);
 }

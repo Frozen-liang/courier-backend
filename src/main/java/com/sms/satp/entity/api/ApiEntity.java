@@ -8,8 +8,10 @@ import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.api.common.ParamInfo;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -18,6 +20,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
@@ -66,10 +70,4 @@ public class ApiEntity extends BaseEntity {
 
     private ApiJsonType apiResponseJsonType;
     private ApiJsonType apiRequestJsonType;
-
-
-    public static void main(String[] args) {
-
-    }
-
 }

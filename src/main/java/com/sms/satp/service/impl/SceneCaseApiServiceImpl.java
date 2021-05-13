@@ -7,9 +7,9 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR;
 
-import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.common.SearchFiled;
 import com.sms.satp.common.enums.OperationType;
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.AddSceneCaseApiDto;
 import com.sms.satp.dto.SceneCaseApiDto;
 import com.sms.satp.dto.SceneCaseApiLogDto;
