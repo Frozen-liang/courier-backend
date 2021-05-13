@@ -8,7 +8,6 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.core.models.ParseOptions;
 import java.util.List;
 import java.util.Objects;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ public class OpenApiDocumentTransformerTest {
                     .toString(),
                 null,
                 parseOptions).getOpenAPI();
-        DocumentDefinition documentDefinition = new DocumentDefinition(openAPI, new ObjectId().toString());
+        DocumentDefinition documentDefinition = new DocumentDefinition(openAPI);
         ApiDocumentTransformer swaggerApiDocumentTransformer = SwaggerApiDocumentTransformer.INSTANCE;
         List<ApiEntity> apiEntities = swaggerApiDocumentTransformer
             .toApiEntities(documentDefinition);

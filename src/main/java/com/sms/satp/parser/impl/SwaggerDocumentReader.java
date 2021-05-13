@@ -15,20 +15,20 @@ public enum SwaggerDocumentReader implements DocumentReader {
     }
 
     @Override
-    public DocumentDefinition readLocation(String location, String projectId) {
+    public DocumentDefinition<?> readLocation(String location, String projectId) {
         OpenAPI openApi = new OpenAPIParser()
             .readLocation(location,
                 null,
                 PARSE_OPTIONS).getOpenAPI();
-        return new DocumentDefinition(openApi, projectId);
+        return DocumentDefinition.builder().document(openApi).build();
     }
 
     @Override
-    public DocumentDefinition readContents(String content, String projectId) {
+    public DocumentDefinition<?> readContents(String content, String projectId) {
         OpenAPI openApi = new OpenAPIParser()
             .readContents(content,
                 null,
                 PARSE_OPTIONS).getOpenAPI();
-        return new DocumentDefinition(openApi, projectId);
+        return DocumentDefinition.builder().document(openApi).build();
     }
 }

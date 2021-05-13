@@ -13,7 +13,7 @@ public class MD5Util {
             String json = JsonUtils.serializeObject(o);
             return DigestUtils.md5DigestAsHex(json.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 

@@ -19,6 +19,7 @@ import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
 import com.sms.satp.mapper.ApiMapper;
+import com.sms.satp.repository.ApiGroupRepository;
 import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
@@ -40,8 +41,9 @@ class ApiServiceTest {
     private final ProjectEntityRepository projectEntityRepository = mock(ProjectEntityRepository.class);
     private final ApiHistoryRepository apiHistoryRepository = mock(ApiHistoryRepository.class);
     private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
+    private final ApiGroupRepository apiGroupRepository = mock(ApiGroupRepository.class);
     private final ApiService apiService = new ApiServiceImpl(projectEntityRepository,
-        apiRepository, apiHistoryRepository, apiMapper, customizedApiRepository);
+        apiRepository, apiHistoryRepository, apiMapper, customizedApiRepository, apiGroupRepository);
     private final ApiEntity api = ApiEntity.builder().id(ID).build();
     private final ApiResponse apiResponseDto = ApiResponse.builder().id(ID).build();
     private final ApiRequest apiRequestDto = ApiRequest.builder().id(ID).build();

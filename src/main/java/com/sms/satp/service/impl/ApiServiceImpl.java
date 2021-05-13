@@ -14,10 +14,12 @@ import com.sms.satp.dto.request.ApiRequest;
 import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
+import com.sms.satp.entity.group.ApiGroupEntity;
 import com.sms.satp.mapper.ApiMapper;
 import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.DocumentReader;
 import com.sms.satp.parser.common.DocumentDefinition;
+import com.sms.satp.repository.ApiGroupRepository;
 import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
@@ -26,11 +28,14 @@ import com.sms.satp.service.ApiService;
 import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.PageDtoConverter;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -46,25 +51,41 @@ public class ApiServiceImpl implements ApiService {
     private final ApiHistoryRepository apiHistoryRepository;
     private final ApiMapper apiMapper;
     private final CustomizedApiRepository customizedApiRepository;
+    private final ApiGroupRepository apiGroupRepository;
 
     public ApiServiceImpl(ProjectEntityRepository projectEntityRepository,
         ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository, ApiMapper apiMapper,
-        CustomizedApiRepository customizedApiRepository) {
+        CustomizedApiRepository customizedApiRepository, ApiGroupRepository apiGroupRepository) {
         this.projectEntityRepository = projectEntityRepository;
         this.apiRepository = apiRepository;
         this.apiHistoryRepository = apiHistoryRepository;
         this.apiMapper = apiMapper;
         this.customizedApiRepository = customizedApiRepository;
+        this.apiGroupRepository = apiGroupRepository;
     }
 
     @Override
     public boolean importDocument(ApiImportRequest apiImportRequest) {
         DocumentType documentType = DocumentType.getType(apiImportRequest.getDocumentType());
-        DocumentDefinition definition = getDocumentParserResult(apiImportRequest);
-        ApiDocumentTransformer transformer = documentType.getTransformer();
+        DocumentDefinition definition = parserDocument(apiImportRequest);
+        ApiDocumentTransformer<?> transformer = documentType.getTransformer();
+        Set<ApiGroupEntity> apiGroupEntities = transformer.toApiGroupEntities(definition);
+        List<ApiGroupEntity> oldGroupEntities =
+            apiGroupRepository.findApiGroupEntitiesByProjectId(apiImportRequest.getProjectId());
+        Collection<ApiGroupEntity> unsavedGroupEntities = CollectionUtils
+            .subtract(apiGroupEntities, oldGroupEntities);
+        List<ApiGroupEntity> newApiGroupEntities = apiGroupRepository.saveAll(unsavedGroupEntities);
+        newApiGroupEntities.addAll(oldGroupEntities);
+
         List<ApiEntity> apiEntities = transformer.toApiEntities(definition);
         /*List<ApiEntity> oldApiEntities = apiRepository
             .findApiEntitiesByProjectId(apiImportRequest);*/
+        apiEntities.forEach(apiEntity -> apiEntity.setProjectId(apiImportRequest.getProjectId()));
+
+        List<ApiEntity> oldApiEntities = apiRepository
+            .findApiEntitiesByProjectId(apiImportRequest.getProjectId());
+        Collection<ApiEntity> subtract = CollectionUtils.subtract(apiEntities, oldApiEntities);
+
         List<ApiHistoryEntity> apiHistoryEntities = apiRepository.insert(apiEntities).stream()
             .map(apiEntity -> ApiHistoryEntity.builder().record(apiEntity).build()).collect(
                 Collectors.toList());
@@ -93,7 +114,6 @@ public class ApiServiceImpl implements ApiService {
             throw new ApiTestPlatformException(GET_API_PAGE_ERROR);
         }
     }
-
 
     @Override
     public Boolean add(ApiRequest apiRequestDto) {
@@ -139,18 +159,18 @@ public class ApiServiceImpl implements ApiService {
         }
     }
 
-    private DocumentDefinition getDocumentParserResult(ApiImportRequest apiImportRequest) {
-        DocumentDefinition content;
+    private DocumentDefinition<?> parserDocument(ApiImportRequest apiImportRequest) {
+        DocumentDefinition<?> documentDefinition;
         DocumentType documentType = DocumentType.getType(apiImportRequest.getDocumentType());
         DocumentReader reader = documentType.getReader();
         String documentUrl = apiImportRequest.getDocumentUrl();
         MultipartFile file = apiImportRequest.getFile();
         String projectId = apiImportRequest.getProjectId();
         if (StringUtils.isNotBlank(documentUrl)) {
-            content = reader.readLocation(documentUrl, projectId);
+            documentDefinition = reader.readLocation(documentUrl, projectId);
         } else if (Objects.nonNull(file)) {
             try {
-                content = reader
+                documentDefinition = reader
                     .readContents(IOUtils.toString(file.getInputStream(), StandardCharsets.UTF_8), projectId);
             } catch (Exception e) {
                 throw ExceptionUtils.mpe("Failed to read the file in DocumentType", e);
@@ -159,6 +179,6 @@ public class ApiServiceImpl implements ApiService {
             throw ExceptionUtils
                 .mpe("Not in the supported range(DocumentType=%s)", new Object[]{DocumentType.values()});
         }
-        return content;
+        return documentDefinition;
     }
 }

@@ -1,6 +1,5 @@
 package com.sms.satp.parser.common;
 
-import io.swagger.v3.oas.models.OpenAPI;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,8 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DocumentDefinition {
+public class DocumentDefinition<T> {
 
-    private OpenAPI openApi;
-    private String projectId;
+    private T document;
 }
