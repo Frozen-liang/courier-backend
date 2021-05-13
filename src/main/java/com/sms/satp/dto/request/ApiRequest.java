@@ -1,5 +1,7 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
+import com.sms.satp.common.validate.InsertGroup;
+import com.sms.satp.common.validate.UpdateGroup;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -15,30 +17,31 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ApiRequest {
 
+    @NotBlank(groups = UpdateGroup.class, message = "The id must not be empty.")
     private String id;
 
-    @NotBlank(message = "The projectId must not be null.")
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId must not be null.")
     private String projectId;
 
     private String groupId;
 
     private List<String> tagId;
 
-    @NotBlank(message = "The apiName must not be null.")
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiName must not be null.")
     private String apiName;
 
     private String description;
 
-    @NotNull(message = "The apiPath must not be null.")
+    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiPath must not be null.")
     private String apiPath;
 
-    @NotNull(message = "The apiProtocol must not be null.")
+    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiProtocol must not be null.")
     private Integer apiProtocol;
 
-    @NotNull(message = "The requestMethod must not be null.")
+    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The requestMethod must not be null.")
     private Integer requestMethod;
 
-    @NotNull(message = "The apiRequestParamType must not be null.")
+    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiRequestParamType must not be null.")
     private Integer apiRequestParamType;
 
 
@@ -55,7 +58,7 @@ public class ApiRequest {
     @Valid
     private List<ParamInfoRequest> responseParams;
 
-    @NotNull(message = "The apiStatus must not be null.")
+    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiStatus must not be null.")
     private Integer apiStatus;
 
     private boolean removed;
@@ -64,9 +67,9 @@ public class ApiRequest {
 
     private String postInject;
 
-    @NotNull(message = "The apiResponseJsonType must not be null.")
+    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiResponseJsonType must not be null.")
     private Integer apiResponseJsonType;
 
-    @NotNull(message = "The apiRequestJsonType must not be null.")
+    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiRequestJsonType must not be null.")
     private Integer apiRequestJsonType;
 }

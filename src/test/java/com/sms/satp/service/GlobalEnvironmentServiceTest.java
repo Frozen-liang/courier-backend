@@ -15,31 +15,31 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.GlobalEnvironmentRequest;
-import com.sms.satp.dto.GlobalEnvironmentResponse;
+import com.sms.satp.dto.request.GlobalEnvironmentRequest;
+import com.sms.satp.dto.response.GlobalEnvironmentResponse;
 import com.sms.satp.entity.env.GlobalEnvironment;
 import com.sms.satp.mapper.GlobalEnvironmentMapper;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.GlobalEnvironmentRepository;
 import com.sms.satp.service.impl.GlobalEnvironmentServiceImpl;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.UpdateDefinition;
 
 @DisplayName("Tests for GlobalEnvironmentService")
 class GlobalEnvironmentServiceTest {
 
     private final GlobalEnvironmentRepository globalEnvironmentRepository = mock(GlobalEnvironmentRepository.class);
     private final GlobalEnvironmentMapper globalEnvironmentMapper = mock(GlobalEnvironmentMapper.class);
-    private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
+    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
     private final GlobalEnvironmentService globalEnvironmentService = new GlobalEnvironmentServiceImpl(
         globalEnvironmentRepository,
-        globalEnvironmentMapper, mongoTemplate);
+        globalEnvironmentMapper, commonDeleteRepository);
     private final GlobalEnvironment globalEnvironment = GlobalEnvironment.builder().id(ID).build();
     private final GlobalEnvironmentResponse globalEnvironmentResponse = GlobalEnvironmentResponse
         .builder().id(ID).build();
@@ -47,6 +47,7 @@ class GlobalEnvironmentServiceTest {
         .builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final String NOT_EXIST_ID = ObjectId.get().toString();
+    private static final List<String> ID_LIST = Collections.singletonList(ID);
     private static final Integer TOTAL_ELEMENTS = 10;
 
     @Test
@@ -95,8 +96,7 @@ class GlobalEnvironmentServiceTest {
         when(globalEnvironmentRepository.findById(any()))
             .thenReturn(Optional.of(GlobalEnvironment.builder().id(ID).build()));
         when(globalEnvironmentRepository.save(any(GlobalEnvironment.class))).thenReturn(globalEnvironment);
-        globalEnvironmentService.edit(globalEnvironmentRequest);
-        verify(globalEnvironmentRepository, times(1)).save(any(GlobalEnvironment.class));
+        assertThat(globalEnvironmentService.edit(globalEnvironmentRequest)).isTrue();
     }
 
     @Test
@@ -141,17 +141,16 @@ class GlobalEnvironmentServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectEnvironment service")
     void delete_test() {
-        globalEnvironmentService.delete(new String[]{ID});
-        verify(mongoTemplate, times(1))
-            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
+        when(commonDeleteRepository.deleteByIds(ID_LIST, GlobalEnvironment.class)).thenReturn(Boolean.TRUE);
+        assertThat(globalEnvironmentService.delete(ID_LIST)).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while delete GlobalEnvironment")
     void delete_exception_test() {
-        doThrow(new RuntimeException()).when(mongoTemplate)
-            .updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class));
-        assertThatThrownBy(() -> globalEnvironmentService.delete(new String[]{ID}))
+        doThrow(new RuntimeException()).when(commonDeleteRepository)
+            .deleteByIds(ID_LIST, GlobalEnvironment.class);
+        assertThatThrownBy(() -> globalEnvironmentService.delete(ID_LIST))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID.getCode());
     }

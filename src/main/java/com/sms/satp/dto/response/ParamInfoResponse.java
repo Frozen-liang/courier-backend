@@ -1,4 +1,4 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.response;
 
 import java.util.ArrayList;
 import java.util.List;

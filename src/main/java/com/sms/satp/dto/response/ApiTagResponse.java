@@ -1,4 +1,4 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

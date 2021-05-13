@@ -2,8 +2,8 @@ package com.sms.satp.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sms.satp.dto.GlobalEnvironmentRequest;
-import com.sms.satp.dto.GlobalEnvironmentResponse;
+import com.sms.satp.dto.request.GlobalEnvironmentRequest;
+import com.sms.satp.dto.response.GlobalEnvironmentResponse;
 import com.sms.satp.entity.env.GlobalEnvironment;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,7 +19,6 @@ class GlobalEnvironmentMapperTest {
 
     private static final Integer SIZE = 10;
     private static final String EVN_NAME = "evnName";
-    private static final String CREATE_TIME_STRING = "2020-04-27 15:19:00";
     private static final LocalDateTime CREATE_TIME = LocalDateTime.now();
     private static final LocalDateTime MODIFY_TIME = LocalDateTime.now();
 
@@ -52,7 +51,6 @@ class GlobalEnvironmentMapperTest {
     void dto_to_entity() {
         GlobalEnvironmentRequest globalEnvironmentDto = GlobalEnvironmentRequest.builder()
             .envName(EVN_NAME)
-            .createDateTime(CREATE_TIME_STRING)
             .build();
         GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentDto);
         assertThat(globalEnvironment.getEnvName()).isEqualTo(EVN_NAME);

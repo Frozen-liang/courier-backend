@@ -3,8 +3,8 @@ package com.sms.satp.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.common.enums.ApiTagType;
-import com.sms.satp.dto.ApiTagRequest;
-import com.sms.satp.dto.ApiTagResponse;
+import com.sms.satp.dto.request.ApiTagRequest;
+import com.sms.satp.dto.response.ApiTagResponse;
 import com.sms.satp.entity.tag.ApiTag;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -56,7 +56,6 @@ class ApiTagMapperTest {
         ApiTagRequest apiTagDto = ApiTagRequest.builder()
             .tagName(TAG_NAME)
             .tagType(ApiTagType.CASE.getCode())
-            .createDateTime(CREATE_TIME_STRING)
             .build();
         ApiTag apiTag = apiTagMapper.toEntity(apiTagDto);
         assertThat(apiTag.getTagName()).isEqualTo(TAG_NAME);

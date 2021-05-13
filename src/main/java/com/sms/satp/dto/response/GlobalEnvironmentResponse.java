@@ -1,4 +1,4 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.response;
 
 import com.sms.satp.entity.api.common.HeaderInfo;
 import com.sms.satp.entity.env.EnvironmentAuth;
@@ -8,14 +8,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectEnvironmentResponse {
+@Builder
+@Data
+public class GlobalEnvironmentResponse {
 
     private String id;
-    private String projectId;
     private String envName;
     private String envDesc;
     private String frontUri;
@@ -26,8 +25,8 @@ public class ProjectEnvironmentResponse {
     private String globalAfterProcess;
     private String createDateTime;
     private String modifyDateTime;
-    private String createUserId;
-    private String modifyUserId;
+    private Long createUserId;
+    private Long modifyUserId;
     private List<HeaderInfo> headers;
     private List<ParamInfoResponse> params;
     private List<ParamInfoResponse> urlParams;

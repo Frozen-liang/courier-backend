@@ -2,8 +2,8 @@ package com.sms.satp.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sms.satp.dto.DataCollectionRequest;
-import com.sms.satp.dto.DataCollectionResponse;
+import com.sms.satp.dto.request.DataCollectionRequest;
+import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,7 +19,6 @@ class DataCollectionMapperTest {
 
     private static final Integer SIZE = 10;
     private static final String COLLECTION_NAME = "testName";
-    private static final String CREATE_TIME_STRING = "2020-02-10 14:24:35";
     private static final LocalDateTime CREATE_TIME = LocalDateTime.now();
     private static final LocalDateTime MODIFY_TIME = LocalDateTime.now();
 
@@ -53,7 +52,6 @@ class DataCollectionMapperTest {
     void dto_to_entity() {
         DataCollectionRequest dataCollectionDto = DataCollectionRequest.builder()
             .collectionName(COLLECTION_NAME)
-            .createDateTime(CREATE_TIME_STRING)
             .build();
         DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionDto);
         assertThat(dataCollection.getCollectionName()).isEqualTo(COLLECTION_NAME);

@@ -45,7 +45,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     @NonNull
     protected ResponseEntity<Object> handleExceptionInternal(@Nullable Exception ex, @Nullable Object body,
-        @NonNull HttpHeaders headers, @Nullable HttpStatus status, @Nullable WebRequest request) {
+        @NonNull HttpHeaders headers, @NonNull HttpStatus status, @Nullable WebRequest request) {
         if (ex instanceof MethodArgumentNotValidException) {
             MethodArgumentNotValidException exception = (MethodArgumentNotValidException) ex;
             return new ResponseEntity<>(Response.error(Integer.toString(Objects.requireNonNull(status).value()),

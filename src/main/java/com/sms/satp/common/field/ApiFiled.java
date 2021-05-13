@@ -1,8 +1,7 @@
-package com.sms.satp.service.condition;
+package com.sms.satp.common.field;
 
 public enum ApiFiled {
 
-    PROJECT_ID("projectId"),
     TAG_ID("tagId"),
     GROUP_ID("groupId"),
     API_PROTOCOL("apiProtocol"),

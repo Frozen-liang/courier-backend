@@ -1,7 +1,7 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.ApiRequest;
-import com.sms.satp.dto.ApiResponse;
+import com.sms.satp.dto.request.ApiRequest;
+import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;

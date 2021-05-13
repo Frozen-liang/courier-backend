@@ -7,6 +7,7 @@ import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.enums.EnumCommon;
+import com.sms.satp.common.enums.GroupImportType;
 import com.sms.satp.common.enums.ParamType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.enums.SaveMode;
@@ -31,7 +32,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToApiRequestParamTypeConverter.INSTANCE, IntegerToApiStatusConverter.INSTANCE,
                 IntegerToParamTypeConverter.INSTANCE, IntegerToRequestMethodConverter.INSTANCE,
                 IntegerToApiTagTypeConverter.INSTANCE, IntegerToApiJsonTypeConverter.INSTANCE,
-                IntegerToSaveModeConverter.INSTANCE, IntegerToDocumentTypeConverter.INSTANCE);
+                IntegerToSaveModeConverter.INSTANCE, IntegerToDocumentTypeConverter.INSTANCE,
+                IntegerToGroupImportTypeConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -130,6 +132,15 @@ public class MongoCustomConverterConfiguration {
 
         public DocumentType convert(@NotNull Integer code) {
             return DocumentType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToGroupImportTypeConverter implements Converter<Integer, GroupImportType> {
+        INSTANCE;
+
+        public GroupImportType convert(@NotNull Integer code) {
+            return GroupImportType.getType(code);
         }
     }
 

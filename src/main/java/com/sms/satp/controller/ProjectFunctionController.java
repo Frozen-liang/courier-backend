@@ -1,8 +1,10 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.dto.ProjectFunctionRequest;
-import com.sms.satp.dto.ProjectFunctionResponse;
+import com.sms.satp.common.validate.InsertGroup;
+import com.sms.satp.common.validate.UpdateGroup;
+import com.sms.satp.dto.request.ProjectFunctionRequest;
+import com.sms.satp.dto.response.ProjectFunctionResponse;
 import com.sms.satp.service.ProjectFunctionService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
@@ -37,20 +39,17 @@ public class ProjectFunctionController {
     }
 
     @PostMapping
-    public Boolean add(@Validated @RequestBody ProjectFunctionRequest projectFunctionRequest) {
-        projectFunctionService.add(projectFunctionRequest);
-        return Boolean.TRUE;
+    public Boolean add(@Validated(InsertGroup.class) @RequestBody ProjectFunctionRequest projectFunctionRequest) {
+        return projectFunctionService.add(projectFunctionRequest);
     }
 
     @PutMapping
-    public Boolean edit(@Validated @RequestBody ProjectFunctionRequest projectFunctionRequest) {
-        projectFunctionService.edit(projectFunctionRequest);
-        return Boolean.TRUE;
+    public Boolean edit(@Validated(UpdateGroup.class) @RequestBody ProjectFunctionRequest projectFunctionRequest) {
+        return projectFunctionService.edit(projectFunctionRequest);
     }
 
     @DeleteMapping("/{ids}")
-    public Boolean delete(@PathVariable String[] ids) {
-        projectFunctionService.delete(ids);
-        return Boolean.TRUE;
+    public Boolean delete(@PathVariable List<String> ids) {
+        return projectFunctionService.delete(ids);
     }
 }

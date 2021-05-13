@@ -1,5 +1,7 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
+import com.sms.satp.common.validate.InsertGroup;
+import com.sms.satp.common.validate.UpdateGroup;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
@@ -14,16 +16,18 @@ import lombok.NoArgsConstructor;
 @Data
 public class GlobalFunctionRequest {
 
+    @NotEmpty(groups = UpdateGroup.class, message = "The id cannot be empty")
     private String id;
-    @NotEmpty(message = "The functionKey cannot be empty")
+
+    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The functionKey cannot be empty")
     private String functionKey;
-    @NotEmpty(message = "The functionName cannot be empty")
+
+    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The functionName cannot be empty")
     private String functionName;
+
     @Valid
     private List<ParamInfoRequest> functionParams;
+
+
     private String functionCode;
-    private String createDateTime;
-    private String modifyDateTime;
-    private Long createUserId;
-    private Long modifyUserId;
 }

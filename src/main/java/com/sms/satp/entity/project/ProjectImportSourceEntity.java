@@ -2,6 +2,7 @@ package com.sms.satp.entity.project;
 
 import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.DocumentType;
+import com.sms.satp.common.enums.GroupImportType;
 import com.sms.satp.common.enums.SaveMode;
 import com.sms.satp.entity.BaseEntity;
 import lombok.Data;
@@ -31,4 +32,6 @@ public class ProjectImportSourceEntity extends BaseEntity {
      * 变更API状态设置.
      */
     private ApiStatus apiChangeStatus;
+
+    private GroupImportType groupImportType;
 }

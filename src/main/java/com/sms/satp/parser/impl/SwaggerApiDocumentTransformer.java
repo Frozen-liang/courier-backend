@@ -16,8 +16,10 @@ import com.sms.satp.common.enums.SchemaType;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiEntity.ApiEntityBuilder;
 import com.sms.satp.entity.api.common.ParamInfo;
+import com.sms.satp.entity.group.ApiGroupEntity;
 import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.common.DocumentDefinition;
+import com.sms.satp.utils.MD5Util;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -40,6 +42,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -51,7 +54,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 
 @Slf4j
-public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer {
+public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer<OpenAPI> {
 
     INSTANCE;
 
@@ -60,24 +63,49 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer {
     public static final String DEFAULT_RESPONSE_KEY = "200";
 
     @Override
-    public List<ApiEntity> toApiEntities(DocumentDefinition definition) {
-        OpenAPI openAPI = definition.getOpenApi();
-        Map<String, Schema> schemas = openAPI.getComponents().getSchemas();
+    public List<ApiEntity> toApiEntities(DocumentDefinition<OpenAPI> definition) {
+        OpenAPI definitionDocument = definition.getDocument();
+        Map<String, Schema> schemas = definitionDocument.getComponents().getSchemas();
         final Map<String, List<ParamInfo>> componentReference = prepareComponentReference(schemas);
-        return openAPI.getPaths().entrySet().stream()
-            .map(entry -> buildApiEntities(entry, componentReference, definition.getProjectId()))
+        return definitionDocument.getPaths().entrySet().stream()
+            .map(entry -> buildApiEntities(entry, componentReference))
             .flatMap(Collection::stream).collect(Collectors.toList());
     }
 
+    @Override
+    public Set<ApiGroupEntity> toApiGroupEntities(DocumentDefinition<OpenAPI> definition) {
+        OpenAPI document = definition.getDocument();
+        return document.getPaths().entrySet().stream()
+            .map(this::buildGroups)
+            .flatMap(Collection::stream).collect(Collectors.toSet());
+    }
+
+    private Set<ApiGroupEntity> buildGroups(Entry<String, PathItem> entry) {
+
+        PathItem item = entry.getValue();
+        return Arrays.stream(RequestMethod.values()).sequential()
+            .map(method -> mapTuple(item, method))
+            .filter(tuple -> Objects.nonNull(tuple._2))
+            .map(Tuple2::_2)
+            .map(this::buildApiGroup).filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+    }
+
+    public ApiGroupEntity buildApiGroup(Operation operation) {
+        List<String> tags = operation.getTags();
+        return tags.stream().findFirst().map(groupName -> ApiGroupEntity.builder().name(groupName).build())
+            .orElse(null);
+    }
+
     private List<ApiEntity> buildApiEntities(Entry<String, PathItem> entry,
-        Map<String, List<ParamInfo>> componentReference, String projectId) {
+        Map<String, List<ParamInfo>> componentReference) {
         PathItem item = entry.getValue();
         String apiPath = entry.getKey();
         return Arrays.stream(RequestMethod.values()).sequential()
             .map(method -> mapTuple(item, method))
             .filter(tuple -> Objects.nonNull(tuple._2))
             .map(tuple -> buildApiEntity(tuple, componentReference, apiPath)).filter(Objects::nonNull)
-            .peek(apiEntity -> apiEntity.setProjectId(projectId))
             .collect(Collectors.toList());
     }
 
@@ -107,12 +135,14 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer {
         Optional.ofNullable(operation.getRequestBody())
             .flatMap(requestBody -> requestBody.getContent().entrySet().stream().findFirst()).stream()
             // set api request param type.
-            .peek(entry -> apiEntityBuilder.apiRequestParamType(Media.resolve(entry.getKey()).getApiRequestParamType()))
+            .peek(entry -> apiEntityBuilder
+                .apiRequestParamType(Media.resolve(entry.getKey()).getApiRequestParamType()))
             .map(Entry::getValue)
             .peek(mediaType -> ifRequestOrResponseEqualArray(mediaType, apiEntityBuilder::apiRequestJsonType))
             .findFirst()
             .ifPresent(
-                mediaType -> buildRequestOrResponse(componentReference, mediaType, apiEntityBuilder::requestParams));
+                mediaType -> buildRequestOrResponse(componentReference, mediaType,
+                    apiEntityBuilder::requestParams));
 
         Optional<ApiResponse> apiResponse = Optional.ofNullable(operation.getResponses())
             .map(response -> response.get(DEFAULT_RESPONSE_KEY));
@@ -122,12 +152,15 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer {
             .peek(mediaType -> ifRequestOrResponseEqualArray(mediaType, apiEntityBuilder::apiResponseJsonType)
             ).findFirst()
             .ifPresent(
-                mediaType -> buildRequestOrResponse(componentReference, mediaType, apiEntityBuilder::responseParams));
+                mediaType -> buildRequestOrResponse(componentReference, mediaType,
+                    apiEntityBuilder::responseParams));
 
         // Build response header
         apiResponse.map(ApiResponse::getHeaders)
             .ifPresent(headers -> buildResponseHeaders(headers, apiEntityBuilder::responseHeaders));
-        return apiEntityBuilder.build();
+        ApiEntity apiEntity = apiEntityBuilder.build();
+        apiEntity.setMd5(MD5Util.getMD5(apiEntity));
+        return apiEntity;
 
     }
 
@@ -185,7 +218,6 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer {
         }).collect(Collectors.groupingBy(Tuple2::_1, mapping(Tuple2::_2, toList())));
     }
 
-
     private Tuple2<RequestMethod, Operation> mapTuple(PathItem item,
         RequestMethod method) {
         String operationMethodName = StringUtils.capitalize(method.name().toLowerCase(Locale.US));
@@ -203,9 +235,9 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer {
         Map<String, List<ParamInfo>> prepareReference = schemas.keySet().stream()
             .collect(Collectors.toConcurrentMap(Function.identity(), key -> new ArrayList<>()));
         return prepareReference.entrySet().parallelStream()
-            .collect(Collectors.toMap(Entry::getKey, entry -> buildJsonParamInfo(entry, schemas, prepareReference)));
+            .collect(
+                Collectors.toMap(Entry::getKey, entry -> buildJsonParamInfo(entry, schemas, prepareReference)));
     }
-
 
     private List<ParamInfo> buildJsonParamInfo(Entry<String, List<ParamInfo>> entry, Map<String, Schema> schemas,
         Map<String, List<ParamInfo>> paramInfoReference) {
@@ -255,7 +287,6 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer {
             ? paramInfoMap.get(componentKey) : Collections.emptyList();
         return parentComponentKey.equals(componentKey) ? Tuple.of(true, Collections.emptyList()) : Tuple.of(false,
             fetchReference.get());
-
 
     }
 
