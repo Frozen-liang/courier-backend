@@ -17,13 +17,13 @@ public class UnifiedResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(@NonNull MethodParameter returnType,
         @Nullable Class<? extends HttpMessageConverter<?>> converterType) {
-        return !returnType.hasMethodAnnotation(IgnoreWrap.class) && !Objects.requireNonNull(returnType.getMethod())
-            .getReturnType()
+        return !returnType.hasMethodAnnotation(IgnoreWrap.class) && Objects.nonNull(returnType.getMethod())
+            && Objects.nonNull(returnType.getMethod().getReturnType()) && returnType.getMethod().getReturnType()
             .isAssignableFrom(Void.TYPE);
     }
 
     @Override
-    @NonNull
+    @Nullable
     public Object beforeBodyWrite(Object body, @Nullable MethodParameter returnType,
         @Nullable MediaType selectedContentType,
         @Nullable Class<? extends HttpMessageConverter<?>> selectedConverterType, @Nullable ServerHttpRequest request,

@@ -19,15 +19,18 @@ public class BeforeConvertListener {
     }
 
     @EventListener
-    public void listener(BeforeConvertEvent<BaseEntity> beforeSaveEvent) {
-        BaseEntity baseEntity = beforeSaveEvent.getSource();
-        Optional.ofNullable(baseEntity.getId()).ifPresent(id -> {
-            BaseEntity oldBaseEntity = mongoTemplate
-                .findById(id, BaseEntity.class, Objects.requireNonNull(beforeSaveEvent.getCollectionName()));
-            Optional.ofNullable(oldBaseEntity).ifPresent(entity -> {
-                baseEntity.setCreateUserId(entity.getCreateUserId());
-                baseEntity.setCreateDateTime(entity.getCreateDateTime());
+    public void listener(BeforeConvertEvent<Object> beforeSaveEvent) {
+        if (beforeSaveEvent.getSource() instanceof BaseEntity) {
+            BaseEntity baseEntity = (BaseEntity) beforeSaveEvent.getSource();
+            String collectionName = Objects.requireNonNull(beforeSaveEvent.getCollectionName());
+            Optional.ofNullable(baseEntity.getId()).ifPresent(id -> {
+                BaseEntity oldBaseEntity = mongoTemplate
+                    .findById(id, BaseEntity.class, collectionName);
+                Optional.ofNullable(oldBaseEntity).ifPresent(entity -> {
+                    baseEntity.setCreateUserId(entity.getCreateUserId());
+                    baseEntity.setCreateDateTime(entity.getCreateDateTime());
+                });
             });
-        });
+        }
     }
 }
