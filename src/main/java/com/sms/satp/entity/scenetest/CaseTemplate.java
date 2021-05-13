@@ -14,8 +14,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "SceneCase")
-public class SceneCase extends BaseEntity {
+@Document(collection = "CaseTemplate")
+public class CaseTemplate extends BaseEntity {
 
     private String name;
 
@@ -28,7 +28,4 @@ public class SceneCase extends BaseEntity {
     private String testStatus;
 
     private List<String> caseTag;
-
-    private Integer priority;
-
 }

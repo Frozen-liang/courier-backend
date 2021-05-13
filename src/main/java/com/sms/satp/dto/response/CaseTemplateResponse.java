@@ -1,4 +1,4 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -7,11 +7,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @Builder
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-public class SceneCaseDto {
+@AllArgsConstructor
+public class CaseTemplateResponse {
 
     private String id;
     private String name;
@@ -20,8 +20,9 @@ public class SceneCaseDto {
     private String groupId;
     private String testStatus;
     private List<String> caseTag;
-    private Integer priority;
-    private boolean remove;
+    private Boolean removed;
+    private String createUserId;
     private LocalDateTime createDateTime;
+    private String modifyUserId;
     private LocalDateTime modifyDateTime;
 }

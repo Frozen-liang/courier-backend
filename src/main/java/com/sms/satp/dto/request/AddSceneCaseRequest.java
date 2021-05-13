@@ -1,4 +1,4 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
 import java.util.List;
 import javax.validation.constraints.NotNull;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddSceneCaseDto {
+public class AddSceneCaseRequest {
 
     @NotNull(message = "The name can not be empty")
     private String name;

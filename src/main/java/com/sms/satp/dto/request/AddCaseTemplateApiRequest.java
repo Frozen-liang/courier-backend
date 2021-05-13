@@ -1,42 +1,34 @@
-package com.sms.satp.entity.scenetest;
+package com.sms.satp.dto.request;
 
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.RequestMethod;
-import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.api.common.ParamInfo;
 import java.util.List;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.data.mongodb.core.mapping.FieldType;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-@SuperBuilder
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "SceneCaseApi")
-public class SceneCaseApi extends BaseEntity {
+public class AddCaseTemplateApiRequest {
 
-    @Field(targetType = FieldType.OBJECT_ID)
+    @NotNull(message = "The apiId can not be empty")
     private String apiId;
-
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String sceneCaseId;
-
-    @Field(targetType = FieldType.OBJECT_ID)
+    @NotNull(message = "The caseTemplateId can not be empty")
+    private String caseTemplateId;
+    @NotNull(message = "The projectId can not be empty")
     private String projectId;
-
+    @NotNull(message = "The apiName can not be empty")
     private String apiName;
 
     private String description;
-
+    @NotNull(message = "The apiPath can not be empty")
     private String apiPath;
 
     private ApiProtocol apiProtocol;
@@ -68,4 +60,5 @@ public class SceneCaseApi extends BaseEntity {
 
     private Boolean isExecute;
 
+    private Boolean removed;
 }

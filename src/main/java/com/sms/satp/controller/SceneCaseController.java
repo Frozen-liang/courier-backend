@@ -1,12 +1,15 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.dto.AddSceneCaseDto;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.SceneCaseDto;
-import com.sms.satp.dto.SceneCaseSearchDto;
-import com.sms.satp.dto.UpdateSceneCaseDto;
+import com.sms.satp.dto.request.AddSceneCaseRequest;
+import com.sms.satp.dto.request.SearchSceneCaseRequest;
+import com.sms.satp.dto.request.UpdateSceneCaseRequest;
+import com.sms.satp.dto.request.UpdateSceneTemplateRequest;
+import com.sms.satp.dto.response.SceneCaseResponse;
+import com.sms.satp.dto.response.SceneTemplateResponse;
 import com.sms.satp.service.SceneCaseService;
+import java.util.List;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,33 +32,37 @@ public class SceneCaseController {
     }
 
     @PostMapping
-    public Boolean add(@Valid @RequestBody AddSceneCaseDto sceneCaseDto) {
-        sceneCaseService.add(sceneCaseDto);
-        return Boolean.TRUE;
+    public Boolean add(@Valid @RequestBody AddSceneCaseRequest sceneCaseDto) {
+        return sceneCaseService.add(sceneCaseDto);
     }
 
     @DeleteMapping("/{ids}")
-    public Boolean deleteByIds(@PathVariable String[] ids) {
-        for (String id : ids) {
-            sceneCaseService.deleteById(id);
-        }
-        return Boolean.TRUE;
+    public Boolean deleteByIds(@PathVariable List<String> ids) {
+        return sceneCaseService.deleteByIds(ids);
     }
 
     @PutMapping
-    public Boolean edit(@Valid @RequestBody UpdateSceneCaseDto sceneCaseDto) {
-        sceneCaseService.edit(sceneCaseDto);
-        return Boolean.TRUE;
+    public Boolean edit(@Valid @RequestBody UpdateSceneCaseRequest sceneCaseDto) {
+        return sceneCaseService.edit(sceneCaseDto);
     }
 
     @GetMapping("/page/{projectId}")
-    public Page<SceneCaseDto> page(PageDto pageDto, @PathVariable String projectId) {
+    public Page<SceneCaseResponse> page(PageDto pageDto, @PathVariable String projectId) {
         return sceneCaseService.page(pageDto, projectId);
     }
 
     @GetMapping("/search/{projectId}")
-    public Page<SceneCaseDto> search(SceneCaseSearchDto searchDto, @PathVariable String projectId) {
+    public Page<SceneCaseResponse> search(SearchSceneCaseRequest searchDto, @PathVariable String projectId) {
         return sceneCaseService.search(searchDto, projectId);
     }
 
+    @GetMapping("/conn/{id}")
+    public SceneTemplateResponse getConn(@PathVariable String id) {
+        return sceneCaseService.getConn(id);
+    }
+
+    @PutMapping("/conn/edit")
+    public Boolean editConn(@RequestBody UpdateSceneTemplateRequest updateSceneTemplateRequest) {
+        return sceneCaseService.editConn(updateSceneTemplateRequest);
+    }
 }

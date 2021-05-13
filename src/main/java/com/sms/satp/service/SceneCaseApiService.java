@@ -1,24 +1,27 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.AddSceneCaseApiDto;
-import com.sms.satp.dto.SceneCaseApiDto;
-import com.sms.satp.dto.UpdateSceneCaseApiSortOrderDto;
+import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
+import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
+import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
+import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import java.util.List;
 
 public interface SceneCaseApiService {
 
-    void batch(AddSceneCaseApiDto addSceneCaseApiDto);
+    Boolean batchAdd(BatchAddSceneCaseApiRequest addSceneCaseApiDto);
 
-    void deleteById(String id);
+    Boolean deleteByIds(List<String> ids);
 
-    void edit(SceneCaseApiDto sceneCaseApiDto);
+    Boolean edit(UpdateSceneCaseApiRequest updateSceneCaseApiRequest);
 
-    void batchEdit(UpdateSceneCaseApiSortOrderDto updateSceneCaseApiSortOrderDto);
+    Boolean editAll(List<SceneCaseApi> sceneCaseApiList);
 
-    List<SceneCaseApiDto> listBySceneCaseId(String sceneCaseId, boolean remove);
+    Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiDto);
+
+    List<SceneCaseApiResponse> listBySceneCaseId(String sceneCaseId, boolean remove);
 
     List<SceneCaseApi> listBySceneCaseId(String sceneCaseId);
 
-    SceneCaseApiDto getSceneCaseApiById(String id);
+    SceneCaseApiResponse getSceneCaseApiById(String id);
 }

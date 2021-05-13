@@ -1,4 +1,4 @@
-package com.sms.satp.dto;
+package com.sms.satp.dto.request;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateSceneCaseApiSortOrderDto {
+public class BatchUpdateCaseTemplateApiRequest {
 
-    private List<SceneCaseApiDto> sceneCaseApiDtoList;
+    private List<UpdateCaseTemplateApiRequest> updateCaseTemplateApiRequestList;
 }

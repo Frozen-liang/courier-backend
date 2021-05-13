@@ -1,9 +1,9 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.dto.AddSceneCaseApiDto;
-import com.sms.satp.dto.SceneCaseApiDto;
-import com.sms.satp.dto.UpdateSceneCaseApiSortOrderDto;
+import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
+import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
+import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.service.SceneCaseApiService;
 import java.util.List;
 import javax.validation.Valid;
@@ -27,39 +27,22 @@ public class SceneCaseApiController {
     }
 
     @PostMapping(value = "/batch")
-    public Boolean batch(@Valid @RequestBody AddSceneCaseApiDto addSceneCaseApiDto) {
-        sceneCaseApiService.batch(addSceneCaseApiDto);
-        return Boolean.TRUE;
+    public Boolean batchAdd(@Valid @RequestBody BatchAddSceneCaseApiRequest addSceneCaseApiDto) {
+        return sceneCaseApiService.batchAdd(addSceneCaseApiDto);
     }
 
     @DeleteMapping(value = "/{ids}")
-    public Boolean deleteByIds(@PathVariable String[] ids) {
-        for (String id : ids) {
-            sceneCaseApiService.deleteById(id);
-        }
-        return Boolean.TRUE;
+    public Boolean deleteByIds(@PathVariable List<String> ids) {
+        return sceneCaseApiService.deleteByIds(ids);
     }
 
     @PutMapping
-    public Boolean edit(@Valid @RequestBody SceneCaseApiDto sceneCaseApiDto) {
-        sceneCaseApiService.edit(sceneCaseApiDto);
-        return Boolean.TRUE;
-    }
-
-    @PutMapping(value = "/batch/edit")
-    public Boolean batchEdit(@Valid @RequestBody UpdateSceneCaseApiSortOrderDto updateSceneCaseApiSortOrderDto) {
-        sceneCaseApiService.batchEdit(updateSceneCaseApiSortOrderDto);
-        return Boolean.TRUE;
-    }
-
-    @GetMapping(value = "/list/{sceneCaseId}/{remove}")
-    public List<SceneCaseApiDto> listBySceneCaseId(@PathVariable String sceneCaseId,
-        @PathVariable boolean remove) {
-        return sceneCaseApiService.listBySceneCaseId(sceneCaseId, remove);
+    public Boolean edit(@Valid @RequestBody UpdateSceneCaseApiRequest updateSceneCaseApiRequest) {
+        return sceneCaseApiService.edit(updateSceneCaseApiRequest);
     }
 
     @GetMapping(value = "/{id}")
-    public SceneCaseApiDto getSceneCaseApiById(@PathVariable String id) {
+    public SceneCaseApiResponse getSceneCaseApiById(@PathVariable String id) {
         return sceneCaseApiService.getSceneCaseApiById(id);
     }
 

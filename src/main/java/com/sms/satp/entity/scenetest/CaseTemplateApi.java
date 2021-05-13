@@ -21,14 +21,14 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "SceneCaseApi")
-public class SceneCaseApi extends BaseEntity {
+@Document(collection = "CaseTemplateApi")
+public class CaseTemplateApi extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String apiId;
 
     @Field(targetType = FieldType.OBJECT_ID)
-    private String sceneCaseId;
+    private String caseTemplateId;
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
