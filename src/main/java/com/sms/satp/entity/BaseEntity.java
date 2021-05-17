@@ -6,11 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
@@ -21,9 +21,9 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 public class BaseEntity {
 
     @MongoId(FieldType.OBJECT_ID)
-    @Indexed(unique = true)
     private String id;
     @Builder.Default
+    @JsonIgnore
     private Boolean removed = false;
     @CreatedBy
     private Long createUserId;

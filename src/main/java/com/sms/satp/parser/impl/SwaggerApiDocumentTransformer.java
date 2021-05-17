@@ -19,6 +19,7 @@ import com.sms.satp.entity.api.common.ParamInfo;
 import com.sms.satp.entity.group.ApiGroupEntity;
 import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.common.DocumentDefinition;
+import com.sms.satp.utils.MD5Util;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
@@ -34,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -43,8 +43,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -64,10 +62,9 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Open
     @Override
     public List<ApiEntity> toApiEntities(DocumentDefinition<OpenAPI> definition) {
         OpenAPI definitionDocument = definition.getDocument();
-        Map<String, Schema> schemas = definitionDocument.getComponents().getSchemas();
-        final Map<String, List<ParamInfo>> componentReference = prepareComponentReference(schemas);
+        Map<String, Schema> components = definitionDocument.getComponents().getSchemas();
         return definitionDocument.getPaths().entrySet().stream()
-            .map(entry -> buildApiEntities(entry, componentReference))
+            .map(entry -> buildApiEntities(entry, components))
             .flatMap(Collection::stream).collect(Collectors.toList());
     }
 
@@ -98,18 +95,18 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Open
     }
 
     private List<ApiEntity> buildApiEntities(Entry<String, PathItem> entry,
-        Map<String, List<ParamInfo>> componentReference) {
+        Map<String, Schema> components) {
         PathItem item = entry.getValue();
         String apiPath = entry.getKey();
         return Arrays.stream(RequestMethod.values()).sequential()
             .map(method -> mapTuple(item, method))
             .filter(tuple -> Objects.nonNull(tuple._2))
-            .map(tuple -> buildApiEntity(tuple, componentReference, apiPath)).filter(Objects::nonNull)
+            .map(tuple -> buildApiEntity(tuple, components, apiPath)).filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
 
     private ApiEntity buildApiEntity(Tuple2<RequestMethod, Operation> tuple,
-        Map<String, List<ParamInfo>> componentReference, String apiPath) {
+        Map<String, Schema> components, String apiPath) {
         RequestMethod requestMethod = tuple._1;
         Operation operation = tuple._2;
 
@@ -139,26 +136,26 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Open
             .map(Entry::getValue)
             .peek(mediaType -> ifRequestOrResponseEqualArray(mediaType, apiEntityBuilder::apiRequestJsonType))
             .findFirst()
-            .ifPresent(
-                mediaType -> buildRequestOrResponse(componentReference, mediaType,
-                    apiEntityBuilder::requestParams));
+            .map(MediaType::getSchema)
+            .map(schema -> toParams(Optional.empty(), schema, components))
+            .ifPresent(apiEntityBuilder::requestParams);
 
         Optional<ApiResponse> apiResponse = Optional.ofNullable(operation.getResponses())
             .map(response -> response.get(DEFAULT_RESPONSE_KEY));
         // Build response body.
         apiResponse
             .flatMap(response -> response.getContent().values().stream().findFirst()).stream()
-            .peek(mediaType -> ifRequestOrResponseEqualArray(mediaType, apiEntityBuilder::apiResponseJsonType)
-            ).findFirst()
-            .ifPresent(
-                mediaType -> buildRequestOrResponse(componentReference, mediaType,
-                    apiEntityBuilder::responseParams));
+            .peek(mediaType -> ifRequestOrResponseEqualArray(mediaType, apiEntityBuilder::apiResponseJsonType))
+            .findFirst()
+            .map(MediaType::getSchema)
+            .map(schema -> toParams(Optional.empty(), schema, components))
+            .ifPresent(apiEntityBuilder::responseParams);
 
         // Build response header
         apiResponse.map(ApiResponse::getHeaders)
             .ifPresent(headers -> buildResponseHeaders(headers, apiEntityBuilder::responseHeaders));
         ApiEntity apiEntity = apiEntityBuilder.build();
-        // apiEntity.setMd5(MD5Util.getMD5(apiEntity));
+        apiEntity.setMd5(MD5Util.getMD5(apiEntity));
         return apiEntity;
 
     }
@@ -170,27 +167,6 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Open
         } else {
             callback.accept(ApiJsonType.OBJECT);
         }
-    }
-
-    private void buildRequestOrResponse(Map<String, List<ParamInfo>> componentReference,
-        MediaType mediaType, Consumer<List<ParamInfo>> callback) {
-        Schema<?> schema = mediaType.getSchema();
-        Map<String, Schema> properties = schema.getProperties();
-        List<ParamInfo> paramInfos;
-        if (MapUtils.isNotEmpty(properties)) {
-            paramInfos = properties.entrySet().stream()
-                .map(entry -> buildChildParamInfo(null, componentReference, entry))
-                .collect(toList());
-
-        } else {
-            String componentKey = (schema instanceof ArraySchema)
-                ? ((ArraySchema) schema).getItems().get$ref() :
-                schema.get$ref();
-            paramInfos = componentReference.get(getKey(componentKey));
-        }
-        callback.accept(paramInfos);
-
-
     }
 
     private void buildResponseHeaders(Map<String, Header> headers, Consumer<List<ParamInfo>> callback) {
@@ -230,67 +206,64 @@ public enum SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Open
         }
     }
 
-    private Map<String, List<ParamInfo>> prepareComponentReference(Map<String, Schema> schemas) {
-        Map<String, List<ParamInfo>> prepareReference = schemas.keySet().stream()
-            .collect(Collectors.toConcurrentMap(Function.identity(), key -> new ArrayList<>()));
-        return prepareReference.entrySet().parallelStream()
-            .collect(
-                Collectors.toMap(Entry::getKey, entry -> buildJsonParamInfo(entry, schemas, prepareReference)));
-    }
-
-    private List<ParamInfo> buildJsonParamInfo(Entry<String, List<ParamInfo>> entry, Map<String, Schema> schemas,
-        Map<String, List<ParamInfo>> paramInfoReference) {
-        Schema<?> schema = schemas.get(entry.getKey());
-        Optional<Map<String, Schema>> properties = Optional.ofNullable(schema.getProperties());
-
-        List<ParamInfo> childParams = properties.orElse(new HashMap<>()).entrySet().stream()
-            .map(propertiesEntry -> buildChildParamInfo(entry.getKey(), paramInfoReference, propertiesEntry))
-            .peek(paramInfo -> ifRequired(schema, paramInfo))
-            .collect(Collectors.toList());
-        List<ParamInfo> value = entry.getValue();
-        value.addAll(childParams);
-        return value;
-    }
-
-    private void ifRequired(Schema<?> schema, ParamInfo paramInfo) {
+    private static boolean ifRequired(Schema<?> schema, String paramKey) {
         List<String> required = schema.getRequired();
-        if (CollectionUtils.isNotEmpty(required) && required.contains(paramInfo.getKey())) {
-            paramInfo.setRequired(true);
+
+        return CollectionUtils.isNotEmpty(required) && required.contains(paramKey);
+    }
+
+
+    private static String getComponentKey(Schema schema) {
+        String componentKey = (schema instanceof ArraySchema)
+            ? ((ArraySchema) schema).getItems().get$ref()
+            : schema.get$ref();
+        return StringUtils.substringAfterLast(componentKey, COMPONENT_KEY_PATTERN);
+    }
+
+    private List<ParamInfo> toParams(Optional<List<String>> pathSummary, Schema<?> schema,
+        Map<String, Schema> components) {
+        List<ParamInfo> paramInfos = new ArrayList<>();
+        Map<String, Schema> properties = schema.getProperties();
+
+        if (MapUtils.isNotEmpty(properties)) {
+
+            for (Entry<String, Schema> entry : properties.entrySet()) {
+                String key = entry.getKey();
+                Schema childSchema = entry.getValue();
+                SchemaType childSchemaType = SchemaType
+                    .resolve(StringUtils.defaultString(childSchema.getType(), OBJECT.getType()), OBJECT.getType());
+                ParamInfo childParam = ParamInfo.builder().key(key)
+                    .paramType(childSchemaType.getParamType())
+                    .description(childSchema.getDescription())
+                    .required(ifRequired(schema, key))
+                    .build();
+                if (List.of(JSON, OBJECT, ARRAY).contains(childSchemaType)) {
+                    childParam.setChildParam(toComplexParams(pathSummary, childSchema, components));
+                }
+                paramInfos.add(childParam);
+            }
+
+        } else {
+            paramInfos = toComplexParams(Optional.empty(), schema,
+                components);
         }
+        return paramInfos;
     }
 
-    private ParamInfo buildChildParamInfo(String parentComponentKey,
-        Map<String, List<ParamInfo>> paramInfoReference, Entry<String, Schema> propertiesEntry) {
-        Schema<?> childSchema = propertiesEntry.getValue();
-        String type = StringUtils.defaultString(childSchema.getType(), OBJECT.getType());
-        SchemaType childSchemaType = SchemaType.resolve(type, childSchema.getFormat());
-        ParamInfo childParam = ParamInfo.builder().key(propertiesEntry.getKey())
-            .paramType(childSchemaType.getParamType()).description(childSchema.getDescription()).build();
-        if (List.of(JSON, OBJECT, ARRAY).contains(childSchemaType)) {
-            String componentKey = (childSchema instanceof ArraySchema)
-                ? ((ArraySchema) childSchema).getItems().get$ref()
-                : childSchema.get$ref();
-            Tuple2<Boolean, List<ParamInfo>> tuple = buildChildReference(parentComponentKey, componentKey,
-                paramInfoReference);
-            childParam.setReference(tuple._1);
-            childParam.setChildParam(tuple._2);
+    private List<ParamInfo> toComplexParams(Optional<List<String>> pathSummary,
+        Schema schema, Map<String, Schema> components) {
+        String componentKey = getComponentKey(schema);
+        if (StringUtils.isBlank(componentKey)) {
+            return Collections.emptyList();
         }
-
-        return childParam;
-    }
-
-    private Tuple2<Boolean, List<ParamInfo>> buildChildReference(String parentComponentKey, String ref,
-        Map<String, List<ParamInfo>> paramInfoMap) {
-        String componentKey = getKey(ref);
-        Supplier<List<ParamInfo>> fetchReference = () -> StringUtils.isNotBlank(componentKey)
-            ? paramInfoMap.get(componentKey) : Collections.emptyList();
-        return parentComponentKey.equals(componentKey) ? Tuple.of(true, Collections.emptyList()) : Tuple.of(false,
-            fetchReference.get());
-
-    }
-
-    private static String getKey(String ref) {
-        return StringUtils.substringAfterLast(ref, COMPONENT_KEY_PATTERN);
+        List<String> paths = pathSummary.orElse(new ArrayList<>());
+        if (paths.contains(componentKey)) {
+            return Collections.emptyList();
+        } else {
+            paths.add(componentKey);
+            return toParams(Optional.of(paths), components.get(componentKey),
+                components);
+        }
     }
 
 }

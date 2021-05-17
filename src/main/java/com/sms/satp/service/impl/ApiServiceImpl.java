@@ -15,7 +15,10 @@ import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
 import com.sms.satp.entity.group.ApiGroupEntity;
+import com.sms.satp.entity.project.ProjectImportFlowEntity;
+import com.sms.satp.mapper.ApiHistoryMapper;
 import com.sms.satp.mapper.ApiMapper;
+import com.sms.satp.parser.ApiDocumentChecker;
 import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.DocumentReader;
 import com.sms.satp.parser.common.DocumentDefinition;
@@ -24,52 +27,71 @@ import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.repository.ProjectEntityRepository;
+import com.sms.satp.repository.ProjectImportFlowRepository;
 import com.sms.satp.service.ApiService;
 import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.PageDtoConverter;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.domain.Page;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
-public class ApiServiceImpl implements ApiService {
+public class ApiServiceImpl implements ApiService, ApplicationContextAware {
 
     private final ProjectEntityRepository projectEntityRepository;
     private final ApiRepository apiRepository;
     private final ApiHistoryRepository apiHistoryRepository;
     private final ApiMapper apiMapper;
+    private final ApiHistoryMapper apiHistoryMapper;
     private final CustomizedApiRepository customizedApiRepository;
     private final ApiGroupRepository apiGroupRepository;
+    private final ProjectImportFlowRepository projectImportFlowRepository;
+    private ApplicationContext applicationContext;
 
     public ApiServiceImpl(ProjectEntityRepository projectEntityRepository,
         ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository, ApiMapper apiMapper,
-        CustomizedApiRepository customizedApiRepository, ApiGroupRepository apiGroupRepository) {
+        ApiHistoryMapper apiHistoryMapper, CustomizedApiRepository customizedApiRepository,
+        ApiGroupRepository apiGroupRepository,
+        ProjectImportFlowRepository projectImportFlowRepository) {
         this.projectEntityRepository = projectEntityRepository;
         this.apiRepository = apiRepository;
         this.apiHistoryRepository = apiHistoryRepository;
         this.apiMapper = apiMapper;
+        this.apiHistoryMapper = apiHistoryMapper;
         this.customizedApiRepository = customizedApiRepository;
         this.apiGroupRepository = apiGroupRepository;
+        this.projectImportFlowRepository = projectImportFlowRepository;
     }
 
     @Override
     public boolean importDocument(ApiImportRequest apiImportRequest) {
+        final ProjectImportFlowEntity projectImportFlowEntity = projectImportFlowRepository.save(
+            ProjectImportFlowEntity.builder().projectId(apiImportRequest.getProjectId()).startTime(LocalDateTime.now())
+                .build());
         DocumentType documentType = DocumentType.getType(apiImportRequest.getDocumentType());
         DocumentDefinition definition = parserDocument(apiImportRequest);
         ApiDocumentTransformer<?> transformer = documentType.getTransformer();
         Set<ApiGroupEntity> apiGroupEntities = transformer.toApiGroupEntities(definition);
+        apiGroupEntities.forEach(apiGroup -> apiGroup.setProjectId(apiImportRequest.getProjectId()));
         List<ApiGroupEntity> oldGroupEntities =
             apiGroupRepository.findApiGroupEntitiesByProjectId(apiImportRequest.getProjectId());
         Collection<ApiGroupEntity> unsavedGroupEntities = CollectionUtils
@@ -78,20 +100,31 @@ public class ApiServiceImpl implements ApiService {
         newApiGroupEntities.addAll(oldGroupEntities);
 
         List<ApiEntity> apiEntities = transformer.toApiEntities(definition);
-        /*List<ApiEntity> oldApiEntities = apiRepository
-            .findApiEntitiesByProjectId(apiImportRequest);*/
         apiEntities.forEach(apiEntity -> apiEntity.setProjectId(apiImportRequest.getProjectId()));
+        List<ApiDocumentChecker> apiDocumentCheckers = documentType.getApiDocumentCheckers();
+        boolean allPass = apiDocumentCheckers.stream()
+            .allMatch(apiDocumentChecker -> apiDocumentChecker
+                .check(apiEntities, projectImportFlowEntity, this.applicationContext));
+        if (allPass) {
 
-        //List<ApiEntity> oldApiEntities = apiRepository
-        //    .findApiEntitiesByProjectId(apiImportRequest.getProjectId());
-        //Collection<ApiEntity> subtract = CollectionUtils.subtract(apiEntities, oldApiEntities);
+            Function<ApiEntity, String> generateUniqueId =
+                apiEntity -> apiEntity.getSwaggerId().concat(apiEntity.getRequestMethod().name());
+            Map<String, ApiEntity> oldApiEntities = apiRepository
+                .findApiEntitiesByProjectIdAndSwaggerIdNotNull(apiImportRequest.getProjectId()).stream()
+                .collect(Collectors.toMap(generateUniqueId, Function.identity()));
 
-        List<ApiHistoryEntity> apiHistoryEntities = apiRepository.insert(apiEntities).stream()
-            .map(apiEntity -> ApiHistoryEntity.builder().record(apiEntity).build()).collect(
-                Collectors.toList());
-        apiHistoryRepository.insert(apiHistoryEntities);
+            Collection<ApiEntity> diffApiEntities = CollectionUtils.subtract(apiEntities, oldApiEntities.values());
+
+            List<ApiHistoryEntity> apiHistoryEntities = apiRepository.insert(apiEntities).stream()
+                .map(apiEntity -> ApiHistoryEntity.builder().record(apiHistoryMapper.toApiHistoryDetail(apiEntity))
+                    .build())
+                .collect(
+                    Collectors.toList());
+            apiHistoryRepository.insert(apiHistoryEntities);
+        }
         return true;
     }
+
 
     @Override
     public ApiResponse findById(String id) {
@@ -121,7 +154,8 @@ public class ApiServiceImpl implements ApiService {
         try {
             ApiEntity apiEntity = apiMapper.toEntity(apiRequestDto);
             ApiEntity newApiEntity = apiRepository.insert(apiEntity);
-            ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder().record(newApiEntity).build();
+            ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
+                .record(apiHistoryMapper.toApiHistoryDetail(apiEntity)).build();
             apiHistoryRepository.insert(apiHistoryEntity);
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
@@ -140,7 +174,8 @@ public class ApiServiceImpl implements ApiService {
                 return Boolean.FALSE;
             }
             ApiEntity newApiEntity = apiRepository.save(apiEntity);
-            ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder().record(newApiEntity).build();
+            ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
+                .record(apiHistoryMapper.toApiHistoryDetail(apiEntity)).build();
             apiHistoryRepository.insert(apiHistoryEntity);
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
@@ -157,6 +192,11 @@ public class ApiServiceImpl implements ApiService {
             log.error("Failed to delete the Api!", e);
             throw new ApiTestPlatformException(DELETE_API_BY_ID_ERROR);
         }
+    }
+
+    @Override
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 
     private DocumentDefinition<?> parserDocument(ApiImportRequest apiImportRequest) {
@@ -181,4 +221,5 @@ public class ApiServiceImpl implements ApiService {
         }
         return documentDefinition;
     }
+
 }

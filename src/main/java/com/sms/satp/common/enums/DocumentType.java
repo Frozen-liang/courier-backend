@@ -1,10 +1,14 @@
 package com.sms.satp.common.enums;
 
+import com.sms.satp.parser.ApiDocumentChecker;
 import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.DocumentReader;
+import com.sms.satp.parser.impl.OperationIdDuplicateChecker;
 import com.sms.satp.parser.impl.SwaggerApiDocumentTransformer;
 import com.sms.satp.parser.impl.SwaggerDocumentReader;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -12,8 +16,9 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 public enum DocumentType implements EnumCommon {
-    SWAGGER(0, SwaggerApiDocumentTransformer.INSTANCE, SwaggerDocumentReader.INSTANCE),
-    POSTMAN(1, null, null);
+    SWAGGER(0, SwaggerApiDocumentTransformer.INSTANCE, SwaggerDocumentReader.INSTANCE, List.of(
+        new OperationIdDuplicateChecker())),
+    POSTMAN(1, null, null, Collections.emptyList());
 
 
     private static final Map<Integer, DocumentType> MAPPINGS =
@@ -23,13 +28,15 @@ public enum DocumentType implements EnumCommon {
     private final int code;
     private final ApiDocumentTransformer transformer;
     private final DocumentReader reader;
+    private final List<ApiDocumentChecker> apiDocumentCheckers;
 
     DocumentType(int code, ApiDocumentTransformer transformer,
-        DocumentReader reader) {
+        DocumentReader reader, List<ApiDocumentChecker> apiDocumentCheckers) {
 
         this.code = code;
         this.transformer = transformer;
         this.reader = reader;
+        this.apiDocumentCheckers = apiDocumentCheckers;
     }
 
 
@@ -43,6 +50,10 @@ public enum DocumentType implements EnumCommon {
 
     public DocumentReader getReader() {
         return reader;
+    }
+
+    public List<ApiDocumentChecker> getApiDocumentCheckers() {
+        return apiDocumentCheckers;
     }
 
     @NonNull

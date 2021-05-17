@@ -1,0 +1,32 @@
+package com.sms.satp.entity.project;
+
+import com.sms.satp.common.enums.ImportStatus;
+import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
+
+@SuppressWarnings("EQ_OVERRIDING_EQUALS_NOT_SYMMETRIC")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Document(collection = "ProjectImportFlow")
+public class ProjectImportFlowEntity {
+
+    @MongoId(FieldType.OBJECT_ID)
+    private String id;
+    private String projectId;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+    private ImportStatus importStatus;
+    private String errorDetail;
+    @LastModifiedDate
+    private LocalDateTime createDateTime;
+}
