@@ -1,12 +1,12 @@
 package com.sms.satp.entity.api;
 
+import com.sms.satp.entity.api.common.ApiHistoryDetail;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
@@ -19,13 +19,12 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 public class ApiHistoryEntity {
 
     @MongoId(FieldType.OBJECT_ID)
-    @Indexed(unique = true)
     private String id;
 
     /**
      * 历史记录.
      */
-    private ApiEntity record;
+    private ApiHistoryDetail record;
 
     /**
      * 修改描述.

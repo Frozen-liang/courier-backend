@@ -6,6 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ApiRepository extends MongoRepository<ApiEntity, String> {
 
-    List<ApiEntity> findApiEntitiesByProjectId(String projectId);
+    List<ApiEntity> findApiEntitiesByProjectIdAndSwaggerIdNotNull(String projectId);
 
 }

@@ -18,12 +18,14 @@ import com.sms.satp.dto.request.ApiRequest;
 import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
+import com.sms.satp.mapper.ApiHistoryMapper;
 import com.sms.satp.mapper.ApiMapper;
 import com.sms.satp.repository.ApiGroupRepository;
 import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.repository.ProjectEntityRepository;
+import com.sms.satp.repository.ProjectImportFlowRepository;
 import com.sms.satp.service.impl.ApiServiceImpl;
 import java.util.Collections;
 import java.util.List;
@@ -42,8 +44,11 @@ class ApiServiceTest {
     private final ApiHistoryRepository apiHistoryRepository = mock(ApiHistoryRepository.class);
     private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
     private final ApiGroupRepository apiGroupRepository = mock(ApiGroupRepository.class);
+    private final ApiHistoryMapper apiHistoryMapper = mock(ApiHistoryMapper.class);
+    private final ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
     private final ApiService apiService = new ApiServiceImpl(projectEntityRepository,
-        apiRepository, apiHistoryRepository, apiMapper, customizedApiRepository, apiGroupRepository);
+        apiRepository, apiHistoryRepository, apiMapper, apiHistoryMapper, customizedApiRepository, apiGroupRepository,
+        projectImportFlowRepository);
     private final ApiEntity api = ApiEntity.builder().id(ID).build();
     private final ApiResponse apiResponseDto = ApiResponse.builder().id(ID).build();
     private final ApiRequest apiRequestDto = ApiRequest.builder().id(ID).build();

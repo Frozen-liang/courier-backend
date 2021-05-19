@@ -16,6 +16,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import net.minidev.json.annotate.JsonIgnore;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.HashIndexed;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -29,41 +31,44 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @NoArgsConstructor
 @SuperBuilder
 @Document(collection = "Api")
+@CompoundIndex(def = "{'projectId': 1, 'swaggerId': 1}")
 public class ApiEntity extends BaseEntity {
 
 
     @JsonIgnore
+    @HashIndexed
+    @Indexed(background = true)
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
     @Field(targetType = FieldType.OBJECT_ID)
+    @Indexed(background = true)
     private String groupId;
-    @Include
+
     @JsonIgnore
     @Field(targetType = FieldType.OBJECT_ID)
     private List<String> tagId;
-    @Include
-    @Indexed(unique = true)
+
     private String apiName;
-    @Include
+
     private String description;
-    @Include
+
     private String apiPath;
-    @Include
+
     private ApiProtocol apiProtocol;
-    @Include
+
     private RequestMethod requestMethod;
-    @Include
+
     private ApiRequestParamType apiRequestParamType;
-    @Include
+
     private List<ParamInfo> requestHeaders;
-    @Include
+
     private List<ParamInfo> responseHeaders;
-    @Include
+
     private List<ParamInfo> pathParams;
-    @Include
+
     private List<ParamInfo> restfulParams;
-    @Include
+
     private List<ParamInfo> requestParams;
     private List<ParamInfo> responseParams;
     @JsonIgnore
@@ -72,16 +77,16 @@ public class ApiEntity extends BaseEntity {
     private String preInject;
     @JsonIgnore
     private String postInject;
-    @Include
+
     private String swaggerId;
 
-    @Include
-    @JsonIgnore
-    private String md5;
-    @Include
-    private ApiJsonType apiResponseJsonType;
-    @Include
-    private ApiJsonType apiRequestJsonType;
 
+    @JsonIgnore
+    @Include
+    private String md5;
+
+    private ApiJsonType apiResponseJsonType;
+
+    private ApiJsonType apiRequestJsonType;
 
 }
