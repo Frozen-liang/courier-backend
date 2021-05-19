@@ -26,7 +26,6 @@ import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.repository.ProjectEntityRepository;
 import com.sms.satp.service.ApiService;
 import com.sms.satp.utils.ExceptionUtils;
-import com.sms.satp.utils.PageDtoConverter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
@@ -107,7 +106,6 @@ public class ApiServiceImpl implements ApiService {
     @Override
     public Page<ApiResponse> page(ApiPageRequest apiPageRequest) {
         try {
-            PageDtoConverter.frontMapping(apiPageRequest);
             return customizedApiRepository.page(apiPageRequest);
         } catch (Exception e) {
             log.error("Failed to get the Api page!", e);
