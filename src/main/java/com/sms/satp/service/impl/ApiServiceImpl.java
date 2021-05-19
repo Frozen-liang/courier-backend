@@ -195,7 +195,7 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
             ApiEntity apiEntity = apiMapper.toEntity(apiRequestDto);
             ApiEntity newApiEntity = apiRepository.insert(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
-                .record(apiHistoryMapper.toApiHistoryDetail(apiEntity)).build();
+                .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             apiHistoryRepository.insert(apiHistoryEntity);
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
@@ -215,7 +215,7 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
             }
             ApiEntity newApiEntity = apiRepository.save(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
-                .record(apiHistoryMapper.toApiHistoryDetail(apiEntity)).build();
+                .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             apiHistoryRepository.insert(apiHistoryEntity);
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
