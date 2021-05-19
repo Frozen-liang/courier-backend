@@ -1,5 +1,9 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.GLOBAL_FUNCTION;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_GLOBAL_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_GLOBAL_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_GLOBAL_FUNCTION_ERROR;
@@ -8,6 +12,8 @@ import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_LIST_E
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.GlobalFunctionRequest;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
@@ -74,6 +80,8 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
 
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = GLOBAL_FUNCTION,
+        template = "{{#globalFunctionRequest.functionName}}")
     public Boolean add(GlobalFunctionRequest globalFunctionRequest) {
         log.info("GlobalFunctionService-add()-params: [GlobalFunction]={}", globalFunctionRequest.toString());
         try {
@@ -87,6 +95,8 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = GLOBAL_FUNCTION,
+        template = "{{#globalFunctionRequest.functionName}}")
     public Boolean edit(GlobalFunctionRequest globalFunctionRequest) {
         log.info("GlobalFunctionService-edit()-params: [GlobalFunction]={}", globalFunctionRequest.toString());
         try {
@@ -104,6 +114,8 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = GLOBAL_FUNCTION, template = "{{#result?.![#this.functionName]}}", enhance =
+    @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
             return commonDeleteRepository.deleteByIds(ids, GlobalFunction.class);

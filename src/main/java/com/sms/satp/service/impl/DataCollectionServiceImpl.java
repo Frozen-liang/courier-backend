@@ -1,5 +1,9 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.DATA_COLLECTION;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_DATA_COLLECTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
@@ -10,6 +14,8 @@ import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.response.DataCollectionResponse;
@@ -75,6 +81,8 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = DATA_COLLECTION,
+        template = "{{#dataCollectionRequest.collectionName}}")
     public Boolean add(DataCollectionRequest dataCollectionRequest) {
         log.info("DataCollectionService-add()-params: [DataCollection]={}", dataCollectionRequest.toString());
         try {
@@ -88,6 +96,8 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = DATA_COLLECTION,
+        template = "{{#dataCollectionRequest.collectionName}}")
     public Boolean edit(DataCollectionRequest dataCollectionRequest) {
         log.info("DataCollectionService-edit()-params: [DataCollection]={}", dataCollectionRequest.toString());
         try {
@@ -105,6 +115,8 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = DATA_COLLECTION, template = "{{#result?.![#this.collectionName]}}", enhance =
+    @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
             return customizedDataCollectionRepository.deleteByIds(ids);

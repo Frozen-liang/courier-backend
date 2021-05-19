@@ -1,7 +1,6 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
 import com.sms.satp.dto.request.ApiTagRequest;
@@ -40,9 +39,9 @@ public class ApiTagController {
     }
 
     @PostMapping
+
     public Boolean add(@Validated(InsertGroup.class) @RequestBody ApiTagRequest apiTagRequest) {
-        apiTagService.add(apiTagRequest);
-        return Boolean.TRUE;
+        return apiTagService.add(apiTagRequest);
     }
 
     @PutMapping

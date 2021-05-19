@@ -1,5 +1,9 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.PROJECT_ENV;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_ENVIRONMENT_ERROR;
@@ -10,6 +14,8 @@ import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.ProjectEnvironmentRequest;
@@ -97,6 +103,8 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = PROJECT_ENV,
+        template = "{{#projectEnvironmentRequest.envName}}")
     public Boolean add(ProjectEnvironmentRequest projectEnvironmentRequest) {
         log.info("ProjectEnvironmentService-add()-params: [ProjectEnvironment]={}",
             projectEnvironmentRequest.toString());
@@ -112,6 +120,8 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = PROJECT_ENV,
+        template = "{{#projectEnvironmentRequest.envName}}")
     public Boolean edit(ProjectEnvironmentRequest projectEnvironmentRequest) {
         log.info("ProjectEnvironmentService-edit()-params: [ProjectEnvironment]={}",
             projectEnvironmentRequest.toString());
@@ -131,6 +141,8 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = PROJECT_ENV, template = "{{#result?.![#this.envName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
             return commonDeleteRepository.deleteByIds(ids, ProjectEnvironment.class);

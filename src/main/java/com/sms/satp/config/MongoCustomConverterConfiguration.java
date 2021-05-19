@@ -8,6 +8,8 @@ import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.enums.EnumCommon;
 import com.sms.satp.common.enums.GroupImportType;
+import com.sms.satp.common.enums.OperationModule;
+import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.common.enums.ParamType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.enums.SaveMode;
@@ -33,7 +35,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToParamTypeConverter.INSTANCE, IntegerToRequestMethodConverter.INSTANCE,
                 IntegerToApiTagTypeConverter.INSTANCE, IntegerToApiJsonTypeConverter.INSTANCE,
                 IntegerToSaveModeConverter.INSTANCE, IntegerToDocumentTypeConverter.INSTANCE,
-                IntegerToGroupImportTypeConverter.INSTANCE);
+                IntegerToGroupImportTypeConverter.INSTANCE, IntegerToOperationTypeConverter.INSTANCE,
+                IntegerToOperationModuleConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -141,6 +144,24 @@ public class MongoCustomConverterConfiguration {
 
         public GroupImportType convert(@NotNull Integer code) {
             return GroupImportType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToOperationTypeConverter implements Converter<Integer, OperationType> {
+        INSTANCE;
+
+        public OperationType convert(@NotNull Integer code) {
+            return OperationType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToOperationModuleConverter implements Converter<Integer, OperationModule> {
+        INSTANCE;
+
+        public OperationModule convert(@NotNull Integer code) {
+            return OperationModule.getType(code);
         }
     }
 

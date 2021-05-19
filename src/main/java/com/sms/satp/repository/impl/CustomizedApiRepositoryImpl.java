@@ -15,6 +15,7 @@ import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
+import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -46,6 +47,7 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
 
     @Override
     public Page<ApiResponse> page(ApiPageRequest apiPageRequest) {
+        PageDtoConverter.frontMapping(apiPageRequest);
         ArrayList<AggregationOperation> aggregationOperations = new ArrayList<>();
         Query query = new Query();
 
@@ -56,21 +58,22 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         LookupOperation apiGroupLookupOperation =
             LookupOperation.newLookup().from("ApiGroup").localField(GROUP_ID.getFiled())
                 .foreignField(ID.getFiled())
-                .as("ApiGroup");
+                .as("apiGroup");
         aggregationOperations.add(apiTagLookupOperation);
         aggregationOperations.add(apiGroupLookupOperation);
 
         buildCriteria(apiPageRequest, query, aggregationOperations);
 
-        Sort sort = Sort.by(Direction.fromString(apiPageRequest.getOrder()), apiPageRequest.getSort());
+        Sort sort = PageDtoConverter.createSort(apiPageRequest);
         aggregationOperations.add(Aggregation.sort(sort));
 
         int skipRecord = apiPageRequest.getPageNumber() * apiPageRequest.getPageSize();
         aggregationOperations.add(Aggregation.skip(Long.valueOf(skipRecord)));
         aggregationOperations.add(Aggregation.limit(apiPageRequest.getPageSize()));
 
-        ProjectionOperation project = Aggregation.project(ApiResponse.class);
-        ProjectionOperation projectionOperation = project.andInclude("apiTag.tagName", "ApiGroup.groupName");
+        ProjectionOperation projectionOperation = Aggregation.project(ApiResponse.class);
+        projectionOperation = projectionOperation.and("apiTag.tagName").as("tagName");
+        projectionOperation = projectionOperation.and("apiGroup.name").as("groupName");
         aggregationOperations.add(projectionOperation);
 
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);

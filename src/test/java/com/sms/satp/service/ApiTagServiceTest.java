@@ -36,10 +36,8 @@ class ApiTagServiceTest {
 
     private final ApiTagRepository apiTagRepository = mock(ApiTagRepository.class);
     private final ApiTagMapper apiTagMapper = mock(ApiTagMapper.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
     private final ApiTagService apiTagService = new ApiTagServiceImpl(
-        apiTagRepository,
-        apiTagMapper,commonDeleteRepository);
+        apiTagRepository, apiTagMapper);
     private final ApiTag apiTag = ApiTag.builder().id(ID).build();
     private final ApiTagResponse apiTagResponse = ApiTagResponse.builder().id(ID).build();
     private final ApiTagRequest apiTagRequest = ApiTagRequest.builder().id(ID).build();
