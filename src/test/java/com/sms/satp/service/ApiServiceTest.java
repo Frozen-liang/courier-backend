@@ -46,7 +46,7 @@ class ApiServiceTest {
     private final ApiGroupRepository apiGroupRepository = mock(ApiGroupRepository.class);
     private final ApiHistoryMapper apiHistoryMapper = mock(ApiHistoryMapper.class);
     private final ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
-    private final ApiService apiService = new ApiServiceImpl(projectEntityRepository,
+    private final ApiService apiService = new ApiServiceImpl(
         apiRepository, apiHistoryRepository, apiMapper, apiHistoryMapper, customizedApiRepository, apiGroupRepository,
         projectImportFlowRepository);
     private final ApiEntity api = ApiEntity.builder().id(ID).build();

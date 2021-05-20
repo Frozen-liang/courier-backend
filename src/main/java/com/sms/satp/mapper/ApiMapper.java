@@ -29,8 +29,7 @@ public interface ApiMapper {
 
     List<ApiResponse> toDtoList(List<ApiEntity> apiEntityList);
 
-    @Mapping(target = "createDateTime", ignore = true)
-    @Mapping(target = "modifyDateTime", ignore = true)
+
     @Mapping(target = "apiProtocol",
         expression = "java(com.sms.satp.common.enums.ApiProtocol.getType(apiRequestDto.getApiProtocol()))")
     @Mapping(target = "requestMethod",
@@ -45,5 +44,9 @@ public interface ApiMapper {
     @Mapping(target = "apiRequestJsonType",
         expression = "java(com.sms.satp.common.enums.ApiJsonType.getType(apiRequestDto.getApiRequestJsonType()))")
     ApiEntity toEntity(ApiRequest apiRequestDto);
+
+
+
+
 
 }

@@ -16,7 +16,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 public enum DocumentType implements EnumCommon {
-    SWAGGER(0, SwaggerApiDocumentTransformer.INSTANCE, SwaggerDocumentReader.INSTANCE, List.of(
+    SWAGGER(0, new SwaggerApiDocumentTransformer(), SwaggerDocumentReader.INSTANCE, List.of(
         new OperationIdDuplicateChecker())),
     POSTMAN(1, null, null, Collections.emptyList());
 

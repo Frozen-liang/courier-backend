@@ -10,8 +10,10 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 
+@Slf4j
 public class OperationIdDuplicateChecker implements ApiDocumentChecker {
 
     @Override
@@ -34,7 +36,10 @@ public class OperationIdDuplicateChecker implements ApiDocumentChecker {
             projectImportFlowEntity.setErrorDetail(builder.toString());
             ProjectImportFlowRepository projectImportFlowRepository =
                 context.getBean(ProjectImportFlowRepository.class);
+            log.error("The project whose id is {},{}",
+                projectImportFlowEntity.getProjectId(), projectImportFlowEntity.getErrorDetail());
             projectImportFlowRepository.save(projectImportFlowEntity);
+
             return false;
 
         }

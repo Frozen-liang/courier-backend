@@ -12,6 +12,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_API_PAGE_ERROR;
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.DocumentType;
+import com.sms.satp.common.enums.ImportStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiImportRequest;
 import com.sms.satp.dto.request.ApiPageRequest;
@@ -31,10 +32,11 @@ import com.sms.satp.repository.ApiGroupRepository;
 import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
-import com.sms.satp.repository.ProjectEntityRepository;
 import com.sms.satp.repository.ProjectImportFlowRepository;
 import com.sms.satp.service.ApiService;
 import com.sms.satp.utils.ExceptionUtils;
+import com.sms.satp.utils.MD5Util;
+import com.sms.satp.utils.PageDtoConverter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -44,9 +46,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -61,7 +65,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class ApiServiceImpl implements ApiService, ApplicationContextAware {
 
-    private final ProjectEntityRepository projectEntityRepository;
     private final ApiRepository apiRepository;
     private final ApiHistoryRepository apiHistoryRepository;
     private final ApiMapper apiMapper;
@@ -71,12 +74,10 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
     private final ProjectImportFlowRepository projectImportFlowRepository;
     private ApplicationContext applicationContext;
 
-    public ApiServiceImpl(ProjectEntityRepository projectEntityRepository,
-        ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository, ApiMapper apiMapper,
+    public ApiServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository, ApiMapper apiMapper,
         ApiHistoryMapper apiHistoryMapper, CustomizedApiRepository customizedApiRepository,
         ApiGroupRepository apiGroupRepository,
         ProjectImportFlowRepository projectImportFlowRepository) {
-        this.projectEntityRepository = projectEntityRepository;
         this.apiRepository = apiRepository;
         this.apiHistoryRepository = apiHistoryRepository;
         this.apiMapper = apiMapper;
@@ -91,11 +92,13 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
         final ProjectImportFlowEntity projectImportFlowEntity = projectImportFlowRepository.save(
             ProjectImportFlowEntity.builder().projectId(apiImportRequest.getProjectId()).startTime(LocalDateTime.now())
                 .build());
+        log.info("The project whose Id is [{}] starts to import API documents.", apiImportRequest.getProjectId());
         DocumentType documentType = DocumentType.getType(apiImportRequest.getDocumentType());
         DocumentDefinition definition = parserDocument(apiImportRequest);
         ApiDocumentTransformer<?> transformer = documentType.getTransformer();
-        Set<ApiGroupEntity> apiGroupEntities = transformer.toApiGroupEntities(definition);
-        apiGroupEntities.forEach(apiGroup -> apiGroup.setProjectId(apiImportRequest.getProjectId()));
+        Set<ApiGroupEntity> apiGroupEntities = transformer.toApiGroupEntities(definition,
+            (apiGroupEntity -> apiGroupEntity.setProjectId(apiImportRequest.getProjectId())));
+
         List<ApiGroupEntity> oldGroupEntities =
             apiGroupRepository.findApiGroupEntitiesByProjectId(apiImportRequest.getProjectId());
         Collection<ApiGroupEntity> unsavedGroupEntities = CollectionUtils
@@ -103,28 +106,66 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
         List<ApiGroupEntity> newApiGroupEntities = apiGroupRepository.saveAll(unsavedGroupEntities);
         newApiGroupEntities.addAll(oldGroupEntities);
 
-        List<ApiEntity> apiEntities = transformer.toApiEntities(definition);
-        apiEntities.forEach(apiEntity -> apiEntity.setProjectId(apiImportRequest.getProjectId()));
+        Map<String, String> groupMapping = newApiGroupEntities.stream()
+            .collect(Collectors.toMap(ApiGroupEntity::getName, ApiGroupEntity::getId));
+
+        List<ApiEntity> apiEntities = transformer.toApiEntities(definition, apiEntity -> {
+            apiEntity.setProjectId(apiImportRequest.getProjectId());
+            apiEntity.setGroupId(groupMapping.get(apiEntity.getGroupId()));
+            apiEntity.setMd5(MD5Util.getMD5(apiEntity));
+        });
+
         List<ApiDocumentChecker> apiDocumentCheckers = documentType.getApiDocumentCheckers();
-        boolean allPass = apiDocumentCheckers.stream()
+        boolean allCheckPass = apiDocumentCheckers.stream()
             .allMatch(apiDocumentChecker -> apiDocumentChecker
                 .check(apiEntities, projectImportFlowEntity, this.applicationContext));
-        if (allPass) {
 
-            Function<ApiEntity, String> generateUniqueId =
-                apiEntity -> apiEntity.getSwaggerId().concat(apiEntity.getRequestMethod().name());
+        if (allCheckPass) {
+
             Map<String, ApiEntity> oldApiEntities = apiRepository
                 .findApiEntitiesByProjectIdAndSwaggerIdNotNull(apiImportRequest.getProjectId()).stream()
-                .collect(Collectors.toMap(generateUniqueId, Function.identity()));
-
+                .collect(Collectors.toConcurrentMap(ApiEntity::getSwaggerId, Function.identity()));
             Collection<ApiEntity> diffApiEntities = CollectionUtils.subtract(apiEntities, oldApiEntities.values());
+            diffApiEntities.parallelStream()
+                .filter(apiEntity -> oldApiEntities.containsKey(apiEntity.getSwaggerId()))
+                .forEach(apiEntity -> {
+                    ApiEntity oldApiEntity = oldApiEntities.get(apiEntity.getSwaggerId());
+                    apiEntity.setId(oldApiEntity.getId());
+                    apiEntity.setApiStatus(oldApiEntity.getApiStatus());
+                    apiEntity.setPreInject(oldApiEntity.getPreInject());
+                    apiEntity.setPostInject(oldApiEntity.getPostInject());
+                    apiEntity.setTagId(oldApiEntity.getTagId());
+                    apiEntity.setCreateUserId(oldApiEntity.getCreateUserId());
+                    apiEntity.setCreateDateTime(oldApiEntity.getCreateDateTime());
+                });
 
-            List<ApiHistoryEntity> apiHistoryEntities = apiRepository.insert(apiEntities).stream()
-                .map(apiEntity -> ApiHistoryEntity.builder().record(apiHistoryMapper.toApiHistoryDetail(apiEntity))
-                    .build())
-                .collect(
-                    Collectors.toList());
-            apiHistoryRepository.insert(apiHistoryEntities);
+            if (MapUtils.isNotEmpty(oldApiEntities)) {
+                List<String> swaggerIds =
+                    apiEntities.stream().map(ApiEntity::getSwaggerId).collect(Collectors.toList());
+                Predicate<String> existSwaggerId = swaggerIds::contains;
+                Collection<ApiEntity> invalidApiEntities = oldApiEntities.values().stream()
+                    .filter(apiEntity -> existSwaggerId.negate().test(apiEntity.getSwaggerId()))
+                    .collect(Collectors.toList());
+                log.info("Remove expired API=[{}]",
+                    invalidApiEntities.stream().map(ApiEntity::getApiPath).collect(Collectors.joining(",")));
+                apiRepository.deleteAll(invalidApiEntities);
+            }
+            if (CollectionUtils.isNotEmpty(diffApiEntities)) {
+
+                List<ApiHistoryEntity> apiHistoryEntities = apiRepository.saveAll(diffApiEntities).stream()
+                    .map(apiEntity -> ApiHistoryEntity.builder()
+                        .record(apiHistoryMapper.toApiHistoryDetail(apiEntity)).build())
+                    .collect(Collectors.toList());
+
+                apiHistoryRepository.insert(apiHistoryEntities);
+            }
+            if (log.isDebugEnabled()) {
+                log.debug("The project whose Id is [{}],Update API documents in total [{}].",
+                    apiImportRequest.getProjectId(), diffApiEntities.size());
+            }
+            projectImportFlowEntity.setImportStatus(ImportStatus.SUCCESS);
+            projectImportFlowEntity.setEndTime(LocalDateTime.now());
+            projectImportFlowRepository.save(projectImportFlowEntity);
         }
         return true;
     }
@@ -159,7 +200,7 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
             ApiEntity apiEntity = apiMapper.toEntity(apiRequestDto);
             ApiEntity newApiEntity = apiRepository.insert(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
-                .record(apiHistoryMapper.toApiHistoryDetail(apiEntity)).build();
+                .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             apiHistoryRepository.insert(apiHistoryEntity);
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
@@ -180,7 +221,7 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
             }
             ApiEntity newApiEntity = apiRepository.save(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
-                .record(apiHistoryMapper.toApiHistoryDetail(apiEntity)).build();
+                .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             apiHistoryRepository.insert(apiHistoryEntity);
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
