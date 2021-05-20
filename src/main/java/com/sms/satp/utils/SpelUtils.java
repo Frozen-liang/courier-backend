@@ -39,6 +39,16 @@ public class SpelUtils {
         return null;
     }
 
+    public static <T> T getValue(EvaluationContext context, String template, Class<T> clazz) {
+        try {
+            Expression expression = spelExpressionParser.parseExpression(template, templateParserContext);
+            return expression.getValue(context, clazz);
+        } catch (Exception e) {
+            log.error("Parse expression:{} error", template);
+        }
+        return null;
+    }
+
     public static String getProjectId(EvaluationContext context, LogRecord logRecord, Method method) {
         try {
             Expression expression;
@@ -79,16 +89,6 @@ public class SpelUtils {
             }
         } catch (Exception e) {
             log.error("Parse expression:{} error,methodName:{}", logRecord.projectId(), method);
-        }
-        return null;
-    }
-
-    public static <T> T getValue(EvaluationContext context, String template, Class<T> clazz) {
-        try {
-            Expression expression = spelExpressionParser.parseExpression(template, templateParserContext);
-            return expression.getValue(context, clazz);
-        } catch (Exception e) {
-            log.error("Parse expression:{} error", template);
         }
         return null;
     }

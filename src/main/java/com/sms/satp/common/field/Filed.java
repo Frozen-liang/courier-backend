@@ -10,7 +10,7 @@ public interface Filed {
 
     String getFiled();
 
-     default Optional<Criteria> is(Object value) {
+    default Optional<Criteria> is(Object value) {
         return Objects.nonNull(value) ? Optional.of(Criteria.where(getFiled()).is(value)) : Optional.empty();
     }
 
