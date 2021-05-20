@@ -1,5 +1,6 @@
 package com.sms.satp.mapper;
 
+import static com.sms.satp.common.enums.OperationModule.PROJECT;
 import static com.sms.satp.common.enums.OperationType.ADD;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,7 +17,7 @@ public class LogMapperTest {
 
     private final LogMapper logMapper = new LogMapperImpl();
     private final LogEntity logEntity =
-        LogEntity.builder().operationType(ADD).operationDesc(DESCRIPTION).build();
+        LogEntity.builder().operationType(ADD).operationModule(PROJECT).operationDesc(DESCRIPTION).build();
     private static final Integer SIZE = 10;
     private static final String DESCRIPTION = "description";
 
