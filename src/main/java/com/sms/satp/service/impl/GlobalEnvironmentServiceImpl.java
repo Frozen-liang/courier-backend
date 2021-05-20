@@ -99,8 +99,9 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = GLOBAL_ENV, template = "{{#result?.![#this.envName]}}", enhance =
-    @Enhance(enable = true, primaryKey = "ids"))
+    @LogRecord(operationType = DELETE, operationModule = GLOBAL_ENV,
+        template = "{{#result?.![#this.envName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
             return commonDeleteRepository.deleteByIds(ids, GlobalEnvironment.class);

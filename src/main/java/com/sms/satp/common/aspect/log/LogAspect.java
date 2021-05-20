@@ -1,10 +1,11 @@
 package com.sms.satp.common.aspect.log;
 
+import static com.sms.satp.common.field.CommonFiled.ID;
+
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.OperationModule;
 import com.sms.satp.common.enums.OperationType;
-import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.entity.log.LogEntity;
 import com.sms.satp.service.LogService;
 import com.sms.satp.utils.SpelUtils;
@@ -50,30 +51,35 @@ public class LogAspect {
         OperationModule operationModule = logRecord.operationModule();
         Enhance enhance = logRecord.enhance();
         EvaluationContext context = SpelUtils.getContext(args, method);
+        enhance(enhance, context, operationModule.getCollectionName(), method);
+        String operationDesc = SpelUtils.getValue(context, logRecord.template(), String.class);
+        String projectId = SpelUtils.getProjectId(context, logRecord, method);
+        if (StringUtils.isEmpty(operationDesc)) {
+            log.warn("The operationDesc is empty,please check the method: {} template:{}",
+                method, logRecord.template());
+        }
+        LogEntity logEntity = LogEntity.builder().operationType(operationType).operationModule(operationModule)
+            .operationDesc(operationDesc).projectId(projectId).build();
+        logService.add(logEntity);
+    }
+
+    private void enhance(Enhance enhance, EvaluationContext context, String collectionName, Method method) {
         if (enhance.enable()) {
             Object value = SpelUtils.getValue(context, enhance.primaryKey());
             if (Objects.nonNull(value)) {
                 Object queryByIdResult;
                 if (value instanceof List) {
-                    Query query = Query.query(Criteria.where(CommonFiled.ID.getFiled()).in((List) value));
-                    queryByIdResult = mongoTemplate.find(query, Object.class, operationModule.getCollectionName());
+                    Query query = Query.query(Criteria.where(ID.getFiled()).in((List) value));
+                    queryByIdResult = mongoTemplate.find(query, Object.class, collectionName);
                 } else {
-                    queryByIdResult = mongoTemplate.findById(value, Object.class, operationModule.getCollectionName());
+                    queryByIdResult = mongoTemplate.findById(value, Object.class, collectionName);
                 }
                 context.setVariable(enhance.queryResultKey(), queryByIdResult);
             } else {
-                log.error("The method:{} parameterNames not exist primaryKey:{}.",
-                    method.getName(), enhance.primaryKey());
+                log.error("The method:{} parameterNames not exist the primaryKey:{}.",
+                    method, enhance.primaryKey());
             }
         }
-        String operationDesc = SpelUtils.getValue(context, logRecord.template(), String.class);
-        if (StringUtils.isEmpty(operationDesc)) {
-            log.warn("The operationDesc is empty,please check the method: {} template:{}",
-                method.getName(), logRecord.template());
-        }
-        LogEntity logEntity = LogEntity.builder().operationType(operationType).operationModule(operationModule)
-            .operationDesc(operationDesc).build();
-        logService.add(logEntity);
     }
 
 }

@@ -141,7 +141,8 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = PROJECT_ENV, template = "{{#result?.![#this.envName]}}",
+    @LogRecord(operationType = DELETE, operationModule = PROJECT_ENV,
+        template = "{{#result?.![#this.envName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {

@@ -18,12 +18,10 @@ import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -99,46 +97,26 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
 
     private void buildCriteria(ApiPageRequest apiPageRequest, Query query,
         List<AggregationOperation> aggregationOperations) {
-        Criteria projectIdCriteria = Criteria.where(PROJECT_ID.getFiled()).is(apiPageRequest.getProjectId());
-        Criteria removedCriteria = Criteria.where(REMOVE.getFiled()).is(Boolean.FALSE);
-        query.addCriteria(projectIdCriteria);
-        query.addCriteria(removedCriteria);
-        aggregationOperations.add(Aggregation.match(projectIdCriteria));
-        aggregationOperations.add(Aggregation.match(removedCriteria));
+        REMOVE.is(Boolean.FALSE)
+            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+        PROJECT_ID.is(apiPageRequest.getProjectId())
+            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+        API_PROTOCOL.in(apiPageRequest.getApiProtocol())
+            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+        API_REQUEST_PARAM_TYPE.in(apiPageRequest.getApiRequestParamType())
+            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+        API_STATUS.in(apiPageRequest.getApiStatus())
+            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+        GROUP_ID.in(apiPageRequest.getGroupId())
+            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+        REQUEST_METHOD.in(apiPageRequest.getRequestMethod())
+            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+        TAG_ID.in(apiPageRequest.getTagId()).ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+    }
 
-        if (Objects.nonNull(apiPageRequest.getApiProtocol())) {
-            Criteria criteria = Criteria.where(API_PROTOCOL.getFiled()).in(apiPageRequest.getApiProtocol());
-            aggregationOperations.add(Aggregation.match(criteria));
-            query.addCriteria(criteria);
-        }
-        if (Objects.nonNull(apiPageRequest.getApiRequestParamType())) {
-            Criteria criteria = Criteria.where(API_REQUEST_PARAM_TYPE.getFiled())
-                .in(apiPageRequest.getApiRequestParamType());
-            aggregationOperations.add(Aggregation.match(criteria));
-            query.addCriteria(criteria);
-        }
-        if (Objects.nonNull(apiPageRequest.getApiStatus())) {
-            Criteria criteria = Criteria.where(API_STATUS.getFiled()).in(apiPageRequest.getApiStatus());
-            aggregationOperations.add(Aggregation.match(criteria));
-            query.addCriteria(criteria);
-        }
-        if (Objects.nonNull(apiPageRequest.getGroupId())) {
-            Criteria criteria = Criteria.where(GROUP_ID.getFiled()).in(apiPageRequest.getGroupId());
-            aggregationOperations.add(Aggregation.match(criteria));
-            query.addCriteria(criteria);
-        }
-        if (Objects.nonNull(apiPageRequest.getRequestMethod())) {
-            Criteria criteria = Criteria.where(REQUEST_METHOD.getFiled())
-                .in(apiPageRequest.getRequestMethod());
-            aggregationOperations.add(Aggregation.match(criteria));
-            query.addCriteria(criteria);
-        }
-        if (Objects.nonNull(apiPageRequest.getTagId())) {
-            Criteria criteria = Criteria.where(TAG_ID.getFiled()).in(apiPageRequest.getTagId());
-            aggregationOperations.add(Aggregation.match(criteria));
-            query.addCriteria(criteria);
-        }
-
+    private void addCriteria(Criteria criteria, Query query, List<AggregationOperation> aggregationOperations) {
+        query.addCriteria(criteria);
+        aggregationOperations.add(Aggregation.match(criteria));
     }
 
 }

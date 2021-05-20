@@ -19,9 +19,9 @@ public class LogController {
         this.logService = logService;
     }
 
-    @GetMapping
+    @GetMapping("/page")
     public Page<LogResponse> page(LogPageRequest logPageRequest) {
-        return null;
+        return logService.page(logPageRequest);
     }
 
 }

@@ -112,8 +112,8 @@ public class ApiTagServiceImpl implements ApiTagService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = API_TAG, template = "{{#result?.![#this.tagName]}}", enhance =
-    @Enhance(enable = true, primaryKey = "ids"))
+    @LogRecord(operationType = DELETE, operationModule = API_TAG, template = "{{#result?.![#this.tagName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
             Long removeCount = apiTagRepository.deleteAllByIdIsIn(ids);

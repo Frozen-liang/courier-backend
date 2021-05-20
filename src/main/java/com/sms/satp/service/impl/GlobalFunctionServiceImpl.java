@@ -114,8 +114,9 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = GLOBAL_FUNCTION, template = "{{#result?.![#this.functionName]}}", enhance =
-    @Enhance(enable = true, primaryKey = "ids"))
+    @LogRecord(operationType = DELETE, operationModule = GLOBAL_FUNCTION,
+        template = "{{#result?.![#this.functionName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
             return commonDeleteRepository.deleteByIds(ids, GlobalFunction.class);

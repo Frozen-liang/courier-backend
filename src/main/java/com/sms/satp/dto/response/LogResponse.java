@@ -1,6 +1,5 @@
 package com.sms.satp.dto.response;
 
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,5 +25,5 @@ public class LogResponse {
 
     private Long operatorId;
 
-    private LocalDateTime createDateTime;
+    private String operationDateTime;
 }

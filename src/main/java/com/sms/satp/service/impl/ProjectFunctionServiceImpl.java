@@ -126,7 +126,8 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = PROJECT_FUNCTION, template = "{{#result?.![#this.functionName]}}",
+    @LogRecord(operationType = DELETE, operationModule = PROJECT_FUNCTION,
+        template = "{{#result?.![#this.functionName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {

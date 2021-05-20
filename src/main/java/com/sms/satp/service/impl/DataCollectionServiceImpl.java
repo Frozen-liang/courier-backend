@@ -115,8 +115,9 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = DATA_COLLECTION, template = "{{#result?.![#this.collectionName]}}", enhance =
-    @Enhance(enable = true, primaryKey = "ids"))
+    @LogRecord(operationType = DELETE, operationModule = DATA_COLLECTION,
+        template = "{{#result?.![#this.collectionName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
             return customizedDataCollectionRepository.deleteByIds(ids);
