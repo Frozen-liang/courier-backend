@@ -116,6 +116,7 @@ public enum ErrorCode {
     GET_SCENE_CASE_CONN_ERROR("4108","Failed to get the SceneCase conn!"),
     EDIT_SCENE_CASE_CONN_ERROR("4109","Failed to edit the SceneCase conn!"),
     ADD_CASE_TEMPLATE_CONN_ERROR("4110","Failed to add the CaseTemplateConn!"),
+    GET_LOG_PAGE_ERROR("4111","Failed to get the Log page!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

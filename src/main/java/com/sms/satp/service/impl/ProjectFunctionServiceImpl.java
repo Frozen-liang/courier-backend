@@ -1,5 +1,9 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.PROJECT_FUNCTION;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_PROJECT_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_FUNCTION_ERROR;
@@ -9,6 +13,8 @@ import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ProjectFunctionRequest;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
@@ -86,6 +92,8 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
 
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = PROJECT_FUNCTION,
+        template = "{{#projectFunctionRequest.functionName}}")
     public Boolean add(ProjectFunctionRequest projectFunctionRequest) {
         log.info("ProjectFunctionService-add()-params: [ProjectFunction]={}", projectFunctionRequest.toString());
         try {
@@ -99,6 +107,8 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = PROJECT_FUNCTION,
+        template = "{{#projectFunctionRequest.functionName}}")
     public Boolean edit(ProjectFunctionRequest projectFunctionRequest) {
         log.info("ProjectFunctionService-edit()-params: [ProjectFunction]={}", projectFunctionRequest.toString());
         try {
@@ -116,6 +126,9 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = PROJECT_FUNCTION,
+        template = "{{#result?.![#this.functionName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
             return commonDeleteRepository.deleteByIds(ids, ProjectFunction.class);

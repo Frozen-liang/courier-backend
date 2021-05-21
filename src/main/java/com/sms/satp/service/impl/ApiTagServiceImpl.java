@@ -1,5 +1,9 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.API_TAG;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_TAG_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_TAG_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TAG_ERROR;
@@ -8,6 +12,8 @@ import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_LIST_ERROR;
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTagRequest;
@@ -15,7 +21,6 @@ import com.sms.satp.dto.response.ApiTagResponse;
 import com.sms.satp.entity.tag.ApiTag;
 import com.sms.satp.mapper.ApiTagMapper;
 import com.sms.satp.repository.ApiTagRepository;
-import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.service.ApiTagService;
 import java.util.List;
 import java.util.Objects;
@@ -34,17 +39,16 @@ public class ApiTagServiceImpl implements ApiTagService {
 
     private final ApiTagRepository apiTagRepository;
     private final ApiTagMapper apiTagMapper;
-    private final CommonDeleteRepository commonDeleteRepository;
     private static final String TAG_TYPE = "tagType";
 
-    public ApiTagServiceImpl(ApiTagRepository apiTagRepository, ApiTagMapper apiTagMapper,
-        CommonDeleteRepository commonDeleteRepository) {
+    public ApiTagServiceImpl(ApiTagRepository apiTagRepository, ApiTagMapper apiTagMapper) {
         this.apiTagRepository = apiTagRepository;
         this.apiTagMapper = apiTagMapper;
-        this.commonDeleteRepository = commonDeleteRepository;
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = API_TAG, template = "{{#result.tagName}}",
+        enhance = @Enhance(enable = true))
     public ApiTagResponse findById(String id) {
         try {
             Optional<ApiTag> optional = apiTagRepository.findById(id);
@@ -76,6 +80,7 @@ public class ApiTagServiceImpl implements ApiTagService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = API_TAG, template = "{{#apiTagRequest.tagName}}")
     public Boolean add(ApiTagRequest apiTagRequest) {
         log.info("ApiTagService-add()-params: [ApiTag]={}", apiTagRequest.toString());
         try {
@@ -89,6 +94,7 @@ public class ApiTagServiceImpl implements ApiTagService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = API_TAG, template = "{{#apiTagRequest.tagName}}")
     public Boolean edit(ApiTagRequest apiTagRequest) {
         log.info("ApiTagService-edit()-params: [ApiTag]={}", apiTagRequest.toString());
         try {
@@ -106,6 +112,8 @@ public class ApiTagServiceImpl implements ApiTagService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = API_TAG, template = "{{#result?.![#this.tagName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
             Long removeCount = apiTagRepository.deleteAllByIdIsIn(ids);

@@ -29,8 +29,7 @@ public class GlobalEnvironmentController {
 
     @GetMapping("/{id}")
     public GlobalEnvironmentResponse getById(@PathVariable("id") String id) {
-        return
-            globalEnvironmentService.findById(id);
+        return globalEnvironmentService.findById(id);
     }
 
     @PostMapping

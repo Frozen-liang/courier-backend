@@ -1,11 +1,16 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.PROJECT;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_PAGE_ERROR;
 
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.enums.ImportStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
@@ -31,7 +36,6 @@ import com.sms.satp.repository.ProjectImportFlowRepository;
 import com.sms.satp.service.ApiService;
 import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.MD5Util;
-import com.sms.satp.utils.PageDtoConverter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -180,7 +184,6 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
     @Override
     public Page<ApiResponse> page(ApiPageRequest apiPageRequest) {
         try {
-            PageDtoConverter.frontMapping(apiPageRequest);
             return customizedApiRepository.page(apiPageRequest);
         } catch (Exception e) {
             log.error("Failed to get the Api page!", e);
@@ -189,6 +192,7 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = PROJECT, template = "{{#apiRequestDto.apiName}}")
     public Boolean add(ApiRequest apiRequestDto) {
         log.info("ApiService-add()-params: [Api]={}", apiRequestDto.toString());
         try {
@@ -205,6 +209,7 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = PROJECT, template = "{{#apiRequestDto.apiName}}")
     public Boolean edit(ApiRequest apiRequestDto) {
         log.info("ApiService-edit()-params: [Api]={}", apiRequestDto.toString());
         try {
@@ -225,6 +230,8 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = PROJECT, template = "{{#result?.![#this.apiName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
             return customizedApiRepository.deleteByIds(ids);

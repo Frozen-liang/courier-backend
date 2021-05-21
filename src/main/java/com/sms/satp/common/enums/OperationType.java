@@ -1,18 +1,31 @@
 package com.sms.satp.common.enums;
 
-public enum OperationType {
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.springframework.lang.Nullable;
+
+public enum OperationType implements EnumCommon {
 
     ADD(0),
     EDIT(1),
     DELETE(2);
 
-    private final Integer type;
+    private static final Map<Integer, OperationType> MAPPINGS =
+        Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationType::getCode, Function.identity()));
+    private final int code;
 
-    OperationType(Integer type) {
-        this.type = type;
+    OperationType(int code) {
+        this.code = code;
     }
 
-    public Integer getType() {
-        return this.type;
+    public int getCode() {
+        return this.code;
+    }
+
+    public static OperationType getType(@Nullable Integer code) {
+        return Objects.isNull(code) ? null : MAPPINGS.get(code);
     }
 }
