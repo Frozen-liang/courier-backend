@@ -1,6 +1,6 @@
 package com.sms.satp.common.field;
 
-public enum ApiFiled {
+public enum ApiFiled implements Filed {
 
     TAG_ID("tagId"),
     GROUP_ID("groupId"),

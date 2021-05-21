@@ -30,10 +30,7 @@ public class CommonDeleteRepositoryImpl implements CommonDeleteRepository {
         Update update = Update.update(REMOVE.getFiled(), Boolean.TRUE);
         update.set(MODIFY_DATE_TIME.getFiled(), LocalDateTime.now());
         UpdateResult updateResult = mongoTemplate.updateFirst(query, update, entityClass);
-        if (updateResult.getModifiedCount() == MODIFY_COUNT) {
-            return Boolean.TRUE;
-        }
-        return Boolean.FALSE;
+        return updateResult.getModifiedCount() == MODIFY_COUNT;
     }
 
     @Override
@@ -42,9 +39,7 @@ public class CommonDeleteRepositoryImpl implements CommonDeleteRepository {
         Update update = Update.update(REMOVE.getFiled(), Boolean.TRUE);
         update.set(MODIFY_DATE_TIME.getFiled(), LocalDateTime.now());
         UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
-        if (updateResult.getModifiedCount() > 0) {
-            return Boolean.TRUE;
-        }
-        return Boolean.FALSE;
+        return updateResult.getModifiedCount() > 0;
     }
+
 }

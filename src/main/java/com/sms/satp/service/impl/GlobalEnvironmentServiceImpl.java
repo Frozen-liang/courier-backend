@@ -1,11 +1,17 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.GLOBAL_ENV;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_GLOBAL_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_GLOBAL_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_ENVIRONMENT_LIST_ERROR;
 
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.GlobalEnvironmentRequest;
 import com.sms.satp.dto.response.GlobalEnvironmentResponse;
@@ -47,6 +53,8 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = GLOBAL_ENV,
+        template = "{{#globalEnvironmentRequest.envName}}")
     public Boolean add(GlobalEnvironmentRequest globalEnvironmentRequest) {
         log.info("GlobalEnvironmentService-add()-params: [GlobalEnvironment]={}", globalEnvironmentRequest.toString());
         try {
@@ -60,6 +68,8 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = GLOBAL_ENV,
+        template = "{{#globalEnvironmentRequest.envName}}")
     public Boolean edit(GlobalEnvironmentRequest globalEnvironmentRequest) {
         log.info("GlobalEnvironmentService-edit()-params: [GlobalEnvironment]={}", globalEnvironmentRequest.toString());
         try {
@@ -89,6 +99,9 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = GLOBAL_ENV,
+        template = "{{#result?.![#this.envName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
             return commonDeleteRepository.deleteByIds(ids, GlobalEnvironment.class);
