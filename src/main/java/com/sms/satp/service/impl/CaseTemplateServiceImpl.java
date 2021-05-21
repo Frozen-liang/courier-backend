@@ -11,11 +11,9 @@ import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.AddCaseTemplateRequest;
 import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
-import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.dto.response.CaseTemplateResponse;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
-import com.sms.satp.mapper.CaseTemplateApiMapper;
 import com.sms.satp.mapper.CaseTemplateMapper;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
@@ -43,17 +41,14 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     private final CustomizedCaseTemplateRepository customizedCaseTemplateRepository;
     private final CaseTemplateMapper caseTemplateMapper;
     private final CaseTemplateApiService caseTemplateApiService;
-    private final CaseTemplateApiMapper caseTemplateApiMapper;
 
     public CaseTemplateServiceImpl(CaseTemplateRepository sceneCaseRepository,
         CustomizedCaseTemplateRepository customizedSceneCaseRepository,
-        CaseTemplateMapper sceneCaseMapper, CaseTemplateApiService sceneCaseApiService,
-        CaseTemplateApiMapper caseTemplateApiMapper) {
+        CaseTemplateMapper sceneCaseMapper, CaseTemplateApiService sceneCaseApiService) {
         this.sceneCaseTemplateRepository = sceneCaseRepository;
         this.customizedCaseTemplateRepository = customizedSceneCaseRepository;
         this.caseTemplateMapper = sceneCaseMapper;
         this.caseTemplateApiService = sceneCaseApiService;
-        this.caseTemplateApiMapper = caseTemplateApiMapper;
     }
 
     @Override
@@ -145,10 +140,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     private void editCaseTemplateApiStatus(CaseTemplate caseTemplate, Boolean oldRemove) {
-        List<CaseTemplateApiResponse> caseTemplateApiResponseList = caseTemplateApiService
-            .listByCaseTemplateId(caseTemplate.getId(), oldRemove);
-        List<CaseTemplateApi> caseTemplateApiList =
-            caseTemplateApiMapper.toCaseTemplateApiByResponseList(caseTemplateApiResponseList);
+        List<CaseTemplateApi> caseTemplateApiList = caseTemplateApiService
+            .getApiByCaseTemplateId(caseTemplate.getId(), oldRemove);
         for (CaseTemplateApi caseTemplateApi : caseTemplateApiList) {
             caseTemplateApi.setRemoved(caseTemplate.getRemoved());
         }

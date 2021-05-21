@@ -136,6 +136,19 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
+    public List<SceneCaseApi> getApiBySceneCaseId(String sceneCaseId, boolean remove) {
+        try {
+            Example<SceneCaseApi> example = Example.of(
+                SceneCaseApi.builder().sceneCaseId(sceneCaseId).removed(remove).build());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SearchFiled.ORDER_NUMBER.getFiledName());
+            return sceneCaseApiRepository.findAll(example, sort);
+        } catch (Exception e) {
+            log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);
+            throw new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR);
+        }
+    }
+
+    @Override
     public SceneCaseApiResponse getSceneCaseApiById(String id) {
         try {
             Optional<SceneCaseApi> sceneCaseApi = sceneCaseApiRepository.findById(id);

@@ -41,12 +41,6 @@ public class CaseTemplateApiController {
         return caseTemplateApiService.edit(updateCaseTemplateApiRequest);
     }
 
-    @GetMapping(value = "/list/{caseTemplateId}/{remove}")
-    public List<CaseTemplateApiResponse> listByCaseTemplateId(@PathVariable String caseTemplateId,
-        @PathVariable boolean remove) {
-        return caseTemplateApiService.listByCaseTemplateId(caseTemplateId, remove);
-    }
-
     @GetMapping(value = "/{id}")
     public CaseTemplateApiResponse getSceneCaseApiById(@PathVariable String id) {
         return caseTemplateApiService.getSceneCaseApiById(id);

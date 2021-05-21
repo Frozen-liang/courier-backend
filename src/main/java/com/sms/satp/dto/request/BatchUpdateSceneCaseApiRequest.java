@@ -1,7 +1,8 @@
 package com.sms.satp.dto.request;
 
-import com.sms.satp.dto.response.SceneCaseApiResponse;
 import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,5 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class BatchUpdateSceneCaseApiRequest {
 
-    private List<SceneCaseApiResponse> sceneCaseApiRequestList;
+    @Valid
+    @NotEmpty(message = "The entity can not be empty")
+    private List<UpdateSceneCaseApiRequest> sceneCaseApiRequestList;
 }

@@ -1,10 +1,16 @@
 package com.sms.satp.dto.request;
 
+import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
+import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ParamInfo;
+import com.sms.satp.entity.api.common.ResponseHeadersVerification;
+import com.sms.satp.entity.api.common.ResponseResultVerification;
+import com.sms.satp.entity.api.common.ResponseTimeVerification;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,6 +34,11 @@ public class AddCaseTemplateApiRequest {
     private String apiName;
 
     private String description;
+
+    private ApiType apiType;
+
+    private String jsData;
+
     @NotNull(message = "The apiPath can not be empty")
     private String apiPath;
 
@@ -52,13 +63,21 @@ public class AddCaseTemplateApiRequest {
 
     private ApiJsonType apiRequestJsonType;
 
-    private String matchRule;
+    private HttpStatusVerification httpStatusVerification;
 
-    private Integer timeoutLimit;
+    private ResponseHeadersVerification responseHeadersVerification;
+
+    private ResponseResultVerification responseResultVerification;
+
+    private ResponseTimeVerification responseTimeVerification;
 
     private Integer orderNumber;
 
     private Boolean isExecute;
+
+    private ApiBindingStatus apiBindingStatus;
+
+    private Boolean isLock;
 
     private Boolean removed;
 }

@@ -2,15 +2,13 @@ package com.sms.satp.service;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.request.AddCaseTemplateRequest;
-import com.sms.satp.dto.response.CaseTemplateApiResponse;
-import com.sms.satp.dto.response.CaseTemplateResponse;
-import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.request.AddCaseTemplateRequest;
+import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
+import com.sms.satp.dto.response.CaseTemplateResponse;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
-import com.sms.satp.mapper.CaseTemplateApiMapper;
 import com.sms.satp.mapper.CaseTemplateMapper;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
@@ -49,7 +47,6 @@ class CaseTemplateServiceTest {
     private CaseTemplateMapper caseTemplateMapper;
     private CaseTemplateServiceImpl caseTemplateService;
     private CaseTemplateApiService caseTemplateApiService;
-    private CaseTemplateApiMapper caseTemplateApiMapper;
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -66,9 +63,8 @@ class CaseTemplateServiceTest {
         customizedCaseTemplateRepository = mock(CustomizedCaseTemplateRepository.class);
         caseTemplateMapper = mock(CaseTemplateMapper.class);
         caseTemplateApiService = mock(CaseTemplateApiService.class);
-        caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
         caseTemplateService = new CaseTemplateServiceImpl(caseTemplateRepository, customizedCaseTemplateRepository,
-            caseTemplateMapper, caseTemplateApiService, caseTemplateApiMapper);
+            caseTemplateMapper, caseTemplateApiService);
     }
 
     @Test
@@ -127,11 +123,9 @@ class CaseTemplateServiceTest {
             .ofNullable(CaseTemplate.builder().removed(Boolean.TRUE).build());
         when(caseTemplateRepository.findById(any())).thenReturn(optionalSceneCase);
         when(caseTemplateRepository.save(any(CaseTemplate.class))).thenReturn(caseTemplate);
-        List<CaseTemplateApiResponse> caseTemplateApiDtoList = Lists
-            .newArrayList(CaseTemplateApiResponse.builder().id(MOCK_ID).build());
-        when(caseTemplateApiService.listByCaseTemplateId(any(), anyBoolean())).thenReturn(caseTemplateApiDtoList);
-        List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList(CaseTemplateApi.builder().id(MOCK_ID).build());
-        when(caseTemplateApiMapper.toCaseTemplateApiByResponseList(any())).thenReturn(caseTemplateApiList);
+        List<CaseTemplateApi> caseTemplateApiDtoList = Lists
+            .newArrayList(CaseTemplateApi.builder().id(MOCK_ID).build());
+        when(caseTemplateApiService.getApiByCaseTemplateId(any(), anyBoolean())).thenReturn(caseTemplateApiDtoList);
         when(caseTemplateApiService.editAll(any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = caseTemplateService.edit(UpdateCaseTemplateRequest.builder().removed(Boolean.FALSE).build());
         assertTrue(isSuccess);

@@ -2,20 +2,20 @@ package com.sms.satp.service;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.response.CaseTemplateConnResponse;
-import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.request.AddSceneCaseRequest;
+import com.sms.satp.dto.request.SearchSceneCaseRequest;
+import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
+import com.sms.satp.dto.request.UpdateSceneCaseRequest;
+import com.sms.satp.dto.request.UpdateSceneTemplateRequest;
+import com.sms.satp.dto.response.CaseTemplateConnResponse;
 import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.dto.response.SceneTemplateResponse;
-import com.sms.satp.dto.request.SearchSceneCaseRequest;
-import com.sms.satp.dto.request.UpdateSceneCaseRequest;
-import com.sms.satp.dto.request.UpdateSceneTemplateRequest;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.CaseTemplateConnMapper;
-import com.sms.satp.mapper.SceneCaseApiMapper;
 import com.sms.satp.mapper.SceneCaseMapper;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.repository.SceneCaseRepository;
@@ -56,7 +56,6 @@ class SceneCaseServiceTest {
     private SceneCaseMapper sceneCaseMapper;
     private SceneCaseServiceImpl sceneCaseService;
     private SceneCaseApiService sceneCaseApiService;
-    private SceneCaseApiMapper sceneCaseApiMapper;
     private CaseTemplateConnService caseTemplateConnService;
     private CaseTemplateConnMapper caseTemplateConnMapper;
     private CaseTemplateApiService caseTemplateApiService;
@@ -70,19 +69,17 @@ class SceneCaseServiceTest {
     private final static Integer MOCK_SIZE = 1;
     private final static long MOCK_TOTAL = 1L;
 
-
     @BeforeEach
     void setBean() {
         sceneCaseRepository = mock(SceneCaseRepository.class);
         customizedSceneCaseRepository = mock(CustomizedSceneCaseRepository.class);
         sceneCaseMapper = mock(SceneCaseMapper.class);
         sceneCaseApiService = mock(SceneCaseApiService.class);
-        sceneCaseApiMapper = mock(SceneCaseApiMapper.class);
         caseTemplateConnService = mock(CaseTemplateConnService.class);
         caseTemplateConnMapper = mock(CaseTemplateConnMapper.class);
         caseTemplateApiService = mock(CaseTemplateApiService.class);
         sceneCaseService = new SceneCaseServiceImpl(sceneCaseRepository, customizedSceneCaseRepository,
-            sceneCaseMapper, sceneCaseApiService, sceneCaseApiMapper,
+            sceneCaseMapper, sceneCaseApiService,
             caseTemplateConnService, caseTemplateConnMapper, caseTemplateApiService);
     }
 
@@ -147,11 +144,9 @@ class SceneCaseServiceTest {
         Optional<SceneCase> optionalSceneCase = Optional.ofNullable(SceneCase.builder().removed(Boolean.TRUE).build());
         when(sceneCaseRepository.findById(any())).thenReturn(optionalSceneCase);
         when(sceneCaseRepository.save(any(SceneCase.class))).thenReturn(sceneCase);
-        List<SceneCaseApiResponse> sceneCaseApiDtoList = Lists
-            .newArrayList(SceneCaseApiResponse.builder().id(MOCK_ID).build());
-        when(sceneCaseApiService.listBySceneCaseId(any(), anyBoolean())).thenReturn(sceneCaseApiDtoList);
-        List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(SceneCaseApi.builder().build());
-        when(sceneCaseApiMapper.toSceneCaseApiList(any())).thenReturn(sceneCaseApiList);
+        List<SceneCaseApi> sceneCaseApiDtoList = Lists
+            .newArrayList(SceneCaseApi.builder().id(MOCK_ID).build());
+        when(sceneCaseApiService.getApiBySceneCaseId(any(), anyBoolean())).thenReturn(sceneCaseApiDtoList);
         when(sceneCaseApiService.editAll(any())).thenReturn(Boolean.TRUE);
         List<CaseTemplateConn> caseTemplateConnList =
             Lists.newArrayList(CaseTemplateConn.builder().id(MOCK_ID).build());
@@ -256,7 +251,7 @@ class SceneCaseServiceTest {
         when(caseTemplateConnService.editList(any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = sceneCaseService.editConn(UpdateSceneTemplateRequest.builder()
             .caseTemplateConnDtoList(Lists.newArrayList(CaseTemplateConnResponse.builder().build()))
-            .sceneCaseApiDtoList(Lists.newArrayList(SceneCaseApiResponse.builder().build())).build());
+            .sceneCaseApiDtoList(Lists.newArrayList(UpdateSceneCaseApiRequest.builder().build())).build());
         assertTrue(isSuccess);
     }
 
@@ -269,7 +264,7 @@ class SceneCaseServiceTest {
         when(caseTemplateConnService.editList(any())).thenReturn(Boolean.TRUE);
         assertThatThrownBy(() -> sceneCaseService.editConn(UpdateSceneTemplateRequest.builder()
             .caseTemplateConnDtoList(Lists.newArrayList(CaseTemplateConnResponse.builder().build()))
-            .sceneCaseApiDtoList(Lists.newArrayList(SceneCaseApiResponse.builder().build())).build()))
+            .sceneCaseApiDtoList(Lists.newArrayList(UpdateSceneCaseApiRequest.builder().build())).build()))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 }
