@@ -10,6 +10,7 @@ import com.sms.satp.entity.log.LogEntity;
 import com.sms.satp.service.LogService;
 import com.sms.satp.utils.SpelUtils;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,7 @@ public class LogAspect {
         EvaluationContext context = SpelUtils.getContext(args, method);
         enhance(enhance, context, operationModule.getCollectionName(), method);
         String operationDesc = SpelUtils.getValue(context, logRecord.template(), String.class);
-        String projectId = SpelUtils.getProjectId(context, logRecord, method);
+        String projectId = SpelUtils.getProjectId(context, logRecord, method, args);
         if (StringUtils.isEmpty(operationDesc)) {
             log.warn("The operationDesc is empty,please check the method: {} template:{}",
                 method, logRecord.template());
@@ -68,8 +69,8 @@ public class LogAspect {
             Object value = SpelUtils.getValue(context, enhance.primaryKey());
             if (Objects.nonNull(value)) {
                 Object queryByIdResult;
-                if (value instanceof List) {
-                    Query query = Query.query(Criteria.where(ID.getFiled()).in((List) value));
+                if (value instanceof Collection) {
+                    Query query = Query.query(Criteria.where(ID.getFiled()).in((Collection) value));
                     queryByIdResult = mongoTemplate.find(query, Object.class, collectionName);
                 } else {
                     queryByIdResult = mongoTemplate.findById(value, Object.class, collectionName);

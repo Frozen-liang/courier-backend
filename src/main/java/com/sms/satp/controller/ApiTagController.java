@@ -6,6 +6,7 @@ import com.sms.satp.common.validate.UpdateGroup;
 import com.sms.satp.dto.request.ApiTagRequest;
 import com.sms.satp.dto.response.ApiTagResponse;
 import com.sms.satp.service.ApiTagService;
+import java.util.Collections;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,7 +40,6 @@ public class ApiTagController {
     }
 
     @PostMapping
-
     public Boolean add(@Validated(InsertGroup.class) @RequestBody ApiTagRequest apiTagRequest) {
         return apiTagService.add(apiTagRequest);
     }
@@ -53,6 +53,5 @@ public class ApiTagController {
     public Boolean delete(@PathVariable List<String> ids) {
         return apiTagService.delete(ids);
     }
-
 
 }

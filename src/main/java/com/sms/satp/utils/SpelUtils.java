@@ -4,6 +4,8 @@ import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.OperationType;
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +53,7 @@ public class SpelUtils {
     }
 
     @SuppressWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-    public static String getProjectId(EvaluationContext context, LogRecord logRecord, Method method) {
+    public static String getProjectId(EvaluationContext context, LogRecord logRecord, Method method, Object[] args) {
         try {
             Expression expression;
             String value = null;
@@ -61,7 +63,7 @@ public class SpelUtils {
                     return null;
                 }
                 String resultKey = logRecord.enhance().queryResultKey();
-                exp = createObjectExpression(resultKey, logRecord.projectId());
+                exp = createListExpression(resultKey, logRecord.projectId());
                 expression = spelExpressionParser.parseExpression(exp, templateParserContext);
                 try {
                     value = expression.getValue(context, String.class);
@@ -69,7 +71,7 @@ public class SpelUtils {
                     log.warn("The expression:{} cannot get the value.", exp);
                 }
                 if (StringUtils.isEmpty(value)) {
-                    exp = createListExpression(resultKey, logRecord.projectId());
+                    exp = createObjectExpression(resultKey, logRecord.projectId());
                     expression = spelExpressionParser.parseExpression(exp, templateParserContext);
                     return expression.getValue(context, String.class);
                 }
@@ -77,8 +79,12 @@ public class SpelUtils {
 
             String[] parameterNames = parameterNameDiscoverer.getParameterNames(method);
             Objects.requireNonNull(parameterNames);
-            for (String parameterName : parameterNames) {
-                exp = createObjectExpression(parameterName, logRecord.projectId());
+            for (int i = 0; i < parameterNames.length; i++) {
+                if (args[i] instanceof Collection) {
+                    exp = createListExpression(parameterNames[i], logRecord.projectId());
+                } else {
+                    exp = createObjectExpression(parameterNames[i], logRecord.projectId());
+                }
                 expression = spelExpressionParser.parseExpression(exp, templateParserContext);
                 try {
                     value = expression.getValue(context, String.class);
