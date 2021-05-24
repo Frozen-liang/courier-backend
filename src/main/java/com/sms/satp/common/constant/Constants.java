@@ -30,5 +30,6 @@ public class Constants {
     public static final String API_PATH = SDK_VERSION + "/api";
     public static final String PROJECT_IMPORT_SOURCE = SDK_VERSION + "/project/import/source";
     public static final String LOG_PATH = SDK_VERSION + "/log";
+    public static final String API_TEST_CASE_PATH = SDK_VERSION + "/api-test-case";
 
 }

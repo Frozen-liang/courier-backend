@@ -47,8 +47,6 @@ public class ApiTagServiceImpl implements ApiTagService {
     }
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = API_TAG, template = "{{#result.tagName}}",
-        enhance = @Enhance(enable = true))
     public ApiTagResponse findById(String id) {
         try {
             Optional<ApiTag> optional = apiTagRepository.findById(id);
