@@ -1,7 +1,7 @@
 package com.sms.satp.entity.project;
 
 import com.sms.satp.common.enums.ApiStatus;
-import com.sms.satp.common.enums.DocumentType;
+import com.sms.satp.common.enums.DocumentUrlType;
 import com.sms.satp.common.enums.GroupImportType;
 import com.sms.satp.common.enums.SaveMode;
 import com.sms.satp.entity.BaseEntity;
@@ -19,7 +19,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 public class ProjectImportSourceEntity extends BaseEntity {
 
 
-    private DocumentType documentType;
+    private DocumentUrlType documentType;
     private SaveMode saveMode;
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;

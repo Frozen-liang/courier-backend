@@ -4,7 +4,6 @@ import com.sms.satp.parser.common.DocumentDefinition;
 
 public interface DocumentReader {
 
-    public DocumentDefinition readLocation(String location, String projectId);
+    DocumentDefinition read(String source);
 
-    public DocumentDefinition readContents(String content, String projectId);
 }

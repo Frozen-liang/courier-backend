@@ -17,7 +17,7 @@ public class UpdateSceneTemplateRequest {
 
     private SceneCaseResponse sceneCaseDto;
 
-    private List<SceneCaseApiResponse> sceneCaseApiDtoList;
+    private List<UpdateSceneCaseApiRequest> sceneCaseApiDtoList;
 
     private List<CaseTemplateConnResponse> caseTemplateConnDtoList;
 }

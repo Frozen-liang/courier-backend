@@ -13,7 +13,7 @@ import org.mapstruct.ReportingPolicy;
     ReportingPolicy.IGNORE, builder = @Builder(disableBuilder = true))
 public interface ProjectImportSourceMapper  {
 
-    @Mapping(target = "documentType", expression = "java(com.sms.satp.common.enums.DocumentType.getType(request"
+    @Mapping(target = "documentType", expression = "java(com.sms.satp.common.enums.DocumentUrlType.getType(request"
         + ".getDocumentType()))")
     @Mapping(target = "saveMode", expression = "java(com.sms.satp.common.enums.SaveMode.getType(request"
         + ".getSaveMode()))")

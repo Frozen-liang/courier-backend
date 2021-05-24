@@ -1,13 +1,19 @@
 package com.sms.satp.config;
 
+import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.ApiTagType;
+import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.enums.DocumentType;
+import com.sms.satp.common.enums.DocumentUrlType;
 import com.sms.satp.common.enums.EnumCommon;
 import com.sms.satp.common.enums.GroupImportType;
+import com.sms.satp.common.enums.MatchType;
+import com.sms.satp.common.enums.OperationModule;
+import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.common.enums.ParamType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.enums.SaveMode;
@@ -33,7 +39,11 @@ public class MongoCustomConverterConfiguration {
                 IntegerToParamTypeConverter.INSTANCE, IntegerToRequestMethodConverter.INSTANCE,
                 IntegerToApiTagTypeConverter.INSTANCE, IntegerToApiJsonTypeConverter.INSTANCE,
                 IntegerToSaveModeConverter.INSTANCE, IntegerToDocumentTypeConverter.INSTANCE,
-                IntegerToGroupImportTypeConverter.INSTANCE);
+                IntegerToGroupImportTypeConverter.INSTANCE, IntegerToOperationTypeConverter.INSTANCE,
+                IntegerToOperationModuleConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
+                IntegerToApiTypeConverter.INSTANCE, IntegerToMatchTypeConverter.INSTANCE,
+                IntegerToApiBindingStatusConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
+                IntegerToDocumentUrlTypeConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -144,5 +154,58 @@ public class MongoCustomConverterConfiguration {
         }
     }
 
+    @ReadingConverter
+    enum IntegerToOperationTypeConverter implements Converter<Integer, OperationType> {
+        INSTANCE;
 
+        public OperationType convert(@NotNull Integer code) {
+            return OperationType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToOperationModuleConverter implements Converter<Integer, OperationModule> {
+        INSTANCE;
+
+        public OperationModule convert(@NotNull Integer code) {
+            return OperationModule.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToApiTypeConverter implements Converter<Integer, ApiType> {
+        INSTANCE;
+
+        public ApiType convert(@NotNull Integer code) {
+            return ApiType.getApiType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToMatchTypeConverter implements Converter<Integer, MatchType> {
+        INSTANCE;
+
+        public MatchType convert(@NotNull Integer code) {
+            return MatchType.getMatchType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToDocumentUrlTypeConverter implements Converter<Integer, DocumentUrlType> {
+        INSTANCE;
+
+        public DocumentUrlType convert(@NotNull Integer code) {
+            return DocumentUrlType.getType(code);
+        }
+    }
+
+
+    @ReadingConverter
+    enum IntegerToApiBindingStatusConverter implements Converter<Integer, ApiBindingStatus> {
+        INSTANCE;
+
+        public ApiBindingStatus convert(@NotNull Integer code) {
+            return ApiBindingStatus.getApiBindingStatus(code);
+        }
+    }
 }

@@ -25,7 +25,6 @@ import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.CaseTemplateConnMapper;
-import com.sms.satp.mapper.SceneCaseApiMapper;
 import com.sms.satp.mapper.SceneCaseMapper;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.repository.SceneCaseRepository;
@@ -55,7 +54,6 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private final CustomizedSceneCaseRepository customizedSceneCaseRepository;
     private final SceneCaseMapper sceneCaseMapper;
     private final SceneCaseApiService sceneCaseApiService;
-    private final SceneCaseApiMapper sceneCaseApiMapper;
     private final CaseTemplateConnService caseTemplateConnService;
     private final CaseTemplateConnMapper caseTemplateConnMapper;
     private final CaseTemplateApiService caseTemplateApiService;
@@ -63,7 +61,6 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     public SceneCaseServiceImpl(SceneCaseRepository sceneCaseRepository,
         CustomizedSceneCaseRepository customizedSceneCaseRepository,
         SceneCaseMapper sceneCaseMapper, SceneCaseApiService sceneCaseApiService,
-        SceneCaseApiMapper sceneCaseApiMapper,
         CaseTemplateConnService caseTemplateConnService,
         CaseTemplateConnMapper caseTemplateConnMapper,
         CaseTemplateApiService caseTemplateApiService) {
@@ -71,7 +68,6 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         this.customizedSceneCaseRepository = customizedSceneCaseRepository;
         this.sceneCaseMapper = sceneCaseMapper;
         this.sceneCaseApiService = sceneCaseApiService;
-        this.sceneCaseApiMapper = sceneCaseApiMapper;
         this.caseTemplateConnService = caseTemplateConnService;
         this.caseTemplateConnMapper = caseTemplateConnMapper;
         this.caseTemplateApiService = caseTemplateApiService;
@@ -226,9 +222,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     private void editSceneCaseApiStatus(SceneCase sceneCase, Boolean oldRemove) {
-        List<SceneCaseApiResponse> sceneCaseApiResponseList = sceneCaseApiService
-            .listBySceneCaseId(sceneCase.getId(), oldRemove);
-        List<SceneCaseApi> sceneCaseApiList = sceneCaseApiMapper.toSceneCaseApiList(sceneCaseApiResponseList);
+        List<SceneCaseApi> sceneCaseApiList = sceneCaseApiService
+            .getApiBySceneCaseId(sceneCase.getId(), oldRemove);
         for (SceneCaseApi sceneCaseApi : sceneCaseApiList) {
             sceneCaseApi.setRemoved(sceneCase.getRemoved());
         }

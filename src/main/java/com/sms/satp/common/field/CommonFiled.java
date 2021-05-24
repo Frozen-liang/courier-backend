@@ -1,6 +1,10 @@
 package com.sms.satp.common.field;
 
-public enum  CommonFiled {
+import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.mongodb.core.query.Criteria;
+
+public enum CommonFiled implements Filed {
 
     ID("_id"),
     PROJECT_ID("projectId"),
@@ -16,5 +20,10 @@ public enum  CommonFiled {
 
     public String getFiled() {
         return filed;
+    }
+
+    public Optional<Criteria> projectIdIs(String projectId) {
+        return StringUtils.isEmpty(projectId) ? Optional.of(Criteria.where(getFiled()).exists(false)) :
+            Optional.of(Criteria.where(getFiled()).is(projectId));
     }
 }

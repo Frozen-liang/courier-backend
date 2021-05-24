@@ -15,11 +15,11 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 public class ApiImportRequest {
 
-    @NotNull(message = "The documentType must not be null.")
-    @Range(min = 0, max = 1)
-    private Integer documentType;
+    @NotNull(message = "The documentFileType must not be null.")
+    @Range(min = 0, max = 2)
+    private Integer documentFileType;
     @NotBlank(message = "The projectId must not be null.")
     private String projectId;
-    private String documentUrl;
+    @NotNull(message = "The file must not be null.")
     private MultipartFile file;
 }

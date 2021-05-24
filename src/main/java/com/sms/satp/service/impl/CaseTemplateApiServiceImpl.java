@@ -139,6 +139,19 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
+    public List<CaseTemplateApi> getApiByCaseTemplateId(String caseTemplateId, boolean remove) {
+        try {
+            Example<CaseTemplateApi> example = Example
+                .of(CaseTemplateApi.builder().caseTemplateId(caseTemplateId).removed(remove).build());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SearchFiled.ORDER_NUMBER.getFiledName());
+            return caseTemplateApiRepository.findAll(example, sort);
+        } catch (Exception e) {
+            log.error("Failed to get the CaseTemplateApi list by caseTemplateId!", e);
+            throw new ApiTestPlatformException(GET_CASE_TEMPLATE_API_LIST_BY_CASE_TEMPLATE_ID_ERROR);
+        }
+    }
+
+    @Override
     public CaseTemplateApiResponse getSceneCaseApiById(String id) {
         try {
             Optional<CaseTemplateApi> sceneCaseApi = caseTemplateApiRepository.findById(id);
