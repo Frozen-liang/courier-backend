@@ -5,7 +5,8 @@ import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.DocumentReader;
 import com.sms.satp.parser.impl.OperationIdDuplicateChecker;
 import com.sms.satp.parser.impl.SwaggerApiDocumentTransformer;
-import com.sms.satp.parser.impl.SwaggerDocumentReader;
+import com.sms.satp.parser.impl.SwaggerFileDocumentReader;
+import com.sms.satp.parser.impl.SwaggerUrlDocumentReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -16,9 +17,11 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 public enum DocumentType implements EnumCommon {
-    SWAGGER(0, new SwaggerApiDocumentTransformer(), SwaggerDocumentReader.INSTANCE, List.of(
+    SWAGGER_URL(0, new SwaggerApiDocumentTransformer(), new SwaggerUrlDocumentReader(), List.of(
         new OperationIdDuplicateChecker())),
-    POSTMAN(1, null, null, Collections.emptyList());
+    SWAGGER_FILE(1, new SwaggerApiDocumentTransformer(), new SwaggerFileDocumentReader(), List.of(
+        new OperationIdDuplicateChecker())),
+    POSTMAN(2, null, null, Collections.emptyList());
 
 
     private static final Map<Integer, DocumentType> MAPPINGS =

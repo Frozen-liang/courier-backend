@@ -8,6 +8,7 @@ import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.enums.DocumentType;
+import com.sms.satp.common.enums.DocumentUrlType;
 import com.sms.satp.common.enums.EnumCommon;
 import com.sms.satp.common.enums.GroupImportType;
 import com.sms.satp.common.enums.MatchType;
@@ -41,7 +42,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToGroupImportTypeConverter.INSTANCE, IntegerToOperationTypeConverter.INSTANCE,
                 IntegerToOperationModuleConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
                 IntegerToApiTypeConverter.INSTANCE, IntegerToMatchTypeConverter.INSTANCE,
-                IntegerToApiBindingStatusConverter.INSTANCE);
+                IntegerToApiBindingStatusConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
+                IntegerToDocumentUrlTypeConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -187,6 +189,16 @@ public class MongoCustomConverterConfiguration {
             return MatchType.getMatchType(code);
         }
     }
+
+    @ReadingConverter
+    enum IntegerToDocumentUrlTypeConverter implements Converter<Integer, DocumentUrlType> {
+        INSTANCE;
+
+        public DocumentUrlType convert(@NotNull Integer code) {
+            return DocumentUrlType.getType(code);
+        }
+    }
+
 
     @ReadingConverter
     enum IntegerToApiBindingStatusConverter implements Converter<Integer, ApiBindingStatus> {
