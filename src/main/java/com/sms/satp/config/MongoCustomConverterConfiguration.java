@@ -1,13 +1,16 @@
 package com.sms.satp.config;
 
+import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.ApiTagType;
+import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.enums.EnumCommon;
 import com.sms.satp.common.enums.GroupImportType;
+import com.sms.satp.common.enums.MatchType;
 import com.sms.satp.common.enums.OperationModule;
 import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.common.enums.ParamType;
@@ -36,7 +39,9 @@ public class MongoCustomConverterConfiguration {
                 IntegerToApiTagTypeConverter.INSTANCE, IntegerToApiJsonTypeConverter.INSTANCE,
                 IntegerToSaveModeConverter.INSTANCE, IntegerToDocumentTypeConverter.INSTANCE,
                 IntegerToGroupImportTypeConverter.INSTANCE, IntegerToOperationTypeConverter.INSTANCE,
-                IntegerToOperationModuleConverter.INSTANCE);
+                IntegerToOperationModuleConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
+                IntegerToApiTypeConverter.INSTANCE, IntegerToMatchTypeConverter.INSTANCE,
+                IntegerToApiBindingStatusConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -165,5 +170,30 @@ public class MongoCustomConverterConfiguration {
         }
     }
 
+    @ReadingConverter
+    enum IntegerToApiTypeConverter implements Converter<Integer, ApiType> {
+        INSTANCE;
 
+        public ApiType convert(@NotNull Integer code) {
+            return ApiType.getApiType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToMatchTypeConverter implements Converter<Integer, MatchType> {
+        INSTANCE;
+
+        public MatchType convert(@NotNull Integer code) {
+            return MatchType.getMatchType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToApiBindingStatusConverter implements Converter<Integer, ApiBindingStatus> {
+        INSTANCE;
+
+        public ApiBindingStatus convert(@NotNull Integer code) {
+            return ApiBindingStatus.getApiBindingStatus(code);
+        }
+    }
 }

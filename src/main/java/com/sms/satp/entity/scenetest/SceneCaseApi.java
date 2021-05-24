@@ -1,16 +1,23 @@
 package com.sms.satp.entity.scenetest;
 
+import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
+import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.entity.BaseEntity;
+import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ParamInfo;
+import com.sms.satp.entity.api.common.ResponseHeadersVerification;
+import com.sms.satp.entity.api.common.ResponseResultVerification;
+import com.sms.satp.entity.api.common.ResponseTimeVerification;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -21,6 +28,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(callSuper = true)
 @Document(collection = "SceneCaseApi")
 public class SceneCaseApi extends BaseEntity {
 
@@ -36,6 +44,10 @@ public class SceneCaseApi extends BaseEntity {
     private String apiName;
 
     private String description;
+
+    private ApiType apiType;
+
+    private String jsData;
 
     private String apiPath;
 
@@ -60,12 +72,24 @@ public class SceneCaseApi extends BaseEntity {
 
     private ApiJsonType apiRequestJsonType;
 
-    private String matchRule;
+    private HttpStatusVerification httpStatusVerification;
 
-    private Integer timeoutLimit;
+    private ResponseHeadersVerification responseHeadersVerification;
+
+    private ResponseResultVerification responseResultVerification;
+
+    private ResponseTimeVerification responseTimeVerification;
 
     private Integer orderNumber;
 
     private Boolean isExecute;
+    /**
+     * API绑定状态.
+     */
+    private ApiBindingStatus apiBindingStatus;
 
+    /**
+     * 是否锁定，当前步骤出错或未通过时，依然执行下一个步骤.
+     */
+    private Boolean isLock;
 }

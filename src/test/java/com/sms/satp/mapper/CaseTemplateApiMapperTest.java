@@ -1,6 +1,12 @@
 package com.sms.satp.mapper;
 
 import com.google.common.collect.Lists;
+import com.sms.satp.common.enums.ApiBindingStatus;
+import com.sms.satp.common.enums.ApiJsonType;
+import com.sms.satp.common.enums.ApiProtocol;
+import com.sms.satp.common.enums.ApiRequestParamType;
+import com.sms.satp.common.enums.ApiType;
+import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.dto.request.AddCaseTemplateApiRequest;
 import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
@@ -10,29 +16,21 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 @DisplayName("Tests for CaseTemplateApiMapper")
 class CaseTemplateApiMapperTest {
 
-    private CaseTemplateApiMapper caseTemplateApiMapper = new CaseTemplateApiMapperImpl();
+    private ResponseResultVerificationMapper responseResultVerificationMapper =
+        mock(ResponseResultVerificationMapper.class);
+    private ResponseHeadersVerificationMapper responseHeadersVerificationMapper =
+        mock(ResponseHeadersVerificationMapper.class);
+    private ParamInfoMapper paramInfoMapper = mock(ParamInfoMapper.class);
+
+    private CaseTemplateApiMapper caseTemplateApiMapper =
+        new CaseTemplateApiMapperImpl(responseResultVerificationMapper, responseHeadersVerificationMapper,
+            paramInfoMapper);
     private static final String MOCK_ID = "1";
-
-    @Test
-    @DisplayName("Test the toCaseTemplateApi method in the CaseTemplateApiMapper")
-    void toCaseTemplateApi_test() {
-        CaseTemplateApiResponse dto = getTemplateApiResponse();
-        CaseTemplateApi api = caseTemplateApiMapper.toCaseTemplateApi(dto);
-        assertThat(api.getId()).isEqualTo(MOCK_ID);
-    }
-
-    @Test
-    @DisplayName("Test the toCaseTemplateApiByResponseList method in the CaseTemplateApiMapper")
-    void toCaseTemplateApiByResponseList_test() {
-        List<CaseTemplateApiResponse> caseTemplateApiResponseList = Lists.newArrayList(getTemplateApiResponse());
-        List<CaseTemplateApi> caseTemplateApiList =
-            caseTemplateApiMapper.toCaseTemplateApiByResponseList(caseTemplateApiResponseList);
-        assertThat(caseTemplateApiList).isNotEmpty();
-    }
 
     @Test
     @DisplayName("Test the toCaseTemplateApiByUpdateRequest method in the CaseTemplateApiMapper")
@@ -72,6 +70,13 @@ class CaseTemplateApiMapperTest {
     private CaseTemplateApi getTemplateApi() {
         return CaseTemplateApi.builder()
             .id(MOCK_ID)
+            .apiType(ApiType.API)
+            .apiProtocol(ApiProtocol.HTTPS)
+            .requestMethod(RequestMethod.GET)
+            .apiRequestParamType(ApiRequestParamType.FORM_DATA)
+            .apiResponseJsonType(ApiJsonType.OBJECT)
+            .apiRequestJsonType(ApiJsonType.OBJECT)
+            .apiBindingStatus(ApiBindingStatus.BINDING)
             .caseTemplateId(MOCK_ID)
             .apiId(MOCK_ID)
             .build();

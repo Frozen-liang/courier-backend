@@ -23,6 +23,8 @@ public interface CaseTemplateApiService {
 
     List<CaseTemplateApi> listByCaseTemplateId(String caseTemplateId);
 
+    List<CaseTemplateApi> getApiByCaseTemplateId(String caseTemplateId, boolean remove);
+
     CaseTemplateApiResponse getSceneCaseApiById(String id);
 
 }

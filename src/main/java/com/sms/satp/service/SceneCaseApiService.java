@@ -23,5 +23,7 @@ public interface SceneCaseApiService {
 
     List<SceneCaseApi> listBySceneCaseId(String sceneCaseId);
 
+    List<SceneCaseApi> getApiBySceneCaseId(String sceneCaseId, boolean remove);
+
     SceneCaseApiResponse getSceneCaseApiById(String id);
 }
