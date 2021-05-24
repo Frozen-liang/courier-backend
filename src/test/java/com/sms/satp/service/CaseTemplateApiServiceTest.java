@@ -83,7 +83,7 @@ class CaseTemplateApiServiceTest {
     void deleteByIds_test() {
         Optional<CaseTemplateApi> caseTemplateApi = Optional.ofNullable(CaseTemplateApi.builder().id(MOCK_ID).build());
         when(caseTemplateApiRepository.findById(any())).thenReturn(caseTemplateApi);
-        doNothing().when(caseTemplateApiRepository).deleteById(any());
+        when(caseTemplateApiRepository.deleteAllByIdIsIn(any())).thenReturn(1L);
         Boolean isSuccess = caseTemplateApiService.deleteByIds(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }
@@ -94,7 +94,7 @@ class CaseTemplateApiServiceTest {
         Optional<CaseTemplateApi> caseTemplateApi = Optional.ofNullable(CaseTemplateApi.builder().id(MOCK_ID).build());
         when(caseTemplateApiRepository.findById(any())).thenReturn(caseTemplateApi);
         doThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_API_ERROR)).when(caseTemplateApiRepository)
-            .deleteById(any());
+            .deleteAllByIdIsIn(any());
         assertThatThrownBy(() -> caseTemplateApiService.deleteByIds(Lists.newArrayList(MOCK_ID)))
             .isInstanceOf(ApiTestPlatformException.class);
     }

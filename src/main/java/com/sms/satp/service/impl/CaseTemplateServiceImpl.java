@@ -1,11 +1,17 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.CASE_TEMPLATE;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_PAGE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
 
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.AddCaseTemplateRequest;
@@ -52,6 +58,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE, template = "{{#addCaseTemplateRequest"
+        + "?.[#this.name]}}", projectId = "addCaseTemplateRequest.projectId")
     public Boolean add(AddCaseTemplateRequest addCaseTemplateRequest) {
         log.info("CaseTemplateService-add()-params: [CaseTemplate]={}", addCaseTemplateRequest.toString());
         try {
@@ -66,6 +74,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE, template = "{{#result?.![#this.name]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("CaseTemplateService-deleteById()-params: [id]={}", ids);
         try {
@@ -82,6 +92,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE, template = "{{#updateCaseTemplateRequest"
+        + "?.[#this.name]}}", projectId = "updateCaseTemplateRequest.projectId")
     public Boolean edit(UpdateCaseTemplateRequest updateCaseTemplateRequest) {
         log.info("CaseTemplateService-edit()-params: [CaseTemplate]={}", updateCaseTemplateRequest.toString());
         try {

@@ -1,8 +1,7 @@
-package com.sms.satp.common;
+package com.sms.satp.common.field;
 
-public enum SearchFiled {
+public enum SceneFiled implements Filed{
 
-    PROJECT_ID("projectId"),
     NAME("name"),
     GROUP_ID("groupId"),
     TEST_STATUS("testStatus"),
@@ -14,11 +13,16 @@ public enum SearchFiled {
 
     private final String filedName;
 
-    SearchFiled(String filedName) {
+    SceneFiled(String filedName) {
         this.filedName = filedName;
     }
 
     public String getFiledName() {
+        return this.filedName;
+    }
+
+    @Override
+    public String getFiled() {
         return this.filedName;
     }
 }

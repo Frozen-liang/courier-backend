@@ -1,5 +1,9 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.SCENE_CASE;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_CONN_ERROR;
@@ -9,6 +13,8 @@ import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_PAGE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
 
 import com.google.common.collect.Lists;
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
@@ -74,6 +80,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = SCENE_CASE, template = "{{#addSceneCaseRequest"
+        + "?.[#this.name]}}", projectId = "addSceneCaseRequest.projectId")
     public Boolean add(AddSceneCaseRequest addSceneCaseRequest) {
         log.info("SceneCaseService-add()-params: [SceneCase]={}", addSceneCaseRequest.toString());
         try {
@@ -88,6 +96,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = SCENE_CASE, template = "{{#result?.![#this.name]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("SceneCaseService-deleteById()-params: [ids]={}", ids);
         try {
@@ -104,6 +114,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE, template = "{{#updateSceneCaseRequest"
+        + "?.[#this.name]}}", projectId = "updateSceneCaseRequest.projectId")
     public Boolean edit(UpdateSceneCaseRequest updateSceneCaseRequest) {
         log.info("SceneCaseService-edit()-params: [SceneCase]={}", updateSceneCaseRequest.toString());
         try {

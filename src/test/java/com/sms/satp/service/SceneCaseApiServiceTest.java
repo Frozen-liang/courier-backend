@@ -81,9 +81,7 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the deleteByIds method in the SceneCaseApi service")
     void deleteByIds_test() {
-        Optional<SceneCaseApi> sceneCaseApi = Optional.ofNullable(SceneCaseApi.builder().id(MOCK_ID).build());
-        when(sceneCaseApiRepository.findById(any())).thenReturn(sceneCaseApi);
-        doNothing().when(sceneCaseApiRepository).deleteById(any());
+        when(sceneCaseApiRepository.deleteAllByIdIsIn(any())).thenReturn(1L);
         Boolean isSuccess = sceneCaseApiService.deleteByIds(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }
@@ -91,10 +89,8 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the deleteByIds method in the SceneCaseApi service throws exception")
     void deleteByIds_test_thenThrowException() {
-        Optional<SceneCaseApi> sceneCaseApi = Optional.ofNullable(SceneCaseApi.builder().id(MOCK_ID).build());
-        when(sceneCaseApiRepository.findById(any())).thenReturn(sceneCaseApi);
         doThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_API_ERROR)).when(sceneCaseApiRepository)
-            .deleteById(any());
+            .deleteAllByIdIsIn(any());
         assertThatThrownBy(() -> sceneCaseApiService.deleteByIds(Lists.newArrayList(MOCK_ID)))
             .isInstanceOf(ApiTestPlatformException.class);
     }
