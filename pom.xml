@@ -51,10 +51,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -266,7 +262,8 @@
                 </executions>
                 <configuration>
                     <configLocation>
-                        <![CDATA[https://gitlab.smsassist.com/share/7up/google-style-guide/raw/master/google-checks-tuned.xml]]>
+<!--                        <![CDATA[https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/main/resources/google_checks.xml]]>-->
+                        /Users/pader.zhang/Downloads/old-checkstyle.xml
                     </configLocation>
                     <logViolationsToConsole>true</logViolationsToConsole>
                     <encoding>UTF-8</encoding>
@@ -279,7 +276,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>8.18</version>
+                        <version>8.42</version>
                     </dependency>
                 </dependencies>
             </plugin>

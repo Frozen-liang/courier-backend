@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-    unmappedTargetPolicy = ReportingPolicy.IGNORE,uses = MatchParamInfoMapper.class)
+    unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = MatchParamInfoMapper.class)
 public interface ResponseHeadersVerificationMapper {
 
     ResponseHeadersVerificationResponse toDto(ResponseHeadersVerification responseHeadersVerification);

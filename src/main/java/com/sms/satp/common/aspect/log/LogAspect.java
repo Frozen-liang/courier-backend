@@ -11,7 +11,6 @@ import com.sms.satp.service.LogService;
 import com.sms.satp.utils.SpelUtils;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
