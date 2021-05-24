@@ -17,7 +17,6 @@ import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.common.enums.ParamType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.enums.SaveMode;
-import com.sun.istack.NotNull;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +26,7 @@ import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
+import org.springframework.lang.NonNull;
 
 @Configuration
 public class MongoCustomConverterConfiguration {
@@ -66,7 +66,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToApiProtocolConverter implements Converter<Integer, ApiProtocol> {
         INSTANCE;
 
-        public ApiProtocol convert(@NotNull Integer code) {
+        public ApiProtocol convert(@NonNull Integer code) {
             return ApiProtocol.getType(code);
         }
     }
@@ -75,7 +75,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToApiRequestParamTypeConverter implements Converter<Integer, ApiRequestParamType> {
         INSTANCE;
 
-        public ApiRequestParamType convert(@NotNull Integer code) {
+        public ApiRequestParamType convert(@NonNull Integer code) {
             return ApiRequestParamType.getType(code);
         }
     }
@@ -85,7 +85,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToApiStatusConverter implements Converter<Integer, ApiStatus> {
         INSTANCE;
 
-        public ApiStatus convert(@NotNull Integer code) {
+        public ApiStatus convert(@NonNull Integer code) {
             return ApiStatus.getType(code);
         }
     }
@@ -95,7 +95,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToParamTypeConverter implements Converter<Integer, ParamType> {
         INSTANCE;
 
-        public ParamType convert(@NotNull Integer code) {
+        public ParamType convert(@NonNull Integer code) {
             return ParamType.getType(code);
         }
     }
@@ -104,7 +104,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToRequestMethodConverter implements Converter<Integer, RequestMethod> {
         INSTANCE;
 
-        public RequestMethod convert(@NotNull Integer code) {
+        public RequestMethod convert(@NonNull Integer code) {
             return RequestMethod.getType(code);
         }
     }
@@ -113,7 +113,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToApiTagTypeConverter implements Converter<Integer, ApiTagType> {
         INSTANCE;
 
-        public ApiTagType convert(@NotNull Integer code) {
+        public ApiTagType convert(@NonNull Integer code) {
             return ApiTagType.getType(code);
         }
     }
@@ -122,7 +122,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToApiJsonTypeConverter implements Converter<Integer, ApiJsonType> {
         INSTANCE;
 
-        public ApiJsonType convert(@NotNull Integer code) {
+        public ApiJsonType convert(@NonNull Integer code) {
             return ApiJsonType.getType(code);
         }
     }
@@ -131,7 +131,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToSaveModeConverter implements Converter<Integer, SaveMode> {
         INSTANCE;
 
-        public SaveMode convert(@NotNull Integer code) {
+        public SaveMode convert(@NonNull Integer code) {
             return SaveMode.getType(code);
         }
     }
@@ -140,7 +140,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToDocumentTypeConverter implements Converter<Integer, DocumentType> {
         INSTANCE;
 
-        public DocumentType convert(@NotNull Integer code) {
+        public DocumentType convert(@NonNull Integer code) {
             return DocumentType.getType(code);
         }
     }
@@ -149,7 +149,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToGroupImportTypeConverter implements Converter<Integer, GroupImportType> {
         INSTANCE;
 
-        public GroupImportType convert(@NotNull Integer code) {
+        public GroupImportType convert(@NonNull Integer code) {
             return GroupImportType.getType(code);
         }
     }
@@ -158,7 +158,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToOperationTypeConverter implements Converter<Integer, OperationType> {
         INSTANCE;
 
-        public OperationType convert(@NotNull Integer code) {
+        public OperationType convert(@NonNull Integer code) {
             return OperationType.getType(code);
         }
     }
@@ -167,7 +167,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToOperationModuleConverter implements Converter<Integer, OperationModule> {
         INSTANCE;
 
-        public OperationModule convert(@NotNull Integer code) {
+        public OperationModule convert(@NonNull Integer code) {
             return OperationModule.getType(code);
         }
     }
@@ -176,7 +176,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToApiTypeConverter implements Converter<Integer, ApiType> {
         INSTANCE;
 
-        public ApiType convert(@NotNull Integer code) {
+        public ApiType convert(@NonNull Integer code) {
             return ApiType.getApiType(code);
         }
     }
@@ -185,7 +185,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToMatchTypeConverter implements Converter<Integer, MatchType> {
         INSTANCE;
 
-        public MatchType convert(@NotNull Integer code) {
+        public MatchType convert(@NonNull Integer code) {
             return MatchType.getMatchType(code);
         }
     }
@@ -194,7 +194,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToDocumentUrlTypeConverter implements Converter<Integer, DocumentUrlType> {
         INSTANCE;
 
-        public DocumentUrlType convert(@NotNull Integer code) {
+        public DocumentUrlType convert(@NonNull Integer code) {
             return DocumentUrlType.getType(code);
         }
     }
@@ -204,7 +204,7 @@ public class MongoCustomConverterConfiguration {
     enum IntegerToApiBindingStatusConverter implements Converter<Integer, ApiBindingStatus> {
         INSTANCE;
 
-        public ApiBindingStatus convert(@NotNull Integer code) {
+        public ApiBindingStatus convert(@NonNull Integer code) {
             return ApiBindingStatus.getApiBindingStatus(code);
         }
     }
