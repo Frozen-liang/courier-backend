@@ -12,7 +12,7 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
     unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {ResponseResultVerificationMapper.class,
-    ResponseHeadersVerificationMapper.class, ParamInfoMapper.class})
+        ResponseHeadersVerificationMapper.class, ParamInfoMapper.class})
 public interface CaseTemplateApiMapper {
 
     CaseTemplateApi toCaseTemplateApiByUpdateRequest(UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest);
