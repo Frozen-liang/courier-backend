@@ -262,8 +262,7 @@
                 </executions>
                 <configuration>
                     <configLocation>
-<!--                        <![CDATA[https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/main/resources/google_checks.xml]]>-->
-                        /Users/pader.zhang/Downloads/old-checkstyle.xml
+                        <![CDATA[https://gitlab.smsassist.com/share/7up/google-style-guide/raw/master/google-checks-tuned.xml]]>
                     </configLocation>
                     <logViolationsToConsole>true</logViolationsToConsole>
                     <encoding>UTF-8</encoding>
