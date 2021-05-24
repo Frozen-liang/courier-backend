@@ -116,6 +116,11 @@ public enum ErrorCode {
     GET_SCENE_CASE_CONN_ERROR("4108","Failed to get the SceneCase conn!"),
     EDIT_SCENE_CASE_CONN_ERROR("4109","Failed to edit the SceneCase conn!"),
     ADD_CASE_TEMPLATE_CONN_ERROR("4110","Failed to add the CaseTemplateConn!"),
+    GET_API_TAG_GROUP_BY_ID_ERROR("4112", "Failed to get the ApiTagGroup by id!"),
+    GET_API_TAG_GROUP_LIST_ERROR("4113", "Failed to get the ApiTagGroup list!"),
+    ADD_API_TAG_GROUP_ERROR("4114", "Failed to add the ApiTagGroup!"),
+    EDIT_API_TAG_GROUP_ERROR("4115", "Failed to edit the ApiTagGroup!"),
+    DELETE_API_TAG_GROUP_BY_ID_ERROR("4116", "Failed to delete the ApiTagGroup!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 
