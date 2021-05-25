@@ -26,13 +26,19 @@ public class UpdateSceneCaseApiRequest {
 
     @NotNull(message = "The id can not be empty")
     private String id;
+    @NotNull(message = "The apiId can not be empty")
     private String apiId;
+    @NotNull(message = "The sceneCaseId can not be empty")
     private String sceneCaseId;
+    @NotNull(message = "The projectId can not be empty")
     private String projectId;
+    @NotNull(message = "The apiName can not be empty")
     private String apiName;
     private String description;
+    @NotNull(message = "The apiType can not be empty")
     private ApiType apiType;
     private String jsData;
+    @NotNull(message = "The apiPath can not be empty")
     private String apiPath;
     private ApiProtocol apiProtocol;
     private RequestMethod requestMethod;

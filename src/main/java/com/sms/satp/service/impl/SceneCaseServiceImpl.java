@@ -44,6 +44,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -80,8 +81,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = SCENE_CASE, template = "{{#addSceneCaseRequest"
-        + "?.[#this.name]}}", projectId = "addSceneCaseRequest.projectId")
+    @LogRecord(operationType = ADD, operationModule = SCENE_CASE, template = "{{#addSceneCaseRequest.name}}")
     public Boolean add(AddSceneCaseRequest addSceneCaseRequest) {
         log.info("SceneCaseService-add()-params: [SceneCase]={}", addSceneCaseRequest.toString());
         try {
@@ -99,7 +99,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     @LogRecord(operationType = DELETE, operationModule = SCENE_CASE, template = "{{#result?.![#this.name]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
-        log.info("SceneCaseService-deleteById()-params: [ids]={}", ids);
+        log.info("SceneCaseService-deleteById()-params: [ids]={}", ids.toString());
         try {
             for (String id : ids) {
                 sceneCaseRepository.deleteById(id);
@@ -114,8 +114,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE, template = "{{#updateSceneCaseRequest"
-        + "?.[#this.name]}}", projectId = "updateSceneCaseRequest.projectId")
+    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE, template = "{{#updateSceneCaseRequest.name}}")
     public Boolean edit(UpdateSceneCaseRequest updateSceneCaseRequest) {
         log.info("SceneCaseService-edit()-params: [SceneCase]={}", updateSceneCaseRequest.toString());
         try {
@@ -193,15 +192,15 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     public Boolean editConn(UpdateSceneTemplateRequest updateSceneTemplateRequest) {
         log.info("SceneCaseService-editConn()-params: [SceneTemplateDto]={}", updateSceneTemplateRequest.toString());
         try {
-            if (!updateSceneTemplateRequest.getSceneCaseApiDtoList().isEmpty()) {
+            if (!updateSceneTemplateRequest.getUpdateSceneCaseApiRequests().isEmpty()) {
                 sceneCaseApiService.batchEdit(
                     BatchUpdateSceneCaseApiRequest.builder()
-                        .sceneCaseApiRequestList(updateSceneTemplateRequest.getSceneCaseApiDtoList()).build());
+                        .sceneCaseApiRequestList(updateSceneTemplateRequest.getUpdateSceneCaseApiRequests()).build());
             }
-            if (!updateSceneTemplateRequest.getCaseTemplateConnDtoList().isEmpty()) {
+            if (!updateSceneTemplateRequest.getUpdateCaseTemplateConnRequests().isEmpty()) {
                 List<CaseTemplateConn> caseTemplateConnList =
                     caseTemplateConnMapper
-                        .toCaseTemplateConnList(updateSceneTemplateRequest.getCaseTemplateConnDtoList());
+                        .toCaseTemplateConnList(updateSceneTemplateRequest.getUpdateCaseTemplateConnRequests());
                 caseTemplateConnService.editList(caseTemplateConnList);
             }
             return Boolean.TRUE;
@@ -222,8 +221,10 @@ public class SceneCaseServiceImpl implements SceneCaseService {
 
     private void deleteSceneCaseApi(String id) {
         List<SceneCaseApi> sceneCaseApiList = sceneCaseApiService.listBySceneCaseId(id);
-        List<String> ids = sceneCaseApiList.stream().map(SceneCaseApi::getId).collect(Collectors.toList());
-        sceneCaseApiService.deleteByIds(ids);
+        if (CollectionUtils.isNotEmpty(sceneCaseApiList)) {
+            List<String> ids = sceneCaseApiList.stream().map(SceneCaseApi::getId).collect(Collectors.toList());
+            sceneCaseApiService.deleteByIds(ids);
+        }
     }
 
     private void deleteCaseTemplate(String id) {
@@ -236,10 +237,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private void editSceneCaseApiStatus(SceneCase sceneCase, Boolean oldRemove) {
         List<SceneCaseApi> sceneCaseApiList = sceneCaseApiService
             .getApiBySceneCaseId(sceneCase.getId(), oldRemove);
-        for (SceneCaseApi sceneCaseApi : sceneCaseApiList) {
-            sceneCaseApi.setRemoved(sceneCase.getRemoved());
+        if (CollectionUtils.isNotEmpty(sceneCaseApiList)) {
+            for (SceneCaseApi sceneCaseApi : sceneCaseApiList) {
+                sceneCaseApi.setRemoved(sceneCase.getRemoved());
+            }
+            sceneCaseApiService.editAll(sceneCaseApiList);
         }
-        sceneCaseApiService.editAll(sceneCaseApiList);
     }
 
 }

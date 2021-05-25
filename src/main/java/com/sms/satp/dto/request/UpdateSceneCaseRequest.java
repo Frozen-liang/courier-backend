@@ -17,6 +17,7 @@ public class UpdateSceneCaseRequest {
     private String id;
     private String name;
     private String createUserName;
+    @NotNull(message = "The projectId can not be empty")
     private String projectId;
     private String groupId;
     private String testStatus;

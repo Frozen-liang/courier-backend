@@ -47,8 +47,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     @Override
     @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API, template = "{{#addSceneCaseApiDto"
-        + ".addSceneCaseApiRequestList?.[#this.apiName]}}", projectId = "addSceneCaseApiDto"
-        + ".addSceneCaseApiRequestList[0].projectId")
+        + ".addSceneCaseApiRequestList?.![#this.apiName]}}", projectId = "addSceneCaseApiRequestList[0].projectId")
     public Boolean batchAdd(BatchAddSceneCaseApiRequest addSceneCaseApiDto) {
         log.info("SceneCaseApiService-batchAdd()-params: [SceneCaseApi]={}", addSceneCaseApiDto.toString());
         try {
@@ -77,8 +76,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API, template = "{{#updateCaseTemplateApiRequest"
-        + "?.[#this.apiName]}}", projectId = "updateCaseTemplateApiRequest.projectId")
+    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
+        template = "{{#updateSceneCaseApiRequest.apiName}}")
     public Boolean edit(UpdateSceneCaseApiRequest updateSceneCaseApiRequest) {
         log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", updateSceneCaseApiRequest.toString());
         try {
@@ -92,8 +91,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API, template = "{{#sceneCaseApiList"
-        + "?.[#this.apiName]}}", projectId = "sceneCaseApiList[0].projectId")
+    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API, template = "{{#sceneCaseApiList[0].apiName}}")
     public Boolean editAll(List<SceneCaseApi> sceneCaseApiList) {
         log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", sceneCaseApiList.toString());
         try {
@@ -107,8 +105,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API, template = "{{#updateSceneCaseApiSortOrderDto"
-        + ".sceneCaseApiRequestList?.[#this.apiName]}}", projectId = "updateSceneCaseApiSortOrderDto"
-        + ".sceneCaseApiRequestList[0].projectId")
+        + ".sceneCaseApiRequestList?.![#this.apiName]}}", projectId = "sceneCaseApiRequestList[0].projectId")
     public Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiSortOrderDto) {
         log.info("SceneCaseApiService-batchEdit()-params: [SceneCaseApi]={}",
             updateSceneCaseApiSortOrderDto.toString());
@@ -130,7 +127,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApi> example = Example.of(
                 SceneCaseApi.builder().sceneCaseId(sceneCaseId).removed(remove).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiledName());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiled());
             List<SceneCaseApi> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(sceneCaseApiMapper::toSceneCaseApiDto).collect(Collectors.toList());
         } catch (Exception e) {
@@ -156,7 +153,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApi> example = Example.of(
                 SceneCaseApi.builder().sceneCaseId(sceneCaseId).removed(remove).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiledName());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiled());
             return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);

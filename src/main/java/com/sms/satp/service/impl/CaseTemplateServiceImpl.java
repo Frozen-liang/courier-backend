@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -58,8 +59,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE, template = "{{#addCaseTemplateRequest"
-        + "?.[#this.name]}}", projectId = "addCaseTemplateRequest.projectId")
+    @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE, template = "{{#addCaseTemplateRequest.name}}")
     public Boolean add(AddCaseTemplateRequest addCaseTemplateRequest) {
         log.info("CaseTemplateService-add()-params: [CaseTemplate]={}", addCaseTemplateRequest.toString());
         try {
@@ -92,8 +92,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE, template = "{{#updateCaseTemplateRequest"
-        + "?.[#this.name]}}", projectId = "updateCaseTemplateRequest.projectId")
+    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE, template = "{{#updateCaseTemplateRequest.name}}")
     public Boolean edit(UpdateCaseTemplateRequest updateCaseTemplateRequest) {
         log.info("CaseTemplateService-edit()-params: [CaseTemplate]={}", updateCaseTemplateRequest.toString());
         try {
@@ -148,16 +147,20 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
 
     private void deleteCaseTemplateApi(List<CaseTemplateApi> caseTemplateApiList) {
         List<String> ids = caseTemplateApiList.stream().map(CaseTemplateApi::getId).collect(Collectors.toList());
-        caseTemplateApiService.deleteByIds(ids);
+        if (CollectionUtils.isNotEmpty(ids)) {
+            caseTemplateApiService.deleteByIds(ids);
+        }
     }
 
     private void editCaseTemplateApiStatus(CaseTemplate caseTemplate, Boolean oldRemove) {
         List<CaseTemplateApi> caseTemplateApiList = caseTemplateApiService
             .getApiByCaseTemplateId(caseTemplate.getId(), oldRemove);
-        for (CaseTemplateApi caseTemplateApi : caseTemplateApiList) {
-            caseTemplateApi.setRemoved(caseTemplate.getRemoved());
+        if (CollectionUtils.isNotEmpty(caseTemplateApiList)) {
+            for (CaseTemplateApi caseTemplateApi : caseTemplateApiList) {
+                caseTemplateApi.setRemoved(caseTemplate.getRemoved());
+            }
+            caseTemplateApiService.editAll(caseTemplateApiList);
         }
-        caseTemplateApiService.editAll(caseTemplateApiList);
     }
 
 }

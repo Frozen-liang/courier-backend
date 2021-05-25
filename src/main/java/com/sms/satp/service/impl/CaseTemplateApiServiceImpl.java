@@ -5,7 +5,6 @@ import static com.sms.satp.common.enums.OperationType.ADD;
 import static com.sms.satp.common.enums.OperationType.DELETE;
 import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_API_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.BATCH_EDIT_CASE_TEMPLATE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_API_BY_ID_ERROR;
@@ -16,7 +15,6 @@ import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.dto.request.BatchAddCaseTemplateApiRequest;
-import com.sms.satp.dto.request.BatchUpdateCaseTemplateApiRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
 import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
@@ -47,8 +45,8 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
 
     @Override
     @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE_API, template = "{{#addCaseTemplateApiRequest"
-        + ".addCaseTemplateApiRequestList?.[#this.apiName]}}", projectId = "addCaseTemplateApiRequest"
-        + ".addCaseTemplateApiRequestList[0].projectId")
+        + ".addCaseTemplateApiRequestList?.![#this.apiName]}}", projectId = "addCaseTemplateApiRequestList[0]"
+        + ".projectId")
     public Boolean batchAdd(BatchAddCaseTemplateApiRequest addCaseTemplateApiRequest) {
         log.info("CaseTemplateApiService-batchAdd()-params: [CaseTemplateApi]={}",
             addCaseTemplateApiRequest.toString());
@@ -78,8 +76,8 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API, template = "{{#updateCaseTemplateApiRequest"
-        + "?.[#this.apiName]}}", projectId = "updateCaseTemplateApiRequest.projectId")
+    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API,
+        template = "{{#updateCaseTemplateApiRequest.apiName}}")
     public Boolean edit(UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest) {
         log.info("CaseTemplateApiService-edit()-params: [CaseTemplateApi]={}", updateCaseTemplateApiRequest.toString());
         try {
@@ -94,8 +92,8 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API, template = "{{#caseTemplateApiList"
-        + "?.[#this.apiName]}}", projectId = "caseTemplateApiList[0].projectId")
+    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API,
+        template = "{{#caseTemplateApiList[0].apiName}}")
     public Boolean editAll(List<CaseTemplateApi> caseTemplateApiList) {
         log.info("CaseTemplateApiService-edit()-params: [CaseTemplateApi]={}", caseTemplateApiList.toString());
         try {
@@ -108,31 +106,11 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API, template = "{{#updateCaseTemplateApiDto"
-        + ".updateCaseTemplateApiRequestList?.[#this.apiName]}}", projectId = "updateCaseTemplateApiDto"
-        + ".updateCaseTemplateApiRequestList[0].projectId")
-    public Boolean batchEdit(BatchUpdateCaseTemplateApiRequest updateCaseTemplateApiDto) {
-        log.info("CaseTemplateApiService-batchEdit()-params: [CaseTemplateApi]={}",
-            updateCaseTemplateApiDto.toString());
-        try {
-            if (!updateCaseTemplateApiDto.getUpdateCaseTemplateApiRequestList().isEmpty()) {
-                List<CaseTemplateApi> caseApiList = aseTemplateApiMapper.toCaseTemplateApiListByUpdateRequestList(
-                    updateCaseTemplateApiDto.getUpdateCaseTemplateApiRequestList());
-                caseTemplateApiRepository.saveAll(caseApiList);
-            }
-            return Boolean.TRUE;
-        } catch (Exception e) {
-            log.error("Failed to batch edit the CaseTemplateApi!", e);
-            throw new ApiTestPlatformException(BATCH_EDIT_CASE_TEMPLATE_API_ERROR);
-        }
-    }
-
-    @Override
     public List<CaseTemplateApiResponse> listByCaseTemplateId(String caseTemplateId, boolean remove) {
         try {
             Example<CaseTemplateApi> example = Example
                 .of(CaseTemplateApi.builder().caseTemplateId(caseTemplateId).removed(remove).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiledName());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiled());
             List<CaseTemplateApi> sceneCaseApiList = caseTemplateApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(aseTemplateApiMapper::toCaseTemplateApiDto)
                 .collect(Collectors.toList());
@@ -159,7 +137,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
         try {
             Example<CaseTemplateApi> example = Example
                 .of(CaseTemplateApi.builder().caseTemplateId(caseTemplateId).removed(remove).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiledName());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiled());
             return caseTemplateApiRepository.findAll(example, sort);
         } catch (Exception e) {
             log.error("Failed to get the CaseTemplateApi list by caseTemplateId!", e);

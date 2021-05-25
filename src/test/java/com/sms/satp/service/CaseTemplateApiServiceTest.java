@@ -138,26 +138,6 @@ class CaseTemplateApiServiceTest {
     }
 
     @Test
-    @DisplayName("Test the batchEdit method in the CaseTemplateApi service")
-    void batchEdit_test() {
-        BatchUpdateCaseTemplateApiRequest dto = getUpdateSortOrder();
-        CaseTemplateApi caseTemplateApi = CaseTemplateApi.builder().id(MOCK_ID).build();
-        List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList(caseTemplateApi);
-        when(caseTemplateApiRepository.saveAll(any())).thenReturn(caseTemplateApiList);
-        Boolean isSuccess = caseTemplateApiService.batchEdit(dto);
-        assertTrue(isSuccess);
-    }
-
-    @Test
-    @DisplayName("Test the batchEdit method in the CaseTemplateApi service throws exception")
-    void batchEdit_thenThrowException() {
-        BatchUpdateCaseTemplateApiRequest dto = getUpdateSortOrder();
-        when(caseTemplateApiRepository.saveAll(any()))
-            .thenThrow(new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR));
-        assertThatThrownBy(() -> caseTemplateApiService.batchEdit(dto)).isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
     @DisplayName("Test the list method in the CaseTemplateApi service")
     void listBySceneCaseId_test() {
         List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList(CaseTemplateApi.builder().build());

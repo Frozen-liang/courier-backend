@@ -1,6 +1,6 @@
 package com.sms.satp.common.field;
 
-public enum SceneFiled implements Filed{
+public enum SceneFiled implements Filed {
 
     NAME("name"),
     GROUP_ID("groupId"),
@@ -15,10 +15,6 @@ public enum SceneFiled implements Filed{
 
     SceneFiled(String filedName) {
         this.filedName = filedName;
-    }
-
-    public String getFiledName() {
-        return this.filedName;
     }
 
     @Override
