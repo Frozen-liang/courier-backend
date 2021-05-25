@@ -3,6 +3,7 @@ package com.sms.satp.service;
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_TAG_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_TAG_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TAG_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_LIST_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +43,6 @@ class ApiTagServiceTest {
     private final ApiTagResponse apiTagResponse = ApiTagResponse.builder().id(ID).build();
     private final ApiTagRequest apiTagRequest = ApiTagRequest.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
-    private static final String NOT_EXIST_ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String PROJECT_ID = "10";
     private static final String TAG_NAME = "testName";
@@ -54,16 +54,14 @@ class ApiTagServiceTest {
         when(apiTagRepository.findById(ID)).thenReturn(Optional.of(apiTag));
         when(apiTagMapper.toDto(apiTag)).thenReturn(apiTagResponse);
         ApiTagResponse result1 = apiTagService.findById(ID);
-        ApiTagResponse result2 = apiTagService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
-        assertThat(result2).isNull();
     }
 
     @Test
     @DisplayName("An exception occurred while getting ApiTag")
     public void findById_exception_test() {
-        doThrow(new RuntimeException()).when(apiTagRepository).findById(ID);
+        when(apiTagRepository.findById(ID)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> apiTagService.findById(ID)).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_TAG_BY_ID_ERROR.getCode());
     }
@@ -91,8 +89,7 @@ class ApiTagServiceTest {
     @DisplayName("Test the edit method in the ApiTag service")
     public void edit_test() {
         when(apiTagMapper.toEntity(apiTagRequest)).thenReturn(apiTag);
-        when(apiTagRepository.findById(any()))
-            .thenReturn(Optional.of(ApiTag.builder().id(ID).build()));
+        when(apiTagRepository.existsById(any())).thenReturn(Boolean.TRUE);
         when(apiTagRepository.save(any(ApiTag.class))).thenReturn(apiTag);
         apiTagService.edit(apiTagRequest);
         verify(apiTagRepository, times(1)).save(any(ApiTag.class));
@@ -102,11 +99,21 @@ class ApiTagServiceTest {
     @DisplayName("An exception occurred while edit ApiTag")
     public void edit_exception_test() {
         when(apiTagMapper.toEntity(apiTagRequest)).thenReturn(apiTag);
-        when(apiTagRepository.findById(any())).thenReturn(Optional.of(apiTag));
+        when(apiTagRepository.existsById(any())).thenReturn(Boolean.TRUE);
         doThrow(new RuntimeException()).when(apiTagRepository).save(any(ApiTag.class));
         assertThatThrownBy(() -> apiTagService.edit(apiTagRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_API_TAG_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An not exist exception occurred while edit ApiTag")
+    public void edit_not_exist_exception_test() {
+        when(apiTagMapper.toEntity(apiTagRequest)).thenReturn(apiTag);
+        when(apiTagRepository.existsById(any())).thenReturn(Boolean.FALSE);
+        assertThatThrownBy(() -> apiTagService.edit(apiTagRequest))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_NOT_EXIST_ERROR.getCode());
     }
 
     @Test
@@ -146,7 +153,8 @@ class ApiTagServiceTest {
     @DisplayName("An exception occurred while delete ApiTag")
     public void delete_exception_test() {
         doThrow(new RuntimeException()).when(apiTagRepository).deleteAllByIdIsIn(any());
-        assertThatThrownBy(() -> apiTagService.delete(Collections.singletonList(ID))).isInstanceOf(ApiTestPlatformException.class)
+        assertThatThrownBy(() -> apiTagService.delete(Collections.singletonList(ID)))
+            .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_API_TAG_BY_ID_ERROR.getCode());
     }
 }

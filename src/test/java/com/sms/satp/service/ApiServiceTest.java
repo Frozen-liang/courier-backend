@@ -53,7 +53,6 @@ class ApiServiceTest {
     private final ApiResponse apiResponseDto = ApiResponse.builder().id(ID).build();
     private final ApiRequest apiRequestDto = ApiRequest.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
-    private static final String NOT_EXIST_ID = ObjectId.get().toString();
 
     @Test
     @DisplayName("Test the findById method in the Api service")
@@ -61,16 +60,15 @@ class ApiServiceTest {
         when(apiRepository.findById(ID)).thenReturn(Optional.of(api));
         when(apiMapper.toDto(api)).thenReturn(apiResponseDto);
         ApiResponse result1 = apiService.findById(ID);
-        ApiResponse result2 = apiService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
-        assertThat(result2).isNull();
+
     }
 
     @Test
     @DisplayName("An exception occurred while getting Api")
     public void findById_exception_test() {
-        doThrow(new RuntimeException()).when(apiRepository).findById(ID);
+        when(apiRepository.findById(ID)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> apiService.findById(ID)).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_BY_ID_ERROR.getCode());
     }
@@ -99,8 +97,7 @@ class ApiServiceTest {
     @DisplayName("Test the edit method in the Api service")
     public void edit_test() {
         when(apiMapper.toEntity(apiRequestDto)).thenReturn(api);
-        when(apiRepository.findById(any()))
-            .thenReturn(Optional.of(ApiEntity.builder().id(ID).build()));
+        when(apiRepository.existsById(any())).thenReturn(Boolean.TRUE);
         when(apiRepository.save(any(ApiEntity.class))).thenReturn(api);
         when(apiHistoryRepository.insert(any(ApiHistoryEntity.class))).thenReturn(ApiHistoryEntity.builder().build());
         Boolean bool = apiService.edit(apiRequestDto);
@@ -111,7 +108,7 @@ class ApiServiceTest {
     @DisplayName("An exception occurred while edit Api")
     public void edit_exception_test() {
         when(apiMapper.toEntity(apiRequestDto)).thenReturn(api);
-        when(apiRepository.findById(any())).thenReturn(Optional.of(api));
+        when(apiRepository.existsById(any())).thenReturn(Boolean.TRUE);
         doThrow(new RuntimeException()).when(apiRepository).save(any(ApiEntity.class));
         assertThatThrownBy(() -> apiService.edit(apiRequestDto))
             .isInstanceOf(ApiTestPlatformException.class)

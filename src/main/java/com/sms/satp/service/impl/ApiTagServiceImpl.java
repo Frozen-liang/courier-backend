@@ -7,6 +7,7 @@ import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_TAG_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_TAG_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TAG_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_LIST_ERROR;
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
@@ -22,9 +23,9 @@ import com.sms.satp.entity.tag.ApiTag;
 import com.sms.satp.mapper.ApiTagMapper;
 import com.sms.satp.repository.ApiTagRepository;
 import com.sms.satp.service.ApiTagService;
+import com.sms.satp.utils.ExceptionUtils;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -47,16 +48,9 @@ public class ApiTagServiceImpl implements ApiTagService {
     }
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = API_TAG, template = "{{#result.tagName}}",
-        enhance = @Enhance(enable = true))
     public ApiTagResponse findById(String id) {
-        try {
-            Optional<ApiTag> optional = apiTagRepository.findById(id);
-            return apiTagMapper.toDto(optional.orElse(null));
-        } catch (Exception e) {
-            log.error("Failed to get the ApiTag by id!", e);
-            throw new ApiTestPlatformException(GET_API_TAG_BY_ID_ERROR);
-        }
+        return apiTagRepository.findById(id).map(apiTagMapper::toDto)
+            .orElseThrow(() -> ExceptionUtils.mpe(GET_API_TAG_BY_ID_ERROR));
     }
 
     @Override
@@ -98,15 +92,18 @@ public class ApiTagServiceImpl implements ApiTagService {
     public Boolean edit(ApiTagRequest apiTagRequest) {
         log.info("ApiTagService-edit()-params: [ApiTag]={}", apiTagRequest.toString());
         try {
-            ApiTag apiTag = apiTagMapper.toEntity(apiTagRequest);
-            Optional<ApiTag> optional = apiTagRepository.findById(apiTagRequest.getId());
-            if (optional.isEmpty()) {
-                return Boolean.FALSE;
+            boolean exists = apiTagRepository.existsById(apiTagRequest.getId());
+            if (!exists) {
+                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ApiTag", apiTagRequest.getId());
             }
+            ApiTag apiTag = apiTagMapper.toEntity(apiTagRequest);
             apiTagRepository.save(apiTag);
+        } catch (ApiTestPlatformException apiTestPlatEx) {
+            log.error(apiTestPlatEx.getMessage());
+            throw apiTestPlatEx;
         } catch (Exception e) {
-            log.error("Failed to add the ApiTag!", e);
-            throw new ApiTestPlatformException(EDIT_API_TAG_ERROR);
+            log.error("Failed to edit the ApiTag!", e);
+            throw ExceptionUtils.mpe(EDIT_API_TAG_ERROR);
         }
         return Boolean.TRUE;
     }
@@ -117,14 +114,11 @@ public class ApiTagServiceImpl implements ApiTagService {
     public Boolean delete(List<String> ids) {
         try {
             Long removeCount = apiTagRepository.deleteAllByIdIsIn(ids);
-            if (Objects.requireNonNull(removeCount) > 0) {
-                return Boolean.TRUE;
-            }
+            return removeCount > 0;
         } catch (Exception e) {
             log.error("Failed to delete the ApiTag!", e);
             throw new ApiTestPlatformException(DELETE_API_TAG_BY_ID_ERROR);
         }
-        return Boolean.FALSE;
     }
 
 }

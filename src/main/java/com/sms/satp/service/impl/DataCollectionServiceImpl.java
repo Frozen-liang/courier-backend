@@ -7,6 +7,7 @@ import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_DATA_COLLECTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
@@ -24,8 +25,8 @@ import com.sms.satp.mapper.DataCollectionMapper;
 import com.sms.satp.repository.CustomizedDataCollectionRepository;
 import com.sms.satp.repository.DataCollectionRepository;
 import com.sms.satp.service.DataCollectionService;
+import com.sms.satp.utils.ExceptionUtils;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -53,13 +54,8 @@ public class DataCollectionServiceImpl implements DataCollectionService {
 
     @Override
     public DataCollectionResponse findById(String id) {
-        try {
-            Optional<DataCollection> optional = dataCollectionRepository.findById(id);
-            return dataCollectionMapper.toDto(optional.orElse(null));
-        } catch (Exception e) {
-            log.error("Failed to get the DataCollection by id!", e);
-            throw new ApiTestPlatformException(GET_DATA_COLLECTION_BY_ID_ERROR);
-        }
+        return dataCollectionRepository.findById(id).map(dataCollectionMapper::toDto)
+            .orElseThrow(() -> ExceptionUtils.mpe(GET_DATA_COLLECTION_BY_ID_ERROR));
     }
 
     @Override
@@ -101,12 +97,15 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     public Boolean edit(DataCollectionRequest dataCollectionRequest) {
         log.info("DataCollectionService-edit()-params: [DataCollection]={}", dataCollectionRequest.toString());
         try {
-            DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
-            Optional<DataCollection> optional = dataCollectionRepository.findById(dataCollection.getId());
-            if (optional.isEmpty()) {
-                return Boolean.FALSE;
+            boolean exists = dataCollectionRepository.existsById(dataCollectionRequest.getId());
+            if (!exists) {
+                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "DataCollection", dataCollectionRequest.getId());
             }
+            DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
             dataCollectionRepository.save(dataCollection);
+        } catch (ApiTestPlatformException apiTestPlatEx) {
+            log.error(apiTestPlatEx.getMessage());
+            throw apiTestPlatEx;
         } catch (Exception e) {
             log.error("Failed to add the DataCollection!", e);
             throw new ApiTestPlatformException(EDIT_DATA_COLLECTION_ERROR);

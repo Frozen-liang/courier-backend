@@ -6,6 +6,7 @@ import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_PAGE_ERROR;
 
@@ -35,13 +36,13 @@ import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.repository.ProjectImportFlowRepository;
 import com.sms.satp.service.ApiService;
+import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.MD5Util;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -197,13 +198,8 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
 
     @Override
     public ApiResponse findById(String id) {
-        try {
-            Optional<ApiEntity> optional = apiRepository.findById(id);
-            return apiMapper.toDto(optional.orElse(null));
-        } catch (Exception e) {
-            log.error("Failed to get the Api by id!", e);
-            throw new ApiTestPlatformException(GET_API_BY_ID_ERROR);
-        }
+        return apiRepository.findById(id).map(apiMapper::toDto)
+            .orElseThrow(() -> ExceptionUtils.mpe(GET_API_BY_ID_ERROR));
     }
 
     @Override
@@ -235,18 +231,21 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = PROJECT, template = "{{#apiRequestDto.apiName}}")
-    public Boolean edit(ApiRequest apiRequestDto) {
-        log.info("ApiService-edit()-params: [Api]={}", apiRequestDto.toString());
+    public Boolean edit(ApiRequest apiRequest) {
+        log.info("ApiService-edit()-params: [Api]={}", apiRequest.toString());
         try {
-            ApiEntity apiEntity = apiMapper.toEntity(apiRequestDto);
-            Optional<ApiEntity> optional = apiRepository.findById(apiEntity.getId());
-            if (optional.isEmpty()) {
-                return Boolean.FALSE;
+            boolean exists = apiRepository.existsById(apiRequest.getId());
+            if (!exists) {
+                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "Api", apiRequest.getId());
             }
+            ApiEntity apiEntity = apiMapper.toEntity(apiRequest);
             ApiEntity newApiEntity = apiRepository.save(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             apiHistoryRepository.insert(apiHistoryEntity);
+        } catch (ApiTestPlatformException apiTestPlatEx) {
+            log.error(apiTestPlatEx.getMessage());
+            throw apiTestPlatEx;
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
             throw new ApiTestPlatformException(EDIT_API_ERROR);

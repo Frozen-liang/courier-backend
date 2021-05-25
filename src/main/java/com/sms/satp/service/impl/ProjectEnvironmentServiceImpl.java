@@ -6,6 +6,7 @@ import static com.sms.satp.common.enums.OperationType.DELETE;
 import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_LIST_ERROR;
@@ -27,10 +28,10 @@ import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
 import com.sms.satp.service.GlobalEnvironmentService;
 import com.sms.satp.service.ProjectEnvironmentService;
+import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -126,13 +127,16 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
         log.info("ProjectEnvironmentService-edit()-params: [ProjectEnvironment]={}",
             projectEnvironmentRequest.toString());
         try {
+            boolean exists = projectEnvironmentRepository.existsById(projectEnvironmentRequest.getId());
+            if (!exists) {
+                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ProjectEnvironment", projectEnvironmentRequest.getId());
+            }
             ProjectEnvironment projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentRequest);
-            Optional<ProjectEnvironment> optional = projectEnvironmentRepository.findById(projectEnvironment.getId());
-            if (optional.isEmpty()) {
-                return Boolean.FALSE;
-            }
             projectEnvironmentRepository.save(projectEnvironment);
+        } catch (ApiTestPlatformException apiTestPlatEx) {
+            log.error(apiTestPlatEx.getMessage());
+            throw apiTestPlatEx;
         } catch (Exception e) {
             log.error("Failed to edit the projectEnvironment!", e);
             throw new ApiTestPlatformException(EDIT_PROJECT_ENVIRONMENT_ERROR);
@@ -155,14 +159,8 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
 
     @Override
     public ProjectEnvironmentResponse findById(String id) {
-        try {
-            Optional<ProjectEnvironment> projectEnvironmentOptional
-                = projectEnvironmentRepository.findById(id);
-            return projectEnvironmentMapper.toDto(projectEnvironmentOptional.orElse(null));
-        } catch (Exception e) {
-            log.error("Failed to get the ProjectEnvironment by id!", e);
-            throw new ApiTestPlatformException(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR);
-        }
+        return projectEnvironmentRepository.findById(id).map(projectEnvironmentMapper::toDto)
+            .orElseThrow(() -> ExceptionUtils.mpe(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR));
     }
 
 }
