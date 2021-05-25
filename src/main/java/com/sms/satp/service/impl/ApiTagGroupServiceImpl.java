@@ -79,6 +79,11 @@ public class ApiTagGroupServiceImpl implements ApiTagGroupService {
             if (!exists) {
                 throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ApiTagGroup", apiTagGroupRequest.getId());
             }
+            exists = apiTagGroupRepository.existsByProjectIdAndName(apiTagGroupRequest.getProjectId(),
+                apiTagGroupRequest.getName());
+            if (exists) {
+                throw ExceptionUtils.mpe(THE_API_TAG_GROUP_NAME_EXIST_ERROR, apiTagGroupRequest.getName());
+            }
             ApiTagGroup apiTagGroup = apiTagGroupMapper.toEntity(apiTagGroupRequest);
             apiTagGroupRepository.save(apiTagGroup);
         } catch (ApiTestPlatformException apiTestPlatEx) {

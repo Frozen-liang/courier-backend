@@ -77,6 +77,7 @@ class ApiTagGroupServiceTest {
     @DisplayName("An exception occurred while adding ApiTagGroup")
     public void add_exception_test() {
         when(apiTagGroupMapper.toEntity(any())).thenReturn(ApiTagGroup.builder().build());
+        when(apiTagGroupRepository.existsByProjectIdAndName(any(), any())).thenReturn(Boolean.FALSE);
         doThrow(new RuntimeException()).when(apiTagGroupRepository).insert(any(ApiTagGroup.class));
         assertThatThrownBy(() -> apiTagGroupService.add(apiTagGroupRequest))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -85,7 +86,7 @@ class ApiTagGroupServiceTest {
 
     @Test
     @DisplayName("An group name exist exception occurred while adding ApiTagGroup")
-    public void the_group_name_exist_exception_test() {
+    public void add_the_group_name_exist_exception_test() {
         when(apiTagGroupMapper.toEntity(any())).thenReturn(ApiTagGroup.builder().build());
         when(apiTagGroupRepository.existsByProjectIdAndName(any(), any())).thenReturn(Boolean.TRUE);
         assertThatThrownBy(() -> apiTagGroupService.add(apiTagGroupRequest))
@@ -121,6 +122,17 @@ class ApiTagGroupServiceTest {
         assertThatThrownBy(() -> apiTagGroupService.edit(apiTagGroupRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_NOT_EXIST_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An group name exist exception occurred while edit ApiTagGroup")
+    public void edit_the_group_name_exist_exception_test() {
+        when(apiTagGroupMapper.toEntity(any())).thenReturn(ApiTagGroup.builder().build());
+        when(apiTagGroupRepository.existsById(any())).thenReturn(Boolean.FALSE);
+        when(apiTagGroupRepository.existsByProjectIdAndName(any(), any())).thenReturn(Boolean.TRUE);
+        assertThatThrownBy(() -> apiTagGroupService.add(apiTagGroupRequest))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(THE_API_TAG_GROUP_NAME_EXIST_ERROR.getCode());
     }
 
     @Test

@@ -31,10 +31,7 @@ public class CustomizedDataCollectionRepositoryImpl implements CustomizedDataCol
         Query query = new Query(Criteria.where(CommonFiled.ID.getFiled()).is(id));
         query.fields().include(PARAM_LIST);
         DataCollection dataCollection = mongoTemplate.findOne(query, DataCollection.class);
-        if (Objects.nonNull(dataCollection)) {
-            return dataCollection.getParamList();
-        }
-        return Collections.emptyList();
+        return Objects.nonNull(dataCollection) ? dataCollection.getParamList() : Collections.emptyList();
     }
 
     @Override
