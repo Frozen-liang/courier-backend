@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectDto {
-
     private String id;
     @NotNull(message = "Project name cannot be empty")
     private String name;

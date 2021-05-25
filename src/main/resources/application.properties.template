@@ -3,3 +3,6 @@ logging.file.max-history=5
 logging.file.name=./logs/satp-server.log
 server.http2.enabled=true
 server.compression.enabled=true
+spring.servlet.multipart.max-file-size=10MB
+spring.data.mongodb.auto-index-creation=true
+spring.thymeleaf.enabled=true
