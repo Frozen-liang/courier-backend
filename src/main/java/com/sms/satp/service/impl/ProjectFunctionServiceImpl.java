@@ -6,6 +6,7 @@ import static com.sms.satp.common.enums.OperationType.DELETE;
 import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_PROJECT_FUNCTION_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_LIST_ERROR;
@@ -25,9 +26,9 @@ import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.ProjectFunctionRepository;
 import com.sms.satp.service.GlobalFunctionService;
 import com.sms.satp.service.ProjectFunctionService;
+import com.sms.satp.utils.ExceptionUtils;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -57,13 +58,8 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
 
     @Override
     public ProjectFunctionResponse findById(String id) {
-        try {
-            Optional<ProjectFunction> optional = projectFunctionRepository.findById(id);
-            return projectFunctionMapper.toDto(optional.orElse(null));
-        } catch (Exception e) {
-            log.error("Failed to get the ProjectFunction by id!", e);
-            throw new ApiTestPlatformException(GET_PROJECT_FUNCTION_BY_ID_ERROR);
-        }
+        return projectFunctionRepository.findById(id).map(projectFunctionMapper::toDto)
+            .orElseThrow(() -> ExceptionUtils.mpe(GET_PROJECT_FUNCTION_BY_ID_ERROR));
     }
 
     @Override
@@ -112,12 +108,15 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     public Boolean edit(ProjectFunctionRequest projectFunctionRequest) {
         log.info("ProjectFunctionService-edit()-params: [ProjectFunction]={}", projectFunctionRequest.toString());
         try {
-            ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
-            Optional<ProjectFunction> optional = projectFunctionRepository.findById(projectFunction.getId());
-            if (optional.isEmpty()) {
-                return Boolean.FALSE;
+            boolean exists = projectFunctionRepository.existsById(projectFunctionRequest.getId());
+            if (!exists) {
+                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ProjectFunction", projectFunctionRequest.getId());
             }
+            ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
             projectFunctionRepository.save(projectFunction);
+        } catch (ApiTestPlatformException apiTestPlatEx) {
+            log.error(apiTestPlatEx.getMessage());
+            throw apiTestPlatEx;
         } catch (Exception e) {
             log.error("Failed to add the ProjectFunction!", e);
             throw new ApiTestPlatformException(EDIT_PROJECT_FUNCTION_ERROR);

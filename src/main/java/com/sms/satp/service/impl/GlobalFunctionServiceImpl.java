@@ -7,6 +7,7 @@ import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_GLOBAL_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_GLOBAL_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_GLOBAL_FUNCTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_LIST_ERROR;
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
@@ -22,8 +23,8 @@ import com.sms.satp.mapper.GlobalFunctionMapper;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.GlobalFunctionRepository;
 import com.sms.satp.service.GlobalFunctionService;
+import com.sms.satp.utils.ExceptionUtils;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -51,13 +52,8 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
 
     @Override
     public GlobalFunctionResponse findById(String id) {
-        try {
-            Optional<GlobalFunction> optional = globalFunctionRepository.findById(id);
-            return globalFunctionMapper.toDto(optional.orElse(null));
-        } catch (Exception e) {
-            log.error("Failed to get the GlobalFunction by id!", e);
-            throw new ApiTestPlatformException(GET_GLOBAL_FUNCTION_BY_ID_ERROR);
-        }
+        return globalFunctionRepository.findById(id).map(globalFunctionMapper::toDto)
+            .orElseThrow(() -> ExceptionUtils.mpe(GET_GLOBAL_FUNCTION_BY_ID_ERROR));
     }
 
     @Override
@@ -100,12 +96,15 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     public Boolean edit(GlobalFunctionRequest globalFunctionRequest) {
         log.info("GlobalFunctionService-edit()-params: [GlobalFunction]={}", globalFunctionRequest.toString());
         try {
-            GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionRequest);
-            Optional<GlobalFunction> optional = globalFunctionRepository.findById(globalFunction.getId());
-            if (optional.isEmpty()) {
-                return Boolean.FALSE;
+            boolean exists = globalFunctionRepository.existsById(globalFunctionRequest.getId());
+            if (!exists) {
+                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "GlobalFunction", globalFunctionRequest.getId());
             }
+            GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionRequest);
             globalFunctionRepository.save(globalFunction);
+        } catch (ApiTestPlatformException apiTestPlatEx) {
+            log.error(apiTestPlatEx.getMessage());
+            throw apiTestPlatEx;
         } catch (Exception e) {
             log.error("Failed to add the GlobalFunction!", e);
             throw new ApiTestPlatformException(EDIT_GLOBAL_FUNCTION_ERROR);

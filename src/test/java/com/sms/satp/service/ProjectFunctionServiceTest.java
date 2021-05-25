@@ -2,6 +2,7 @@ package com.sms.satp.service;
 
 import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_PROJECT_FUNCTION_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_LIST_ERROR;
@@ -46,7 +47,6 @@ class ProjectFunctionServiceTest {
     private final ProjectFunctionRequest projectFunctionRequest = ProjectFunctionRequest
         .builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
-    private static final String NOT_EXIST_ID = ObjectId.get().toString();
     private static final List<String> ID_LIST = Collections.singletonList(ID);
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String PROJECT_ID = "10";
@@ -59,16 +59,14 @@ class ProjectFunctionServiceTest {
         when(projectFunctionRepository.findById(ID)).thenReturn(Optional.of(projectFunction));
         when(projectFunctionMapper.toDto(projectFunction)).thenReturn(projectFunctionResponse);
         ProjectFunctionResponse result1 = projectFunctionService.findById(ID);
-        ProjectFunctionResponse result2 = projectFunctionService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
-        assertThat(result2).isNull();
     }
 
     @Test
     @DisplayName("An exception occurred while getting ProjectFunction")
     public void findById_exception_test() {
-        doThrow(new RuntimeException()).when(projectFunctionRepository).findById(ID);
+        when(projectFunctionRepository.findById(ID)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> projectFunctionService.findById(ID)).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_PROJECT_FUNCTION_BY_ID_ERROR.getCode());
     }
@@ -96,8 +94,7 @@ class ProjectFunctionServiceTest {
     @DisplayName("Test the edit method in the ProjectFunction service")
     public void edit_test() {
         when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
-        when(projectFunctionRepository.findById(any()))
-            .thenReturn(Optional.of(ProjectFunction.builder().id(ID).build()));
+        when(projectFunctionRepository.existsById(any())).thenReturn(Boolean.TRUE);
         when(projectFunctionRepository.save(any(ProjectFunction.class))).thenReturn(projectFunction);
         assertThat(projectFunctionService.edit(projectFunctionRequest)).isTrue();
     }
@@ -106,11 +103,21 @@ class ProjectFunctionServiceTest {
     @DisplayName("An exception occurred while edit ProjectFunction")
     public void edit_exception_test() {
         when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
-        when(projectFunctionRepository.findById(any())).thenReturn(Optional.of(projectFunction));
+        when(projectFunctionRepository.existsById(any())).thenReturn(Boolean.TRUE);
         doThrow(new RuntimeException()).when(projectFunctionRepository).save(any(ProjectFunction.class));
         assertThatThrownBy(() -> projectFunctionService.edit(projectFunctionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_PROJECT_FUNCTION_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An not exist exception occurred while edit ProjectFunction")
+    public void edit_not_exist_exception_test() {
+        when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
+        when(projectFunctionRepository.existsById(any())).thenReturn(Boolean.FALSE);
+        assertThatThrownBy(() -> projectFunctionService.edit(projectFunctionRequest))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_NOT_EXIST_ERROR.getCode());
     }
 
     @Test

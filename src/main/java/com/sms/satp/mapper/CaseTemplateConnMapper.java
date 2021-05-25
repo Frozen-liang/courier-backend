@@ -1,6 +1,7 @@
 package com.sms.satp.mapper;
 
 import com.sms.satp.dto.request.AddCaseTemplateConnRequest;
+import com.sms.satp.dto.request.UpdateCaseTemplateConnRequest;
 import com.sms.satp.dto.response.CaseTemplateConnResponse;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import java.util.List;
@@ -14,7 +15,7 @@ public interface CaseTemplateConnMapper {
 
     CaseTemplateConnResponse toCaseTemplateConnDto(CaseTemplateConn conn);
 
-    List<CaseTemplateConn> toCaseTemplateConnList(List<CaseTemplateConnResponse> caseTemplateConnDtoList);
+    List<CaseTemplateConn> toCaseTemplateConnList(List<UpdateCaseTemplateConnRequest> caseTemplateConnDtoList);
 
     CaseTemplateConn toCaseTemplateConn(AddCaseTemplateConnRequest addCaseTemplateConnRequest);
 }

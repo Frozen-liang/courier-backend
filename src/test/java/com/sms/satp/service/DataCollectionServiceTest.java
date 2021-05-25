@@ -3,6 +3,7 @@ package com.sms.satp.service;
 import static com.sms.satp.common.exception.ErrorCode.ADD_DATA_COLLECTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
@@ -46,7 +47,6 @@ class DataCollectionServiceTest {
     private final DataCollectionResponse dataCollectionResponse = DataCollectionResponse.builder().id(ID).build();
     private final DataCollectionRequest dataCollectionRequest = DataCollectionRequest.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
-    private static final String NOT_EXIST_ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String COLLECTION_NAME = "collectionName";
     private static final String PROJECT_ID = ObjectId.get().toString();
@@ -57,16 +57,14 @@ class DataCollectionServiceTest {
         when(dataCollectionRepository.findById(ID)).thenReturn(Optional.of(dataCollection));
         when(dataCollectionMapper.toDto(dataCollection)).thenReturn(dataCollectionResponse);
         DataCollectionResponse result1 = dataCollectionService.findById(ID);
-        DataCollectionResponse result2 = dataCollectionService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
-        assertThat(result2).isNull();
     }
 
     @Test
     @DisplayName("An exception occurred while getting DataCollection")
     public void findById_exception_test() {
-        doThrow(new RuntimeException()).when(dataCollectionRepository).findById(ID);
+        when(dataCollectionRepository.findById(ID)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> dataCollectionService.findById(ID)).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_DATA_COLLECTION_BY_ID_ERROR.getCode());
     }
@@ -94,8 +92,7 @@ class DataCollectionServiceTest {
     @DisplayName("Test the edit method in the DataCollection service")
     public void edit_test() {
         when(dataCollectionMapper.toEntity(dataCollectionRequest)).thenReturn(dataCollection);
-        when(dataCollectionRepository.findById(any()))
-            .thenReturn(Optional.of(DataCollection.builder().id(ID).build()));
+        when(dataCollectionRepository.existsById(any())).thenReturn(Boolean.TRUE);
         when(dataCollectionRepository.save(any(DataCollection.class))).thenReturn(dataCollection);
         assertThat(dataCollectionService.edit(dataCollectionRequest)).isTrue();
     }
@@ -104,11 +101,21 @@ class DataCollectionServiceTest {
     @DisplayName("An exception occurred while edit DataCollection")
     public void edit_exception_test() {
         when(dataCollectionMapper.toEntity(dataCollectionRequest)).thenReturn(dataCollection);
-        when(dataCollectionRepository.findById(any())).thenReturn(Optional.of(dataCollection));
+        when(dataCollectionRepository.existsById(any())).thenReturn(Boolean.TRUE);
         doThrow(new RuntimeException()).when(dataCollectionRepository).save(any(DataCollection.class));
         assertThatThrownBy(() -> dataCollectionService.edit(dataCollectionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_DATA_COLLECTION_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An not exist exception occurred while edit DataCollection")
+    public void edit_not_exist_exception_test() {
+        when(dataCollectionMapper.toEntity(dataCollectionRequest)).thenReturn(dataCollection);
+        when(dataCollectionRepository.existsById(any())).thenReturn(Boolean.FALSE);
+        assertThatThrownBy(() -> dataCollectionService.edit(dataCollectionRequest))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_NOT_EXIST_ERROR.getCode());
     }
 
     @Test

@@ -117,11 +117,18 @@ public enum ErrorCode {
     EDIT_SCENE_CASE_CONN_ERROR("4109", "Failed to edit the SceneCase conn!"),
     ADD_CASE_TEMPLATE_CONN_ERROR("4110", "Failed to add the CaseTemplateConn!"),
     GET_LOG_PAGE_ERROR("4111", "Failed to get the Log page!"),
-    GET_API_TEST_CASE_BY_ID_ERROR("4116", "Failed to get the ApiCase by id!"),
-    ADD_API_TEST_CASE_ERROR("4117", "Failed to add the ApiCase!"),
-    DELETE_API_TEST_CASE_BY_ID_ERROR("4118", "Failed to delete the ApiCase!"),
-    EDIT_API_TEST_CASE_ERROR("4119", "Failed to edit the ApiCase!"),
-    GET_API_TEST_CASE_LIST_ERROR("4120", "Failed to get the ApiCase list!"),
+    GET_API_TAG_GROUP_BY_ID_ERROR("4112", "Failed to get the ApiTagGroup by id!"),
+    GET_API_TAG_GROUP_LIST_ERROR("4113", "Failed to get the ApiTagGroup list!"),
+    ADD_API_TAG_GROUP_ERROR("4114", "Failed to add the ApiTagGroup!"),
+    EDIT_API_TAG_GROUP_ERROR("4115", "Failed to edit the ApiTagGroup!"),
+    DELETE_API_TAG_GROUP_BY_ID_ERROR("4116", "Failed to delete the ApiTagGroup!"),
+    THE_API_TAG_GROUP_NAME_EXIST_ERROR("4117", "The %s exist!"),
+    EDIT_NOT_EXIST_ERROR("4118", "The %s not found. id=%s"),
+    GET_API_TEST_CASE_BY_ID_ERROR("4119", "Failed to get the ApiCase by id!"),
+    ADD_API_TEST_CASE_ERROR("4120", "Failed to add the ApiCase!"),
+    DELETE_API_TEST_CASE_BY_ID_ERROR("4121", "Failed to delete the ApiCase!"),
+    EDIT_API_TEST_CASE_ERROR("4122", "Failed to edit the ApiCase!"),
+    GET_API_TEST_CASE_LIST_ERROR("4123", "Failed to get the ApiCase list!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

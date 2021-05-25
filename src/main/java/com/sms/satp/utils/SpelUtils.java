@@ -74,6 +74,8 @@ public class SpelUtils {
                     exp = createObjectExpression(resultKey, logRecord.projectId());
                     expression = spelExpressionParser.parseExpression(exp, templateParserContext);
                     return expression.getValue(context, String.class);
+                } else {
+                    return value;
                 }
             }
 

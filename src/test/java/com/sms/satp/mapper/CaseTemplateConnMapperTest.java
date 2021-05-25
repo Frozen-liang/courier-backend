@@ -2,6 +2,7 @@ package com.sms.satp.mapper;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.dto.request.AddCaseTemplateConnRequest;
+import com.sms.satp.dto.request.UpdateCaseTemplateConnRequest;
 import com.sms.satp.dto.response.CaseTemplateConnResponse;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import java.util.List;
@@ -30,7 +31,7 @@ class CaseTemplateConnMapperTest {
     @Test
     @DisplayName("Test the toCaseTemplateConnList method in the CaseTemplateConnMapper")
     void toCaseTemplateConnList_test() {
-        List<CaseTemplateConnResponse> dtoList = Lists.newArrayList(CaseTemplateConnResponse.builder()
+        List<UpdateCaseTemplateConnRequest> dtoList = Lists.newArrayList(UpdateCaseTemplateConnRequest.builder()
             .id(MOCK_ID).caseTemplateId(MOCK_ID).build());
         List<CaseTemplateConn> connList = caseTemplateConnMapper.toCaseTemplateConnList(dtoList);
         assertThat(connList.size()).isEqualTo(dtoList.size());

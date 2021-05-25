@@ -3,6 +3,7 @@ package com.sms.satp.service;
 import static com.sms.satp.common.exception.ErrorCode.ADD_GLOBAL_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_GLOBAL_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_GLOBAL_FUNCTION_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_LIST_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,8 +45,8 @@ class GlobalFunctionServiceTest {
     private final GlobalFunctionResponse globalFunctionResponse = GlobalFunctionResponse.builder().id(ID).build();
     private final GlobalFunctionRequest globalFunctionRequest = GlobalFunctionRequest.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
-    private static final List<String> ID_LIST = Collections.singletonList(ID);;
-    private static final String NOT_EXIST_ID = ObjectId.get().toString();
+    private static final List<String> ID_LIST = Collections.singletonList(ID);
+    ;
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String FUNCTION_NAME = "functionName";
     private static final String FUNCTION_DESC = "functionDesc";
@@ -56,16 +57,14 @@ class GlobalFunctionServiceTest {
         when(globalFunctionRepository.findById(ID)).thenReturn(Optional.of(globalFunction));
         when(globalFunctionMapper.toDto(globalFunction)).thenReturn(globalFunctionResponse);
         GlobalFunctionResponse result1 = globalFunctionService.findById(ID);
-        GlobalFunctionResponse result2 = globalFunctionService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
-        assertThat(result2).isNull();
     }
 
     @Test
     @DisplayName("An exception occurred while getting GlobalFunction")
     public void findById_exception_test() {
-        doThrow(new RuntimeException()).when(globalFunctionRepository).findById(ID);
+        when(globalFunctionRepository.findById(ID)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> globalFunctionService.findById(ID)).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_GLOBAL_FUNCTION_BY_ID_ERROR.getCode());
     }
@@ -93,8 +92,7 @@ class GlobalFunctionServiceTest {
     @DisplayName("Test the edit method in the GlobalFunction service")
     public void edit_test() {
         when(globalFunctionMapper.toEntity(globalFunctionRequest)).thenReturn(globalFunction);
-        when(globalFunctionRepository.findById(any()))
-            .thenReturn(Optional.of(GlobalFunction.builder().id(ID).build()));
+        when(globalFunctionRepository.existsById(any())).thenReturn(Boolean.TRUE);
         when(globalFunctionRepository.save(any(GlobalFunction.class))).thenReturn(globalFunction);
         assertThat(globalFunctionService.edit(globalFunctionRequest)).isTrue();
     }
@@ -103,11 +101,21 @@ class GlobalFunctionServiceTest {
     @DisplayName("An exception occurred while edit GlobalFunction")
     public void edit_exception_test() {
         when(globalFunctionMapper.toEntity(globalFunctionRequest)).thenReturn(globalFunction);
-        when(globalFunctionRepository.findById(any())).thenReturn(Optional.of(globalFunction));
+        when(globalFunctionRepository.existsById(any())).thenReturn(Boolean.TRUE);
         doThrow(new RuntimeException()).when(globalFunctionRepository).save(any(GlobalFunction.class));
         assertThatThrownBy(() -> globalFunctionService.edit(globalFunctionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_GLOBAL_FUNCTION_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An not exist exception occurred while edit GlobalFunction")
+    public void edit_not_exist_exception_test() {
+        when(globalFunctionMapper.toEntity(globalFunctionRequest)).thenReturn(globalFunction);
+        when(globalFunctionRepository.existsById(any())).thenReturn(Boolean.FALSE);
+        assertThatThrownBy(() -> globalFunctionService.edit(globalFunctionRequest))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_NOT_EXIST_ERROR.getCode());
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.sms.satp.entity.scenetest;
+package com.sms.satp.entity.group;
 
 import com.sms.satp.entity.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -11,22 +11,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
-@SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Data
 @ToString(callSuper = true)
-@Document(collection = "CaseTemplateConn")
-public class CaseTemplateConn extends BaseEntity {
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@Document(collection = "ApiTagGroup")
+public class ApiTagGroup extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
-    private String sceneCaseId;
+    private String projectId;
 
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String caseTemplateId;
-
-    private Integer orderNumber;
-
-    private Boolean isExecute;
+    private String name;
 }

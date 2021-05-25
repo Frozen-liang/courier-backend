@@ -5,6 +5,7 @@ import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
+import com.sms.satp.dto.request.UpdateCaseTemplateConnRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseRequest;
 import com.sms.satp.dto.request.UpdateSceneTemplateRequest;
@@ -250,8 +251,8 @@ class SceneCaseServiceTest {
         when(caseTemplateConnMapper.toCaseTemplateConnList(any())).thenReturn(caseTemplateConnList);
         when(caseTemplateConnService.editList(any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = sceneCaseService.editConn(UpdateSceneTemplateRequest.builder()
-            .caseTemplateConnDtoList(Lists.newArrayList(CaseTemplateConnResponse.builder().build()))
-            .sceneCaseApiDtoList(Lists.newArrayList(UpdateSceneCaseApiRequest.builder().build())).build());
+            .updateCaseTemplateConnRequests(Lists.newArrayList(UpdateCaseTemplateConnRequest.builder().build()))
+            .updateSceneCaseApiRequests(Lists.newArrayList(UpdateSceneCaseApiRequest.builder().build())).build());
         assertTrue(isSuccess);
     }
 
@@ -263,8 +264,8 @@ class SceneCaseServiceTest {
             .thenThrow(new ApiTestPlatformException(EDIT_SCENE_CASE_CONN_ERROR));
         when(caseTemplateConnService.editList(any())).thenReturn(Boolean.TRUE);
         assertThatThrownBy(() -> sceneCaseService.editConn(UpdateSceneTemplateRequest.builder()
-            .caseTemplateConnDtoList(Lists.newArrayList(CaseTemplateConnResponse.builder().build()))
-            .sceneCaseApiDtoList(Lists.newArrayList(UpdateSceneCaseApiRequest.builder().build())).build()))
+            .updateCaseTemplateConnRequests(Lists.newArrayList(UpdateCaseTemplateConnRequest.builder().build()))
+            .updateSceneCaseApiRequests(Lists.newArrayList(UpdateSceneCaseApiRequest.builder().build())).build()))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 }
