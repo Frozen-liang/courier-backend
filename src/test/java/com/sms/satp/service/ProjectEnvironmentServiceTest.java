@@ -2,6 +2,7 @@ package com.sms.satp.service;
 
 import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_LIST_ERROR;
@@ -62,7 +63,6 @@ class ProjectEnvironmentServiceTest {
     private final static int DEFAULT_PAGE_SIZE = 10;
     private static final int FRONT_FIRST_NUMBER = 1;
     private final static String ID = "607cebb2fbe52328bf14a2a2";
-    private final static String NOT_EXIST_ID = "607cebb223552328bf14a2a2";
     private static final List<String> ID_LIST = Collections.singletonList(ID);
     private final static String PROJECT_ID = "25";
     private final static String EVN_NAME = "evnName";
@@ -142,7 +142,7 @@ class ProjectEnvironmentServiceTest {
     void edit_test() {
         ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().id(ID).build();
         when(projectEnvironmentMapper.toEntity(projectEnvironmentRequest)).thenReturn(projectEnvironment);
-        when(projectEnvironmentRepository.findById(ID)).thenReturn(Optional.of(ProjectEnvironment.builder().build()));
+        when(projectEnvironmentRepository.existsById(any())).thenReturn(Boolean.TRUE);
         when(projectEnvironmentRepository.save(projectEnvironment)).thenReturn(projectEnvironment);
         assertThat(projectEnvironmentService.edit(projectEnvironmentRequest)).isTrue();
     }
@@ -157,9 +157,7 @@ class ProjectEnvironmentServiceTest {
         when(projectEnvironmentRepository.findById(ID)).thenReturn(projectEnvironmentOptional);
         when(projectEnvironmentMapper.toDto(projectEnvironment)).thenReturn(projectEnvironmentResponse);
         ProjectEnvironmentResponse result1 = projectEnvironmentService.findById(ID);
-        ProjectEnvironmentResponse result2 = projectEnvironmentService.findById(NOT_EXIST_ID);
         assertThat(result1.getEnvName()).isEqualTo(EVN_NAME);
-        assertThat(result2).isNull();
     }
 
     @Test
@@ -198,7 +196,7 @@ class ProjectEnvironmentServiceTest {
     @DisplayName("An exception occurred while edit ProjectEnvironment")
     void edit_exception_test() {
         when(projectEnvironmentMapper.toEntity(any())).thenReturn(ProjectEnvironment.builder().id(ID).build());
-        when(projectEnvironmentRepository.findById(ID)).thenReturn(Optional.of(ProjectEnvironment.builder().build()));
+        when(projectEnvironmentRepository.existsById(any())).thenReturn(Boolean.TRUE);
         doThrow(new RuntimeException()).when(projectEnvironmentRepository).save(argThat(t -> true));
         assertThatThrownBy(() -> projectEnvironmentService.edit(ProjectEnvironmentRequest.builder().id(ID).build()))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -206,9 +204,19 @@ class ProjectEnvironmentServiceTest {
     }
 
     @Test
+    @DisplayName("An not exist exception occurred while edit ProjectEnvironment")
+    public void edit_not_exist_exception_test() {
+        when(projectEnvironmentMapper.toEntity(any())).thenReturn(ProjectEnvironment.builder().id(ID).build());
+        when(projectEnvironmentRepository.existsById(any())).thenReturn(Boolean.FALSE);
+        assertThatThrownBy(() -> projectEnvironmentService.edit(ProjectEnvironmentRequest.builder().id(ID).build()))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_NOT_EXIST_ERROR.getCode());
+    }
+
+    @Test
     @DisplayName("An exception occurred while getting ProjectEnvironment by id")
     void getProjectEnvironment_exception_test() {
-        doThrow(new RuntimeException()).when(projectEnvironmentRepository).findById(anyString());
+        when(projectEnvironmentRepository.findById(any())).thenReturn(Optional.empty());
         assertThatThrownBy(() -> projectEnvironmentService.findById(anyString()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR.getCode());

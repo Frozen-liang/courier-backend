@@ -3,6 +3,7 @@ package com.sms.satp.service;
 import static com.sms.satp.common.exception.ErrorCode.ADD_GLOBAL_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_GLOBAL_ENVIRONMENT_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_ENVIRONMENT_LIST_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,7 +30,6 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.mongodb.core.MongoTemplate;
 
 @DisplayName("Tests for GlobalEnvironmentService")
 class GlobalEnvironmentServiceTest {
@@ -46,7 +46,6 @@ class GlobalEnvironmentServiceTest {
     private final GlobalEnvironmentRequest globalEnvironmentRequest = GlobalEnvironmentRequest
         .builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
-    private static final String NOT_EXIST_ID = ObjectId.get().toString();
     private static final List<String> ID_LIST = Collections.singletonList(ID);
     private static final Integer TOTAL_ELEMENTS = 10;
 
@@ -56,16 +55,14 @@ class GlobalEnvironmentServiceTest {
         when(globalEnvironmentRepository.findById(ID)).thenReturn(Optional.of(globalEnvironment));
         when(globalEnvironmentMapper.toDto(globalEnvironment)).thenReturn(globalEnvironmentResponse);
         GlobalEnvironmentResponse result1 = globalEnvironmentService.findById(ID);
-        GlobalEnvironmentResponse result2 = globalEnvironmentService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
-        assertThat(result2).isNull();
     }
 
     @Test
     @DisplayName("An exception occurred while getting GlobalEnvironment")
     public void findById_exception_test() {
-        doThrow(new RuntimeException()).when(globalEnvironmentRepository).findById(ID);
+        when(globalEnvironmentRepository.findById(ID)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> globalEnvironmentService.findById(ID)).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_GLOBAL_ENVIRONMENT_BY_ID_ERROR.getCode());
     }
@@ -93,8 +90,7 @@ class GlobalEnvironmentServiceTest {
     @DisplayName("Test the edit method in the GlobalEnvironment service")
     public void edit_test() {
         when(globalEnvironmentMapper.toEntity(globalEnvironmentRequest)).thenReturn(globalEnvironment);
-        when(globalEnvironmentRepository.findById(any()))
-            .thenReturn(Optional.of(GlobalEnvironment.builder().id(ID).build()));
+        when(globalEnvironmentRepository.existsById(any())).thenReturn(Boolean.TRUE);
         when(globalEnvironmentRepository.save(any(GlobalEnvironment.class))).thenReturn(globalEnvironment);
         assertThat(globalEnvironmentService.edit(globalEnvironmentRequest)).isTrue();
     }
@@ -103,12 +99,21 @@ class GlobalEnvironmentServiceTest {
     @DisplayName("An exception occurred while edit GlobalEnvironment")
     public void edit_exception_test() {
         when(globalEnvironmentMapper.toEntity(globalEnvironmentRequest)).thenReturn(globalEnvironment);
-        when(globalEnvironmentRepository.findById(any()))
-            .thenReturn(Optional.of(GlobalEnvironment.builder().id(ID).build()));
+        when(globalEnvironmentRepository.existsById(any())).thenReturn(Boolean.TRUE);
         doThrow(new RuntimeException()).when(globalEnvironmentRepository).save(any(GlobalEnvironment.class));
         assertThatThrownBy(() -> globalEnvironmentService.edit(globalEnvironmentRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_GLOBAL_ENVIRONMENT_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An not exist exception occurred while edit GlobalEnvironment")
+    public void edit_not_exist_exception_test() {
+        when(globalEnvironmentMapper.toEntity(globalEnvironmentRequest)).thenReturn(globalEnvironment);
+        when(globalEnvironmentRepository.existsById(any())).thenReturn(Boolean.FALSE);
+        assertThatThrownBy(() -> globalEnvironmentService.edit(globalEnvironmentRequest))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_NOT_EXIST_ERROR.getCode());
     }
 
     @Test

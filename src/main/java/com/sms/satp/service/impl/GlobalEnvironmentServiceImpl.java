@@ -7,6 +7,7 @@ import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_GLOBAL_ENVIRONMENT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_GLOBAL_ENVIRONMENT_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_ENVIRONMENT_LIST_ERROR;
 
@@ -20,8 +21,8 @@ import com.sms.satp.mapper.GlobalEnvironmentMapper;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.GlobalEnvironmentRepository;
 import com.sms.satp.service.GlobalEnvironmentService;
+import com.sms.satp.utils.ExceptionUtils;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -43,13 +44,8 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
 
     @Override
     public GlobalEnvironmentResponse findById(String id) {
-        try {
-            Optional<GlobalEnvironment> optional = globalEnvironmentRepository.findById(id);
-            return globalEnvironmentMapper.toDto(optional.orElse(null));
-        } catch (Exception e) {
-            log.error("Failed to get the GlobalEnvironment by id!", e);
-            throw new ApiTestPlatformException(GET_GLOBAL_ENVIRONMENT_BY_ID_ERROR);
-        }
+        return globalEnvironmentRepository.findById(id).map(globalEnvironmentMapper::toDto)
+            .orElseThrow(() -> ExceptionUtils.mpe(GET_GLOBAL_ENVIRONMENT_BY_ID_ERROR));
     }
 
     @Override
@@ -73,12 +69,15 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     public Boolean edit(GlobalEnvironmentRequest globalEnvironmentRequest) {
         log.info("GlobalEnvironmentService-edit()-params: [GlobalEnvironment]={}", globalEnvironmentRequest.toString());
         try {
-            GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentRequest);
-            Optional<GlobalEnvironment> optional = globalEnvironmentRepository.findById(globalEnvironment.getId());
-            if (optional.isEmpty()) {
-                return Boolean.FALSE;
+            boolean exists = globalEnvironmentRepository.existsById(globalEnvironmentRequest.getId());
+            if (!exists) {
+                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "GlobalEnvironment", globalEnvironmentRequest.getId());
             }
+            GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentRequest);
             globalEnvironmentRepository.save(globalEnvironment);
+        } catch (ApiTestPlatformException apiTestPlatEx) {
+            log.error(apiTestPlatEx.getMessage());
+            throw apiTestPlatEx;
         } catch (Exception e) {
             log.error("Failed to add the globalEnvironment!", e);
             throw new ApiTestPlatformException(EDIT_GLOBAL_ENVIRONMENT_ERROR);
