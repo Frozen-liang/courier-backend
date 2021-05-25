@@ -1,5 +1,9 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.SCENE_CASE_API;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.BATCH_EDIT_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_API_ERROR;
@@ -7,8 +11,10 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR;
 
-import com.sms.satp.common.SearchFiled;
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
 import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
@@ -40,6 +46,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API, template = "{{#addSceneCaseApiDto"
+        + ".addSceneCaseApiRequestList?.![#this.apiName]}}", projectId = "addSceneCaseApiRequestList[0].projectId")
     public Boolean batchAdd(BatchAddSceneCaseApiRequest addSceneCaseApiDto) {
         log.info("SceneCaseApiService-batchAdd()-params: [SceneCaseApi]={}", addSceneCaseApiDto.toString());
         try {
@@ -54,13 +62,13 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = SCENE_CASE_API, template = "{{#result?.![#this.apiName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("SceneCaseApiService-deleteByIds()-params: [ids]={}", ids);
         try {
-            for (String id : ids) {
-                sceneCaseApiRepository.deleteById(id);
-            }
-            return Boolean.TRUE;
+            Long count = sceneCaseApiRepository.deleteAllByIdIsIn(ids);
+            return count > 0;
         } catch (Exception e) {
             log.error("Failed to delete the SceneCaseApi!", e);
             throw new ApiTestPlatformException(DELETE_SCENE_CASE_API_ERROR);
@@ -68,6 +76,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
+        template = "{{#updateSceneCaseApiRequest.apiName}}")
     public Boolean edit(UpdateSceneCaseApiRequest updateSceneCaseApiRequest) {
         log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", updateSceneCaseApiRequest.toString());
         try {
@@ -81,6 +91,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API, template = "{{#sceneCaseApiList[0].apiName}}")
     public Boolean editAll(List<SceneCaseApi> sceneCaseApiList) {
         log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", sceneCaseApiList.toString());
         try {
@@ -93,6 +104,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API, template = "{{#updateSceneCaseApiSortOrderDto"
+        + ".sceneCaseApiRequestList?.![#this.apiName]}}", projectId = "sceneCaseApiRequestList[0].projectId")
     public Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiSortOrderDto) {
         log.info("SceneCaseApiService-batchEdit()-params: [SceneCaseApi]={}",
             updateSceneCaseApiSortOrderDto.toString());
@@ -114,7 +127,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApi> example = Example.of(
                 SceneCaseApi.builder().sceneCaseId(sceneCaseId).removed(remove).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SearchFiled.ORDER_NUMBER.getFiledName());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiled());
             List<SceneCaseApi> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(sceneCaseApiMapper::toSceneCaseApiDto).collect(Collectors.toList());
         } catch (Exception e) {
@@ -140,7 +153,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApi> example = Example.of(
                 SceneCaseApi.builder().sceneCaseId(sceneCaseId).removed(remove).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SearchFiled.ORDER_NUMBER.getFiledName());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiled());
             return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);
