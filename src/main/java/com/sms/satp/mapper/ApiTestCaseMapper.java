@@ -11,8 +11,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-    unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {ResponseResultVerificationMapper.class,
-    ResponseHeadersVerificationMapper.class, ParamInfoMapper.class})
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    uses = {ResponseResultVerificationMapper.class, ResponseHeadersVerificationMapper.class, ParamInfoMapper.class})
 public interface ApiTestCaseMapper {
 
     @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)

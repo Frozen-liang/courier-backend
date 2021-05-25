@@ -56,7 +56,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     }
 
     @Override
-    public List<ApiTestCaseResponse> list(String apiId,String projectId) {
+    public List<ApiTestCaseResponse> list(String apiId, String projectId) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
             ApiTestCase apiTestCase = ApiTestCase.builder().apiId(apiId).projectId(projectId).build();
