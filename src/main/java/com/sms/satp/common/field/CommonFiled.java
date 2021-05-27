@@ -8,6 +8,7 @@ public enum CommonFiled implements Filed {
 
     ID("_id"),
     PROJECT_ID("projectId"),
+    API_ID("apiId"),
     CREATE_DATE_TIME("createDateTime"),
     MODIFY_DATE_TIME("modifyDateTime"),
     REMOVE("removed");

@@ -33,7 +33,7 @@ public class LogServiceImpl implements LogService {
         try {
             logRepository.insert(logEntity);
         } catch (Exception e) {
-            log.error("Failed to add the log. logEntity{}", logEntity.toString());
+            log.error("Failed to add the log. {}", logEntity.toString());
             return Boolean.FALSE;
         }
         return Boolean.TRUE;

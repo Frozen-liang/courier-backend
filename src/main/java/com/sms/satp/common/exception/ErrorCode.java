@@ -124,7 +124,11 @@ public enum ErrorCode {
     DELETE_API_TAG_GROUP_BY_ID_ERROR("4116", "Failed to delete the ApiTagGroup!"),
     THE_API_TAG_GROUP_NAME_EXIST_ERROR("4117", "The %s exist!"),
     EDIT_NOT_EXIST_ERROR("4118", "The %s not found. id=%s"),
-
+    GET_API_TEST_CASE_BY_ID_ERROR("4119", "Failed to get the ApiCase by id!"),
+    ADD_API_TEST_CASE_ERROR("4120", "Failed to add the ApiCase!"),
+    DELETE_API_TEST_CASE_BY_ID_ERROR("4121", "Failed to delete the ApiCase!"),
+    EDIT_API_TEST_CASE_ERROR("4122", "Failed to edit the ApiCase!"),
+    GET_API_TEST_CASE_LIST_ERROR("4123", "Failed to get the ApiCase list!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

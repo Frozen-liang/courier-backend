@@ -14,9 +14,9 @@ import java.util.Collection;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -42,8 +42,8 @@ public class LogAspect {
     public void pointCut() {
     }
 
-    @Before("pointCut() && @annotation(logRecord)")
-    public void before(JoinPoint jp, LogRecord logRecord) {
+    @Around("pointCut() && @annotation(logRecord)")
+    public Object around(ProceedingJoinPoint jp, LogRecord logRecord) throws Throwable {
         MethodSignature signature = (MethodSignature) jp.getSignature();
         Method method = signature.getMethod();
         Object[] args = jp.getArgs();
@@ -52,6 +52,7 @@ public class LogAspect {
         Enhance enhance = logRecord.enhance();
         EvaluationContext context = SpelUtils.getContext(args, method);
         enhance(enhance, context, operationModule.getCollectionName(), method);
+        Object result = jp.proceed();
         String operationDesc = SpelUtils.getValue(context, logRecord.template(), String.class);
         String projectId = SpelUtils.getProjectId(context, logRecord, method, args);
         if (StringUtils.isEmpty(operationDesc)) {
@@ -61,6 +62,7 @@ public class LogAspect {
         LogEntity logEntity = LogEntity.builder().operationType(operationType).operationModule(operationModule)
             .operationDesc(operationDesc).projectId(projectId).build();
         logService.add(logEntity);
+        return result;
     }
 
     private void enhance(Enhance enhance, EvaluationContext context, String collectionName, Method method) {
