@@ -44,7 +44,7 @@ public class ApiTestCaseResponse {
     private Boolean isExecute;
     private Boolean removed;
     private Long createUserId;
-    private LocalDateTime createDateTime;
+    private String createDateTime;
     private Long modifyUserId;
-    private LocalDateTime modifyDateTime;
+    private String modifyDateTime;
 }

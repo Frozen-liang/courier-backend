@@ -33,12 +33,12 @@ public class ApiTestCaseController {
     }
 
     @PostMapping
-    public Boolean add(@Validated(UpdateGroup.class) @RequestBody ApiTestCaseRequest apiTestCaseRequest) {
+    public Boolean add(@Validated(InsertGroup.class) @RequestBody ApiTestCaseRequest apiTestCaseRequest) {
         return apiTestCaseService.add(apiTestCaseRequest);
     }
 
     @PutMapping
-    public Boolean edit(@Validated(InsertGroup.class) @RequestBody ApiTestCaseRequest apiTestCaseRequest) {
+    public Boolean edit(@Validated(UpdateGroup.class) @RequestBody ApiTestCaseRequest apiTestCaseRequest) {
         return apiTestCaseService.edit(apiTestCaseRequest);
     }
 

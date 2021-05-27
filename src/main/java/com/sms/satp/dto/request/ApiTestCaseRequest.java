@@ -13,6 +13,7 @@ import com.sms.satp.entity.api.common.ResponseHeadersVerification;
 import com.sms.satp.entity.api.common.ResponseResultVerification;
 import com.sms.satp.entity.api.common.ResponseTimeVerification;
 import java.util.List;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,21 +26,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ApiTestCaseRequest {
 
-    @NotNull(groups = UpdateGroup.class, message = "The apiId can not be empty")
+    @NotEmpty(groups = UpdateGroup.class, message = "The id can not be empty")
     private String id;
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The caseName can not be empty")
+    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The caseName can not be empty")
     private String caseName;
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiId can not be empty")
+    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiId can not be empty")
     private String apiId;
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId can not be empty")
+    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId can not be empty")
     private String projectId;
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiName can not be empty")
+    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiName can not be empty")
     private String apiName;
     private String description;
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiType can not be empty")
     private ApiType apiType;
     private String jsData;
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiPath can not be empty")
+    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiPath can not be empty")
     private String apiPath;
     private ApiProtocol apiProtocol;
     private RequestMethod requestMethod;

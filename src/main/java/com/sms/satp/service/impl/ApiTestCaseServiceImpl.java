@@ -3,6 +3,7 @@ package com.sms.satp.service.impl;
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_TEST_CASE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_LIST_ERROR;
 import static com.sms.satp.common.field.CommonFiled.API_ID;
@@ -16,10 +17,10 @@ import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
 import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.repository.ApiTestCaseRepository;
-import com.sms.satp.repository.CustomizedDataCollectionRepository;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.service.ApiTestCaseService;
+import com.sms.satp.utils.ExceptionUtils;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -33,26 +34,21 @@ import org.springframework.stereotype.Service;
 public class ApiTestCaseServiceImpl implements ApiTestCaseService {
 
     private final ApiTestCaseRepository apiTestCaseRepository;
-    private final CustomizedDataCollectionRepository customizedDataCollectionRepository;
+    private final CommonDeleteRepository commonDeleteRepository;
     private final ApiTestCaseMapper apiTestCaseMapper;
 
     public ApiTestCaseServiceImpl(ApiTestCaseRepository apiTestCaseRepository,
-        CustomizedDataCollectionRepository customizedDataCollectionRepository,
+        CommonDeleteRepository commonDeleteRepository,
         ApiTestCaseMapper apiTestCaseMapper) {
         this.apiTestCaseRepository = apiTestCaseRepository;
-        this.customizedDataCollectionRepository = customizedDataCollectionRepository;
+        this.commonDeleteRepository = commonDeleteRepository;
         this.apiTestCaseMapper = apiTestCaseMapper;
     }
 
     @Override
     public ApiTestCaseResponse findById(String id) {
-        try {
-            Optional<ApiTestCase> optional = apiTestCaseRepository.findById(id);
-            return apiTestCaseMapper.toDto(optional.orElse(null));
-        } catch (Exception e) {
-            log.error("Failed to get the ApiTestCase by id!", e);
-            throw new ApiTestPlatformException(GET_API_TEST_CASE_BY_ID_ERROR);
-        }
+        return apiTestCaseRepository.findById(id).map(apiTestCaseMapper::toDto)
+            .orElseThrow(() -> ExceptionUtils.mpe(GET_API_TEST_CASE_BY_ID_ERROR));
     }
 
     @Override
@@ -91,12 +87,15 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     public Boolean edit(ApiTestCaseRequest apiTestCaseRequest) {
         log.info("ApiTestCaseService-edit()-params: [ApiTestCase]={}", apiTestCaseRequest.toString());
         try {
-            ApiTestCase apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
-            Optional<ApiTestCase> optional = apiTestCaseRepository.findById(apiTestCase.getId());
-            if (optional.isEmpty()) {
-                return Boolean.FALSE;
+            boolean exists = apiTestCaseRepository.existsById(apiTestCaseRequest.getId());
+            if (!exists) {
+                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ApiTestCase", apiTestCaseRequest.getId());
             }
+            ApiTestCase apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
             apiTestCaseRepository.save(apiTestCase);
+        } catch (ApiTestPlatformException apiTestPlatEx) {
+            log.error(apiTestPlatEx.getMessage());
+            throw apiTestPlatEx;
         } catch (Exception e) {
             log.error("Failed to add the ApiTestCase!", e);
             throw new ApiTestPlatformException(EDIT_API_TEST_CASE_ERROR);
@@ -107,7 +106,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     @Override
     public Boolean delete(List<String> ids) {
         try {
-            return customizedDataCollectionRepository.deleteByIds(ids);
+            return commonDeleteRepository.deleteByIds(ids, ApiTestCase.class);
         } catch (Exception e) {
             log.error("Failed to delete the ApiTestCase!", e);
             throw new ApiTestPlatformException(DELETE_API_TEST_CASE_BY_ID_ERROR);

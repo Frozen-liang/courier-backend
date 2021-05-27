@@ -3,6 +3,7 @@ package com.sms.satp.service;
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_TEST_CASE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_LIST_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,6 +19,7 @@ import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
 import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.repository.ApiTestCaseRepository;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedDataCollectionRepository;
 import com.sms.satp.service.impl.ApiTestCaseServiceImpl;
 import java.util.ArrayList;
@@ -33,18 +35,17 @@ import org.springframework.data.domain.Sort;
 class ApiTestCaseServiceTest {
 
     private final ApiTestCaseRepository apiTestCaseRepository = mock(ApiTestCaseRepository.class);
-    private final CustomizedDataCollectionRepository customizedDataCollectionRepository = mock(
-        CustomizedDataCollectionRepository.class);
+    private final CommonDeleteRepository commonDeleteRepository = mock(
+        CommonDeleteRepository.class);
     private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
     private final ApiTestCaseService apiTestCaseService = new ApiTestCaseServiceImpl(
-        apiTestCaseRepository, customizedDataCollectionRepository, apiTestCaseMapper);
+        apiTestCaseRepository, commonDeleteRepository, apiTestCaseMapper);
     private final ApiTestCase apiTestCase = ApiTestCase.builder().id(ID).build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
         .id(ID).build();
     private final ApiTestCaseRequest apiTestCaseRequest = ApiTestCaseRequest.builder()
         .id(ID).build();
     private static final String ID = ObjectId.get().toString();
-    private static final String NOT_EXIST_ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String API_ID = ObjectId.get().toString();
     private static final String PROJECT_ID = ObjectId.get().toString();
@@ -55,16 +56,14 @@ class ApiTestCaseServiceTest {
         when(apiTestCaseRepository.findById(ID)).thenReturn(Optional.of(apiTestCase));
         when(apiTestCaseMapper.toDto(apiTestCase)).thenReturn(apiTestCaseResponse);
         ApiTestCaseResponse result1 = apiTestCaseService.findById(ID);
-        ApiTestCaseResponse result2 = apiTestCaseService.findById(NOT_EXIST_ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
-        assertThat(result2).isNull();
     }
 
     @Test
     @DisplayName("An exception occurred while getting ApiTestCase")
     public void findById_exception_test() {
-        doThrow(new RuntimeException()).when(apiTestCaseRepository).findById(ID);
+        when(apiTestCaseRepository.findById(ID)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> apiTestCaseService.findById(ID)).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_TEST_CASE_BY_ID_ERROR.getCode());
     }
@@ -91,8 +90,7 @@ class ApiTestCaseServiceTest {
     @DisplayName("Test the edit method in the ApiTestCase service")
     public void edit_test() {
         when(apiTestCaseMapper.toEntity(apiTestCaseRequest)).thenReturn(apiTestCase);
-        when(apiTestCaseRepository.findById(any()))
-            .thenReturn(Optional.of(ApiTestCase.builder().id(ID).build()));
+        when(apiTestCaseRepository.existsById(any())).thenReturn(Boolean.TRUE);
         when(apiTestCaseRepository.save(any(ApiTestCase.class))).thenReturn(apiTestCase);
         assertThat(apiTestCaseService.edit(apiTestCaseRequest)).isTrue();
     }
@@ -101,11 +99,21 @@ class ApiTestCaseServiceTest {
     @DisplayName("An exception occurred while edit ApiTestCase")
     public void edit_exception_test() {
         when(apiTestCaseMapper.toEntity(apiTestCaseRequest)).thenReturn(apiTestCase);
-        when(apiTestCaseRepository.findById(any())).thenReturn(Optional.of(apiTestCase));
+        when(apiTestCaseRepository.existsById(any())).thenReturn(Boolean.TRUE);
         doThrow(new RuntimeException()).when(apiTestCaseRepository).save(any(ApiTestCase.class));
         assertThatThrownBy(() -> apiTestCaseService.edit(apiTestCaseRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_API_TEST_CASE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An not exist exception occurred while edit ApiTestCase")
+    public void edit_not_exist_exception_test() {
+        when(apiTestCaseMapper.toEntity(apiTestCaseRequest)).thenReturn(apiTestCase);
+        when(apiTestCaseRepository.existsById(any())).thenReturn(Boolean.FALSE);
+        assertThatThrownBy(() -> apiTestCaseService.edit(apiTestCaseRequest))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_NOT_EXIST_ERROR.getCode());
     }
 
     @Test
@@ -138,7 +146,7 @@ class ApiTestCaseServiceTest {
     @DisplayName("Test the delete method in the ApiTestCase service")
     public void delete_test() {
         List<String> ids = Collections.singletonList(ID);
-        when(customizedDataCollectionRepository.deleteByIds(ids)).thenReturn(Boolean.TRUE);
+        when(commonDeleteRepository.deleteByIds(ids, ApiTestCase.class)).thenReturn(Boolean.TRUE);
         assertThat(apiTestCaseService.delete(Collections.singletonList(ID))).isTrue();
     }
 
@@ -146,8 +154,8 @@ class ApiTestCaseServiceTest {
     @DisplayName("An exception occurred while delete ApiTestCase")
     public void delete_exception_test() {
         List<String> ids = Collections.singletonList(ID);
-        doThrow(new RuntimeException()).when(customizedDataCollectionRepository)
-            .deleteByIds(ids);
+        doThrow(new RuntimeException()).when(commonDeleteRepository)
+            .deleteByIds(ids, ApiTestCase.class);
         assertThatThrownBy(() -> apiTestCaseService.delete(ids))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_API_TEST_CASE_BY_ID_ERROR.getCode());
