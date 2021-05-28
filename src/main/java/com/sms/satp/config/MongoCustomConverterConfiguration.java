@@ -1,5 +1,7 @@
 package com.sms.satp.config;
 
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
 import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
@@ -25,11 +27,16 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.lang.NonNull;
 
 @Configuration
 public class MongoCustomConverterConfiguration {
+
+    private static final String BUCKET = "TestFile";
 
     @Bean
     MongoCustomConversions mongoCustomConversions() {
@@ -51,6 +58,12 @@ public class MongoCustomConverterConfiguration {
     AuditorAware<Long> auditorAware() {
         // get createUserId and modifyUserId
         return () -> Optional.of(1L);
+    }
+
+
+    @Bean
+    public GridFsTemplate gridFsTemplate(MongoDatabaseFactory dbFactory, MongoConverter mongoConverter) {
+        return new GridFsTemplate(dbFactory, mongoConverter, BUCKET);
     }
 
     @WritingConverter

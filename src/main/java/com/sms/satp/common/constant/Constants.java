@@ -32,5 +32,6 @@ public class Constants {
     public static final String LOG_PATH = SDK_VERSION + "/log";
     public static final String API_TAG_GROUP_PATH = SDK_VERSION + "/api-tag-group";
     public static final String API_TEST_CASE_PATH = SDK_VERSION + "/api-test-case";
+    public static final String FILE_PATH = SDK_VERSION + "/file";
 
 }
