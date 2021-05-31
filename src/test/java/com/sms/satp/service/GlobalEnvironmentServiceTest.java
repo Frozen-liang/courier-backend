@@ -60,6 +60,15 @@ class GlobalEnvironmentServiceTest {
     }
 
     @Test
+    @DisplayName("Test the findOne method in the GlobalEnvironment service")
+    public void findOne_test() {
+        when(globalEnvironmentRepository.findById(ID)).thenReturn(Optional.of(globalEnvironment));
+        GlobalEnvironment result = globalEnvironmentService.findOne(ID);
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(ID);
+    }
+
+    @Test
     @DisplayName("An exception occurred while getting GlobalEnvironment")
     public void findById_exception_test() {
         when(globalEnvironmentRepository.findById(ID)).thenReturn(Optional.empty());

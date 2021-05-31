@@ -3,6 +3,7 @@ package com.sms.satp.controller;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
+import com.sms.satp.dto.request.ApiTestCaseExecuteRequest;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.service.ApiTestCaseService;
@@ -50,5 +51,10 @@ public class ApiTestCaseController {
     @DeleteMapping("/{ids}")
     public Boolean delete(@PathVariable List<String> ids) {
         return apiTestCaseService.delete(ids);
+    }
+
+    @PostMapping("/execute")
+    public Boolean execute(@Validated @RequestBody ApiTestCaseExecuteRequest apiTestCaseExecuteRequest) {
+        return apiTestCaseService.execute(apiTestCaseExecuteRequest);
     }
 }

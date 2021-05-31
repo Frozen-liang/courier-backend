@@ -260,4 +260,14 @@ class ProjectEnvironmentServiceTest {
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_PROJECT_ENVIRONMENT_LIST_ERROR.getCode());
     }
+
+    @Test
+    @DisplayName("Test the method of find the ProjectEnvironment by id")
+    void findOne_test() {
+        ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().envName(EVN_NAME).build();
+        Optional<ProjectEnvironment> projectEnvironmentOptional = Optional.ofNullable(projectEnvironment);
+        when(projectEnvironmentRepository.findById(ID)).thenReturn(projectEnvironmentOptional);
+        ProjectEnvironment result = projectEnvironmentService.findOne(ID);
+        assertThat(result.getEnvName()).isEqualTo(EVN_NAME);
+    }
 }

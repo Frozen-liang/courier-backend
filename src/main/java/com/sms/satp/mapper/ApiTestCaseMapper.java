@@ -19,8 +19,6 @@ public interface ApiTestCaseMapper {
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
     @Mapping(target = "responseResultVerificationResponse", source = "responseResultVerification")
     @Mapping(target = "responseHeadersVerificationResponse", source = "responseHeadersVerification")
-    @Mapping(target = "apiType",
-        expression = "java(apiTestCase.getApiType().getCode())")
     @Mapping(target = "apiProtocol",
         expression = "java(apiTestCase.getApiProtocol().getCode())")
     @Mapping(target = "requestMethod",

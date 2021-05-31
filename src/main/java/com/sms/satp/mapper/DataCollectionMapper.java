@@ -2,8 +2,10 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.common.constant.TimePatternConstant;
 import com.sms.satp.dto.request.DataCollectionRequest;
+import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
+import com.sms.satp.entity.datacollection.TestData;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -21,5 +23,10 @@ public interface DataCollectionMapper {
     List<DataCollectionResponse> toDtoList(List<DataCollection> dataCollections);
 
     DataCollection toEntity(DataCollectionRequest dataCollectionDto);
+
+    @Mapping(target = "dataList", ignore = true)
+    DataCollection toDataCollection(DataCollectionRequest dataCollectionRequest);
+
+    TestData toTestDataEntity(TestDataRequest testDataRequest);
 
 }
