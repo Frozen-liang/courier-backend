@@ -12,7 +12,6 @@ import static com.sms.satp.common.exception.ErrorCode.THE_ENVIRONMENT_NOT_EXITS_
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -24,12 +23,11 @@ import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
-import com.sms.satp.entity.datacollection.DataCollection;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.entity.job.ApiTestCaseJob;
 import com.sms.satp.mapper.ApiTestCaseMapper;
-import com.sms.satp.mapper.DataCollectionMapper;
-import com.sms.satp.mapper.DataCollectionMapperImpl;
+import com.sms.satp.mapper.JobMapper;
+import com.sms.satp.mapper.JobMapperImpl;
 import com.sms.satp.repository.ApiTestCaseJobRepository;
 import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CommonDeleteRepository;
@@ -50,12 +48,12 @@ class ApiTestCaseServiceTest {
     private final CommonDeleteRepository commonDeleteRepository = mock(
         CommonDeleteRepository.class);
     private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
-    private final DataCollectionMapper dataCollectionMapper = new DataCollectionMapperImpl();
+    private final JobMapper jobMapper = new JobMapperImpl();
     private final ProjectEnvironmentService projectEnvironmentService = mock(ProjectEnvironmentService.class);
     private final ApiTestCaseJobRepository apiTestCaseJobRepository = mock(ApiTestCaseJobRepository.class);
     private final ApiTestCaseService apiTestCaseService = new ApiTestCaseServiceImpl(
-        apiTestCaseRepository, commonDeleteRepository, dataCollectionMapper, projectEnvironmentService,
-        apiTestCaseJobRepository, apiTestCaseMapper);
+        apiTestCaseRepository, commonDeleteRepository, projectEnvironmentService,
+        apiTestCaseJobRepository, apiTestCaseMapper, jobMapper);
     private final ApiTestCase apiTestCase = ApiTestCase.builder().id(ID).build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
         .id(ID).build();

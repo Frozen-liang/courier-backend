@@ -20,18 +20,17 @@ import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
-import com.sms.satp.entity.datacollection.DataCollection;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.entity.job.ApiTestCaseJob;
+import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.mapper.ApiTestCaseMapper;
-import com.sms.satp.mapper.DataCollectionMapper;
+import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.repository.ApiTestCaseJobRepository;
 import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.service.ApiTestCaseService;
 import com.sms.satp.service.ProjectEnvironmentService;
 import com.sms.satp.utils.ExceptionUtils;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -49,22 +48,22 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
 
     private final ApiTestCaseRepository apiTestCaseRepository;
     private final CommonDeleteRepository commonDeleteRepository;
-    private final DataCollectionMapper dataCollectionMapper;
     private final ProjectEnvironmentService projectEnvironmentService;
     private final ApiTestCaseJobRepository apiTestCaseJobRepository;
     private final ApiTestCaseMapper apiTestCaseMapper;
+    private final JobMapper jobMapper;
 
     public ApiTestCaseServiceImpl(ApiTestCaseRepository apiTestCaseRepository,
         CommonDeleteRepository commonDeleteRepository,
-        DataCollectionMapper dataCollectionMapper,
         ProjectEnvironmentService projectEnvironmentService,
-        ApiTestCaseJobRepository apiTestCaseJobRepository, ApiTestCaseMapper apiTestCaseMapper) {
+        ApiTestCaseJobRepository apiTestCaseJobRepository, ApiTestCaseMapper apiTestCaseMapper,
+        JobMapper jobMapper) {
         this.apiTestCaseRepository = apiTestCaseRepository;
         this.commonDeleteRepository = commonDeleteRepository;
-        this.dataCollectionMapper = dataCollectionMapper;
         this.projectEnvironmentService = projectEnvironmentService;
         this.apiTestCaseJobRepository = apiTestCaseJobRepository;
         this.apiTestCaseMapper = apiTestCaseMapper;
+        this.jobMapper = jobMapper;
     }
 
     @Override
@@ -147,16 +146,16 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
             if (Objects.isNull(projectEnvironment)) {
                 throw ExceptionUtils.mpe(THE_ENVIRONMENT_NOT_EXITS_ERROR);
             }
-            ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder().apiTestCase(apiTestCase)
-                .environment(projectEnvironment)
+            ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder()
+                .apiTestCase(jobMapper.toJobApiTestCase(apiTestCase))
+                .environment(jobMapper.toJobEnvironment(projectEnvironment))
                 .build();
             if (Objects.nonNull(dataCollectionRequest) && CollectionUtils
                 .isNotEmpty(dataCollectionRequest.getDataList())) {
-                DataCollection dataCollection = dataCollectionMapper.toDataCollection(dataCollectionRequest);
+                JobDataCollection jobDataCollection = jobMapper.toJobDataCollection(dataCollectionRequest);
                 dataCollectionRequest.getDataList().forEach(dataList -> {
-                    dataCollection
-                        .setDataList(Collections.singletonList(dataCollectionMapper.toTestDataEntity(dataList)));
-                    apiTestCaseJob.setDataCollection(dataCollection);
+                    jobDataCollection.setTestData(jobMapper.toTestDataEntity(dataList));
+                    apiTestCaseJob.setDataCollection(jobDataCollection);
                     apiTestCaseJob.setId(null);
                     apiTestCaseJobRepository.insert(apiTestCaseJob);
                 });

@@ -23,10 +23,4 @@ public interface DataCollectionMapper {
     List<DataCollectionResponse> toDtoList(List<DataCollection> dataCollections);
 
     DataCollection toEntity(DataCollectionRequest dataCollectionDto);
-
-    @Mapping(target = "dataList", ignore = true)
-    DataCollection toDataCollection(DataCollectionRequest dataCollectionRequest);
-
-    TestData toTestDataEntity(TestDataRequest testDataRequest);
-
 }

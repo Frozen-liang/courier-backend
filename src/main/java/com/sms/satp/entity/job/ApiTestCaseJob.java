@@ -2,9 +2,9 @@ package com.sms.satp.entity.job;
 
 import com.sms.satp.common.enums.JobStatus;
 import com.sms.satp.entity.BaseEntity;
-import com.sms.satp.entity.apitestcase.ApiTestCase;
-import com.sms.satp.entity.datacollection.DataCollection;
-import com.sms.satp.entity.env.ProjectEnvironment;
+import com.sms.satp.entity.job.common.JobApiTestCase;
+import com.sms.satp.entity.job.common.JobDataCollection;
+import com.sms.satp.entity.job.common.JobEnvironment;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,11 +22,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "ApiTestCaseJob")
 public class ApiTestCaseJob extends BaseEntity {
 
-    private ApiTestCase apiTestCase;
+    private JobApiTestCase apiTestCase;
 
-    private ProjectEnvironment environment;
+    private JobEnvironment environment;
 
-    private DataCollection dataCollection;
+    private JobDataCollection dataCollection;
 
     private JobStatus jobStatus;
 }
