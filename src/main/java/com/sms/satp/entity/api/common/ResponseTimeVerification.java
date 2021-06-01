@@ -15,4 +15,5 @@ public class ResponseTimeVerification {
 
     private Integer timeoutLimit;
 
+    private String verificationResult;
 }

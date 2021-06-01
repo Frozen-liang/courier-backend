@@ -11,26 +11,15 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-    unmappedTargetPolicy = ReportingPolicy.IGNORE,
-    uses = {ResponseResultVerificationMapper.class, ResponseHeadersVerificationMapper.class, ParamInfoMapper.class})
+    unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = ApiTestCaseMapper.class)
 public interface SceneCaseApiMapper {
 
+    @Mapping(target = "apiTestCase", source = "apiTestCaseRequest")
     SceneCaseApi toSceneCaseApiByUpdateRequest(UpdateSceneCaseApiRequest updateSceneCaseApiRequest);
 
-    @Mapping(target = "responseResultVerificationResponse", source = "responseResultVerification")
-    @Mapping(target = "responseHeadersVerificationResponse", source = "responseHeadersVerification")
+    @Mapping(target = "apiTestCaseResponse", source = "apiTestCase")
     @Mapping(target = "apiType",
         expression = "java(sceneCaseApi.getApiType().getCode())")
-    @Mapping(target = "apiProtocol",
-        expression = "java(sceneCaseApi.getApiProtocol().getCode())")
-    @Mapping(target = "requestMethod",
-        expression = "java(sceneCaseApi.getRequestMethod().getCode())")
-    @Mapping(target = "apiRequestParamType",
-        expression = "java(sceneCaseApi.getApiRequestParamType().getCode())")
-    @Mapping(target = "apiResponseJsonType",
-        expression = "java(sceneCaseApi.getApiResponseJsonType().getCode())")
-    @Mapping(target = "apiRequestJsonType",
-        expression = "java(sceneCaseApi.getApiRequestJsonType().getCode())")
     @Mapping(target = "apiBindingStatus",
         expression = "java(sceneCaseApi.getApiBindingStatus().getCode())")
     SceneCaseApiResponse toSceneCaseApiDto(SceneCaseApi sceneCaseApi);
@@ -38,4 +27,8 @@ public interface SceneCaseApiMapper {
     List<SceneCaseApi> toSceneCaseApiList(List<UpdateSceneCaseApiRequest> sceneCaseApiList);
 
     List<SceneCaseApi> toSceneCaseApiListByAddRequest(List<AddSceneCaseApiRequest> addSceneCaseApiRequestList);
+
+    @Mapping(target = "apiTestCase", source = "apiTestCaseRequest")
+    SceneCaseApi toSceneCaseApi(AddSceneCaseApiRequest addSceneCaseApiRequest);
+
 }

@@ -1,6 +1,7 @@
 package com.sms.satp.entity.scenetest;
 
 import com.sms.satp.entity.BaseEntity;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,7 +27,5 @@ public class CaseTemplateConn extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String caseTemplateId;
 
-    private Integer orderNumber;
-
-    private Boolean isExecute;
+    private List<CaseTemplateApiConn> caseTemplateApiConnList;
 }

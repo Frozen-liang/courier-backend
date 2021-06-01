@@ -8,8 +8,9 @@ import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.dto.request.AddSceneCaseApiRequest;
-import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
+import com.sms.satp.dto.response.SceneCaseApiResponse;
+import com.sms.satp.entity.apitestcase.ApiTestCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -21,13 +22,8 @@ import static org.mockito.Mockito.mock;
 @DisplayName("Tests for SceneCaseApiMapper")
 class SceneCaseApiMapperTest {
 
-    private ResponseResultVerificationMapper responseResultVerificationMapper =
-        mock(ResponseResultVerificationMapper.class);
-    private ResponseHeadersVerificationMapper responseHeadersVerificationMapper =
-        mock(ResponseHeadersVerificationMapper.class);
-    private ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
-    private SceneCaseApiMapper sceneCaseApiMapper = new SceneCaseApiMapperImpl(responseResultVerificationMapper,
-        responseHeadersVerificationMapper, paramInfoMapper);
+    private ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
+    private SceneCaseApiMapper sceneCaseApiMapper = new SceneCaseApiMapperImpl(apiTestCaseMapper);
     private static final String MOCK_ID = "1";
 
     @Test
@@ -43,11 +39,11 @@ class SceneCaseApiMapperTest {
     void toSceneCaseApiDto_test() {
         SceneCaseApi sceneCaseApi = SceneCaseApi.builder().id(MOCK_ID).sceneCaseId(MOCK_ID)
             .apiType(ApiType.API)
-            .apiProtocol(ApiProtocol.HTTPS)
-            .requestMethod(RequestMethod.GET)
-            .apiRequestParamType(ApiRequestParamType.FORM_DATA)
-            .apiResponseJsonType(ApiJsonType.OBJECT)
-            .apiRequestJsonType(ApiJsonType.OBJECT)
+            .apiTestCase(ApiTestCase.builder().apiProtocol(ApiProtocol.HTTPS).requestMethod(RequestMethod.GET)
+                .apiRequestParamType(ApiRequestParamType.FORM_DATA)
+                .apiResponseJsonType(ApiJsonType.OBJECT)
+                .apiRequestJsonType(ApiJsonType.OBJECT)
+                .build())
             .apiBindingStatus(ApiBindingStatus.BINDING)
             .build();
         SceneCaseApiResponse dto = sceneCaseApiMapper.toSceneCaseApiDto(sceneCaseApi);
@@ -58,7 +54,7 @@ class SceneCaseApiMapperTest {
     @DisplayName("Test the toSceneCaseApiList method in the SceneCaseApiMapper")
     void toSceneCaseApiList_test() {
         List<UpdateSceneCaseApiRequest> sceneCaseApiList =
-            Lists.newArrayList(UpdateSceneCaseApiRequest.builder().id(MOCK_ID).apiId(MOCK_ID).build());
+            Lists.newArrayList(UpdateSceneCaseApiRequest.builder().id(MOCK_ID).build());
         List<SceneCaseApi> apiList = sceneCaseApiMapper.toSceneCaseApiList(sceneCaseApiList);
         assertThat(apiList.size()).isEqualTo(sceneCaseApiList.size());
     }

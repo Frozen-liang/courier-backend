@@ -44,6 +44,10 @@ public class MatchParamInfo {
      */
     private Boolean required;
     /**
+     * 校验结果.
+     */
+    private String verificationResult;
+    /**
      * 对象子属性. JSON/Object/JsonArray.
      */
     @ToString.Exclude

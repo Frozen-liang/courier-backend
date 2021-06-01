@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -46,8 +47,9 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API, template = "{{#addSceneCaseApiDto"
-        + ".addSceneCaseApiRequestList?.![#this.apiName]}}", projectId = "addSceneCaseApiRequestList[0].projectId")
+    @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API,
+        template = "{{#addSceneCaseApiDto.addSceneCaseApiRequestList.apiTestCaseRequest?.![#this.apiName]}}",
+        projectId = "addSceneCaseApiRequestList[0].projectId")
     public Boolean batchAdd(BatchAddSceneCaseApiRequest addSceneCaseApiDto) {
         log.info("SceneCaseApiService-batchAdd()-params: [SceneCaseApi]={}", addSceneCaseApiDto.toString());
         try {
@@ -127,7 +129,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApi> example = Example.of(
                 SceneCaseApi.builder().sceneCaseId(sceneCaseId).removed(remove).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
             List<SceneCaseApi> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(sceneCaseApiMapper::toSceneCaseApiDto).collect(Collectors.toList());
         } catch (Exception e) {
@@ -153,7 +155,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApi> example = Example.of(
                 SceneCaseApi.builder().sceneCaseId(sceneCaseId).removed(remove).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
             return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);
