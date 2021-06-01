@@ -31,10 +31,6 @@ public class ParamInfo {
      */
     private ParamType paramType;
     /**
-     * 是否递归引用自己.
-     */
-    private Boolean reference;
-    /**
      * 是否必填.
      */
     private Boolean required;
