@@ -45,8 +45,8 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
 
     @Override
     @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE_API, template = "{{#addCaseTemplateApiRequest"
-        + ".addCaseTemplateApiRequestList?.![#this.apiName]}}", projectId = "addCaseTemplateApiRequestList[0]"
-        + ".projectId")
+        + ".addCaseTemplateApiRequestList.apiTestCaseRequest?.![#this.apiName]}}",
+        projectId = "addCaseTemplateApiRequestList[0].projectId")
     public Boolean batchAdd(BatchAddCaseTemplateApiRequest addCaseTemplateApiRequest) {
         log.info("CaseTemplateApiService-batchAdd()-params: [CaseTemplateApi]={}",
             addCaseTemplateApiRequest.toString());
@@ -110,7 +110,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
         try {
             Example<CaseTemplateApi> example = Example
                 .of(CaseTemplateApi.builder().caseTemplateId(caseTemplateId).removed(remove).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
             List<CaseTemplateApi> sceneCaseApiList = caseTemplateApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(aseTemplateApiMapper::toCaseTemplateApiDto)
                 .collect(Collectors.toList());
@@ -137,7 +137,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
         try {
             Example<CaseTemplateApi> example = Example
                 .of(CaseTemplateApi.builder().caseTemplateId(caseTemplateId).removed(remove).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER_NUMBER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
             return caseTemplateApiRepository.findAll(example, sort);
         } catch (Exception e) {
             log.error("Failed to get the CaseTemplateApi list by caseTemplateId!", e);

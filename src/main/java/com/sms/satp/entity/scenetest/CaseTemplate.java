@@ -27,7 +27,12 @@ public class CaseTemplate extends BaseEntity {
 
     private String groupId;
 
-    private String testStatus;
+    private List<String> tagIds;
 
-    private List<String> caseTag;
+    private Integer priority;
+
+    /**
+     * 是否锁定，当前步骤出错或未通过时，依然执行下一个步骤.
+     */
+    private Boolean isLock;
 }

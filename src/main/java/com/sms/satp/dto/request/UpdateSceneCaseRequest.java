@@ -21,7 +21,7 @@ public class UpdateSceneCaseRequest {
     private String projectId;
     private String groupId;
     private String testStatus;
-    private List<String> caseTag;
+    private List<String> tagIds;
     private Integer priority;
     private Boolean removed;
 }

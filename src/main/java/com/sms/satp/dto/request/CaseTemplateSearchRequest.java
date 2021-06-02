@@ -17,6 +17,6 @@ public class CaseTemplateSearchRequest extends PageDto {
     private String groupId;
     private boolean remove;
     private List<String> testStatus;
-    private List<String> caseTag;
+    private List<String> tagIds;
     private List<String> createUserName;
 }

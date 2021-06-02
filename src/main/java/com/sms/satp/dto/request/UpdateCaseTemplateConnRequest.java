@@ -17,7 +17,7 @@ public class UpdateCaseTemplateConnRequest {
 
     private String caseTemplateId;
 
-    private Integer orderNumber;
+    private Integer order;
 
     private Boolean isExecute;
 

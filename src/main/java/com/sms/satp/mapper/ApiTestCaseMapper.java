@@ -4,6 +4,7 @@ import com.sms.satp.common.constant.TimePatternConstant;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
+import com.sms.satp.entity.job.common.JobApiTestCase;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -36,4 +37,17 @@ public interface ApiTestCaseMapper {
     List<ApiTestCaseResponse> toDtoList(List<ApiTestCase> apiTestCaseList);
 
     ApiTestCase toEntity(ApiTestCaseRequest apiTestCaseRequest);
+
+    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
+    @Mapping(target = "apiProtocol",
+        expression = "java(apiTestCase.getApiProtocol().getCode())")
+    @Mapping(target = "requestMethod",
+        expression = "java(apiTestCase.getRequestMethod().getCode())")
+    @Mapping(target = "apiRequestParamType",
+        expression = "java(apiTestCase.getApiRequestParamType().getCode())")
+    @Mapping(target = "apiResponseJsonType",
+        expression = "java(apiTestCase.getApiResponseJsonType().getCode())")
+    @Mapping(target = "apiRequestJsonType",
+        expression = "java(apiTestCase.getApiRequestJsonType().getCode())")
+    JobApiTestCase toJob(ApiTestCase apiTestCase);
 }

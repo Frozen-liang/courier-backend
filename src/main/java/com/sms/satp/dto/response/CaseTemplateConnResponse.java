@@ -1,5 +1,6 @@
 package com.sms.satp.dto.response;
 
+import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -19,9 +20,7 @@ public class CaseTemplateConnResponse {
 
     private String caseTemplateId;
 
-    private Integer orderNumber;
-
-    private Boolean isExecute;
+    private List<CaseTemplateApiConn> caseTemplateApiConnList;
 
     private Boolean removed;
 

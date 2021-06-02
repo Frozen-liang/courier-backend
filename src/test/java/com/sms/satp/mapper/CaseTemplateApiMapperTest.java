@@ -8,8 +8,9 @@ import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.dto.request.AddCaseTemplateApiRequest;
-import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.response.CaseTemplateApiResponse;
+import com.sms.satp.entity.apitestcase.ApiTestCase;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -21,15 +22,9 @@ import static org.mockito.Mockito.mock;
 @DisplayName("Tests for CaseTemplateApiMapper")
 class CaseTemplateApiMapperTest {
 
-    private ResponseResultVerificationMapper responseResultVerificationMapper =
-        mock(ResponseResultVerificationMapper.class);
-    private ResponseHeadersVerificationMapper responseHeadersVerificationMapper =
-        mock(ResponseHeadersVerificationMapper.class);
-    private ParamInfoMapper paramInfoMapper = mock(ParamInfoMapper.class);
+    private ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
 
-    private CaseTemplateApiMapper caseTemplateApiMapper =
-        new CaseTemplateApiMapperImpl(responseResultVerificationMapper, responseHeadersVerificationMapper,
-            paramInfoMapper);
+    private CaseTemplateApiMapper caseTemplateApiMapper = new CaseTemplateApiMapperImpl(apiTestCaseMapper);
     private static final String MOCK_ID = "1";
 
     @Test
@@ -61,7 +56,7 @@ class CaseTemplateApiMapperTest {
     @DisplayName("Test the toCaseTemplateApiListByAddRequestList method in the CaseTemplateApiMapper")
     void toCaseTemplateApiListByAddRequestList_test() {
         List<AddCaseTemplateApiRequest> addCaseTemplateApiRequestList = Lists.newArrayList(
-            AddCaseTemplateApiRequest.builder().apiId(MOCK_ID).build());
+            AddCaseTemplateApiRequest.builder().build());
         List<CaseTemplateApi> caseTemplateApiList =
             caseTemplateApiMapper.toCaseTemplateApiListByAddRequestList(addCaseTemplateApiRequestList);
         assertThat(caseTemplateApiList).isNotEmpty();
@@ -71,14 +66,16 @@ class CaseTemplateApiMapperTest {
         return CaseTemplateApi.builder()
             .id(MOCK_ID)
             .apiType(ApiType.API)
-            .apiProtocol(ApiProtocol.HTTPS)
-            .requestMethod(RequestMethod.GET)
-            .apiRequestParamType(ApiRequestParamType.FORM_DATA)
-            .apiResponseJsonType(ApiJsonType.OBJECT)
-            .apiRequestJsonType(ApiJsonType.OBJECT)
+            .apiTestCase(ApiTestCase.builder()
+                .apiProtocol(ApiProtocol.HTTPS)
+                .requestMethod(RequestMethod.GET)
+                .apiRequestParamType(ApiRequestParamType.FORM_DATA)
+                .apiResponseJsonType(ApiJsonType.OBJECT)
+                .apiRequestJsonType(ApiJsonType.OBJECT)
+                .apiId(MOCK_ID)
+                .build())
             .apiBindingStatus(ApiBindingStatus.BINDING)
             .caseTemplateId(MOCK_ID)
-            .apiId(MOCK_ID)
             .build();
     }
 
@@ -86,7 +83,6 @@ class CaseTemplateApiMapperTest {
         return UpdateCaseTemplateApiRequest.builder()
             .id(MOCK_ID)
             .caseTemplateId(MOCK_ID)
-            .apiId(MOCK_ID)
             .build();
     }
 
@@ -94,7 +90,6 @@ class CaseTemplateApiMapperTest {
         return CaseTemplateApiResponse.builder()
             .id(MOCK_ID)
             .caseTemplateId(MOCK_ID)
-            .apiId(MOCK_ID)
             .build();
     }
 
