@@ -21,6 +21,6 @@ public class UpdateCaseTemplateRequest {
     private String projectId;
     private String groupId;
     private String testStatus;
-    private List<String> caseTag;
+    private List<String> tagIds;
     private Boolean removed;
 }

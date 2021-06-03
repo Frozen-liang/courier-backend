@@ -1,5 +1,7 @@
 package com.sms.satp.dto.request;
 
+import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,9 +17,7 @@ public class AddCaseTemplateConnRequest {
 
     private String caseTemplateId;
 
-    private Integer orderNumber;
-
-    private Boolean isExecute;
+    private List<CaseTemplateApiConn> caseTemplateApiConnList;
 
     private Boolean removed;
 }

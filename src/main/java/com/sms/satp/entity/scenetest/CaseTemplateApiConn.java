@@ -1,4 +1,4 @@
-package com.sms.satp.dto.request;
+package com.sms.satp.entity.scenetest;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,20 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateCaseTemplateConnRequest {
+@Builder
+public class CaseTemplateApiConn {
 
-    private String id;
-
-    private String sceneCaseId;
-
-    private String caseTemplateId;
+    private String caseTemplateApiId;
 
     private Integer order;
 
     private Boolean isExecute;
-
-    private Boolean removed;
 }

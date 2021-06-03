@@ -2,7 +2,6 @@ package com.sms.satp.entity.job.common;
 
 import com.sms.satp.dto.response.ParamInfoResponse;
 import com.sms.satp.entity.api.common.HeaderInfo;
-import com.sms.satp.entity.api.common.ParamInfo;
 import com.sms.satp.entity.env.EnvironmentAuth;
 import java.time.LocalDateTime;
 import java.util.List;

@@ -31,7 +31,7 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
         PageDtoConverter.frontMapping(searchDto);
         Query query = new Query();
         CommonFiled.PROJECT_ID.is(projectId).ifPresent(query::addCriteria);
-        SceneFiled.CASE_TAG.in(searchDto.getCaseTag()).ifPresent(query::addCriteria);
+        SceneFiled.TAG_IDS.in(searchDto.getTagIds()).ifPresent(query::addCriteria);
         SceneFiled.CREATE_USER_NAME.in(searchDto.getCreateUserName()).ifPresent(query::addCriteria);
         SceneFiled.TEST_STATUS.in(searchDto.getTestStatus()).ifPresent(query::addCriteria);
         SceneFiled.NAME.is(searchDto.getName()).ifPresent(query::addCriteria);

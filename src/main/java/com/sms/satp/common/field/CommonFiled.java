@@ -11,7 +11,8 @@ public enum CommonFiled implements Filed {
     API_ID("apiId"),
     CREATE_DATE_TIME("createDateTime"),
     MODIFY_DATE_TIME("modifyDateTime"),
-    REMOVE("removed");
+    REMOVE("removed"),
+    CREATE_USER_ID("createUserId");
 
     private final String filed;
 

@@ -129,9 +129,14 @@ public enum ErrorCode {
     DELETE_API_TEST_CASE_BY_ID_ERROR("4121", "Failed to delete the ApiCase!"),
     EDIT_API_TEST_CASE_ERROR("4122", "Failed to edit the ApiCase!"),
     GET_API_TEST_CASE_LIST_ERROR("4123", "Failed to get the ApiCase list!"),
-    THE_API_TEST_CASE_NOT_EXITS_ERROR("4124", "The ApiTestCase no exist!"),
-    THE_ENVIRONMENT_NOT_EXITS_ERROR("4125", "The Environment no exist!"),
-    EXECUTE_API_TEST_CASE_ERROR("4126", "Execute the ApiTestCase error!"),
+    ADD_SCENE_CASE_JOB_ERROR("4124", "Failed to add the SceneCaseJob!"),
+    GET_SCENE_CASE_JOB_PAGE_ERROR("4125", "Failed to get the SceneCaseJob page!"),
+    GET_SCENE_CASE_JOB_ERROR("4126", "Failed to get the SceneCaseJob!"),
+    EDIT_SCENE_CASE_JOB_ERROR("4127", "Failed to edit the SceneCaseJob!"),
+    GET_SCENE_CASE_BY_ID_ERROR("4128", "Failed to get the SceneCase by id!"),
+    THE_API_TEST_CASE_NOT_EXITS_ERROR("4129", "The ApiTestCase no exist!"),
+    THE_ENVIRONMENT_NOT_EXITS_ERROR("4130", "The Environment no exist!"),
+    EXECUTE_API_TEST_CASE_ERROR("4131", "Execute the ApiTestCase error!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

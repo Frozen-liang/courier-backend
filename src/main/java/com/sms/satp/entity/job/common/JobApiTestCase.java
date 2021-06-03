@@ -1,21 +1,22 @@
 package com.sms.satp.entity.job.common;
 
-import com.sms.satp.common.enums.ApiJsonType;
-import com.sms.satp.common.enums.ApiProtocol;
-import com.sms.satp.common.enums.ApiRequestParamType;
-import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.dto.response.ParamInfoResponse;
+import com.sms.satp.dto.response.ResponseHeadersVerificationResponse;
+import com.sms.satp.dto.response.ResponseResultVerificationResponse;
+import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.dto.response.ParamInfoResponse;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ParamInfo;
 import com.sms.satp.entity.api.common.ResponseHeadersVerification;
 import com.sms.satp.entity.api.common.ResponseResultVerification;
 import com.sms.satp.entity.api.common.ResponseTimeVerification;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 @Data
 @AllArgsConstructor
@@ -23,15 +24,15 @@ import lombok.NoArgsConstructor;
 @Builder
 public class JobApiTestCase {
 
+    @Field(targetType = FieldType.OBJECT_ID)
     private String id;
 
+    @Field(targetType = FieldType.OBJECT_ID)
     private String apiId;
 
     private String caseName;
 
-    @Builder.Default
-    private Integer apiType = 1;
-
+    @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
     private List<String> tagIds;
@@ -65,9 +66,9 @@ public class JobApiTestCase {
 
     private HttpStatusVerification httpStatusVerification;
 
-    private ResponseHeadersVerification responseHeadersVerification;
+    private ResponseHeadersVerificationResponse responseHeadersVerification;
 
-    private ResponseResultVerification responseResultVerification;
+    private ResponseResultVerificationResponse responseResultVerification;
 
     private ResponseTimeVerification responseTimeVerification;
 

@@ -236,7 +236,7 @@ class SceneCaseApiServiceTest {
         return BatchUpdateSceneCaseApiRequest.builder()
             .sceneCaseApiRequestList(Lists.newArrayList(UpdateSceneCaseApiRequest.builder()
                 .sceneCaseId(MOCK_SCENE_CASE_ID)
-                .orderNumber(MOCK_ORDER_NUMBER)
+                .order(MOCK_ORDER_NUMBER)
                 .build())).build();
     }
 
