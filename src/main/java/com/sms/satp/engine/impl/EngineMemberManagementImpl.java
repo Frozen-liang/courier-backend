@@ -47,7 +47,6 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     @Override
     public Set<String> getAvailableMembers() {
-
         return engineMembers.values().stream()
             .filter(engineMember -> engineMember.getStatus().equals(EngineStatus.RUNNING))
             .map(EngineMember::getDestination)
@@ -57,7 +56,7 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     @Override
     public void unBind(String sessionId) {
         Optional<EngineMember> engineMemberOptional = engineMembers.values().stream()
-            .filter(engineMember -> engineMember.getSessionId().equals(sessionId)).findFirst();
+            .filter(engineMember -> sessionId.equals(engineMember.getSessionId())).findFirst();
         engineMemberOptional.ifPresent(engineMember -> {
             engineMembers.remove(engineMember.getDestination());
             log.info("The destination {} unbind from member of the engine.", engineMember.getDestination());

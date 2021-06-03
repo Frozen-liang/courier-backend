@@ -159,6 +159,11 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
+    public List<ProjectEnvironmentResponse> findAllByProjectId(String projectId) {
+        return projectEnvironmentMapper.toDtoList(projectEnvironmentRepository.findAllByProjectId(projectId));
+    }
+
+    @Override
     public ProjectEnvironmentResponse findById(String id) {
         return projectEnvironmentRepository.findById(id).map(projectEnvironmentMapper::toDto)
             .orElseThrow(() -> ExceptionUtils.mpe(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR));

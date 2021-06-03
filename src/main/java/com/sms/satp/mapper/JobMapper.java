@@ -2,6 +2,7 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.request.TestDataRequest;
+import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
 import com.sms.satp.entity.datacollection.TestData;
 import com.sms.satp.entity.env.GlobalEnvironment;
@@ -11,6 +12,7 @@ import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
@@ -21,7 +23,7 @@ public interface JobMapper {
 
     JobEnvironment toJobEnvironment(GlobalEnvironment globalEnvironment);
 
-    JobApiTestCase toJobApiTestCase(ApiTestCase apiTestCase);
+    JobApiTestCase toJobApiTestCase(ApiTestCaseResponse apiTestCaseResponse);
 
     JobDataCollection toJobDataCollection(DataCollectionRequest dataCollectionRequest);
 

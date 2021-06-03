@@ -22,4 +22,6 @@ public interface ProjectEnvironmentService {
     List<Object> list(String projectId);
 
     Boolean delete(List<String> ids);
+
+    List<ProjectEnvironmentResponse> findAllByProjectId(String projectId);
 }

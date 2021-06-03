@@ -1,6 +1,5 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.request.ApiTestCaseExecuteRequest;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import java.util.List;
@@ -16,7 +15,5 @@ public interface ApiTestCaseService {
     Boolean edit(ApiTestCaseRequest apiTestCaseRequest);
 
     Boolean delete(List<String> ids);
-
-    Boolean execute(ApiTestCaseExecuteRequest apiTestCaseExecuteRequest);
 
 }

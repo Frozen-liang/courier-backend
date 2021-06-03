@@ -1,5 +1,6 @@
 package com.sms.satp.entity.job.common;
 
+import com.sms.satp.dto.response.ParamInfoResponse;
 import com.sms.satp.entity.api.common.HeaderInfo;
 import com.sms.satp.entity.api.common.ParamInfo;
 import com.sms.satp.entity.env.EnvironmentAuth;
@@ -38,11 +39,11 @@ public class JobEnvironment {
 
     private List<HeaderInfo> headers;
 
-    private List<ParamInfo> params;
+    private List<ParamInfoResponse> params;
 
-    private List<ParamInfo> urlParams;
+    private List<ParamInfoResponse> urlParams;
 
-    private List<ParamInfo> additionalParams;
+    private List<ParamInfoResponse> additionalParams;
 
     private Long modifyUserId;
 

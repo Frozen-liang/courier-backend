@@ -29,4 +29,6 @@ public class ApiTestCaseJob extends BaseEntity {
     private JobDataCollection dataCollection;
 
     private JobStatus jobStatus;
+
+    private String message;
 }

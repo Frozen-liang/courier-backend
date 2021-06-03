@@ -4,6 +4,7 @@ import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.dto.response.ParamInfoResponse;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ParamInfo;
 import com.sms.satp.entity.api.common.ResponseHeadersVerification;
@@ -28,6 +29,9 @@ public class JobApiTestCase {
 
     private String caseName;
 
+    @Builder.Default
+    private Integer apiType = 1;
+
     private String projectId;
 
     private List<String> tagIds;
@@ -38,26 +42,26 @@ public class JobApiTestCase {
 
     private String apiPath;
 
-    private ApiProtocol apiProtocol;
+    private Integer apiProtocol;
 
-    private RequestMethod requestMethod;
+    private Integer requestMethod;
 
-    private ApiRequestParamType apiRequestParamType;
+    private Integer apiRequestParamType;
 
-    private List<ParamInfo> requestHeaders;
-    private List<ParamInfo> responseHeaders;
-    private List<ParamInfo> pathParams;
-    private List<ParamInfo> restfulParams;
-    private List<ParamInfo> requestParams;
-    private List<ParamInfo> responseParams;
+    private List<ParamInfoResponse> requestHeaders;
+    private List<ParamInfoResponse> responseHeaders;
+    private List<ParamInfoResponse> pathParams;
+    private List<ParamInfoResponse> restfulParams;
+    private List<ParamInfoResponse> requestParams;
+    private List<ParamInfoResponse> responseParams;
 
     private String preInject;
 
     private String postInject;
 
-    private ApiJsonType apiResponseJsonType;
+    private Integer apiResponseJsonType;
 
-    private ApiJsonType apiRequestJsonType;
+    private Integer apiRequestJsonType;
 
     private HttpStatusVerification httpStatusVerification;
 
@@ -69,8 +73,16 @@ public class JobApiTestCase {
 
     private Long modifyUserId;
 
-    private LocalDateTime modifyDateTime;
+    private String modifyDateTime;
+
+    private Object response;
 
     private long runtime;
+
+    private Boolean result;
+
+    private String failMessage;
+
+    private String paramData;
 
 }

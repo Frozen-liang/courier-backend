@@ -19,8 +19,8 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
-        registry.addEndpoint("/wss").addInterceptors(new HandshakeInterceptor() {
+        registry.addEndpoint("/user").setAllowedOriginPatterns("*").withSockJS();
+        registry.addEndpoint("/engine").addInterceptors(new HandshakeInterceptor() {
             @Override
             public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                 WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
@@ -40,6 +40,6 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.setUserDestinationPrefix("/engine");
         config.setApplicationDestinationPrefixes("/channel");
-        config.enableSimpleBroker("/engine");
+        config.enableSimpleBroker("/engine", "/user");
     }
 }

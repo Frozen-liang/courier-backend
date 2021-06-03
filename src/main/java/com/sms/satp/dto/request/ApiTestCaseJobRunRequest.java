@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class ApiTestCaseExecuteRequest {
+public class ApiTestCaseJobRunRequest {
 
     @NotEmpty(message = "The apiTestCaseId must not empty.")
     private String apiTestCaseId;
