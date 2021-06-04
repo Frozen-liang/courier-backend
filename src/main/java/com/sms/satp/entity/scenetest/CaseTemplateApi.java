@@ -26,6 +26,9 @@ public class CaseTemplateApi extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String caseTemplateId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String projectId;
+
     private ApiType apiType;
 
     private String shell;

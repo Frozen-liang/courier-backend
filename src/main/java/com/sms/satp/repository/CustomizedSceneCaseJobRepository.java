@@ -7,5 +7,5 @@ import org.springframework.data.domain.Page;
 
 public interface CustomizedSceneCaseJobRepository {
 
-    Page<SceneCaseJob> page(List<String> userIds, PageDto pageDto);
+    Page<SceneCaseJob> page(String sceneCaseId, List<String> userIds, PageDto pageDto);
 }

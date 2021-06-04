@@ -99,7 +99,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
 
             if (Objects.isNull(request.getDataCollection())) {
                 SceneCaseJob sceneCaseJob = SceneCaseJob.builder().environment(jobEnvironment).caseList(caseList)
-                    .sceneCaseId(request.getSceneCaseId()).build();
+                    .sceneCaseId(request.getSceneCaseId()).projectId(request.getProjectId()).build();
                 sceneCaseJobRepository.insert(sceneCaseJob);
             } else {
                 for (TestData testData : request.getDataCollection().getDataList()) {
@@ -110,6 +110,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                         .environment(jobEnvironment)
                         .dataCollection(jobDataCollection)
                         .caseList(caseList)
+                        .projectId(request.getProjectId())
                         .build();
                     sceneCaseJobRepository.insert(sceneCaseJob);
                 }
@@ -122,9 +123,9 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     }
 
     @Override
-    public Page<SceneCaseJob> page(List<String> userIds, PageDto pageDto) {
+    public Page<SceneCaseJob> page(String sceneCaseId, List<String> userIds, PageDto pageDto) {
         try {
-            return customizedSceneCaseJobRepository.page(userIds, pageDto);
+            return customizedSceneCaseJobRepository.page(sceneCaseId, userIds, pageDto);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseJob page!", e);
             throw new ApiTestPlatformException(GET_SCENE_CASE_JOB_PAGE_ERROR);

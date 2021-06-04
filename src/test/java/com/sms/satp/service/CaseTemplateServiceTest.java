@@ -9,6 +9,7 @@ import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
 import com.sms.satp.dto.response.CaseTemplateResponse;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
+import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import com.sms.satp.mapper.CaseTemplateMapper;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
@@ -47,6 +48,7 @@ class CaseTemplateServiceTest {
     private CaseTemplateMapper caseTemplateMapper;
     private CaseTemplateServiceImpl caseTemplateService;
     private CaseTemplateApiService caseTemplateApiService;
+    private CaseTemplateConnService caseTemplateConnService;
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -63,8 +65,9 @@ class CaseTemplateServiceTest {
         customizedCaseTemplateRepository = mock(CustomizedCaseTemplateRepository.class);
         caseTemplateMapper = mock(CaseTemplateMapper.class);
         caseTemplateApiService = mock(CaseTemplateApiService.class);
+        caseTemplateConnService = mock(CaseTemplateConnService.class);
         caseTemplateService = new CaseTemplateServiceImpl(caseTemplateRepository, customizedCaseTemplateRepository,
-            caseTemplateMapper, caseTemplateApiService);
+            caseTemplateMapper, caseTemplateApiService, caseTemplateConnService);
     }
 
     @Test
@@ -99,6 +102,10 @@ class CaseTemplateServiceTest {
         List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList(CaseTemplateApi.builder().build());
         when(caseTemplateApiService.listByCaseTemplateId(any())).thenReturn(caseTemplateApiList);
         when(caseTemplateApiService.deleteByIds(any())).thenReturn(Boolean.TRUE);
+        List<CaseTemplateConn> caseTemplateConnList =
+            Lists.newArrayList(CaseTemplateConn.builder().id(MOCK_ID).build());
+        when(caseTemplateConnService.listByCassTemplateId(any())).thenReturn(caseTemplateConnList);
+        when(caseTemplateConnService.deleteByIds(any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = caseTemplateService.deleteByIds(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }

@@ -15,6 +15,8 @@ public class AddCaseTemplateApiRequest {
 
     private String caseTemplateId;
 
+    private String projectId;
+
     private ApiType apiType;
 
     private String shell;
