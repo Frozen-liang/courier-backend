@@ -44,8 +44,8 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE_API, template = "{{#addCaseTemplateApiRequest"
-        + ".addCaseTemplateApiRequestList.apiTestCaseRequest?.![#this.apiName]}}",
+    @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE_API,
+        template = "{{#addCaseTemplateApiRequest.addCaseTemplateApiRequestList?.![#this.apiTestCaseRequest.apiName]}}",
         projectId = "addCaseTemplateApiRequestList[0].projectId")
     public Boolean batchAdd(BatchAddCaseTemplateApiRequest addCaseTemplateApiRequest) {
         log.info("CaseTemplateApiService-batchAdd()-params: [CaseTemplateApi]={}",
@@ -62,7 +62,8 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE_API, template = "{{#result?.![#this.apiName]}}",
+    @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE_API,
+        template = "{{#result?.![#this.apiTestCase.apiName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("CaseTemplateApiService-deleteById()-params: [id]={}", ids);
@@ -77,7 +78,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API,
-        template = "{{#updateCaseTemplateApiRequest.apiName}}")
+        template = "{{#updateCaseTemplateApiRequest.apiTestCaseRequest.apiName}}")
     public Boolean edit(UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest) {
         log.info("CaseTemplateApiService-edit()-params: [CaseTemplateApi]={}", updateCaseTemplateApiRequest.toString());
         try {
@@ -93,7 +94,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API,
-        template = "{{#caseTemplateApiList[0].apiName}}")
+        template = "{{#caseTemplateApiList[0].apiTestCase.apiName}}")
     public Boolean editAll(List<CaseTemplateApi> caseTemplateApiList) {
         log.info("CaseTemplateApiService-edit()-params: [CaseTemplateApi]={}", caseTemplateApiList.toString());
         try {

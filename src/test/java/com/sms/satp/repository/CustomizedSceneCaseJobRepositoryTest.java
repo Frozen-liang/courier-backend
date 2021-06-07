@@ -33,7 +33,7 @@ class CustomizedSceneCaseJobRepositoryTest {
         List<SceneCaseJob> sceneCaseJobList = Lists.newArrayList(SceneCaseJob.builder().id(MOCK_ID).build());
         when(mongoTemplate.find(any(Query.class), eq(SceneCaseJob.class))).thenReturn(sceneCaseJobList);
         when(mongoTemplate.count(any(Query.class), eq(SceneCaseJob.class))).thenReturn(COUNT);
-        Page<SceneCaseJob> page = customizedSceneCaseJobRepository.page(Lists.newArrayList(MOCK_ID),
+        Page<SceneCaseJob> page = customizedSceneCaseJobRepository.page(MOCK_ID, Lists.newArrayList(MOCK_ID),
             PageDto.builder().build());
         assertThat(page).isNotNull();
     }

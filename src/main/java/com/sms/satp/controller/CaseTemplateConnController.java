@@ -2,6 +2,7 @@ package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.dto.request.AddCaseTemplateConnRequest;
+import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import com.sms.satp.service.CaseTemplateConnService;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,4 +31,10 @@ public class CaseTemplateConnController {
     public Boolean add(@Valid @RequestBody AddCaseTemplateConnRequest addCaseTemplateConnRequest) {
         return caseTemplateConnService.add(addCaseTemplateConnRequest);
     }
+
+    @PostMapping("/{caseTemplateId}/{sceneCaseId}")
+    public CaseTemplateConn addByIds(@PathVariable String caseTemplateId, @PathVariable String sceneCaseId) {
+        return caseTemplateConnService.addByIds(caseTemplateId, sceneCaseId);
+    }
+
 }

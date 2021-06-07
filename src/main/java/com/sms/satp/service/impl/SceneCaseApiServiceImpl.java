@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -48,7 +47,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     @Override
     @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API,
-        template = "{{#addSceneCaseApiDto.addSceneCaseApiRequestList.apiTestCaseRequest?.![#this.apiName]}}",
+        template = "{{#addSceneCaseApiDto.addSceneCaseApiRequestList?.![#this.apiTestCaseRequest.apiName]}}",
         projectId = "addSceneCaseApiRequestList[0].projectId")
     public Boolean batchAdd(BatchAddSceneCaseApiRequest addSceneCaseApiDto) {
         log.info("SceneCaseApiService-batchAdd()-params: [SceneCaseApi]={}", addSceneCaseApiDto.toString());
@@ -64,7 +63,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = SCENE_CASE_API, template = "{{#result?.![#this.apiName]}}",
+    @LogRecord(operationType = DELETE, operationModule = SCENE_CASE_API,
+        template = "{{#result?.![#this.apiTestCase.apiName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("SceneCaseApiService-deleteByIds()-params: [ids]={}", ids);
@@ -79,7 +79,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
-        template = "{{#updateSceneCaseApiRequest.apiName}}")
+        template = "{{#updateSceneCaseApiRequest.apiTestCaseRequest.apiName}}")
     public Boolean edit(UpdateSceneCaseApiRequest updateSceneCaseApiRequest) {
         log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", updateSceneCaseApiRequest.toString());
         try {
@@ -93,7 +93,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API, template = "{{#sceneCaseApiList[0].apiName}}")
+    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
+        template = "{{#sceneCaseApiList[0].apiTestCase.apiName}}")
     public Boolean editAll(List<SceneCaseApi> sceneCaseApiList) {
         log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", sceneCaseApiList.toString());
         try {
@@ -106,8 +107,9 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API, template = "{{#updateSceneCaseApiSortOrderDto"
-        + ".sceneCaseApiRequestList?.![#this.apiName]}}", projectId = "sceneCaseApiRequestList[0].projectId")
+    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
+        template = "{{#updateSceneCaseApiSortOrderDto.sceneCaseApiRequestList?.![#this.apiTestCaseRequest.apiName]}}",
+        projectId = "sceneCaseApiRequestList[0].projectId")
     public Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiSortOrderDto) {
         log.info("SceneCaseApiService-batchEdit()-params: [SceneCaseApi]={}",
             updateSceneCaseApiSortOrderDto.toString());

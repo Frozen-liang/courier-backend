@@ -30,9 +30,10 @@ public class SceneCaseJobController {
         return sceneCaseJobService.add(request);
     }
 
-    @GetMapping("/page/{userIds}")
-    public Page<SceneCaseJob> page(@PathVariable List<String> userIds, PageDto pageDto) {
-        return sceneCaseJobService.page(userIds, pageDto);
+    @GetMapping("/page/{sceneCaseId}/{userIds}")
+    public Page<SceneCaseJob> page(@PathVariable String sceneCaseId, @PathVariable List<String> userIds,
+        PageDto pageDto) {
+        return sceneCaseJobService.page(sceneCaseId, userIds, pageDto);
     }
 
     @GetMapping("/{jobId}")

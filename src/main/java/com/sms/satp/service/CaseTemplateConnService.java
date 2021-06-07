@@ -8,9 +8,13 @@ public interface CaseTemplateConnService {
 
     Boolean deleteById(String id);
 
+    Boolean deleteByIds(List<String> ids);
+
     List<CaseTemplateConn> listBySceneCaseId(String sceneCaseId);
 
     List<CaseTemplateConn> listBySceneCaseId(String sceneCaseId, boolean remove);
+
+    List<CaseTemplateConn> listByCassTemplateId(String caseTemplateId);
 
     Boolean edit(CaseTemplateConn caseTemplateConn);
 
@@ -18,4 +22,5 @@ public interface CaseTemplateConnService {
 
     Boolean add(AddCaseTemplateConnRequest addCaseTemplateConnRequest);
 
+    CaseTemplateConn addByIds(String caseTemplateId, String sceneCaseId);
 }

@@ -17,6 +17,9 @@ public class AddSceneCaseJobRequest {
     @NotNull(message = "The sceneCaseId can not be empty")
     private String sceneCaseId;
 
+    @NotNull(message = "The projectId can not be empty")
+    private String projectId;
+
     private List<String> sceneCaseApiIds;
 
     private List<String> caseTemplateConnIds;
