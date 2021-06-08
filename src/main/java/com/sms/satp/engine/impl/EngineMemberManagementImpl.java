@@ -1,5 +1,6 @@
 package com.sms.satp.engine.impl;
 
+import com.sms.satp.dto.request.CaseRecordRequest;
 import com.sms.satp.engine.EngineId;
 import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.enums.EngineStatus;
@@ -51,6 +52,18 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
             .filter(engineMember -> engineMember.getStatus().equals(EngineStatus.RUNNING))
             .map(EngineMember::getDestination)
             .collect(Collectors.toUnmodifiableSet());
+    }
+
+    @Override
+    public void caseRecord(CaseRecordRequest caseRecordRequest) {
+        engineMembers.computeIfPresent(caseRecordRequest.getDestination(), (key, member) -> {
+            member.setCaseTaskSize(caseRecordRequest.getCaseCount());
+            member.setSceneCaseTaskSize(caseRecordRequest.getSceneCaseCount());
+            member.setCurrentTaskSize(caseRecordRequest.getCaseCount() + caseRecordRequest.getSceneCaseCount());
+            log.info("The destination {} currentTask {} caseTask {} sceneCaseTask {}.", member.getDestination(),
+                member.getCurrentTaskSize(), member.getCaseTaskSize(), member.getSceneCaseTaskSize());
+            return member;
+        });
     }
 
     @Override

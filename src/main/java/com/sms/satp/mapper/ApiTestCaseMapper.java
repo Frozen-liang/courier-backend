@@ -21,15 +21,15 @@ public interface ApiTestCaseMapper {
     @Mapping(target = "responseResultVerificationResponse", source = "responseResultVerification")
     @Mapping(target = "responseHeadersVerificationResponse", source = "responseHeadersVerification")
     @Mapping(target = "apiProtocol",
-        expression = "java(apiTestCase.getApiProtocol().getCode())")
+        expression = "java(com.sms.satp.utils.EnumCommonUtils.getCode(apiTestCase.getApiProtocol()))")
     @Mapping(target = "requestMethod",
-        expression = "java(apiTestCase.getRequestMethod().getCode())")
+        expression = "java(com.sms.satp.utils.EnumCommonUtils.getCode(apiTestCase.getRequestMethod()))")
     @Mapping(target = "apiRequestParamType",
-        expression = "java(apiTestCase.getApiRequestParamType().getCode())")
+        expression = "java(com.sms.satp.utils.EnumCommonUtils.getCode(apiTestCase.getApiRequestParamType()))")
     @Mapping(target = "apiResponseJsonType",
-        expression = "java(apiTestCase.getApiResponseJsonType().getCode())")
+        expression = "java(com.sms.satp.utils.EnumCommonUtils.getCode(apiTestCase.getApiResponseJsonType()))")
     @Mapping(target = "apiRequestJsonType",
-        expression = "java(apiTestCase.getApiRequestJsonType().getCode())")
+        expression = "java(com.sms.satp.utils.EnumCommonUtils.getCode(apiTestCase.getApiRequestJsonType()))")
     ApiTestCaseResponse toDto(ApiTestCase apiTestCase);
 
     List<ApiTestCaseResponse> toDtoList(List<ApiTestCase> apiTestCaseList);
@@ -42,7 +42,7 @@ public interface ApiTestCaseMapper {
     @Mapping(target = "requestMethod",
         expression = "java(apiTestCase.getRequestMethod().getCode())")
     @Mapping(target = "apiRequestParamType",
-        expression = "java(apiTestCase.getApiRequestParamType().getCode())")
+        expression = "java(com.sms.satp.utils.EnumCommonUtils.getCode(apiTestCase.getApiRequestParamType()))")
     @Mapping(target = "apiResponseJsonType",
         expression = "java(apiTestCase.getApiResponseJsonType().getCode())")
     @Mapping(target = "apiRequestJsonType",

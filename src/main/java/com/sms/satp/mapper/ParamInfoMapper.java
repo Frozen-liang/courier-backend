@@ -24,7 +24,8 @@ public interface ParamInfoMapper {
 
     List<ParamInfo> toEntityList(List<ParamInfoRequest> paramInfoDtoList);
 
-    @Mapping(target = "paramType", expression = "java(paramInfo.getParamType().getCode())")
+    @Mapping(target = "paramType",
+        expression = "java(com.sms.satp.utils.EnumCommonUtils.getCode(paramInfo.getParamType()))")
     ParamInfoResponse toDto(ParamInfo paramInfo);
 
     List<ParamInfoResponse> toDtoList(List<ParamInfo> paramInfoList);

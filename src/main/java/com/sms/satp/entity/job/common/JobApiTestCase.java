@@ -4,11 +4,6 @@ import com.sms.satp.dto.response.ParamInfoResponse;
 import com.sms.satp.dto.response.ResponseHeadersVerificationResponse;
 import com.sms.satp.dto.response.ResponseResultVerificationResponse;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
-import com.sms.satp.dto.response.ParamInfoResponse;
-import com.sms.satp.entity.api.common.HttpStatusVerification;
-import com.sms.satp.entity.api.common.ParamInfo;
-import com.sms.satp.entity.api.common.ResponseHeadersVerification;
-import com.sms.satp.entity.api.common.ResponseResultVerification;
 import com.sms.satp.entity.api.common.ResponseTimeVerification;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -50,12 +45,10 @@ public class JobApiTestCase {
     private Integer apiRequestParamType;
 
     private List<ParamInfoResponse> requestHeaders;
-    private List<ParamInfoResponse> responseHeaders;
     private List<ParamInfoResponse> pathParams;
     private List<ParamInfoResponse> restfulParams;
     private List<ParamInfoResponse> requestParams;
     private List<ParamInfoResponse> responseParams;
-
     private String preInject;
 
     private String postInject;
@@ -76,14 +69,6 @@ public class JobApiTestCase {
 
     private String modifyDateTime;
 
-    private Object response;
-
-    private long runtime;
-
-    private Boolean result;
-
-    private String failMessage;
-
-    private String paramData;
+    private CaseReport caseReport;
 
 }

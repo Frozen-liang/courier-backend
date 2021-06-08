@@ -12,21 +12,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class JobSceneCaseApi {
-
-    private String id;
-
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String sceneCaseId;
-
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String caseTemplateId;
-
-    private Integer apiType;
-
-    private String shell;
-
-    private Integer order;
+public class JobCaseApi {
 
     private JobApiTestCase jobApiTestCase;
 }

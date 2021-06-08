@@ -9,12 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class ApiTestCaseJobRunRequest {
+public class CaseRecordRequest {
 
-    private String apiTestCaseId;
+    private String destination;
 
-    private String envId;
+    private Integer caseCount;
 
-    private DataCollectionRequest dataCollectionRequest;
-
+    private Integer sceneCaseCount;
 }

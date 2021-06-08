@@ -2,7 +2,6 @@ package com.sms.satp.entity.job;
 
 import com.sms.satp.common.enums.JobStatus;
 import com.sms.satp.entity.BaseEntity;
-import com.sms.satp.entity.job.common.JobApiTestCase;
 import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "ApiTestCaseJob")
 public class ApiTestCaseJob extends BaseEntity {
 
-    private JobApiTestCase apiTestCase;
+    private JobCaseApi apiTestCase;
 
     private JobEnvironment environment;
 

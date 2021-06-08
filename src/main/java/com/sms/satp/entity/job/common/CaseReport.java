@@ -1,7 +1,7 @@
 package com.sms.satp.entity.job.common;
 
-import com.sms.satp.entity.api.common.ParamInfo;
-import java.util.List;
+
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,15 +15,22 @@ public class CaseReport {
 
     private String caseId;
 
+    private int status;
+
+    private String requestUrl;
+
+    private Map<String, String> requestHeader;
+
+    private Map<String, String> responseHeader;
+
+    private Object responseData;
+
+    private Object requestData;
+
     private Boolean result;
 
     private String failMessage;
 
-    private Object response;
-
-    private List<ParamInfo> responseHeaders;
-
     private Long runtime;
 
-    private String paramData;
 }

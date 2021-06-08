@@ -4,11 +4,8 @@ import static com.sms.satp.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_TEST_CASE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.EXECUTE_API_TEST_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_LIST_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.THE_API_TEST_CASE_NOT_EXITS_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.THE_ENVIRONMENT_NOT_EXITS_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -17,18 +14,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.request.ApiTestCaseExecuteRequest;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
-import com.sms.satp.dto.request.DataCollectionRequest;
-import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
-import com.sms.satp.entity.env.ProjectEnvironment;
-import com.sms.satp.entity.job.ApiTestCaseJob;
 import com.sms.satp.mapper.ApiTestCaseMapper;
-import com.sms.satp.mapper.JobMapper;
-import com.sms.satp.mapper.JobMapperImpl;
-import com.sms.satp.repository.ApiTestCaseJobRepository;
 import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.service.impl.ApiTestCaseServiceImpl;
@@ -48,21 +37,11 @@ class ApiTestCaseServiceTest {
     private final CommonDeleteRepository commonDeleteRepository = mock(
         CommonDeleteRepository.class);
     private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
-    private final JobMapper jobMapper = new JobMapperImpl();
-    private final ProjectEnvironmentService projectEnvironmentService = mock(ProjectEnvironmentService.class);
-    private final ApiTestCaseJobRepository apiTestCaseJobRepository = mock(ApiTestCaseJobRepository.class);
     private final ApiTestCaseService apiTestCaseService = new ApiTestCaseServiceImpl(
-        apiTestCaseRepository, commonDeleteRepository, projectEnvironmentService,
-        apiTestCaseJobRepository, apiTestCaseMapper, jobMapper);
+        apiTestCaseRepository, commonDeleteRepository, apiTestCaseMapper);
     private final ApiTestCase apiTestCase = ApiTestCase.builder().id(ID).build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
         .id(ID).build();
-    private final ApiTestCaseExecuteRequest apiTestCaseExecuteRequest =
-        ApiTestCaseExecuteRequest.builder()
-            .dataCollectionRequest(
-                DataCollectionRequest.builder().dataList(Collections.singletonList(TestDataRequest.builder().build()))
-                    .build())
-            .build();
     private final ApiTestCaseRequest apiTestCaseRequest = ApiTestCaseRequest.builder()
         .id(ID).build();
     private static final String ID = ObjectId.get().toString();
@@ -181,45 +160,4 @@ class ApiTestCaseServiceTest {
             .extracting("code").isEqualTo(DELETE_API_TEST_CASE_BY_ID_ERROR.getCode());
     }
 
-    @Test
-    @DisplayName("Test the execute method in the ApiTestCase service")
-    public void execute_test() {
-        when(apiTestCaseRepository.findById(any())).thenReturn(Optional.of(apiTestCase));
-        when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(null);
-        when(projectEnvironmentService.findOne(any())).thenReturn(ProjectEnvironment.builder().build());
-        assertThat(apiTestCaseService.execute(apiTestCaseExecuteRequest)).isTrue();
-    }
-
-    @Test
-    @DisplayName("An exception occurred while execute ApiTestCase")
-    public void environment_not_exist_exception_test() {
-        when(apiTestCaseRepository.findById(any())).thenReturn(Optional.of(apiTestCase));
-        when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(null);
-        when(projectEnvironmentService.findOne(any())).thenReturn(null);
-        assertThatThrownBy(() -> apiTestCaseService.execute(apiTestCaseExecuteRequest))
-            .isInstanceOf(ApiTestPlatformException.class)
-            .extracting("code").isEqualTo(THE_ENVIRONMENT_NOT_EXITS_ERROR.getCode());
-    }
-
-    @Test
-    @DisplayName("An exception occurred while execute ApiTestCase")
-    public void execute_exception_test() {
-        when(apiTestCaseRepository.findById(any())).thenReturn(Optional.of(apiTestCase));
-        when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(null);
-        when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
-        assertThatThrownBy(() -> apiTestCaseService.execute(apiTestCaseExecuteRequest))
-            .isInstanceOf(ApiTestPlatformException.class)
-            .extracting("code").isEqualTo(EXECUTE_API_TEST_CASE_ERROR.getCode());
-    }
-
-    @Test
-    @DisplayName("An exception occurred while execute ApiTestCase")
-    public void api_test_case_not_exist_exception_test() {
-        when(apiTestCaseRepository.findById(any())).thenReturn(Optional.empty());
-        when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(null);
-        when(projectEnvironmentService.findOne(any())).thenReturn(ProjectEnvironment.builder().build());
-        assertThatThrownBy(() -> apiTestCaseService.execute(apiTestCaseExecuteRequest))
-            .isInstanceOf(ApiTestPlatformException.class)
-            .extracting("code").isEqualTo(THE_API_TEST_CASE_NOT_EXITS_ERROR.getCode());
-    }
 }

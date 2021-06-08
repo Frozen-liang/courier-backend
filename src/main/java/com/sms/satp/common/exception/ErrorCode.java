@@ -137,6 +137,7 @@ public enum ErrorCode {
     THE_API_TEST_CASE_NOT_EXITS_ERROR("4129", "The ApiTestCase no exist!"),
     THE_ENVIRONMENT_NOT_EXITS_ERROR("4130", "The Environment no exist!"),
     EXECUTE_API_TEST_CASE_ERROR("4131", "Execute the ApiTestCase error!"),
+    GET_API_TEST_CASE_JOB_ERROR("4132", "Failed to get the ApiTestCaseJob!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

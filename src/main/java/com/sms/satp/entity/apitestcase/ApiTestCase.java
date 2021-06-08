@@ -79,6 +79,4 @@ public class ApiTestCase extends BaseEntity {
     private Boolean isExecute;
 
     private String createUserName;
-
-    private long runtime;
 }
