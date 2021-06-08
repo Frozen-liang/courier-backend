@@ -15,7 +15,6 @@ public class AddSceneCaseJobRequest {
 
     private String sceneCaseId;
 
-    @NotNull(message = "The projectId can not be empty")
     private String projectId;
 
     private List<String> sceneCaseApiIds;
