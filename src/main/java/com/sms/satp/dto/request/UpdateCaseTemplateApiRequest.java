@@ -19,6 +19,8 @@ public class UpdateCaseTemplateApiRequest {
 
     private String caseTemplateId;
 
+    private String projectId;
+
     private ApiType apiType;
 
     private String shell;

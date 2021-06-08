@@ -26,6 +26,8 @@ public class SceneCaseJob extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String sceneCaseId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String projectId;
     /**
      * 是否锁定，当前步骤出错或未通过时，依然执行下一个步骤.
      */

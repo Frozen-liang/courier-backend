@@ -9,6 +9,7 @@ public enum SceneFiled implements Filed {
     PRIORITY("priority"),
     CREATE_USER_NAME("createUserName"),
     CASE_TEMPLATE_ID("caseTemplateId"),
+    SCENE_CASE_ID("sceneCaseId"),
     STATUS("status"),
     ORDER("order");
 

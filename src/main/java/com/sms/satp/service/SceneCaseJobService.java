@@ -11,7 +11,7 @@ public interface SceneCaseJobService {
 
     Boolean add(AddSceneCaseJobRequest request);
 
-    Page<SceneCaseJob> page(List<String> userIds, PageDto pageDto);
+    Page<SceneCaseJob> page(String sceneCaseId, List<String> userIds, PageDto pageDto);
 
     SceneCaseJob get(String jobId);
 

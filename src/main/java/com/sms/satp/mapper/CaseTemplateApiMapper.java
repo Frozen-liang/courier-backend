@@ -31,6 +31,7 @@ public interface CaseTemplateApiMapper {
     List<CaseTemplateApi> toCaseTemplateApiListByAddRequestList(
         List<AddCaseTemplateApiRequest> addCaseTemplateApiRequestList);
 
+    @Mapping(target = "apiTestCase.id", expression = "java(new org.bson.types.ObjectId().toString())")
     @Mapping(target = "apiTestCase", source = "apiTestCaseRequest")
     CaseTemplateApi toCaseTemplateApi(AddCaseTemplateApiRequest addCaseTemplateApiRequest);
 

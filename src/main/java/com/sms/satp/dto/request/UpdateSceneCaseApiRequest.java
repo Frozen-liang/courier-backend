@@ -19,6 +19,8 @@ public class UpdateSceneCaseApiRequest {
 
     private String sceneCaseId;
 
+    private String projectId;
+
     private ApiType apiType;
 
     private String shell;

@@ -26,6 +26,9 @@ public class SceneCaseApi extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String sceneCaseId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String projectId;
+
     private ApiType apiType;
 
     private String shell;

@@ -28,6 +28,7 @@ public interface SceneCaseApiMapper {
 
     List<SceneCaseApi> toSceneCaseApiListByAddRequest(List<AddSceneCaseApiRequest> addSceneCaseApiRequestList);
 
+    @Mapping(target = "apiTestCase.id", expression = "java(new org.bson.types.ObjectId().toString())")
     @Mapping(target = "apiTestCase", source = "apiTestCaseRequest")
     SceneCaseApi toSceneCaseApi(AddSceneCaseApiRequest addSceneCaseApiRequest);
 

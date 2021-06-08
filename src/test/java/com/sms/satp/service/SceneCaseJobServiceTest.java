@@ -131,8 +131,8 @@ class SceneCaseJobServiceTest {
     @DisplayName("Test the page method in the SceneCaseJob service")
     void page_test() {
         Page<SceneCaseJob> sceneCaseJobPage = Page.empty(Pageable.unpaged());
-        when(customizedSceneCaseJobRepository.page(any(), any())).thenReturn(sceneCaseJobPage);
-        Page<SceneCaseJob> responsePage = sceneCaseJobService.page(Lists.newArrayList(MOCK_ID),
+        when(customizedSceneCaseJobRepository.page(any(), any(), any())).thenReturn(sceneCaseJobPage);
+        Page<SceneCaseJob> responsePage = sceneCaseJobService.page(MOCK_ID, Lists.newArrayList(MOCK_ID),
             PageDto.builder().build());
         assertThat(responsePage).isNotNull();
     }
@@ -140,9 +140,9 @@ class SceneCaseJobServiceTest {
     @Test
     @DisplayName("Test the page method in the SceneCaseJob service thrown exception")
     void page_test_thrownException() {
-        when(customizedSceneCaseJobRepository.page(any(), any()))
+        when(customizedSceneCaseJobRepository.page(any(), any(), any()))
             .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_JOB_PAGE_ERROR));
-        assertThatThrownBy(() -> sceneCaseJobService.page(Lists.newArrayList(MOCK_ID),
+        assertThatThrownBy(() -> sceneCaseJobService.page(MOCK_ID, Lists.newArrayList(MOCK_ID),
             PageDto.builder().build()));
     }
 
