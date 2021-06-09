@@ -62,6 +62,16 @@ class DataCollectionServiceTest {
     }
 
     @Test
+    @DisplayName("Test the findOne method in the DataCollection service")
+    public void findOne_test() {
+        when(dataCollectionRepository.findById(ID)).thenReturn(Optional.of(dataCollection));
+        DataCollection result = dataCollectionService.findOne(ID);
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(ID);
+    }
+
+
+    @Test
     @DisplayName("An exception occurred while getting DataCollection")
     public void findById_exception_test() {
         when(dataCollectionRepository.findById(ID)).thenReturn(Optional.empty());

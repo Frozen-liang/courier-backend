@@ -15,4 +15,5 @@ public interface ApiTestCaseService {
     Boolean edit(ApiTestCaseRequest apiTestCaseRequest);
 
     Boolean delete(List<String> ids);
+
 }

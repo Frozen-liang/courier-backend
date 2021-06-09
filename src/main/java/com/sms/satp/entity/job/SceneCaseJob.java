@@ -33,13 +33,13 @@ public class SceneCaseJob extends BaseEntity {
      */
     private Boolean isLock;
 
-    private List<JobSceneCaseApi> caseList;
+    private List<JobSceneCaseApi> apiTestCase;
 
     private JobEnvironment environment;
 
     private JobDataCollection dataCollection;
 
-    private Long runTime;
+    private Long countRunTime;
 
     /**
      * 测试人员.

@@ -1,6 +1,5 @@
 package com.sms.satp.entity.job;
 
-import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.entity.job.common.JobApiTestCase;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

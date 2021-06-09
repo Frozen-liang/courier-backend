@@ -32,6 +32,7 @@ import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -158,9 +159,20 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
+    public List<ProjectEnvironmentResponse> findAllByProjectId(String projectId) {
+        return projectEnvironmentMapper.toDtoList(projectEnvironmentRepository.findAllByProjectId(projectId));
+    }
+
+    @Override
     public ProjectEnvironmentResponse findById(String id) {
         return projectEnvironmentRepository.findById(id).map(projectEnvironmentMapper::toDto)
             .orElseThrow(() -> ExceptionUtils.mpe(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR));
+    }
+
+    @Override
+    public ProjectEnvironment findOne(String id) {
+        return projectEnvironmentRepository.findById(id)
+            .orElse(projectEnvironmentMapper.toEntityByGlobal(globalEnvironmentService.findOne(id)));
     }
 
 }

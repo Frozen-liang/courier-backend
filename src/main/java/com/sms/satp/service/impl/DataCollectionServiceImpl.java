@@ -59,6 +59,11 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
+    public DataCollection findOne(String id) {
+        return dataCollectionRepository.findById(id).orElse(null);
+    }
+
+    @Override
     public List<DataCollectionResponse> list(String projectId, String collectionName) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());

@@ -3,6 +3,7 @@ package com.sms.satp.service;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.AddSceneCaseJobRequest;
 import com.sms.satp.entity.job.SceneCaseJob;
+import com.sms.satp.entity.job.SceneCaseJobReport;
 import java.util.List;
 import org.springframework.data.domain.Page;
 
@@ -15,4 +16,8 @@ public interface SceneCaseJobService {
     SceneCaseJob get(String jobId);
 
     Boolean edit(SceneCaseJob sceneCaseJob);
+
+    void handleJobReport(SceneCaseJobReport jobReport);
+
+    void runJob(AddSceneCaseJobRequest addSceneCaseJobRequest);
 }

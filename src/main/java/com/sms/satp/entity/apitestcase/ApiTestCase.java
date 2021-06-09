@@ -39,13 +39,11 @@ public class ApiTestCase extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
+    private List<String> tagIds;
+
     private String apiName;
 
     private String description;
-
-    private ApiType apiType;
-
-    private String jsData;
 
     private String apiPath;
 

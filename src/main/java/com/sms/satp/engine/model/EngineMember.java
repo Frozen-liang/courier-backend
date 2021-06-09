@@ -26,5 +26,9 @@ public class EngineMember {
     @Default
     private Integer currentTaskSize = 0;
     @Default
+    private Integer caseTaskSize = 0;
+    @Default
+    private Integer sceneCaseTaskSize = 0;
+    @Default
     private EngineStatus status = EngineStatus.PENDING;
 }
