@@ -12,7 +12,6 @@ import com.sms.satp.mapper.FileMapper;
 import com.sms.satp.repository.CustomizedFileRepository;
 import com.sms.satp.service.FileService;
 import com.sms.satp.utils.ExceptionUtils;
-import java.io.IOException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -40,7 +39,7 @@ public class FileServiceImpl implements FileService {
     public Boolean insertTestFile(TestFileRequest testFileRequest) {
         try {
             return customizedFileRepository.insertTestFile(testFileRequest);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Failed to upload the TestFile!");
             throw ExceptionUtils.mpe(UPLOAD_TEST_FILE_ERROR);
         }
@@ -53,7 +52,7 @@ public class FileServiceImpl implements FileService {
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
             throw apiTestPlatEx;
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Failed to edit the TestFile");
             throw ExceptionUtils.mpe(EDIT_TEST_FILE_ERROR);
         }
@@ -70,7 +69,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public GridFsResource downloadTestFile(ObjectId id) {
+    public GridFsResource downloadTestFile(String id) {
         try {
             return customizedFileRepository.downloadTestFile(id);
         } catch (Exception e) {

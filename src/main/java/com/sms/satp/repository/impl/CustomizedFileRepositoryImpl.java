@@ -79,7 +79,7 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
     }
 
     @Override
-    public GridFsResource downloadTestFile(ObjectId id) {
+    public GridFsResource downloadTestFile(String id) {
         Query query = new Query();
         ID.is(id).ifPresent(query::addCriteria);
         GridFSFile gridFsFile = gridFsTemplate.findOne(query);
