@@ -1,5 +1,6 @@
 package com.sms.satp.service;
 
+import static com.sms.satp.common.exception.ErrorCode.DELETE_TEST_FILE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DOWNLOAD_TEST_FILE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_TEST_FILE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.UPLOAD_TEST_FILE_ERROR;
@@ -55,7 +56,7 @@ public class FileServiceTest {
     @DisplayName("An exception occurred while upload TestFile")
     public void insertTestFile_exception_test() throws IOException {
         doThrow(new RuntimeException()).when(customizedFileRepository).insertTestFile(testFileRequest);
-        assertThatThrownBy(() -> customizedFileRepository.insertTestFile(testFileRequest)).isInstanceOf(
+        assertThatThrownBy(() -> fileService.insertTestFile(testFileRequest)).isInstanceOf(
             ApiTestPlatformException.class).extracting("code").isEqualTo(UPLOAD_TEST_FILE_ERROR.getCode());
     }
 
@@ -70,13 +71,28 @@ public class FileServiceTest {
     @DisplayName("An exception occurred while update TestFile")
     public void updateTestFile_exception_test() throws IOException {
         when(customizedFileRepository.updateTestFile(testFileRequest)).thenThrow(new RuntimeException());
-        assertThatThrownBy(() -> customizedFileRepository.updateTestFile(testFileRequest)).isInstanceOf(
+        assertThatThrownBy(() -> fileService.updateTestFile(testFileRequest)).isInstanceOf(
             ApiTestPlatformException.class).extracting("code").isEqualTo(EDIT_TEST_FILE_ERROR.getCode());
     }
 
     @Test
-    @DisplayName("Test the downloadTestFile method in the file service")
+    @DisplayName("Test the deleteTestFileById method in the file service")
     public void deleteTestFileById_test() {
+        when(customizedFileRepository.deleteTestFileById(ID)).thenReturn(Boolean.TRUE);
+        assertThat(fileService.deleteTestFileById(ID)).isTrue();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while delete TestFile")
+    public void deleteTestFileById_exception_test() {
+        when(customizedFileRepository.deleteTestFileById(ID)).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> fileService.deleteTestFileById(ID)).isInstanceOf(
+            ApiTestPlatformException.class).extracting("code").isEqualTo(DELETE_TEST_FILE_BY_ID_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the downloadTestFile method in the file service")
+    public void downloadTestFile_test() {
         GridFsResource gridFsResource = mock(GridFsResource.class);
         when(customizedFileRepository.downloadTestFile(ID)).thenReturn(gridFsResource);
         assertThat(fileService.downloadTestFile(ID)).isNotNull();
@@ -84,9 +100,9 @@ public class FileServiceTest {
 
     @Test
     @DisplayName("An exception occurred while download TestFile")
-    public void deleteTestFileById_exception_test() {
+    public void downloadTestFile_exception_test() {
         when(customizedFileRepository.downloadTestFile(ID)).thenThrow(new RuntimeException());
-        assertThatThrownBy(() -> customizedFileRepository.downloadTestFile(ID)).isInstanceOf(
+        assertThatThrownBy(() -> fileService.downloadTestFile(ID)).isInstanceOf(
             ApiTestPlatformException.class).extracting("code").isEqualTo(DOWNLOAD_TEST_FILE_ERROR.getCode());
     }
 
