@@ -21,8 +21,6 @@ public class ApiTestCaseResponse {
     private String projectId;
     private String apiName;
     private String description;
-    private Integer apiType;
-    private String jsData;
     private String apiPath;
     private Integer apiProtocol;
     private Integer requestMethod;

@@ -44,10 +44,4 @@ public class JobEnvironment {
 
     private List<ParamInfoResponse> additionalParams;
 
-    private Long modifyUserId;
-
-    private LocalDateTime modifyDateTime;
-
-    private String createUserName;
-
 }

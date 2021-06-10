@@ -15,14 +15,21 @@ public interface ParamInfoMapper {
 
 
     @Mapping(target = "paramType", expression = "java(com.sms.satp.common.enums.ParamType"
-        + ".getType(paramInfoDto.getParamType()))")
-    ParamInfo toEntity(ParamInfoRequest paramInfoDto);
+        + ".getType(paramInfoRequest.getParamType()))")
+    ParamInfo toEntity(ParamInfoRequest paramInfoRequest);
+
+    @Mapping(target = "paramType", expression = "java(com.sms.satp.common.enums.ParamType"
+        + ".getType(paramInfoResponse.getParamType()))")
+    ParamInfo toEntityByResponse(ParamInfoResponse paramInfoResponse);
 
     List<ParamInfo> toEntityList(List<ParamInfoRequest> paramInfoDtoList);
 
-    @Mapping(target = "paramType", expression = "java(paramInfo.getParamType().getCode())")
+    @Mapping(target = "paramType",
+        expression = "java(com.sms.satp.utils.EnumCommonUtils.getCode(paramInfo.getParamType()))")
     ParamInfoResponse toDto(ParamInfo paramInfo);
 
     List<ParamInfoResponse> toDtoList(List<ParamInfo> paramInfoList);
+
+
 
 }

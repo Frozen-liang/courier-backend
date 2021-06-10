@@ -11,6 +11,7 @@ import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.enums.DocumentUrlType;
 import com.sms.satp.common.enums.EnumCommon;
 import com.sms.satp.common.enums.GroupImportType;
+import com.sms.satp.common.enums.JobStatus;
 import com.sms.satp.common.enums.MatchType;
 import com.sms.satp.common.enums.OperationModule;
 import com.sms.satp.common.enums.OperationType;
@@ -43,7 +44,7 @@ public class MongoCustomConverterConfiguration {
                 IntegerToOperationModuleConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
                 IntegerToApiTypeConverter.INSTANCE, IntegerToMatchTypeConverter.INSTANCE,
                 IntegerToApiBindingStatusConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
-                IntegerToDocumentUrlTypeConverter.INSTANCE);
+                IntegerToDocumentUrlTypeConverter.INSTANCE, IntegerToJobStatusConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -206,6 +207,15 @@ public class MongoCustomConverterConfiguration {
 
         public ApiBindingStatus convert(@NonNull Integer code) {
             return ApiBindingStatus.getApiBindingStatus(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToJobStatusConverter implements Converter<Integer, JobStatus> {
+        INSTANCE;
+
+        public JobStatus convert(@NonNull Integer code) {
+            return JobStatus.getType(code);
         }
     }
 }

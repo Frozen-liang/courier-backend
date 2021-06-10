@@ -49,6 +49,11 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
+    public GlobalEnvironment findOne(String id) {
+        return globalEnvironmentRepository.findById(id).orElse(null);
+    }
+
+    @Override
     @LogRecord(operationType = ADD, operationModule = GLOBAL_ENV,
         template = "{{#globalEnvironmentRequest.envName}}")
     public Boolean add(GlobalEnvironmentRequest globalEnvironmentRequest) {

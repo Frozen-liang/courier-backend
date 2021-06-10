@@ -1,5 +1,6 @@
 package com.sms.satp.engine.impl;
 
+import com.sms.satp.dto.request.CaseRecordRequest;
 import com.sms.satp.engine.EngineId;
 import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.enums.EngineStatus;
@@ -47,7 +48,6 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     @Override
     public Set<String> getAvailableMembers() {
-
         return engineMembers.values().stream()
             .filter(engineMember -> engineMember.getStatus().equals(EngineStatus.RUNNING))
             .map(EngineMember::getDestination)
@@ -55,9 +55,21 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     }
 
     @Override
+    public void caseRecord(CaseRecordRequest caseRecordRequest) {
+        engineMembers.computeIfPresent(caseRecordRequest.getDestination(), (key, member) -> {
+            member.setCaseTaskSize(caseRecordRequest.getCaseCount());
+            member.setSceneCaseTaskSize(caseRecordRequest.getSceneCaseCount());
+            member.setCurrentTaskSize(caseRecordRequest.getCaseCount() + caseRecordRequest.getSceneCaseCount());
+            log.info("The destination {} currentTask {} caseTask {} sceneCaseTask {}.", member.getDestination(),
+                member.getCurrentTaskSize(), member.getCaseTaskSize(), member.getSceneCaseTaskSize());
+            return member;
+        });
+    }
+
+    @Override
     public void unBind(String sessionId) {
         Optional<EngineMember> engineMemberOptional = engineMembers.values().stream()
-            .filter(engineMember -> engineMember.getSessionId().equals(sessionId)).findFirst();
+            .filter(engineMember -> sessionId.equals(engineMember.getSessionId())).findFirst();
         engineMemberOptional.ifPresent(engineMember -> {
             engineMembers.remove(engineMember.getDestination());
             log.info("The destination {} unbind from member of the engine.", engineMember.getDestination());

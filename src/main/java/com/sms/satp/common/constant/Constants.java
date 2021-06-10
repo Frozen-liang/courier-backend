@@ -5,7 +5,7 @@ public class Constants {
     private Constants() {
     }
 
-    private static final String SDK_VERSION = "/v1";
+    public static final String SDK_VERSION = "/v1";
     public static final String INTERFACE_PATH = SDK_VERSION + "/interface";
     public static final String DATA_PATH = SDK_VERSION + "/data";
     public static final String PROJECT_PATH = SDK_VERSION + "/project";
@@ -32,6 +32,7 @@ public class Constants {
     public static final String API_TAG_GROUP_PATH = SDK_VERSION + "/api-tag-group";
     public static final String API_TEST_CASE_PATH = SDK_VERSION + "/api-test-case";
     public static final String SCENE_CASE_JOB_PATH = SDK_VERSION + "/scene-case-job";
+    public static final String API_TEST_CASE_JOB_PATH = SDK_VERSION + "/api-test-case-job";
     public static final String SCENE_CASE_GROUP_PATH = SDK_VERSION + "/scene-case-group";
     public static final String CASE_TEMPLATE_GROUP_PATH = SDK_VERSION + "/case-template-group";
 }

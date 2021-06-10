@@ -37,9 +37,6 @@ public class ApiTestCaseRequest {
     @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiName can not be empty")
     private String apiName;
     private String description;
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiType can not be empty")
-    private ApiType apiType;
-    private String jsData;
     @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiPath can not be empty")
     private String apiPath;
     private ApiProtocol apiProtocol;
