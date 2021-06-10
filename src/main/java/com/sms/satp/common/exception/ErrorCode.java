@@ -129,10 +129,11 @@ public enum ErrorCode {
     DELETE_API_TEST_CASE_BY_ID_ERROR("4121", "Failed to delete the ApiCase!"),
     EDIT_API_TEST_CASE_ERROR("4122", "Failed to edit the ApiCase!"),
     GET_API_TEST_CASE_LIST_ERROR("4123", "Failed to get the ApiCase list!"),
-    ADD_TEST_FILE_ERROR("4124", "Failed to add the TestFile!"),
+    UPLOAD_TEST_FILE_ERROR("4124", "Failed to upload the TestFile!"),
     DELETE_TEST_FILE_BY_ID_ERROR("4125", "Failed to delete the TestFile!"),
     EDIT_TEST_FILE_ERROR("4126", "Failed to edit the TestFile!"),
     GET_TEST_FILE_LIST_ERROR("4123", "Failed to get the TestFile list!"),
+    DOWNLOAD_TEST_FILE_ERROR("4123", "Failed to download the TestFile!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

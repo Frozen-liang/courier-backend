@@ -4,14 +4,18 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.field.CommonFiled.ID;
 import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 
+import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.sms.satp.dto.request.TestFileRequest;
 import com.sms.satp.repository.CustomizedFileRepository;
 import com.sms.satp.utils.ExceptionUtils;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
@@ -26,6 +30,15 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
 
     public CustomizedFileRepositoryImpl(GridFsTemplate gridFsTemplate) {
         this.gridFsTemplate = gridFsTemplate;
+    }
+
+
+    @Override
+    public List<GridFSFile> list(ObjectId projectId) {
+        Query query = Query.query(Criteria.where("metadata.projectId").is(projectId));
+        GridFSFindIterable gridFSFiles = gridFsTemplate.find(query);
+        List<GridFSFile> list = new ArrayList<>();
+        return gridFSFiles.into(list);
     }
 
     @Override
@@ -46,7 +59,7 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
         ID.is(id).ifPresent(query::addCriteria);
         GridFSFile gridFsFile = gridFsTemplate.findOne(query);
         if (Objects.isNull(gridFsFile)) {
-            throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR,"TestFile",id.toString());
+            throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "TestFile", id.toString());
         }
         gridFsTemplate.delete(query);
         GridFsUpload<ObjectId> gridFsUpload = GridFsUpload.fromStream(testFile.getInputStream())
