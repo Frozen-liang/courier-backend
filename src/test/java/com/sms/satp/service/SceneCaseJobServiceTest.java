@@ -8,7 +8,6 @@ import com.sms.satp.entity.datacollection.TestData;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.entity.job.SceneCaseJob;
 import com.sms.satp.entity.job.common.JobDataCollection;
-import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
