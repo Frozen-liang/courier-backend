@@ -9,7 +9,8 @@ import org.springframework.lang.Nullable;
 
 public enum ProjectType implements EnumCommon {
 
-    WEB(0);
+    WEB(0),
+    APP(1);
     private static final Map<Integer, ProjectType> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(ProjectType::getCode, Function.identity()));
     private final int code;

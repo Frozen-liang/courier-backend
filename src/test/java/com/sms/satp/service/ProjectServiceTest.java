@@ -136,7 +136,7 @@ class ProjectServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             projectResponseList.add(ProjectResponse.builder().build());
         }
-        when(projectRepository.findAllByRemoved(Boolean.FALSE)).thenReturn(projectList);
+        when(projectRepository.findAllByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE)).thenReturn(projectList);
         when(projectMapper.toDtoList(projectList)).thenReturn(projectResponseList);
         List<ProjectResponse> result = projectService.list();
         assertThat(result).hasSize(TOTAL_ELEMENTS);
@@ -145,7 +145,8 @@ class ProjectServiceTest {
     @Test
     @DisplayName("An exception occurred while getting Project list")
     public void list_exception_test() {
-        doThrow(new RuntimeException()).when(projectRepository).findAllByRemoved(Boolean.FALSE);
+        doThrow(new RuntimeException()).when(projectRepository)
+            .findAllByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE);
         assertThatThrownBy(projectService::list)
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_PROJECT_LIST_ERROR.getCode());

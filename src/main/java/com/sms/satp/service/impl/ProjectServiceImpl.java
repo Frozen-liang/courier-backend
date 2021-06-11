@@ -48,7 +48,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<ProjectResponse> list() {
         try {
-            return projectMapper.toDtoList(projectRepository.findAllByRemoved(Boolean.FALSE));
+            return projectMapper.toDtoList(projectRepository.findAllByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE));
         } catch (Exception e) {
             log.error("Failed to get the Project list!", e);
             throw new ApiTestPlatformException(GET_PROJECT_LIST_ERROR);

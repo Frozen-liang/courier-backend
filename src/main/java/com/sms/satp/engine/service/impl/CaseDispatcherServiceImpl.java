@@ -1,7 +1,6 @@
 package com.sms.satp.engine.service.impl;
 
 import com.sms.satp.engine.EngineMemberManagement;
-import com.sms.satp.engine.model.CaseJob;
 import com.sms.satp.engine.service.CaseDispatcherService;
 import com.sms.satp.entity.job.ApiTestCaseJob;
 import com.sms.satp.entity.job.SceneCaseJob;

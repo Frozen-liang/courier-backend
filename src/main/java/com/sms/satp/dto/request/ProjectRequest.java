@@ -19,7 +19,7 @@ public class ProjectRequest {
     private String id;
     @NotEmpty(message = "The name must not be empty.", groups = {UpdateGroup.class, InsertGroup.class})
     private String name;
-    @NotEmpty(message = "The name must not be empty.", groups = {UpdateGroup.class, InsertGroup.class})
+    @NotEmpty(message = "The description must not be empty.", groups = {UpdateGroup.class, InsertGroup.class})
     private String description;
     private String version;
     private ProjectType type;

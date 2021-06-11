@@ -1,6 +1,7 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.common.constant.TimePatternConstant;
+import static com.sms.satp.common.constant.TimePatternConstant.DEFAULT_PATTERN;
+
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.ApiTestCaseJobPageResponse;
@@ -33,12 +34,14 @@ public interface JobMapper {
 
     @Mapping(target = "jobStatus",
         expression = "java(com.sms.satp.utils.EnumCommonUtils.getCode(apiTestCaseJob.getJobStatus()))")
-    @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
-    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
+    @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = DEFAULT_PATTERN)
+    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = DEFAULT_PATTERN)
     ApiTestCaseJobResponse toApiTestCaseJobResponse(ApiTestCaseJob apiTestCaseJob);
 
-    @Mapping(target = "testDateTime", source = "createDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
+    @Mapping(target = "testDateTime", source = "createDateTime", dateFormat = DEFAULT_PATTERN)
     @Mapping(target = "testUser", source = "createUserName")
     @Mapping(target = "testReport", source = "apiTestCaseJob.apiTestCase.jobApiTestCase.caseReport")
+    @Mapping(target = "jobStatus",
+        expression = "java(com.sms.satp.utils.EnumCommonUtils.getCode(apiTestCaseJob.getJobStatus()))")
     ApiTestCaseJobPageResponse toApiTestCaseJobPageResponse(ApiTestCaseJob apiTestCaseJob);
 }

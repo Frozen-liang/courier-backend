@@ -34,10 +34,10 @@ public class ParamInfoMapperTest {
     @DisplayName("Test the method to convert the ParamInfo's dto object to a entity object")
     void dto_to_entity() {
         ParamInfoRequest paramInfoDto = ParamInfoRequest.builder()
-            .description(DESCRIPTION).paramType(1).build();
+            .description(DESCRIPTION).paramType(ParamType.STRING).build();
         ParamInfo paramInfo = paramInfoMapper.toEntity(paramInfoDto);
         assertThat(paramInfo.getDescription()).isEqualTo(DESCRIPTION);
-        assertThat(paramInfo.getParamType().getCode()).isEqualTo(1);
+        assertThat(paramInfo.getParamType()).isEqualTo(ParamType.STRING);
     }
 
     @Test

@@ -94,9 +94,9 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                 JobDataCollection jobDataCollection = jobMapper.toJobDataCollection(dataCollectionRequest);
                 dataCollectionRequest.getDataList().forEach(dataList -> {
                     apiTestCaseJob.setId(null);
-                    apiTestCaseJobRepository.insert(apiTestCaseJob);
                     jobDataCollection.setTestData(jobMapper.toTestDataEntity(dataList));
                     apiTestCaseJob.setDataCollection(jobDataCollection);
+                    apiTestCaseJobRepository.insert(apiTestCaseJob);
                     caseDispatcherService.dispatch(apiTestCaseJob);
                 });
                 return;
@@ -107,8 +107,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             log.error(apiTestPlatEx.getMessage());
             caseDispatcherService.sendMessage(PREFIX + userId, apiTestPlatEx.getMessage());
         } catch (Exception e) {
-            log.error("Execute the ApiTestCase error");
-            e.printStackTrace();
+            log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
             caseDispatcherService.sendMessage(PREFIX + userId, "Execute the ApiTestCase error");
         }
     }
