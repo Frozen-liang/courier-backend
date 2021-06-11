@@ -16,7 +16,7 @@ public interface ProjectMapper {
 
     @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
-    @Mapping(target = "type",expression = "java(com.sms.satp.utils.EnumCommonUtils.getCode(project.getType()))")
+    @Mapping(target = "type", expression = "java(com.sms.satp.utils.EnumCommonUtils.getCode(project.getType()))")
     ProjectResponse toDto(ProjectEntity project);
 
     List<ProjectResponse> toDtoList(List<ProjectEntity> projectList);
