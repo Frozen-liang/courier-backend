@@ -1,5 +1,9 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.PROJECT;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_PROJECT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
@@ -7,7 +11,10 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.THE_PROJECT_EXIST_ERROR;
+import static com.sms.satp.utils.Assert.isTrue;
 
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ProjectRequest;
 import com.sms.satp.dto.response.ProjectResponse;
@@ -57,6 +64,8 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = PROJECT, projectId = "id",
+        template = "{{#projectRequest.name}}")
     public Boolean add(ProjectRequest projectRequest) {
         log.info("ProjectService-add()-params: [Project]={}", projectRequest.toString());
         try {
@@ -78,13 +87,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = PROJECT, projectId = "id",
+        template = "{{#projectRequest.name}}")
     public Boolean edit(ProjectRequest projectRequest) {
         log.info("ProjectService-edit()-params: [Project]={}", projectRequest.toString());
         try {
             boolean exists = projectRepository.existsById(projectRequest.getId());
-            if (!exists) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "Project", projectRequest.getId());
-            }
+            isTrue(exists, EDIT_NOT_EXIST_ERROR, "Project", projectRequest.getId());
             ProjectEntity project = projectMapper.toEntity(projectRequest);
             projectRepository.save(project);
         } catch (ApiTestPlatformException apiTestPlatEx) {
@@ -98,6 +107,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = PROJECT, projectId = "id",
+        template = "{{#result?.![#this.name]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
             return commonDeleteRepository.deleteByIds(ids, ProjectEntity.class);

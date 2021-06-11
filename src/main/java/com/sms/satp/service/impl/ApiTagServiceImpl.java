@@ -12,6 +12,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_LIST_ERROR;
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
+import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -93,9 +94,7 @@ public class ApiTagServiceImpl implements ApiTagService {
         log.info("ApiTagService-edit()-params: [ApiTag]={}", apiTagRequest.toString());
         try {
             boolean exists = apiTagRepository.existsById(apiTagRequest.getId());
-            if (!exists) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ApiTag", apiTagRequest.getId());
-            }
+            isTrue(exists, EDIT_NOT_EXIST_ERROR, "ApiTag", apiTagRequest.getId());
             ApiTag apiTag = apiTagMapper.toEntity(apiTagRequest);
             apiTagRepository.save(apiTag);
         } catch (ApiTestPlatformException apiTestPlatEx) {

@@ -32,16 +32,6 @@ public class SpelUtils {
     private SpelUtils() {
     }
 
-    public static Object getValue(EvaluationContext context, String name) {
-        try {
-            Expression expression = spelExpressionParser.parseExpression(SYMBOL + name);
-            return expression.getValue(context);
-        } catch (Exception e) {
-            log.error("Parse expression:{} error", name);
-        }
-        return null;
-    }
-
     public static <T> T getValue(EvaluationContext context, String template, Class<T> clazz) {
         try {
             Expression expression = spelExpressionParser.parseExpression(template, templateParserContext);

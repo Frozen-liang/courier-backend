@@ -4,17 +4,18 @@ import com.sms.satp.entity.api.common.HeaderInfo;
 import com.sms.satp.entity.env.EnvironmentAuth;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectEnvironmentResponse {
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class ProjectEnvironmentResponse extends BaseResponse {
 
-    private String id;
     private String projectId;
     private String envName;
     private String envDesc;
@@ -24,10 +25,6 @@ public class ProjectEnvironmentResponse {
     private String afterInject;
     private String globalBeforeProcess;
     private String globalAfterProcess;
-    private String createDateTime;
-    private String modifyDateTime;
-    private String createUserId;
-    private String modifyUserId;
     private List<HeaderInfo> headers;
     private List<ParamInfoResponse> params;
     private List<ParamInfoResponse> urlParams;

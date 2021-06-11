@@ -11,6 +11,8 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_GROUP_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_GROUP_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.THE_API_TAG_GROUP_NAME_EXIST_ERROR;
+import static com.sms.satp.utils.Assert.isFalse;
+import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -63,9 +65,7 @@ public class ApiTagGroupServiceImpl implements ApiTagGroupService {
         try {
             boolean exists = apiTagGroupRepository.existsByProjectIdAndName(apiTagGroupRequest.getProjectId(),
                 apiTagGroupRequest.getName());
-            if (exists) {
-                throw ExceptionUtils.mpe(THE_API_TAG_GROUP_NAME_EXIST_ERROR, apiTagGroupRequest.getName());
-            }
+            isTrue(exists, THE_API_TAG_GROUP_NAME_EXIST_ERROR, apiTagGroupRequest.getName());
             ApiTagGroup apiTagGroup = apiTagGroupMapper.toEntity(apiTagGroupRequest);
             apiTagGroupRepository.insert(apiTagGroup);
         } catch (ApiTestPlatformException apiTestPlatEx) {
@@ -84,14 +84,10 @@ public class ApiTagGroupServiceImpl implements ApiTagGroupService {
         log.info("ApiTagGroupService-edit()-params: [ApiTagGroup]={}", apiTagGroupRequest.toString());
         try {
             boolean exists = apiTagGroupRepository.existsById(apiTagGroupRequest.getId());
-            if (!exists) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ApiTagGroup", apiTagGroupRequest.getId());
-            }
+            isTrue(exists, EDIT_NOT_EXIST_ERROR, "ApiTagGroup", apiTagGroupRequest.getId());
             exists = apiTagGroupRepository.existsByProjectIdAndName(apiTagGroupRequest.getProjectId(),
                 apiTagGroupRequest.getName());
-            if (exists) {
-                throw ExceptionUtils.mpe(THE_API_TAG_GROUP_NAME_EXIST_ERROR, apiTagGroupRequest.getName());
-            }
+            isFalse(exists, THE_API_TAG_GROUP_NAME_EXIST_ERROR, apiTagGroupRequest.getName());
             ApiTagGroup apiTagGroup = apiTagGroupMapper.toEntity(apiTagGroupRequest);
             apiTagGroupRepository.save(apiTagGroup);
         } catch (ApiTestPlatformException apiTestPlatEx) {

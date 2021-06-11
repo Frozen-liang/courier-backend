@@ -15,4 +15,6 @@ public interface ProjectFunctionService {
     Boolean edit(ProjectFunctionRequest projectFunctionRequest);
 
     Boolean delete(List<String> ids);
+
+    List<ProjectFunctionResponse> findAll(String projectId, String functionKey, String functionName);
 }

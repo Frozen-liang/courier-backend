@@ -1,17 +1,17 @@
 package com.sms.satp.dto.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectResponse {
-
-    private String id;
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class ProjectResponse extends BaseResponse {
 
     private String name;
 
@@ -20,12 +20,4 @@ public class ProjectResponse {
     private String version;
 
     private Integer type;
-
-    private String createDateTime;
-
-    private String modifyDateTime;
-
-    private Long createUserId;
-
-    private Long modifyUserId;
 }

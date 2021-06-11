@@ -10,6 +10,7 @@ import static com.sms.satp.common.field.CommonFiled.API_ID;
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
+import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
@@ -88,9 +89,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         log.info("ApiTestCaseService-edit()-params: [ApiTestCase]={}", apiTestCaseRequest.toString());
         try {
             boolean exists = apiTestCaseRepository.existsById(apiTestCaseRequest.getId());
-            if (!exists) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ApiTestCase", apiTestCaseRequest.getId());
-            }
+            isTrue(exists, EDIT_NOT_EXIST_ERROR, "ApiTestCase", apiTestCaseRequest.getId());
             ApiTestCase apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
             apiTestCaseRepository.save(apiTestCase);
         } catch (ApiTestPlatformException apiTestPlatEx) {

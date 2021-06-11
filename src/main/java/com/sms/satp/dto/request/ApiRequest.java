@@ -1,5 +1,10 @@
 package com.sms.satp.dto.request;
 
+import com.sms.satp.common.enums.ApiJsonType;
+import com.sms.satp.common.enums.ApiProtocol;
+import com.sms.satp.common.enums.ApiRequestParamType;
+import com.sms.satp.common.enums.ApiStatus;
+import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
 import java.util.List;
@@ -36,13 +41,13 @@ public class ApiRequest {
     private String apiPath;
 
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiProtocol must not be null.")
-    private Integer apiProtocol;
+    private ApiProtocol apiProtocol;
 
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The requestMethod must not be null.")
-    private Integer requestMethod;
+    private RequestMethod requestMethod;
 
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiRequestParamType must not be null.")
-    private Integer apiRequestParamType;
+    private ApiRequestParamType apiRequestParamType;
 
 
     @Valid
@@ -59,7 +64,7 @@ public class ApiRequest {
     private List<ParamInfoRequest> responseParams;
 
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiStatus must not be null.")
-    private Integer apiStatus;
+    private ApiStatus apiStatus;
 
     private boolean removed;
 
@@ -68,8 +73,8 @@ public class ApiRequest {
     private String postInject;
 
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiResponseJsonType must not be null.")
-    private Integer apiResponseJsonType;
+    private ApiJsonType apiResponseJsonType;
 
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiRequestJsonType must not be null.")
-    private Integer apiRequestJsonType;
+    private ApiJsonType apiRequestJsonType;
 }
