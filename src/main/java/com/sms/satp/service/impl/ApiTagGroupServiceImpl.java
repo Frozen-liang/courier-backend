@@ -65,7 +65,7 @@ public class ApiTagGroupServiceImpl implements ApiTagGroupService {
         try {
             boolean exists = apiTagGroupRepository.existsByProjectIdAndName(apiTagGroupRequest.getProjectId(),
                 apiTagGroupRequest.getName());
-            isTrue(exists, THE_API_TAG_GROUP_NAME_EXIST_ERROR, apiTagGroupRequest.getName());
+            isFalse(exists, THE_API_TAG_GROUP_NAME_EXIST_ERROR, apiTagGroupRequest.getName());
             ApiTagGroup apiTagGroup = apiTagGroupMapper.toEntity(apiTagGroupRequest);
             apiTagGroupRepository.insert(apiTagGroup);
         } catch (ApiTestPlatformException apiTestPlatEx) {
