@@ -42,8 +42,8 @@ public class CaseTemplateApiController {
     }
 
     @GetMapping(value = "/{id}")
-    public CaseTemplateApiResponse getSceneCaseApiById(@PathVariable String id) {
-        return caseTemplateApiService.getSceneCaseApiById(id);
+    public CaseTemplateApiResponse getCaseTemplateApiById(@PathVariable String id) {
+        return caseTemplateApiService.getCaseTemplateApiById(id);
     }
 
 }

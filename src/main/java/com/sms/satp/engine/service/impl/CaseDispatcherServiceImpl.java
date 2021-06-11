@@ -1,11 +1,11 @@
 package com.sms.satp.engine.service.impl;
 
 import com.sms.satp.engine.EngineMemberManagement;
-import com.sms.satp.engine.model.CaseJob;
 import com.sms.satp.engine.service.CaseDispatcherService;
 import com.sms.satp.entity.job.ApiTestCaseJob;
 import com.sms.satp.entity.job.SceneCaseJob;
 import com.sms.satp.entity.job.common.CaseReport;
+import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -44,6 +44,12 @@ public class CaseDispatcherServiceImpl implements CaseDispatcherService {
 
     @Override
     public void sendJobReport(String destination, CaseReport caseReport) {
+        log.info("Send job report. destination {}", destination);
+        simpMessagingTemplate.convertAndSend(destination, caseReport);
+    }
+
+    @Override
+    public void sendJobReport(String destination, List<CaseReport> caseReport) {
         log.info("Send job report. destination {}", destination);
         simpMessagingTemplate.convertAndSend(destination, caseReport);
     }

@@ -29,6 +29,7 @@ import com.sms.satp.service.CaseTemplateService;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
@@ -84,7 +85,7 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE_GROUP, template = "{{#result?.![#this.name]}}",
+    @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE_GROUP, template = "{{#result?.name}}",
         enhance = @Enhance(enable = true))
     public Boolean deleteById(String id) {
         try {
@@ -124,10 +125,12 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
         CaseTemplateSearchRequest request = CaseTemplateSearchRequest.builder().groupId(id).build();
         Page<CaseTemplate> caseTemplatePage = customizedCaseTemplateRepository.search(request, projectId);
         List<CaseTemplate> caseTemplateList = caseTemplatePage.getContent();
-        for (CaseTemplate caseTemplate : caseTemplateList) {
-            caseTemplate.setRemoved(true);
+        if (CollectionUtils.isNotEmpty(caseTemplateList)) {
+            for (CaseTemplate caseTemplate : caseTemplateList) {
+                caseTemplate.setRemoved(true);
+            }
+            caseTemplateService.batchEdit(caseTemplateList);
         }
-        caseTemplateService.batchEdit(caseTemplateList);
     }
 
 }

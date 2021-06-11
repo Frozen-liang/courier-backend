@@ -34,5 +34,5 @@ public class UpdateCaseTemplateApiRequest {
 
     private ApiTestCaseRequest apiTestCaseRequest;
 
-    private Boolean removed;
+    private boolean removed;
 }

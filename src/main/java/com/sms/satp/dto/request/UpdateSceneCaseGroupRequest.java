@@ -21,5 +21,5 @@ public class UpdateSceneCaseGroupRequest {
 
     private String parentId;
 
-    private Boolean removed;
+    private boolean removed;
 }

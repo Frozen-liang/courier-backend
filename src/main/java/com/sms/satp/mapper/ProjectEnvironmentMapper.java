@@ -5,7 +5,6 @@ import com.sms.satp.dto.request.ProjectEnvironmentRequest;
 import com.sms.satp.dto.response.ProjectEnvironmentResponse;
 import com.sms.satp.entity.env.GlobalEnvironment;
 import com.sms.satp.entity.env.ProjectEnvironment;
-import com.sms.satp.entity.job.common.JobEnvironment;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -27,5 +26,4 @@ public interface ProjectEnvironmentMapper {
 
     ProjectEnvironment toEntity(ProjectEnvironmentRequest projectEnvironmentDto);
 
-    JobEnvironment toJobEnvironment(ProjectEnvironment projectEnvironment);
 }

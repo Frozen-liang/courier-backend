@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @Document(collection = "SceneCaseGroup")

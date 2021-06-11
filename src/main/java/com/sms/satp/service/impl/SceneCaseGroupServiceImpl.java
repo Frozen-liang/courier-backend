@@ -29,6 +29,7 @@ import com.sms.satp.service.SceneCaseService;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
@@ -84,7 +85,7 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = SCENE_CASE_GROUP, template = "{{#result?.![#this.name]}}",
+    @LogRecord(operationType = DELETE, operationModule = SCENE_CASE_GROUP, template = "{{#result?.name}}",
         enhance = @Enhance(enable = true))
     public Boolean deleteById(String id) {
         try {
@@ -124,10 +125,12 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
         SearchSceneCaseRequest request = SearchSceneCaseRequest.builder().groupId(id).build();
         Page<SceneCase> sceneCasePage = customizedSceneCaseRepository.search(request, projectId);
         List<SceneCase> sceneCaseList = sceneCasePage.getContent();
-        for (SceneCase sceneCase : sceneCaseList) {
-            sceneCase.setRemoved(true);
+        if (CollectionUtils.isNotEmpty(sceneCaseList)) {
+            for (SceneCase sceneCase : sceneCaseList) {
+                sceneCase.setRemoved(true);
+            }
+            sceneCaseService.batchEdit(sceneCaseList);
         }
-        sceneCaseService.batchEdit(sceneCaseList);
     }
 
 }

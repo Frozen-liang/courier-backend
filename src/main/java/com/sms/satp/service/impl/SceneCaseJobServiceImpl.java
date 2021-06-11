@@ -1,7 +1,5 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_JOB_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_JOB_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
@@ -9,14 +7,17 @@ import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ER
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.AddSceneCaseJobRequest;
+import com.sms.satp.dto.request.SceneCaseJobRequest;
+import com.sms.satp.dto.request.TestDataRequest;
+import com.sms.satp.dto.response.SceneCaseJobResponse;
 import com.sms.satp.engine.service.CaseDispatcherService;
-import com.sms.satp.entity.datacollection.TestData;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.entity.job.JobSceneCaseApi;
 import com.sms.satp.entity.job.SceneCaseJob;
 import com.sms.satp.entity.job.SceneCaseJobReport;
+import com.sms.satp.entity.job.common.CaseReport;
+import com.sms.satp.entity.job.common.JobApiTestCase;
 import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
@@ -24,9 +25,7 @@ import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
-import com.sms.satp.mapper.DataCollectionMapper;
-import com.sms.satp.mapper.ProjectEnvironmentMapper;
-import com.sms.satp.mapper.SceneCaseJobMapper;
+import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.repository.CaseTemplateConnRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
@@ -35,16 +34,17 @@ import com.sms.satp.repository.SceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.ProjectEnvironmentService;
 import com.sms.satp.service.SceneCaseJobService;
+import com.sms.satp.utils.ExceptionUtils;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -57,21 +57,20 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     private final SceneCaseRepository sceneCaseRepository;
     private final CaseTemplateConnRepository caseTemplateConnRepository;
     private final SceneCaseJobRepository sceneCaseJobRepository;
-    private final DataCollectionMapper dataCollectionMapper;
+    private final JobMapper jobMapper;
     private final CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository;
-    private final SceneCaseJobMapper sceneCaseJobMapper;
-    private final ProjectEnvironmentMapper projectEnvironmentMapper;
     private final CaseDispatcherService caseDispatcherService;
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
+
+    private static final String PREFIX = "/user/";
 
     public SceneCaseJobServiceImpl(SceneCaseApiRepository sceneCaseApiRepository,
         ProjectEnvironmentService projectEnvironmentService,
         SceneCaseRepository sceneCaseRepository,
         CaseTemplateConnRepository caseTemplateConnRepository,
         SceneCaseJobRepository sceneCaseJobRepository,
-        DataCollectionMapper dataCollectionMapper,
+        JobMapper jobMapper,
         CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository,
-        SceneCaseJobMapper sceneCaseJobMapper, ProjectEnvironmentMapper projectEnvironmentMapper,
         CaseDispatcherService caseDispatcherService,
         CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository) {
         this.sceneCaseApiRepository = sceneCaseApiRepository;
@@ -79,59 +78,16 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         this.sceneCaseRepository = sceneCaseRepository;
         this.caseTemplateConnRepository = caseTemplateConnRepository;
         this.sceneCaseJobRepository = sceneCaseJobRepository;
-        this.dataCollectionMapper = dataCollectionMapper;
+        this.jobMapper = jobMapper;
         this.customizedSceneCaseJobRepository = customizedSceneCaseJobRepository;
-        this.sceneCaseJobMapper = sceneCaseJobMapper;
-        this.projectEnvironmentMapper = projectEnvironmentMapper;
         this.caseDispatcherService = caseDispatcherService;
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
     }
 
     @Override
-    public Boolean add(AddSceneCaseJobRequest request) {
-        /*try {
-            Optional<ProjectEnvironment> environment =
-                projectEnvironmentRepository.findById(request.getEnvironmentId());
-            if (environment.isEmpty()) {
-                throw new ApiTestPlatformException(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR);
-            }
-            JobEnvironment jobEnvironment = projectEnvironmentMapper.toJobEnvironment(environment.get());
-            Optional<SceneCase> sceneCase = sceneCaseRepository.findById(request.getSceneCaseId());
-            if (sceneCase.isEmpty()) {
-                throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
-            }
-            List<JobSceneCaseApi> caseList = getApiCaseList(request);
-
-            if (Objects.isNull(request.getDataCollection())) {
-                SceneCaseJob sceneCaseJob = SceneCaseJob.builder().environment(jobEnvironment).caseList(caseList)
-                    .sceneCaseId(request.getSceneCaseId()).projectId(request.getProjectId()).build();
-                sceneCaseJobRepository.insert(sceneCaseJob);
-            } else {
-                for (TestData testData : request.getDataCollection().getDataList()) {
-                    JobDataCollection jobDataCollection =
-                        dataCollectionMapper.toDataCollectionJob(request.getDataCollection(), testData);
-                    SceneCaseJob sceneCaseJob = SceneCaseJob.builder()
-                        .sceneCaseId(request.getSceneCaseId())
-                        .environment(jobEnvironment)
-                        .dataCollection(jobDataCollection)
-                        .caseList(caseList)
-                        .projectId(request.getProjectId())
-                        .build();
-                    sceneCaseJobRepository.insert(sceneCaseJob);
-                }
-            }
-            return Boolean.TRUE;
-        } catch (Exception e) {
-            log.error("Failed to add the SceneCaseJob!", e);
-            throw new ApiTestPlatformException(ADD_SCENE_CASE_JOB_ERROR);
-        }*/
-        return Boolean.TRUE;
-    }
-
-    @Override
-    public Page<SceneCaseJob> page(String sceneCaseId, List<String> userIds, PageDto pageDto) {
+    public Page<SceneCaseJobResponse> page(SceneCaseJobRequest sceneCaseJobRequest) {
         try {
-            return customizedSceneCaseJobRepository.page(sceneCaseId, userIds, pageDto);
+            return customizedSceneCaseJobRepository.page(sceneCaseJobRequest).map(jobMapper::toSceneCaseJobResponse);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseJob page!", e);
             throw new ApiTestPlatformException(GET_SCENE_CASE_JOB_PAGE_ERROR);
@@ -139,57 +95,54 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     }
 
     @Override
-    public SceneCaseJob get(String jobId) {
-        try {
-            SceneCaseJob job = SceneCaseJob.builder().id(jobId).build();
-            Example<SceneCaseJob> example = Example.of(job);
-            Optional<SceneCaseJob> sceneCaseJob = sceneCaseJobRepository.findOne(example);
-            return sceneCaseJob.orElseGet(null);
-        } catch (Exception e) {
-            log.error("Failed to get the SceneCaseJob page!", e);
-            throw new ApiTestPlatformException(GET_SCENE_CASE_JOB_ERROR);
-        }
-    }
-
-    @Override
-    public Boolean edit(SceneCaseJob sceneCaseJob) {
-        try {
-            sceneCaseJobRepository.save(sceneCaseJob);
-            return Boolean.TRUE;
-        } catch (Exception e) {
-            log.error("Failed to edit the SceneCaseJob!", e);
-            throw new ApiTestPlatformException(EDIT_SCENE_CASE_JOB_ERROR);
-        }
+    public SceneCaseJobResponse get(String jobId) {
+        return sceneCaseJobRepository.findById(jobId).map(jobMapper::toSceneCaseJobResponse)
+            .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_JOB_ERROR));
     }
 
     @Override
     public void handleJobReport(SceneCaseJobReport jobReport) {
-
+        Map<String, CaseReport> caseReportMap =
+            jobReport.getCaseReportList().stream()
+                .collect(Collectors.toMap(CaseReport::getCaseId, Function.identity(), (key1, key2) -> key2));
+        sceneCaseJobRepository.findById(jobReport.getJobId()).ifPresent(job -> {
+            for (JobSceneCaseApi jobSceneCaseApi : job.getApiTestCase()) {
+                JobApiTestCase jobApiTestCase = jobSceneCaseApi.getJobApiTestCase();
+                jobApiTestCase.setCaseReport(caseReportMap.get(jobSceneCaseApi.getId()));
+            }
+            job.setJobStatus(jobReport.getJobStatus());
+            job.setMessage(jobReport.getMessage());
+            caseDispatcherService.sendJobReport(PREFIX + job.getCreateUserId(), jobReport.getCaseReportList());
+            sceneCaseJobRepository.save(job);
+        });
     }
 
     @Override
     public void runJob(AddSceneCaseJobRequest request) {
+        // getCurrentUserId
+        int userId = 1;
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(request.getEnvId());
             if (Objects.isNull(projectEnvironment)) {
                 throw new ApiTestPlatformException(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR);
             }
-            JobEnvironment jobEnvironment = projectEnvironmentMapper.toJobEnvironment(projectEnvironment);
+            JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
             Optional<SceneCase> sceneCase = sceneCaseRepository.findById(request.getSceneCaseId());
             if (sceneCase.isEmpty()) {
                 throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
             }
             List<JobSceneCaseApi> caseList = getApiCaseList(request);
 
-            if (Objects.isNull(request.getDataCollection())) {
+            if (Objects.isNull(request.getDataCollectionRequest())) {
                 SceneCaseJob sceneCaseJob = SceneCaseJob.builder().environment(jobEnvironment).apiTestCase(caseList)
                     .sceneCaseId(request.getSceneCaseId()).build();
                 sceneCaseJobRepository.insert(sceneCaseJob);
                 caseDispatcherService.dispatch(sceneCaseJob);
             } else {
-                for (TestData testData : request.getDataCollection().getDataList()) {
-                    JobDataCollection jobDataCollection =
-                        dataCollectionMapper.toDataCollectionJob(request.getDataCollection(), testData);
+                for (TestDataRequest testData : request.getDataCollectionRequest().getDataList()) {
+                    JobDataCollection jobDataCollection = jobMapper
+                        .toJobDataCollection(request.getDataCollectionRequest());
+                    jobDataCollection.setTestData(jobMapper.toTestDataEntity(testData));
                     SceneCaseJob sceneCaseJob = SceneCaseJob.builder()
                         .sceneCaseId(request.getSceneCaseId())
                         .environment(jobEnvironment)
@@ -200,9 +153,13 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                     caseDispatcherService.dispatch(sceneCaseJob);
                 }
             }
+        } catch (ApiTestPlatformException apiTestPlatEx) {
+            log.error(apiTestPlatEx.getMessage());
+            caseDispatcherService.sendMessage(PREFIX + userId, apiTestPlatEx.getMessage());
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseJob!", e);
-            throw new ApiTestPlatformException(ADD_SCENE_CASE_JOB_ERROR);
+            e.printStackTrace();
+            caseDispatcherService.sendMessage(PREFIX + userId, "Execute the SceneCaseJob error");
         }
     }
 
@@ -211,7 +168,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         if (CollectionUtils.isNotEmpty(request.getSceneCaseApiIds())) {
             List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList();
             sceneCaseApiRepository.findAllById(request.getSceneCaseApiIds()).forEach(sceneCaseApiList::add);
-            caseList.addAll(sceneCaseJobMapper.toJobSceneCaseApiList(sceneCaseApiList));
+            caseList.addAll(jobMapper.toJobSceneCaseApiList(sceneCaseApiList));
         }
 
         if (CollectionUtils.isNotEmpty(request.getCaseTemplateConnIds())) {
@@ -224,7 +181,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::getOrder));
             resetOrder(caseTemplateApiList, apiConn);
-            caseList.addAll(sceneCaseJobMapper.toJobSceneCaseApiListByTemplate(caseTemplateApiList));
+            caseList.addAll(jobMapper.toJobSceneCaseApiListByTemplate(caseTemplateApiList));
         }
 
         if (CollectionUtils.isNotEmpty(caseList)) {
