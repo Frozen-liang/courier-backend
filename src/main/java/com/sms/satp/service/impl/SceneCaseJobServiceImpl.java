@@ -103,8 +103,8 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     @Override
     public void handleJobReport(SceneCaseJobReport jobReport) {
         Map<String, CaseReport> caseReportMap =
-            jobReport.getCaseReportList().stream()
-                .collect(Collectors.toMap(CaseReport::getCaseId, Function.identity(), (key1, key2) -> key2));
+            jobReport.getCaseReportList().stream().distinct()
+                .collect(Collectors.toMap(CaseReport::getCaseId, Function.identity()));
         sceneCaseJobRepository.findById(jobReport.getJobId()).ifPresent(job -> {
             for (JobSceneCaseApi jobSceneCaseApi : job.getApiTestCase()) {
                 JobApiTestCase jobApiTestCase = jobSceneCaseApi.getJobApiTestCase();
