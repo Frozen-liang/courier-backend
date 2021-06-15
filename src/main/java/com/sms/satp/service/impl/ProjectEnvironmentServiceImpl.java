@@ -14,6 +14,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_PA
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
+import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -129,9 +130,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
             projectEnvironmentRequest.toString());
         try {
             boolean exists = projectEnvironmentRepository.existsById(projectEnvironmentRequest.getId());
-            if (!exists) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ProjectEnvironment", projectEnvironmentRequest.getId());
-            }
+            isTrue(exists, EDIT_NOT_EXIST_ERROR, "ProjectEnvironment", projectEnvironmentRequest.getId());
             ProjectEnvironment projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentRequest);
             projectEnvironmentRepository.save(projectEnvironment);
@@ -160,7 +159,8 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
 
     @Override
     public List<ProjectEnvironmentResponse> findAllByProjectId(String projectId) {
-        return projectEnvironmentMapper.toDtoList(projectEnvironmentRepository.findAllByProjectId(projectId));
+        return projectEnvironmentMapper
+            .toDtoList(projectEnvironmentRepository.findAllByProjectIdAndRemoved(projectId, Boolean.FALSE));
     }
 
     @Override

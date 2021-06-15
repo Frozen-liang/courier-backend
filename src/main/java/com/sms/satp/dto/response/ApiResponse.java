@@ -1,21 +1,18 @@
 package com.sms.satp.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sms.satp.common.constant.TimePatternConstant;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class ApiResponse {
-
-    private String id;
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class ApiResponse extends BaseResponse {
 
     private String projectId;
 
@@ -58,10 +55,4 @@ public class ApiResponse {
     private Integer apiRequestJsonType;
 
     private String createUser;
-
-    @JsonFormat(pattern = TimePatternConstant.DEFAULT_PATTERN)
-    private LocalDateTime createDateTime;
-
-    @JsonFormat(pattern = TimePatternConstant.DEFAULT_PATTERN)
-    private LocalDateTime modifyDateTime;
 }

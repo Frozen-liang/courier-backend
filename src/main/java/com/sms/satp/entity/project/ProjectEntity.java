@@ -1,5 +1,6 @@
 package com.sms.satp.entity.project;
 
+import com.sms.satp.common.enums.ProjectType;
 import com.sms.satp.entity.BaseEntity;
 import edu.umd.cs.findbugs.annotations.SuppressWarnings;
 import lombok.Data;
@@ -20,6 +21,6 @@ public class ProjectEntity extends BaseEntity {
 
     private String name;
     private String description;
-
-
+    private String version;
+    private ProjectType type;
 }

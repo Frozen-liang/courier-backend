@@ -67,7 +67,7 @@ public class LogAspect {
 
     private void enhance(Enhance enhance, EvaluationContext context, String collectionName, Method method) {
         if (enhance.enable()) {
-            Object value = SpelUtils.getValue(context, enhance.primaryKey());
+            Object value = context.lookupVariable(enhance.primaryKey());
             if (Objects.nonNull(value)) {
                 Object queryByIdResult;
                 if (value instanceof Collection) {

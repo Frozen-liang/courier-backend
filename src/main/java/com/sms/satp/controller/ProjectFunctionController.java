@@ -38,6 +38,12 @@ public class ProjectFunctionController {
         return projectFunctionService.list(projectId, functionKey, functionName);
     }
 
+    @GetMapping("/find-all/{projectId}")
+    public List<ProjectFunctionResponse> findAll(@PathVariable("projectId") String projectId, String functionKey,
+        String functionName) {
+        return projectFunctionService.findAll(projectId, functionKey, functionName);
+    }
+
     @PostMapping
     public Boolean add(@Validated(InsertGroup.class) @RequestBody ProjectFunctionRequest projectFunctionRequest) {
         return projectFunctionService.add(projectFunctionRequest);

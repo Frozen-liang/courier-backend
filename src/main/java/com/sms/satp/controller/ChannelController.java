@@ -10,7 +10,6 @@ import com.sms.satp.entity.job.ApiTestCaseJobReport;
 import com.sms.satp.entity.job.SceneCaseJobReport;
 import com.sms.satp.service.ApiTestCaseJobService;
 import com.sms.satp.service.SceneCaseJobService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RestController
 public class ChannelController {
 
@@ -50,13 +48,11 @@ public class ChannelController {
 
     @MessageMapping(Constants.SDK_VERSION + "/scene-job-report")
     public void sceneJobReport(@Payload SceneCaseJobReport jobReport) {
-        log.info(jobReport.toString());
         sceneCaseJobService.handleJobReport(jobReport);
     }
 
     @MessageMapping(Constants.SDK_VERSION + "/case-record")
     public void caseRecord(@Payload CaseRecordRequest caseRecordRequest) {
-        log.info(caseRecordRequest.toString());
         engineMemberManagement.caseRecord(caseRecordRequest);
     }
 

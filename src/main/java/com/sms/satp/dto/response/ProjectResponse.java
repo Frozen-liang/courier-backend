@@ -6,15 +6,18 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class ApiTagGroupResponse extends BaseResponse {
-
-    private String projectId;
+public class ProjectResponse extends BaseResponse {
 
     private String name;
 
+    private String description;
+
+    private String version;
+
+    private Integer type;
 }

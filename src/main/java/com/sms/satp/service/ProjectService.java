@@ -1,22 +1,18 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.ProjectDto;
+import com.sms.satp.dto.request.ProjectRequest;
+import com.sms.satp.dto.response.ProjectResponse;
 import java.util.List;
-import org.springframework.data.domain.Page;
 
 public interface ProjectService {
 
-    List<ProjectDto> list();
+    ProjectResponse findById(String id);
 
-    Page<ProjectDto> page(PageDto pageDto);
+    List<ProjectResponse> list();
 
-    void add(ProjectDto projectDto);
+    Boolean add(ProjectRequest projectRequest);
 
-    void edit(ProjectDto projectDto);
+    Boolean edit(ProjectRequest projectRequest);
 
-    void delete(String id);
-
-    ProjectDto findById(String id);
-
+    Boolean delete(List<String> ids);
 }
