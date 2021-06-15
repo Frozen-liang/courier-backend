@@ -144,6 +144,7 @@ public enum ErrorCode {
     EDIT_CASE_TEMPLATE_GROUP_ERROR("4136", "Failed to edit the CaseTemplateGroup!"),
     DELETE_CASE_TEMPLATE_GROUP_ERROR("4137", "Failed to delete the CaseTemplateGroup!"),
     GET_CASE_TEMPLATE_GROUP_LIST_ERROR("4138", "Failed to get the CaseTemplateGroup list!"),
+    GET_API_GROUP_LIST_ERROR("4139", "Failed to get the ApiGroup list!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 
