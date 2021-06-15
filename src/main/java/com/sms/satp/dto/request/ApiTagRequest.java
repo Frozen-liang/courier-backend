@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
 import javax.validation.constraints.NotEmpty;
@@ -8,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Range;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,7 +28,5 @@ public class ApiTagRequest {
     private String tagName;
 
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The tagType cannot by null.")
-    @Range(min = 1, max = 3, groups = {InsertGroup.class,
-        UpdateGroup.class}, message = "The tayType must between 1 and 3.")
-    private Integer tagType;
+    private ApiTagType tagType;
 }

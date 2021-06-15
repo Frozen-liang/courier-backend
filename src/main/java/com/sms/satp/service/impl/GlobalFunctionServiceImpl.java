@@ -12,6 +12,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_BY_ID_
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_LIST_ERROR;
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
+import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -97,9 +98,8 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
         log.info("GlobalFunctionService-edit()-params: [GlobalFunction]={}", globalFunctionRequest.toString());
         try {
             boolean exists = globalFunctionRepository.existsById(globalFunctionRequest.getId());
-            if (!exists) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "GlobalFunction", globalFunctionRequest.getId());
-            }
+
+            isTrue(exists, EDIT_NOT_EXIST_ERROR, "GlobalFunction", globalFunctionRequest.getId());
             GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionRequest);
             globalFunctionRepository.save(globalFunction);
         } catch (ApiTestPlatformException apiTestPlatEx) {

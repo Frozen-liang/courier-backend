@@ -1,24 +1,21 @@
 package com.sms.satp.dto.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Builder
-public class ApiTagResponse {
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class ApiTagResponse extends BaseResponse {
 
-    private String id;
     private String projectId;
     private String groupId;
     private String tagName;
     private Integer tagType;
-    private String createDateTime;
-    private String modifyDateTime;
-    private Long createUserId;
-    private Long modifyUserId;
 
 }

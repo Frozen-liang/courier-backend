@@ -5,11 +5,13 @@ public enum SceneFiled implements Filed {
     NAME("name"),
     GROUP_ID("groupId"),
     TEST_STATUS("testStatus"),
-    CASE_TAG("caseTag"),
+    TAG_IDS("tagIds"),
     PRIORITY("priority"),
     CREATE_USER_NAME("createUserName"),
+    CASE_TEMPLATE_ID("caseTemplateId"),
+    SCENE_CASE_ID("sceneCaseId"),
     STATUS("status"),
-    ORDER_NUMBER("orderNumber");
+    ORDER("order");
 
     private final String filedName;
 

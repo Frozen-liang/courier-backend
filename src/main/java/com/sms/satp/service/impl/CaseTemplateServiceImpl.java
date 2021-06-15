@@ -20,10 +20,12 @@ import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
 import com.sms.satp.dto.response.CaseTemplateResponse;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
+import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import com.sms.satp.mapper.CaseTemplateMapper;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
 import com.sms.satp.service.CaseTemplateApiService;
+import com.sms.satp.service.CaseTemplateConnService;
 import com.sms.satp.service.CaseTemplateService;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.List;
@@ -48,14 +50,17 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     private final CustomizedCaseTemplateRepository customizedCaseTemplateRepository;
     private final CaseTemplateMapper caseTemplateMapper;
     private final CaseTemplateApiService caseTemplateApiService;
+    private final CaseTemplateConnService caseTemplateConnService;
 
     public CaseTemplateServiceImpl(CaseTemplateRepository sceneCaseRepository,
         CustomizedCaseTemplateRepository customizedSceneCaseRepository,
-        CaseTemplateMapper sceneCaseMapper, CaseTemplateApiService sceneCaseApiService) {
+        CaseTemplateMapper sceneCaseMapper, CaseTemplateApiService sceneCaseApiService,
+        CaseTemplateConnService caseTemplateConnService) {
         this.sceneCaseTemplateRepository = sceneCaseRepository;
         this.customizedCaseTemplateRepository = customizedSceneCaseRepository;
         this.caseTemplateMapper = sceneCaseMapper;
         this.caseTemplateApiService = sceneCaseApiService;
+        this.caseTemplateConnService = caseTemplateConnService;
     }
 
     @Override
@@ -83,6 +88,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
                 sceneCaseTemplateRepository.deleteById(id);
                 List<CaseTemplateApi> caseTemplateApiList = caseTemplateApiService.listByCaseTemplateId(id);
                 deleteCaseTemplateApi(caseTemplateApiList);
+                List<CaseTemplateConn> caseTemplateConnList = caseTemplateConnService.listByCassTemplateId(id);
+                deleteCaseTemplateConn(caseTemplateConnList);
             }
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -142,6 +149,13 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         } catch (Exception e) {
             log.error("Failed to search the CaseTemplate!", e);
             throw new ApiTestPlatformException(SEARCH_CASE_TEMPLATE_ERROR);
+        }
+    }
+
+    private void deleteCaseTemplateConn(List<CaseTemplateConn> caseTemplateConnList) {
+        List<String> ids = caseTemplateConnList.stream().map(CaseTemplateConn::getId).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(ids)) {
+            caseTemplateConnService.deleteByIds(ids);
         }
     }
 

@@ -44,6 +44,11 @@ public class ProjectEnvironmentController {
         return projectEnvironmentService.list(projectId);
     }
 
+    @GetMapping("/find-all/{projectId}")
+    public List<ProjectEnvironmentResponse> findAllByProjectId(@PathVariable String projectId) {
+        return projectEnvironmentService.findAllByProjectId(projectId);
+    }
+
     @PostMapping
     public Boolean add(@Validated(InsertGroup.class) @RequestBody ProjectEnvironmentRequest projectEnvironmentRequest) {
         return projectEnvironmentService.add(projectEnvironmentRequest);

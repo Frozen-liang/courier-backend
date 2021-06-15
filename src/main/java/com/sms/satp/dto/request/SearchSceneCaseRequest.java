@@ -17,7 +17,7 @@ public class SearchSceneCaseRequest extends PageDto {
     private String groupId;
     private boolean remove;
     private List<String> testStatus;
-    private List<String> caseTag;
+    private List<String> tagIds;
     private List<Integer> priority;
     private List<String> createUserName;
 

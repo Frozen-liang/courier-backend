@@ -9,6 +9,7 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_PAGE_ERROR;
+import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -235,9 +236,7 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
         log.info("ApiService-edit()-params: [Api]={}", apiRequest.toString());
         try {
             boolean exists = apiRepository.existsById(apiRequest.getId());
-            if (!exists) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "Api", apiRequest.getId());
-            }
+            isTrue(exists, EDIT_NOT_EXIST_ERROR, "Api", apiRequest.getId());
             ApiEntity apiEntity = apiMapper.toEntity(apiRequest);
             ApiEntity newApiEntity = apiRepository.save(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()

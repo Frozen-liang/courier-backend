@@ -2,23 +2,20 @@ package com.sms.satp.dto.response;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Builder
-public class DataCollectionResponse {
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class DataCollectionResponse extends BaseResponse {
 
-    private String id;
     private String projectId;
     private String collectionName;
     private List<String> paramList;
     private List<TestDataResponse> dataList;
-    private String createDateTime;
-    private String modifyDateTime;
-    private Long createUserId;
-    private Long modifyUserId;
 }

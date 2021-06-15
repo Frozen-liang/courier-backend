@@ -14,6 +14,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_PA
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
+import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -32,6 +33,7 @@ import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -128,9 +130,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
             projectEnvironmentRequest.toString());
         try {
             boolean exists = projectEnvironmentRepository.existsById(projectEnvironmentRequest.getId());
-            if (!exists) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ProjectEnvironment", projectEnvironmentRequest.getId());
-            }
+            isTrue(exists, EDIT_NOT_EXIST_ERROR, "ProjectEnvironment", projectEnvironmentRequest.getId());
             ProjectEnvironment projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentRequest);
             projectEnvironmentRepository.save(projectEnvironment);
@@ -158,9 +158,21 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
+    public List<ProjectEnvironmentResponse> findAllByProjectId(String projectId) {
+        return projectEnvironmentMapper
+            .toDtoList(projectEnvironmentRepository.findAllByProjectIdAndRemoved(projectId, Boolean.FALSE));
+    }
+
+    @Override
     public ProjectEnvironmentResponse findById(String id) {
         return projectEnvironmentRepository.findById(id).map(projectEnvironmentMapper::toDto)
             .orElseThrow(() -> ExceptionUtils.mpe(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR));
+    }
+
+    @Override
+    public ProjectEnvironment findOne(String id) {
+        return projectEnvironmentRepository.findById(id)
+            .orElse(projectEnvironmentMapper.toEntityByGlobal(globalEnvironmentService.findOne(id)));
     }
 
 }

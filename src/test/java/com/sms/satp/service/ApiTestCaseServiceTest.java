@@ -20,7 +20,6 @@ import com.sms.satp.entity.apitestcase.ApiTestCase;
 import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CommonDeleteRepository;
-import com.sms.satp.repository.CustomizedDataCollectionRepository;
 import com.sms.satp.service.impl.ApiTestCaseServiceImpl;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -160,4 +159,5 @@ class ApiTestCaseServiceTest {
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_API_TEST_CASE_BY_ID_ERROR.getCode());
     }
+
 }

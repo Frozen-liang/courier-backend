@@ -2,9 +2,12 @@ package com.sms.satp.service;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.AddCaseTemplateConnRequest;
+import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
+import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.CaseTemplateConnMapper;
 import com.sms.satp.repository.CaseTemplateConnRepository;
+import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.service.impl.CaseTemplateConnServiceImpl;
 import java.util.List;
 import java.util.Optional;
@@ -31,15 +34,21 @@ class CaseTemplateConnServiceTest {
 
     private CaseTemplateConnRepository caseTemplateConnRepository;
     private CaseTemplateConnMapper caseTemplateConnMapper;
+    private CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository;
+    private CaseTemplateApiService caseTemplateApiService;
     private CaseTemplateConnServiceImpl caseTemplateConnService;
 
     private final static String MOCK_ID = new ObjectId().toString();
+    private final static Integer MOCK_NUM = 1;
 
     @BeforeEach
     void setUpBean() {
         caseTemplateConnRepository = mock(CaseTemplateConnRepository.class);
         caseTemplateConnMapper = mock(CaseTemplateConnMapper.class);
-        caseTemplateConnService = new CaseTemplateConnServiceImpl(caseTemplateConnRepository, caseTemplateConnMapper);
+        customizedSceneCaseApiRepository = mock(CustomizedSceneCaseApiRepository.class);
+        caseTemplateApiService = mock(CaseTemplateApiService.class);
+        caseTemplateConnService = new CaseTemplateConnServiceImpl(caseTemplateConnRepository, caseTemplateConnMapper,
+            customizedSceneCaseApiRepository, caseTemplateApiService);
     }
 
     @Test
@@ -61,6 +70,23 @@ class CaseTemplateConnServiceTest {
     }
 
     @Test
+    @DisplayName("Test the deleteByIds method in the CaseTemplateConn service")
+    void deleteByIds_test() {
+        when(caseTemplateConnRepository.deleteAllByIdIsIn(any())).thenReturn(1L);
+        Boolean isSuccess = caseTemplateConnService.deleteByIds(Lists.newArrayList(MOCK_ID));
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the deleteByIds method in the CaseTemplateConn service thrown exception")
+    void deleteByIds_test_thrownException() {
+        when(caseTemplateConnRepository.deleteAllByIdIsIn(any()))
+            .thenThrow(new ApiTestPlatformException(DELETE_CASE_TEMPLATE_CONN_ERROR));
+        assertThatThrownBy(() -> caseTemplateConnService.deleteByIds(Lists.newArrayList(MOCK_ID)));
+    }
+
+
+    @Test
     @DisplayName("Test the listBySceneCaseId method in the CaseTemplateConn service")
     void listBySceneCaseId_test() {
         List<CaseTemplateConn> caseTemplateConnList = Lists.newArrayList(CaseTemplateConn.builder().build());
@@ -75,6 +101,24 @@ class CaseTemplateConnServiceTest {
         when(caseTemplateConnRepository.findAll(any(Example.class)))
             .thenThrow(new ApiTestPlatformException(GET_CASE_TEMPLATE_CONN_LIST_ERROR));
         assertThatThrownBy(() -> caseTemplateConnService.listBySceneCaseId(MOCK_ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the listByCassTemplateId method in the CaseTemplateConn service")
+    void listByCassTemplateId_test() {
+        List<CaseTemplateConn> caseTemplateConnList = Lists.newArrayList(CaseTemplateConn.builder().build());
+        when(caseTemplateConnRepository.findAll(any(Example.class))).thenReturn(caseTemplateConnList);
+        List<CaseTemplateConn> dto = caseTemplateConnService.listByCassTemplateId(MOCK_ID);
+        assertThat(dto).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Test the listByCassTemplateId method in the CaseTemplateConn service thrown exception")
+    void listByCassTemplateId_test_thrownException() {
+        when(caseTemplateConnRepository.findAll(any(Example.class)))
+            .thenThrow(new ApiTestPlatformException(GET_CASE_TEMPLATE_CONN_LIST_ERROR));
+        assertThatThrownBy(() -> caseTemplateConnService.listByCassTemplateId(MOCK_ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
@@ -152,6 +196,29 @@ class CaseTemplateConnServiceTest {
         when(caseTemplateConnMapper.toCaseTemplateConn(any())).thenReturn(caseTemplateConn);
         when(caseTemplateConnRepository.insert(any(CaseTemplateConn.class)))
             .thenThrow(new ApiTestPlatformException(ADD_CASE_TEMPLATE_CONN_ERROR));
-        assertThatThrownBy(()->caseTemplateConnService.add(request)).isInstanceOf(ApiTestPlatformException.class);
+        assertThatThrownBy(() -> caseTemplateConnService.add(request)).isInstanceOf(ApiTestPlatformException.class);
     }
+
+    @Test
+    @DisplayName("Test the addByIds method in the CaseTemplateConn service")
+    void addByIds_test() {
+        List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList(CaseTemplateApi.builder().id(MOCK_ID).build());
+        when(caseTemplateApiService.getApiByCaseTemplateId(any(), any(Boolean.class))).thenReturn(caseTemplateApiList);
+        SceneCaseApi sceneCaseApi = SceneCaseApi.builder().id(MOCK_ID).order(MOCK_NUM).build();
+        when(customizedSceneCaseApiRepository.findMaxOrderBySceneCaseId(any())).thenReturn(sceneCaseApi);
+        CaseTemplateConn conn = CaseTemplateConn.builder().id(MOCK_ID).build();
+        when(caseTemplateConnRepository.insert(any(CaseTemplateConn.class))).thenReturn(conn);
+        CaseTemplateConn dto = caseTemplateConnService.addByIds(MOCK_ID, MOCK_ID);
+        assertThat(dto).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the addByIds method in the CaseTemplateConn service thrown exception")
+    void addByIds_test_thrownException() {
+        when(caseTemplateApiService.getApiByCaseTemplateId(any(), any(Boolean.class)))
+            .thenThrow(new ApiTestPlatformException(ADD_CASE_TEMPLATE_CONN_ERROR));
+        assertThatThrownBy(() -> caseTemplateConnService.addByIds(MOCK_ID, MOCK_ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
 }

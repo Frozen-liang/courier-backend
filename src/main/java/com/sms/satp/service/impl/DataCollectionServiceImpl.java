@@ -14,6 +14,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_PARAM_
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
+import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -59,6 +60,11 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
+    public DataCollection findOne(String id) {
+        return dataCollectionRepository.findById(id).orElse(null);
+    }
+
+    @Override
     public List<DataCollectionResponse> list(String projectId, String collectionName) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
@@ -98,9 +104,7 @@ public class DataCollectionServiceImpl implements DataCollectionService {
         log.info("DataCollectionService-edit()-params: [DataCollection]={}", dataCollectionRequest.toString());
         try {
             boolean exists = dataCollectionRepository.existsById(dataCollectionRequest.getId());
-            if (!exists) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "DataCollection", dataCollectionRequest.getId());
-            }
+            isTrue(exists, EDIT_NOT_EXIST_ERROR, "DataCollection", dataCollectionRequest.getId());
             DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
             dataCollectionRepository.save(dataCollection);
         } catch (ApiTestPlatformException apiTestPlatEx) {

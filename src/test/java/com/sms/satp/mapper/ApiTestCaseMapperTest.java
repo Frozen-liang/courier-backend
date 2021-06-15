@@ -32,7 +32,7 @@ class ApiTestCaseMapperTest {
     private ApiTestCase apiTestCase = ApiTestCase.builder()
         .caseName(CASE_NAME).apiProtocol(ApiProtocol.HTTP).createDateTime(CREATE_TIME).modifyDateTime(MODIFY_TIME)
         .apiRequestJsonType(ApiJsonType.OBJECT).apiResponseJsonType(ApiJsonType.ARRAY).requestMethod(RequestMethod.GET)
-        .apiRequestParamType(ApiRequestParamType.JSON).apiType(ApiType.API).build();
+        .apiRequestParamType(ApiRequestParamType.JSON).build();
     private static final Integer SIZE = 10;
     private static final String CASE_NAME = "apiTestCase";
     private static final LocalDateTime CREATE_TIME = LocalDateTime.now();

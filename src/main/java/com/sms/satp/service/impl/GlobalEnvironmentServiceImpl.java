@@ -10,6 +10,7 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_GLOBAL_ENVIRONMENT_ER
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_ENVIRONMENT_LIST_ERROR;
+import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -49,6 +50,11 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
+    public GlobalEnvironment findOne(String id) {
+        return globalEnvironmentRepository.findById(id).orElse(null);
+    }
+
+    @Override
     @LogRecord(operationType = ADD, operationModule = GLOBAL_ENV,
         template = "{{#globalEnvironmentRequest.envName}}")
     public Boolean add(GlobalEnvironmentRequest globalEnvironmentRequest) {
@@ -70,9 +76,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
         log.info("GlobalEnvironmentService-edit()-params: [GlobalEnvironment]={}", globalEnvironmentRequest.toString());
         try {
             boolean exists = globalEnvironmentRepository.existsById(globalEnvironmentRequest.getId());
-            if (!exists) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "GlobalEnvironment", globalEnvironmentRequest.getId());
-            }
+            isTrue(exists, EDIT_NOT_EXIST_ERROR, "GlobalEnvironment", globalEnvironmentRequest.getId());
             GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentRequest);
             globalEnvironmentRepository.save(globalEnvironment);
         } catch (ApiTestPlatformException apiTestPlatEx) {

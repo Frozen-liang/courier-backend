@@ -34,7 +34,7 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
         SceneFiled.NAME.is(searchDto.getName()).ifPresent(query::addCriteria);
         SceneFiled.GROUP_ID.is(searchDto.getGroupId()).ifPresent(query::addCriteria);
         SceneFiled.TEST_STATUS.in(searchDto.getTestStatus()).ifPresent(query::addCriteria);
-        SceneFiled.CASE_TAG.in(searchDto.getCaseTag()).ifPresent(query::addCriteria);
+        SceneFiled.TAG_IDS.in(searchDto.getTagIds()).ifPresent(query::addCriteria);
         SceneFiled.PRIORITY.in(searchDto.getPriority()).ifPresent(query::addCriteria);
         SceneFiled.CREATE_USER_NAME.in(searchDto.getCreateUserName()).ifPresent(query::addCriteria);
         long total = mongoTemplate.count(query, SceneCase.class);

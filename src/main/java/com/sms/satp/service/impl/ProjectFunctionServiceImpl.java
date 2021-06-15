@@ -13,6 +13,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_LIST_
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
+import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -65,20 +66,11 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     @Override
     public List<Object> list(String projectId, String functionKey, String functionName) {
         try {
-            ProjectFunction projectFunction = ProjectFunction.builder()
-                .projectId(projectId).functionKey(functionKey).functionName(functionName).build();
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
-            ExampleMatcher matcher = ExampleMatcher.matching()
-                .withMatcher(PROJECT_ID.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
-                .withMatcher(FUNCTION_KEY, ExampleMatcher.GenericPropertyMatchers.exact())
-                .withMatcher(REMOVE.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
-                .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
-            Example<ProjectFunction> example = Example.of(projectFunction, matcher);
+            List<ProjectFunctionResponse> projectFunctionResponses = this.findAll(projectId, functionKey, functionName);
             ArrayList<Object> list = new ArrayList<>();
             List<GlobalFunctionResponse> globalFunctionList = globalFunctionService.list(functionKey, functionName);
-            List<ProjectFunction> projectFunctionList = projectFunctionRepository.findAll(example, sort);
             list.addAll(globalFunctionList);
-            list.addAll(projectFunctionMapper.toDtoList(projectFunctionList));
+            list.addAll(projectFunctionResponses);
             return list;
         } catch (Exception e) {
             log.error("Failed to get the ProjectFunction list!", e);
@@ -109,9 +101,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         log.info("ProjectFunctionService-edit()-params: [ProjectFunction]={}", projectFunctionRequest.toString());
         try {
             boolean exists = projectFunctionRepository.existsById(projectFunctionRequest.getId());
-            if (!exists) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ProjectFunction", projectFunctionRequest.getId());
-            }
+            isTrue(exists, EDIT_NOT_EXIST_ERROR, "ProjectFunction", projectFunctionRequest.getId());
             ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
             projectFunctionRepository.save(projectFunction);
         } catch (ApiTestPlatformException apiTestPlatEx) {
@@ -135,6 +125,21 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
             log.error("Failed to delete the ProjectFunction!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_FUNCTION_BY_ID_ERROR);
         }
+    }
+
+    @Override
+    public List<ProjectFunctionResponse> findAll(String projectId, String functionKey, String functionName) {
+        ProjectFunction projectFunction = ProjectFunction.builder()
+            .projectId(projectId).functionKey(functionKey).functionName(functionName).build();
+        Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
+        ExampleMatcher matcher = ExampleMatcher.matching()
+            .withMatcher(PROJECT_ID.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
+            .withMatcher(FUNCTION_KEY, ExampleMatcher.GenericPropertyMatchers.exact())
+            .withMatcher(REMOVE.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
+            .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
+        Example<ProjectFunction> example = Example.of(projectFunction, matcher);
+        List<ProjectFunction> projectFunctionList = projectFunctionRepository.findAll(example, sort);
+        return projectFunctionMapper.toDtoList(projectFunctionList);
     }
 
 }
