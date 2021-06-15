@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Range;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,7 +28,5 @@ public class ApiTagRequest {
     private String tagName;
 
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The tagType cannot by null.")
-    @Range(min = 0, max = 2, groups = {InsertGroup.class,
-        UpdateGroup.class}, message = "The tayType must between 1 and 3.")
     private ApiTagType tagType;
 }

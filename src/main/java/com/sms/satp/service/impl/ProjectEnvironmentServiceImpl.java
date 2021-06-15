@@ -159,7 +159,8 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
 
     @Override
     public List<ProjectEnvironmentResponse> findAllByProjectId(String projectId) {
-        return projectEnvironmentMapper.toDtoList(projectEnvironmentRepository.findAllByProjectId(projectId));
+        return projectEnvironmentMapper
+            .toDtoList(projectEnvironmentRepository.findAllByProjectIdAndRemoved(projectId, Boolean.FALSE));
     }
 
     @Override

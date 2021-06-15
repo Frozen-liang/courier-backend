@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ProjectEnvironmentRepository extends MongoRepository<ProjectEnvironment, String> {
 
-    List<ProjectEnvironment> findAllByProjectId(String projectId);
+    List<ProjectEnvironment> findAllByProjectIdAndRemoved(String projectId, Boolean removed);
 }
