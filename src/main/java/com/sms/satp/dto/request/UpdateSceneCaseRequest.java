@@ -23,5 +23,5 @@ public class UpdateSceneCaseRequest {
     private String testStatus;
     private List<String> tagIds;
     private Integer priority;
-    private Boolean removed;
+    private boolean removed;
 }

@@ -11,6 +11,7 @@ public enum SceneFiled implements Filed {
     CASE_TEMPLATE_ID("caseTemplateId"),
     SCENE_CASE_ID("sceneCaseId"),
     STATUS("status"),
+    PARENT_ID("parentId"),
     ORDER("order");
 
     private final String filedName;

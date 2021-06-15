@@ -22,7 +22,9 @@ public enum OperationModule implements EnumCommon {
     DATA_COLLECTION(11, "DataCollection"),
     API_TAG(12, "ApiTag"),
     API_TAG_GROUP(13, "ApiTagGroup"),
-    API_GROUP(14, "ApiGroup");
+    API_GROUP(14, "ApiGroup"),
+    SCENE_CASE_GROUP(15, "SceneCaseGroup"),
+    CASE_TEMPLATE_GROUP(16, "CaseTemplateGroup");
 
     private static final Map<Integer, OperationModule> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationModule::getCode, Function.identity()));

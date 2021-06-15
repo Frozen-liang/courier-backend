@@ -34,6 +34,7 @@ import org.springframework.data.domain.Pageable;
 
 import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_CONN_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
@@ -169,6 +170,33 @@ class SceneCaseServiceTest {
         when(sceneCaseRepository.save(any(SceneCase.class)))
             .thenThrow(new ApiTestPlatformException(EDIT_SCENE_CASE_ERROR));
         assertThatThrownBy(() -> sceneCaseService.edit(UpdateSceneCaseRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the batch edit method in the SceneCase service")
+    void batchEdit_test() {
+        SceneCase sceneCase = SceneCase.builder().id(MOCK_ID).build();
+        Optional<SceneCase> optionalSceneCase = Optional
+            .ofNullable(SceneCase.builder().removed(Boolean.TRUE).build());
+        when(sceneCaseRepository.findById(any())).thenReturn(optionalSceneCase);
+        when(sceneCaseRepository.save(any(SceneCase.class))).thenReturn(sceneCase);
+        List<SceneCaseApi> caseTemplateApiDtoList = Lists
+            .newArrayList(SceneCaseApi.builder().id(MOCK_ID).build());
+        when(sceneCaseApiService.getApiBySceneCaseId(any(), anyBoolean())).thenReturn(caseTemplateApiDtoList);
+        when(caseTemplateApiService.editAll(any())).thenReturn(Boolean.TRUE);
+        List<SceneCase> sceneCaseList = Lists.newArrayList(sceneCase);
+        Boolean isSuccess = sceneCaseService.batchEdit(sceneCaseList);
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the batch edit method in the SceneCase service thrown exception")
+    void batchEdit_test_thrownException() {
+        SceneCase sceneCase = SceneCase.builder().id(MOCK_ID).build();
+        when(sceneCaseRepository.findById(any())).thenThrow(new ApiTestPlatformException(EDIT_CASE_TEMPLATE_ERROR));
+        List<SceneCase> sceneCaseList = Lists.newArrayList(sceneCase);
+        assertThatThrownBy(() -> sceneCaseService.batchEdit(sceneCaseList))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 

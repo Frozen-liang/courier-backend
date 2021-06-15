@@ -103,17 +103,24 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     public Boolean edit(UpdateCaseTemplateRequest updateCaseTemplateRequest) {
         log.info("CaseTemplateService-edit()-params: [CaseTemplate]={}", updateCaseTemplateRequest.toString());
         try {
-            CaseTemplate sceneCaseTemplate = caseTemplateMapper
+            CaseTemplate caseTemplate = caseTemplateMapper
                 .toCaseTemplateByUpdateRequest(updateCaseTemplateRequest);
-            Optional<CaseTemplate> optionalSceneCase = sceneCaseTemplateRepository.findById(sceneCaseTemplate.getId());
-            optionalSceneCase.ifPresent(sceneCaseFindById -> {
-                sceneCaseTemplate.setCreateUserId(sceneCaseFindById.getCreateUserId());
-                sceneCaseTemplate.setCreateDateTime(sceneCaseFindById.getCreateDateTime());
-                if (!Objects.equals(sceneCaseTemplate.getRemoved(), sceneCaseFindById.getRemoved())) {
-                    editCaseTemplateApiStatus(sceneCaseTemplate, sceneCaseFindById.getRemoved());
-                }
-                sceneCaseTemplateRepository.save(sceneCaseTemplate);
-            });
+            updateCaseTemplate(caseTemplate);
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to edit the CaseTemplate!", e);
+            throw new ApiTestPlatformException(EDIT_CASE_TEMPLATE_ERROR);
+        }
+    }
+
+    @Override
+    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE, template = "{{#caseTemplateList[0].name}}")
+    public Boolean batchEdit(List<CaseTemplate> caseTemplateList) {
+        log.info("CaseTemplateService-edit()-params: [caseTemplateList]={}", caseTemplateList.toString());
+        try {
+            for (CaseTemplate caseTemplate : caseTemplateList) {
+                updateCaseTemplate(caseTemplate);
+            }
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to edit the CaseTemplate!", e);
@@ -150,6 +157,18 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             log.error("Failed to search the CaseTemplate!", e);
             throw new ApiTestPlatformException(SEARCH_CASE_TEMPLATE_ERROR);
         }
+    }
+
+    private void updateCaseTemplate(CaseTemplate caseTemplate) {
+        Optional<CaseTemplate> optionalSceneCase = sceneCaseTemplateRepository.findById(caseTemplate.getId());
+        optionalSceneCase.ifPresent(sceneCaseFindById -> {
+            caseTemplate.setCreateUserId(sceneCaseFindById.getCreateUserId());
+            caseTemplate.setCreateDateTime(sceneCaseFindById.getCreateDateTime());
+            if (!Objects.equals(caseTemplate.getRemoved(), sceneCaseFindById.getRemoved())) {
+                editCaseTemplateApiStatus(caseTemplate, sceneCaseFindById.getRemoved());
+            }
+            sceneCaseTemplateRepository.save(caseTemplate);
+        });
     }
 
     private void deleteCaseTemplateConn(List<CaseTemplateConn> caseTemplateConnList) {

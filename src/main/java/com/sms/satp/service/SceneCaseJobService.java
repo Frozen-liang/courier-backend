@@ -1,21 +1,16 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.AddSceneCaseJobRequest;
-import com.sms.satp.entity.job.SceneCaseJob;
+import com.sms.satp.dto.request.SceneCaseJobRequest;
+import com.sms.satp.dto.response.SceneCaseJobResponse;
 import com.sms.satp.entity.job.SceneCaseJobReport;
-import java.util.List;
 import org.springframework.data.domain.Page;
 
 public interface SceneCaseJobService {
 
-    Boolean add(AddSceneCaseJobRequest request);
+    Page<SceneCaseJobResponse> page(SceneCaseJobRequest sceneCaseJobRequest);
 
-    Page<SceneCaseJob> page(String sceneCaseId, List<String> userIds, PageDto pageDto);
-
-    SceneCaseJob get(String jobId);
-
-    Boolean edit(SceneCaseJob sceneCaseJob);
+    SceneCaseJobResponse get(String jobId);
 
     void handleJobReport(SceneCaseJobReport jobReport);
 

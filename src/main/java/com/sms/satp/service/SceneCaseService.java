@@ -7,6 +7,7 @@ import com.sms.satp.dto.request.UpdateSceneCaseRequest;
 import com.sms.satp.dto.request.UpdateSceneTemplateRequest;
 import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.dto.response.SceneTemplateResponse;
+import com.sms.satp.entity.scenetest.SceneCase;
 import java.util.List;
 import org.springframework.data.domain.Page;
 
@@ -17,6 +18,8 @@ public interface SceneCaseService {
     Boolean deleteByIds(List<String> ids);
 
     Boolean edit(UpdateSceneCaseRequest updateSceneCaseRequest);
+
+    Boolean batchEdit(List<SceneCase> sceneCaseList);
 
     Page<SceneCaseResponse> page(PageDto pageDto, String projectId);
 
