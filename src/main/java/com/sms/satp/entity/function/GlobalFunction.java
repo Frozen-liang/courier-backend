@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 @SuperBuilder
 @Data
@@ -20,6 +22,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "GlobalFunction")
 public class GlobalFunction extends BaseEntity {
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String workspaceId;
     private String functionKey;
     private String functionName;
     private List<ParamInfo> functionParams;

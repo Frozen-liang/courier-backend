@@ -36,9 +36,9 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
     @Override
     public List<GridFSFile> list(ObjectId projectId) {
         Query query = Query.query(Criteria.where("metadata.projectId").is(projectId));
-        GridFSFindIterable gridFSFiles = gridFsTemplate.find(query);
+        GridFSFindIterable gridFsFiles = gridFsTemplate.find(query);
         List<GridFSFile> list = new ArrayList<>();
-        return gridFSFiles.into(list);
+        return gridFsFiles.into(list);
     }
 
     @Override
@@ -54,7 +54,6 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
     @Override
     public Boolean updateTestFile(TestFileRequest testFileRequest) throws IOException {
         ObjectId id = testFileRequest.getId();
-        MultipartFile testFile = testFileRequest.getTestFile();
         Query query = new Query();
         ID.is(id).ifPresent(query::addCriteria);
         GridFSFile gridFsFile = gridFsTemplate.findOne(query);
@@ -62,6 +61,7 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
             throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "TestFile", id.toString());
         }
         gridFsTemplate.delete(query);
+        MultipartFile testFile = testFileRequest.getTestFile();
         GridFsUpload<ObjectId> gridFsUpload = GridFsUpload.fromStream(testFile.getInputStream())
             .id(id).contentType(Objects.requireNonNull(testFile.getContentType()))
             .filename(Objects.requireNonNull(testFile.getOriginalFilename()))
