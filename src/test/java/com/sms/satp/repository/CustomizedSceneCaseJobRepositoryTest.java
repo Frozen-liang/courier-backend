@@ -1,6 +1,7 @@
 package com.sms.satp.repository;
 
 import com.sms.satp.dto.PageDto;
+import com.sms.satp.dto.request.SceneCaseJobRequest;
 import com.sms.satp.entity.job.SceneCaseJob;
 import com.sms.satp.repository.impl.CustomizedSceneCaseJobRepositoryImpl;
 import java.util.List;
@@ -33,8 +34,9 @@ class CustomizedSceneCaseJobRepositoryTest {
         List<SceneCaseJob> sceneCaseJobList = Lists.newArrayList(SceneCaseJob.builder().id(MOCK_ID).build());
         when(mongoTemplate.find(any(Query.class), eq(SceneCaseJob.class))).thenReturn(sceneCaseJobList);
         when(mongoTemplate.count(any(Query.class), eq(SceneCaseJob.class))).thenReturn(COUNT);
-        Page<SceneCaseJob> page = customizedSceneCaseJobRepository.page(MOCK_ID, Lists.newArrayList(MOCK_ID),
-            PageDto.builder().build());
+        SceneCaseJobRequest request =
+            SceneCaseJobRequest.builder().sceneCaseId(MOCK_ID).userIds(Lists.newArrayList(MOCK_ID)).build();
+        Page<SceneCaseJob> page = customizedSceneCaseJobRepository.page(request);
         assertThat(page).isNotNull();
     }
 

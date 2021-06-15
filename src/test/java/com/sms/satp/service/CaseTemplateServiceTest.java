@@ -134,7 +134,8 @@ class CaseTemplateServiceTest {
             .newArrayList(CaseTemplateApi.builder().id(MOCK_ID).build());
         when(caseTemplateApiService.getApiByCaseTemplateId(any(), anyBoolean())).thenReturn(caseTemplateApiDtoList);
         when(caseTemplateApiService.editAll(any())).thenReturn(Boolean.TRUE);
-        Boolean isSuccess = caseTemplateService.edit(UpdateCaseTemplateRequest.builder().removed(Boolean.FALSE).build());
+        Boolean isSuccess = caseTemplateService
+            .edit(UpdateCaseTemplateRequest.builder().removed(Boolean.FALSE).build());
         assertTrue(isSuccess);
     }
 
@@ -151,6 +152,33 @@ class CaseTemplateServiceTest {
         when(caseTemplateRepository.save(any(CaseTemplate.class)))
             .thenThrow(new ApiTestPlatformException(EDIT_CASE_TEMPLATE_ERROR));
         assertThatThrownBy(() -> caseTemplateService.edit(UpdateCaseTemplateRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the batch edit method in the CaseTemplate service")
+    void batchEdit_test() {
+        CaseTemplate caseTemplate = CaseTemplate.builder().id(MOCK_ID).build();
+        Optional<CaseTemplate> optionalSceneCase = Optional
+            .ofNullable(CaseTemplate.builder().removed(Boolean.TRUE).build());
+        when(caseTemplateRepository.findById(any())).thenReturn(optionalSceneCase);
+        when(caseTemplateRepository.save(any(CaseTemplate.class))).thenReturn(caseTemplate);
+        List<CaseTemplateApi> caseTemplateApiDtoList = Lists
+            .newArrayList(CaseTemplateApi.builder().id(MOCK_ID).build());
+        when(caseTemplateApiService.getApiByCaseTemplateId(any(), anyBoolean())).thenReturn(caseTemplateApiDtoList);
+        when(caseTemplateApiService.editAll(any())).thenReturn(Boolean.TRUE);
+        List<CaseTemplate> caseTemplateList = Lists.newArrayList(caseTemplate);
+        Boolean isSuccess = caseTemplateService.batchEdit(caseTemplateList);
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the batch edit method in the CaseTemplate service thrown exception")
+    void batchEdit_test_thrownException() {
+        CaseTemplate caseTemplate = CaseTemplate.builder().id(MOCK_ID).build();
+        when(caseTemplateRepository.findById(any())).thenThrow(new ApiTestPlatformException(EDIT_CASE_TEMPLATE_ERROR));
+        List<CaseTemplate> caseTemplateList = Lists.newArrayList(caseTemplate);
+        assertThatThrownBy(() -> caseTemplateService.batchEdit(caseTemplateList))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 

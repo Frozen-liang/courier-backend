@@ -22,5 +22,5 @@ public class UpdateCaseTemplateRequest {
     private String groupId;
     private String testStatus;
     private List<String> tagIds;
-    private Boolean removed;
+    private boolean removed;
 }

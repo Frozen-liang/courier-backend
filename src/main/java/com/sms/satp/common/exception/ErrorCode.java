@@ -138,7 +138,16 @@ public enum ErrorCode {
     THE_ENVIRONMENT_NOT_EXITS_ERROR("4130", "The Environment no exist!"),
     EXECUTE_API_TEST_CASE_ERROR("4131", "Execute the ApiTestCase error!"),
     GET_API_TEST_CASE_JOB_ERROR("4132", "Failed to get the ApiTestCaseJob!"),
-    THE_PROJECT_EXIST_ERROR("4132", "The project exist! name=%s version=%s"),
+    ADD_SCENE_CASE_GROUP_ERROR("4133", "Failed to add the SceneCaseGroup!"),
+    EDIT_SCENE_CASE_GROUP_ERROR("4134", "Failed to edit the SceneCaseGroup!"),
+    DELETE_SCENE_CASE_GROUP_ERROR("4135", "Failed to delete the SceneCaseGroup!"),
+    GET_SCENE_CASE_GROUP_LIST_ERROR("4136", "Failed to get the SceneCaseGroup list!"),
+    ADD_CASE_TEMPLATE_GROUP_ERROR("4137", "Failed to add the CaseTemplateGroup!"),
+    EDIT_CASE_TEMPLATE_GROUP_ERROR("4138", "Failed to edit the CaseTemplateGroup!"),
+    DELETE_CASE_TEMPLATE_GROUP_ERROR("4139", "Failed to delete the CaseTemplateGroup!"),
+    GET_CASE_TEMPLATE_GROUP_LIST_ERROR("4140", "Failed to get the CaseTemplateGroup list!"),
+    GET_API_GROUP_LIST_ERROR("4141", "Failed to get the ApiGroup list!"),
+    THE_PROJECT_EXIST_ERROR("4142", "The project exist! name=%s version=%s"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

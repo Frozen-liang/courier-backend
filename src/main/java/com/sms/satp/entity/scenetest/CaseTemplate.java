@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -23,8 +25,10 @@ public class CaseTemplate extends BaseEntity {
 
     private String createUserName;
 
+    @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
 
     private List<String> tagIds;
