@@ -55,7 +55,7 @@ class ApiTagMapperTest {
     void dto_to_entity() {
         ApiTagRequest apiTagDto = ApiTagRequest.builder()
             .tagName(TAG_NAME)
-            .tagType(ApiTagType.CASE.getCode())
+            .tagType(ApiTagType.CASE)
             .build();
         ApiTag apiTag = apiTagMapper.toEntity(apiTagDto);
         assertThat(apiTag.getTagName()).isEqualTo(TAG_NAME);

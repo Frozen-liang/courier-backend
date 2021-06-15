@@ -1,6 +1,7 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.common.constant.TimePatternConstant;
+import static com.sms.satp.common.constant.TimePatternConstant.DEFAULT_PATTERN;
+
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.ApiTestCaseJobPageResponse;
@@ -12,13 +13,14 @@ import com.sms.satp.entity.job.ApiTestCaseJob;
 import com.sms.satp.entity.job.common.JobApiTestCase;
 import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
+import com.sms.satp.utils.EnumCommonUtils;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-    unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = ParamInfoMapper.class)
+    unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {EnumCommonUtils.class, ParamInfoMapper.class})
 public interface JobMapper {
 
     JobEnvironment toJobEnvironment(ProjectEnvironment projectEnvironment);
@@ -31,13 +33,9 @@ public interface JobMapper {
 
     TestData toTestDataEntity(TestDataRequest testDataRequest);
 
-    @Mapping(target = "jobStatus",
-        expression = "java(com.sms.satp.utils.EnumCommonUtils.getCode(apiTestCaseJob.getJobStatus()))")
-    @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
-    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
     ApiTestCaseJobResponse toApiTestCaseJobResponse(ApiTestCaseJob apiTestCaseJob);
 
-    @Mapping(target = "testDateTime", source = "createDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
+    @Mapping(target = "testDateTime", source = "createDateTime", dateFormat = DEFAULT_PATTERN)
     @Mapping(target = "testUser", source = "createUserName")
     @Mapping(target = "testReport", source = "apiTestCaseJob.apiTestCase.jobApiTestCase.caseReport")
     ApiTestCaseJobPageResponse toApiTestCaseJobPageResponse(ApiTestCaseJob apiTestCaseJob);

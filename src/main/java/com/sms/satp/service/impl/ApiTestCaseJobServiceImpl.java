@@ -2,6 +2,8 @@ package com.sms.satp.service.impl;
 
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_JOB_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.THE_ENVIRONMENT_NOT_EXITS_ERROR;
+import static com.sms.satp.utils.Assert.notEmpty;
+import static com.sms.satp.utils.Assert.notNull;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseJobPageRequest;
@@ -24,6 +26,7 @@ import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.satp.service.ApiTestCaseJobService;
 import com.sms.satp.service.ApiTestCaseService;
 import com.sms.satp.service.ProjectEnvironmentService;
+import com.sms.satp.utils.Assert;
 import com.sms.satp.utils.ExceptionUtils;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -77,13 +80,13 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
         // getCurrentUserId
         int userId = 1;
         try {
-            String apiTestCaseId = Objects.requireNonNull(apiTestCaseJobRunRequest.getApiTestCaseId());
-            String envId = Objects.requireNonNull(apiTestCaseJobRunRequest.getEnvId());
+            String apiTestCaseId = apiTestCaseJobRunRequest.getApiTestCaseId();
+            String envId = apiTestCaseJobRunRequest.getEnvId();
+            notEmpty(apiTestCaseId, "The ApiTestCaseId must not be empty.");
+            notEmpty(envId, "The EnvId must not be empty.");
             ApiTestCaseResponse apiTestCaseResponse = apiTestCaseService.findById(apiTestCaseId);
             ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(envId);
-            if (Objects.isNull(projectEnvironment)) {
-                throw ExceptionUtils.mpe(THE_ENVIRONMENT_NOT_EXITS_ERROR);
-            }
+            notNull(projectEnvironment, THE_ENVIRONMENT_NOT_EXITS_ERROR);
             ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder()
                 .apiTestCase(
                     JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestCaseResponse)).build())
@@ -94,9 +97,9 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                 JobDataCollection jobDataCollection = jobMapper.toJobDataCollection(dataCollectionRequest);
                 dataCollectionRequest.getDataList().forEach(dataList -> {
                     apiTestCaseJob.setId(null);
-                    apiTestCaseJobRepository.insert(apiTestCaseJob);
                     jobDataCollection.setTestData(jobMapper.toTestDataEntity(dataList));
                     apiTestCaseJob.setDataCollection(jobDataCollection);
+                    apiTestCaseJobRepository.insert(apiTestCaseJob);
                     caseDispatcherService.dispatch(apiTestCaseJob);
                 });
                 return;
@@ -107,8 +110,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             log.error(apiTestPlatEx.getMessage());
             caseDispatcherService.sendMessage(PREFIX + userId, apiTestPlatEx.getMessage());
         } catch (Exception e) {
-            log.error("Execute the ApiTestCase error");
-            e.printStackTrace();
+            log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
             caseDispatcherService.sendMessage(PREFIX + userId, "Execute the ApiTestCase error");
         }
     }

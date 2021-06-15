@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.sms.satp.common.enums.ParamType;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
 import java.util.ArrayList;
@@ -38,10 +39,8 @@ public class ParamInfoRequest {
      *
      * @link ParamType
      */
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The paramType must not be null.")
-    @Range(min = 0, max = 14, groups = {InsertGroup.class,
-        UpdateGroup.class}, message = "The tayType must between 0 and 14.")
-    private Integer paramType;
+
+    private ParamType paramType;
     /**
      * 是否递归引用自己.
      */

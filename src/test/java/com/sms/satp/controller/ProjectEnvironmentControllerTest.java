@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.satp.common.constant.Constants;
+import com.sms.satp.common.enums.ParamType;
 import com.sms.satp.common.response.Response;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.ParamInfoRequest;
@@ -90,7 +91,7 @@ class ProjectEnvironmentControllerTest {
             .projectId(PROJECT_ID)
             .frontUri(FRONT_URI)
             .envName(EVN_NAME)
-            .params(Collections.singletonList(ParamInfoRequest.builder().key("key").paramType(14).build()))
+            .params(Collections.singletonList(ParamInfoRequest.builder().key("key").paramType(ParamType.NUMBER).build()))
             .build();
         when(projectEnvironmentService.add(projectEnvironmentDto)).thenReturn(Boolean.TRUE);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders

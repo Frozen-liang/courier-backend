@@ -4,17 +4,17 @@ import com.sms.satp.entity.job.JobCaseApi;
 import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApiTestCaseJobResponse {
-
-    private String id;
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class ApiTestCaseJobResponse extends BaseResponse {
 
     private JobCaseApi apiTestCase;
 
@@ -30,11 +30,4 @@ public class ApiTestCaseJobResponse {
      */
     private String createUserName;
 
-    private Long createUserId;
-
-    private Long modifyUserId;
-
-    private String createDateTime;
-
-    private String modifyDateTime;
 }

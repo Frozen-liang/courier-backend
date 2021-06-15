@@ -16,6 +16,7 @@
 
 package com.sms.satp.utils;
 
+import com.sms.satp.common.exception.ErrorCode;
 import java.util.Collection;
 import java.util.Map;
 import org.apache.commons.collections4.CollectionUtils;
@@ -45,6 +46,19 @@ public final class Assert {
     }
 
     /**
+     * 断言这个 boolean 为 true.
+     * <p>为 false 则抛出异常</p>
+     *
+     * @param expression boolean 值
+     * @param errorCode  message & code
+     */
+    public static void isTrue(boolean expression, ErrorCode errorCode, Object... params) {
+        if (!expression) {
+            throw ExceptionUtils.mpe(errorCode, params);
+        }
+    }
+
+    /**
      * 断言这个 boolean 为 false.
      * <p>为 true 则抛出异常</p>
      *
@@ -53,6 +67,17 @@ public final class Assert {
      */
     public static void isFalse(boolean expression, String message, Object... params) {
         isTrue(!expression, message, params);
+    }
+
+    /**
+     * 断言这个 boolean 为 false.
+     * <p>为 false 则抛出异常</p>
+     *
+     * @param expression boolean 值
+     * @param errorCode  message & code
+     */
+    public static void isFalse(boolean expression, ErrorCode errorCode, Object... params) {
+        isTrue(!expression, errorCode, params);
     }
 
     /**
@@ -66,6 +91,10 @@ public final class Assert {
         isTrue(object == null, message, params);
     }
 
+    public static void isNull(Object object, ErrorCode errorCode, Object... params) {
+        isTrue(object == null, errorCode, params);
+    }
+
     /**
      * 断言这个 object 不为 null.
      * <p>为 null 则抛异常</p>
@@ -75,6 +104,10 @@ public final class Assert {
      */
     public static void notNull(Object object, String message, Object... params) {
         isTrue(object != null, message, params);
+    }
+
+    public static void notNull(Object object, ErrorCode errorCode, Object... params) {
+        isTrue(object != null, errorCode, params);
     }
 
     /**
@@ -88,6 +121,10 @@ public final class Assert {
         isTrue(StringUtils.isNotBlank(value), message, params);
     }
 
+    public static void notEmpty(String value, ErrorCode errorCode, Object... params) {
+        isTrue(StringUtils.isNotBlank(value), errorCode, params);
+    }
+
     /**
      * 断言这个 collection 不为 empty.
      * <p>为 empty 则抛异常</p>
@@ -97,6 +134,10 @@ public final class Assert {
      */
     public static void notEmpty(Collection<?> collection, String message, Object... params) {
         isTrue(CollectionUtils.isNotEmpty(collection), message, params);
+    }
+
+    public static void notEmpty(Collection<?> collection, ErrorCode errorCode, Object... params) {
+        isTrue(CollectionUtils.isNotEmpty(collection), errorCode, params);
     }
 
     /**
@@ -110,6 +151,10 @@ public final class Assert {
         isTrue(MapUtils.isNotEmpty(map), message, params);
     }
 
+    public static void notEmpty(Map<?, ?> map, ErrorCode errorCode, Object... params) {
+        isTrue(MapUtils.isNotEmpty(map), errorCode, params);
+    }
+
     /**
      * 断言这个 数组 不为 empty.
      * <p>为 empty 则抛异常</p>
@@ -119,5 +164,9 @@ public final class Assert {
      */
     public static void notEmpty(Object[] array, String message, Object... params) {
         isTrue(ArrayUtils.isNotEmpty(array), message, params);
+    }
+
+    public static void notEmpty(Object[] array, ErrorCode errorCode, Object... params) {
+        isTrue(ArrayUtils.isNotEmpty(array), errorCode, params);
     }
 }
