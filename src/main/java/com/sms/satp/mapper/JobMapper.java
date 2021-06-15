@@ -2,6 +2,7 @@ package com.sms.satp.mapper;
 
 import static com.sms.satp.common.constant.TimePatternConstant.DEFAULT_PATTERN;
 
+import com.sms.satp.common.constant.TimePatternConstant;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.ApiTestCaseJobPageResponse;
@@ -16,9 +17,9 @@ import com.sms.satp.entity.job.SceneCaseJob;
 import com.sms.satp.entity.job.common.JobApiTestCase;
 import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
-import com.sms.satp.utils.EnumCommonUtils;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.utils.EnumCommonUtils;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
