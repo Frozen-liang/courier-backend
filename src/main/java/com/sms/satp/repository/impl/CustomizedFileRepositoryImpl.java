@@ -35,12 +35,12 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
 
 
     @Override
+    @SuppressWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
     public List<GridFSFile> list(ObjectId projectId) {
         Query query = Query.query(Criteria.where("metadata.projectId").is(projectId));
         GridFSFindIterable gridFsFiles = gridFsTemplate.find(query);
         List<GridFSFile> list = new ArrayList<>();
-        gridFsFiles.into(list);
-        return list;
+        return gridFsFiles.into(list);
     }
 
     @Override
