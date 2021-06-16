@@ -60,7 +60,7 @@ public class FileController {
     }
 
     @SneakyThrows({IOException.class, IllegalStateException.class})
-    @GetMapping(value = "/download/{id}", produces = APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/download/{id}")
     public void downloadTestFile(@PathVariable("id") String id, HttpServletResponse response) {
         GridFsResource gridFsResource = fileService.downloadTestFile(id);
         String filename = gridFsResource.getFilename();

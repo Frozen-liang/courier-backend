@@ -153,6 +153,7 @@ public enum ErrorCode {
     EDIT_TEST_FILE_ERROR("4145", "Failed to edit the TestFile!"),
     GET_TEST_FILE_LIST_ERROR("4146", "Failed to get the TestFile list!"),
     DOWNLOAD_TEST_FILE_ERROR("4147", "Failed to download the TestFile!"),
+    THE_TEST_FILE_NOT_EXIST_ERROR("4148", "The TestFile not exist! id=%s"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

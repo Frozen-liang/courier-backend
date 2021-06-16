@@ -42,8 +42,6 @@ public class ApiResponse extends BaseResponse {
 
     private Integer apiStatus;
 
-    private boolean removed;
-
     private String preInject;
 
     private String postInject;

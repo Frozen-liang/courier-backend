@@ -21,4 +21,5 @@ public class BaseResponse {
     private LocalDateTime modifyDateTime;
     private Long createUserId;
     private Long modifyUserId;
+    private Boolean removed;
 }

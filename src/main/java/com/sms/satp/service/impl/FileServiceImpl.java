@@ -3,7 +3,9 @@ package com.sms.satp.service.impl;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_TEST_FILE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DOWNLOAD_TEST_FILE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_TEST_FILE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.THE_TEST_FILE_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.UPLOAD_TEST_FILE_ERROR;
+import static com.sms.satp.utils.Assert.notNull;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.TestFileRequest;
@@ -71,9 +73,14 @@ public class FileServiceImpl implements FileService {
     @Override
     public GridFsResource downloadTestFile(String id) {
         try {
-            return customizedFileRepository.downloadTestFile(id);
+            GridFsResource gridFsResource = customizedFileRepository.downloadTestFile(id);
+            notNull(gridFsResource, THE_TEST_FILE_NOT_EXIST_ERROR, id);
+            return gridFsResource;
+        } catch (ApiTestPlatformException apiTestPlatEx) {
+            log.error(apiTestPlatEx.getMessage());
+            throw apiTestPlatEx;
         } catch (Exception e) {
-            log.error("Failed to download the TestFile by id:{}", id.toString());
+            log.error("Failed to download the TestFile by id:{}", id);
             throw ExceptionUtils.mpe(DOWNLOAD_TEST_FILE_ERROR);
         }
     }

@@ -4,6 +4,7 @@ import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class TestFileRequest {
 
     @NotNull(groups = UpdateGroup.class, message = "The id must not be null.")
+    @Null(groups = InsertGroup.class, message = "The id must be null.")
     private ObjectId id;
 
     @NotNull(groups = {InsertGroup.class}, message = "The projectId must not be null.")
