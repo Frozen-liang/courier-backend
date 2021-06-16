@@ -24,6 +24,7 @@ import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.entity.job.ApiTestCaseJob;
 import com.sms.satp.entity.job.ApiTestCaseJobReport;
 import com.sms.satp.entity.job.JobCaseApi;
+import com.sms.satp.entity.job.common.CaseReport;
 import com.sms.satp.entity.job.common.JobApiTestCase;
 import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.mapper.JobMapperImpl;
@@ -100,7 +101,7 @@ class ApiTestCaseJobServiceTest {
     public void handleJobReport_test() {
         when(apiTestCaseJobRepository.findById(any())).thenReturn(Optional.of(apiTestCaseJob));
         when(apiTestCaseJobRepository.save(any(ApiTestCaseJob.class))).thenReturn(apiTestCaseJob);
-        doNothing().when(caseDispatcherService).sendJobReport(anyString(), any());
+        doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(CaseReport.class));
         doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJob.class));
         apiTestCaseJobService.handleJobReport(ApiTestCaseJobReport.builder().jobId(ObjectId.get().toString()).build());
         verify(apiTestCaseJobRepository, times(1)).save(any(ApiTestCaseJob.class));
@@ -144,7 +145,7 @@ class ApiTestCaseJobServiceTest {
         when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
         when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest);
-        doNothing().when(caseDispatcherService).sendJobReport(anyString(), any());
+        doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(CaseReport.class));
         doNothing().when(caseDispatcherService).sendMessage(anyString(), anyString());
         verify(caseDispatcherService, times(1)).sendMessage(anyString(), anyString());
     }

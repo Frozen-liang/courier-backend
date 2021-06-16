@@ -147,7 +147,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    public CaseTemplateApiResponse getSceneCaseApiById(String id) {
+    public CaseTemplateApiResponse getCaseTemplateApiById(String id) {
         try {
             Optional<CaseTemplateApi> sceneCaseApi = caseTemplateApiRepository.findById(id);
             return sceneCaseApi.map(aseTemplateApiMapper::toCaseTemplateApiDto).orElse(null);

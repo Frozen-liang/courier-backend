@@ -11,15 +11,13 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-    unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = ApiTestCaseMapper.class)
+    unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {EnumCommonUtils.class, ApiTestCaseMapper.class})
 public interface SceneCaseApiMapper {
 
     @Mapping(target = "apiTestCase", source = "apiTestCaseRequest")
     SceneCaseApi toSceneCaseApiByUpdateRequest(UpdateSceneCaseApiRequest updateSceneCaseApiRequest);
 
     @Mapping(target = "apiTestCaseResponse", source = "apiTestCase")
-    @Mapping(target = "apiType",
-        expression = "java(sceneCaseApi.getApiType().getCode())")
     SceneCaseApiResponse toSceneCaseApiDto(SceneCaseApi sceneCaseApi);
 
     List<SceneCaseApi> toSceneCaseApiList(List<UpdateSceneCaseApiRequest> sceneCaseApiList);

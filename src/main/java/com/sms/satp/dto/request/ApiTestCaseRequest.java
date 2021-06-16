@@ -15,6 +15,7 @@ import com.sms.satp.entity.api.common.ResponseTimeVerification;
 import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +28,7 @@ import lombok.NoArgsConstructor;
 public class ApiTestCaseRequest {
 
     @NotEmpty(groups = UpdateGroup.class, message = "The id can not be empty")
+    @Null(groups = InsertGroup.class, message = "The id must be null.")
     private String id;
     @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The caseName can not be empty")
     private String caseName;

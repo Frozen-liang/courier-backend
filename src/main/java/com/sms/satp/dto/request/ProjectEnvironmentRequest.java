@@ -7,6 +7,7 @@ import com.sms.satp.entity.env.EnvironmentAuth;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +20,7 @@ import lombok.NoArgsConstructor;
 public class ProjectEnvironmentRequest {
 
     @NotEmpty(groups = UpdateGroup.class, message = "The id cannot be empty.")
+    @Null(groups = InsertGroup.class, message = "The id must be null.")
     private String id;
 
     @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId must not be empty")

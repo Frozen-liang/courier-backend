@@ -119,14 +119,22 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         log.info("SceneCaseService-edit()-params: [SceneCase]={}", updateSceneCaseRequest.toString());
         try {
             SceneCase sceneCase = sceneCaseMapper.toUpdateSceneCase(updateSceneCaseRequest);
-            Optional<SceneCase> optionalSceneCase = sceneCaseRepository.findById(sceneCase.getId());
-            optionalSceneCase.ifPresent(sceneCaseFindById -> {
-                if (!Objects.equals(sceneCase.getRemoved(), sceneCaseFindById.getRemoved())) {
-                    editSceneCaseApiStatus(sceneCase, sceneCaseFindById.getRemoved());
-                    editCaseTemplateStatus(sceneCase, sceneCaseFindById.getRemoved());
-                }
-                sceneCaseRepository.save(sceneCase);
-            });
+            updateSceneCase(sceneCase);
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to edit the SceneCase!", e);
+            throw new ApiTestPlatformException(EDIT_SCENE_CASE_ERROR);
+        }
+    }
+
+    @Override
+    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE, template = "{{#sceneCaseList[0].name}}")
+    public Boolean batchEdit(List<SceneCase> sceneCaseList) {
+        log.info("SceneCaseService-batchEdit()-params: [SceneCase]={}", sceneCaseList.toString());
+        try {
+            for (SceneCase sceneCase : sceneCaseList) {
+                updateSceneCase(sceneCase);
+            }
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to edit the SceneCase!", e);
@@ -208,6 +216,17 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             log.error("Failed to edit the SceneCase conn!", e);
             throw new ApiTestPlatformException(EDIT_SCENE_CASE_CONN_ERROR);
         }
+    }
+
+    private void updateSceneCase(SceneCase sceneCase) {
+        Optional<SceneCase> optionalSceneCase = sceneCaseRepository.findById(sceneCase.getId());
+        optionalSceneCase.ifPresent(sceneCaseFindById -> {
+            if (!Objects.equals(sceneCase.getRemoved(), sceneCaseFindById.getRemoved())) {
+                editSceneCaseApiStatus(sceneCase, sceneCaseFindById.getRemoved());
+                editCaseTemplateStatus(sceneCase, sceneCaseFindById.getRemoved());
+            }
+            sceneCaseRepository.save(sceneCase);
+        });
     }
 
     private void editCaseTemplateStatus(SceneCase sceneCase, Boolean oldRemove) {

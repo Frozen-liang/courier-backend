@@ -197,30 +197,22 @@ class CaseTemplateApiServiceTest {
 
     @Test
     @DisplayName("Test the getCaseTemplateApiById method in the CaseTemplateApi service")
-    void getSceneCaseApiById_test() {
+    void getCaseTemplateApiById_test() {
         CaseTemplateApi caseTemplateApi = CaseTemplateApi.builder().id(MOCK_ID).build();
         Optional<CaseTemplateApi> caseTemplateApiOptional = Optional.ofNullable(caseTemplateApi);
         when(caseTemplateApiRepository.findById(any())).thenReturn(caseTemplateApiOptional);
         CaseTemplateApiResponse caseTemplateApiDto = CaseTemplateApiResponse.builder().build();
         when(caseTemplateApiMapper.toCaseTemplateApiDto(any())).thenReturn(caseTemplateApiDto);
-        CaseTemplateApiResponse dto = caseTemplateApiService.getSceneCaseApiById(MOCK_ID);
+        CaseTemplateApiResponse dto = caseTemplateApiService.getCaseTemplateApiById(MOCK_ID);
         assertThat(dto).isNotNull();
     }
 
     @Test
     @DisplayName("Test the getCaseTemplateApiById method in the CaseTemplateApi service throws exception")
-    void getSceneCaseApiById_testThrowException() {
+    void getCaseTemplateApiById_testThrowException() {
         when(caseTemplateApiRepository.findById(any()))
             .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_API_BY_ID_ERROR));
-        assertThatThrownBy(() -> caseTemplateApiService.getSceneCaseApiById(MOCK_ID));
-    }
-
-    private BatchUpdateCaseTemplateApiRequest getUpdateSortOrder() {
-        return BatchUpdateCaseTemplateApiRequest.builder()
-            .updateCaseTemplateApiRequestList(Lists.newArrayList(UpdateCaseTemplateApiRequest.builder()
-                .caseTemplateId(MOCK_SCENE_CASE_ID)
-                .order(MOCK_ORDER_NUMBER)
-                .build())).build();
+        assertThatThrownBy(() -> caseTemplateApiService.getCaseTemplateApiById(MOCK_ID));
     }
 
     private BatchAddCaseTemplateApiRequest getAddDto() {

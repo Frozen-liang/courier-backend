@@ -28,6 +28,7 @@ public class SceneCase extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
 
     private List<String> tagIds;

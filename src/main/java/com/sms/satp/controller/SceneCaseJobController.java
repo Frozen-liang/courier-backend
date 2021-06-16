@@ -1,17 +1,12 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.dto.PageDto;
-import com.sms.satp.dto.request.AddSceneCaseJobRequest;
-import com.sms.satp.entity.job.SceneCaseJob;
+import com.sms.satp.dto.request.SceneCaseJobRequest;
+import com.sms.satp.dto.response.SceneCaseJobResponse;
 import com.sms.satp.service.SceneCaseJobService;
-import java.util.List;
-import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,19 +20,13 @@ public class SceneCaseJobController {
         this.sceneCaseJobService = sceneCaseJobService;
     }
 
-    @PostMapping
-    public Boolean add(@Valid @RequestBody AddSceneCaseJobRequest request) {
-        return sceneCaseJobService.add(request);
-    }
-
-    @GetMapping("/page/{sceneCaseId}/{userIds}")
-    public Page<SceneCaseJob> page(@PathVariable String sceneCaseId, @PathVariable List<String> userIds,
-        PageDto pageDto) {
-        return sceneCaseJobService.page(sceneCaseId, userIds, pageDto);
+    @GetMapping("/page")
+    public Page<SceneCaseJobResponse> page(SceneCaseJobRequest sceneCaseJobRequest) {
+        return sceneCaseJobService.page(sceneCaseJobRequest);
     }
 
     @GetMapping("/{jobId}")
-    public SceneCaseJob get(@PathVariable String jobId) {
+    public SceneCaseJobResponse get(@PathVariable String jobId) {
         return sceneCaseJobService.get(jobId);
     }
 

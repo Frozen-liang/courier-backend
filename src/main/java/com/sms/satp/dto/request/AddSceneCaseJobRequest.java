@@ -1,6 +1,5 @@
 package com.sms.satp.dto.request;
 
-import com.sms.satp.entity.datacollection.DataCollection;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +20,7 @@ public class AddSceneCaseJobRequest {
 
     private List<String> caseTemplateConnIds;
 
-    private DataCollection dataCollection;
+    private DataCollectionRequest dataCollectionRequest;
 
     private String envId;
 }

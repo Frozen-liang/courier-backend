@@ -17,5 +17,5 @@ public class DataParamRequest {
     @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The key cannot by empty")
     private String key;
 
-    private Object value;
+    private String value;
 }

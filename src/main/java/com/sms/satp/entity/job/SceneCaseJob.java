@@ -1,5 +1,6 @@
 package com.sms.satp.entity.job;
 
+import com.sms.satp.common.enums.JobStatus;
 import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
@@ -39,12 +40,12 @@ public class SceneCaseJob extends BaseEntity {
 
     private JobDataCollection dataCollection;
 
-    private Long countRunTime;
-
     /**
      * 测试人员.
      */
     private String createUserName;
 
-    private Integer jobStatus;
+    private JobStatus jobStatus;
+
+    private String message;
 }
