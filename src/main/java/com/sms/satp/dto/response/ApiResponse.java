@@ -18,7 +18,11 @@ public class ApiResponse extends BaseResponse {
 
     private String groupName;
 
+    private String groupId;
+
     private List<String> tagName;
+
+    private List<String> tagId;
 
     private String apiName;
 
