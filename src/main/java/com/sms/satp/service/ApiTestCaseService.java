@@ -1,5 +1,6 @@
 package com.sms.satp.service;
 
+import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import java.util.List;
@@ -16,4 +17,5 @@ public interface ApiTestCaseService {
 
     Boolean delete(List<String> ids);
 
+    void updateApiTestCaseStatusByApiId(List<String> apiIds, ApiBindingStatus status);
 }

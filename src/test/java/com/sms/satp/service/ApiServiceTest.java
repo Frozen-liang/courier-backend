@@ -33,6 +33,7 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 
 @DisplayName("Tests for ApiService")
@@ -43,12 +44,13 @@ class ApiServiceTest {
     private final ProjectEntityRepository projectEntityRepository = mock(ProjectEntityRepository.class);
     private final ApiHistoryRepository apiHistoryRepository = mock(ApiHistoryRepository.class);
     private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
+    private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final ApiGroupRepository apiGroupRepository = mock(ApiGroupRepository.class);
     private final ApiHistoryMapper apiHistoryMapper = mock(ApiHistoryMapper.class);
     private final ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
     private final ApiService apiService = new ApiServiceImpl(
         apiRepository, apiHistoryRepository, apiMapper, apiHistoryMapper, customizedApiRepository, apiGroupRepository,
-        projectImportFlowRepository);
+        projectImportFlowRepository, applicationEventPublisher);
     private final ApiEntity api = ApiEntity.builder().id(ID).build();
     private final ApiResponse apiResponseDto = ApiResponse.builder().id(ID).build();
     private final ApiRequest apiRequestDto = ApiRequest.builder().id(ID).build();

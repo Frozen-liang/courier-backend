@@ -17,10 +17,12 @@ import com.sms.satp.common.enums.DocumentFileType;
 import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.enums.ImportStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.common.listener.event.ApiDeleteEvent;
 import com.sms.satp.dto.request.ApiImportRequest;
 import com.sms.satp.dto.request.ApiPageRequest;
 import com.sms.satp.dto.request.ApiRequest;
 import com.sms.satp.dto.response.ApiResponse;
+import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
 import com.sms.satp.entity.group.ApiGroupEntity;
@@ -56,6 +58,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -72,11 +75,13 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
     private final ApiGroupRepository apiGroupRepository;
     private final ProjectImportFlowRepository projectImportFlowRepository;
     private ApplicationContext applicationContext;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public ApiServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository, ApiMapper apiMapper,
         ApiHistoryMapper apiHistoryMapper, CustomizedApiRepository customizedApiRepository,
         ApiGroupRepository apiGroupRepository,
-        ProjectImportFlowRepository projectImportFlowRepository) {
+        ProjectImportFlowRepository projectImportFlowRepository,
+        ApplicationEventPublisher applicationEventPublisher) {
         this.apiRepository = apiRepository;
         this.apiHistoryRepository = apiHistoryRepository;
         this.apiMapper = apiMapper;
@@ -84,6 +89,7 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
         this.customizedApiRepository = customizedApiRepository;
         this.apiGroupRepository = apiGroupRepository;
         this.projectImportFlowRepository = projectImportFlowRepository;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @SneakyThrows
@@ -174,6 +180,8 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
         log.info("Remove expired API=[{}]",
             invalidApiEntities.stream().map(ApiEntity::getApiPath).collect(Collectors.joining(",")));
         apiRepository.deleteAll(invalidApiEntities);
+        applicationEventPublisher.publishEvent(new ApiDeleteEvent(this,
+            invalidApiEntities.stream().map(BaseEntity::getId).collect(Collectors.toList())));
     }
 
     private boolean isAllCheckPass(ProjectImportFlowEntity projectImportFlowEntity, List<ApiEntity> apiEntities,

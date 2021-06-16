@@ -23,6 +23,7 @@ public class ApiTestCaseResponse extends BaseResponse {
     private String description;
     private String apiPath;
     private Integer apiProtocol;
+    private Integer status;
     private Integer requestMethod;
     private Integer apiRequestParamType;
     private List<ParamInfoResponse> requestHeaders;

@@ -18,7 +18,6 @@ public class SceneCaseApiResponse {
     private String shell;
     private Integer order;
     private Boolean removed;
-    private Integer apiBindingStatus;
     private ApiTestCaseResponse apiTestCaseResponse;
     private Long createUserId;
     private LocalDateTime createDateTime;

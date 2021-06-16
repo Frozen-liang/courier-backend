@@ -20,8 +20,6 @@ public interface SceneCaseApiMapper {
     @Mapping(target = "apiTestCaseResponse", source = "apiTestCase")
     @Mapping(target = "apiType",
         expression = "java(sceneCaseApi.getApiType().getCode())")
-    @Mapping(target = "apiBindingStatus",
-        expression = "java(sceneCaseApi.getApiBindingStatus().getCode())")
     SceneCaseApiResponse toSceneCaseApiDto(SceneCaseApi sceneCaseApi);
 
     List<SceneCaseApi> toSceneCaseApiList(List<UpdateSceneCaseApiRequest> sceneCaseApiList);

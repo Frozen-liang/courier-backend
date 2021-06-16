@@ -9,10 +9,14 @@ import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_LIST_ERR
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
@@ -20,6 +24,7 @@ import com.sms.satp.entity.apitestcase.ApiTestCase;
 import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CustomizedApiTestCaseRepository;
 import com.sms.satp.service.impl.ApiTestCaseServiceImpl;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,11 +39,11 @@ import org.springframework.data.domain.Sort;
 class ApiTestCaseServiceTest {
 
     private final ApiTestCaseRepository apiTestCaseRepository = mock(ApiTestCaseRepository.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(
-        CommonDeleteRepository.class);
+    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository = mock(
+        CustomizedApiTestCaseRepository.class);
     private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
     private final ApiTestCaseService apiTestCaseService = new ApiTestCaseServiceImpl(
-        apiTestCaseRepository, commonDeleteRepository, apiTestCaseMapper);
+        apiTestCaseRepository, customizedApiTestCaseRepository, apiTestCaseMapper);
     private final ApiTestCase apiTestCase = ApiTestCase.builder().id(ID).build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
         .id(ID).build();
@@ -145,7 +150,7 @@ class ApiTestCaseServiceTest {
     @DisplayName("Test the delete method in the ApiTestCase service")
     public void delete_test() {
         List<String> ids = Collections.singletonList(ID);
-        when(commonDeleteRepository.deleteByIds(ids, ApiTestCase.class)).thenReturn(Boolean.TRUE);
+        when(customizedApiTestCaseRepository.deleteByIds(ids)).thenReturn(Boolean.TRUE);
         assertThat(apiTestCaseService.delete(Collections.singletonList(ID))).isTrue();
     }
 
@@ -153,11 +158,19 @@ class ApiTestCaseServiceTest {
     @DisplayName("An exception occurred while delete ApiTestCase")
     public void delete_exception_test() {
         List<String> ids = Collections.singletonList(ID);
-        doThrow(new RuntimeException()).when(commonDeleteRepository)
-            .deleteByIds(ids, ApiTestCase.class);
+        doThrow(new RuntimeException()).when(customizedApiTestCaseRepository)
+            .deleteByIds(ids);
         assertThatThrownBy(() -> apiTestCaseService.delete(ids))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_API_TEST_CASE_BY_ID_ERROR.getCode());
     }
 
+    @Test
+    @DisplayName("Test the updateApiTestCaseStatusByApiId method in the ApiTestCase service")
+    public void updateApiTestCaseStatusByApiId_test() {
+        doNothing().when(customizedApiTestCaseRepository).updateApiTestCaseStatusByApiId(any(), any());
+        apiTestCaseService.updateApiTestCaseStatusByApiId(Collections.singletonList(ObjectId.get().toString()),
+            ApiBindingStatus.BINDING);
+        verify(customizedApiTestCaseRepository, times(1)).updateApiTestCaseStatusByApiId(any(), any());
+    }
 }

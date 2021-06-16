@@ -12,13 +12,14 @@ import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
 import static com.sms.satp.utils.Assert.isTrue;
 
+import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
 import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.repository.ApiTestCaseRepository;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CustomizedApiTestCaseRepository;
 import com.sms.satp.service.ApiTestCaseService;
 import com.sms.satp.utils.ExceptionUtils;
 import java.util.List;
@@ -35,14 +36,14 @@ import org.springframework.stereotype.Service;
 public class ApiTestCaseServiceImpl implements ApiTestCaseService {
 
     private final ApiTestCaseRepository apiTestCaseRepository;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository;
     private final ApiTestCaseMapper apiTestCaseMapper;
 
     public ApiTestCaseServiceImpl(ApiTestCaseRepository apiTestCaseRepository,
-        CommonDeleteRepository commonDeleteRepository,
+        CustomizedApiTestCaseRepository customizedApiTestCaseRepository,
         ApiTestCaseMapper apiTestCaseMapper) {
         this.apiTestCaseRepository = apiTestCaseRepository;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.customizedApiTestCaseRepository = customizedApiTestCaseRepository;
         this.apiTestCaseMapper = apiTestCaseMapper;
     }
 
@@ -105,11 +106,17 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     @Override
     public Boolean delete(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, ApiTestCase.class);
+            return customizedApiTestCaseRepository.deleteByIds(ids);
         } catch (Exception e) {
             log.error("Failed to delete the ApiTestCase!", e);
             throw new ApiTestPlatformException(DELETE_API_TEST_CASE_BY_ID_ERROR);
         }
+    }
+
+    @Override
+    public void updateApiTestCaseStatusByApiId(List<String> apiIds, ApiBindingStatus status) {
+        log.info("Update ApiTestCase's status to {},apiIds = {}", status.getCode(), apiIds);
+        customizedApiTestCaseRepository.updateApiTestCaseStatusByApiId(apiIds, status);
     }
 
 }

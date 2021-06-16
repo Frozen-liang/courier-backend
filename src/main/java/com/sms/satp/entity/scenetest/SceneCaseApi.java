@@ -35,10 +35,5 @@ public class SceneCaseApi extends BaseEntity {
 
     private Integer order;
 
-    /**
-     * API绑定状态.
-     */
-    private ApiBindingStatus apiBindingStatus;
-
     private ApiTestCase apiTestCase;
 }

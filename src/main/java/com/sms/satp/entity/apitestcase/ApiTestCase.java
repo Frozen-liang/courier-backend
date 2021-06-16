@@ -1,5 +1,6 @@
 package com.sms.satp.entity.apitestcase;
 
+import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
@@ -40,6 +41,8 @@ public class ApiTestCase extends BaseEntity {
     private String projectId;
 
     private List<String> tagIds;
+
+    private ApiBindingStatus status;
 
     private String apiName;
 
