@@ -36,4 +36,6 @@ public class Constants {
     public static final String SCENE_CASE_GROUP_PATH = SDK_VERSION + "/scene-case-group";
     public static final String CASE_TEMPLATE_GROUP_PATH = SDK_VERSION + "/case-template-group";
     public static final String API_GROUP_PATH = SDK_VERSION + "/api-group";
+    public static final String FILE_PATH = SDK_VERSION + "/file";
+
 }

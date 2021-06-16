@@ -1,5 +1,6 @@
 package com.sms.satp.entity.env;
 
+import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.api.common.HeaderInfo;
 import com.sms.satp.entity.api.common.ParamInfo;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 @Data
 @SuperBuilder
@@ -21,6 +24,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "GlobalEnvironment")
 public class GlobalEnvironment extends BaseEntity {
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String workspaceId;
     private String envName;
     private String envDesc;
     private String frontUri;
@@ -30,7 +35,8 @@ public class GlobalEnvironment extends BaseEntity {
     private String globalBeforeProcess;
     private String globalAfterProcess;
     private List<HeaderInfo> headers;
-    private List<ParamInfo> params;
+    private List<ParamInfo> envVariable;
     private List<ParamInfo> urlParams;
-    private List<ParamInfo> additionalParams;
+    private ApiRequestParamType requestParamType;
+    private List<ParamInfo> requestParams;
 }

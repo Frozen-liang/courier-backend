@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class DataParam {
 
     private String key;
-    private Object value;
+    private String value;
 }

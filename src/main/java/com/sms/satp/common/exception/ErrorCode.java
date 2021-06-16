@@ -148,6 +148,12 @@ public enum ErrorCode {
     GET_CASE_TEMPLATE_GROUP_LIST_ERROR("4140", "Failed to get the CaseTemplateGroup list!"),
     GET_API_GROUP_LIST_ERROR("4141", "Failed to get the ApiGroup list!"),
     THE_PROJECT_EXIST_ERROR("4142", "The project exist! name=%s version=%s"),
+    UPLOAD_TEST_FILE_ERROR("4143", "Failed to upload the TestFile!"),
+    DELETE_TEST_FILE_BY_ID_ERROR("4144", "Failed to delete the TestFile!"),
+    EDIT_TEST_FILE_ERROR("4145", "Failed to edit the TestFile!"),
+    GET_TEST_FILE_LIST_ERROR("4146", "Failed to get the TestFile list!"),
+    DOWNLOAD_TEST_FILE_ERROR("4147", "Failed to download the TestFile!"),
+    THE_TEST_FILE_NOT_EXIST_ERROR("4148", "The TestFile not exist! id=%s"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

@@ -18,7 +18,11 @@ public class ApiResponse extends BaseResponse {
 
     private String groupName;
 
+    private String groupId;
+
     private List<String> tagName;
+
+    private List<String> tagId;
 
     private String apiName;
 
@@ -41,8 +45,6 @@ public class ApiResponse extends BaseResponse {
     private List<ParamInfoResponse> responseParams;
 
     private Integer apiStatus;
-
-    private boolean removed;
 
     private String preInject;
 

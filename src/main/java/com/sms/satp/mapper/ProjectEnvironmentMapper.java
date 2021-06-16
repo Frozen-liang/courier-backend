@@ -4,13 +4,14 @@ import com.sms.satp.dto.request.ProjectEnvironmentRequest;
 import com.sms.satp.dto.response.ProjectEnvironmentResponse;
 import com.sms.satp.entity.env.GlobalEnvironment;
 import com.sms.satp.entity.env.ProjectEnvironment;
+import com.sms.satp.utils.EnumCommonUtils;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-    unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = ParamInfoMapper.class)
+    unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {ParamInfoMapper.class, EnumCommonUtils.class})
 public interface ProjectEnvironmentMapper {
 
 

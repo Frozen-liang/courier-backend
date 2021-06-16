@@ -1,5 +1,6 @@
 package com.sms.satp.entity.env;
 
+import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.api.common.HeaderInfo;
 import com.sms.satp.entity.api.common.ParamInfo;
@@ -34,7 +35,8 @@ public class ProjectEnvironment extends BaseEntity {
     private String globalBeforeProcess;
     private String globalAfterProcess;
     private List<HeaderInfo> headers;
-    private List<ParamInfo> params;
+    private List<ParamInfo> envVariable;
     private List<ParamInfo> urlParams;
-    private List<ParamInfo> additionalParams;
+    private ApiRequestParamType requestParamType;
+    private List<ParamInfo> requestParams;
 }
