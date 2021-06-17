@@ -1,6 +1,6 @@
 package com.sms.satp.config;
 
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +19,7 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
 
     @Override
-    @SuppressWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
+    @SuppressFBWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/user").setAllowedOriginPatterns("*").withSockJS();
         registry.addEndpoint("/engine").addInterceptors(new HandshakeInterceptor() {

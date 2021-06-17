@@ -1,7 +1,7 @@
 package com.sms.satp.entity.project;
 
 import com.sms.satp.common.enums.ImportStatus;
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-@SuppressWarnings("EQ_OVERRIDING_EQUALS_NOT_SYMMETRIC")
+@SuppressFBWarnings("EQ_OVERRIDING_EQUALS_NOT_SYMMETRIC")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

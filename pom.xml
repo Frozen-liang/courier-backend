@@ -27,7 +27,7 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <org.projectlombok.version>1.18.20</org.projectlombok.version>
         <groovy.version>3.0.8</groovy.version>
-        <findbugs.version>1.3.7</findbugs.version>
+        <spotbug.version>3.0.1</spotbug.version>
         <sonar.coverage.exclusions>
             **/entity/**.java,
             **/SatpApplication.java,
@@ -161,10 +161,10 @@
         </dependency>
 
         <dependency>
-            <scope>compile</scope>
-            <groupId>net.sourceforge.findbugs</groupId>
-            <artifactId>findbugs</artifactId>
-            <version>${findbugs.version}</version>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${spotbug.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <dependency>

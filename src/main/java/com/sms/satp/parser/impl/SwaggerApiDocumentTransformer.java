@@ -60,6 +60,7 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
     };
     private static final Consumer<ApiGroupEntity> EMPTY_GROUP_CALLBACK = (apiGroupEntity) -> {
     };
+    public static final String DELIMITER = ":";
 
     @Override
 
@@ -120,7 +121,9 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
             .requestMethod(requestMethod)
             .apiName(operation.getSummary())
             .groupId(Objects.requireNonNullElse(operation.getTags(), new ArrayList<String>()).get(0))
-            .swaggerId(operation.getOperationId())
+            .swaggerId(
+                Optional.ofNullable(operation.getOperationId())
+                    .orElse(String.join(DELIMITER, apiPath, requestMethod.name())))
             .apiProtocol(ApiProtocol.HTTPS)
             .apiStatus(ApiStatus.DEVELOP)
             .description(operation.getDescription());
