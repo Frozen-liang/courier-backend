@@ -6,7 +6,6 @@ import com.sms.satp.common.validate.UpdateGroup;
 import com.sms.satp.dto.request.ApiTagRequest;
 import com.sms.satp.dto.response.ApiTagResponse;
 import com.sms.satp.service.ApiTagService;
-import java.util.Collections;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,9 +33,8 @@ public class ApiTagController {
     }
 
     @GetMapping("/list/{projectId}")
-    public List<ApiTagResponse> list(@PathVariable("projectId") String projectId, String tagName,
-        Integer tagType) {
-        return apiTagService.list(projectId, tagName, tagType);
+    public List<ApiTagResponse> list(@PathVariable("projectId") String projectId, String tagName) {
+        return apiTagService.list(projectId, tagName);
     }
 
     @PostMapping

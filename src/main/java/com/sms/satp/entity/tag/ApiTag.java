@@ -1,6 +1,5 @@
 package com.sms.satp.entity.tag;
 
-import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,5 +25,4 @@ public class ApiTag extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
     private String tagName;
-    private ApiTagType tagType;
 }

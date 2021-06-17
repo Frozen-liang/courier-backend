@@ -4,6 +4,7 @@ import com.sms.satp.dto.request.AddSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.utils.EnumCommonUtils;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;

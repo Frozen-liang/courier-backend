@@ -24,7 +24,8 @@ public enum OperationModule implements EnumCommon {
     API_TAG_GROUP(13, "ApiTagGroup"),
     API_GROUP(14, "ApiGroup"),
     SCENE_CASE_GROUP(15, "SceneCaseGroup"),
-    CASE_TEMPLATE_GROUP(16, "CaseTemplateGroup");
+    CASE_TEMPLATE_GROUP(16, "CaseTemplateGroup"),
+    TEST_FILE(17, "TestFile");
 
     private static final Map<Integer, OperationModule> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationModule::getCode, Function.identity()));

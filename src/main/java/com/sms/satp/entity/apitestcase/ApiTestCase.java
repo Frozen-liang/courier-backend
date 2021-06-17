@@ -56,6 +56,8 @@ public class ApiTestCase extends BaseEntity {
 
     private ApiRequestParamType apiRequestParamType;
 
+    private String raw;
+
     private List<ParamInfo> requestHeaders;
     private List<ParamInfo> responseHeaders;
     private List<ParamInfo> pathParams;

@@ -16,7 +16,6 @@ import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
-import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTagRequest;
 import com.sms.satp.dto.response.ApiTagResponse;
@@ -55,10 +54,9 @@ public class ApiTagServiceImpl implements ApiTagService {
     }
 
     @Override
-    public List<ApiTagResponse> list(String projectId, String tagName, Integer tagType) {
+    public List<ApiTagResponse> list(String projectId, String tagName) {
         try {
-            ApiTag apiTag = ApiTag.builder().projectId(projectId).tagName(tagName)
-                .tagType(Objects.nonNull(tagType) ? ApiTagType.getType(tagType) : null).build();
+            ApiTag apiTag = ApiTag.builder().projectId(projectId).tagName(tagName).build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher(TAG_TYPE, ExampleMatcher.GenericPropertyMatchers.exact())

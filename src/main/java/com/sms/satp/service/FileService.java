@@ -17,4 +17,6 @@ public interface FileService {
     Boolean deleteTestFileById(String id);
 
     GridFsResource downloadTestFile(String id);
+
+    FileInfoResponse findById(String id);
 }
