@@ -2,10 +2,9 @@ package com.sms.satp.utils;
 
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.OperationType;
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +41,7 @@ public class SpelUtils {
         return null;
     }
 
-    @SuppressWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public static String getProjectId(EvaluationContext context, LogRecord logRecord, Method method, Object[] args) {
         try {
             Expression expression;

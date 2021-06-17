@@ -1,7 +1,7 @@
 package com.sms.satp.common.mongo.listener;
 
 import com.sms.satp.entity.BaseEntity;
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.context.event.EventListener;
@@ -21,7 +21,7 @@ public class BeforeConvertListener {
     }
 
     @EventListener
-    @SuppressWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public void listener(@NonNull BeforeConvertEvent<BaseEntity> beforeSaveEvent) {
         if (beforeSaveEvent.getSource() instanceof BaseEntity) {
             BaseEntity baseEntity = beforeSaveEvent.getSource();
