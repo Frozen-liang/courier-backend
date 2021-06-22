@@ -20,14 +20,15 @@ import com.sms.satp.entity.job.JobCaseApi;
 import com.sms.satp.entity.job.common.CaseReport;
 import com.sms.satp.entity.job.common.JobApiTestCase;
 import com.sms.satp.entity.job.common.JobDataCollection;
+import com.sms.satp.entity.job.common.JobEnvironment;
 import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.repository.ApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.satp.service.ApiTestCaseJobService;
 import com.sms.satp.service.ApiTestCaseService;
 import com.sms.satp.service.ProjectEnvironmentService;
-import com.sms.satp.utils.Assert;
 import com.sms.satp.utils.ExceptionUtils;
+import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -80,32 +81,35 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
         // getCurrentUserId
         int userId = 1;
         try {
-            String apiTestCaseId = apiTestCaseJobRunRequest.getApiTestCaseId();
+            List<String> apiTestCaseIds = apiTestCaseJobRunRequest.getApiTestCaseIds();
             String envId = apiTestCaseJobRunRequest.getEnvId();
-            notEmpty(apiTestCaseId, "The ApiTestCaseId must not be empty.");
+            notEmpty(apiTestCaseIds, "The ApiTestCaseIds must not be empty.");
             notEmpty(envId, "The EnvId must not be empty.");
-            ApiTestCaseResponse apiTestCaseResponse = apiTestCaseService.findById(apiTestCaseId);
             ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(envId);
             notNull(projectEnvironment, THE_ENVIRONMENT_NOT_EXITS_ERROR);
-            ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder()
-                .apiTestCase(
-                    JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestCaseResponse)).build())
-                .environment(jobMapper.toJobEnvironment(projectEnvironment))
-                .build();
-            if (Objects.nonNull(dataCollectionRequest) && CollectionUtils
-                .isNotEmpty(dataCollectionRequest.getDataList())) {
-                JobDataCollection jobDataCollection = jobMapper.toJobDataCollection(dataCollectionRequest);
-                dataCollectionRequest.getDataList().forEach(dataList -> {
-                    apiTestCaseJob.setId(null);
-                    jobDataCollection.setTestData(jobMapper.toTestDataEntity(dataList));
-                    apiTestCaseJob.setDataCollection(jobDataCollection);
+            JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
+            apiTestCaseIds.forEach((apiTestCaseId) -> {
+                ApiTestCaseResponse apiTestCaseResponse = apiTestCaseService.findById(apiTestCaseId);
+                ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder()
+                    .apiTestCase(
+                        JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestCaseResponse)).build())
+                    .environment(jobEnvironment)
+                    .build();
+                if (Objects.nonNull(dataCollectionRequest) && CollectionUtils
+                    .isNotEmpty(dataCollectionRequest.getDataList())) {
+                    JobDataCollection jobDataCollection = jobMapper.toJobDataCollection(dataCollectionRequest);
+                    dataCollectionRequest.getDataList().forEach(dataList -> {
+                        apiTestCaseJob.setId(null);
+                        jobDataCollection.setTestData(jobMapper.toTestDataEntity(dataList));
+                        apiTestCaseJob.setDataCollection(jobDataCollection);
+                        apiTestCaseJobRepository.insert(apiTestCaseJob);
+                        caseDispatcherService.dispatch(apiTestCaseJob);
+                    });
+                } else {
                     apiTestCaseJobRepository.insert(apiTestCaseJob);
                     caseDispatcherService.dispatch(apiTestCaseJob);
-                });
-                return;
-            }
-            apiTestCaseJobRepository.insert(apiTestCaseJob);
-            caseDispatcherService.dispatch(apiTestCaseJob);
+                }
+            });
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
             caseDispatcherService.sendMessage(PREFIX + userId, apiTestPlatEx.getMessage());

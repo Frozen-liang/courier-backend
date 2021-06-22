@@ -91,7 +91,7 @@ class ProjectEnvironmentControllerTest {
             .projectId(PROJECT_ID)
             .frontUri(FRONT_URI)
             .envName(EVN_NAME)
-            .params(Collections.singletonList(ParamInfoRequest.builder().key("key").paramType(ParamType.NUMBER).build()))
+            .envVariable(Collections.singletonList(ParamInfoRequest.builder().key("key").paramType(ParamType.NUMBER).build()))
             .build();
         when(projectEnvironmentService.add(projectEnvironmentDto)).thenReturn(Boolean.TRUE);
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders

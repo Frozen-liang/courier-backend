@@ -8,7 +8,7 @@ public interface ApiTagService {
 
     ApiTagResponse findById(String id);
 
-    List<ApiTagResponse> list(String projectId, String tagName);
+    List<ApiTagResponse> list(String projectId, String groupId, String tagName);
 
     Boolean add(ApiTagRequest apiTagRequest);
 

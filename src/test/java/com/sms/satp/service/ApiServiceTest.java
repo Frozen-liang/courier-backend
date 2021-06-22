@@ -59,8 +59,7 @@ class ApiServiceTest {
     @Test
     @DisplayName("Test the findById method in the Api service")
     public void findById_test() {
-        when(apiRepository.findById(ID)).thenReturn(Optional.of(api));
-        when(apiMapper.toDto(api)).thenReturn(apiResponseDto);
+        when(customizedApiRepository.findById(ID)).thenReturn(Optional.of(apiResponseDto));
         ApiResponse result1 = apiService.findById(ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);

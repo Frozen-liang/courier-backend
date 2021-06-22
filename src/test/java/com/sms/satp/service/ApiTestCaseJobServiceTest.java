@@ -60,12 +60,12 @@ class ApiTestCaseJobServiceTest {
         TestDataRequest.builder().dataName("test")
             .data(List.of(DataParamRequest.builder().key("key").value("value").build())).build();
     private final ApiTestCaseJobRunRequest apiTestCaseJobRunRequest =
-        ApiTestCaseJobRunRequest.builder().apiTestCaseId(ObjectId.get().toString()).envId(ObjectId.get().toString())
+        ApiTestCaseJobRunRequest.builder().apiTestCaseIds(Collections.singletonList(ObjectId.get().toString())).envId(ObjectId.get().toString())
             .dataCollectionRequest(
                 DataCollectionRequest.builder().collectionName("test")
                     .dataList(Collections.singletonList(testDataRequest)).build()).build();
     private final ApiTestCaseJobRunRequest apiTestCaseJobRunRequest2 =
-        ApiTestCaseJobRunRequest.builder().apiTestCaseId(ObjectId.get().toString()).envId(ObjectId.get().toString())
+        ApiTestCaseJobRunRequest.builder().apiTestCaseIds(Collections.singletonList(ObjectId.get().toString())).envId(ObjectId.get().toString())
             .build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
         .id(ID).build();

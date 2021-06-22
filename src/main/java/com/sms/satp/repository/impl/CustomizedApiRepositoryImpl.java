@@ -1,5 +1,7 @@
 package com.sms.satp.repository.impl;
 
+import static com.sms.satp.common.enums.OperationModule.API_GROUP;
+import static com.sms.satp.common.enums.OperationModule.API_TAG;
 import static com.sms.satp.common.field.ApiFiled.API_PROTOCOL;
 import static com.sms.satp.common.field.ApiFiled.API_REQUEST_PARAM_TYPE;
 import static com.sms.satp.common.field.ApiFiled.API_STATUS;
@@ -16,8 +18,11 @@ import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.utils.PageDtoConverter;
+import io.vavr.control.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -44,21 +49,27 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
 
 
     @Override
+    public Optional<ApiResponse> findById(String id) {
+        List<AggregationOperation> aggregationOperations = new ArrayList<>();
+        createLookUpOperation(aggregationOperations);
+        ProjectionOperation projectionOperation = Aggregation.project(ApiResponse.class);
+        projectionOperation = projectionOperation.and("apiTag.tagName").as("tagName");
+        projectionOperation = projectionOperation.and("apiGroup.name").as("groupName");
+        aggregationOperations.add(projectionOperation);
+        aggregationOperations.add(Aggregation.match(Criteria.where(ID.getFiled()).is(id)));
+        Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
+        List<ApiResponse> records = mongoTemplate.aggregate(aggregation, ApiEntity.class, ApiResponse.class)
+            .getMappedResults();
+        return records.size() > 0 ? Optional.of(records.get(0)) : Optional.empty();
+    }
+
+    @Override
     public Page<ApiResponse> page(ApiPageRequest apiPageRequest) {
         PageDtoConverter.frontMapping(apiPageRequest);
-        ArrayList<AggregationOperation> aggregationOperations = new ArrayList<>();
+        List<AggregationOperation> aggregationOperations = new ArrayList<>();
         Query query = new Query();
 
-        LookupOperation apiTagLookupOperation =
-            LookupOperation.newLookup().from("ApiTag").localField(TAG_ID.getFiled())
-                .foreignField(ID.getFiled())
-                .as("apiTag");
-        LookupOperation apiGroupLookupOperation =
-            LookupOperation.newLookup().from("ApiGroup").localField(GROUP_ID.getFiled())
-                .foreignField(ID.getFiled())
-                .as("apiGroup");
-        aggregationOperations.add(apiTagLookupOperation);
-        aggregationOperations.add(apiGroupLookupOperation);
+        createLookUpOperation(aggregationOperations);
 
         buildCriteria(apiPageRequest, query, aggregationOperations);
 
@@ -93,6 +104,19 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
     @Override
     public Boolean deleteByIds(List<String> ids) {
         return commonDeleteRepository.deleteByIds(ids, ApiEntity.class);
+    }
+
+    private void createLookUpOperation(List<AggregationOperation> aggregationOperations) {
+        LookupOperation apiTagLookupOperation =
+            LookupOperation.newLookup().from(API_TAG.getCollectionName()).localField(TAG_ID.getFiled())
+                .foreignField(ID.getFiled())
+                .as("apiTag");
+        LookupOperation apiGroupLookupOperation =
+            LookupOperation.newLookup().from(API_GROUP.getCollectionName()).localField(GROUP_ID.getFiled())
+                .foreignField(ID.getFiled())
+                .as("apiGroup");
+        aggregationOperations.add(apiTagLookupOperation);
+        aggregationOperations.add(apiGroupLookupOperation);
     }
 
     private void buildCriteria(ApiPageRequest apiPageRequest, Query query,

@@ -46,7 +46,7 @@ class ApiTagServiceTest {
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String PROJECT_ID = "10";
     private static final String TAG_NAME = "testName";
-    private static final Integer TAG_TYPE = 1;
+    private static final String GROUP_ID = ObjectId.get().toString();
 
     @Test
     @DisplayName("Test the findById method in the ApiTag service")
@@ -129,7 +129,7 @@ class ApiTagServiceTest {
         }
         when(apiTagRepository.findAll(any(), any(Sort.class))).thenReturn(list);
         when(apiTagMapper.toDtoList(list)).thenReturn(apiTagDtos);
-        List<ApiTagResponse> result = apiTagService.list(PROJECT_ID, TAG_NAME);
+        List<ApiTagResponse> result = apiTagService.list(PROJECT_ID, GROUP_ID, TAG_NAME);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -137,7 +137,7 @@ class ApiTagServiceTest {
     @DisplayName("An exception occurred while getting ApiTag list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(apiTagRepository).findAll(any(), any(Sort.class));
-        assertThatThrownBy(() -> apiTagService.list(PROJECT_ID, TAG_NAME))
+        assertThatThrownBy(() -> apiTagService.list(PROJECT_ID, GROUP_ID, TAG_NAME))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_TAG_LIST_ERROR.getCode());
     }

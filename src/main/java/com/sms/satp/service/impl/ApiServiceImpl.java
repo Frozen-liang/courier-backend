@@ -207,8 +207,7 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
 
     @Override
     public ApiResponse findById(String id) {
-        return apiRepository.findById(id).map(apiMapper::toDto)
-            .orElseThrow(() -> ExceptionUtils.mpe(GET_API_BY_ID_ERROR));
+        return customizedApiRepository.findById(id).orElseThrow(() -> ExceptionUtils.mpe(GET_API_BY_ID_ERROR));
     }
 
     @Override

@@ -33,8 +33,8 @@ public class ApiTagController {
     }
 
     @GetMapping("/list/{projectId}")
-    public List<ApiTagResponse> list(@PathVariable("projectId") String projectId, String tagName) {
-        return apiTagService.list(projectId, tagName);
+    public List<ApiTagResponse> list(@PathVariable("projectId") String projectId, String groupId, String tagName) {
+        return apiTagService.list(projectId, groupId, tagName);
     }
 
     @PostMapping

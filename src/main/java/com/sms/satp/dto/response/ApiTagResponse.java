@@ -15,6 +15,7 @@ public class ApiTagResponse extends BaseResponse {
 
     private String projectId;
     private String groupId;
+    private String groupName;
     private String tagName;
     private Integer tagType;
 

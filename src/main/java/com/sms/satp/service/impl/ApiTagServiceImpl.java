@@ -54,9 +54,9 @@ public class ApiTagServiceImpl implements ApiTagService {
     }
 
     @Override
-    public List<ApiTagResponse> list(String projectId, String tagName) {
+    public List<ApiTagResponse> list(String projectId, String groupId, String tagName) {
         try {
-            ApiTag apiTag = ApiTag.builder().projectId(projectId).tagName(tagName).build();
+            ApiTag apiTag = ApiTag.builder().projectId(projectId).groupId(groupId).tagName(tagName).build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher(TAG_TYPE, ExampleMatcher.GenericPropertyMatchers.exact())
