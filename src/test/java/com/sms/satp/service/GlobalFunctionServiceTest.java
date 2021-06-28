@@ -50,6 +50,7 @@ class GlobalFunctionServiceTest {
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String FUNCTION_NAME = "functionName";
     private static final String FUNCTION_DESC = "functionDesc";
+    private static final String WORKSPACE_ID = ObjectId.get().toString();
 
     @Test
     @DisplayName("Test the findById method in the GlobalFunction service")
@@ -131,7 +132,7 @@ class GlobalFunctionServiceTest {
         }
         when(globalFunctionRepository.findAll(any(), any(Sort.class))).thenReturn(list);
         when(globalFunctionMapper.toDtoList(list)).thenReturn(globalEnvironmentDtos);
-        List<GlobalFunctionResponse> result = globalFunctionService.list(FUNCTION_NAME, FUNCTION_DESC);
+        List<GlobalFunctionResponse> result = globalFunctionService.list(WORKSPACE_ID, FUNCTION_NAME, FUNCTION_DESC);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -140,7 +141,7 @@ class GlobalFunctionServiceTest {
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(globalFunctionRepository)
             .findAll(any(), any(Sort.class));
-        assertThatThrownBy(() -> globalFunctionService.list(FUNCTION_NAME, FUNCTION_DESC))
+        assertThatThrownBy(() -> globalFunctionService.list(WORKSPACE_ID, FUNCTION_NAME, FUNCTION_DESC))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_GLOBAL_FUNCTION_LIST_ERROR.getCode());
     }

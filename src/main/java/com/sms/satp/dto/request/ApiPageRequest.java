@@ -26,8 +26,6 @@ public class ApiPageRequest extends PageDto {
 
     private List<Integer> requestMethod;
 
-    private List<Integer> apiRequestParamType;
-
     private List<Integer> apiStatus;
 
 }

@@ -10,7 +10,7 @@ import org.springframework.lang.Nullable;
 public enum OperationModule implements EnumCommon {
     PROJECT(0, "Project"),
     API(1, "Api"),
-    API_CASE(2, "ApiCase"),
+    API_TEST_CASE(2, "ApiTestCase"),
     SCENE_CASE(3, "SceneCase"),
     SCENE_CASE_API(4, "SceneCaseApi"),
     CASE_TEMPLATE_API(5, "CaseTemplateApi"),

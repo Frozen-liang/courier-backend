@@ -29,12 +29,8 @@ public class DataCollectionRequest {
     @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The collectionName cannot be empty")
     private String collectionName;
 
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The paramList cannot be null")
-    @Size(min = 1, groups = {InsertGroup.class, UpdateGroup.class}, message = "The paramList cannot be empty")
     private List<String> paramList;
 
     @Valid
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The dataList cannot be null")
-    @Size(min = 1, groups = {InsertGroup.class, UpdateGroup.class}, message = "The dataList cannot be empty")
     private List<TestDataRequest> dataList;
 }

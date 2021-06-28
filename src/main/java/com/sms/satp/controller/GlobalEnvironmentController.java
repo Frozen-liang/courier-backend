@@ -42,9 +42,9 @@ public class GlobalEnvironmentController {
         return globalEnvironmentService.edit(globalEnvironmentRequest);
     }
 
-    @GetMapping("/list")
-    public List<GlobalEnvironmentResponse> list() {
-        return globalEnvironmentService.list();
+    @GetMapping("/list/{workspaceId}")
+    public List<GlobalEnvironmentResponse> list(@PathVariable String workspaceId) {
+        return globalEnvironmentService.list(workspaceId);
     }
 
     @DeleteMapping("/{ids}")

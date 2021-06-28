@@ -15,7 +15,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.dto.request.ApiTagListRequest;
 import com.sms.satp.dto.request.ApiTagRequest;
 import com.sms.satp.dto.response.ApiTagResponse;
 import com.sms.satp.entity.tag.ApiTag;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,16 +40,16 @@ class ApiTagServiceTest {
 
     private final ApiTagRepository apiTagRepository = mock(ApiTagRepository.class);
     private final ApiTagMapper apiTagMapper = mock(ApiTagMapper.class);
+    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
     private final ApiTagService apiTagService = new ApiTagServiceImpl(
-        apiTagRepository, apiTagMapper);
+        apiTagRepository, commonDeleteRepository, apiTagMapper);
     private final ApiTag apiTag = ApiTag.builder().id(ID).build();
     private final ApiTagResponse apiTagResponse = ApiTagResponse.builder().id(ID).build();
     private final ApiTagRequest apiTagRequest = ApiTagRequest.builder().id(ID).build();
+    private final ApiTagListRequest apiTagListRequest = ApiTagListRequest.builder().projectId(PROJECT_ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
-    private static final String PROJECT_ID = "10";
-    private static final String TAG_NAME = "testName";
-    private static final String GROUP_ID = ObjectId.get().toString();
+    private static final String PROJECT_ID = ObjectId.get().toString();
 
     @Test
     @DisplayName("Test the findById method in the ApiTag service")
@@ -129,7 +132,7 @@ class ApiTagServiceTest {
         }
         when(apiTagRepository.findAll(any(), any(Sort.class))).thenReturn(list);
         when(apiTagMapper.toDtoList(list)).thenReturn(apiTagDtos);
-        List<ApiTagResponse> result = apiTagService.list(PROJECT_ID, GROUP_ID, TAG_NAME);
+        List<ApiTagResponse> result = apiTagService.list(apiTagListRequest);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -137,7 +140,7 @@ class ApiTagServiceTest {
     @DisplayName("An exception occurred while getting ApiTag list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(apiTagRepository).findAll(any(), any(Sort.class));
-        assertThatThrownBy(() -> apiTagService.list(PROJECT_ID, GROUP_ID, TAG_NAME))
+        assertThatThrownBy(() -> apiTagService.list(apiTagListRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_TAG_LIST_ERROR.getCode());
     }
@@ -145,6 +148,10 @@ class ApiTagServiceTest {
     @Test
     @DisplayName("Test the delete method in the ApiTag service")
     public void delete_test() {
+        when(apiTagRepository.findAllByIdIn(Collections.singletonList(ID)))
+            .thenReturn(Stream.of(ApiTag.builder().tagType(
+                ApiTagType.API).id(ObjectId.get().toString()).build()));
+        when(commonDeleteRepository.removeTags(any(), any(), any())).thenReturn(Boolean.TRUE);
         when(apiTagRepository.deleteAllByIdIsIn(any())).thenReturn(1L);
         assertThat(apiTagService.delete(Collections.singletonList(ID))).isTrue();
     }
@@ -152,7 +159,7 @@ class ApiTagServiceTest {
     @Test
     @DisplayName("An exception occurred while delete ApiTag")
     public void delete_exception_test() {
-        doThrow(new RuntimeException()).when(apiTagRepository).deleteAllByIdIsIn(any());
+        doThrow(new RuntimeException()).when(apiTagRepository).findAllByIdIn(any());
         assertThatThrownBy(() -> apiTagService.delete(Collections.singletonList(ID)))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_API_TAG_BY_ID_ERROR.getCode());

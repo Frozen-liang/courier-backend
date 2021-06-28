@@ -11,6 +11,7 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 @Configuration
@@ -19,8 +20,14 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
 
     @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+        registry.setMessageSizeLimit(65536 * 10);
+    }
+
+    @Override
     @SuppressFBWarnings("SIC_INNER_SHOULD_BE_STATIC_ANON")
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+
         registry.addEndpoint("/user").setAllowedOriginPatterns("*").withSockJS();
         registry.addEndpoint("/engine").addInterceptors(new HandshakeInterceptor() {
             @Override

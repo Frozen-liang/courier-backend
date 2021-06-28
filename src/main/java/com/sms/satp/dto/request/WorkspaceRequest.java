@@ -1,6 +1,5 @@
 package com.sms.satp.dto.request;
 
-import com.sms.satp.common.enums.ProjectType;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
 import javax.validation.constraints.NotEmpty;
@@ -14,18 +13,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectRequest {
+public class WorkspaceRequest {
 
     @NotEmpty(message = "The id must not be empty.", groups = UpdateGroup.class)
     @Null(message = "The id must be null.", groups = InsertGroup.class)
     private String id;
-    @NotEmpty(message = "The name must not be empty.", groups = {UpdateGroup.class, InsertGroup.class})
-    private String workspaceId;
+
     @NotEmpty(message = "The name must not be empty.", groups = {UpdateGroup.class, InsertGroup.class})
     private String name;
-    @NotEmpty(message = "The description must not be empty.", groups = {UpdateGroup.class, InsertGroup.class})
-    private String description;
-    private String version;
-    private ProjectType type;
-
 }

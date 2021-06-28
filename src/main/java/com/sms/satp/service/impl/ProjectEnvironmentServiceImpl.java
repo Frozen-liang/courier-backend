@@ -84,7 +84,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
-    public List<Object> list(String projectId) {
+    public List<Object> list(String projectId, String workspaceId) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
             ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().projectId(projectId).build();
@@ -94,7 +94,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
                 .withMatcher(REMOVE.getFiled(), GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
             Example<ProjectEnvironment> example = Example.of(projectEnvironment, exampleMatcher);
-            List<GlobalEnvironmentResponse> globalEnvironments = globalEnvironmentService.list();
+            List<GlobalEnvironmentResponse> globalEnvironments = globalEnvironmentService.list(workspaceId);
             List<ProjectEnvironment> projectEnvironments = projectEnvironmentRepository.findAll(example, sort);
             result.addAll(globalEnvironments);
             result.addAll(projectEnvironmentMapper.toDtoList(projectEnvironments));

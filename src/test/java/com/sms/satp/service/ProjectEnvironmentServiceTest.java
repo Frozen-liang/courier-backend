@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Example;
@@ -63,6 +64,7 @@ class ProjectEnvironmentServiceTest {
     private final static int DEFAULT_PAGE_SIZE = 10;
     private static final int FRONT_FIRST_NUMBER = 1;
     private final static String ID = "607cebb2fbe52328bf14a2a2";
+    private final static String WORKSPACE_ID = ObjectId.get().toString();
     private static final List<String> ID_LIST = Collections.singletonList(ID);
     private final static String PROJECT_ID = "25";
     private final static String EVN_NAME = "evnName";
@@ -245,18 +247,18 @@ class ProjectEnvironmentServiceTest {
         }
         when(projectEnvironmentRepository.findAll(any(), any(Sort.class))).thenReturn(list);
         when(projectEnvironmentMapper.toDtoList(list)).thenReturn(projectEnvironmentDtos);
-        when(globalEnvironmentService.list())
+        when(globalEnvironmentService.list(WORKSPACE_ID))
             .thenReturn(Collections.singletonList(GlobalEnvironmentResponse.builder().build()));
-        List<Object> result = projectEnvironmentService.list(PROJECT_ID);
+        List<Object> result = projectEnvironmentService.list(PROJECT_ID,WORKSPACE_ID);
         assertThat(result).hasSize(TOTAL_ELEMENTS + 1);
     }
 
     @Test
     @DisplayName("An exception occurred while getting ProjectEnvironment list")
     public void list_exception_test() {
-        when(globalEnvironmentService.list()).thenReturn(null);
+        when(globalEnvironmentService.list(WORKSPACE_ID)).thenReturn(null);
         doThrow(new RuntimeException()).when(projectEnvironmentRepository).findAll(any(), any(Sort.class));
-        assertThatThrownBy(() -> projectEnvironmentService.list(PROJECT_ID))
+        assertThatThrownBy(() -> projectEnvironmentService.list(PROJECT_ID,WORKSPACE_ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_PROJECT_ENVIRONMENT_LIST_ERROR.getCode());
     }

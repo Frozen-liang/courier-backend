@@ -46,6 +46,7 @@ class GlobalEnvironmentServiceTest {
     private final GlobalEnvironmentRequest globalEnvironmentRequest = GlobalEnvironmentRequest
         .builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
+    private static final String WORKSPACE_ID = ObjectId.get().toString();
     private static final List<String> ID_LIST = Collections.singletonList(ID);
     private static final Integer TOTAL_ELEMENTS = 10;
 
@@ -137,9 +138,10 @@ class GlobalEnvironmentServiceTest {
             globalEnvironmentDtos.add(GlobalEnvironmentResponse.builder().build());
         }
 
-        when(globalEnvironmentRepository.findByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE)).thenReturn(list);
+        when(globalEnvironmentRepository.findByRemovedIsFalseAndWorkspaceIdOrderByCreateDateTimeDesc(WORKSPACE_ID))
+            .thenReturn(list);
         when(globalEnvironmentMapper.toDtoList(list)).thenReturn(globalEnvironmentDtos);
-        List<GlobalEnvironmentResponse> result = globalEnvironmentService.list();
+        List<GlobalEnvironmentResponse> result = globalEnvironmentService.list(WORKSPACE_ID);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -147,8 +149,9 @@ class GlobalEnvironmentServiceTest {
     @DisplayName("An exception occurred while getting GlobalEnvironment list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(globalEnvironmentRepository)
-            .findByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE);
-        assertThatThrownBy(globalEnvironmentService::list).isInstanceOf(ApiTestPlatformException.class)
+            .findByRemovedIsFalseAndWorkspaceIdOrderByCreateDateTimeDesc(WORKSPACE_ID);
+        assertThatThrownBy(() -> globalEnvironmentService.list(WORKSPACE_ID))
+            .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_GLOBAL_ENVIRONMENT_LIST_ERROR.getCode());
     }
 

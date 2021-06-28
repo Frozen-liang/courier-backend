@@ -11,15 +11,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class ProjectResponse extends BaseResponse {
+public class WorkspaceResponse extends BaseResponse {
 
     private String name;
-
-    private String workspaceId;
-
-    private String description;
-
-    private String version;
-
-    private Integer type;
 }

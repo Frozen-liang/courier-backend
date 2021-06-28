@@ -77,6 +77,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
 
     @Override
     public void runJob(ApiTestCaseJobRunRequest apiTestCaseJobRunRequest) {
+        long start = System.currentTimeMillis();
         DataCollectionRequest dataCollectionRequest = apiTestCaseJobRunRequest.getDataCollectionRequest();
         // getCurrentUserId
         int userId = 1;
@@ -110,6 +111,8 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                     caseDispatcherService.dispatch(apiTestCaseJob);
                 }
             });
+            log.info("The use case takes {} milliseconds to send data! request:{}",
+                System.currentTimeMillis() - start, apiTestCaseJobRunRequest.toString());
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
             caseDispatcherService.sendMessage(PREFIX + userId, apiTestPlatEx.getMessage());

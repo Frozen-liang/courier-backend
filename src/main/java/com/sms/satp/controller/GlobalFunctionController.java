@@ -33,8 +33,9 @@ public class GlobalFunctionController {
     }
 
     @GetMapping("/list")
-    public List<GlobalFunctionResponse> list(String functionKey, String functionName) {
-        return globalFunctionService.list(functionKey, functionName);
+    public List<GlobalFunctionResponse> list(String workspaceId, String functionKey,
+        String functionName) {
+        return globalFunctionService.list(workspaceId, functionKey, functionName);
     }
 
     @PostMapping

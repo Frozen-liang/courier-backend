@@ -119,6 +119,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
 
     @Override
     public void runJob(AddSceneCaseJobRequest request) {
+        long start = System.currentTimeMillis();
         // getCurrentUserId
         int userId = 1;
         try {
@@ -153,6 +154,8 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                     caseDispatcherService.dispatch(sceneCaseJob);
                 }
             }
+            log.info("The use case takes {} milliseconds to send data! request:{}",
+                System.currentTimeMillis() - start, request.toString());
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
             caseDispatcherService.sendMessage(PREFIX + userId, apiTestPlatEx.getMessage());

@@ -3,6 +3,7 @@ package com.sms.satp.controller;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
+import com.sms.satp.dto.request.ApiTagListRequest;
 import com.sms.satp.dto.request.ApiTagRequest;
 import com.sms.satp.dto.response.ApiTagResponse;
 import com.sms.satp.service.ApiTagService;
@@ -32,9 +33,9 @@ public class ApiTagController {
         return apiTagService.findById(id);
     }
 
-    @GetMapping("/list/{projectId}")
-    public List<ApiTagResponse> list(@PathVariable("projectId") String projectId, String groupId, String tagName) {
-        return apiTagService.list(projectId, groupId, tagName);
+    @GetMapping("/list")
+    public List<ApiTagResponse> list(@Validated ApiTagListRequest apiTagListRequest) {
+        return apiTagService.list(apiTagListRequest);
     }
 
     @PostMapping

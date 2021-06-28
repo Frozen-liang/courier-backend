@@ -15,6 +15,7 @@ import lombok.experimental.SuperBuilder;
 public class ProjectFunctionResponse extends BaseResponse {
 
     private String projectId;
+    private String workspaceId;
     private String functionKey;
     private String functionName;
     private List<ParamInfoResponse> functionParams;

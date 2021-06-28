@@ -14,19 +14,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class ApiTagRequest {
+public class ApiTagListRequest {
 
-    @NotEmpty(groups = UpdateGroup.class, message = "The id cannot be empty.")
-    @Null(groups = InsertGroup.class, message = "The id must be null.")
-    private String id;
-
-    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId cannot be empty.")
+    @NotEmpty(message = "The projectId cannot be empty.")
     private String projectId;
 
     private String groupId;
 
-    private ApiTagType tagType;
+    private Integer tagType;
 
-    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The tagName cannot be empty.")
     private String tagName;
 }

@@ -5,6 +5,7 @@ import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
+import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.enums.DocumentUrlType;
@@ -43,7 +44,7 @@ public class MongoCustomConverterConfiguration {
             .of(EnumCommonToIntegerConverter.INSTANCE, IntegerToApiProtocolConverter.INSTANCE,
                 IntegerToApiRequestParamTypeConverter.INSTANCE, IntegerToApiStatusConverter.INSTANCE,
                 IntegerToParamTypeConverter.INSTANCE, IntegerToRequestMethodConverter.INSTANCE,
-                IntegerToApiJsonTypeConverter.INSTANCE,
+                IntegerToApiTagTypeConverter.INSTANCE, IntegerToApiJsonTypeConverter.INSTANCE,
                 IntegerToSaveModeConverter.INSTANCE, IntegerToDocumentTypeConverter.INSTANCE,
                 IntegerToGroupImportTypeConverter.INSTANCE, IntegerToOperationTypeConverter.INSTANCE,
                 IntegerToOperationModuleConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
@@ -119,6 +120,15 @@ public class MongoCustomConverterConfiguration {
 
         public RequestMethod convert(@NonNull Integer code) {
             return RequestMethod.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToApiTagTypeConverter implements Converter<Integer, ApiTagType> {
+        INSTANCE;
+
+        public ApiTagType convert(@NonNull Integer code) {
+            return ApiTagType.getType(code);
         }
     }
 

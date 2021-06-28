@@ -3,7 +3,6 @@ package com.sms.satp.repository.impl;
 import static com.sms.satp.common.enums.OperationModule.API_GROUP;
 import static com.sms.satp.common.enums.OperationModule.API_TAG;
 import static com.sms.satp.common.field.ApiFiled.API_PROTOCOL;
-import static com.sms.satp.common.field.ApiFiled.API_REQUEST_PARAM_TYPE;
 import static com.sms.satp.common.field.ApiFiled.API_STATUS;
 import static com.sms.satp.common.field.ApiFiled.GROUP_ID;
 import static com.sms.satp.common.field.ApiFiled.REQUEST_METHOD;
@@ -18,10 +17,8 @@ import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.utils.PageDtoConverter;
-import io.vavr.control.Option;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -126,8 +123,6 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         PROJECT_ID.is(apiPageRequest.getProjectId())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         API_PROTOCOL.in(apiPageRequest.getApiProtocol())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        API_REQUEST_PARAM_TYPE.in(apiPageRequest.getApiRequestParamType())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         API_STATUS.in(apiPageRequest.getApiStatus())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));

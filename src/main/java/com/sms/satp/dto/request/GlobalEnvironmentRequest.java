@@ -24,6 +24,7 @@ public class GlobalEnvironmentRequest {
     @Null(groups = InsertGroup.class, message = "The id must be null.")
     private String id;
 
+    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The workspaceId cannot be empty")
     private String workspaceId;
 
     @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The evnName cannot be empty")
