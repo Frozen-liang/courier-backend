@@ -1,6 +1,7 @@
 package com.sms.satp.entity.system;
 
 import com.sms.satp.entity.BaseEntity;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -17,4 +18,5 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class UserGroupEntity extends BaseEntity {
 
     private String name;
+    private List<String> roleIds;
 }

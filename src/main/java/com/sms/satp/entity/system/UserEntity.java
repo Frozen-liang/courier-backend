@@ -38,7 +38,7 @@ public class UserEntity extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private List<String> associatedWorkspaces;
 
-    private boolean enabled;
+    private Boolean enabled;
 
 
 }
