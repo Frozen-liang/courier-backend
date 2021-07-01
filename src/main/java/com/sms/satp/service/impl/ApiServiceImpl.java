@@ -272,6 +272,20 @@ public class ApiServiceImpl implements ApiService, ApplicationContextAware {
     }
 
     @Override
+    public Boolean deleteByIds(List<String> ids) {
+        log.info("Delete api ids:{}.", ids);
+        apiRepository.deleteAllByIdIn(ids);
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public Boolean deleteAll() {
+        log.info("Delete all api when removed is true.");
+        apiRepository.deleteAllByRemovedIsTrue();
+        return Boolean.TRUE;
+    }
+
+    @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }

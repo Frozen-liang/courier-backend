@@ -3,6 +3,7 @@ package com.sms.satp.controller;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.dto.request.AddSceneCaseJobRequest;
 import com.sms.satp.dto.request.ApiTestCaseJobRunRequest;
+import com.sms.satp.dto.request.ApiTestRequest;
 import com.sms.satp.dto.request.CaseRecordRequest;
 import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.request.EngineRegistrationRequest;
@@ -29,6 +30,11 @@ public class ChannelController {
         this.apiTestCaseJobService = apiTestCaseJobService;
         this.sceneCaseJobService = sceneCaseJobService;
         this.engineMemberManagement = engineMemberManagement;
+    }
+
+    @MessageMapping(Constants.SDK_VERSION + "/api-test")
+    public void apiTest(@Payload ApiTestRequest apiTestRequest) {
+        apiTestCaseJobService.apiTest(apiTestRequest);
     }
 
     @MessageMapping(Constants.SDK_VERSION + "/run-job")

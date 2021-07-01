@@ -61,4 +61,14 @@ public class ApiController {
         return apiService.delete(ids);
     }
 
+    @DeleteMapping("/delete/{ids}")
+    public Boolean deleteByIds(@PathVariable List<String> ids) {
+        return apiService.deleteByIds(ids);
+    }
+
+    @DeleteMapping("/deleteAll")
+    public Boolean deleteAll() {
+        return apiService.deleteAll();
+    }
+
 }

@@ -3,6 +3,7 @@ package com.sms.satp.mapper;
 import static com.sms.satp.common.constant.TimePatternConstant.DEFAULT_PATTERN;
 
 import com.sms.satp.common.constant.TimePatternConstant;
+import com.sms.satp.dto.request.ApiTestRequest;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.ApiTestCaseJobPageResponse;
@@ -35,6 +36,8 @@ public interface JobMapper {
     @Mapping(target = "responseHeadersVerification", source = "responseHeadersVerificationResponse")
     @Mapping(target = "responseResultVerification", source = "responseResultVerificationResponse")
     JobApiTestCase toJobApiTestCase(ApiTestCaseResponse apiTestCaseResponse);
+
+    JobApiTestCase toJobApiTestCase(ApiTestRequest apiTestRequest);
 
     JobDataCollection toJobDataCollection(DataCollectionRequest dataCollectionRequest);
 

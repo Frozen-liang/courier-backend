@@ -2,6 +2,7 @@ package com.sms.satp.service;
 
 import com.sms.satp.dto.request.ApiTestCaseJobPageRequest;
 import com.sms.satp.dto.request.ApiTestCaseJobRunRequest;
+import com.sms.satp.dto.request.ApiTestRequest;
 import com.sms.satp.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.entity.job.ApiTestCaseJobReport;
@@ -16,4 +17,6 @@ public interface ApiTestCaseJobService {
     Page<ApiTestCaseJobPageResponse> page(ApiTestCaseJobPageRequest pageRequest);
 
     ApiTestCaseJobResponse get(String jobId);
+
+    void apiTest(ApiTestRequest apiTestRequest);
 }

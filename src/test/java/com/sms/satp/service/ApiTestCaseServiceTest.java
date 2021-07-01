@@ -49,6 +49,7 @@ class ApiTestCaseServiceTest {
         .id(ID).build();
     private final ApiTestCaseRequest apiTestCaseRequest = ApiTestCaseRequest.builder()
         .id(ID).build();
+    private static final boolean REMOVED = Boolean.FALSE;
     private static final String ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String API_ID = ObjectId.get().toString();
@@ -133,7 +134,7 @@ class ApiTestCaseServiceTest {
         }
         when(apiTestCaseRepository.findAll(any(), any(Sort.class))).thenReturn(apiTestCaseList);
         when(apiTestCaseMapper.toDtoList(apiTestCaseList)).thenReturn(apiTestCaseResponseList);
-        List<ApiTestCaseResponse> result = apiTestCaseService.list(API_ID, PROJECT_ID);
+        List<ApiTestCaseResponse> result = apiTestCaseService.list(API_ID, PROJECT_ID, REMOVED);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -141,7 +142,7 @@ class ApiTestCaseServiceTest {
     @DisplayName("An exception occurred while getting ApiTestCase list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(apiTestCaseRepository).findAll(any(), any(Sort.class));
-        assertThatThrownBy(() -> apiTestCaseService.list(API_ID, PROJECT_ID))
+        assertThatThrownBy(() -> apiTestCaseService.list(API_ID, PROJECT_ID, REMOVED))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_TEST_CASE_LIST_ERROR.getCode());
     }
@@ -172,5 +173,20 @@ class ApiTestCaseServiceTest {
         apiTestCaseService.updateApiTestCaseStatusByApiId(Collections.singletonList(ObjectId.get().toString()),
             ApiBindingStatus.BINDING);
         verify(customizedApiTestCaseRepository, times(1)).updateApiTestCaseStatusByApiId(any(), any());
+    }
+
+    @Test
+    @DisplayName("Test the deleteByIds method in the ApiTestCase service")
+    public void deleteByIds_test() {
+        List<String> ids = Collections.singletonList(ID);
+        doNothing().when(apiTestCaseRepository).deleteAllByIdIn(ids);
+        assertThat(apiTestCaseService.deleteByIds(ids)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test the deleteAll method in the ApiTestCase service")
+    public void deleteAll_test() {
+        doNothing().when(apiTestCaseRepository).deleteAllByRemovedIsTrue();
+        assertThat(apiTestCaseService.deleteAll()).isTrue();
     }
 }

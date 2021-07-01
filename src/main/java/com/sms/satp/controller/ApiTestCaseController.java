@@ -43,8 +43,8 @@ public class ApiTestCaseController {
     }
 
     @GetMapping("/list")
-    public List<ApiTestCaseResponse> list(String apiId, String projectId) {
-        return apiTestCaseService.list(apiId, projectId);
+    public List<ApiTestCaseResponse> list(String apiId, String projectId, boolean removed) {
+        return apiTestCaseService.list(apiId, projectId, removed);
     }
 
     @DeleteMapping("/{ids}")
@@ -52,4 +52,13 @@ public class ApiTestCaseController {
         return apiTestCaseService.delete(ids);
     }
 
+    @DeleteMapping("/delete/{ids}")
+    public Boolean deleteByIds(@PathVariable List<String> ids) {
+        return apiTestCaseService.deleteByIds(ids);
+    }
+
+    @DeleteMapping("/deleteAll")
+    public Boolean deleteAll() {
+        return apiTestCaseService.deleteAll();
+    }
 }

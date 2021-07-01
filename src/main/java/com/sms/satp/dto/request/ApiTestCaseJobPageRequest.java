@@ -18,4 +18,6 @@ public class ApiTestCaseJobPageRequest extends PageDto {
 
     private ObjectId apiTestCaseId;
 
+    private String apiId;
+
 }

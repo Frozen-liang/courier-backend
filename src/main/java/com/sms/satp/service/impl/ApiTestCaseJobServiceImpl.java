@@ -8,6 +8,7 @@ import static com.sms.satp.utils.Assert.notNull;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseJobPageRequest;
 import com.sms.satp.dto.request.ApiTestCaseJobRunRequest;
+import com.sms.satp.dto.request.ApiTestRequest;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -131,5 +133,31 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
     public ApiTestCaseJobResponse get(String jobId) {
         return apiTestCaseJobRepository.findById(jobId).map(jobMapper::toApiTestCaseJobResponse)
             .orElseThrow(() -> ExceptionUtils.mpe(GET_API_TEST_CASE_JOB_ERROR));
+    }
+
+    @Override
+    public void apiTest(ApiTestRequest apiTestRequest) {
+        // getCurrentUserId
+        int userId = 1;
+        try {
+            ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(apiTestRequest.getEnvId());
+            String apiPath = apiTestRequest.getApiPath();
+            if (Objects.isNull(projectEnvironment) && (StringUtils.isEmpty(apiPath) || !apiPath.startsWith("http")
+                || !apiPath.startsWith("ws"))) {
+                throw ExceptionUtils.mpe("The request address is illegality, please check environment or api path.");
+            }
+            ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder()
+                .environment(jobMapper.toJobEnvironment(projectEnvironment))
+                .apiTestCase(JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestRequest)).build())
+                .build();
+            apiTestCaseJobRepository.insert(apiTestCaseJob);
+            caseDispatcherService.dispatch(apiTestCaseJob);
+        } catch (ApiTestPlatformException apiTestPlatEx) {
+            log.error(apiTestPlatEx.getMessage());
+            caseDispatcherService.sendMessage(PREFIX + userId, apiTestPlatEx.getMessage());
+        } catch (Exception e) {
+            log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
+            caseDispatcherService.sendMessage(PREFIX + userId, "Execute the ApiTest error");
+        }
     }
 }

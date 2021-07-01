@@ -60,10 +60,10 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     }
 
     @Override
-    public List<ApiTestCaseResponse> list(String apiId, String projectId) {
+    public List<ApiTestCaseResponse> list(String apiId, String projectId, boolean removed) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
-            ApiTestCase apiTestCase = ApiTestCase.builder().apiId(apiId).projectId(projectId).build();
+            ApiTestCase apiTestCase = ApiTestCase.builder().apiId(apiId).removed(removed).projectId(projectId).build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(API_ID.getFiled(), GenericPropertyMatchers.exact())
@@ -130,6 +130,20 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     public void updateApiTestCaseStatusByApiId(List<String> apiIds, ApiBindingStatus status) {
         log.info("Update ApiTestCase's status to {},apiIds = {}", status.getCode(), apiIds);
         customizedApiTestCaseRepository.updateApiTestCaseStatusByApiId(apiIds, status);
+    }
+
+    @Override
+    public Boolean deleteByIds(List<String> ids) {
+        log.info("Delete ApiTestCase ids:{}.", ids);
+        apiTestCaseRepository.deleteAllByIdIn(ids);
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public Boolean deleteAll() {
+        log.info("Delete all ApiTestCase when removed is true.");
+        apiTestCaseRepository.deleteAllByRemovedIsTrue();
+        return Boolean.TRUE;
     }
 
 }

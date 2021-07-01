@@ -23,4 +23,8 @@ public interface ApiService {
 
     Boolean delete(List<String> ids);
 
+    Boolean deleteByIds(List<String> ids);
+
+    Boolean deleteAll();
+
 }

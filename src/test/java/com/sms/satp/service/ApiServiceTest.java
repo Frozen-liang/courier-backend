@@ -8,6 +8,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_API_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -151,5 +152,20 @@ class ApiServiceTest {
         assertThatThrownBy(() -> apiService.delete(Collections.singletonList(ID)))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_API_BY_ID_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the deleteByIds method in the Api service")
+    public void deleteByIds_test() {
+        List<String> ids = Collections.singletonList(ID);
+        doNothing().when(apiRepository).deleteAllByIdIn(ids);
+        assertThat(apiService.deleteByIds(ids)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test the deleteAll method in the Api service")
+    public void deleteAll_test() {
+        doNothing().when(apiRepository).deleteAllByRemovedIsTrue();
+        assertThat(apiService.deleteAll()).isTrue();
     }
 }

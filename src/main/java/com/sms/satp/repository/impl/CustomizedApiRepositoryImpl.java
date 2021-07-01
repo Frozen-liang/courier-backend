@@ -2,6 +2,7 @@ package com.sms.satp.repository.impl;
 
 import static com.sms.satp.common.enums.OperationModule.API_GROUP;
 import static com.sms.satp.common.enums.OperationModule.API_TAG;
+import static com.sms.satp.common.field.ApiFiled.API_NAME;
 import static com.sms.satp.common.field.ApiFiled.API_PROTOCOL;
 import static com.sms.satp.common.field.ApiFiled.API_STATUS;
 import static com.sms.satp.common.field.ApiFiled.GROUP_ID;
@@ -118,9 +119,11 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
 
     private void buildCriteria(ApiPageRequest apiPageRequest, Query query,
         List<AggregationOperation> aggregationOperations) {
-        REMOVE.is(Boolean.FALSE)
+        REMOVE.is(apiPageRequest.isRemoved())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         PROJECT_ID.is(apiPageRequest.getProjectId())
+            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+        API_NAME.like(apiPageRequest.getApiName())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         API_PROTOCOL.in(apiPageRequest.getApiProtocol())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));

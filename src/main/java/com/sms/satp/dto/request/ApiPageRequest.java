@@ -18,6 +18,10 @@ public class ApiPageRequest extends PageDto {
     @NotNull(message = "The projectId must not be null.")
     private ObjectId projectId;
 
+    private String apiName;
+
+    private boolean removed;
+
     private List<ObjectId> groupId;
 
     private List<ObjectId> tagId;
