@@ -1,6 +1,5 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseRequest;
@@ -21,9 +20,7 @@ public interface SceneCaseService {
 
     Boolean batchEdit(List<SceneCase> sceneCaseList);
 
-    Page<SceneCaseResponse> page(PageDto pageDto, String projectId);
-
-    Page<SceneCaseResponse> search(SearchSceneCaseRequest searchDto, String projectId);
+    Page<SceneCaseResponse> page(SearchSceneCaseRequest searchDto, String projectId);
 
     SceneTemplateResponse getConn(String id);
 

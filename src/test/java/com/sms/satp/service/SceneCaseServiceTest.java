@@ -2,7 +2,6 @@ package com.sms.satp.service;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateConnRequest;
@@ -38,7 +37,6 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_CONN_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_PAGE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -201,26 +199,6 @@ class SceneCaseServiceTest {
     }
 
     @Test
-    @DisplayName("Test the page method in the SceneCase service")
-    void page_test() {
-        List<SceneCase> dtoList = Lists.newArrayList(SceneCase.builder().build());
-        Pageable pageable = PageRequest.of(MOCK_PAGE, MOCK_SIZE);
-        Page<SceneCase> sceneCaseDtoPage = new PageImpl<>(dtoList, pageable, MOCK_TOTAL);
-        when(sceneCaseRepository.findAll(any(), (Pageable) any())).thenReturn(sceneCaseDtoPage);
-        Page<SceneCaseResponse> pageDto = sceneCaseService.page(PageDto.builder().build(), MOCK_PROJECT_ID);
-        assertThat(pageDto).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Test the page method in the SceneCase service thrown exception")
-    void page_test_thenThrownException() {
-        when(sceneCaseRepository.findAll(any(), (Pageable) any()))
-            .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_PAGE_ERROR));
-        assertThatThrownBy(() -> sceneCaseService.page(PageDto.builder().build(), MOCK_PROJECT_ID))
-            .isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
     @DisplayName("Test the search method in the SceneCase service")
     void search_test() {
         SearchSceneCaseRequest dto = new SearchSceneCaseRequest();
@@ -229,7 +207,7 @@ class SceneCaseServiceTest {
         Pageable pageable = PageRequest.of(MOCK_PAGE, MOCK_SIZE);
         Page<SceneCase> sceneCaseDtoPage = new PageImpl<>(dtoList, pageable, MOCK_TOTAL);
         when(customizedSceneCaseRepository.search(any(), any())).thenReturn(sceneCaseDtoPage);
-        Page<SceneCaseResponse> pageDto = sceneCaseService.search(dto, MOCK_PROJECT_ID);
+        Page<SceneCaseResponse> pageDto = sceneCaseService.page(dto, MOCK_PROJECT_ID);
         assertThat(pageDto).isNotNull();
     }
 
@@ -240,7 +218,7 @@ class SceneCaseServiceTest {
         dto.setName(MOCK_NAME);
         when(customizedSceneCaseRepository.search(any(), any()))
             .thenThrow(new ApiTestPlatformException(SEARCH_SCENE_CASE_ERROR));
-        assertThatThrownBy(() -> sceneCaseService.search(dto, MOCK_PROJECT_ID))
+        assertThatThrownBy(() -> sceneCaseService.page(dto, MOCK_PROJECT_ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 

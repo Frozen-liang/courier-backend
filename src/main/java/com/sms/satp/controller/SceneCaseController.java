@@ -1,7 +1,6 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseRequest;
@@ -47,13 +46,8 @@ public class SceneCaseController {
     }
 
     @GetMapping("/page/{projectId}")
-    public Page<SceneCaseResponse> page(PageDto pageDto, @PathVariable String projectId) {
-        return sceneCaseService.page(pageDto, projectId);
-    }
-
-    @GetMapping("/search/{projectId}")
-    public Page<SceneCaseResponse> search(SearchSceneCaseRequest searchDto, @PathVariable String projectId) {
-        return sceneCaseService.search(searchDto, projectId);
+    public Page<SceneCaseResponse> page(SearchSceneCaseRequest searchDto, @PathVariable String projectId) {
+        return sceneCaseService.page(searchDto, projectId);
     }
 
     @GetMapping("/conn/{id}")

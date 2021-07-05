@@ -3,8 +3,8 @@ package com.sms.satp.entity.apitestcase;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
-import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.common.enums.ResponseParamsExtractionType;
 import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ParamInfo;
@@ -59,6 +59,8 @@ public class ApiTestCase extends BaseEntity {
     private List<ParamInfo> restfulParams;
     private List<ParamInfo> requestParams;
     private List<ParamInfo> responseParams;
+
+    private ResponseParamsExtractionType responseParamsExtractionType;
 
     private String preInject;
 
