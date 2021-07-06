@@ -104,6 +104,11 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         return commonDeleteRepository.deleteByIds(ids, ApiEntity.class);
     }
 
+    @Override
+    public Boolean recover(List<String> ids) {
+        return commonDeleteRepository.recover(ids,ApiEntity.class);
+    }
+
     private void createLookUpOperation(List<AggregationOperation> aggregationOperations) {
         LookupOperation apiTagLookupOperation =
             LookupOperation.newLookup().from(API_TAG.getCollectionName()).localField(TAG_ID.getFiled())

@@ -13,9 +13,9 @@ public interface CaseDispatcherService {
 
     void dispatch(SceneCaseJob caseJob);
 
-    void sendJobReport(String destination, CaseReport caseReport);
+    void sendJobReport(String userId, CaseReport caseReport);
 
-    void sendJobReport(String destination, List<CaseReport> caseReport);
+    void sendJobReport(String userId, List<CaseReport> caseReport);
 
-    void sendMessage(String destination, String message);
+    void sendErrorMessage(String userId, String message);
 }

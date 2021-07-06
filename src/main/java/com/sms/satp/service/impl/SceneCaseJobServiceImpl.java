@@ -62,8 +62,6 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     private final CaseDispatcherService caseDispatcherService;
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
 
-    private static final String PREFIX = "/user/";
-
     public SceneCaseJobServiceImpl(SceneCaseApiRepository sceneCaseApiRepository,
         ProjectEnvironmentService projectEnvironmentService,
         SceneCaseRepository sceneCaseRepository,
@@ -112,7 +110,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             }
             job.setJobStatus(jobReport.getJobStatus());
             job.setMessage(jobReport.getMessage());
-            caseDispatcherService.sendJobReport(PREFIX + job.getCreateUserId(), jobReport.getCaseReportList());
+            caseDispatcherService.sendJobReport(job.getCreateUserId(), jobReport.getCaseReportList());
             sceneCaseJobRepository.save(job);
         });
     }
@@ -121,7 +119,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     public void runJob(AddSceneCaseJobRequest request) {
         long start = System.currentTimeMillis();
         // getCurrentUserId
-        int userId = 1;
+        String userId = "1";
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(request.getEnvId());
             if (Objects.isNull(projectEnvironment)) {
@@ -158,11 +156,11 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                 System.currentTimeMillis() - start, request.toString());
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
-            caseDispatcherService.sendMessage(PREFIX + userId, apiTestPlatEx.getMessage());
+            caseDispatcherService.sendErrorMessage(userId, apiTestPlatEx.getMessage());
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseJob!", e);
             e.printStackTrace();
-            caseDispatcherService.sendMessage(PREFIX + userId, "Execute the SceneCaseJob error");
+            caseDispatcherService.sendErrorMessage(userId, "Execute the SceneCaseJob error");
         }
     }
 

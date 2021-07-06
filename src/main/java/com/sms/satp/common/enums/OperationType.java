@@ -11,7 +11,8 @@ public enum OperationType implements EnumCommon {
 
     ADD(0),
     EDIT(1),
-    DELETE(2);
+    DELETE(2),
+    SYNC(3);
 
     private static final Map<Integer, OperationType> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationType::getCode, Function.identity()));

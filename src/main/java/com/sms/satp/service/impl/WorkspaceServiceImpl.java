@@ -1,5 +1,9 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.WORKSPACE;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_WORKSPACE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_WORKSPACE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
@@ -9,6 +13,8 @@ import static com.sms.satp.common.exception.ErrorCode.GET_WORKSPACE_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.THE_WORKSPACE_CANNOT_DELETE_ERROR;
 import static com.sms.satp.utils.Assert.isFalse;
 
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.WorkspaceRequest;
 import com.sms.satp.dto.response.WorkspaceResponse;
@@ -60,6 +66,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = WORKSPACE, template = "{{#workspaceRequest.name}}")
     public Boolean add(WorkspaceRequest workspaceRequest) {
         log.info("WorkspaceService-add()-params: [Workspace]={}", workspaceRequest.toString());
         try {
@@ -73,6 +80,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = WORKSPACE, template = "{{#workspaceRequest.name}}")
     public Boolean edit(WorkspaceRequest workspaceRequest) {
         log.info("WorkspaceService-edit()-params: [Workspace]={}", workspaceRequest.toString());
         try {
@@ -93,6 +101,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = WORKSPACE, template = "{{#result.name}}",
+        enhance = @Enhance(enable = true))
     public Boolean delete(String id) {
         try {
             isFalse(projectService.existsByWorkspaceId(id), THE_WORKSPACE_CANNOT_DELETE_ERROR);

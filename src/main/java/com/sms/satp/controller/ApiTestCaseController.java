@@ -61,4 +61,9 @@ public class ApiTestCaseController {
     public Boolean deleteAll() {
         return apiTestCaseService.deleteAll();
     }
+
+    @PutMapping("/recover")
+    public Boolean recover(@RequestBody List<String> ids) {
+        return apiTestCaseService.recover(ids);
+    }
 }

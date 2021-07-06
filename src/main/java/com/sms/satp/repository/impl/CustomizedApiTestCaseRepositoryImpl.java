@@ -47,4 +47,9 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
     public Boolean deleteByIds(List<String> ids) {
         return commonDeleteRepository.deleteByIds(ids, ApiTestCase.class);
     }
+
+    @Override
+    public Boolean recover(List<String> ids) {
+        return commonDeleteRepository.recover(ids, ApiTestCase.class);
+    }
 }

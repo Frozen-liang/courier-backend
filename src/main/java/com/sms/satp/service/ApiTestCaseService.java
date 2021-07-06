@@ -23,4 +23,5 @@ public interface ApiTestCaseService {
 
     Boolean deleteAll();
 
+    Boolean recover(List<String> ids);
 }

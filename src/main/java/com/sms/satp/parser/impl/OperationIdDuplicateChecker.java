@@ -1,5 +1,7 @@
 package com.sms.satp.parser.impl;
 
+import static com.sms.satp.utils.UserDestinationUtil.getImportDest;
+
 import com.sms.satp.common.enums.ImportStatus;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
@@ -12,6 +14,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 @Slf4j
 public class OperationIdDuplicateChecker implements ApiDocumentChecker {
@@ -36,10 +39,12 @@ public class OperationIdDuplicateChecker implements ApiDocumentChecker {
             projectImportFlowEntity.setErrorDetail(builder.toString());
             ProjectImportFlowRepository projectImportFlowRepository =
                 context.getBean(ProjectImportFlowRepository.class);
+
             log.error("The project whose id is {},{}",
                 projectImportFlowEntity.getProjectId(), projectImportFlowEntity.getErrorDetail());
             projectImportFlowRepository.save(projectImportFlowEntity);
-
+            SimpMessagingTemplate simpMessagingTemplate = context.getBean(SimpMessagingTemplate.class);
+            simpMessagingTemplate.convertAndSend(getImportDest(), projectImportFlowEntity);
             return false;
 
         }

@@ -146,4 +146,9 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         return Boolean.TRUE;
     }
 
+    @Override
+    public Boolean recover(List<String> ids) {
+        return customizedApiTestCaseRepository.recover(ids);
+    }
+
 }

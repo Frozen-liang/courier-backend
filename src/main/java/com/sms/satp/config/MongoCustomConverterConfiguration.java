@@ -56,9 +56,9 @@ public class MongoCustomConverterConfiguration {
     }
 
     @Bean
-    AuditorAware<Long> auditorAware() {
+    AuditorAware<String> auditorAware() {
         // get createUserId and modifyUserId
-        return () -> Optional.of(1L);
+        return () -> Optional.of("1");
     }
 
 

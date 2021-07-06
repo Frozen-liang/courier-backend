@@ -2,7 +2,9 @@ package com.sms.satp.service.impl;
 
 import com.sms.satp.dto.request.ProjectImportSourceRequest;
 import com.sms.satp.dto.response.ProjectImportSourceResponse;
+import com.sms.satp.entity.project.ProjectImportSourceEntity;
 import com.sms.satp.mapper.ProjectImportSourceMapper;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.ProjectImportSourceRepository;
 import com.sms.satp.service.ProjectImportSourceService;
 import java.util.List;
@@ -13,12 +15,15 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
 
     private final ProjectImportSourceMapper projectImportSourceMapper;
     private final ProjectImportSourceRepository projectImportSourceRepository;
+    private final CommonDeleteRepository commonDeleteRepository;
 
 
     public ProjectImportSourceServiceImpl(ProjectImportSourceMapper projectImportSourceMapper,
-        ProjectImportSourceRepository projectImportSourceRepository) {
+        ProjectImportSourceRepository projectImportSourceRepository,
+        CommonDeleteRepository commonDeleteRepository) {
         this.projectImportSourceMapper = projectImportSourceMapper;
         this.projectImportSourceRepository = projectImportSourceRepository;
+        this.commonDeleteRepository = commonDeleteRepository;
     }
 
     @Override
@@ -38,7 +43,6 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
 
     @Override
     public ProjectImportSourceResponse findById(String id) {
-
         return this.projectImportSourceRepository.findById(id)
             .map(projectImportSourceMapper::toProjectImportSourceResponse).orElse(null);
 
@@ -46,6 +50,16 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
 
     @Override
     public List<ProjectImportSourceResponse> findByProjectId(String projectId) {
-        return this.projectImportSourceRepository.findByProjectId(projectId);
+        return this.projectImportSourceRepository.findByProjectIdAndRemovedIsFalse(projectId);
+    }
+
+    @Override
+    public Boolean delete(List<String> ids) {
+        return commonDeleteRepository.deleteByIds(ids, ProjectImportSourceEntity.class);
+    }
+
+    @Override
+    public Iterable<ProjectImportSourceEntity> findByIds(List<String> proImpSourceIds) {
+        return this.projectImportSourceRepository.findAllById(proImpSourceIds);
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 @Repository
 public class CommonDeleteRepositoryImpl implements CommonDeleteRepository {
@@ -50,6 +51,18 @@ public class CommonDeleteRepositoryImpl implements CommonDeleteRepository {
         filed.in(tagIds).ifPresent(query::addCriteria);
         Update update = new Update();
         update.pullAll(filed.getFiled(), tagIds.toArray());
+        UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
+        return updateResult.getModifiedCount() > 0;
+    }
+
+    @Override
+    public Boolean recover(List<String> ids, Class<?> entityClass) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Boolean.FALSE;
+        }
+        Query query = new Query(Criteria.where(ID.getFiled()).in(ids));
+        Update update = Update.update(REMOVE.getFiled(), Boolean.FALSE);
+        update.set(MODIFY_DATE_TIME.getFiled(), LocalDateTime.now());
         UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
         return updateResult.getModifiedCount() > 0;
     }
