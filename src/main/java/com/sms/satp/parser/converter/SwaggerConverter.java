@@ -1,5 +1,6 @@
 package com.sms.satp.parser.converter;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.models.ArrayModel;
 import io.swagger.models.ComposedModel;
 import io.swagger.models.ExternalDocs;
@@ -75,16 +76,19 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+@SuppressFBWarnings
+@Slf4j
 public class SwaggerConverter implements SwaggerParserExtension {
 
-    private List<String> globalConsumes = new ArrayList<>();
-    private List<String> globalProduces = new ArrayList<>();
-    private Components components = new Components();
-    private Map<String, io.swagger.models.parameters.Parameter> globalV2Parameters = new HashMap<>();
+    private final Components components = new Components();
+    private final Map<String, io.swagger.models.parameters.Parameter> globalV2Parameters = new HashMap<>();
 
     @Override
     public SwaggerParseResult readLocation(String url, List<AuthorizationValue> auths, ParseOptions options) {
@@ -101,8 +105,8 @@ public class SwaggerConverter implements SwaggerParserExtension {
     @Override
     public SwaggerParseResult readContents(String swaggerAsString, List<AuthorizationValue> auth,
         ParseOptions options) {
-        SwaggerDeserializationResult result = new SwaggerParser().readWithInfo(swaggerAsString, options == null ?
-            true : options.isResolve());
+        SwaggerDeserializationResult result = new SwaggerParser().readWithInfo(swaggerAsString,
+            options == null || options.isResolve());
 
         if (options != null) {
             if (options.isResolve()) {
@@ -130,7 +134,8 @@ public class SwaggerConverter implements SwaggerParserExtension {
                 } else {
                     out.messages(resultV3.getMessages());
                 }
-            } catch (Exception ignore) {
+            } catch (Exception e) {
+                log.warn("Failed to read API message {}", e.getMessage());
             }
         }
         return out;
@@ -151,288 +156,184 @@ public class SwaggerConverter implements SwaggerParserExtension {
         return convertedAuth;
     }
 
-    public SwaggerParseResult convert(SwaggerDeserializationResult parse) {
-        if (parse == null) {
-            return null;
+    public Operation convert(io.swagger.models.Operation v2Operation, List<String> globalConsumes,
+        List<String> globalProduces) {
+        Operation operation = new Operation();
+        if (StringUtils.isNotBlank(v2Operation.getDescription())) {
+            operation.setDescription(v2Operation.getDescription());
         }
-
-        SwaggerParseResult output = new SwaggerParseResult().messages(parse.getMessages());
-
-        if (parse.getSwagger() == null) {
-            return output;
+        if (StringUtils.isNotBlank(v2Operation.getSummary())) {
+            operation.setSummary(v2Operation.getSummary());
         }
+        operation.setDeprecated(v2Operation.isDeprecated());
+        operation.setOperationId(v2Operation.getOperationId());
+        operation.setExtensions(convert(v2Operation.getVendorExtensions()));
 
-        OpenAPI openAPI = new OpenAPI();
-        SwaggerInventory inventory = new SwaggerInventory().process(parse.getSwagger());
+        operation.setTags(v2Operation.getTags());
 
-        Swagger swagger = parse.getSwagger();
+        if (v2Operation.getParameters() != null) {
+            List<io.swagger.models.parameters.Parameter> formParams = new ArrayList<>();
+            for (io.swagger.models.parameters.Parameter param : v2Operation.getParameters()) {
 
-        if (swagger.getVendorExtensions() != null) {
-            openAPI.setExtensions(convert(swagger.getVendorExtensions()));
-        }
-        // Set extension to retain original version of OAS document.
-        openAPI.addExtension("x-original-swagger-version", swagger.getSwagger());
-
-        if (swagger.getExternalDocs() != null) {
-            openAPI.setExternalDocs(convert(swagger.getExternalDocs()));
-        }
-
-        if (swagger.getInfo() != null) {
-            openAPI.setInfo(convert(swagger.getInfo()));
-        }
-
-        openAPI.setServers(convert(swagger.getSchemes(), swagger.getHost(), swagger.getBasePath()));
-
-        if (swagger.getTags() != null) {
-            openAPI.setTags(convertTags(swagger.getTags()));
-        }
-
-        if (swagger.getConsumes() != null) {
-            this.globalConsumes.addAll(swagger.getConsumes());
-        }
-
-        if (swagger.getProduces() != null) {
-            this.globalProduces.addAll(swagger.getProduces());
-        }
-
-        if (swagger.getSecurity() != null && swagger.getSecurity().size() > 0) {
-            openAPI.setSecurity(convertSecurityRequirements(swagger.getSecurity()));
-        }
-
-        List<Model> models = inventory.getModels();
-
-        // TODO until we have the example object working correctly in v3 pojos...
-        for (Model model : models) {
-            if (model instanceof RefModel) {
-                RefModel ref = (RefModel) model;
-                if (ref.get$ref().indexOf("#/definitions") == 0) {
-                    String updatedRef = "#/components/schemas" + ref.get$ref().substring("#/definitions".length());
-                    ref.set$ref(updatedRef);
-                }
-            }
-        }
-
-        for (Property property : inventory.getProperties()) {
-            if (property instanceof RefProperty) {
-                RefProperty ref = (RefProperty) property;
-                if (ref.get$ref().indexOf("#/definitions") == 0) {
-                    String updatedRef = "#/components/schemas" + ref.get$ref().substring("#/definitions".length());
-                    ref.set$ref(updatedRef);
-                }
-            }
-
-            if (property instanceof ComposedProperty) {
-                ComposedProperty comprop = (ComposedProperty) property;
-                if (comprop.getAllOf() != null) {
-                    for (Property item : comprop.getAllOf()) {
-                        if (item instanceof RefProperty) {
-                            RefProperty ref = (RefProperty) item;
-                            if (ref.get$ref().indexOf("#/definitions") == 0) {
-                                String updatedRef =
-                                    "#/components/schemas" + ref.get$ref().substring("#/definitions".length());
-                                ref.set$ref(updatedRef);
-                            }
-
-
-                        }
-
+                if ("formData".equals(param.getIn())) {
+                    formParams.add(param);
+                } else if ("body".equals(param.getIn())) {
+                    operation.setRequestBody(
+                        convertParameterToRequestBody(param, v2Operation.getConsumes(), globalConsumes));
+                    operation.addExtension("x-codegen-request-body-name", param.getName());
+                } else {
+                    Parameter convert = convert(param);
+                    String ref = convert.get$ref();
+                    if (ref != null && ref.startsWith("#/components/requestBodies/") && isRefABodyParam(param)) {
+                        operation.setRequestBody(new RequestBody().$ref(ref));
+                    } else if (ref != null && ref.startsWith("#/components/schemas/") && isRefAFormParam(param)) {
+                        formParams.add(param);
+                    } else {
+                        operation.addParametersItem(convert);
                     }
                 }
             }
+
+            if (formParams.size() > 0) {
+                RequestBody body = convertFormDataToRequestBody(formParams, v2Operation.getConsumes(), globalConsumes);
+                body.getContent().forEach((key, content) -> {
+                    Schema schema = content.getSchema();
+                    if (schema != null && schema.getRequired() != null && schema.getRequired().size() > 0) {
+                        body.setRequired(Boolean.TRUE);
+                    }
+                });
+                operation.requestBody(body);
+            }
+
         }
 
-        if (swagger.getParameters() != null) {
-            globalV2Parameters.putAll(swagger.getParameters());
-            swagger.getParameters().forEach((k, v) -> {
-                if ("body".equals(v.getIn())) {
-                    components.addRequestBodies(k, convertParameterToRequestBody(v));
-                } else if ("formData".equals(v.getIn())) {
-                    // formData_ is added not to overwrite existing schemas
-                    components.addSchemas("formData_" + k, convertFormDataToSchema(v));
-                } else {
-                    components.addParameters(k, convert(v));
+        if (v2Operation.getResponses() != null) {
+            for (String responseCode : v2Operation.getResponses().keySet()) {
+                io.swagger.models.Response v2Response = v2Operation.getResponses().get(responseCode);
+                ApiResponse response = convert(v2Response, v2Operation.getProduces(), globalProduces);
+                ApiResponses responses = operation.getResponses();
+                if (responses == null) {
+                    responses = new ApiResponses();
                 }
-            });
-        }
 
-        Paths v3Paths = new Paths();
-        Map<String, Path> pathMap = Optional.ofNullable(swagger.getPaths()).orElse(new HashMap<>());
-        for (String pathname : pathMap.keySet()) {
-            io.swagger.models.Path v2Path = swagger.getPath(pathname);
-            PathItem v3Path = convert(v2Path);
-            v3Paths.put(pathname, v3Path);
-        }
-        openAPI.setPaths(v3Paths);
-
-        if (swagger.getResponses() != null) {
-            swagger.getResponses().forEach((k, v) -> components.addResponses(k, convert(v)));
-        }
-
-        if (swagger.getDefinitions() != null) {
-            for (String key : swagger.getDefinitions().keySet()) {
-                Model model = swagger.getDefinitions().get(key);
-                Schema schema = convert(model);
-
-                components.addSchemas(key, schema);
+                operation.responses(responses.addApiResponse(responseCode, response));
             }
         }
 
-        if (swagger.getSecurityDefinitions() != null) {
-            swagger.getSecurityDefinitions().forEach((k, v) -> components.addSecuritySchemes(k, convert(v)));
+        if (v2Operation.getExternalDocs() != null) {
+            operation.setExternalDocs(convert(v2Operation.getExternalDocs()));
         }
 
-        openAPI.setComponents(components);
-
-        output.setOpenAPI(openAPI);
-
-        return output;
-    }
-
-    private List<io.swagger.v3.oas.models.security.SecurityRequirement> convertSecurityRequirements(
-        List<SecurityRequirement> security) {
-        List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = new ArrayList<>();
-
-        for (SecurityRequirement requirement : security) {
-            io.swagger.v3.oas.models.security.SecurityRequirement securityRequirement = new io.swagger.v3.oas.models.security.SecurityRequirement();
-
-            requirement.getRequirements().forEach((k, v) -> securityRequirement.addList(k, v));
-
-            securityRequirements.add(securityRequirement);
+        if (v2Operation.getSecurity() != null && v2Operation.getSecurity().size() > 0) {
+            operation.setSecurity(convertSecurityRequirementsMap(v2Operation.getSecurity()));
         }
 
-        return securityRequirements;
+        return operation;
     }
 
-    private List<io.swagger.v3.oas.models.security.SecurityRequirement> convertSecurityRequirementsMap(
-        List<Map<String, List<String>>> security) {
-        List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = new ArrayList<>();
-
-//        for (SecurityRequirement requirement : security) {
-//            io.swagger.v3.oas.models.security.SecurityRequirement securityRequirement = new io.swagger.v3.oas.models.security.SecurityRequirement();
-//
-//            requirement.getRequirements().forEach((k,v) -> securityRequirement.addList(k, v));
-//
-//            securityRequirements.add(securityRequirement);
-//        }
-
-        for (Map<String, List<String>> map : security) {
-            io.swagger.v3.oas.models.security.SecurityRequirement securityRequirement = new io.swagger.v3.oas.models.security.SecurityRequirement();
-
-            map.forEach((k, v) -> securityRequirement.addList(k, v));
-
-            securityRequirements.add(securityRequirement);
+    private Map<String, Object> convert(Map<String, Object> vendorExtensions) {
+        if (vendorExtensions != null && vendorExtensions.size() > 0) {
+            vendorExtensions.entrySet().removeIf(extension -> (
+                extension.getKey().equals("x-example"))
+                || extension.getKey().equals("x-examples")
+                || extension.getKey().equals("x-nullable"));
         }
 
-        return securityRequirements;
+        return vendorExtensions;
     }
 
-    private SecurityScheme convert(SecuritySchemeDefinition definition) {
-        SecurityScheme securityScheme;
+    public Info convert(io.swagger.models.Info v2Info) {
+        Info info = new Info();
 
-        switch (definition.getType()) {
-            case "basic":
-                securityScheme = createBasicSecurityScheme();
-                break;
-            case "apiKey":
-                securityScheme = convertApiKeySecurityScheme(definition);
-                break;
-            case "oauth2":
-                securityScheme = convertOauth2SecurityScheme(definition);
-                break;
-            default:
-                securityScheme = new SecurityScheme();
+        info.setContact(convert(v2Info.getContact()));
+        info.setDescription(v2Info.getDescription());
+        info.setLicense(convert(v2Info.getLicense()));
+        info.setTermsOfService(v2Info.getTermsOfService());
+        info.setTitle(v2Info.getTitle());
+        info.setVersion(v2Info.getVersion());
+        info.setExtensions(convert(v2Info.getVendorExtensions()));
+
+        return info;
+    }
+
+    private License convert(io.swagger.models.License v2License) {
+        if (v2License == null) {
+            return null;
         }
 
-        securityScheme.setDescription(definition.getDescription());
-        securityScheme.setExtensions(convert(definition.getVendorExtensions()));
+        License license = new License();
+        license.setExtensions(convert(v2License.getVendorExtensions()));
+        license.setName(v2License.getName());
+        license.setUrl(v2License.getUrl());
 
-        return securityScheme;
+        return license;
     }
 
-    private SecurityScheme convertOauth2SecurityScheme(SecuritySchemeDefinition definition) {
-        SecurityScheme securityScheme = new SecurityScheme();
-        OAuth2Definition oAuth2Definition = (OAuth2Definition) definition;
-        OAuthFlows oAuthFlows = new OAuthFlows();
-        OAuthFlow oAuthFlow = new OAuthFlow();
-
-        securityScheme.setType(SecurityScheme.Type.OAUTH2);
-        String flow = oAuth2Definition.getFlow();
-
-        if (flow != null) {
-            switch (flow) {
-                case "implicit":
-                    oAuthFlow.setAuthorizationUrl(oAuth2Definition.getAuthorizationUrl());
-                    oAuthFlows.setImplicit(oAuthFlow);
-                    break;
-                case "password":
-                    oAuthFlow.setTokenUrl(oAuth2Definition.getTokenUrl());
-                    oAuthFlows.setPassword(oAuthFlow);
-                    break;
-                case "application":
-                    oAuthFlow.setTokenUrl(oAuth2Definition.getTokenUrl());
-                    oAuthFlows.setClientCredentials(oAuthFlow);
-                    break;
-                case "accessCode":
-                    oAuthFlow.setAuthorizationUrl(oAuth2Definition.getAuthorizationUrl());
-                    oAuthFlow.setTokenUrl(oAuth2Definition.getTokenUrl());
-                    oAuthFlows.setAuthorizationCode(oAuthFlow);
-                    break;
-            }
+    public Contact convert(io.swagger.models.Contact v2Contact) {
+        if (v2Contact == null) {
+            return null;
         }
 
-        Scopes scopes = new Scopes();
-        Map<String, String> oAuth2Scopes = oAuth2Definition.getScopes();
-        if (oAuth2Scopes != null) {
-            oAuth2Scopes.forEach((k, v) -> scopes.addString(k, v));
-        }
-        oAuthFlow.setScopes(scopes);
+        Contact contact = new Contact();
 
-        securityScheme.setFlows(oAuthFlows);
+        contact.setUrl(v2Contact.getUrl());
+        contact.setName(v2Contact.getName());
+        contact.setEmail(v2Contact.getEmail());
 
-        return securityScheme;
+        // TODO - treat this process after adding extensions to v2Contact object
+
+        return contact;
     }
 
-    private SecurityScheme convertApiKeySecurityScheme(SecuritySchemeDefinition definition) {
-        SecurityScheme securityScheme = new SecurityScheme();
-        ApiKeyAuthDefinition apiKeyAuthDefinition = (ApiKeyAuthDefinition) definition;
+    public PathItem convert(Path v2Path, List<String> globalConsumes, List<String> globalProduces) {
+        PathItem v3Path = new PathItem();
 
-        securityScheme.setType(SecurityScheme.Type.APIKEY);
-        securityScheme.setName(apiKeyAuthDefinition.getName());
-        securityScheme.setIn(SecurityScheme.In.valueOf(apiKeyAuthDefinition.getIn().toString()));
+        if (v2Path instanceof RefPath) {
 
-        return securityScheme;
-    }
+            v3Path.set$ref(((RefPath) v2Path).get$ref());
+        } else {
 
-    private SecurityScheme createBasicSecurityScheme() {
-        SecurityScheme securityScheme = new SecurityScheme();
-
-        securityScheme.setType(SecurityScheme.Type.HTTP);
-        securityScheme.setScheme("basic");
-
-        return securityScheme;
-    }
-
-    private List<Tag> convertTags(List<io.swagger.models.Tag> v2tags) {
-        List<Tag> v3tags = new ArrayList<>();
-
-        for (io.swagger.models.Tag v2tag : v2tags) {
-            Tag v3tag = new Tag();
-
-            v3tag.setDescription(v2tag.getDescription());
-            v3tag.setName(v2tag.getName());
-
-            if (v2tag.getExternalDocs() != null) {
-                v3tag.setExternalDocs(convert(v2tag.getExternalDocs()));
+            if (v2Path.getParameters() != null) {
+                for (io.swagger.models.parameters.Parameter param : v2Path.getParameters()) {
+                    v3Path.addParametersItem(convert(param));
+                }
             }
 
-            Map<String, Object> extensions = convert(v2tag.getVendorExtensions());
-            if (extensions != null) {
-                v3tag.setExtensions(extensions);
+            io.swagger.models.Operation v2Operation;
+
+            v2Operation = v2Path.getGet();
+            if (v2Operation != null) {
+                v3Path.setGet(convert(v2Operation, globalConsumes, globalProduces));
             }
-            v3tags.add(v3tag);
+            v2Operation = v2Path.getPut();
+            if (v2Operation != null) {
+                v3Path.setPut(convert(v2Operation, globalConsumes, globalProduces));
+            }
+            v2Operation = v2Path.getPost();
+            if (v2Operation != null) {
+                v3Path.setPost(convert(v2Operation, globalConsumes, globalProduces));
+            }
+            v2Operation = v2Path.getPatch();
+            if (v2Operation != null) {
+                v3Path.setPatch(convert(v2Operation, globalConsumes, globalProduces));
+            }
+            v2Operation = v2Path.getDelete();
+            if (v2Operation != null) {
+                v3Path.setDelete(convert(v2Operation, globalConsumes, globalProduces));
+            }
+            v2Operation = v2Path.getHead();
+            if (v2Operation != null) {
+                v3Path.setHead(convert(v2Operation, globalConsumes, globalProduces));
+            }
+            v2Operation = v2Path.getOptions();
+            if (v2Operation != null) {
+                v3Path.setOptions(convert(v2Operation, globalConsumes, globalProduces));
+            }
+
+            v3Path.setExtensions(convert(v2Path.getVendorExtensions()));
         }
 
-        return v3tags;
+        return v3Path;
     }
 
     private ExternalDocumentation convert(ExternalDocs externalDocs) {
@@ -481,256 +382,27 @@ public class SwaggerConverter implements SwaggerParserExtension {
         return servers;
     }
 
-    public Info convert(io.swagger.models.Info v2Info) {
-        Info info = new Info();
+    private SecurityScheme convert(SecuritySchemeDefinition definition) {
+        SecurityScheme securityScheme;
 
-        info.setContact(convert(v2Info.getContact()));
-        info.setDescription(v2Info.getDescription());
-        info.setLicense(convert(v2Info.getLicense()));
-        info.setTermsOfService(v2Info.getTermsOfService());
-        info.setTitle(v2Info.getTitle());
-        info.setVersion(v2Info.getVersion());
-        info.setExtensions(convert(v2Info.getVendorExtensions()));
-
-        return info;
-    }
-
-    private License convert(io.swagger.models.License v2License) {
-        if (v2License == null) {
-            return null;
+        switch (definition.getType()) {
+            case "basic":
+                securityScheme = createBasicSecurityScheme();
+                break;
+            case "apiKey":
+                securityScheme = convertApiKeySecurityScheme(definition);
+                break;
+            case "oauth2":
+                securityScheme = convertOauth2SecurityScheme(definition);
+                break;
+            default:
+                securityScheme = new SecurityScheme();
         }
 
-        License license = new License();
-        license.setExtensions(convert(v2License.getVendorExtensions()));
-        license.setName(v2License.getName());
-        license.setUrl(v2License.getUrl());
+        securityScheme.setDescription(definition.getDescription());
+        securityScheme.setExtensions(convert(definition.getVendorExtensions()));
 
-        return license;
-    }
-
-    public Contact convert(io.swagger.models.Contact v2Contact) {
-        if (v2Contact == null) {
-            return null;
-        }
-
-        Contact contact = new Contact();
-
-        contact.setUrl(v2Contact.getUrl());
-        contact.setName(v2Contact.getName());
-        contact.setEmail(v2Contact.getEmail());
-
-        // TODO - treat this process after adding extensions to v2Contact object
-
-        return contact;
-    }
-
-    public PathItem convert(Path v2Path) {
-        PathItem v3Path = new PathItem();
-
-        if (v2Path instanceof RefPath) {
-
-            v3Path.set$ref(((RefPath) v2Path).get$ref());
-        } else {
-
-            if (v2Path.getParameters() != null) {
-                for (io.swagger.models.parameters.Parameter param : v2Path.getParameters()) {
-                    v3Path.addParametersItem(convert(param));
-                }
-            }
-
-            io.swagger.models.Operation v2Operation;
-
-            v2Operation = v2Path.getGet();
-            if (v2Operation != null) {
-                v3Path.setGet(convert(v2Operation));
-            }
-            v2Operation = v2Path.getPut();
-            if (v2Operation != null) {
-                v3Path.setPut(convert(v2Operation));
-            }
-            v2Operation = v2Path.getPost();
-            if (v2Operation != null) {
-                v3Path.setPost(convert(v2Operation));
-            }
-            v2Operation = v2Path.getPatch();
-            if (v2Operation != null) {
-                v3Path.setPatch(convert(v2Operation));
-            }
-            v2Operation = v2Path.getDelete();
-            if (v2Operation != null) {
-                v3Path.setDelete(convert(v2Operation));
-            }
-            v2Operation = v2Path.getHead();
-            if (v2Operation != null) {
-                v3Path.setHead(convert(v2Operation));
-            }
-            v2Operation = v2Path.getOptions();
-            if (v2Operation != null) {
-                v3Path.setOptions(convert(v2Operation));
-            }
-
-            v3Path.setExtensions(convert(v2Path.getVendorExtensions()));
-        }
-
-        return v3Path;
-    }
-
-    private boolean isRefABodyParam(io.swagger.models.parameters.Parameter param) {
-        if (param instanceof RefParameter) {
-            RefParameter refParameter = (RefParameter) param;
-            String simpleRef = refParameter.getSimpleRef();
-            io.swagger.models.parameters.Parameter parameter = globalV2Parameters.get(simpleRef);
-            return "body".equals(parameter.getIn());
-        }
-        return false;
-    }
-
-    private boolean isRefAFormParam(io.swagger.models.parameters.Parameter param) {
-        if (param instanceof RefParameter) {
-            RefParameter refParameter = (RefParameter) param;
-            String simpleRef = refParameter.getSimpleRef();
-            io.swagger.models.parameters.Parameter parameter = globalV2Parameters.get(simpleRef);
-            return "formData".equals(parameter.getIn());
-        }
-        return false;
-    }
-
-    public Operation convert(io.swagger.models.Operation v2Operation) {
-        Operation operation = new Operation();
-        if (StringUtils.isNotBlank(v2Operation.getDescription())) {
-            operation.setDescription(v2Operation.getDescription());
-        }
-        if (StringUtils.isNotBlank(v2Operation.getSummary())) {
-            operation.setSummary(v2Operation.getSummary());
-        }
-        operation.setDeprecated(v2Operation.isDeprecated());
-        operation.setOperationId(v2Operation.getOperationId());
-        operation.setExtensions(convert(v2Operation.getVendorExtensions()));
-
-        operation.setTags(v2Operation.getTags());
-
-        if (v2Operation.getParameters() != null) {
-            List<io.swagger.models.parameters.Parameter> formParams = new ArrayList<>();
-            for (io.swagger.models.parameters.Parameter param : v2Operation.getParameters()) {
-
-                if ("formData".equals(param.getIn())) {
-                    formParams.add(param);
-                } else if ("body".equals(param.getIn())) {
-                    operation.setRequestBody(convertParameterToRequestBody(param, v2Operation.getConsumes()));
-                    operation.addExtension("x-codegen-request-body-name", param.getName());
-                } else {
-                    Parameter convert = convert(param);
-                    String $ref = convert.get$ref();
-                    if ($ref != null && $ref.startsWith("#/components/requestBodies/") && isRefABodyParam(param)) {
-                        operation.setRequestBody(new RequestBody().$ref($ref));
-                    } else if ($ref != null && $ref.startsWith("#/components/schemas/") && isRefAFormParam(param)) {
-                        formParams.add(param);
-                    } else {
-                        operation.addParametersItem(convert);
-                    }
-                }
-            }
-
-            if (formParams.size() > 0) {
-                RequestBody body = convertFormDataToRequestBody(formParams, v2Operation.getConsumes());
-                body.getContent().forEach((key, content) -> {
-                    Schema schema = content.getSchema();
-                    if (schema != null && schema.getRequired() != null && schema.getRequired().size() > 0) {
-                        body.setRequired(Boolean.TRUE);
-                    }
-                });
-                operation.requestBody(body);
-            }
-
-        }
-
-        if (v2Operation.getResponses() != null) {
-            for (String responseCode : v2Operation.getResponses().keySet()) {
-                io.swagger.models.Response v2Response = v2Operation.getResponses().get(responseCode);
-                ApiResponse response = convert(v2Response, v2Operation.getProduces());
-                ApiResponses responses = operation.getResponses();
-                if (responses == null) {
-                    responses = new ApiResponses();
-                }
-
-                operation.responses(responses.addApiResponse(responseCode, response));
-            }
-        }
-
-        if (v2Operation.getExternalDocs() != null) {
-            operation.setExternalDocs(convert(v2Operation.getExternalDocs()));
-        }
-
-        if (v2Operation.getSecurity() != null && v2Operation.getSecurity().size() > 0) {
-            operation.setSecurity(convertSecurityRequirementsMap(v2Operation.getSecurity()));
-        }
-
-        return operation;
-    }
-
-    private Map<String, Object> convert(Map<String, Object> vendorExtensions) {
-        if (vendorExtensions != null && vendorExtensions.size() > 0) {
-            vendorExtensions.entrySet().removeIf(extension -> (
-                extension.getKey().equals("x-example")) ||
-                extension.getKey().equals("x-examples") ||
-                extension.getKey().equals("x-nullable"));
-        }
-
-        return vendorExtensions;
-    }
-
-    private Schema convertFormDataToSchema(io.swagger.models.parameters.Parameter formParam) {
-        SerializableParameter sp = (SerializableParameter) formParam;
-        return convert(sp);
-    }
-
-    private RequestBody convertFormDataToRequestBody(List<io.swagger.models.parameters.Parameter> formParams,
-        List<String> consumes) {
-        RequestBody body = new RequestBody();
-
-        Schema formSchema = new Schema();
-
-        for (io.swagger.models.parameters.Parameter param : formParams) {
-            SerializableParameter sp;
-
-            Schema schema;
-            String name;
-            if (param instanceof RefParameter) {
-                RefParameter refParameter = (RefParameter) param;
-                String simpleRef = refParameter.getSimpleRef();
-                sp = (SerializableParameter) globalV2Parameters.get(simpleRef);
-                name = components.getSchemas().get("formData_" + simpleRef).getName();
-                schema = new Schema().$ref("#/components/schemas/formData_" + simpleRef);
-            } else {
-                sp = (SerializableParameter) param;
-                schema = convert(sp);
-                name = schema.getName();
-            }
-
-            if (sp.getRequired()) {
-                formSchema.addRequiredItem(sp.getName());
-            }
-
-            formSchema.addProperties(name, schema);
-        }
-
-        List<String> mediaTypes = new ArrayList<>(globalConsumes);
-        if (consumes != null && consumes.size() > 0) {
-            mediaTypes.clear();
-            mediaTypes.addAll(consumes);
-        }
-
-        // Assume multipart/form-data if nothing is specified
-        if (mediaTypes.size() == 0) {
-            mediaTypes.add("multipart/form-data");
-        }
-
-        Content content = new Content();
-        for (String type : mediaTypes) {
-            content.addMediaType(type, new MediaType().schema(formSchema));
-        }
-        body.content(content);
-        return body;
+        return securityScheme;
     }
 
     private Schema convert(SerializableParameter sp) {
@@ -751,29 +423,20 @@ public class SwaggerConverter implements SwaggerParserExtension {
                 ptype = PrimitiveType.fromTypeAndFormat(sp.getType(), null);
                 if (ptype != null) {
                     schema = ptype.createProperty();
-                    schema.setFormat(sp.getFormat());
                 } else {
                     schema = new Schema();
                     schema.setType(sp.getType());
-                    schema.setFormat(sp.getFormat());
                 }
+                schema.setFormat(sp.getFormat());
             }
         }
 
         schema.setDescription(sp.getDescription());
         schema.setReadOnly(sp.isReadOnly());
         schema.setEnum(sp.getEnum());
-
-        if (sp.getMaxItems() != null) {
-            schema.setMaxItems(sp.getMaxItems());
-        }
-        if (sp.getMinItems() != null) {
-            schema.setMinItems(sp.getMinItems());
-        }
-        if (sp.isUniqueItems() != null) {
-            schema.setUniqueItems(sp.isUniqueItems());
-        }
-
+        ifNotNull(sp.getMaxItems(), schema::setMaxLength);
+        ifNotNull(sp.getMinItems(), schema::setMinItems);
+        ifNotNull(sp.isUniqueItems(), schema::setUniqueItems);
         schema.setMaximum(sp.getMaximum());
         schema.setExclusiveMaximum(sp.isExclusiveMaximum());
         schema.setMinimum(sp.getMinimum());
@@ -807,139 +470,8 @@ public class SwaggerConverter implements SwaggerParserExtension {
         return schema;
     }
 
-    private RequestBody convertParameterToRequestBody(io.swagger.models.parameters.Parameter param) {
-        return convertParameterToRequestBody(param, null);
-    }
-
-    private RequestBody convertParameterToRequestBody(io.swagger.models.parameters.Parameter param,
-        List<String> consumes) {
-        RequestBody body = new RequestBody();
-        BodyParameter bp = (BodyParameter) param;
-
-        List<String> mediaTypes = new ArrayList<>(globalConsumes);
-        if (consumes != null && consumes.size() > 0) {
-            mediaTypes.clear();
-            mediaTypes.addAll(consumes);
-        }
-
-        if (mediaTypes.size() == 0) {
-            mediaTypes.add("*/*");
-        }
-
-        if (StringUtils.isNotBlank(param.getDescription())) {
-            body.description(param.getDescription());
-        }
-        body.required(param.getRequired());
-
-        Content content = new Content();
-        for (String type : mediaTypes) {
-            content.addMediaType(type,
-                new MediaType().schema(
-                    convert(bp.getSchema())));
-            if (StringUtils.isNotBlank(bp.getDescription())) {
-                body.setDescription(bp.getDescription());
-            }
-        }
-        convertExamples(((BodyParameter) param).getExamples(), content);
-        body.content(content);
-        return body;
-    }
-
-    public ApiResponse convert(Response response) {
-        return convert(response, null);
-    }
-
-    public ApiResponse convert(io.swagger.models.Response v2Response, List<String> produces) {
-        ApiResponse response = new ApiResponse();
-        Content content = new Content();
-
-        if (v2Response instanceof RefResponse) {
-
-            RefResponse ref = (RefResponse) v2Response;
-            if (ref.get$ref().indexOf("#/responses") == 0) {
-                String updatedRef = "#/components/responses" + ref.get$ref().substring("#/responses".length());
-                ref.set$ref(updatedRef);
-            }
-
-            response.set$ref(ref.get$ref());
-        } else {
-
-            List<String> mediaTypes = new ArrayList<>(globalProduces);
-            if (produces != null) {
-                // use this for media type
-                mediaTypes.clear();
-                mediaTypes.addAll(produces);
-            }
-
-            if (mediaTypes.size() == 0) {
-                mediaTypes.add("*/*");
-            }
-
-            response.setDescription(v2Response.getDescription());
-
-            if (v2Response.getSchema() != null) {
-                Schema schema = convertFileSchema(convert(v2Response.getSchema()));
-                for (String type : mediaTypes) {
-                    // TODO: examples
-                    MediaType mediaType = new MediaType();
-                    content.addMediaType(type, mediaType.schema(schema));
-                }
-                response.content(content);
-            }
-
-            response.content(convertExamples(v2Response.getExamples(), content));
-            response.setExtensions(convert(v2Response.getVendorExtensions()));
-
-            if (v2Response.getHeaders() != null && v2Response.getHeaders().size() > 0) {
-                response.setHeaders(convertHeaders(v2Response.getHeaders()));
-            }
-        }
-
-        return response;
-    }
-
-    private Content convertExamples(final Map examples, final Content content) {
-        if (examples != null) {
-            examples.forEach((k, v) -> {
-                MediaType mT = content.get(k);
-                if (mT == null) {
-                    mT = new MediaType();
-                    content.addMediaType(k.toString(), mT);
-                }
-                mT.setExample(v);
-            });
-        }
-        return content;
-    }
-
-    private Schema convertFileSchema(Schema schema) {
-        if ("file".equals(schema.getType())) {
-            schema.setType("string");
-            schema.setFormat("binary");
-        }
-
-        return schema;
-    }
-
-    private Map<String, Header> convertHeaders(Map<String, Property> headers) {
-        Map<String, Header> result = new HashMap<>();
-
-        headers.forEach((k, v) -> {
-            result.put(k, convertHeader(v));
-        });
-
-        return result;
-    }
-
-    private Header convertHeader(Property property) {
-        Schema schema = convert(property);
-        schema.setDescription(null);
-
-        Header header = new Header();
-        header.setDescription(property.getDescription());
-        header.setSchema(schema);
-
-        return header;
+    public ApiResponse convert(Response response, List<String> globalProduces) {
+        return convert(response, null, globalProduces);
     }
 
     private Schema convert(Property schema) {
@@ -977,8 +509,7 @@ public class SwaggerConverter implements SwaggerParserExtension {
             result = arraySchema;
 
         } else if (schema instanceof FileProperty) {
-            FileSchema fileSchema = Json.mapper().convertValue(schema, FileSchema.class);
-            result = fileSchema;
+            result = Json.mapper().convertValue(schema, FileSchema.class);
 
         } else {
 
@@ -1030,6 +561,56 @@ public class SwaggerConverter implements SwaggerParserExtension {
         return result;
     }
 
+    public ApiResponse convert(io.swagger.models.Response v2Response, List<String> produces,
+        List<String> globalProduces) {
+        ApiResponse response = new ApiResponse();
+        Content content = new Content();
+
+        if (v2Response instanceof RefResponse) {
+
+            RefResponse ref = (RefResponse) v2Response;
+            if (ref.get$ref().indexOf("#/responses") == 0) {
+                String updatedRef = "#/components/responses" + ref.get$ref().substring("#/responses".length());
+                ref.set$ref(updatedRef);
+            }
+
+            response.set$ref(ref.get$ref());
+        } else {
+
+            List<String> mediaTypes = new ArrayList<>(globalProduces);
+            if (produces != null) {
+                // use this for media type
+                mediaTypes.clear();
+                mediaTypes.addAll(produces);
+            }
+
+            if (mediaTypes.size() == 0) {
+                mediaTypes.add("*/*");
+            }
+
+            response.setDescription(v2Response.getDescription());
+
+            if (v2Response.getSchema() != null) {
+                Schema schema = convertFileSchema(convert(v2Response.getSchema()));
+                for (String type : mediaTypes) {
+                    // TODO: examples
+                    MediaType mediaType = new MediaType();
+                    content.addMediaType(type, mediaType.schema(schema));
+                }
+                response.content(content);
+            }
+
+            response.content(convertExamples(v2Response.getExamples(), content));
+            response.setExtensions(convert(v2Response.getVendorExtensions()));
+
+            if (v2Response.getHeaders() != null && v2Response.getHeaders().size() > 0) {
+                response.setHeaders(convertHeaders(v2Response.getHeaders()));
+            }
+        }
+
+        return response;
+    }
+
     public Parameter convert(io.swagger.models.parameters.Parameter v2Parameter) {
         Parameter v3Parameter = new Parameter();
 
@@ -1054,8 +635,8 @@ public class SwaggerConverter implements SwaggerParserExtension {
             RefParameter ref = (RefParameter) v2Parameter;
             if (ref.get$ref().indexOf("#/parameters") == 0) {
                 String updatedRef = "#/components/";
-                if (components.getRequestBodies() != null &&
-                    components.getRequestBodies().get(ref.getSimpleRef()) != null) {
+                if (components.getRequestBodies() != null
+                    && components.getRequestBodies().get(ref.getSimpleRef()) != null) {
                     updatedRef += "requestBodies";
                 } else if (components.getSchemas() != null
                     && components.getSchemas().get("formData_" + ref.getSimpleRef()) != null) {
@@ -1115,15 +696,9 @@ public class SwaggerConverter implements SwaggerParserExtension {
                 Schema itemsSchema = convert(items);
                 a.setItems(itemsSchema);
 
-                if (sp.getMaxItems() != null) {
-                    a.setMaxItems(sp.getMaxItems());
-                }
-                if (sp.getMinItems() != null) {
-                    a.setMinItems(sp.getMinItems());
-                }
-                if (sp.isUniqueItems() != null) {
-                    a.setUniqueItems(sp.isUniqueItems());
-                }
+                ifNotNull(sp.getMaxItems(), schema::setMaxLength);
+                ifNotNull(sp.getMinItems(), schema::setMinItems);
+                ifNotNull(sp.isUniqueItems(), schema::setUniqueItems);
 
                 schema = a;
             } else {
@@ -1258,14 +833,433 @@ public class SwaggerConverter implements SwaggerParserExtension {
         return result;
     }
 
+    public SwaggerParseResult convert(SwaggerDeserializationResult parse) {
+        if (parse == null) {
+            return null;
+        }
+
+        SwaggerParseResult output = new SwaggerParseResult().messages(parse.getMessages());
+
+        if (parse.getSwagger() == null) {
+            return output;
+        }
+
+        OpenAPI openapi = new OpenAPI();
+        final SwaggerInventory inventory = new SwaggerInventory().process(parse.getSwagger());
+        final List<String> globalConsumes = new ArrayList<>();
+        final List<String> globalProduces = new ArrayList<>();
+        Swagger swagger = parse.getSwagger();
+
+        if (swagger.getVendorExtensions() != null) {
+            openapi.setExtensions(convert(swagger.getVendorExtensions()));
+        }
+        // Set extension to retain original version of OAS document.
+        openapi.addExtension("x-original-swagger-version", swagger.getSwagger());
+
+        if (swagger.getExternalDocs() != null) {
+            openapi.setExternalDocs(convert(swagger.getExternalDocs()));
+        }
+
+        if (swagger.getInfo() != null) {
+            openapi.setInfo(convert(swagger.getInfo()));
+        }
+
+        openapi.setServers(convert(swagger.getSchemes(), swagger.getHost(), swagger.getBasePath()));
+
+        if (swagger.getTags() != null) {
+            openapi.setTags(convertTags(swagger.getTags()));
+        }
+
+        if (swagger.getConsumes() != null) {
+            globalConsumes.addAll(swagger.getConsumes());
+        }
+
+        if (swagger.getProduces() != null) {
+            globalProduces.addAll(swagger.getProduces());
+        }
+
+        if (swagger.getSecurity() != null && swagger.getSecurity().size() > 0) {
+            openapi.setSecurity(convertSecurityRequirements(swagger.getSecurity()));
+        }
+
+        List<Model> models = inventory.getModels();
+
+        // TODO until we have the example object working correctly in v3 pojos...
+        for (Model model : models) {
+            if (model instanceof RefModel) {
+                RefModel ref = (RefModel) model;
+                if (ref.get$ref().indexOf("#/definitions") == 0) {
+                    String updatedRef = "#/components/schemas" + ref.get$ref().substring("#/definitions".length());
+                    ref.set$ref(updatedRef);
+                }
+            }
+        }
+
+        for (Property property : inventory.getProperties()) {
+            if (property instanceof RefProperty) {
+                RefProperty ref = (RefProperty) property;
+                if (ref.get$ref().indexOf("#/definitions") == 0) {
+                    String updatedRef = "#/components/schemas" + ref.get$ref().substring("#/definitions".length());
+                    ref.set$ref(updatedRef);
+                }
+            }
+
+            if (property instanceof ComposedProperty) {
+                ComposedProperty comprop = (ComposedProperty) property;
+                if (comprop.getAllOf() != null) {
+                    for (Property item : comprop.getAllOf()) {
+                        if (item instanceof RefProperty) {
+                            RefProperty ref = (RefProperty) item;
+                            if (ref.get$ref().indexOf("#/definitions") == 0) {
+                                String updatedRef =
+                                    "#/components/schemas" + ref.get$ref().substring("#/definitions".length());
+                                ref.set$ref(updatedRef);
+                            }
+
+
+                        }
+
+                    }
+                }
+            }
+        }
+
+        if (swagger.getParameters() != null) {
+            globalV2Parameters.putAll(swagger.getParameters());
+            swagger.getParameters().forEach((k, v) -> {
+                if ("body".equals(v.getIn())) {
+                    components.addRequestBodies(k, convertParameterToRequestBody(v, globalConsumes));
+                } else if ("formData".equals(v.getIn())) {
+                    // formData_ is added not to overwrite existing schemas
+                    components.addSchemas("formData_" + k, convertFormDataToSchema(v));
+                } else {
+                    components.addParameters(k, convert(v));
+                }
+            });
+        }
+
+        Paths v3Paths = new Paths();
+        Map<String, Path> pathMap = Optional.ofNullable(swagger.getPaths()).orElse(new HashMap<>());
+        for (String pathname : pathMap.keySet()) {
+            io.swagger.models.Path v2Path = swagger.getPath(pathname);
+            PathItem v3Path = convert(v2Path, globalConsumes, globalProduces);
+            v3Paths.put(pathname, v3Path);
+        }
+        openapi.setPaths(v3Paths);
+
+        if (swagger.getResponses() != null) {
+            swagger.getResponses().forEach((k, v) -> components.addResponses(k, convert(v, globalProduces)));
+        }
+
+        if (swagger.getDefinitions() != null) {
+            for (String key : swagger.getDefinitions().keySet()) {
+                Model model = swagger.getDefinitions().get(key);
+                Schema schema = convert(model);
+
+                components.addSchemas(key, schema);
+            }
+        }
+
+        if (swagger.getSecurityDefinitions() != null) {
+            swagger.getSecurityDefinitions().forEach((k, v) -> components.addSecuritySchemes(k, convert(v)));
+        }
+
+        openapi.setComponents(components);
+
+        output.setOpenAPI(openapi);
+
+        return output;
+    }
+
+    private List<io.swagger.v3.oas.models.security.SecurityRequirement> convertSecurityRequirements(
+        List<SecurityRequirement> security) {
+        List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = new ArrayList<>();
+
+        for (SecurityRequirement requirement : security) {
+            io.swagger.v3.oas.models.security.SecurityRequirement securityRequirement =
+                new io.swagger.v3.oas.models.security.SecurityRequirement();
+
+            requirement.getRequirements().forEach(securityRequirement::addList);
+
+            securityRequirements.add(securityRequirement);
+        }
+
+        return securityRequirements;
+    }
+
+    private List<io.swagger.v3.oas.models.security.SecurityRequirement> convertSecurityRequirementsMap(
+        List<Map<String, List<String>>> security) {
+        List<io.swagger.v3.oas.models.security.SecurityRequirement> securityRequirements = new ArrayList<>();
+
+        for (Map<String, List<String>> map : security) {
+            io.swagger.v3.oas.models.security.SecurityRequirement securityRequirement =
+                new io.swagger.v3.oas.models.security.SecurityRequirement();
+
+            map.forEach(securityRequirement::addList);
+
+            securityRequirements.add(securityRequirement);
+        }
+
+        return securityRequirements;
+    }
+
+
+    private SecurityScheme convertOauth2SecurityScheme(SecuritySchemeDefinition definition) {
+        SecurityScheme securityScheme = new SecurityScheme();
+        OAuth2Definition oauthToDefinition = (OAuth2Definition) definition;
+        OAuthFlows oauthFlows = new OAuthFlows();
+        OAuthFlow oauthFlow = new OAuthFlow();
+
+        securityScheme.setType(SecurityScheme.Type.OAUTH2);
+        String flow = oauthToDefinition.getFlow();
+
+        if (flow != null) {
+            switch (flow) {
+                case "implicit":
+                    oauthFlow.setAuthorizationUrl(oauthToDefinition.getAuthorizationUrl());
+                    oauthFlows.setImplicit(oauthFlow);
+                    break;
+                case "password":
+                    oauthFlow.setTokenUrl(oauthToDefinition.getTokenUrl());
+                    oauthFlows.setPassword(oauthFlow);
+                    break;
+                case "application":
+                    oauthFlow.setTokenUrl(oauthToDefinition.getTokenUrl());
+                    oauthFlows.setClientCredentials(oauthFlow);
+                    break;
+                case "accessCode":
+                    oauthFlow.setAuthorizationUrl(oauthToDefinition.getAuthorizationUrl());
+                    oauthFlow.setTokenUrl(oauthToDefinition.getTokenUrl());
+                    oauthFlows.setAuthorizationCode(oauthFlow);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        Scopes scopes = new Scopes();
+        Map<String, String> oauth2Scopes = oauthToDefinition.getScopes();
+        if (oauth2Scopes != null) {
+            oauth2Scopes.forEach(scopes::addString);
+        }
+        oauthFlow.setScopes(scopes);
+
+        securityScheme.setFlows(oauthFlows);
+
+        return securityScheme;
+    }
+
+    private SecurityScheme convertApiKeySecurityScheme(SecuritySchemeDefinition definition) {
+        SecurityScheme securityScheme = new SecurityScheme();
+        ApiKeyAuthDefinition apiKeyAuthDefinition = (ApiKeyAuthDefinition) definition;
+
+        securityScheme.setType(SecurityScheme.Type.APIKEY);
+        securityScheme.setName(apiKeyAuthDefinition.getName());
+        securityScheme.setIn(SecurityScheme.In.valueOf(apiKeyAuthDefinition.getIn().toString()));
+
+        return securityScheme;
+    }
+
+    private SecurityScheme createBasicSecurityScheme() {
+        SecurityScheme securityScheme = new SecurityScheme();
+
+        securityScheme.setType(SecurityScheme.Type.HTTP);
+        securityScheme.setScheme("basic");
+
+        return securityScheme;
+    }
+
+    private List<Tag> convertTags(List<io.swagger.models.Tag> v2tags) {
+        List<Tag> v3tags = new ArrayList<>();
+
+        for (io.swagger.models.Tag v2tag : v2tags) {
+            Tag v3tag = new Tag();
+
+            v3tag.setDescription(v2tag.getDescription());
+            v3tag.setName(v2tag.getName());
+
+            if (v2tag.getExternalDocs() != null) {
+                v3tag.setExternalDocs(convert(v2tag.getExternalDocs()));
+            }
+
+            Map<String, Object> extensions = convert(v2tag.getVendorExtensions());
+            if (extensions != null) {
+                v3tag.setExtensions(extensions);
+            }
+            v3tags.add(v3tag);
+        }
+
+        return v3tags;
+    }
+
+
+    private boolean isRefABodyParam(io.swagger.models.parameters.Parameter param) {
+        if (param instanceof RefParameter) {
+            RefParameter refParameter = (RefParameter) param;
+            String simpleRef = refParameter.getSimpleRef();
+            io.swagger.models.parameters.Parameter parameter = globalV2Parameters.get(simpleRef);
+            return "body".equals(parameter.getIn());
+        }
+        return false;
+    }
+
+    private boolean isRefAFormParam(io.swagger.models.parameters.Parameter param) {
+        if (param instanceof RefParameter) {
+            RefParameter refParameter = (RefParameter) param;
+            String simpleRef = refParameter.getSimpleRef();
+            io.swagger.models.parameters.Parameter parameter = globalV2Parameters.get(simpleRef);
+            return "formData".equals(parameter.getIn());
+        }
+        return false;
+    }
+
+
+    private Schema convertFormDataToSchema(io.swagger.models.parameters.Parameter formParam) {
+        SerializableParameter sp = (SerializableParameter) formParam;
+        return convert(sp);
+    }
+
+    private RequestBody convertFormDataToRequestBody(List<io.swagger.models.parameters.Parameter> formParams,
+        List<String> consumes, List<String> globalConsumes) {
+        final RequestBody body = new RequestBody();
+
+        Schema formSchema = new Schema();
+
+        for (io.swagger.models.parameters.Parameter param : formParams) {
+            SerializableParameter sp;
+
+            Schema schema;
+            String name;
+            if (param instanceof RefParameter) {
+                RefParameter refParameter = (RefParameter) param;
+                String simpleRef = refParameter.getSimpleRef();
+                sp = (SerializableParameter) globalV2Parameters.get(simpleRef);
+                name = components.getSchemas().get("formData_" + simpleRef).getName();
+                schema = new Schema().$ref("#/components/schemas/formData_" + simpleRef);
+            } else {
+                sp = (SerializableParameter) param;
+                schema = convert(sp);
+                name = schema.getName();
+            }
+
+            if (sp.getRequired()) {
+                formSchema.addRequiredItem(sp.getName());
+            }
+
+            formSchema.addProperties(name, schema);
+        }
+
+        List<String> mediaTypes = new ArrayList<>(globalConsumes);
+        if (consumes != null && consumes.size() > 0) {
+            mediaTypes.clear();
+            mediaTypes.addAll(consumes);
+        }
+
+        // Assume multipart/form-data if nothing is specified
+        if (mediaTypes.size() == 0) {
+            mediaTypes.add("multipart/form-data");
+        }
+
+        Content content = new Content();
+        for (String type : mediaTypes) {
+            content.addMediaType(type, new MediaType().schema(formSchema));
+        }
+        body.content(content);
+        return body;
+    }
+
+
+    private RequestBody convertParameterToRequestBody(io.swagger.models.parameters.Parameter param,
+        List<String> globalConsumes) {
+        return convertParameterToRequestBody(param, null, globalConsumes);
+    }
+
+    private RequestBody convertParameterToRequestBody(io.swagger.models.parameters.Parameter param,
+        List<String> consumes, List<String> globalConsumes) {
+        RequestBody body = new RequestBody();
+        BodyParameter bp = (BodyParameter) param;
+
+        List<String> mediaTypes = new ArrayList<>(globalConsumes);
+        if (consumes != null && consumes.size() > 0) {
+            mediaTypes.clear();
+            mediaTypes.addAll(consumes);
+        }
+
+        if (mediaTypes.size() == 0) {
+            mediaTypes.add("*/*");
+        }
+
+        if (StringUtils.isNotBlank(param.getDescription())) {
+            body.description(param.getDescription());
+        }
+        body.required(param.getRequired());
+
+        Content content = new Content();
+        for (String type : mediaTypes) {
+            content.addMediaType(type,
+                new MediaType().schema(
+                    convert(bp.getSchema())));
+            if (StringUtils.isNotBlank(bp.getDescription())) {
+                body.setDescription(bp.getDescription());
+            }
+        }
+        convertExamples(((BodyParameter) param).getExamples(), content);
+        body.content(content);
+        return body;
+    }
+
+
+    private Content convertExamples(final Map examples, final Content content) {
+        if (examples != null) {
+            examples.forEach((k, v) -> {
+                MediaType mt = content.computeIfAbsent(k.toString(), (key) -> new MediaType());
+                mt.setExample(v);
+            });
+        }
+        return content;
+    }
+
+    private Schema convertFileSchema(Schema schema) {
+        if ("file".equals(schema.getType())) {
+            schema.setType("string");
+            schema.setFormat("binary");
+        }
+
+        return schema;
+    }
+
+    private Map<String, Header> convertHeaders(Map<String, Property> headers) {
+        Map<String, Header> result = new HashMap<>();
+
+        headers.forEach((k, v) -> result.put(k, convertHeader(v)));
+
+        return result;
+    }
+
+    private Header convertHeader(Property property) {
+        Schema schema = convert(property);
+        schema.setDescription(null);
+
+        Header header = new Header();
+        header.setDescription(property.getDescription());
+        header.setSchema(schema);
+
+        return header;
+    }
+
+
     private void addProperties(Model v2Model, Schema schema) {
         if ((v2Model.getProperties() != null) && (v2Model.getProperties().size() > 0)) {
             Map<String, Property> properties = v2Model.getProperties();
 
-            properties.forEach((k, v) -> {
-                schema.addProperties(k, convert(v));
-            });
+            properties.forEach((k, v) -> schema.addProperties(k, convert(v)));
 
+        }
+    }
+
+    public static <T> void ifNotNull(T t, Consumer<T> callback) {
+        if (Objects.nonNull(t)) {
+            callback.accept(t);
         }
     }
 }
