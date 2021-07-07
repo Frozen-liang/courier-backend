@@ -87,9 +87,6 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class SwaggerConverter implements SwaggerParserExtension {
 
-    private final Components components = new Components();
-    private final Map<String, io.swagger.models.parameters.Parameter> globalV2Parameters = new HashMap<>();
-
     @Override
     public SwaggerParseResult readLocation(String url, List<AuthorizationValue> auths, ParseOptions options) {
         boolean resolve = false;
@@ -157,7 +154,8 @@ public class SwaggerConverter implements SwaggerParserExtension {
     }
 
     public Operation convert(io.swagger.models.Operation v2Operation, List<String> globalConsumes,
-        List<String> globalProduces) {
+        List<String> globalProduces, Map<String, io.swagger.models.parameters.Parameter> globalV2Parameters,
+        Components components) {
         Operation operation = new Operation();
         if (StringUtils.isNotBlank(v2Operation.getDescription())) {
             operation.setDescription(v2Operation.getDescription());
@@ -173,20 +171,25 @@ public class SwaggerConverter implements SwaggerParserExtension {
 
         if (v2Operation.getParameters() != null) {
             List<io.swagger.models.parameters.Parameter> formParams = new ArrayList<>();
+            List<io.swagger.models.parameters.Parameter> bodyParams = new ArrayList<>();
             for (io.swagger.models.parameters.Parameter param : v2Operation.getParameters()) {
 
                 if ("formData".equals(param.getIn())) {
                     formParams.add(param);
                 } else if ("body".equals(param.getIn())) {
-                    operation.setRequestBody(
-                        convertParameterToRequestBody(param, v2Operation.getConsumes(), globalConsumes));
+                    bodyParams.add(param);
                     operation.addExtension("x-codegen-request-body-name", param.getName());
+                    /*operation.setRequestBody(
+                        convertParameterToRequestBody(param, v2Operation.getConsumes(), globalConsumes));
+                    operation.addExtension("x-codegen-request-body-name", param.getName());*/
                 } else {
-                    Parameter convert = convert(param);
+                    Parameter convert = convert(param, components);
                     String ref = convert.get$ref();
-                    if (ref != null && ref.startsWith("#/components/requestBodies/") && isRefABodyParam(param)) {
+                    if (ref != null && ref.startsWith("#/components/requestBodies/") && isRefABodyParam(param,
+                        globalV2Parameters)) {
                         operation.setRequestBody(new RequestBody().$ref(ref));
-                    } else if (ref != null && ref.startsWith("#/components/schemas/") && isRefAFormParam(param)) {
+                    } else if (ref != null && ref.startsWith("#/components/schemas/") && isRefAFormParam(param,
+                        globalV2Parameters)) {
                         formParams.add(param);
                     } else {
                         operation.addParametersItem(convert);
@@ -194,8 +197,21 @@ public class SwaggerConverter implements SwaggerParserExtension {
                 }
             }
 
+            if (bodyParams.size() > 0) {
+                RequestBody requestBody = convertParametersToRequestBody(bodyParams, v2Operation.getConsumes(),
+                    globalConsumes);
+                requestBody.getContent().forEach((key, content) -> {
+                    Schema schema = content.getSchema();
+                    if (schema != null && schema.getRequired() != null && schema.getRequired().size() > 0) {
+                        requestBody.setRequired(Boolean.TRUE);
+                    }
+                });
+                operation.setRequestBody(requestBody);
+            }
+
             if (formParams.size() > 0) {
-                RequestBody body = convertFormDataToRequestBody(formParams, v2Operation.getConsumes(), globalConsumes);
+                RequestBody body = convertFormDataToRequestBody(formParams, v2Operation.getConsumes(), globalConsumes,
+                    globalV2Parameters, components);
                 body.getContent().forEach((key, content) -> {
                     Schema schema = content.getSchema();
                     if (schema != null && schema.getRequired() != null && schema.getRequired().size() > 0) {
@@ -285,7 +301,8 @@ public class SwaggerConverter implements SwaggerParserExtension {
         return contact;
     }
 
-    public PathItem convert(Path v2Path, List<String> globalConsumes, List<String> globalProduces) {
+    public PathItem convert(Path v2Path, List<String> globalConsumes, List<String> globalProduces,
+        Map<String, io.swagger.models.parameters.Parameter> globalV2Parameters, Components components) {
         PathItem v3Path = new PathItem();
 
         if (v2Path instanceof RefPath) {
@@ -295,7 +312,7 @@ public class SwaggerConverter implements SwaggerParserExtension {
 
             if (v2Path.getParameters() != null) {
                 for (io.swagger.models.parameters.Parameter param : v2Path.getParameters()) {
-                    v3Path.addParametersItem(convert(param));
+                    v3Path.addParametersItem(convert(param, components));
                 }
             }
 
@@ -303,31 +320,31 @@ public class SwaggerConverter implements SwaggerParserExtension {
 
             v2Operation = v2Path.getGet();
             if (v2Operation != null) {
-                v3Path.setGet(convert(v2Operation, globalConsumes, globalProduces));
+                v3Path.setGet(convert(v2Operation, globalConsumes, globalProduces, globalV2Parameters, components));
             }
             v2Operation = v2Path.getPut();
             if (v2Operation != null) {
-                v3Path.setPut(convert(v2Operation, globalConsumes, globalProduces));
+                v3Path.setPut(convert(v2Operation, globalConsumes, globalProduces, globalV2Parameters, components));
             }
             v2Operation = v2Path.getPost();
             if (v2Operation != null) {
-                v3Path.setPost(convert(v2Operation, globalConsumes, globalProduces));
+                v3Path.setPost(convert(v2Operation, globalConsumes, globalProduces, globalV2Parameters, components));
             }
             v2Operation = v2Path.getPatch();
             if (v2Operation != null) {
-                v3Path.setPatch(convert(v2Operation, globalConsumes, globalProduces));
+                v3Path.setPatch(convert(v2Operation, globalConsumes, globalProduces, globalV2Parameters, components));
             }
             v2Operation = v2Path.getDelete();
             if (v2Operation != null) {
-                v3Path.setDelete(convert(v2Operation, globalConsumes, globalProduces));
+                v3Path.setDelete(convert(v2Operation, globalConsumes, globalProduces, globalV2Parameters, components));
             }
             v2Operation = v2Path.getHead();
             if (v2Operation != null) {
-                v3Path.setHead(convert(v2Operation, globalConsumes, globalProduces));
+                v3Path.setHead(convert(v2Operation, globalConsumes, globalProduces, globalV2Parameters, components));
             }
             v2Operation = v2Path.getOptions();
             if (v2Operation != null) {
-                v3Path.setOptions(convert(v2Operation, globalConsumes, globalProduces));
+                v3Path.setOptions(convert(v2Operation, globalConsumes, globalProduces, globalV2Parameters, components));
             }
 
             v3Path.setExtensions(convert(v2Path.getVendorExtensions()));
@@ -611,7 +628,7 @@ public class SwaggerConverter implements SwaggerParserExtension {
         return response;
     }
 
-    public Parameter convert(io.swagger.models.parameters.Parameter v2Parameter) {
+    public Parameter convert(io.swagger.models.parameters.Parameter v2Parameter, Components components) {
         Parameter v3Parameter = new Parameter();
 
         if (StringUtils.isNotBlank(v2Parameter.getDescription())) {
@@ -696,9 +713,9 @@ public class SwaggerConverter implements SwaggerParserExtension {
                 Schema itemsSchema = convert(items);
                 a.setItems(itemsSchema);
 
-                ifNotNull(sp.getMaxItems(), schema::setMaxLength);
-                ifNotNull(sp.getMinItems(), schema::setMinItems);
-                ifNotNull(sp.isUniqueItems(), schema::setUniqueItems);
+                ifNotNull(sp.getMaxItems(), a::setMaxLength);
+                ifNotNull(sp.getMinItems(), a::setMinItems);
+                ifNotNull(sp.isUniqueItems(), a::setUniqueItems);
 
                 schema = a;
             } else {
@@ -924,6 +941,8 @@ public class SwaggerConverter implements SwaggerParserExtension {
             }
         }
 
+        final Map<String, io.swagger.models.parameters.Parameter> globalV2Parameters = new HashMap<>();
+        final Components components = new Components();
         if (swagger.getParameters() != null) {
             globalV2Parameters.putAll(swagger.getParameters());
             swagger.getParameters().forEach((k, v) -> {
@@ -933,7 +952,7 @@ public class SwaggerConverter implements SwaggerParserExtension {
                     // formData_ is added not to overwrite existing schemas
                     components.addSchemas("formData_" + k, convertFormDataToSchema(v));
                 } else {
-                    components.addParameters(k, convert(v));
+                    components.addParameters(k, convert(v, components));
                 }
             });
         }
@@ -942,7 +961,7 @@ public class SwaggerConverter implements SwaggerParserExtension {
         Map<String, Path> pathMap = Optional.ofNullable(swagger.getPaths()).orElse(new HashMap<>());
         for (String pathname : pathMap.keySet()) {
             io.swagger.models.Path v2Path = swagger.getPath(pathname);
-            PathItem v3Path = convert(v2Path, globalConsumes, globalProduces);
+            PathItem v3Path = convert(v2Path, globalConsumes, globalProduces, globalV2Parameters, components);
             v3Paths.put(pathname, v3Path);
         }
         openapi.setPaths(v3Paths);
@@ -1093,7 +1112,8 @@ public class SwaggerConverter implements SwaggerParserExtension {
     }
 
 
-    private boolean isRefABodyParam(io.swagger.models.parameters.Parameter param) {
+    private boolean isRefABodyParam(io.swagger.models.parameters.Parameter param,
+        Map<String, io.swagger.models.parameters.Parameter> globalV2Parameters) {
         if (param instanceof RefParameter) {
             RefParameter refParameter = (RefParameter) param;
             String simpleRef = refParameter.getSimpleRef();
@@ -1103,7 +1123,8 @@ public class SwaggerConverter implements SwaggerParserExtension {
         return false;
     }
 
-    private boolean isRefAFormParam(io.swagger.models.parameters.Parameter param) {
+    private boolean isRefAFormParam(io.swagger.models.parameters.Parameter param,
+        Map<String, io.swagger.models.parameters.Parameter> globalV2Parameters) {
         if (param instanceof RefParameter) {
             RefParameter refParameter = (RefParameter) param;
             String simpleRef = refParameter.getSimpleRef();
@@ -1120,7 +1141,8 @@ public class SwaggerConverter implements SwaggerParserExtension {
     }
 
     private RequestBody convertFormDataToRequestBody(List<io.swagger.models.parameters.Parameter> formParams,
-        List<String> consumes, List<String> globalConsumes) {
+        List<String> consumes, List<String> globalConsumes,
+        Map<String, io.swagger.models.parameters.Parameter> globalV2Parameters, Components components) {
         final RequestBody body = new RequestBody();
 
         Schema formSchema = new Schema();
@@ -1204,6 +1226,51 @@ public class SwaggerConverter implements SwaggerParserExtension {
             }
         }
         convertExamples(((BodyParameter) param).getExamples(), content);
+        body.content(content);
+        return body;
+    }
+
+
+    private RequestBody convertParametersToRequestBody(List<io.swagger.models.parameters.Parameter> bodyParams,
+        List<String> consumes, List<String> globalConsumes) {
+
+        final RequestBody body = new RequestBody();
+
+        Schema bodySchema = new Schema();
+
+        for (io.swagger.models.parameters.Parameter param : bodyParams) {
+            BodyParameter sp = (BodyParameter) param;
+
+            Schema schema = convert(sp.getSchema());
+
+            String name = param.getName();
+            schema.setName(name);
+
+            if (StringUtils.isNotBlank(param.getDescription())) {
+                schema.setDescription(param.getDescription());
+            }
+
+            if (sp.getRequired()) {
+                bodySchema.addRequiredItem(sp.getName());
+            }
+
+            bodySchema.addProperties(name, schema);
+        }
+
+        List<String> mediaTypes = new ArrayList<>(globalConsumes);
+        if (consumes != null && consumes.size() > 0) {
+            mediaTypes.clear();
+            mediaTypes.addAll(consumes);
+        }
+
+        if (mediaTypes.size() == 0) {
+            mediaTypes.add("*/*");
+        }
+
+        Content content = new Content();
+        for (String type : mediaTypes) {
+            content.addMediaType(type, new MediaType().schema(bodySchema));
+        }
         body.content(content);
         return body;
     }

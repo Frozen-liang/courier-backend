@@ -106,7 +106,7 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
 
     @Override
     public Boolean recover(List<String> ids) {
-        return commonDeleteRepository.recover(ids,ApiEntity.class);
+        return commonDeleteRepository.recover(ids, ApiEntity.class);
     }
 
     private void createLookUpOperation(List<AggregationOperation> aggregationOperations) {

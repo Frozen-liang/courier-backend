@@ -30,14 +30,16 @@ public interface ApiMapper {
 
     ApiEntity toEntity(ApiRequest apiRequestDto);
 
-    @Mapping(target = "documentType", expression = "java(DocumentFileType.getType(request.getDocumentFileType()).getDocumentType())")
+    @Mapping(target = "documentType",
+        expression = "java(DocumentFileType.getType(request.getDocumentFileType()).getDocumentType())")
     @Mapping(target = "saveMode", expression = "java(SaveMode.getType(request.getSaveMode()))")
     @Mapping(target = "apiPresetStatus", expression = "java(ApiStatus.getType(request.getSaveMode()))")
     @Mapping(target = "apiChangeStatus", expression = "java(ApiStatus.getType(request.getSaveMode()))")
     @Mapping(target = "groupImportType", expression = "java(GroupImportType.getType(request.getSaveMode()))")
     ImportSourceVo toImportSource(ApiImportRequest request, String source);
 
-    @Mapping(target = "documentType", expression = "java(projectImportSourceEntity.getDocumentType().getDocumentType())")
+    @Mapping(target = "documentType",
+        expression = "java(projectImportSourceEntity.getDocumentType().getDocumentType())")
     @Mapping(target = "source", source = "documentUrl")
     ImportSourceVo toImportSource(ProjectImportSourceEntity projectImportSourceEntity);
 

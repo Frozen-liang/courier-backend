@@ -122,7 +122,6 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
                     diffApiEntities = buildDiffApiEntitiesBySaveMode(apiEntities, oldApiEntities, saveMode,
                         importSource.getApiChangeStatus());
                 }
-                log.info("diffApi:{}", diffApiEntities);
 
                 // Save different api.
                 updateApiEntitiesIfNeed(projectId, diffApiEntities);

@@ -84,8 +84,7 @@ public class ApiServiceImpl implements ApiService {
         });
         return true;
     }
-
-   /* private void importApi(ImportSourceVo importSource) {
+    /* private void importApi(ImportSourceVo importSource) {
         String projectId = importSource.getProjectId();
         DocumentType documentType = importSource.getDocumentType();
         DocumentDefinition definition = importSource.getDocumentDefinition();
@@ -249,6 +248,7 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public ApiResponse findById(String id) {
+
         return customizedApiRepository.findById(id).orElseThrow(() -> ExceptionUtils.mpe(GET_API_BY_ID_ERROR));
     }
 
