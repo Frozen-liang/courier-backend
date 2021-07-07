@@ -22,6 +22,7 @@ import com.sms.satp.dto.request.ApiTagRequest;
 import com.sms.satp.dto.response.ApiTagResponse;
 import com.sms.satp.entity.tag.ApiTag;
 import com.sms.satp.mapper.ApiTagMapper;
+import com.sms.satp.mapper.ApiTagMapperImpl;
 import com.sms.satp.repository.ApiTagRepository;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.service.impl.ApiTagServiceImpl;
@@ -39,7 +40,7 @@ import org.springframework.data.domain.Sort;
 class ApiTagServiceTest {
 
     private final ApiTagRepository apiTagRepository = mock(ApiTagRepository.class);
-    private final ApiTagMapper apiTagMapper = mock(ApiTagMapper.class);
+    private final ApiTagMapper apiTagMapper = new ApiTagMapperImpl();
     private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
     private final ApiTagService apiTagService = new ApiTagServiceImpl(
         apiTagRepository, commonDeleteRepository, apiTagMapper);
@@ -55,7 +56,6 @@ class ApiTagServiceTest {
     @DisplayName("Test the findById method in the ApiTag service")
     public void findById_test() {
         when(apiTagRepository.findById(ID)).thenReturn(Optional.of(apiTag));
-        when(apiTagMapper.toDto(apiTag)).thenReturn(apiTagResponse);
         ApiTagResponse result1 = apiTagService.findById(ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
@@ -72,7 +72,6 @@ class ApiTagServiceTest {
     @Test
     @DisplayName("Test the add method in the ApiTag service")
     public void add_test() {
-        when(apiTagMapper.toEntity(apiTagRequest)).thenReturn(apiTag);
         when(apiTagRepository.insert(any(ApiTag.class))).thenReturn(apiTag);
         apiTagService.add(apiTagRequest);
         verify(apiTagRepository, times(1)).insert(any(ApiTag.class));
@@ -81,7 +80,6 @@ class ApiTagServiceTest {
     @Test
     @DisplayName("An exception occurred while adding ApiTag")
     public void add_exception_test() {
-        when(apiTagMapper.toEntity(apiTagRequest)).thenReturn(apiTag);
         doThrow(new RuntimeException()).when(apiTagRepository).insert(any(ApiTag.class));
         assertThatThrownBy(() -> apiTagService.add(apiTagRequest))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -91,7 +89,6 @@ class ApiTagServiceTest {
     @Test
     @DisplayName("Test the edit method in the ApiTag service")
     public void edit_test() {
-        when(apiTagMapper.toEntity(apiTagRequest)).thenReturn(apiTag);
         when(apiTagRepository.existsById(any())).thenReturn(Boolean.TRUE);
         when(apiTagRepository.save(any(ApiTag.class))).thenReturn(apiTag);
         apiTagService.edit(apiTagRequest);
@@ -101,7 +98,6 @@ class ApiTagServiceTest {
     @Test
     @DisplayName("An exception occurred while edit ApiTag")
     public void edit_exception_test() {
-        when(apiTagMapper.toEntity(apiTagRequest)).thenReturn(apiTag);
         when(apiTagRepository.existsById(any())).thenReturn(Boolean.TRUE);
         doThrow(new RuntimeException()).when(apiTagRepository).save(any(ApiTag.class));
         assertThatThrownBy(() -> apiTagService.edit(apiTagRequest))
@@ -112,7 +108,6 @@ class ApiTagServiceTest {
     @Test
     @DisplayName("An not exist exception occurred while edit ApiTag")
     public void edit_not_exist_exception_test() {
-        when(apiTagMapper.toEntity(apiTagRequest)).thenReturn(apiTag);
         when(apiTagRepository.existsById(any())).thenReturn(Boolean.FALSE);
         assertThatThrownBy(() -> apiTagService.edit(apiTagRequest))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -126,12 +121,7 @@ class ApiTagServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             list.add(ApiTag.builder().build());
         }
-        ArrayList<ApiTagResponse> apiTagDtos = new ArrayList<>();
-        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            apiTagDtos.add(ApiTagResponse.builder().build());
-        }
         when(apiTagRepository.findAll(any(), any(Sort.class))).thenReturn(list);
-        when(apiTagMapper.toDtoList(list)).thenReturn(apiTagDtos);
         List<ApiTagResponse> result = apiTagService.list(apiTagListRequest);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
