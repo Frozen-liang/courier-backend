@@ -10,9 +10,10 @@ import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.project.ImportSourceVo;
 import com.sms.satp.entity.project.ProjectImportSourceEntity;
-import com.sms.satp.parser.common.DocumentDefinition;
 import com.sms.satp.utils.EnumCommonUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Objects;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,7 +22,8 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
     unmappedTargetPolicy = ReportingPolicy.IGNORE,
     uses = {ParamInfoMapper.class, EnumCommonUtils.class},
-    imports = {DocumentFileType.class, SaveMode.class, ApiStatus.class, GroupImportType.class})
+    imports = {DocumentFileType.class, SaveMode.class, ApiStatus.class, GroupImportType.class, Objects.class})
+@SuppressFBWarnings
 public interface ApiMapper {
 
     ApiResponse toDto(ApiEntity apiEntity);
@@ -31,7 +33,8 @@ public interface ApiMapper {
     ApiEntity toEntity(ApiRequest apiRequestDto);
 
     @Mapping(target = "documentType",
-        expression = "java(DocumentFileType.getType(request.getDocumentFileType()).getDocumentType())")
+        expression = "java(DocumentFileType"
+            + ".getType(Objects.requireNonNull(request.getDocumentFileType())).getDocumentType())")
     @Mapping(target = "saveMode", expression = "java(SaveMode.getType(request.getSaveMode()))")
     @Mapping(target = "apiPresetStatus", expression = "java(ApiStatus.getType(request.getSaveMode()))")
     @Mapping(target = "apiChangeStatus", expression = "java(ApiStatus.getType(request.getSaveMode()))")
