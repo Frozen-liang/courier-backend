@@ -33,8 +33,9 @@ public interface ApiMapper {
     ApiEntity toEntity(ApiRequest apiRequestDto);
 
     @Mapping(target = "documentType",
-        expression = "java(DocumentFileType"
-            + ".getType(Objects.requireNonNull(request.getDocumentFileType())).getDocumentType())")
+        expression =
+            "java(DocumentFileType.getType(Objects"
+                + ".requireNonNull(Objects.requireNonNull(request).getDocumentFileType())).getDocumentType())")
     @Mapping(target = "saveMode", expression = "java(SaveMode.getType(request.getSaveMode()))")
     @Mapping(target = "apiPresetStatus", expression = "java(ApiStatus.getType(request.getSaveMode()))")
     @Mapping(target = "apiChangeStatus", expression = "java(ApiStatus.getType(request.getSaveMode()))")
