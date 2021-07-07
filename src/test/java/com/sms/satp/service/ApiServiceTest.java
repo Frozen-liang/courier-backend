@@ -8,6 +8,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_API_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -20,12 +21,11 @@ import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
 import com.sms.satp.mapper.ApiHistoryMapper;
 import com.sms.satp.mapper.ApiMapper;
-import com.sms.satp.repository.ApiGroupRepository;
+import com.sms.satp.mapper.ApiMapperImpl;
+import com.sms.satp.mapper.ParamInfoMapperImpl;
 import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
-import com.sms.satp.repository.ProjectEntityRepository;
-import com.sms.satp.repository.ProjectImportFlowRepository;
 import com.sms.satp.service.impl.ApiServiceImpl;
 import java.util.Collections;
 import java.util.List;
@@ -39,16 +39,15 @@ import org.springframework.data.domain.Page;
 class ApiServiceTest {
 
     private final ApiRepository apiRepository = mock(ApiRepository.class);
-    private final ApiMapper apiMapper = mock(ApiMapper.class);
-    private final ProjectEntityRepository projectEntityRepository = mock(ProjectEntityRepository.class);
+    private final ApiMapper apiMapper = new ApiMapperImpl(new ParamInfoMapperImpl());
     private final ApiHistoryRepository apiHistoryRepository = mock(ApiHistoryRepository.class);
     private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
-    private final ApiGroupRepository apiGroupRepository = mock(ApiGroupRepository.class);
+    private final ProjectImportSourceService projectImportSourceService = mock(ProjectImportSourceService.class);
     private final ApiHistoryMapper apiHistoryMapper = mock(ApiHistoryMapper.class);
-    private final ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
+    private final AsyncService asyncService = mock(AsyncService.class);
     private final ApiService apiService = new ApiServiceImpl(
-        apiRepository, apiHistoryRepository, apiMapper, apiHistoryMapper, customizedApiRepository, apiGroupRepository,
-        projectImportFlowRepository);
+        apiRepository, apiHistoryRepository, apiMapper, apiHistoryMapper, customizedApiRepository,
+        asyncService, projectImportSourceService);
     private final ApiEntity api = ApiEntity.builder().id(ID).build();
     private final ApiResponse apiResponseDto = ApiResponse.builder().id(ID).build();
     private final ApiRequest apiRequestDto = ApiRequest.builder().id(ID).build();
@@ -57,8 +56,7 @@ class ApiServiceTest {
     @Test
     @DisplayName("Test the findById method in the Api service")
     public void findById_test() {
-        when(apiRepository.findById(ID)).thenReturn(Optional.of(api));
-        when(apiMapper.toDto(api)).thenReturn(apiResponseDto);
+        when(customizedApiRepository.findById(ID)).thenReturn(Optional.of(apiResponseDto));
         ApiResponse result1 = apiService.findById(ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
@@ -76,7 +74,6 @@ class ApiServiceTest {
     @Test
     @DisplayName("Test the add method in the Api service")
     public void add_test() {
-        when(apiMapper.toEntity(apiRequestDto)).thenReturn(api);
         when(apiRepository.insert(any(ApiEntity.class))).thenReturn(api);
         when(apiHistoryRepository.insert(any(ApiHistoryEntity.class))).thenReturn(ApiHistoryEntity.builder().build());
         Boolean bool = apiService.add(apiRequestDto);
@@ -86,7 +83,6 @@ class ApiServiceTest {
     @Test
     @DisplayName("An exception occurred while adding Api")
     public void add_exception_test() {
-        when(apiMapper.toEntity(any())).thenReturn(api);
         doThrow(new RuntimeException()).when(apiRepository).insert(any(ApiEntity.class));
         assertThatThrownBy(() -> apiService.add(apiRequestDto))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -96,7 +92,6 @@ class ApiServiceTest {
     @Test
     @DisplayName("Test the edit method in the Api service")
     public void edit_test() {
-        when(apiMapper.toEntity(apiRequestDto)).thenReturn(api);
         when(apiRepository.existsById(any())).thenReturn(Boolean.TRUE);
         when(apiRepository.save(any(ApiEntity.class))).thenReturn(api);
         when(apiHistoryRepository.insert(any(ApiHistoryEntity.class))).thenReturn(ApiHistoryEntity.builder().build());
@@ -107,7 +102,6 @@ class ApiServiceTest {
     @Test
     @DisplayName("An exception occurred while edit Api")
     public void edit_exception_test() {
-        when(apiMapper.toEntity(apiRequestDto)).thenReturn(api);
         when(apiRepository.existsById(any())).thenReturn(Boolean.TRUE);
         doThrow(new RuntimeException()).when(apiRepository).save(any(ApiEntity.class));
         assertThatThrownBy(() -> apiService.edit(apiRequestDto))
@@ -150,5 +144,20 @@ class ApiServiceTest {
         assertThatThrownBy(() -> apiService.delete(Collections.singletonList(ID)))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_API_BY_ID_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the deleteByIds method in the Api service")
+    public void deleteByIds_test() {
+        List<String> ids = Collections.singletonList(ID);
+        doNothing().when(apiRepository).deleteAllByIdIn(ids);
+        assertThat(apiService.deleteByIds(ids)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test the deleteAll method in the Api service")
+    public void deleteAll_test() {
+        doNothing().when(apiRepository).deleteAllByRemovedIsTrue();
+        assertThat(apiService.deleteAll()).isTrue();
     }
 }

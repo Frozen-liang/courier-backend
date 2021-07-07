@@ -19,6 +19,8 @@ public class ProjectRequest {
     @NotEmpty(message = "The id must not be empty.", groups = UpdateGroup.class)
     @Null(message = "The id must be null.", groups = InsertGroup.class)
     private String id;
+    @NotEmpty(message = "The workspaceId must not be empty.", groups = {UpdateGroup.class, InsertGroup.class})
+    private String workspaceId;
     @NotEmpty(message = "The name must not be empty.", groups = {UpdateGroup.class, InsertGroup.class})
     private String name;
     @NotEmpty(message = "The description must not be empty.", groups = {UpdateGroup.class, InsertGroup.class})

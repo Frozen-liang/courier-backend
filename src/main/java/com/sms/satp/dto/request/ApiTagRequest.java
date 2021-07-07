@@ -4,7 +4,6 @@ import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,9 +25,8 @@ public class ApiTagRequest {
 
     private String groupId;
 
+    private ApiTagType tagType;
+
     @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The tagName cannot be empty.")
     private String tagName;
-
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The tagType cannot by null.")
-    private ApiTagType tagType;
 }

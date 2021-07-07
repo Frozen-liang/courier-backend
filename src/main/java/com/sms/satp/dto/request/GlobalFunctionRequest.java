@@ -24,6 +24,9 @@ public class GlobalFunctionRequest {
     @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The functionKey cannot be empty")
     private String functionKey;
 
+    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The workspaceId cannot be empty")
+    private String workspaceId;
+
     @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The functionName cannot be empty")
     private String functionName;
 

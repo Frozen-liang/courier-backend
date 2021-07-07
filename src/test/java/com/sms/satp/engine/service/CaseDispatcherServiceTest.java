@@ -14,6 +14,7 @@ import com.sms.satp.entity.job.ApiTestCaseJob;
 import com.sms.satp.entity.job.SceneCaseJob;
 import com.sms.satp.entity.job.common.CaseReport;
 import java.util.Set;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -21,13 +22,14 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 @DisplayName("Test for CaseDispatcherService")
 public class CaseDispatcherServiceTest {
 
+
     private final EngineMemberManagement engineMemberManagement = mock(EngineMemberManagement.class);
     private final SimpMessagingTemplate simpMessagingTemplate = mock(SimpMessagingTemplate.class);
     private final CaseDispatcherService caseDispatcherService = new CaseDispatcherServiceImpl(engineMemberManagement,
         simpMessagingTemplate);
     private final ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder().build();
     private final SceneCaseJob sceneCaseJob = SceneCaseJob.builder().build();
-    private static final String DESTINATION = "destination";
+    private static final String USER_ID = ObjectId.get().toString();
     private static final String MESSAGE = "message";
     private final CaseReport caseReport = CaseReport.builder().build();
 
@@ -52,7 +54,7 @@ public class CaseDispatcherServiceTest {
     @Test
     @DisplayName("Test the sendJobReport method in the CaseDispatcherService service")
     public void sendJobReport_test() {
-        caseDispatcherService.sendJobReport(DESTINATION,caseReport);
+        caseDispatcherService.sendJobReport(USER_ID, caseReport);
         doNothing().when(simpMessagingTemplate).convertAndSend(anyString(), any(Object.class));
         verify(simpMessagingTemplate, times(1)).convertAndSend(anyString(), any(Object.class));
     }
@@ -60,7 +62,7 @@ public class CaseDispatcherServiceTest {
     @Test
     @DisplayName("Test the sendMessage method in the CaseDispatcherService service")
     public void sendMessage_test() {
-        caseDispatcherService.sendMessage(DESTINATION,MESSAGE);
+        caseDispatcherService.sendErrorMessage(USER_ID, MESSAGE);
         doNothing().when(simpMessagingTemplate).convertAndSend(anyString(), any(Object.class));
         verify(simpMessagingTemplate, times(1)).convertAndSend(anyString(), any(Object.class));
     }

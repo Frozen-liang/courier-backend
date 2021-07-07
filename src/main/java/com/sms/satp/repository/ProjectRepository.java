@@ -6,5 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ProjectRepository extends MongoRepository<ProjectEntity, String> {
 
-    List<ProjectEntity> findAllByRemovedOrderByCreateDateTimeDesc(Boolean removed);
+    List<ProjectEntity> findAllByRemovedIsFalseAndWorkspaceIdOrderByCreateDateTimeDesc(String workspaceId);
+
+    boolean existsByWorkspaceIdAndRemovedIsFalse(String workspaceId);
 }

@@ -25,6 +25,6 @@ public class ApiTag extends BaseEntity {
     private String projectId;
     @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
-    private String tagName;
     private ApiTagType tagType;
+    private String tagName;
 }

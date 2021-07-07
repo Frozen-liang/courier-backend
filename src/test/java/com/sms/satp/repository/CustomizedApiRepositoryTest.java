@@ -41,7 +41,6 @@ class CustomizedApiRepositoryTest {
         }
         ApiPageRequest apiPageRequest = new ApiPageRequest();
         apiPageRequest.setApiProtocol(Arrays.asList(1, 2));
-        apiPageRequest.setApiRequestParamType(Arrays.asList(1, 2));
         apiPageRequest.setApiStatus(Arrays.asList(1, 2));
         apiPageRequest.setProjectId(new ObjectId());
         apiPageRequest.setGroupId(Arrays.asList(new ObjectId(), new ObjectId()));

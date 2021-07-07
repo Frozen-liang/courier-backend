@@ -1,7 +1,9 @@
 package com.sms.satp.repository.impl;
 
+import static com.sms.satp.common.enums.OperationModule.API_GROUP;
+import static com.sms.satp.common.enums.OperationModule.API_TAG;
+import static com.sms.satp.common.field.ApiFiled.API_NAME;
 import static com.sms.satp.common.field.ApiFiled.API_PROTOCOL;
-import static com.sms.satp.common.field.ApiFiled.API_REQUEST_PARAM_TYPE;
 import static com.sms.satp.common.field.ApiFiled.API_STATUS;
 import static com.sms.satp.common.field.ApiFiled.GROUP_ID;
 import static com.sms.satp.common.field.ApiFiled.REQUEST_METHOD;
@@ -18,6 +20,7 @@ import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -44,21 +47,27 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
 
 
     @Override
+    public Optional<ApiResponse> findById(String id) {
+        List<AggregationOperation> aggregationOperations = new ArrayList<>();
+        createLookUpOperation(aggregationOperations);
+        ProjectionOperation projectionOperation = Aggregation.project(ApiResponse.class);
+        projectionOperation = projectionOperation.and("apiTag.tagName").as("tagName");
+        projectionOperation = projectionOperation.and("apiGroup.name").as("groupName");
+        aggregationOperations.add(projectionOperation);
+        aggregationOperations.add(Aggregation.match(Criteria.where(ID.getFiled()).is(id)));
+        Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
+        List<ApiResponse> records = mongoTemplate.aggregate(aggregation, ApiEntity.class, ApiResponse.class)
+            .getMappedResults();
+        return records.size() > 0 ? Optional.of(records.get(0)) : Optional.empty();
+    }
+
+    @Override
     public Page<ApiResponse> page(ApiPageRequest apiPageRequest) {
         PageDtoConverter.frontMapping(apiPageRequest);
-        ArrayList<AggregationOperation> aggregationOperations = new ArrayList<>();
+        List<AggregationOperation> aggregationOperations = new ArrayList<>();
         Query query = new Query();
 
-        LookupOperation apiTagLookupOperation =
-            LookupOperation.newLookup().from("ApiTag").localField(TAG_ID.getFiled())
-                .foreignField(ID.getFiled())
-                .as("apiTag");
-        LookupOperation apiGroupLookupOperation =
-            LookupOperation.newLookup().from("ApiGroup").localField(GROUP_ID.getFiled())
-                .foreignField(ID.getFiled())
-                .as("apiGroup");
-        aggregationOperations.add(apiTagLookupOperation);
-        aggregationOperations.add(apiGroupLookupOperation);
+        createLookUpOperation(aggregationOperations);
 
         buildCriteria(apiPageRequest, query, aggregationOperations);
 
@@ -95,15 +104,33 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         return commonDeleteRepository.deleteByIds(ids, ApiEntity.class);
     }
 
+    @Override
+    public Boolean recover(List<String> ids) {
+        return commonDeleteRepository.recover(ids, ApiEntity.class);
+    }
+
+    private void createLookUpOperation(List<AggregationOperation> aggregationOperations) {
+        LookupOperation apiTagLookupOperation =
+            LookupOperation.newLookup().from(API_TAG.getCollectionName()).localField(TAG_ID.getFiled())
+                .foreignField(ID.getFiled())
+                .as("apiTag");
+        LookupOperation apiGroupLookupOperation =
+            LookupOperation.newLookup().from(API_GROUP.getCollectionName()).localField(GROUP_ID.getFiled())
+                .foreignField(ID.getFiled())
+                .as("apiGroup");
+        aggregationOperations.add(apiTagLookupOperation);
+        aggregationOperations.add(apiGroupLookupOperation);
+    }
+
     private void buildCriteria(ApiPageRequest apiPageRequest, Query query,
         List<AggregationOperation> aggregationOperations) {
-        REMOVE.is(Boolean.FALSE)
+        REMOVE.is(apiPageRequest.isRemoved())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         PROJECT_ID.is(apiPageRequest.getProjectId())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        API_PROTOCOL.in(apiPageRequest.getApiProtocol())
+        API_NAME.like(apiPageRequest.getApiName())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        API_REQUEST_PARAM_TYPE.in(apiPageRequest.getApiRequestParamType())
+        API_PROTOCOL.in(apiPageRequest.getApiProtocol())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         API_STATUS.in(apiPageRequest.getApiStatus())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
-public enum DocumentUrlType {
+public enum DocumentUrlType implements EnumCommon {
 
     SWAGGER_FILE(0, DocumentType.SWAGGER_URL);
 

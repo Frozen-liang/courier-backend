@@ -29,7 +29,6 @@ public class ApiTagGroupController {
 
     @GetMapping("/{id}")
     public ApiTagGroupResponse getById(@PathVariable("id") String id) {
-
         return apiTagGroupService.findById(id);
     }
 

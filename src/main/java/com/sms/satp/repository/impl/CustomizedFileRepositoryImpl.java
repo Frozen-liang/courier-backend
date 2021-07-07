@@ -91,4 +91,11 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
         }
         return gridFsTemplate.getResource(gridFsFile);
     }
+
+    @Override
+    public GridFSFile findById(String id) {
+        Query query = new Query();
+        ID.is(id).ifPresent(query::addCriteria);
+        return gridFsTemplate.findOne(query);
+    }
 }

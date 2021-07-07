@@ -1,5 +1,9 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.TEST_FILE;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_TEST_FILE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DOWNLOAD_TEST_FILE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_TEST_FILE_ERROR;
@@ -7,6 +11,8 @@ import static com.sms.satp.common.exception.ErrorCode.THE_TEST_FILE_NOT_EXIST_ER
 import static com.sms.satp.common.exception.ErrorCode.UPLOAD_TEST_FILE_ERROR;
 import static com.sms.satp.utils.Assert.notNull;
 
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.TestFileRequest;
 import com.sms.satp.dto.response.FileInfoResponse;
@@ -38,6 +44,8 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = TEST_FILE,
+        template = "{{#testFileRequest.testFile.originalFilename}}")
     public Boolean insertTestFile(TestFileRequest testFileRequest) {
         try {
             return customizedFileRepository.insertTestFile(testFileRequest);
@@ -48,6 +56,8 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = TEST_FILE,
+        template = "{{#testFileRequest.testFile.originalFilename}}")
     public Boolean updateTestFile(TestFileRequest testFileRequest) {
         try {
             return customizedFileRepository.updateTestFile(testFileRequest);
@@ -61,6 +71,9 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = TEST_FILE,
+        template = "{{#result.filename}}",
+        enhance = @Enhance(enable = true))
     public Boolean deleteTestFileById(String id) {
         try {
             return customizedFileRepository.deleteTestFileById(id);
@@ -83,5 +96,10 @@ public class FileServiceImpl implements FileService {
             log.error("Failed to download the TestFile by id:{}", id);
             throw ExceptionUtils.mpe(DOWNLOAD_TEST_FILE_ERROR);
         }
+    }
+
+    @Override
+    public FileInfoResponse findById(String id) {
+        return fileMapper.toFileInfoResponse(customizedFileRepository.findById(id));
     }
 }

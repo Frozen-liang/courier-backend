@@ -32,10 +32,11 @@ public class ProjectFunctionController {
         return projectFunctionService.findById(id);
     }
 
-    @GetMapping("/list/{projectId}")
-    public List<Object> list(@PathVariable("projectId") String projectId, String functionKey,
+    @GetMapping("/list/{projectId}/{workspaceId}")
+    public List<Object> list(@PathVariable("projectId") String projectId, @PathVariable String workspaceId,
+        String functionKey,
         String functionName) {
-        return projectFunctionService.list(projectId, functionKey, functionName);
+        return projectFunctionService.list(projectId, workspaceId, functionKey, functionName);
     }
 
     @GetMapping("/find-all/{projectId}")

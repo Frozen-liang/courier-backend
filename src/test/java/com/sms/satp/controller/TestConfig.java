@@ -1,6 +1,9 @@
 package com.sms.satp.controller;
 
-import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+
+import com.sms.satp.security.AccessTokenProperties;
+import com.sms.satp.security.jwt.JwtTokenManager;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mapping.context.MappingContext;
@@ -12,7 +15,20 @@ public class TestConfig {
 
     @Bean
     public MappingMongoConverter mongoConverter() {
-        return new MappingMongoConverter(Mockito.mock(DbRefResolver.class), Mockito.mock(MappingContext.class));
+        return new MappingMongoConverter(mock(DbRefResolver.class), mock(MappingContext.class));
+    }
+
+    @Bean
+    public JwtTokenManager jwtTokenManager() {
+        return new JwtTokenManager(accessTokenProperties());
+    }
+
+    @Bean
+    public AccessTokenProperties accessTokenProperties() {
+        AccessTokenProperties accessTokenProperties = new AccessTokenProperties();
+        accessTokenProperties
+            .setSecretKey("2U9TBPRTm6aVlxymkBqR255tLNKkGwGhBoYvJBNci+BvPaO/tnwEsFhxPEw7ESqG14icm6OyJwAAYeJB6XKKcw==");
+        return accessTokenProperties;
     }
 
 }

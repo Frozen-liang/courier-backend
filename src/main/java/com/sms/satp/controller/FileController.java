@@ -1,7 +1,5 @@
 package com.sms.satp.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
-
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;

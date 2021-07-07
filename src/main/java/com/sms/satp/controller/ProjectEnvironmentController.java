@@ -39,9 +39,9 @@ public class ProjectEnvironmentController {
         return projectEnvironmentService.findById(id);
     }
 
-    @GetMapping("/list/{projectId}")
-    public List<Object> list(@PathVariable String projectId) {
-        return projectEnvironmentService.list(projectId);
+    @GetMapping("/list/{projectId}/{workspaceId}")
+    public List<Object> list(@PathVariable String projectId, @PathVariable String workspaceId) {
+        return projectEnvironmentService.list(projectId, workspaceId);
     }
 
     @GetMapping("/find-all/{projectId}")

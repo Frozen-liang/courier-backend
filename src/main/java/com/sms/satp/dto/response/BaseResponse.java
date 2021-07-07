@@ -20,7 +20,7 @@ public class BaseResponse {
     private LocalDateTime createDateTime;
     @JsonFormat(pattern = DEFAULT_PATTERN)
     private LocalDateTime modifyDateTime;
-    private Long createUserId;
-    private Long modifyUserId;
+    private String createUserId;
+    private String modifyUserId;
     private Boolean removed;
 }

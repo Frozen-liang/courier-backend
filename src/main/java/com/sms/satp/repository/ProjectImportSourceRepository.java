@@ -8,5 +8,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ProjectImportSourceRepository extends MongoRepository<ProjectImportSourceEntity, String> {
 
-    List<ProjectImportSourceResponse> findByProjectId(String projectId);
+    List<ProjectImportSourceResponse> findByProjectIdAndRemovedIsFalse(String projectId);
 }

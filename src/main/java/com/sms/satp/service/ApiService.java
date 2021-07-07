@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ApiService {
 
-    boolean importDocument(ApiImportRequest apiImportRequest);
+    boolean importDocumentByFile(ApiImportRequest apiImportRequest);
+
+    Boolean importDocumentByProImpSourceIds(List<String> proImpSourceIds);
 
     ApiResponse findById(String id);
 
@@ -23,4 +25,9 @@ public interface ApiService {
 
     Boolean delete(List<String> ids);
 
+    Boolean deleteByIds(List<String> ids);
+
+    Boolean deleteAll();
+
+    Boolean recover(List<String> ids);
 }

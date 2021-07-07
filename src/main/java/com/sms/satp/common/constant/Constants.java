@@ -37,5 +37,7 @@ public class Constants {
     public static final String CASE_TEMPLATE_GROUP_PATH = SDK_VERSION + "/case-template-group";
     public static final String API_GROUP_PATH = SDK_VERSION + "/api-group";
     public static final String FILE_PATH = SDK_VERSION + "/file";
+    public static final String WORKSPACE_PATH = SDK_VERSION + "/workspace";
+    public static final String USER = SDK_VERSION + "/system/user";
 
 }

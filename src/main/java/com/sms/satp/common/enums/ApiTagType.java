@@ -25,7 +25,7 @@ public enum ApiTagType implements EnumCommon {
         return code;
     }
 
-    public static ApiTagType getType(int code) {
+    public static ApiTagType getType(Integer code) {
         return mappings.get(code);
     }
 }

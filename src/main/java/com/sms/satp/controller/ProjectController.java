@@ -43,9 +43,9 @@ public class ProjectController {
         return projectService.edit(projectRequest);
     }
 
-    @GetMapping("/list")
-    public List<ProjectResponse> list() {
-        return projectService.list();
+    @GetMapping("/list/{workspaceId}")
+    public List<ProjectResponse> list(@PathVariable String workspaceId) {
+        return projectService.list(workspaceId);
     }
 
     @DeleteMapping("/{ids}")

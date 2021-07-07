@@ -26,9 +26,9 @@ public class BaseEntity {
     @JsonIgnore
     private Boolean removed = false;
     @CreatedBy
-    private Long createUserId;
+    private String createUserId;
     @LastModifiedBy
-    private Long modifyUserId;
+    private String modifyUserId;
     @CreatedDate
     private LocalDateTime createDateTime;
     @LastModifiedDate

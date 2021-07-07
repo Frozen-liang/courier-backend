@@ -15,6 +15,8 @@ public class ProjectResponse extends BaseResponse {
 
     private String name;
 
+    private String workspaceId;
+
     private String description;
 
     private String version;
