@@ -59,9 +59,16 @@ task_test:
   cache:
     key: gradle-cache-key
     paths:
-      - $GRADLE_USER_HOME
-      - build
-    policy: pull
+      - .gradle/caches
+      - .gradle/7.1.1
+      - .gradle/checksums
+      - build/classes
+      - build/generated
+      - build/jacoco
+      - build/libs
+      - build/reports
+      - build/resources
+      - build/test-results
   artifacts:
     reports:
       junit:
@@ -81,9 +88,16 @@ task_build_artifact:
   cache:
     key: gradle-cache-key
     paths:
-      - $GRADLE_USER_HOME
-      - build
-    policy: pull
+      - .gradle/caches
+      - .gradle/7.1.1
+      - .gradle/checksums
+      - build/classes
+      - build/generated
+      - build/jacoco
+      - build/libs
+      - build/reports
+      - build/resources
+      - build/test-results
   artifacts:
     paths:
       - build/libs
