@@ -34,8 +34,8 @@ task_gradle:
   cache:
     key: gradle-cache-key
     paths:
-      - .gradle/wrapper
-      - .gradle/caches
+      - $GRADLE_USER_HOME/wrapper
+      - $GRADLE_USER_HOME/caches
     policy: push
 
 task_test:
@@ -48,13 +48,16 @@ task_test:
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
   script:
+    - echo $GRADLE_USER_HOME
+    - pwd
     - ./gradlew check --stacktrace
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print "Total" 100*covered/instructions,"% covered" }' $JACOCO_CSV_LOCATION
   cache:
     key: gradle-cache-key
     paths:
-      - .gradle/wrapper
-      - .gradle/caches
+      - $GRADLE_USER_HOME/wrapper
+      - $GRADLE_USER_HOME/caches
+      - build
     policy: pull
   artifacts:
     reports:
@@ -75,8 +78,8 @@ task_build_artifact:
   cache:
     key: gradle-cache-key
     paths:
-      - .gradle/wrapper
-      - .gradle/caches
+      - $GRADLE_USER_HOME/wrapper
+      - $GRADLE_USER_HOME/caches
     policy: pull
   artifacts:
     paths:
