@@ -137,7 +137,7 @@ public class ApiTagServiceImpl implements ApiTagService {
                             value.stream().map(ApiTag::getId).collect(Collectors.toList()), ApiTestCase.class);
                         break;
                     case SCENE:
-                        commonDeleteRepository.removeTags(SceneFiled.TAG_IDS,
+                        commonDeleteRepository.removeTags(SceneFiled.TAG_ID,
                             value.stream().map(ApiTag::getId).collect(Collectors.toList()), SceneCaseApi.class);
                         break;
                     default:

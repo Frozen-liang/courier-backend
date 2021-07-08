@@ -230,7 +230,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
                 CaseTemplateApi.builder().apiTestCase(apiTestCaseMapper.toEntityByApiEntity(apiEntity.get()))
                     .caseTemplateId(caseTemplate.getId())
                     .projectId(caseTemplate.getProjectId()).order(addSceneCaseApi.getOrder()).apiType(ApiType.API)
-                    .apiBindingStatus(ApiBindingStatus.BINDING).build();
+                    .build();
             caseTemplateApiRepository.insert(caseTemplateApi);
         }
     }
@@ -241,7 +241,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
             CaseTemplateApi caseTemplateApi =
                 CaseTemplateApi.builder().apiTestCase(apiTestCase.get()).caseTemplateId(caseTemplate.getId())
                     .projectId(caseTemplate.getProjectId()).order(addSceneCaseApi.getOrder()).apiType(ApiType.API)
-                    .apiBindingStatus(ApiBindingStatus.BINDING).build();
+                    .build();
             caseTemplateApiRepository.insert(caseTemplateApi);
         }
     }

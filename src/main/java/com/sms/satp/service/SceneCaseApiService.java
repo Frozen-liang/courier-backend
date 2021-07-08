@@ -29,7 +29,5 @@ public interface SceneCaseApiService {
 
     SceneCaseApiResponse getSceneCaseApiById(String id);
 
-    Boolean add(AddSceneCaseApiByIdsRequest request);
-
     Boolean updateStatusByApiIds(List<String> ids, ApiBindingStatus apiBindingStatus);
 }

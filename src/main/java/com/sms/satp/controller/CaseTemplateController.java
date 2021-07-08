@@ -3,6 +3,7 @@ package com.sms.satp.controller;
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.dto.request.AddCaseTemplateRequest;
 import com.sms.satp.dto.request.CaseTemplateSearchRequest;
+import com.sms.satp.dto.request.ConvertCaseTemplateRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
 import com.sms.satp.dto.response.CaseTemplateDetailResponse;
 import com.sms.satp.dto.response.CaseTemplateResponse;
@@ -36,9 +37,9 @@ public class CaseTemplateController {
         return caseTemplateService.add(addCaseTemplateRequest);
     }
 
-    @PostMapping("/{sceneCaseId}")
-    public IdResponse add(@PathVariable String sceneCaseId) {
-        return caseTemplateService.add(sceneCaseId);
+    @PostMapping("/convert")
+    public IdResponse convert(@Valid @RequestBody ConvertCaseTemplateRequest convertCaseTemplateRequest) {
+        return caseTemplateService.add(convertCaseTemplateRequest);
     }
 
     @DeleteMapping("/{ids}")

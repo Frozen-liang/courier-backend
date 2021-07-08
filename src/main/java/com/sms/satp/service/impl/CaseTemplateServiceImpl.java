@@ -18,6 +18,7 @@ import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.dto.request.AddCaseTemplateRequest;
 import com.sms.satp.dto.request.CaseTemplateSearchRequest;
+import com.sms.satp.dto.request.ConvertCaseTemplateRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
 import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.dto.response.CaseTemplateDetailResponse;
@@ -105,21 +106,24 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     @Override
-    public IdResponse add(String sceneCaseId) {
+    public IdResponse add(ConvertCaseTemplateRequest convertCaseTemplateRequest) {
         try {
-            Optional<SceneCase> sceneCase = sceneCaseRepository.findById(sceneCaseId);
+            Optional<SceneCase> sceneCase = sceneCaseRepository.findById(convertCaseTemplateRequest.getSceneCaseId());
             if (sceneCase.isEmpty()) {
                 throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
             }
             CaseTemplate caseTemplate = caseTemplateMapper.toCaseTemplateBySceneCase(sceneCase.get());
+            caseTemplate.setGroupId(convertCaseTemplateRequest.getGroupId());
             caseTemplateRepository.insert(caseTemplate);
-            List<SceneCaseApi> sceneCaseApiList = sceneCaseApiService.listBySceneCaseId(sceneCaseId);
+            List<SceneCaseApi> sceneCaseApiList = sceneCaseApiService
+                .listBySceneCaseId(convertCaseTemplateRequest.getSceneCaseId());
             List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList();
             List<CaseTemplateApi> sceneCaseApiCaseTemplate =
                 caseTemplateApiMapper.toCaseTemplateApiListBySceneCaseApiList(sceneCaseApiList);
             setCaseTemplateId(sceneCaseApiCaseTemplate, caseTemplate.getId());
             caseTemplateApiList.addAll(sceneCaseApiCaseTemplate);
-            List<CaseTemplateConn> caseTemplateConnList = caseTemplateConnRepository.findAllBySceneCaseId(sceneCaseId);
+            List<CaseTemplateConn> caseTemplateConnList =
+                caseTemplateConnRepository.findAllBySceneCaseId(convertCaseTemplateRequest.getSceneCaseId());
             for (CaseTemplateConn caseTemplateConn : caseTemplateConnList) {
                 List<String> caseTemplateApiIds = caseTemplateConn.getCaseTemplateApiConnList().stream()
                     .map(CaseTemplateApiConn::getCaseTemplateApiId).collect(Collectors.toList());

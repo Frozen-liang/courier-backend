@@ -4,10 +4,12 @@ import static com.sms.satp.common.enums.OperationModule.SCENE_CASE;
 import static com.sms.satp.common.enums.OperationType.ADD;
 import static com.sms.satp.common.enums.OperationType.DELETE;
 import static com.sms.satp.common.enums.OperationType.EDIT;
+import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_CONN_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
@@ -15,8 +17,11 @@ import static com.sms.satp.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
 import com.google.common.collect.Lists;
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
+import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.common.field.CommonFiled;
+import com.sms.satp.dto.request.AddSceneCaseApi;
+import com.sms.satp.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
@@ -27,12 +32,18 @@ import com.sms.satp.dto.response.CaseTemplateConnResponse;
 import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.dto.response.SceneTemplateResponse;
+import com.sms.satp.entity.api.ApiEntity;
+import com.sms.satp.entity.apitestcase.ApiTestCase;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.mapper.CaseTemplateConnMapper;
 import com.sms.satp.mapper.SceneCaseMapper;
+import com.sms.satp.repository.ApiRepository;
+import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
+import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.CaseTemplateApiService;
 import com.sms.satp.service.CaseTemplateConnService;
@@ -44,6 +55,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -62,13 +74,19 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private final CaseTemplateConnService caseTemplateConnService;
     private final CaseTemplateConnMapper caseTemplateConnMapper;
     private final CaseTemplateApiService caseTemplateApiService;
+    private final ApiTestCaseRepository apiTestCaseRepository;
+    private final ApiRepository apiRepository;
+    private final ApiTestCaseMapper apiTestCaseMapper;
+    private final SceneCaseApiRepository sceneCaseApiRepository;
 
     public SceneCaseServiceImpl(SceneCaseRepository sceneCaseRepository,
         CustomizedSceneCaseRepository customizedSceneCaseRepository,
         SceneCaseMapper sceneCaseMapper, SceneCaseApiService sceneCaseApiService,
         CaseTemplateConnService caseTemplateConnService,
         CaseTemplateConnMapper caseTemplateConnMapper,
-        CaseTemplateApiService caseTemplateApiService) {
+        CaseTemplateApiService caseTemplateApiService,
+        ApiTestCaseRepository apiTestCaseRepository, ApiRepository apiRepository,
+        ApiTestCaseMapper apiTestCaseMapper, SceneCaseApiRepository sceneCaseApiRepository) {
         this.sceneCaseRepository = sceneCaseRepository;
         this.customizedSceneCaseRepository = customizedSceneCaseRepository;
         this.sceneCaseMapper = sceneCaseMapper;
@@ -76,6 +94,10 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         this.caseTemplateConnService = caseTemplateConnService;
         this.caseTemplateConnMapper = caseTemplateConnMapper;
         this.caseTemplateApiService = caseTemplateApiService;
+        this.apiTestCaseRepository = apiTestCaseRepository;
+        this.apiRepository = apiRepository;
+        this.apiTestCaseMapper = apiTestCaseMapper;
+        this.sceneCaseApiRepository = sceneCaseApiRepository;
     }
 
     @Override
@@ -211,6 +233,27 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         }
     }
 
+    @Override
+    public Boolean addApi(AddSceneCaseApiByIdsRequest request) {
+        try {
+            Optional<SceneCase> sceneCase = sceneCaseRepository.findById(request.getSceneCaseId());
+            if (sceneCase.isEmpty()) {
+                throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
+            }
+            for (AddSceneCaseApi addSceneCaseApi : request.getSceneCaseApis()) {
+                if (BooleanUtils.isTrue(addSceneCaseApi.getIsCase())) {
+                    addSceneCaseApiByTestCase(sceneCase.get(), addSceneCaseApi);
+                } else {
+                    addSceneCaseApiByApi(sceneCase.get(), addSceneCaseApi);
+                }
+            }
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to add the SceneCaseApi!", e);
+            throw new ApiTestPlatformException(ADD_SCENE_CASE_API_ERROR);
+        }
+    }
+
     private void updateSceneCase(SceneCase sceneCase) {
         Optional<SceneCase> optionalSceneCase = sceneCaseRepository.findById(sceneCase.getId());
         optionalSceneCase.ifPresent(sceneCaseFindById -> {
@@ -254,6 +297,29 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 sceneCaseApi.setRemoved(sceneCase.getRemoved());
             }
             sceneCaseApiService.editAll(sceneCaseApiList);
+        }
+    }
+
+    private void addSceneCaseApiByApi(SceneCase sceneCase, AddSceneCaseApi addSceneCaseApi) {
+        Optional<ApiEntity> apiEntity = apiRepository.findById(addSceneCaseApi.getId());
+        if (apiEntity.isPresent()) {
+            SceneCaseApi sceneCaseApi =
+                SceneCaseApi.builder().apiTestCase(apiTestCaseMapper.toEntityByApiEntity(apiEntity.get()))
+                    .sceneCaseId(sceneCase.getId())
+                    .projectId(sceneCase.getProjectId()).order(addSceneCaseApi.getOrder()).apiType(ApiType.API)
+                    .build();
+            sceneCaseApiRepository.insert(sceneCaseApi);
+        }
+    }
+
+    private void addSceneCaseApiByTestCase(SceneCase sceneCase, AddSceneCaseApi addSceneCaseApi) {
+        Optional<ApiTestCase> apiTestCase = apiTestCaseRepository.findById(addSceneCaseApi.getId());
+        if (apiTestCase.isPresent()) {
+            SceneCaseApi sceneCaseApi =
+                SceneCaseApi.builder().apiTestCase(apiTestCase.get()).sceneCaseId(sceneCase.getId())
+                    .projectId(sceneCase.getProjectId()).order(addSceneCaseApi.getOrder()).apiType(ApiType.API)
+                    .build();
+            sceneCaseApiRepository.insert(sceneCaseApi);
         }
     }
 

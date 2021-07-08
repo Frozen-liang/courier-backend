@@ -1,5 +1,6 @@
 package com.sms.satp.service;
 
+import com.sms.satp.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseRequest;
@@ -29,5 +30,5 @@ public interface SceneCaseService {
 
     List<SceneCase> get(String groupId, String projectId);
 
-
+    Boolean addApi(AddSceneCaseApiByIdsRequest request);
 }

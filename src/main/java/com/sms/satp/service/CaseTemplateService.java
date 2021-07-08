@@ -2,6 +2,7 @@ package com.sms.satp.service;
 
 import com.sms.satp.dto.request.AddCaseTemplateRequest;
 import com.sms.satp.dto.request.CaseTemplateSearchRequest;
+import com.sms.satp.dto.request.ConvertCaseTemplateRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
 import com.sms.satp.dto.response.CaseTemplateDetailResponse;
 import com.sms.satp.dto.response.CaseTemplateResponse;
@@ -15,7 +16,7 @@ public interface CaseTemplateService {
 
     Boolean add(AddCaseTemplateRequest addCaseTemplateRequest);
 
-    IdResponse add(String sceneCaseId);
+    IdResponse add(ConvertCaseTemplateRequest convertCaseTemplateRequest);
 
     Boolean deleteByIds(List<String> ids);
 

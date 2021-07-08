@@ -1,6 +1,5 @@
 package com.sms.satp.entity.scenetest;
 
-import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.apitestcase.ApiTestCase;

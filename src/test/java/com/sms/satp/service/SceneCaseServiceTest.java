@@ -15,9 +15,13 @@ import com.sms.satp.dto.response.SceneTemplateResponse;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.mapper.CaseTemplateConnMapper;
 import com.sms.satp.mapper.SceneCaseMapper;
+import com.sms.satp.repository.ApiRepository;
+import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
+import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.impl.SceneCaseServiceImpl;
 import java.util.List;
@@ -59,6 +63,10 @@ class SceneCaseServiceTest {
     private CaseTemplateConnService caseTemplateConnService;
     private CaseTemplateConnMapper caseTemplateConnMapper;
     private CaseTemplateApiService caseTemplateApiService;
+    private ApiTestCaseRepository apiTestCaseRepository;
+    private ApiRepository apiRepository;
+    private ApiTestCaseMapper apiTestCaseMapper;
+    private SceneCaseApiRepository sceneCaseApiRepository;
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -78,9 +86,14 @@ class SceneCaseServiceTest {
         caseTemplateConnService = mock(CaseTemplateConnService.class);
         caseTemplateConnMapper = mock(CaseTemplateConnMapper.class);
         caseTemplateApiService = mock(CaseTemplateApiService.class);
+        apiTestCaseRepository = mock(ApiTestCaseRepository.class);
+        apiRepository = mock(ApiRepository.class);
+        apiTestCaseMapper = mock(ApiTestCaseMapper.class);
+        sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
         sceneCaseService = new SceneCaseServiceImpl(sceneCaseRepository, customizedSceneCaseRepository,
             sceneCaseMapper, sceneCaseApiService,
-            caseTemplateConnService, caseTemplateConnMapper, caseTemplateApiService);
+            caseTemplateConnService, caseTemplateConnMapper, caseTemplateApiService, apiTestCaseRepository,
+            apiRepository, apiTestCaseMapper, sceneCaseApiRepository);
     }
 
     @Test

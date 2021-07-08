@@ -1,7 +1,6 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.satp.dto.response.SceneCaseApiResponse;
@@ -45,11 +44,6 @@ public class SceneCaseApiController {
     @GetMapping(value = "/{id}")
     public SceneCaseApiResponse getSceneCaseApiById(@PathVariable String id) {
         return sceneCaseApiService.getSceneCaseApiById(id);
-    }
-
-    @PostMapping
-    public Boolean add(@Valid @RequestBody AddSceneCaseApiByIdsRequest request) {
-        return sceneCaseApiService.add(request);
     }
 
 }

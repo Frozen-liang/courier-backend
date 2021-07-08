@@ -1,6 +1,7 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
+import com.sms.satp.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseRequest;
@@ -61,5 +62,9 @@ public class SceneCaseController {
         return sceneCaseService.editConn(updateSceneTemplateRequest);
     }
 
+    @PostMapping("/api")
+    public Boolean addApi(@Valid @RequestBody AddSceneCaseApiByIdsRequest request) {
+        return sceneCaseService.addApi(request);
+    }
 
 }

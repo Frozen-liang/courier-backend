@@ -5,6 +5,7 @@ import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_CONN_
 import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_CONN_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_LIST_CASE_TEMPLATE_CONN_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_CONN_LIST_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.exception.ApiTestPlatformException;
@@ -12,10 +13,12 @@ import com.sms.satp.dto.request.AddCaseTemplateConnRequest;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
+import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.CaseTemplateConnMapper;
 import com.sms.satp.repository.CaseTemplateConnRepository;
 import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
+import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.CaseTemplateApiService;
 import com.sms.satp.service.CaseTemplateConnService;
 import java.util.List;
@@ -33,15 +36,17 @@ public class CaseTemplateConnServiceImpl implements CaseTemplateConnService {
     private final CaseTemplateConnMapper caseTemplateConnMapper;
     private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository;
     private final CaseTemplateApiService caseTemplateApiService;
+    private final SceneCaseRepository sceneCaseRepository;
 
     public CaseTemplateConnServiceImpl(CaseTemplateConnRepository caseTemplateConnRepository,
         CaseTemplateConnMapper caseTemplateConnMapper,
         CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository,
-        CaseTemplateApiService caseTemplateApiService) {
+        CaseTemplateApiService caseTemplateApiService, SceneCaseRepository sceneCaseRepository) {
         this.caseTemplateConnRepository = caseTemplateConnRepository;
         this.caseTemplateConnMapper = caseTemplateConnMapper;
         this.customizedSceneCaseApiRepository = customizedSceneCaseApiRepository;
         this.caseTemplateApiService = caseTemplateApiService;
+        this.sceneCaseRepository = sceneCaseRepository;
     }
 
     @Override
@@ -129,9 +134,13 @@ public class CaseTemplateConnServiceImpl implements CaseTemplateConnService {
     }
 
     @Override
-    public Boolean add(AddCaseTemplateConnRequest addCaseTemplateConnRequest) {
+    public Boolean add(AddCaseTemplateConnRequest request) {
         try {
-            CaseTemplateConn caseTemplateConn = caseTemplateConnMapper.toCaseTemplateConn(addCaseTemplateConnRequest);
+            Optional<SceneCase> sceneCase = sceneCaseRepository.findById(request.getSceneCaseId());
+            if (sceneCase.isEmpty()) {
+                throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
+            }
+            CaseTemplateConn caseTemplateConn = caseTemplateConnMapper.toCaseTemplateConn(request);
             caseTemplateConnRepository.insert(caseTemplateConn);
             return Boolean.TRUE;
         } catch (Exception e) {

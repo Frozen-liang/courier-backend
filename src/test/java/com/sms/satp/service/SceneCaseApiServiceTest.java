@@ -3,17 +3,13 @@ package com.sms.satp.service;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.AddSceneCaseApiRequest;
 import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
-import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
+import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
-import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.mapper.SceneCaseApiMapper;
-import com.sms.satp.repository.ApiRepository;
-import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
-import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.impl.SceneCaseApiServiceImpl;
 import java.util.List;
 import java.util.Optional;
@@ -43,15 +39,10 @@ class SceneCaseApiServiceTest {
 
     private final SceneCaseApiRepository sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
     private final SceneCaseApiMapper sceneCaseApiMapper = mock(SceneCaseApiMapper.class);
-    private final ApiTestCaseRepository apiTestCaseRepository = mock(ApiTestCaseRepository.class);
-    private final SceneCaseRepository sceneCaseRepository = mock(SceneCaseRepository.class);
-    private final ApiRepository apiRepository = mock(ApiRepository.class);
-    private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
     private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository =
         mock(CustomizedSceneCaseApiRepository.class);
     private final SceneCaseApiServiceImpl sceneCaseApiService = new SceneCaseApiServiceImpl(sceneCaseApiRepository,
-        sceneCaseApiMapper,
-        apiTestCaseRepository, sceneCaseRepository, apiRepository, apiTestCaseMapper, customizedSceneCaseApiRepository);
+        sceneCaseApiMapper,customizedSceneCaseApiRepository);
 
     private final static String MOCK_SCENE_CASE_ID = "1";
     private final static String MOCK_ID = new ObjectId().toString();

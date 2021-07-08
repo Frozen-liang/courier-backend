@@ -8,6 +8,7 @@ import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.CaseTemplateConnMapper;
 import com.sms.satp.repository.CaseTemplateConnRepository;
 import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
+import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.impl.CaseTemplateConnServiceImpl;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +38,7 @@ class CaseTemplateConnServiceTest {
     private CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository;
     private CaseTemplateApiService caseTemplateApiService;
     private CaseTemplateConnServiceImpl caseTemplateConnService;
+    private SceneCaseRepository sceneCaseRepository;
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static Integer MOCK_NUM = 1;
@@ -47,8 +49,9 @@ class CaseTemplateConnServiceTest {
         caseTemplateConnMapper = mock(CaseTemplateConnMapper.class);
         customizedSceneCaseApiRepository = mock(CustomizedSceneCaseApiRepository.class);
         caseTemplateApiService = mock(CaseTemplateApiService.class);
+        sceneCaseRepository = mock(SceneCaseRepository.class);
         caseTemplateConnService = new CaseTemplateConnServiceImpl(caseTemplateConnRepository, caseTemplateConnMapper,
-            customizedSceneCaseApiRepository, caseTemplateApiService);
+            customizedSceneCaseApiRepository, caseTemplateApiService, sceneCaseRepository);
     }
 
     @Test
