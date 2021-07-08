@@ -1,4 +1,4 @@
-image: gradle:jre11-openj9
+image: gradle:jdk11-openj9
 
 before_script:
   - 'source /tool/.bash_profile_docker'
