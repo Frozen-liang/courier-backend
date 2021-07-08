@@ -19,7 +19,7 @@ variables:
   IMAGE_TAG: ${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}
   PROD_RELEASE_NAME: ${CI_PROJECT_NAME}
   JACOCO_CSV_LOCATION: $CI_PROJECT_DIR/build/reports/jacoco/test/jacocoTestReport.csv
-#  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.jvmargs=-Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8 -Dorg.gradle.parallel=true -Dorg.gradle.configureondemand=true"
   GIT_DEPTH: 1
 
 
