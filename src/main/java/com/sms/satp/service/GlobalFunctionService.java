@@ -8,7 +8,7 @@ public interface GlobalFunctionService {
 
     GlobalFunctionResponse findById(String id);
 
-    List<GlobalFunctionResponse> list(String functionDesc, String functionName);
+    List<GlobalFunctionResponse> list(String workspaceId, String functionDesc, String functionName);
 
     Boolean add(GlobalFunctionRequest globalFunctionRequest);
 

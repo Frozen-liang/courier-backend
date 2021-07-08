@@ -58,9 +58,9 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     }
 
     @Override
-    public List<GlobalFunctionResponse> list(String functionKey, String functionName) {
+    public List<GlobalFunctionResponse> list(String workspaceId, String functionKey, String functionName) {
         try {
-            GlobalFunction globalFunction = GlobalFunction.builder().functionKey(functionKey)
+            GlobalFunction globalFunction = GlobalFunction.builder().workspaceId(workspaceId).functionKey(functionKey)
                 .functionName(functionName).build();
             ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher(REMOVE.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())

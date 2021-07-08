@@ -64,7 +64,7 @@ class CaseTemplateServiceTest {
     private final static String MOCK_NAME = "test";
     private final static String MOCK_PROJECT_ID = "1";
     private final static String MOCK_GROUP_ID = "1";
-    private final static Long MOCK_CREATE_USER_ID = 1L;
+    private final static String MOCK_CREATE_USER_ID = ObjectId.get().toString();
     private final static Integer MOCK_PAGE = 1;
     private final static Integer MOCK_SIZE = 1;
     private final static long MOCK_TOTAL = 1L;

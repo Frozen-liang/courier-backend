@@ -15,7 +15,7 @@ public interface GlobalEnvironmentService {
 
     Boolean edit(GlobalEnvironmentRequest globalEnvironmentRequest);
 
-    List<GlobalEnvironmentResponse> list();
+    List<GlobalEnvironmentResponse> list(String workspaceId);
 
     Boolean delete(List<String> ids);
 

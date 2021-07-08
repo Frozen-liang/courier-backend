@@ -1,6 +1,5 @@
 package com.sms.satp.dto.response;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,7 +46,6 @@ public class ParamInfoResponse {
     /**
      * 对象子属性. JSON/Object/JsonArray.
      */
-    @Builder.Default
     @ToString.Exclude
-    private List<ParamInfoResponse> childParam = new ArrayList<>();
+    private List<ParamInfoResponse> childParam;
 }

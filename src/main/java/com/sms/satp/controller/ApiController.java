@@ -31,9 +31,14 @@ public class ApiController {
         this.apiService = apiService;
     }
 
+    @PostMapping("/import-by-file")
+    public Boolean importDocumentByFile(@Validated ApiImportRequest apiImportRequest) {
+        return apiService.importDocumentByFile(apiImportRequest);
+    }
+
     @PostMapping("/import")
-    public Boolean importDocument(@Validated ApiImportRequest apiImportRequest) {
-        return apiService.importDocument(apiImportRequest);
+    public Boolean importDocumentByProImpSourceIds(@RequestBody List<String> proImpSourceIds) {
+        return apiService.importDocumentByProImpSourceIds(proImpSourceIds);
     }
 
     @GetMapping("{id}")
@@ -59,6 +64,21 @@ public class ApiController {
     @DeleteMapping("{ids}")
     public Boolean delete(@PathVariable("ids") List<String> ids) {
         return apiService.delete(ids);
+    }
+
+    @DeleteMapping("/delete/{ids}")
+    public Boolean deleteByIds(@PathVariable List<String> ids) {
+        return apiService.deleteByIds(ids);
+    }
+
+    @DeleteMapping("/deleteAll")
+    public Boolean deleteAll() {
+        return apiService.deleteAll();
+    }
+
+    @PutMapping("/recover")
+    public Boolean recover(@RequestBody List<String> ids) {
+        return apiService.recover(ids);
     }
 
 }

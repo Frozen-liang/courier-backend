@@ -18,7 +18,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @Document("ProjectImportSource")
 public class ProjectImportSourceEntity extends BaseEntity {
 
-
+    private String name;
     private DocumentUrlType documentType;
     private SaveMode saveMode;
     @Field(targetType = FieldType.OBJECT_ID)

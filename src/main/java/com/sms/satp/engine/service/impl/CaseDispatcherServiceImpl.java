@@ -1,10 +1,14 @@
 package com.sms.satp.engine.service.impl;
 
+import static com.sms.satp.utils.UserDestinationUtil.getCaseDest;
+import static com.sms.satp.utils.UserDestinationUtil.getSceneCaseDest;
+
 import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.service.CaseDispatcherService;
 import com.sms.satp.entity.job.ApiTestCaseJob;
 import com.sms.satp.entity.job.SceneCaseJob;
 import com.sms.satp.entity.job.common.CaseReport;
+import com.sms.satp.websocket.Payload;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -43,20 +47,23 @@ public class CaseDispatcherServiceImpl implements CaseDispatcherService {
     }
 
     @Override
-    public void sendJobReport(String destination, CaseReport caseReport) {
+    public void sendJobReport(String userId, CaseReport caseReport) {
+        String destination = getCaseDest(userId);
         log.info("Send job report. destination {}", destination);
-        simpMessagingTemplate.convertAndSend(destination, caseReport);
+        simpMessagingTemplate.convertAndSend(destination, Payload.ok(caseReport));
     }
 
     @Override
-    public void sendJobReport(String destination, List<CaseReport> caseReport) {
+    public void sendJobReport(String userId, List<CaseReport> caseReport) {
+        String destination = getSceneCaseDest(userId);
         log.info("Send job report. destination {}", destination);
-        simpMessagingTemplate.convertAndSend(destination, caseReport);
+        simpMessagingTemplate.convertAndSend(destination, Payload.ok(caseReport));
     }
 
     @Override
-    public void sendMessage(String destination, String message) {
-        log.info("Send message {} to {}", message, destination);
-        simpMessagingTemplate.convertAndSend(destination, message);
+    public void sendErrorMessage(String userId, String message) {
+        String destination = getCaseDest(userId);
+        log.info("Send message {} to {}", message, getCaseDest(userId));
+        simpMessagingTemplate.convertAndSend(destination, Payload.fail(message));
     }
 }

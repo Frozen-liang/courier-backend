@@ -36,7 +36,7 @@ public class LogEntity {
     private String operator;
 
     @CreatedBy
-    private Long operatorId;
+    private String operatorId;
 
     @CreatedDate
     private LocalDateTime createDateTime;

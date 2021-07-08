@@ -2,11 +2,13 @@ package com.sms.satp.common.aspect.log;
 
 import static com.sms.satp.common.field.CommonFiled.ID;
 
+import com.mongodb.client.gridfs.model.GridFSFile;
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.OperationModule;
 import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.entity.log.LogEntity;
+import com.sms.satp.service.FileService;
 import com.sms.satp.service.LogService;
 import com.sms.satp.utils.SpelUtils;
 import java.lang.reflect.Method;
@@ -22,6 +24,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Component;
 
@@ -32,10 +35,13 @@ public class LogAspect {
 
     private final LogService logService;
     private final MongoTemplate mongoTemplate;
+    private final FileService fileService;
 
-    public LogAspect(LogService logService, MongoTemplate mongoTemplate) {
+    public LogAspect(LogService logService, MongoTemplate mongoTemplate,
+        FileService fileService) {
         this.logService = logService;
         this.mongoTemplate = mongoTemplate;
+        this.fileService = fileService;
     }
 
     @Pointcut(value = "@annotation(com.sms.satp.common.aspect.annotation.LogRecord)")
@@ -51,7 +57,7 @@ public class LogAspect {
         OperationModule operationModule = logRecord.operationModule();
         Enhance enhance = logRecord.enhance();
         EvaluationContext context = SpelUtils.getContext(args, method);
-        enhance(enhance, context, operationModule.getCollectionName(), method);
+        enhance(enhance, context, operationModule, method);
         Object result = jp.proceed();
         String operationDesc = SpelUtils.getValue(context, logRecord.template(), String.class);
         String projectId = SpelUtils.getProjectId(context, logRecord, method, args);
@@ -65,16 +71,21 @@ public class LogAspect {
         return result;
     }
 
-    private void enhance(Enhance enhance, EvaluationContext context, String collectionName, Method method) {
+    private void enhance(Enhance enhance, EvaluationContext context, OperationModule operationModule, Method method) {
         if (enhance.enable()) {
             Object value = context.lookupVariable(enhance.primaryKey());
             if (Objects.nonNull(value)) {
                 Object queryByIdResult;
                 if (value instanceof Collection) {
                     Query query = Query.query(Criteria.where(ID.getFiled()).in((Collection) value));
-                    queryByIdResult = mongoTemplate.find(query, Object.class, collectionName);
+                    queryByIdResult = mongoTemplate.find(query, Object.class, operationModule.getCollectionName());
                 } else {
-                    queryByIdResult = mongoTemplate.findById(value, Object.class, collectionName);
+                    if (operationModule == OperationModule.TEST_FILE) {
+                        queryByIdResult = fileService.findById((String) value);
+                    } else {
+                        queryByIdResult = mongoTemplate
+                            .findById(value, Object.class, operationModule.getCollectionName());
+                    }
                 }
                 context.setVariable(enhance.queryResultKey(), queryByIdResult);
             } else {

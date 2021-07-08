@@ -2,7 +2,6 @@ package com.sms.satp.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.dto.request.ApiTagRequest;
 import com.sms.satp.dto.response.ApiTagResponse;
 import com.sms.satp.entity.tag.ApiTag;
@@ -29,13 +28,11 @@ class ApiTagMapperTest {
     void entity_to_dto() {
         ApiTag apiTag = ApiTag.builder()
             .tagName(TAG_NAME)
-            .tagType(ApiTagType.API)
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
             .build();
         ApiTagResponse apiTagDto = apiTagMapper.toDto(apiTag);
         assertThat(apiTagDto.getTagName()).isEqualTo(TAG_NAME);
-        assertThat(apiTagDto.getTagType()).isEqualTo(ApiTagType.API.getCode());
     }
 
     @Test
@@ -43,7 +40,7 @@ class ApiTagMapperTest {
     void apiTagList_to_apiTagDtoList() {
         List<ApiTag> apiTags = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
-            apiTags.add(ApiTag.builder().tagName(TAG_NAME).tagType(ApiTagType.API).build());
+            apiTags.add(ApiTag.builder().tagName(TAG_NAME).build());
         }
         List<ApiTagResponse> apiTagDtoList = apiTagMapper.toDtoList(apiTags);
         assertThat(apiTagDtoList).hasSize(SIZE);
@@ -55,11 +52,10 @@ class ApiTagMapperTest {
     void dto_to_entity() {
         ApiTagRequest apiTagDto = ApiTagRequest.builder()
             .tagName(TAG_NAME)
-            .tagType(ApiTagType.CASE)
+
             .build();
         ApiTag apiTag = apiTagMapper.toEntity(apiTagDto);
         assertThat(apiTag.getTagName()).isEqualTo(TAG_NAME);
-        assertThat(apiTag.getTagType()).isEqualTo(ApiTagType.CASE);
     }
 
     @Test

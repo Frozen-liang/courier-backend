@@ -8,6 +8,7 @@ import com.sms.satp.dto.response.ProjectImportSourceResponse;
 import com.sms.satp.service.ProjectImportSourceService;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,6 +45,11 @@ public class ProjectImportSourceController {
     @GetMapping("/pid/{projectId}")
     public List<ProjectImportSourceResponse> findByProjectId(@PathVariable String projectId) {
         return projectImportSourceService.findByProjectId(projectId);
+    }
+
+    @DeleteMapping("/{ids}")
+    public Boolean delete(@PathVariable List<String> ids) {
+        return projectImportSourceService.delete(ids);
     }
 
 }

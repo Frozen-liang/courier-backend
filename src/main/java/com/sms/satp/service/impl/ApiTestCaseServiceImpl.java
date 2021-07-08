@@ -1,5 +1,9 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.API_TEST_CASE;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_TEST_CASE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
@@ -12,13 +16,16 @@ import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
 import static com.sms.satp.utils.Assert.isTrue;
 
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
+import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
 import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.repository.ApiTestCaseRepository;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CustomizedApiTestCaseRepository;
 import com.sms.satp.service.ApiTestCaseService;
 import com.sms.satp.utils.ExceptionUtils;
 import java.util.List;
@@ -35,14 +42,14 @@ import org.springframework.stereotype.Service;
 public class ApiTestCaseServiceImpl implements ApiTestCaseService {
 
     private final ApiTestCaseRepository apiTestCaseRepository;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository;
     private final ApiTestCaseMapper apiTestCaseMapper;
 
     public ApiTestCaseServiceImpl(ApiTestCaseRepository apiTestCaseRepository,
-        CommonDeleteRepository commonDeleteRepository,
+        CustomizedApiTestCaseRepository customizedApiTestCaseRepository,
         ApiTestCaseMapper apiTestCaseMapper) {
         this.apiTestCaseRepository = apiTestCaseRepository;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.customizedApiTestCaseRepository = customizedApiTestCaseRepository;
         this.apiTestCaseMapper = apiTestCaseMapper;
     }
 
@@ -53,10 +60,10 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     }
 
     @Override
-    public List<ApiTestCaseResponse> list(String apiId, String projectId) {
+    public List<ApiTestCaseResponse> list(String apiId, String projectId, boolean removed) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
-            ApiTestCase apiTestCase = ApiTestCase.builder().apiId(apiId).projectId(projectId).build();
+            ApiTestCase apiTestCase = ApiTestCase.builder().apiId(apiId).removed(removed).projectId(projectId).build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(API_ID.getFiled(), GenericPropertyMatchers.exact())
@@ -72,6 +79,8 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
 
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = API_TEST_CASE,
+        template = "{{#apiTestCaseRequest.caseName}}")
     public Boolean add(ApiTestCaseRequest apiTestCaseRequest) {
         log.info("ApiTestCaseService-add()-params: [ApiTestCase]={}", apiTestCaseRequest.toString());
         try {
@@ -85,6 +94,8 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = API_TEST_CASE,
+        template = "{{#apiTestCaseRequest.caseName}}")
     public Boolean edit(ApiTestCaseRequest apiTestCaseRequest) {
         log.info("ApiTestCaseService-edit()-params: [ApiTestCase]={}", apiTestCaseRequest.toString());
         try {
@@ -103,13 +114,41 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = API_TEST_CASE,
+        template = "{{#result?.![#this.caseName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, ApiTestCase.class);
+            return customizedApiTestCaseRepository.deleteByIds(ids);
         } catch (Exception e) {
             log.error("Failed to delete the ApiTestCase!", e);
             throw new ApiTestPlatformException(DELETE_API_TEST_CASE_BY_ID_ERROR);
         }
+    }
+
+    @Override
+    public void updateApiTestCaseStatusByApiId(List<String> apiIds, ApiBindingStatus status) {
+        log.info("Update ApiTestCase's status to {},apiIds = {}", status.getCode(), apiIds);
+        customizedApiTestCaseRepository.updateApiTestCaseStatusByApiId(apiIds, status);
+    }
+
+    @Override
+    public Boolean deleteByIds(List<String> ids) {
+        log.info("Delete ApiTestCase ids:{}.", ids);
+        apiTestCaseRepository.deleteAllByIdIn(ids);
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public Boolean deleteAll() {
+        log.info("Delete all ApiTestCase when removed is true.");
+        apiTestCaseRepository.deleteAllByRemovedIsTrue();
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public Boolean recover(List<String> ids) {
+        return customizedApiTestCaseRepository.recover(ids);
     }
 
 }

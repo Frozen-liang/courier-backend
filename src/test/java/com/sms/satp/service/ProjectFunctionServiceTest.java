@@ -50,6 +50,7 @@ class ProjectFunctionServiceTest {
     private static final List<String> ID_LIST = Collections.singletonList(ID);
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String PROJECT_ID = "10";
+    private static final String WORKSPACE_ID = ObjectId.get().toString();
     private static final String FUNCTION_NAME = "functionName";
     private static final String FUNCTION_DESC = "functionDesc";
 
@@ -133,7 +134,7 @@ class ProjectFunctionServiceTest {
         }
         when(projectFunctionRepository.findAll(any(), any(Sort.class))).thenReturn(list);
         when(projectFunctionMapper.toDtoList(list)).thenReturn(projectEnvironmentDtoList);
-        List<Object> result = projectFunctionService.list(PROJECT_ID, FUNCTION_NAME, FUNCTION_DESC);
+        List<Object> result = projectFunctionService.list(PROJECT_ID, WORKSPACE_ID, FUNCTION_NAME, FUNCTION_DESC);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -141,7 +142,7 @@ class ProjectFunctionServiceTest {
     @DisplayName("An exception occurred while getting ProjectFunction list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(projectFunctionRepository).findAll(any(), any(Sort.class));
-        assertThatThrownBy(() -> projectFunctionService.list(PROJECT_ID, FUNCTION_NAME, FUNCTION_DESC))
+        assertThatThrownBy(() -> projectFunctionService.list(PROJECT_ID, WORKSPACE_ID, FUNCTION_NAME, FUNCTION_DESC))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_PROJECT_FUNCTION_LIST_ERROR.getCode());
     }

@@ -19,7 +19,7 @@ public interface ProjectEnvironmentService {
 
     ProjectEnvironment findOne(String id);
 
-    List<Object> list(String projectId);
+    List<Object> list(String projectId, String workspaceId);
 
     Boolean delete(List<String> ids);
 

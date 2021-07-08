@@ -53,9 +53,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectResponse> list() {
+    public List<ProjectResponse> list(String workspaceId) {
         try {
-            return projectMapper.toDtoList(projectRepository.findAllByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE));
+            return projectMapper.toDtoList(
+                projectRepository.findAllByRemovedIsFalseAndWorkspaceIdOrderByCreateDateTimeDesc(workspaceId));
         } catch (Exception e) {
             log.error("Failed to get the Project list!", e);
             throw new ApiTestPlatformException(GET_PROJECT_LIST_ERROR);
@@ -117,6 +118,11 @@ public class ProjectServiceImpl implements ProjectService {
             log.error("Failed to delete the Project!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_BY_ID_ERROR);
         }
+    }
+
+    @Override
+    public boolean existsByWorkspaceId(String workspaceId) {
+        return projectRepository.existsByWorkspaceIdAndRemovedIsFalse(workspaceId);
     }
 
 }

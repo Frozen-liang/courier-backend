@@ -154,9 +154,20 @@ public enum ErrorCode {
     GET_TEST_FILE_LIST_ERROR("4146", "Failed to get the TestFile list!"),
     DOWNLOAD_TEST_FILE_ERROR("4147", "Failed to download the TestFile!"),
     THE_TEST_FILE_NOT_EXIST_ERROR("4148", "The TestFile not exist! id=%s"),
-    GET_SCENE_CASE_ERROR("4049", "Failed to get the SceneCase!"),
-    GET_CASE_TEMPLATE_ERROR("4050", "Failed to get the CaseTemplate!"),
-    GET_CASE_TEMPLATE_BY_ID_ERROR("4051", "Failed to get the CaseTemplate by id!"),
+    ADD_WORKSPACE_ERROR("4149", "Failed to add the Workspace!"),
+    GET_WORKSPACE_LIST_ERROR("4150", "Failed to get the Workspace list!"),
+    DELETE_WORKSPACE_BY_ID_ERROR("4151", "Failed to delete the Workspace!"),
+    EDIT_WORKSPACE_ERROR("4152", "Failed to edit the Workspace!"),
+    GET_WORKSPACE_BY_ID_ERROR("4153", "Failed to get the Workspace by id!"),
+    THE_WORKSPACE_CANNOT_DELETE_ERROR("4154", "There are project under this workspace that cannot be deleted!"),
+    ADD_USER_ERROR("4155", "Failed to add the User!"),
+    GET_USER_LIST_ERROR("4156", "Failed to get the User list!"),
+    DELETE_USER_BY_ID_ERROR("4157", "Failed to delete the User!"),
+    EDIT_USER_ERROR("4158", "Failed to edit the User!"),
+    GET_USER_BY_ID_ERROR("4159", "Failed to get the User by id!"),
+    GET_SCENE_CASE_ERROR("4060", "Failed to get the SceneCase!"),
+    GET_CASE_TEMPLATE_ERROR("4061", "Failed to get the CaseTemplate!"),
+    GET_CASE_TEMPLATE_BY_ID_ERROR("4062", "Failed to get the CaseTemplate by id!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

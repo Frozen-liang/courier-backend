@@ -17,6 +17,7 @@ public class ProjectImportSourceResponse {
 
 
     private String id;
+    private String name;
     private Integer documentType;
     private Integer saveMode;
     private String projectId;

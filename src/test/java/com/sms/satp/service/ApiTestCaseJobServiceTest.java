@@ -60,12 +60,14 @@ class ApiTestCaseJobServiceTest {
         TestDataRequest.builder().dataName("test")
             .data(List.of(DataParamRequest.builder().key("key").value("value").build())).build();
     private final ApiTestCaseJobRunRequest apiTestCaseJobRunRequest =
-        ApiTestCaseJobRunRequest.builder().apiTestCaseId(ObjectId.get().toString()).envId(ObjectId.get().toString())
+        ApiTestCaseJobRunRequest.builder().apiTestCaseIds(Collections.singletonList(ObjectId.get().toString()))
+            .envId(ObjectId.get().toString())
             .dataCollectionRequest(
                 DataCollectionRequest.builder().collectionName("test")
                     .dataList(Collections.singletonList(testDataRequest)).build()).build();
     private final ApiTestCaseJobRunRequest apiTestCaseJobRunRequest2 =
-        ApiTestCaseJobRunRequest.builder().apiTestCaseId(ObjectId.get().toString()).envId(ObjectId.get().toString())
+        ApiTestCaseJobRunRequest.builder().apiTestCaseIds(Collections.singletonList(ObjectId.get().toString()))
+            .envId(ObjectId.get().toString())
             .build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
         .id(ID).build();
@@ -135,8 +137,8 @@ class ApiTestCaseJobServiceTest {
         when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
         when(projectEnvironmentService.findOne(any())).thenReturn(null);
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest);
-        doNothing().when(caseDispatcherService).sendMessage(anyString(), anyString());
-        verify(caseDispatcherService, times(1)).sendMessage(anyString(), anyString());
+        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
     }
 
     @Test
@@ -146,8 +148,8 @@ class ApiTestCaseJobServiceTest {
         when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest);
         doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(CaseReport.class));
-        doNothing().when(caseDispatcherService).sendMessage(anyString(), anyString());
-        verify(caseDispatcherService, times(1)).sendMessage(anyString(), anyString());
+        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
     }
 
 }

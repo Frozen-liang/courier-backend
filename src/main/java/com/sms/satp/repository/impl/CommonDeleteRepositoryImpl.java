@@ -5,6 +5,7 @@ import static com.sms.satp.common.field.CommonFiled.MODIFY_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
 import com.mongodb.client.result.UpdateResult;
+import com.sms.satp.common.field.Filed;
 import com.sms.satp.repository.CommonDeleteRepository;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,7 +13,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.CollectionUtils;
 
 @Repository
 public class CommonDeleteRepositoryImpl implements CommonDeleteRepository {
@@ -37,6 +40,28 @@ public class CommonDeleteRepositoryImpl implements CommonDeleteRepository {
     public Boolean deleteByIds(List<String> ids, Class<?> entityClass) {
         Query query = new Query(Criteria.where(ID.getFiled()).in(ids));
         Update update = Update.update(REMOVE.getFiled(), Boolean.TRUE);
+        update.set(MODIFY_DATE_TIME.getFiled(), LocalDateTime.now());
+        UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
+        return updateResult.getModifiedCount() > 0;
+    }
+
+    @Override
+    public Boolean removeTags(@NonNull Filed filed, @NonNull List<String> tagIds, @NonNull Class<?> entityClass) {
+        Query query = new Query();
+        filed.in(tagIds).ifPresent(query::addCriteria);
+        Update update = new Update();
+        update.pullAll(filed.getFiled(), tagIds.toArray());
+        UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
+        return updateResult.getModifiedCount() > 0;
+    }
+
+    @Override
+    public Boolean recover(List<String> ids, Class<?> entityClass) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Boolean.FALSE;
+        }
+        Query query = new Query(Criteria.where(ID.getFiled()).in(ids));
+        Update update = Update.update(REMOVE.getFiled(), Boolean.FALSE);
         update.set(MODIFY_DATE_TIME.getFiled(), LocalDateTime.now());
         UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
         return updateResult.getModifiedCount() > 0;

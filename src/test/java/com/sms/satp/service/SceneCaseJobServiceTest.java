@@ -126,7 +126,7 @@ class SceneCaseJobServiceTest {
     @DisplayName("Test the runJob method in the SceneCaseJob service thrown exception")
     void runJob_test_EnvironmentIsNull() {
         when(projectEnvironmentService.findOne(any())).thenReturn(null);
-        doNothing().when(caseDispatcherService).sendMessage(any(), any());
+        doNothing().when(caseDispatcherService).sendErrorMessage(any(), any());
         sceneCaseJobService.runJob(getAddRequest());
         verify(projectEnvironmentService, times(1)).findOne(any());
     }
@@ -137,7 +137,7 @@ class SceneCaseJobServiceTest {
         ProjectEnvironment environment = ProjectEnvironment.builder().build();
         when(projectEnvironmentService.findOne(any())).thenReturn(environment);
         when(sceneCaseRepository.findById(any())).thenReturn(Optional.empty());
-        doNothing().when(caseDispatcherService).sendMessage(any(), any());
+        doNothing().when(caseDispatcherService).sendErrorMessage(any(), any());
         sceneCaseJobService.runJob(getAddRequest());
         verify(sceneCaseRepository, times(1)).findById(any());
     }
@@ -146,7 +146,7 @@ class SceneCaseJobServiceTest {
     @DisplayName("Test the runJob method in the SceneCaseJob service thrown exception")
     void runJob_test_thrownException() {
         when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
-        doNothing().when(caseDispatcherService).sendMessage(any(), any());
+        doNothing().when(caseDispatcherService).sendErrorMessage(any(), any());
         sceneCaseJobService.runJob(getAddRequest());
         verify(projectEnvironmentService, times(1)).findOne(MOCK_ID);
     }
@@ -162,7 +162,7 @@ class SceneCaseJobServiceTest {
                             .builder().id(MOCK_ID).build()).build()))
                     .id(MOCK_ID).build());
         when(sceneCaseJobRepository.findById(any())).thenReturn(sceneCaseJob);
-        doNothing().when(caseDispatcherService).sendMessage(any(), any());
+        doNothing().when(caseDispatcherService).sendErrorMessage(any(), any());
         when(sceneCaseJobRepository.save(any())).thenReturn(SceneCaseJob.builder().id(MOCK_ID).build());
         SceneCaseJobReport sceneCaseJobReport = getReport();
         sceneCaseJobService.handleJobReport(sceneCaseJobReport);

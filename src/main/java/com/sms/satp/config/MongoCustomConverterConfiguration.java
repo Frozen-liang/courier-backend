@@ -1,7 +1,5 @@
 package com.sms.satp.config;
 
-import com.mongodb.client.gridfs.GridFSBucket;
-import com.mongodb.client.gridfs.GridFSBuckets;
 import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
@@ -58,9 +56,9 @@ public class MongoCustomConverterConfiguration {
     }
 
     @Bean
-    AuditorAware<Long> auditorAware() {
+    AuditorAware<String> auditorAware() {
         // get createUserId and modifyUserId
-        return () -> Optional.of(1L);
+        return () -> Optional.of("1");
     }
 
 

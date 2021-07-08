@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
 import com.sms.satp.entity.api.common.HeaderInfo;
@@ -23,6 +24,9 @@ public class GlobalEnvironmentRequest {
     @Null(groups = InsertGroup.class, message = "The id must be null.")
     private String id;
 
+    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The workspaceId cannot be empty")
+    private String workspaceId;
+
     @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The evnName cannot be empty")
     private String envName;
 
@@ -44,11 +48,13 @@ public class GlobalEnvironmentRequest {
     private List<HeaderInfo> headers;
 
     @Valid
-    private List<ParamInfoRequest> params;
+    private List<ParamInfoRequest> envVariable;
 
     @Valid
     private List<ParamInfoRequest> urlParams;
 
+    private ApiRequestParamType requestParamType;
+
     @Valid
-    private List<ParamInfoRequest> additionalParams;
+    private List<ParamInfoRequest> requestParams;
 }

@@ -18,4 +18,6 @@ public interface CustomizedFileRepository {
     Boolean deleteTestFileById(String id);
 
     GridFsResource downloadTestFile(String id);
+
+    GridFSFile findById(String id);
 }

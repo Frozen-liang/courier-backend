@@ -18,15 +18,25 @@ import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.common.field.ApiFiled;
+import com.sms.satp.common.field.ApiTestCaseFiled;
+import com.sms.satp.common.field.Filed;
+import com.sms.satp.common.field.SceneFiled;
+import com.sms.satp.dto.request.ApiTagListRequest;
 import com.sms.satp.dto.request.ApiTagRequest;
 import com.sms.satp.dto.response.ApiTagResponse;
+import com.sms.satp.entity.api.ApiEntity;
+import com.sms.satp.entity.apitestcase.ApiTestCase;
+import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.entity.tag.ApiTag;
 import com.sms.satp.mapper.ApiTagMapper;
 import com.sms.satp.repository.ApiTagRepository;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.service.ApiTagService;
 import com.sms.satp.utils.ExceptionUtils;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -40,11 +50,14 @@ import org.springframework.stereotype.Service;
 public class ApiTagServiceImpl implements ApiTagService {
 
     private final ApiTagRepository apiTagRepository;
+    private final CommonDeleteRepository commonDeleteRepository;
     private final ApiTagMapper apiTagMapper;
     private static final String TAG_TYPE = "tagType";
 
-    public ApiTagServiceImpl(ApiTagRepository apiTagRepository, ApiTagMapper apiTagMapper) {
+    public ApiTagServiceImpl(ApiTagRepository apiTagRepository,
+        CommonDeleteRepository commonDeleteRepository, ApiTagMapper apiTagMapper) {
         this.apiTagRepository = apiTagRepository;
+        this.commonDeleteRepository = commonDeleteRepository;
         this.apiTagMapper = apiTagMapper;
     }
 
@@ -55,10 +68,9 @@ public class ApiTagServiceImpl implements ApiTagService {
     }
 
     @Override
-    public List<ApiTagResponse> list(String projectId, String tagName, Integer tagType) {
+    public List<ApiTagResponse> list(ApiTagListRequest apiTagListRequest) {
         try {
-            ApiTag apiTag = ApiTag.builder().projectId(projectId).tagName(tagName)
-                .tagType(Objects.nonNull(tagType) ? ApiTagType.getType(tagType) : null).build();
+            ApiTag apiTag = apiTagMapper.listRequestToApiTag(apiTagListRequest);
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher(TAG_TYPE, ExampleMatcher.GenericPropertyMatchers.exact())
@@ -112,6 +124,26 @@ public class ApiTagServiceImpl implements ApiTagService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
+            Map<ApiTagType, List<ApiTag>> map = apiTagRepository.findAllByIdIn(ids)
+                .collect(Collectors.groupingBy(ApiTag::getTagType));
+            map.forEach((key, value) -> {
+                switch (key) {
+                    case API:
+                        commonDeleteRepository.removeTags(ApiFiled.TAG_ID,
+                            value.stream().map(ApiTag::getId).collect(Collectors.toList()), ApiEntity.class);
+                        break;
+                    case CASE:
+                        commonDeleteRepository.removeTags(ApiTestCaseFiled.TAG_IDS,
+                            value.stream().map(ApiTag::getId).collect(Collectors.toList()), ApiTestCase.class);
+                        break;
+                    case SCENE:
+                        commonDeleteRepository.removeTags(SceneFiled.TAG_IDS,
+                            value.stream().map(ApiTag::getId).collect(Collectors.toList()), SceneCaseApi.class);
+                        break;
+                    default:
+                        break;
+                }
+            });
             Long removeCount = apiTagRepository.deleteAllByIdIsIn(ids);
             return removeCount > 0;
         } catch (Exception e) {

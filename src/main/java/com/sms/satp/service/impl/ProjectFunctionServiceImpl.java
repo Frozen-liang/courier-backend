@@ -64,11 +64,12 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     }
 
     @Override
-    public List<Object> list(String projectId, String functionKey, String functionName) {
+    public List<Object> list(String projectId, String workspaceId, String functionKey, String functionName) {
         try {
             List<ProjectFunctionResponse> projectFunctionResponses = this.findAll(projectId, functionKey, functionName);
             ArrayList<Object> list = new ArrayList<>();
-            List<GlobalFunctionResponse> globalFunctionList = globalFunctionService.list(functionKey, functionName);
+            List<GlobalFunctionResponse> globalFunctionList = globalFunctionService.list(workspaceId, functionKey,
+                functionName);
             list.addAll(globalFunctionList);
             list.addAll(projectFunctionResponses);
             return list;

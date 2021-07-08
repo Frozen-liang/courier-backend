@@ -45,6 +45,7 @@ class ProjectServiceTest {
     private final ProjectRequest projectRequest = ProjectRequest.builder()
         .id(ID).build();
     private static final String ID = ObjectId.get().toString();
+    private static final String WORKSPACE_ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
 
     @Test
@@ -136,9 +137,10 @@ class ProjectServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             projectResponseList.add(ProjectResponse.builder().build());
         }
-        when(projectRepository.findAllByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE)).thenReturn(projectList);
+        when(projectRepository.findAllByRemovedIsFalseAndWorkspaceIdOrderByCreateDateTimeDesc(any()))
+            .thenReturn(projectList);
         when(projectMapper.toDtoList(projectList)).thenReturn(projectResponseList);
-        List<ProjectResponse> result = projectService.list();
+        List<ProjectResponse> result = projectService.list(WORKSPACE_ID);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -146,8 +148,8 @@ class ProjectServiceTest {
     @DisplayName("An exception occurred while getting Project list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(projectRepository)
-            .findAllByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE);
-        assertThatThrownBy(projectService::list)
+            .findAllByRemovedIsFalseAndWorkspaceIdOrderByCreateDateTimeDesc(any());
+        assertThatThrownBy(() -> projectService.list(WORKSPACE_ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_PROJECT_LIST_ERROR.getCode());
     }

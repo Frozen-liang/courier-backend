@@ -44,7 +44,6 @@ class SceneCaseApiMapperTest {
                 .apiResponseJsonType(ApiJsonType.OBJECT)
                 .apiRequestJsonType(ApiJsonType.OBJECT)
                 .build())
-            .apiBindingStatus(ApiBindingStatus.BINDING)
             .build();
         SceneCaseApiResponse dto = sceneCaseApiMapper.toSceneCaseApiDto(sceneCaseApi);
         assertThat(dto.getId()).isEqualTo(MOCK_ID);

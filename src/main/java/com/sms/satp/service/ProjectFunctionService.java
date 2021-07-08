@@ -8,7 +8,7 @@ public interface ProjectFunctionService {
 
     ProjectFunctionResponse findById(String id);
 
-    List<Object> list(String projectId, String functionDesc, String functionName);
+    List<Object> list(String projectId, String workspaceId, String functionDesc, String functionName);
 
     Boolean add(ProjectFunctionRequest projectFunctionRequest);
 

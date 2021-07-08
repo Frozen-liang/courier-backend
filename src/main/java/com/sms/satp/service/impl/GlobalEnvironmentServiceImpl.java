@@ -90,10 +90,10 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
-    public List<GlobalEnvironmentResponse> list() {
+    public List<GlobalEnvironmentResponse> list(String workspaceId) {
         try {
             List<GlobalEnvironment> globalEnvironments = globalEnvironmentRepository
-                .findByRemovedOrderByCreateDateTimeDesc(Boolean.FALSE);
+                .findByRemovedIsFalseAndWorkspaceIdOrderByCreateDateTimeDesc(workspaceId);
             return globalEnvironmentMapper.toDtoList(globalEnvironments);
         } catch (Exception e) {
             log.error("Failed to get the GlobalEnvironment list!", e);

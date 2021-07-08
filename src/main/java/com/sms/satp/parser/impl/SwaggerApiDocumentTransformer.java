@@ -6,6 +6,7 @@ import static com.sms.satp.common.enums.SchemaType.OBJECT;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
 
+import com.google.common.collect.Lists;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiStatus;
@@ -43,11 +44,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
+import org.springframework.data.mongodb.core.index.Index;
 
 @Slf4j
 public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<OpenAPI> {
@@ -147,7 +150,7 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
             .peek(mediaType -> ifRequestOrResponseEqualArray(mediaType, apiEntityBuilder::apiRequestJsonType))
             .findFirst()
             .map(MediaType::getSchema)
-            .map(schema -> toParams(Optional.empty(), schema, components))
+            .map(schema -> toParams(Optional.empty(), schema, components, 0))
             .ifPresent(apiEntityBuilder::requestParams);
 
         Optional<ApiResponse> apiResponse = Optional.ofNullable(operation.getResponses())
@@ -158,7 +161,7 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
             .peek(mediaType -> ifRequestOrResponseEqualArray(mediaType, apiEntityBuilder::apiResponseJsonType))
             .findFirst()
             .map(MediaType::getSchema)
-            .map(schema -> toParams(Optional.empty(), schema, components))
+            .map(schema -> toParams(Optional.empty(), schema, components, 0))
             .ifPresent(apiEntityBuilder::responseParams);
 
         // Build response header
@@ -228,13 +231,14 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
         return StringUtils.substringAfterLast(componentKey, COMPONENT_KEY_PATTERN);
     }
 
-    private List<ParamInfo> toParams(Optional<List<String>> pathSummary, Schema<?> schema,
-        Map<String, Schema> components) {
+    private List<ParamInfo> toParams(Optional<List<List<String>>> pathSummary, Schema<?> schema,
+        Map<String, Schema> components, int currentIndex) {
         List<ParamInfo> paramInfos = new ArrayList<>();
+        List<List<String>> paths = pathSummary.orElse(new ArrayList<>());
         Map<String, Schema> properties = schema.getProperties();
+        paths.add(currentIndex, Lists.newArrayList());
 
         if (MapUtils.isNotEmpty(properties)) {
-
             for (Entry<String, Schema> entry : properties.entrySet()) {
                 String key = entry.getKey();
                 Schema childSchema = entry.getValue();
@@ -246,32 +250,35 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
                     .required(ifRequired(schema, key))
                     .build();
                 if (List.of(JSON, OBJECT, ARRAY).contains(childSchemaType)) {
-                    childParam.setChildParam(toComplexParams(pathSummary, childSchema, components));
+
+                    childParam.setChildParam(toComplexParams(paths, childSchema, components, currentIndex));
                 }
                 paramInfos.add(childParam);
             }
 
         } else {
-            paramInfos = toComplexParams(Optional.empty(), schema,
-                components);
+            paramInfos = toComplexParams(paths, schema,
+                components, currentIndex);
         }
         return paramInfos;
     }
 
-    private List<ParamInfo> toComplexParams(Optional<List<String>> pathSummary,
-        Schema schema, Map<String, Schema> components) {
+    private List<ParamInfo> toComplexParams(List<List<String>> paths,
+        Schema schema, Map<String, Schema> components, int currentIndex) {
         String componentKey = getComponentKey(schema);
         if (StringUtils.isBlank(componentKey)) {
             return Collections.emptyList();
         }
-        List<String> paths = pathSummary.orElse(new ArrayList<>());
-        if (paths.contains(componentKey)) {
-            return Collections.emptyList();
-        } else {
-            paths.add(componentKey);
-            return toParams(Optional.of(paths), components.get(componentKey),
-                components);
+        if (currentIndex > 0) {
+            boolean exist = IntStream.range(0, currentIndex - 1)
+                .anyMatch(index -> paths.get(index).contains(componentKey));
+            if (exist) {
+                return Collections.emptyList();
+            }
         }
+        paths.get(currentIndex).add(componentKey);
+        return toParams(Optional.of(paths), components.get(componentKey),
+            components, currentIndex + 1);
     }
 
 }

@@ -38,10 +38,12 @@ public class JobEnvironment {
 
     private List<HeaderInfo> headers;
 
-    private List<ParamInfoResponse> params;
+    private List<ParamInfoResponse> envVariable;
 
     private List<ParamInfoResponse> urlParams;
 
-    private List<ParamInfoResponse> additionalParams;
+    private List<ParamInfoResponse> requestParams;
+
+    private Integer requestParamType;
 
 }

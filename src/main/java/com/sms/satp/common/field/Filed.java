@@ -3,7 +3,12 @@ package com.sms.satp.common.field;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 public interface Filed {
@@ -49,5 +54,13 @@ public interface Filed {
             return Optional.of(Criteria.where(getFiled()).gte(ltValue));
         }
         return Optional.of(Criteria.where(getFiled()).lte(gtValue));
+    }
+
+    default Optional<Criteria> like(String value) {
+        if (Objects.isNull(value)) {
+            return Optional.empty();
+        }
+        Pattern pattern = Pattern.compile("^.*" + value + ".*$", Pattern.CASE_INSENSITIVE);
+        return Optional.of(Criteria.where(getFiled()).regex(pattern));
     }
 }

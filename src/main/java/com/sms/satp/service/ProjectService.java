@@ -8,11 +8,13 @@ public interface ProjectService {
 
     ProjectResponse findById(String id);
 
-    List<ProjectResponse> list();
+    List<ProjectResponse> list(String workspaceId);
 
     Boolean add(ProjectRequest projectRequest);
 
     Boolean edit(ProjectRequest projectRequest);
 
     Boolean delete(List<String> ids);
+
+    boolean existsByWorkspaceId(String workspaceId);
 }
