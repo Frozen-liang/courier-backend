@@ -37,6 +37,26 @@ public class OpenApiDocumentTransformerTest {
 
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"/config/test-v2.json"})
+    public void test_v2(String candidate) {
+        ParseOptions parseOptions = new ParseOptions();
+        parseOptions.setResolve(true);
+        OpenAPI openAPI = new OpenAPIParser()
+            .readLocation(
+                Objects.requireNonNull(OpenApiDocumentTransformerTest.class.getResource(candidate))
+                    .toString(),
+                null,
+                parseOptions).getOpenAPI();
+        DocumentDefinition documentDefinition = new DocumentDefinition(openAPI);
+        ApiDocumentTransformer swaggerApiDocumentTransformer = new SwaggerApiDocumentTransformer();
+        List<ApiEntity> apiEntities = swaggerApiDocumentTransformer
+            .toApiEntities(documentDefinition, apiEntity -> {
+            });
+        Assertions.assertTrue(apiEntities.size() > 0);
+
+    }
+
 
     @Disabled
     @Test
