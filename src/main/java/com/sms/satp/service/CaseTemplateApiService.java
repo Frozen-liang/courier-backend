@@ -1,6 +1,8 @@
 package com.sms.satp.service;
 
+import com.sms.satp.dto.request.AddCaseTemplateApiByIdsRequest;
 import com.sms.satp.dto.request.BatchAddCaseTemplateApiRequest;
+import com.sms.satp.dto.request.BatchUpdateCaseTemplateApiRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
 import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
@@ -16,7 +18,9 @@ public interface CaseTemplateApiService {
 
     Boolean editAll(List<CaseTemplateApi> caseTemplateApiList);
 
-    List<CaseTemplateApiResponse> listByCaseTemplateId(String caseTemplateId, boolean remove);
+    Boolean batchEdit(BatchUpdateCaseTemplateApiRequest updateCaseTemplateApiDto);
+
+    List<CaseTemplateApiResponse> listByCaseTemplateId(String caseTemplateId, boolean removed);
 
     List<CaseTemplateApi> listByCaseTemplateId(String caseTemplateId);
 
@@ -24,4 +28,5 @@ public interface CaseTemplateApiService {
 
     CaseTemplateApiResponse getCaseTemplateApiById(String id);
 
+    Boolean add(AddCaseTemplateApiByIdsRequest request);
 }

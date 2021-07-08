@@ -31,7 +31,7 @@ public class CaseTemplate extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
 
-    private List<String> tagIds;
+    private List<String> tagId;
 
     private Integer priority;
 

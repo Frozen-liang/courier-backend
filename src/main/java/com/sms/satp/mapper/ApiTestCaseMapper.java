@@ -1,11 +1,9 @@
 package com.sms.satp.mapper;
 
-import static com.sms.satp.common.constant.TimePatternConstant.DEFAULT_PATTERN;
-
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
+import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
-import com.sms.satp.entity.job.common.JobApiTestCase;
 import com.sms.satp.utils.EnumCommonUtils;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -27,6 +25,6 @@ public interface ApiTestCaseMapper {
 
     ApiTestCase toEntity(ApiTestCaseRequest apiTestCaseRequest);
 
-    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = DEFAULT_PATTERN)
-    JobApiTestCase toJob(ApiTestCase apiTestCase);
+    @Mapping(target = "apiId", source = "id")
+    ApiTestCase toEntityByApiEntity(ApiEntity apiEntity);
 }

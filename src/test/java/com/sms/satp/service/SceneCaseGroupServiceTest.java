@@ -5,6 +5,7 @@ import com.sms.satp.dto.request.AddSceneCaseGroupRequest;
 import com.sms.satp.dto.request.SearchSceneCaseGroupRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseGroupRequest;
 import com.sms.satp.dto.response.SceneCaseGroupResponse;
+import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.entity.group.SceneCaseGroup;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.mapper.SceneCaseGroupMapper;
@@ -36,12 +37,9 @@ class SceneCaseGroupServiceTest {
 
     private final SceneCaseGroupRepository sceneCaseGroupRepository = mock(SceneCaseGroupRepository.class);
     private final SceneCaseGroupMapper sceneCaseGroupMapper = mock(SceneCaseGroupMapper.class);
-    private final CustomizedSceneCaseRepository customizedSceneCaseRepository = mock(
-        CustomizedSceneCaseRepository.class);
     private final SceneCaseService sceneCaseService = mock(SceneCaseService.class);
     private final SceneCaseGroupService sceneCaseGroupService =
-        new SceneCaseGroupServiceImpl(sceneCaseGroupRepository, sceneCaseGroupMapper, customizedSceneCaseRepository,
-            sceneCaseService);
+        new SceneCaseGroupServiceImpl(sceneCaseGroupRepository, sceneCaseGroupMapper, sceneCaseService);
 
     private final static String MOCK_ID = "1";
     private final static String MOCK_NAME = "name";
@@ -100,9 +98,8 @@ class SceneCaseGroupServiceTest {
         Optional<SceneCaseGroup> optional = Optional.ofNullable(caseGroup);
         when(sceneCaseGroupRepository.findById(any())).thenReturn(optional);
         doNothing().when(sceneCaseGroupRepository).deleteById(any());
-        Page<SceneCase> sceneCasePage = mock(Page.class);
-        when(sceneCasePage.getContent()).thenReturn(Lists.newArrayList(SceneCase.builder().id(MOCK_ID).build()));
-        when(customizedSceneCaseRepository.search(any(), any())).thenReturn(sceneCasePage);
+        Page<SceneCaseResponse> sceneCasePage = mock(Page.class);
+        when(sceneCasePage.getContent()).thenReturn(Lists.newArrayList(SceneCaseResponse.builder().id(MOCK_ID).build()));
         when(sceneCaseService.batchEdit(any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = sceneCaseGroupService.deleteById(MOCK_ID);
         assertTrue(isSuccess);

@@ -14,11 +14,15 @@ public class AddSceneCaseJobRequest {
 
     private String sceneCaseId;
 
+    private String caseTemplateId;
+
     private String projectId;
 
     private List<String> sceneCaseApiIds;
 
     private List<String> caseTemplateConnIds;
+
+    private List<String> caseTemplateApiIds;
 
     private DataCollectionRequest dataCollectionRequest;
 

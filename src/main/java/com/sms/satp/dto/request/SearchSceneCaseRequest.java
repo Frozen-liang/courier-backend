@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.bson.types.ObjectId;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -16,10 +17,10 @@ import lombok.experimental.SuperBuilder;
 public class SearchSceneCaseRequest extends PageDto {
 
     private String name;
-    private String groupId;
-    private boolean remove;
+    private ObjectId groupId;
+    private boolean removed;
     private List<String> testStatus;
-    private List<String> tagIds;
+    private List<ObjectId> tagId;
     private List<Integer> priority;
     private List<String> createUserName;
 

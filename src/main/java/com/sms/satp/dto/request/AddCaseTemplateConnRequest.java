@@ -18,6 +18,4 @@ public class AddCaseTemplateConnRequest {
     private String caseTemplateId;
 
     private List<CaseTemplateApiConn> caseTemplateApiConnList;
-
-    private Boolean removed;
 }

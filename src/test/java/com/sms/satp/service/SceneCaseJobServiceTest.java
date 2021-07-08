@@ -23,6 +23,7 @@ import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.CaseTemplateApiMapper;
 import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.repository.CaseTemplateConnRepository;
+import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
@@ -63,9 +64,12 @@ class SceneCaseJobServiceTest {
     private final CaseDispatcherService caseDispatcherService = mock(CaseDispatcherService.class);
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository =
         mock(CustomizedCaseTemplateApiRepository.class);
+    private final CaseTemplateApiService caseTemplateApiService = mock(CaseTemplateApiService.class);
+    private final CaseTemplateRepository caseTemplateRepository = mock(CaseTemplateRepository.class);
     private final SceneCaseJobService sceneCaseJobService = new SceneCaseJobServiceImpl(sceneCaseApiRepository,
         projectEnvironmentService, sceneCaseRepository, caseTemplateConnRepository, sceneCaseJobRepository,
-        jobMapper, customizedSceneCaseJobRepository, caseDispatcherService, customizedCaseTemplateApiRepository);
+        jobMapper, customizedSceneCaseJobRepository, caseDispatcherService, customizedCaseTemplateApiRepository,
+        caseTemplateApiService, caseTemplateRepository);
 
     private final static String MOCK_ID = "1";
     private final static Integer MOCK_NUM = 1;
@@ -155,14 +159,14 @@ class SceneCaseJobServiceTest {
                 SceneCaseJob.builder()
                     .apiTestCase(Lists.newArrayList(JobSceneCaseApi.builder().id(MOCK_ID)
                         .jobApiTestCase(JobApiTestCase
-                    .builder().id(MOCK_ID).build()).build()))
+                            .builder().id(MOCK_ID).build()).build()))
                     .id(MOCK_ID).build());
         when(sceneCaseJobRepository.findById(any())).thenReturn(sceneCaseJob);
         doNothing().when(caseDispatcherService).sendMessage(any(), any());
         when(sceneCaseJobRepository.save(any())).thenReturn(SceneCaseJob.builder().id(MOCK_ID).build());
         SceneCaseJobReport sceneCaseJobReport = getReport();
         sceneCaseJobService.handleJobReport(sceneCaseJobReport);
-        verify(sceneCaseJobRepository,times(1)).save(any());
+        verify(sceneCaseJobRepository, times(1)).save(any());
     }
 
     private SceneCaseJobReport getReport() {

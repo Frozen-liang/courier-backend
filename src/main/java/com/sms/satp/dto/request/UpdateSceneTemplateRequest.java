@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateSceneTemplateRequest {
 
-    private UpdateSceneCaseRequest updateSceneCaseRequest;
+    private String sceneCaseId;
 
     private List<UpdateSceneCaseApiRequest> updateSceneCaseApiRequests;
 

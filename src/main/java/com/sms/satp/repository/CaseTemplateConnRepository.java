@@ -7,4 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface CaseTemplateConnRepository extends MongoRepository<CaseTemplateConn, String> {
 
     Long deleteAllByIdIsIn(List<String> ids);
+
+    List<CaseTemplateConn> findAllBySceneCaseId(String sceneCaseId);
 }

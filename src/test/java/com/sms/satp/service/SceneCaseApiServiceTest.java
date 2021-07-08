@@ -7,14 +7,18 @@ import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.mapper.SceneCaseApiMapper;
+import com.sms.satp.repository.ApiRepository;
+import com.sms.satp.repository.ApiTestCaseRepository;
+import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
+import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.impl.SceneCaseApiServiceImpl;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Example;
@@ -29,7 +33,6 @@ import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST_BY
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -38,20 +41,21 @@ import static org.wildfly.common.Assert.assertTrue;
 @DisplayName("Test cases for SceneCaseApiServiceTest")
 class SceneCaseApiServiceTest {
 
-    private SceneCaseApiRepository sceneCaseApiRepository;
-    private SceneCaseApiMapper sceneCaseApiMapper;
-    private SceneCaseApiServiceImpl sceneCaseApiService;
+    private final SceneCaseApiRepository sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
+    private final SceneCaseApiMapper sceneCaseApiMapper = mock(SceneCaseApiMapper.class);
+    private final ApiTestCaseRepository apiTestCaseRepository = mock(ApiTestCaseRepository.class);
+    private final SceneCaseRepository sceneCaseRepository = mock(SceneCaseRepository.class);
+    private final ApiRepository apiRepository = mock(ApiRepository.class);
+    private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
+    private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository =
+        mock(CustomizedSceneCaseApiRepository.class);
+    private final SceneCaseApiServiceImpl sceneCaseApiService = new SceneCaseApiServiceImpl(sceneCaseApiRepository,
+        sceneCaseApiMapper,
+        apiTestCaseRepository, sceneCaseRepository, apiRepository, apiTestCaseMapper, customizedSceneCaseApiRepository);
 
     private final static String MOCK_SCENE_CASE_ID = "1";
     private final static String MOCK_ID = new ObjectId().toString();
     private final static Integer MOCK_ORDER_NUMBER = 1;
-
-    @BeforeEach
-    void setUpBean() {
-        sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
-        sceneCaseApiMapper = mock(SceneCaseApiMapper.class);
-        sceneCaseApiService = new SceneCaseApiServiceImpl(sceneCaseApiRepository, sceneCaseApiMapper);
-    }
 
     @Test
     @DisplayName("Test the batchAdd method in the SceneCaseApi service")

@@ -16,10 +16,8 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {ApiTestCaseMapper.class, EnumCommonUtils.class})
 public interface CaseTemplateApiMapper {
 
-    @Mapping(target = "apiTestCase", source = "apiTestCaseRequest")
     CaseTemplateApi toCaseTemplateApiByUpdateRequest(UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest);
 
-    @Mapping(target = "apiTestCaseResponse", source = "apiTestCase")
     CaseTemplateApiResponse toCaseTemplateApiDto(CaseTemplateApi caseTemplateApi);
 
     List<CaseTemplateApi> toCaseTemplateApiListByUpdateRequestList(
@@ -29,8 +27,12 @@ public interface CaseTemplateApiMapper {
         List<AddCaseTemplateApiRequest> addCaseTemplateApiRequestList);
 
     @Mapping(target = "apiTestCase.id", expression = "java(new org.bson.types.ObjectId().toString())")
-    @Mapping(target = "apiTestCase", source = "apiTestCaseRequest")
     CaseTemplateApi toCaseTemplateApi(AddCaseTemplateApiRequest addCaseTemplateApiRequest);
 
     List<SceneCaseApi> toSceneCaseList(List<CaseTemplateApi> caseTemplateApiList);
+
+    List<CaseTemplateApi> toCaseTemplateApiListBySceneCaseApiList(List<SceneCaseApi> sceneCaseApiList);
+
+    @Mapping(target = "id", ignore = true)
+    CaseTemplateApi toCaseTemplateApiBySceneCaseApi(SceneCaseApi sceneCaseApi);
 }

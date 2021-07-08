@@ -8,6 +8,7 @@ import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.dto.response.SceneTemplateResponse;
 import com.sms.satp.entity.scenetest.SceneCase;
 import java.util.List;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 
 public interface SceneCaseService {
@@ -20,9 +21,13 @@ public interface SceneCaseService {
 
     Boolean batchEdit(List<SceneCase> sceneCaseList);
 
-    Page<SceneCaseResponse> page(SearchSceneCaseRequest searchDto, String projectId);
+    Page<SceneCaseResponse> page(SearchSceneCaseRequest searchDto, ObjectId projectId);
 
     SceneTemplateResponse getConn(String id);
 
     Boolean editConn(UpdateSceneTemplateRequest updateSceneTemplateRequest);
+
+    List<SceneCase> get(String groupId, String projectId);
+
+
 }

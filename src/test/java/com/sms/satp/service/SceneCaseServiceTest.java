@@ -203,11 +203,11 @@ class SceneCaseServiceTest {
     void search_test() {
         SearchSceneCaseRequest dto = new SearchSceneCaseRequest();
         dto.setName(MOCK_NAME);
-        List<SceneCase> dtoList = Lists.newArrayList(SceneCase.builder().build());
+        List<SceneCaseResponse> dtoList = Lists.newArrayList(SceneCaseResponse.builder().build());
         Pageable pageable = PageRequest.of(MOCK_PAGE, MOCK_SIZE);
-        Page<SceneCase> sceneCaseDtoPage = new PageImpl<>(dtoList, pageable, MOCK_TOTAL);
+        Page<SceneCaseResponse> sceneCaseDtoPage = new PageImpl<>(dtoList, pageable, MOCK_TOTAL);
         when(customizedSceneCaseRepository.search(any(), any())).thenReturn(sceneCaseDtoPage);
-        Page<SceneCaseResponse> pageDto = sceneCaseService.page(dto, MOCK_PROJECT_ID);
+        Page<SceneCaseResponse> pageDto = sceneCaseService.page(dto, new ObjectId());
         assertThat(pageDto).isNotNull();
     }
 
@@ -218,7 +218,7 @@ class SceneCaseServiceTest {
         dto.setName(MOCK_NAME);
         when(customizedSceneCaseRepository.search(any(), any()))
             .thenThrow(new ApiTestPlatformException(SEARCH_SCENE_CASE_ERROR));
-        assertThatThrownBy(() -> sceneCaseService.page(dto, MOCK_PROJECT_ID))
+        assertThatThrownBy(() -> sceneCaseService.page(dto, new ObjectId()))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 

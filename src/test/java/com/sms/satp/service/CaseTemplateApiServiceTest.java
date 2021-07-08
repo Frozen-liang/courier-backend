@@ -3,25 +3,26 @@ package com.sms.satp.service;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.AddCaseTemplateApiRequest;
 import com.sms.satp.dto.request.BatchAddCaseTemplateApiRequest;
-import com.sms.satp.dto.request.BatchUpdateCaseTemplateApiRequest;
-import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
+import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.mapper.CaseTemplateApiMapper;
+import com.sms.satp.repository.ApiRepository;
+import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CaseTemplateApiRepository;
+import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.service.impl.CaseTemplateApiServiceImpl;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 
 import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.BATCH_EDIT_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_BY_ID_ERROR;
@@ -29,7 +30,6 @@ import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST_BY
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -38,20 +38,19 @@ import static org.wildfly.common.Assert.assertTrue;
 @DisplayName("Test cases for CaseTemplateApiServiceTest")
 class CaseTemplateApiServiceTest {
 
-    private CaseTemplateApiRepository caseTemplateApiRepository;
-    private CaseTemplateApiMapper caseTemplateApiMapper;
-    private CaseTemplateApiServiceImpl caseTemplateApiService;
+    private final CaseTemplateApiRepository caseTemplateApiRepository= mock(CaseTemplateApiRepository.class);
+    private final CaseTemplateApiMapper caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
+    private final CaseTemplateRepository caseTemplateRepository = mock(CaseTemplateRepository.class);
+    private final ApiRepository apiRepository = mock(ApiRepository.class);
+    private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
+    private final ApiTestCaseRepository apiTestCaseRepository = mock(ApiTestCaseRepository.class);
+    private CaseTemplateApiServiceImpl caseTemplateApiService =
+        new CaseTemplateApiServiceImpl(caseTemplateApiRepository, caseTemplateApiMapper,
+        caseTemplateRepository, apiRepository, apiTestCaseMapper, apiTestCaseRepository);
 
     private final static String MOCK_SCENE_CASE_ID = "1";
     private final static String MOCK_ID = new ObjectId().toString();
     private final static Integer MOCK_ORDER_NUMBER = 1;
-
-    @BeforeEach
-    void setUpBean() {
-        caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
-        caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
-        caseTemplateApiService = new CaseTemplateApiServiceImpl(caseTemplateApiRepository, caseTemplateApiMapper);
-    }
 
     @Test
     @DisplayName("Test the batchAdd method in the CaseTemplateApi service")

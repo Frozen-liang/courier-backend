@@ -9,12 +9,14 @@ import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_CONN_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
@@ -42,6 +44,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.bson.types.ObjectId;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -135,10 +141,9 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
-    public Page<SceneCaseResponse> page(SearchSceneCaseRequest searchDto, String projectId) {
+    public Page<SceneCaseResponse> page(SearchSceneCaseRequest searchDto, ObjectId projectId) {
         try {
-            Page<SceneCase> resultPage = customizedSceneCaseRepository.search(searchDto, projectId);
-            return resultPage.map(sceneCaseMapper::toDto);
+            return customizedSceneCaseRepository.search(searchDto, projectId);
         } catch (Exception e) {
             log.error("Failed to search the SceneCase!", e);
             throw new ApiTestPlatformException(SEARCH_SCENE_CASE_ERROR);
@@ -172,12 +177,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     public Boolean editConn(UpdateSceneTemplateRequest updateSceneTemplateRequest) {
         log.info("SceneCaseService-editConn()-params: [SceneTemplateDto]={}", updateSceneTemplateRequest.toString());
         try {
-            if (!updateSceneTemplateRequest.getUpdateSceneCaseApiRequests().isEmpty()) {
+            if (CollectionUtils.isNotEmpty(updateSceneTemplateRequest.getUpdateSceneCaseApiRequests())) {
                 sceneCaseApiService.batchEdit(
                     BatchUpdateSceneCaseApiRequest.builder()
                         .sceneCaseApiRequestList(updateSceneTemplateRequest.getUpdateSceneCaseApiRequests()).build());
             }
-            if (!updateSceneTemplateRequest.getUpdateCaseTemplateConnRequests().isEmpty()) {
+            if (CollectionUtils.isNotEmpty(updateSceneTemplateRequest.getUpdateCaseTemplateConnRequests())) {
                 List<CaseTemplateConn> caseTemplateConnList =
                     caseTemplateConnMapper
                         .toCaseTemplateConnList(updateSceneTemplateRequest.getUpdateCaseTemplateConnRequests());
@@ -187,6 +192,22 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         } catch (Exception e) {
             log.error("Failed to edit the SceneCase conn!", e);
             throw new ApiTestPlatformException(EDIT_SCENE_CASE_CONN_ERROR);
+        }
+    }
+
+    @Override
+    public List<SceneCase> get(String groupId, String projectId) {
+        try {
+            SceneCase sceneCase = SceneCase.builder().groupId(groupId).projectId(projectId).build();
+            ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+                .withMatcher(CommonFiled.PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
+                .withMatcher(CommonFiled.GROUP_ID.getFiled(), GenericPropertyMatchers.exact())
+                .withIgnoreNullValues();
+            Example<SceneCase> example = Example.of(sceneCase, exampleMatcher);
+            return sceneCaseRepository.findAll(example);
+        } catch (Exception e) {
+            log.error("Failed to get the SceneCase!", e);
+            throw new ApiTestPlatformException(GET_SCENE_CASE_ERROR);
         }
     }
 

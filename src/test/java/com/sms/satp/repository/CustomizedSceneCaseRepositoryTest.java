@@ -1,10 +1,12 @@
 package com.sms.satp.repository;
 
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
+import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.repository.impl.CustomizedSceneCaseRepositoryImpl;
 import java.util.List;
 import org.assertj.core.util.Lists;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
@@ -35,15 +37,15 @@ class CustomizedSceneCaseRepositoryTest {
         when(mongoTemplate.find(any(Query.class), eq(SceneCase.class))).thenReturn(sceneCaseList);
         when(mongoTemplate.count(any(Query.class), eq(SceneCase.class))).thenReturn(COUNT);
         SearchSceneCaseRequest request = new SearchSceneCaseRequest();
-        request.setTagIds(Lists.newArrayList(MOCK_ID));
-        request.setGroupId(MOCK_ID);
+        request.setTagId(Lists.newArrayList(new ObjectId()));
+        request.setGroupId(new ObjectId());
         request.setName(NAME);
         request.setCreateUserName(Lists.newArrayList(NAME));
         request.setTestStatus(Lists.newArrayList(MOCK_ID));
-        request.setRemove(Boolean.FALSE);
+        request.setRemoved(Boolean.FALSE);
         request.setPageNumber(1);
         request.setPageSize(1);
-        Page<SceneCase> page = customizedSceneCaseRepository.search(request, MOCK_ID);
+        Page<SceneCaseResponse> page = customizedSceneCaseRepository.search(request, new ObjectId());
         assertThat(page).isNotNull();
     }
 

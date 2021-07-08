@@ -109,8 +109,6 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(CommonFiled.ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(SceneFiled.NAME.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(CommonFiled.PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(SceneFiled.PARENT_ID.getFiled(), GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
             Example<CaseTemplateGroup> example = Example.of(group, exampleMatcher);
             List<CaseTemplateGroup> caseTemplateGroups = caseTemplateGroupRepository.findAll(example);
@@ -122,9 +120,7 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
     }
 
     private void editCaseTemplateStatus(String id, String projectId) {
-        CaseTemplateSearchRequest request = CaseTemplateSearchRequest.builder().groupId(id).build();
-        Page<CaseTemplate> caseTemplatePage = customizedCaseTemplateRepository.search(request, projectId);
-        List<CaseTemplate> caseTemplateList = caseTemplatePage.getContent();
+        List<CaseTemplate> caseTemplateList = caseTemplateService.get(id, projectId);
         if (CollectionUtils.isNotEmpty(caseTemplateList)) {
             for (CaseTemplate caseTemplate : caseTemplateList) {
                 caseTemplate.setRemoved(true);

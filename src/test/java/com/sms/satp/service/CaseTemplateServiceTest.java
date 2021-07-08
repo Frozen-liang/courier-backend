@@ -2,7 +2,6 @@ package com.sms.satp.service;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.AddCaseTemplateRequest;
 import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
@@ -10,14 +9,17 @@ import com.sms.satp.dto.response.CaseTemplateResponse;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.entity.scenetest.CaseTemplateConn;
+import com.sms.satp.mapper.CaseTemplateApiMapper;
 import com.sms.satp.mapper.CaseTemplateMapper;
+import com.sms.satp.repository.CaseTemplateApiRepository;
+import com.sms.satp.repository.CaseTemplateConnRepository;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
+import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.impl.CaseTemplateServiceImpl;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
@@ -28,7 +30,6 @@ import org.springframework.data.domain.Pageable;
 import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_PAGE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -43,12 +44,21 @@ import static org.wildfly.common.Assert.assertTrue;
 @DisplayName("Test cases for CaseTemplateServiceTest")
 class CaseTemplateServiceTest {
 
-    private CaseTemplateRepository caseTemplateRepository;
-    private CustomizedCaseTemplateRepository customizedCaseTemplateRepository;
-    private CaseTemplateMapper caseTemplateMapper;
-    private CaseTemplateServiceImpl caseTemplateService;
-    private CaseTemplateApiService caseTemplateApiService;
-    private CaseTemplateConnService caseTemplateConnService;
+    private final CaseTemplateRepository caseTemplateRepository = mock(CaseTemplateRepository.class);
+    private final CustomizedCaseTemplateRepository customizedCaseTemplateRepository = mock(
+        CustomizedCaseTemplateRepository.class);
+    private final CaseTemplateMapper caseTemplateMapper = mock(CaseTemplateMapper.class);
+    private final CaseTemplateApiService caseTemplateApiService = mock(CaseTemplateApiService.class);
+    private final CaseTemplateConnService caseTemplateConnService = mock(CaseTemplateConnService.class);
+    private final SceneCaseRepository sceneCaseRepository = mock(SceneCaseRepository.class);
+    private final SceneCaseApiService sceneCaseApiService = mock(SceneCaseApiService.class);
+    private final CaseTemplateConnRepository caseTemplateConnRepository = mock(CaseTemplateConnRepository.class);
+    private final CaseTemplateApiMapper caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
+    private final CaseTemplateApiRepository caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
+    private CaseTemplateServiceImpl caseTemplateService = new CaseTemplateServiceImpl(caseTemplateRepository,
+        customizedCaseTemplateRepository,
+        caseTemplateMapper, caseTemplateApiService, caseTemplateConnService, sceneCaseRepository,
+        sceneCaseApiService, caseTemplateConnRepository, caseTemplateApiMapper, caseTemplateApiRepository);
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -58,17 +68,6 @@ class CaseTemplateServiceTest {
     private final static Integer MOCK_PAGE = 1;
     private final static Integer MOCK_SIZE = 1;
     private final static long MOCK_TOTAL = 1L;
-
-    @BeforeEach
-    void setBean() {
-        caseTemplateRepository = mock(CaseTemplateRepository.class);
-        customizedCaseTemplateRepository = mock(CustomizedCaseTemplateRepository.class);
-        caseTemplateMapper = mock(CaseTemplateMapper.class);
-        caseTemplateApiService = mock(CaseTemplateApiService.class);
-        caseTemplateConnService = mock(CaseTemplateConnService.class);
-        caseTemplateService = new CaseTemplateServiceImpl(caseTemplateRepository, customizedCaseTemplateRepository,
-            caseTemplateMapper, caseTemplateApiService, caseTemplateConnService);
-    }
 
     @Test
     @DisplayName("Test the add method in the CaseTemplate service")
@@ -183,35 +182,15 @@ class CaseTemplateServiceTest {
     }
 
     @Test
-    @DisplayName("Test the page method in the CaseTemplate service")
-    void page_test() {
-        List<CaseTemplate> dtoList = Lists.newArrayList(CaseTemplate.builder().build());
-        Pageable pageable = PageRequest.of(MOCK_PAGE, MOCK_SIZE);
-        Page<CaseTemplate> caseTemplatePage = new PageImpl<>(dtoList, pageable, MOCK_TOTAL);
-        when(caseTemplateRepository.findAll(any(), (Pageable) any())).thenReturn(caseTemplatePage);
-        Page<CaseTemplateResponse> pageDto = caseTemplateService.page(PageDto.builder().build(), MOCK_PROJECT_ID);
-        assertThat(pageDto).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Test the page method in the CaseTemplate service thrown exception")
-    void page_test_thenThrownException() {
-        when(caseTemplateRepository.findAll(any(), (Pageable) any()))
-            .thenThrow(new ApiTestPlatformException(GET_CASE_TEMPLATE_PAGE_ERROR));
-        assertThatThrownBy(() -> caseTemplateService.page(PageDto.builder().build(), MOCK_PROJECT_ID))
-            .isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
     @DisplayName("Test the search method in the CaseTemplate service")
     void search_test() {
         CaseTemplateSearchRequest dto = new CaseTemplateSearchRequest();
         dto.setName(MOCK_NAME);
-        List<CaseTemplate> dtoList = Lists.newArrayList(CaseTemplate.builder().build());
+        List<CaseTemplateResponse> dtoList = Lists.newArrayList(CaseTemplateResponse.builder().build());
         Pageable pageable = PageRequest.of(MOCK_PAGE, MOCK_SIZE);
-        Page<CaseTemplate> caseTemplatePage = new PageImpl<>(dtoList, pageable, MOCK_TOTAL);
-        when(customizedCaseTemplateRepository.search(any(), any())).thenReturn(caseTemplatePage);
-        Page<CaseTemplateResponse> pageDto = caseTemplateService.search(dto, MOCK_PROJECT_ID);
+        Page<CaseTemplateResponse> caseTemplatePage = new PageImpl<>(dtoList, pageable, MOCK_TOTAL);
+        when(customizedCaseTemplateRepository.page(any(), any())).thenReturn(caseTemplatePage);
+        Page<CaseTemplateResponse> pageDto = caseTemplateService.page(dto, new ObjectId());
         assertThat(pageDto).isNotNull();
     }
 
@@ -220,9 +199,9 @@ class CaseTemplateServiceTest {
     void search_test_thenThrownException() {
         CaseTemplateSearchRequest dto = new CaseTemplateSearchRequest();
         dto.setName(MOCK_NAME);
-        when(customizedCaseTemplateRepository.search(any(), any()))
+        when(customizedCaseTemplateRepository.page(any(), any()))
             .thenThrow(new ApiTestPlatformException(SEARCH_CASE_TEMPLATE_ERROR));
-        assertThatThrownBy(() -> caseTemplateService.search(dto, MOCK_PROJECT_ID))
+        assertThatThrownBy(() -> caseTemplateService.page(dto, new ObjectId()))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 }

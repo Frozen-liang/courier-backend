@@ -154,6 +154,9 @@ public enum ErrorCode {
     GET_TEST_FILE_LIST_ERROR("4146", "Failed to get the TestFile list!"),
     DOWNLOAD_TEST_FILE_ERROR("4147", "Failed to download the TestFile!"),
     THE_TEST_FILE_NOT_EXIST_ERROR("4148", "The TestFile not exist! id=%s"),
+    GET_SCENE_CASE_ERROR("4049", "Failed to get the SceneCase!"),
+    GET_CASE_TEMPLATE_ERROR("4050", "Failed to get the CaseTemplate!"),
+    GET_CASE_TEMPLATE_BY_ID_ERROR("4051", "Failed to get the CaseTemplate by id!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

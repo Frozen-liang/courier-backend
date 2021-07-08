@@ -1,7 +1,9 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
+import com.sms.satp.dto.request.AddCaseTemplateApiByIdsRequest;
 import com.sms.satp.dto.request.BatchAddCaseTemplateApiRequest;
+import com.sms.satp.dto.request.BatchUpdateCaseTemplateApiRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
 import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.service.CaseTemplateApiService;
@@ -41,9 +43,19 @@ public class CaseTemplateApiController {
         return caseTemplateApiService.edit(updateCaseTemplateApiRequest);
     }
 
+    @PutMapping("/batch")
+    public Boolean batchEdit(@Valid @RequestBody BatchUpdateCaseTemplateApiRequest batchUpdateCaseTemplateApiRequest) {
+        return caseTemplateApiService.batchEdit(batchUpdateCaseTemplateApiRequest);
+    }
+
     @GetMapping(value = "/{id}")
     public CaseTemplateApiResponse getCaseTemplateApiById(@PathVariable String id) {
         return caseTemplateApiService.getCaseTemplateApiById(id);
+    }
+
+    @PostMapping
+    public Boolean add(@Valid @RequestBody AddCaseTemplateApiByIdsRequest request) {
+        return caseTemplateApiService.add(request);
     }
 
 }

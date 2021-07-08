@@ -1,14 +1,16 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.AddCaseTemplateRequest;
 import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
+import com.sms.satp.dto.response.CaseTemplateDetailResponse;
 import com.sms.satp.dto.response.CaseTemplateResponse;
+import com.sms.satp.dto.response.IdResponse;
 import com.sms.satp.service.CaseTemplateService;
 import java.util.List;
 import javax.validation.Valid;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +36,11 @@ public class CaseTemplateController {
         return caseTemplateService.add(addCaseTemplateRequest);
     }
 
+    @PostMapping("/{sceneCaseId}")
+    public IdResponse add(@PathVariable String sceneCaseId) {
+        return caseTemplateService.add(sceneCaseId);
+    }
+
     @DeleteMapping("/{ids}")
     public Boolean deleteByIds(@PathVariable List<String> ids) {
         return caseTemplateService.deleteByIds(ids);
@@ -45,14 +52,15 @@ public class CaseTemplateController {
     }
 
     @GetMapping("/page/{projectId}")
-    public Page<CaseTemplateResponse> page(PageDto pageDto, @PathVariable String projectId) {
-        return caseTemplateService.page(pageDto, projectId);
+    public Page<CaseTemplateResponse> page(CaseTemplateSearchRequest searchDto,
+        @PathVariable ObjectId projectId) {
+        return caseTemplateService.page(searchDto, projectId);
     }
 
-    @GetMapping("/search/{projectId}")
-    public Page<CaseTemplateResponse> search(CaseTemplateSearchRequest searchDto,
-        @PathVariable String projectId) {
-        return caseTemplateService.search(searchDto, projectId);
+    @GetMapping("/list/{caseTemplateId}/{removed}")
+    public CaseTemplateDetailResponse getApiList(@PathVariable String caseTemplateId,
+        @PathVariable boolean removed) {
+        return caseTemplateService.getApiList(caseTemplateId, removed);
     }
 
 }

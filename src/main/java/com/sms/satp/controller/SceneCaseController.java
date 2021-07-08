@@ -10,6 +10,7 @@ import com.sms.satp.dto.response.SceneTemplateResponse;
 import com.sms.satp.service.SceneCaseService;
 import java.util.List;
 import javax.validation.Valid;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,7 +47,7 @@ public class SceneCaseController {
     }
 
     @GetMapping("/page/{projectId}")
-    public Page<SceneCaseResponse> page(SearchSceneCaseRequest searchDto, @PathVariable String projectId) {
+    public Page<SceneCaseResponse> page(SearchSceneCaseRequest searchDto, @PathVariable ObjectId projectId) {
         return sceneCaseService.page(searchDto, projectId);
     }
 
@@ -59,4 +60,6 @@ public class SceneCaseController {
     public Boolean editConn(@RequestBody UpdateSceneTemplateRequest updateSceneTemplateRequest) {
         return sceneCaseService.editConn(updateSceneTemplateRequest);
     }
+
+
 }

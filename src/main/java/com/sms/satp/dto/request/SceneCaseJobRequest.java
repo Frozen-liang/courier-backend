@@ -18,4 +18,6 @@ public class SceneCaseJobRequest extends PageDto {
     private List<String> userIds;
 
     private String sceneCaseId;
+
+    private String caseTemplateId;
 }

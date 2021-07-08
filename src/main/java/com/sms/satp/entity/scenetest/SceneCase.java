@@ -31,7 +31,8 @@ public class SceneCase extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
 
-    private List<String> tagIds;
+    @Field(targetType = FieldType.OBJECT_ID)
+    private List<String> tagId;
 
     private Integer priority;
 
