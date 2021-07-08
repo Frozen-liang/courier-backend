@@ -53,7 +53,7 @@ task_test:
     - echo $GRADLE_USER_HOME
     - pwd
     - ./gradlew check --stacktrace
-    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, "instructions covered"; print "Total " 100*covered/instructions|bc "% covered"}' $JACOCO_CSV_LOCATION
+    - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, "instructions covered"; print "Total " int(100*covered/instructions) "% covered"}' $JACOCO_CSV_LOCATION
   cache:
     key: gradle-cache-key
     paths:
