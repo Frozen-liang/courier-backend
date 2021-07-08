@@ -55,14 +55,20 @@ task_build_artifact:
   stage: build_artifact
   only:
     refs:
-      - master
+      - to_gradle
   script:
     - echo "Running mvn compile \n"
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "settings.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./.m2/settings.xml" -once'
-    - mvn clean package $MAVEN_BUILD_OPTS $MAVEN_SETTING_OPTS
+    - gradle bootjar --build-cache assemble
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: push
+    paths:
+      - build
+      - .gradle
   artifacts:
     paths:
-      - ./target/
+      - build/lib
     expire_in: 1 day
 
 
