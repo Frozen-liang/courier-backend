@@ -20,6 +20,7 @@ variables:
   PROD_RELEASE_NAME: ${CI_PROJECT_NAME}
   JACOCO_CSV_LOCATION: $CI_PROJECT_DIR/build/reports/jacoco/test/jacocoTestReport.csv
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  GIT_DEPTH: 1
 
 
 
@@ -34,7 +35,7 @@ task_test:
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
   script:
-    - gradle check --stacktrace --debug
+    - gradle check --stacktrace
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, " instructions covered"; print 100*covered/instructions, "% covered" }' $JACOCO_CSV_LOCATION
   cache:
     key: "$CI_COMMIT_REF_NAME"
