@@ -51,7 +51,7 @@ task_test:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
   script:
     - echo $GRADLE_USER_HOME
-    - ls -a .gradle
+    - ls -a /builds/nerko/nerko-api-test-platform/sms-satp/.gradle
     - ./gradlew check --stacktrace
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, "instructions covered"; print "Total " int(100*covered/instructions) "% covered"}' $JACOCO_CSV_LOCATION
   cache:
