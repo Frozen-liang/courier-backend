@@ -119,6 +119,7 @@ tasks.checkstyleTest {
 
 tasks.checkstyleMain {
     group = "verification"
+    sourceSets.add(sourceSets.main.get())
 
 }
 
