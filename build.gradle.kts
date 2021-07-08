@@ -223,7 +223,6 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 
     options.compilerArgs.addAll(listOf("-Xlint:-unchecked", "-Xlint:none", "-nowarn", "-Xlint:-deprecation"))
-    println(options.compilerArgs.toString())
     options.isWarnings = true
     options.isVerbose = true
     options.isDeprecation = false
