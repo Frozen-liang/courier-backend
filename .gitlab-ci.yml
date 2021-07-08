@@ -34,8 +34,8 @@ task_gradle:
   cache:
     key: gradle-cache-key
     paths:
-      - $GRADLE_USER_HOME/wrapper
-      - $GRADLE_USER_HOME/caches
+      - $GRADLE_USER_HOME
+      - build
     policy: push
 
 task_test:
@@ -55,8 +55,7 @@ task_test:
   cache:
     key: gradle-cache-key
     paths:
-      - $GRADLE_USER_HOME/wrapper
-      - $GRADLE_USER_HOME/caches
+      - $GRADLE_USER_HOME
       - build
     policy: pull
   artifacts:
@@ -78,8 +77,8 @@ task_build_artifact:
   cache:
     key: gradle-cache-key
     paths:
-      - $GRADLE_USER_HOME/wrapper
-      - $GRADLE_USER_HOME/caches
+      - $GRADLE_USER_HOME
+      - build
     policy: pull
   artifacts:
     paths:
