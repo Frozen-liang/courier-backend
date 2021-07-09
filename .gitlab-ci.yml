@@ -5,8 +5,8 @@ before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
 
 stages:
-  - build_test
-  - build_artifact
+  - test
+  - build_code
   - build_image
   - deploy
 
@@ -25,32 +25,20 @@ variables:
 task_test:
   tags:
     - docker-runner
-  stage: build_test
+  stage: test
   only:
     - to_gradle
   except:
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
   script:
-    - echo $GRADLE_USER_HOME
-    - pwd
-    - ls -a
     - ./gradlew check --build-cache --stacktrace
-    - ls -a
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, "instructions covered"; print "Total " int(100*covered/instructions) "% covered"}' $JACOCO_CSV_LOCATION
   cache:
     key: ${CI_COMMIT_REF_NAME}-test
     paths:
       - .gradle/caches
       - .gradle/wrapper
-#      - .gradle/7.1.1
-#      - .gradle/checksums
-#      - build/classes
-#      - build/generated
-#      - build/jacoco
-#      - build/reports
-#      - build/resources
-#      - build/test-results
   artifacts:
     reports:
       junit:
@@ -60,10 +48,10 @@ task_test:
 task_build_artifact:
   tags:
     - docker-runner
-  stage: build_artifact
+  stage: build
   only:
     refs:
-      - to_gradle
+      - master
   script:
     - echo "Running mvn compile \n"
     - ./gradlew bootjar --build-cache
@@ -72,14 +60,7 @@ task_build_artifact:
     paths:
       - .gradle/caches
       - .gradle/wrapper
-#      - .gradle/7.1.1
-#      - .gradle/checksums
-#      - build/classes
-#      - build/generated
-#      - build/jacoco
-#      - build/reports
-#      - build/resources
-#      - build/test-results
+    policy: pull
   artifacts:
     paths:
       - build/libs
