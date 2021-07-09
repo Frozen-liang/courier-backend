@@ -35,7 +35,7 @@ task_test:
     - ./gradlew check --build-cache --stacktrace
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, "instructions covered"; print "Total " int(100*covered/instructions) "% covered"}' $JACOCO_CSV_LOCATION
   cache:
-    key: ${CI_COMMIT_REF_NAME}-test
+    key: ${CI_COMMIT_REF_NAME}
     paths:
       - .gradle/caches
       - .gradle/wrapper
@@ -48,15 +48,14 @@ task_test:
 task_build_artifact:
   tags:
     - docker-runner
-  stage: build
+  stage: build_code
   only:
     refs:
       - master
   script:
-    - echo "Running mvn compile \n"
     - ./gradlew bootjar --build-cache
   cache:
-    key: ${CI_COMMIT_REF_NAME}-test
+    key: ${CI_COMMIT_REF_NAME}
     paths:
       - .gradle/caches
       - .gradle/wrapper
