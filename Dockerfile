@@ -7,7 +7,7 @@ MAINTAINER pader.zhang "pader.zhang@starlight-sms.com"
 # Executive working directory
 WORKDIR application
 # Configuration parameter
-ARG JAR_FILE=build/*.jar
+ARG JAR_FILE=build/libs/*.jar
 # Copy the jar file obtained by compiling and building to the mirror space
 COPY ${JAR_FILE} application.jar
 # Extract the split build result from application.jar by tool spring-boot-jarmode-layertools
