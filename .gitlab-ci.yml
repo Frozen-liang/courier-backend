@@ -39,18 +39,18 @@ task_test:
     - ls -a
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, "instructions covered"; print "Total " int(100*covered/instructions) "% covered"}' $JACOCO_CSV_LOCATION
   cache:
-    key: ${CI_COMMIT_REF_NAME}
+    key: ${CI_COMMIT_REF_NAME}-test
     paths:
       - .gradle/caches
       - .gradle/wrapper
-      - .gradle/7.1.1
-      - .gradle/checksums
-      - build/classes
-      - build/generated
-      - build/jacoco
-      - build/reports
-      - build/resources
-      - build/test-results
+#      - .gradle/7.1.1
+#      - .gradle/checksums
+#      - build/classes
+#      - build/generated
+#      - build/jacoco
+#      - build/reports
+#      - build/resources
+#      - build/test-results
   artifacts:
     reports:
       junit:
@@ -68,18 +68,18 @@ task_build_artifact:
     - echo "Running mvn compile \n"
     - ./gradlew bootjar --build-cache
   cache:
-    key: ${CI_COMMIT_REF_NAME}
+    key: ${CI_COMMIT_REF_NAME}-test
     paths:
       - .gradle/caches
       - .gradle/wrapper
-      - .gradle/7.1.1
-      - .gradle/checksums
-      - build/classes
-      - build/generated
-      - build/jacoco
-      - build/reports
-      - build/resources
-      - build/test-results
+#      - .gradle/7.1.1
+#      - .gradle/checksums
+#      - build/classes
+#      - build/generated
+#      - build/jacoco
+#      - build/reports
+#      - build/resources
+#      - build/test-results
   artifacts:
     paths:
       - build/libs
