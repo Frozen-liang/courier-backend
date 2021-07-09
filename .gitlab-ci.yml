@@ -5,7 +5,6 @@ before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
 
 stages:
-  - build_gradle
   - build_test
   - build_artifact
   - build_image
@@ -22,23 +21,7 @@ variables:
   JACOCO_CSV_LOCATION: $CI_PROJECT_DIR/build/reports/jacoco/test/jacocoTestReport.csv
   GIT_DEPTH: 1
 
-
-task_gradle:
-  stage: build_gradle
-  tags:
-    - docker-runner
-  script:
-    - ./gradlew assemble
-  only:
-    changes:
-      - "*.gradle"
-      - gradle.properties
-  cache:
-    key: gradle-cache-key
-    paths:
-      - $GRADLE_USER_HOME
-      - build
-    policy: push
+doss
 
 task_test:
   tags:
@@ -65,7 +48,6 @@ task_test:
       - build/classes
       - build/generated
       - build/jacoco
-      - build/libs
       - build/reports
       - build/resources
       - build/test-results
@@ -94,7 +76,6 @@ task_build_artifact:
       - build/classes
       - build/generated
       - build/jacoco
-      - build/libs
       - build/reports
       - build/resources
       - build/test-results
