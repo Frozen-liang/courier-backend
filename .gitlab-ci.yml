@@ -32,7 +32,7 @@ task_test:
     - ./gradlew check --build-cache --stacktrace
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, "instructions covered"; print "Total " int(100*covered/instructions) "% covered"}' $JACOCO_CSV_LOCATION
   cache:
-    key: ${CI_COMMIT_REF_NAME}
+    key: ${CI_COMMIT_BRANCH}
     paths:
       - .gradle/caches
       - .gradle/wrapper
@@ -52,7 +52,7 @@ task_build_artifact:
   script:
     - ./gradlew bootjar --build-cache
   cache:
-    key: ${CI_COMMIT_REF_NAME}
+    key: ${CI_COMMIT_BRANCH}
     paths:
       - .gradle/caches
       - .gradle/wrapper
