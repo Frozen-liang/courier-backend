@@ -578,6 +578,7 @@ public class SwaggerConverter implements SwaggerParserExtension {
         return result;
     }
 
+    @SuppressFBWarnings
     public ApiResponse convert(io.swagger.models.Response v2Response, List<String> produces,
         List<String> globalProduces) {
         ApiResponse response = new ApiResponse();

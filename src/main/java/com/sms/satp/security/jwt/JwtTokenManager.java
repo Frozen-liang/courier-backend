@@ -40,8 +40,9 @@ public class JwtTokenManager implements InitializingBean {
             .claim(EMAIL, user.getEmail())
             .setIssuer(JWT_ISSUER)
             .setIssuedAt(new Date())
+            // 1 week
             .setExpiration(
-                new Date(System.currentTimeMillis() + accessTokenProperties.getExpire().toMillis())) // 1 week
+                new Date(System.currentTimeMillis() + accessTokenProperties.getExpire().toMillis()))
             .signWith(secretKey)
             .compact();
     }

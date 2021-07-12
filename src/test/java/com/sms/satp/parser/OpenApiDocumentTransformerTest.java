@@ -28,14 +28,17 @@ public class OpenApiDocumentTransformerTest {
                     .toString(),
                 null,
                 parseOptions).getOpenAPI();
-        DocumentDefinition documentDefinition = new DocumentDefinition(openAPI);
-        ApiDocumentTransformer swaggerApiDocumentTransformer = new SwaggerApiDocumentTransformer();
+        DocumentDefinition<OpenAPI> documentDefinition = new DocumentDefinition<>(openAPI);
+        ApiDocumentTransformer<OpenAPI> swaggerApiDocumentTransformer = new SwaggerApiDocumentTransformer();
         List<ApiEntity> apiEntities = swaggerApiDocumentTransformer
             .toApiEntities(documentDefinition, apiEntity -> {
             });
         Assertions.assertTrue(apiEntities.size() > 0);
 
     }
+
+
+
 
 
     @Disabled
