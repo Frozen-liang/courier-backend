@@ -9,7 +9,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import com.sms.satp.dto.request.TestFileRequest;
 import com.sms.satp.repository.CustomizedFileRepository;
 import com.sms.satp.utils.ExceptionUtils;
-import edu.umd.cs.findbugs.annotations.SuppressWarnings;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
 
 
     @Override
-    @SuppressWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
     public List<GridFSFile> list(ObjectId projectId) {
         Query query = Query.query(Criteria.where("metadata.projectId").is(projectId));
         GridFSFindIterable gridFsFiles = gridFsTemplate.find(query);
@@ -54,7 +54,7 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
     }
 
     @Override
-    @SuppressWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public Boolean updateTestFile(TestFileRequest testFileRequest) throws IOException {
         ObjectId id = testFileRequest.getId();
         Query query = new Query();
