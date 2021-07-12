@@ -29,6 +29,7 @@ task_test:
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
   script:
+    - echo $CI_COMMIT_REF_NAME
     - ./gradlew check --build-cache --stacktrace
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, "instructions covered"; print "Total " int(100*covered/instructions) "% covered"}' $JACOCO_CSV_LOCATION
   cache:
