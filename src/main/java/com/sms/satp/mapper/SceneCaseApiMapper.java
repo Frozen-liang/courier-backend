@@ -2,6 +2,7 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.dto.request.AddSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
+import com.sms.satp.dto.response.SceneCaseApiConnResponse;
 import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.utils.EnumCommonUtils;
@@ -26,4 +27,5 @@ public interface SceneCaseApiMapper {
     @Mapping(target = "apiTestCase.id", expression = "java(new org.bson.types.ObjectId().toString())")
     SceneCaseApi toSceneCaseApi(AddSceneCaseApiRequest addSceneCaseApiRequest);
 
+    SceneCaseApiConnResponse toSceneCaseApiConnResponse(SceneCaseApi sceneCaseApi);
 }

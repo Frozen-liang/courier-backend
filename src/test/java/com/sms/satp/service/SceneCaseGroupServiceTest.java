@@ -98,8 +98,8 @@ class SceneCaseGroupServiceTest {
         Optional<SceneCaseGroup> optional = Optional.ofNullable(caseGroup);
         when(sceneCaseGroupRepository.findById(any())).thenReturn(optional);
         doNothing().when(sceneCaseGroupRepository).deleteById(any());
-        Page<SceneCaseResponse> sceneCasePage = mock(Page.class);
-        when(sceneCasePage.getContent()).thenReturn(Lists.newArrayList(SceneCaseResponse.builder().id(MOCK_ID).build()));
+        List<SceneCase> sceneCaseList = Lists.newArrayList(SceneCase.builder().build());
+        when(sceneCaseService.get(any(),any())).thenReturn(sceneCaseList);
         when(sceneCaseService.batchEdit(any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = sceneCaseGroupService.deleteById(MOCK_ID);
         assertTrue(isSuccess);

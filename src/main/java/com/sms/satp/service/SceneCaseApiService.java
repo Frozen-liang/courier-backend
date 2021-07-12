@@ -1,7 +1,6 @@
 package com.sms.satp.service;
 
 import com.sms.satp.common.enums.ApiBindingStatus;
-import com.sms.satp.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
 import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;

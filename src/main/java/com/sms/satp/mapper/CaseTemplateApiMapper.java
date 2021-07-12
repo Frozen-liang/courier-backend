@@ -35,4 +35,6 @@ public interface CaseTemplateApiMapper {
 
     @Mapping(target = "id", ignore = true)
     CaseTemplateApi toCaseTemplateApiBySceneCaseApi(SceneCaseApi sceneCaseApi);
+
+    List<CaseTemplateApiResponse> toCaseTemplateApiDtoList(List<CaseTemplateApi> caseTemplateApiList);
 }

@@ -28,5 +28,4 @@ public interface CaseTemplateApiService {
 
     CaseTemplateApiResponse getCaseTemplateApiById(String id);
 
-    Boolean add(AddCaseTemplateApiByIdsRequest request);
 }

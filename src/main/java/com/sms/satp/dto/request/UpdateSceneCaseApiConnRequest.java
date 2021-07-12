@@ -1,25 +1,28 @@
-package com.sms.satp.dto.response;
+package com.sms.satp.dto.request;
 
 import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-@SuperBuilder
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CaseTemplateConnResponse extends BaseResponse {
+public class UpdateSceneCaseApiConnRequest {
+
+    private String id;
 
     private String sceneCaseId;
 
     private String caseTemplateId;
 
+    private Integer order;
+
+    private Boolean isExecute;
+
     private List<CaseTemplateApiConn> caseTemplateApiConnList;
 
-    private List<CaseTemplateApiResponse> caseTemplateApiDtoList;
 }

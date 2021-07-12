@@ -14,7 +14,5 @@ public class SceneTemplateResponse {
 
     private SceneCaseResponse sceneCaseDto;
 
-    private List<SceneCaseApiResponse> sceneCaseApiDtoList;
-
-    private List<CaseTemplateConnResponse> caseTemplateConnDtoList;
+    private List<SceneCaseApiConnResponse> sceneCaseApiDtoList;
 }

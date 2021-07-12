@@ -1,6 +1,7 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
+import com.sms.satp.dto.request.AddCaseTemplateApiByIdsRequest;
 import com.sms.satp.dto.request.AddCaseTemplateRequest;
 import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.request.ConvertCaseTemplateRequest;
@@ -62,6 +63,11 @@ public class CaseTemplateController {
     public CaseTemplateDetailResponse getApiList(@PathVariable String caseTemplateId,
         @PathVariable boolean removed) {
         return caseTemplateService.getApiList(caseTemplateId, removed);
+    }
+
+    @PostMapping("/api")
+    public Boolean addApi(@Valid @RequestBody AddCaseTemplateApiByIdsRequest request) {
+        return caseTemplateService.addApi(request);
     }
 
 }

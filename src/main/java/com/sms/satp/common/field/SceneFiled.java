@@ -13,7 +13,9 @@ public enum SceneFiled implements Filed {
     STATUS("status"),
     PARENT_ID("parentId"),
     ORDER("order"),
-    API_ID("apiTestCase.apiId");
+    API_ID("apiTestCase.apiId"),
+    API_IS_EXECUTE("apiTestCase.isExecute"),
+    CASE_TEMPLATE_API_CONN_LIST("caseTemplateApiConnList");
 
     private final String filedName;
 

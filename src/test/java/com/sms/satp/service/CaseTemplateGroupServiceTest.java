@@ -36,12 +36,10 @@ class CaseTemplateGroupServiceTest {
 
     private final CaseTemplateGroupRepository caseTemplateGroupRepository = mock(CaseTemplateGroupRepository.class);
     private final CaseTemplateGroupMapper caseTemplateGroupMapper = mock(CaseTemplateGroupMapper.class);
-    private final CustomizedCaseTemplateRepository customizedCaseTemplateRepository =
-        mock(CustomizedCaseTemplateRepository.class);
     private final CaseTemplateService caseTemplateService = mock(CaseTemplateService.class);
+
     private final CaseTemplateGroupService caseTemplateGroupService =
-        new CaseTemplateGroupServiceImpl(caseTemplateGroupRepository, caseTemplateGroupMapper,
-            customizedCaseTemplateRepository, caseTemplateService);
+        new CaseTemplateGroupServiceImpl(caseTemplateGroupRepository, caseTemplateGroupMapper, caseTemplateService);
 
     private final static String MOCK_ID = "1";
     private final static String MOCK_NAME = "name";

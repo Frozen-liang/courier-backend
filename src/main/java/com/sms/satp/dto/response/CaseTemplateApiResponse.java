@@ -13,11 +13,10 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class CaseTemplateApiResponse extends BaseResponse {
 
-    private String id;
     private String caseTemplateId;
+    private String projectId;
     private Integer apiType;
     private String shell;
     private Integer order;
-    private Integer apiBindingStatus;
     private ApiTestCaseResponse apiTestCase;
 }

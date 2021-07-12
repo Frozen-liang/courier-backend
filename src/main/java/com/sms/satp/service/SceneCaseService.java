@@ -1,10 +1,11 @@
 package com.sms.satp.service;
 
+import com.sms.satp.dto.request.AddCaseTemplateConnRequest;
 import com.sms.satp.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
+import com.sms.satp.dto.request.UpdateSceneCaseConnRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseRequest;
-import com.sms.satp.dto.request.UpdateSceneTemplateRequest;
 import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.dto.response.SceneTemplateResponse;
 import com.sms.satp.entity.scenetest.SceneCase;
@@ -26,9 +27,13 @@ public interface SceneCaseService {
 
     SceneTemplateResponse getConn(String id);
 
-    Boolean editConn(UpdateSceneTemplateRequest updateSceneTemplateRequest);
+    Boolean editConn(UpdateSceneCaseConnRequest updateSceneTemplateRequest);
 
     List<SceneCase> get(String groupId, String projectId);
 
     Boolean addApi(AddSceneCaseApiByIdsRequest request);
+
+    Boolean addTemplate(AddCaseTemplateConnRequest addCaseTemplateConnRequest);
+
+    Boolean deleteConn(String sceneCaseApiId);
 }

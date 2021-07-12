@@ -1,5 +1,6 @@
 package com.sms.satp.service;
 
+import com.sms.satp.dto.request.AddCaseTemplateApiByIdsRequest;
 import com.sms.satp.dto.request.AddCaseTemplateRequest;
 import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.request.ConvertCaseTemplateRequest;
@@ -30,4 +31,5 @@ public interface CaseTemplateService {
 
     CaseTemplateDetailResponse getApiList(String caseTemplateId, boolean removed);
 
+    Boolean addApi(AddCaseTemplateApiByIdsRequest request);
 }

@@ -18,5 +18,5 @@ public class AddCaseTemplateApiByIdsRequest {
     private String caseTemplateId;
 
     @NotEmpty(message = "The entity can not be empty")
-    private List<AddSceneCaseApi> sceneCaseApis;
+    private List<AddSceneCaseApi> caseTemplateApis;
 }

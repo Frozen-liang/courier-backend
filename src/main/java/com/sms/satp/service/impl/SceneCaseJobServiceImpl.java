@@ -22,23 +22,19 @@ import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
-import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
-import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.JobMapper;
-import com.sms.satp.repository.CaseTemplateConnRepository;
+import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseRepository;
-import com.sms.satp.service.CaseTemplateApiService;
 import com.sms.satp.service.ProjectEnvironmentService;
 import com.sms.satp.service.SceneCaseJobService;
 import com.sms.satp.utils.ExceptionUtils;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +44,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -58,37 +55,34 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     private final SceneCaseApiRepository sceneCaseApiRepository;
     private final ProjectEnvironmentService projectEnvironmentService;
     private final SceneCaseRepository sceneCaseRepository;
-    private final CaseTemplateConnRepository caseTemplateConnRepository;
     private final SceneCaseJobRepository sceneCaseJobRepository;
     private final JobMapper jobMapper;
     private final CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository;
     private final CaseDispatcherService caseDispatcherService;
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
-    private final CaseTemplateApiService caseTemplateApiService;
     private final CaseTemplateRepository caseTemplateRepository;
+    private final CaseTemplateApiRepository caseTemplateApiRepository;
 
     public SceneCaseJobServiceImpl(SceneCaseApiRepository sceneCaseApiRepository,
         ProjectEnvironmentService projectEnvironmentService,
         SceneCaseRepository sceneCaseRepository,
-        CaseTemplateConnRepository caseTemplateConnRepository,
         SceneCaseJobRepository sceneCaseJobRepository,
         JobMapper jobMapper,
         CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository,
         CaseDispatcherService caseDispatcherService,
         CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository,
-        CaseTemplateApiService caseTemplateApiService,
-        CaseTemplateRepository caseTemplateRepository) {
+        CaseTemplateRepository caseTemplateRepository,
+        CaseTemplateApiRepository caseTemplateApiRepository) {
         this.sceneCaseApiRepository = sceneCaseApiRepository;
         this.projectEnvironmentService = projectEnvironmentService;
         this.sceneCaseRepository = sceneCaseRepository;
-        this.caseTemplateConnRepository = caseTemplateConnRepository;
         this.sceneCaseJobRepository = sceneCaseJobRepository;
         this.jobMapper = jobMapper;
         this.customizedSceneCaseJobRepository = customizedSceneCaseJobRepository;
         this.caseDispatcherService = caseDispatcherService;
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
-        this.caseTemplateApiService = caseTemplateApiService;
         this.caseTemplateRepository = caseTemplateRepository;
+        this.caseTemplateApiRepository = caseTemplateApiRepository;
     }
 
     @Override
@@ -183,28 +177,34 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
 
     private List<JobSceneCaseApi> getApiCaseList(AddSceneCaseJobRequest request) {
         List<JobSceneCaseApi> caseList = Lists.newArrayList();
-        if (CollectionUtils.isNotEmpty(request.getSceneCaseApiIds())) {
-            List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList();
-            sceneCaseApiRepository.findAllById(request.getSceneCaseApiIds()).forEach(sceneCaseApiList::add);
-            caseList.addAll(jobMapper.toJobSceneCaseApiList(sceneCaseApiList));
+        if (StringUtils.isNotBlank(request.getSceneCaseId())) {
+            List<SceneCaseApi> sceneCaseApiList = sceneCaseApiRepository.findAllBySceneCaseId(request.getSceneCaseId());
+            int index = 0;
+            for (SceneCaseApi sceneCaseApi : sceneCaseApiList) {
+                if (Objects.isNull(sceneCaseApi.getCaseTemplateId())
+                    && sceneCaseApi.getApiTestCase().getIsExecute()) {
+                    sceneCaseApi.setOrder(index > 0 ? index + 1 : sceneCaseApi.getOrder());
+                    caseList.add(jobMapper.toJobSceneCaseApi(sceneCaseApi));
+                    index = sceneCaseApi.getOrder();
+
+                } else {
+                    List<CaseTemplateApi> templateApiList =
+                        caseTemplateApiRepository.findAllByCaseTemplateIdOrderByOrder(sceneCaseApi.getCaseTemplateId());
+                    for (CaseTemplateApi caseTemplateApi : templateApiList) {
+                        caseTemplateApi.setOrder(index > 0 ? index + 1 : caseTemplateApi.getOrder());
+                        caseTemplateApi.setCaseTemplateId(null);
+                        JobSceneCaseApi jobSceneCaseApi = jobMapper.toJobSceneCaseApiByTemplate(caseTemplateApi);
+                        jobSceneCaseApi.setSceneCaseId(sceneCaseApi.getSceneCaseId());
+                        caseList.add(jobSceneCaseApi);
+                        index = caseTemplateApi.getOrder();
+                    }
+                }
+            }
         }
 
-        if (CollectionUtils.isNotEmpty(request.getCaseTemplateConnIds())) {
-            List<CaseTemplateConn> caseTemplateConn = Lists.newArrayList();
-            caseTemplateConnRepository.findAllById(request.getCaseTemplateConnIds()).forEach(caseTemplateConn::add);
-            List<CaseTemplateApi> caseTemplateApiList = customizedCaseTemplateApiRepository.findByCaseTemplateIds(
-                caseTemplateConn.stream().map(CaseTemplateConn::getCaseTemplateId).collect(Collectors.toList()));
-            Map<String, Integer> apiConn = caseTemplateConn.stream()
-                .map(CaseTemplateConn::getCaseTemplateApiConnList)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::getOrder));
-            resetOrder(caseTemplateApiList, apiConn);
-            caseList.addAll(jobMapper.toJobSceneCaseApiListByTemplate(caseTemplateApiList));
-        }
-
-        if (CollectionUtils.isNotEmpty(request.getCaseTemplateApiIds())) {
-            List<CaseTemplateApi> caseTemplateApiList =
-                caseTemplateApiService.listByCaseTemplateId(request.getCaseTemplateId());
+        if (StringUtils.isNotBlank(request.getCaseTemplateId())) {
+            List<CaseTemplateApi> caseTemplateApiList = customizedCaseTemplateApiRepository
+                .findByCaseTemplateIdAndIsExecute(request.getCaseTemplateId(), Boolean.TRUE);
             caseList.addAll(jobMapper.toJobSceneCaseApiListByTemplate(caseTemplateApiList));
         }
 
@@ -212,13 +212,6 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             caseList.sort(Comparator.comparingInt(JobSceneCaseApi::getOrder));
         }
         return caseList;
-    }
-
-    private void resetOrder(List<CaseTemplateApi> caseTemplateApiList,
-        Map<String, Integer> apiConn) {
-        for (CaseTemplateApi caseTemplateApi : caseTemplateApiList) {
-            caseTemplateApi.setOrder(apiConn.get(caseTemplateApi.getId()));
-        }
     }
 
 }

@@ -9,4 +9,6 @@ public interface CaseTemplateApiRepository extends MongoRepository<CaseTemplateA
     Long deleteAllByIdIsIn(List<String> ids);
 
     List<CaseTemplateApi> findAllByIdIsIn(List<String> ids);
+
+    List<CaseTemplateApi> findAllByCaseTemplateIdOrderByOrder(String caseTemplateId);
 }

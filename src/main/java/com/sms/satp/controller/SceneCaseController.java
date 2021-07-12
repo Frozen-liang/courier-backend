@@ -1,11 +1,12 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
+import com.sms.satp.dto.request.AddCaseTemplateConnRequest;
 import com.sms.satp.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
+import com.sms.satp.dto.request.UpdateSceneCaseConnRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseRequest;
-import com.sms.satp.dto.request.UpdateSceneTemplateRequest;
 import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.dto.response.SceneTemplateResponse;
 import com.sms.satp.service.SceneCaseService;
@@ -58,13 +59,23 @@ public class SceneCaseController {
     }
 
     @PutMapping("/conn/edit")
-    public Boolean editConn(@RequestBody UpdateSceneTemplateRequest updateSceneTemplateRequest) {
+    public Boolean editConn(@RequestBody UpdateSceneCaseConnRequest updateSceneTemplateRequest) {
         return sceneCaseService.editConn(updateSceneTemplateRequest);
     }
 
     @PostMapping("/api")
     public Boolean addApi(@Valid @RequestBody AddSceneCaseApiByIdsRequest request) {
         return sceneCaseService.addApi(request);
+    }
+
+    @DeleteMapping("/conn/{sceneCaseApiId}")
+    public Boolean deleteConn(@PathVariable String sceneCaseApiId) {
+        return sceneCaseService.deleteConn(sceneCaseApiId);
+    }
+
+    @PostMapping("/template")
+    public Boolean addTemplate(@Valid @RequestBody AddCaseTemplateConnRequest addCaseTemplateConnRequest) {
+        return sceneCaseService.addTemplate(addCaseTemplateConnRequest);
     }
 
 }

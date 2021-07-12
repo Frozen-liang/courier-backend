@@ -8,6 +8,7 @@ import com.sms.satp.dto.request.SceneCaseJobRequest;
 import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.SceneCaseJobResponse;
 import com.sms.satp.engine.service.CaseDispatcherService;
+import com.sms.satp.entity.apitestcase.ApiTestCase;
 import com.sms.satp.entity.env.ProjectEnvironment;
 import com.sms.satp.entity.job.JobSceneCaseApi;
 import com.sms.satp.entity.job.SceneCaseJob;
@@ -15,14 +16,12 @@ import com.sms.satp.entity.job.SceneCaseJobReport;
 import com.sms.satp.entity.job.common.CaseReport;
 import com.sms.satp.entity.job.common.JobApiTestCase;
 import com.sms.satp.entity.job.common.JobDataCollection;
+import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
-import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
-import com.sms.satp.entity.scenetest.CaseTemplateConn;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
-import com.sms.satp.mapper.CaseTemplateApiMapper;
 import com.sms.satp.mapper.JobMapper;
-import com.sms.satp.repository.CaseTemplateConnRepository;
+import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
@@ -55,8 +54,6 @@ class SceneCaseJobServiceTest {
     private final SceneCaseApiRepository sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
     private final ProjectEnvironmentService projectEnvironmentService = mock(ProjectEnvironmentService.class);
     private final SceneCaseRepository sceneCaseRepository = mock(SceneCaseRepository.class);
-    private final CaseTemplateConnRepository caseTemplateConnRepository = mock(CaseTemplateConnRepository.class);
-    private final CaseTemplateApiMapper caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
     private final SceneCaseJobRepository sceneCaseJobRepository = mock(SceneCaseJobRepository.class);
     private final JobMapper jobMapper = mock(JobMapper.class);
     private final CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository =
@@ -64,12 +61,19 @@ class SceneCaseJobServiceTest {
     private final CaseDispatcherService caseDispatcherService = mock(CaseDispatcherService.class);
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository =
         mock(CustomizedCaseTemplateApiRepository.class);
-    private final CaseTemplateApiService caseTemplateApiService = mock(CaseTemplateApiService.class);
+
     private final CaseTemplateRepository caseTemplateRepository = mock(CaseTemplateRepository.class);
+    private final CaseTemplateApiRepository caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
     private final SceneCaseJobService sceneCaseJobService = new SceneCaseJobServiceImpl(sceneCaseApiRepository,
-        projectEnvironmentService, sceneCaseRepository, caseTemplateConnRepository, sceneCaseJobRepository,
-        jobMapper, customizedSceneCaseJobRepository, caseDispatcherService, customizedCaseTemplateApiRepository,
-        caseTemplateApiService, caseTemplateRepository);
+        projectEnvironmentService,
+        sceneCaseRepository,
+        sceneCaseJobRepository,
+        jobMapper,
+        customizedSceneCaseJobRepository,
+        caseDispatcherService,
+        customizedCaseTemplateApiRepository,
+        caseTemplateRepository,
+        caseTemplateApiRepository);
 
     private final static String MOCK_ID = "1";
     private final static Integer MOCK_NUM = 1;
@@ -81,25 +85,27 @@ class SceneCaseJobServiceTest {
         when(projectEnvironmentService.findOne(any())).thenReturn(environment);
         Optional<SceneCase> sceneCase = Optional.ofNullable(SceneCase.builder().build());
         when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
-        List<SceneCaseApi> sceneCaseApi = Lists.newArrayList(SceneCaseApi.builder().build());
-        when(sceneCaseApiRepository.findAllById(any())).thenReturn(sceneCaseApi);
-        List<JobSceneCaseApi> jobSceneCaseApiList =
-            Lists.newArrayList(JobSceneCaseApi.builder().id(MOCK_ID).order(MOCK_NUM).build());
-        when(jobMapper.toJobSceneCaseApiList(any())).thenReturn(jobSceneCaseApiList);
-        List<CaseTemplateConn> caseTemplateConn = Lists.newArrayList(CaseTemplateConn.builder().caseTemplateApiConnList(
-            Lists.newArrayList(CaseTemplateApiConn.builder().caseTemplateApiId(MOCK_ID).order(MOCK_NUM).build()))
-            .build());
-        when(caseTemplateConnRepository.findAllById(any())).thenReturn(caseTemplateConn);
+        Optional<CaseTemplate> sceneCaseApi = Optional.ofNullable(CaseTemplate.builder().build());
+        when(caseTemplateRepository.findById(any())).thenReturn(sceneCaseApi);
+        List<SceneCaseApi> sceneCaseApiList1 = getSceneCaseApiList();
+        when(sceneCaseApiRepository.findAllBySceneCaseId(any())).thenReturn(sceneCaseApiList1);
+        List<CaseTemplateApi> templateApiList =
+            Lists.newArrayList(CaseTemplateApi.builder().id(MOCK_ID).order(MOCK_NUM).build());
+        when(caseTemplateApiRepository.findAllByCaseTemplateIdOrderByOrder(any())).thenReturn(templateApiList);
+        when(jobMapper.toJobSceneCaseApi(any()))
+            .thenReturn(JobSceneCaseApi.builder().id(MOCK_ID).order(MOCK_NUM).build());
+        JobSceneCaseApi jobSceneCaseApiList =
+            JobSceneCaseApi.builder().id(MOCK_ID).order(MOCK_NUM).build();
+        when(jobMapper.toJobSceneCaseApiByTemplate(any())).thenReturn(jobSceneCaseApiList);
         List<CaseTemplateApi> caseTemplateApiList =
             Lists.newArrayList(CaseTemplateApi.builder().id(MOCK_ID).order(MOCK_NUM).build());
         when(customizedCaseTemplateApiRepository.findByCaseTemplateIds(any())).thenReturn(caseTemplateApiList);
         List<JobSceneCaseApi> caseApiList = Lists
             .newArrayList(JobSceneCaseApi.builder().id(MOCK_ID).order(MOCK_NUM).build());
         when(jobMapper.toJobSceneCaseApiListByTemplate(any())).thenReturn(caseApiList);
+
         JobDataCollection dataCollection1 = JobDataCollection.builder().build();
         when(jobMapper.toJobDataCollection(any())).thenReturn(dataCollection1);
-        List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList();
-        when(caseTemplateApiMapper.toSceneCaseList(any())).thenReturn(sceneCaseApiList);
         SceneCaseJob sceneCaseJob = SceneCaseJob.builder().id(MOCK_ID).build();
         when(sceneCaseJobRepository.insert(any(SceneCaseJob.class))).thenReturn(sceneCaseJob);
         AddSceneCaseJobRequest request = getAddRequest();
@@ -219,8 +225,7 @@ class SceneCaseJobServiceTest {
     private AddSceneCaseJobRequest getAddRequest() {
         return AddSceneCaseJobRequest.builder()
             .sceneCaseId(MOCK_ID)
-            .sceneCaseApiIds(Lists.newArrayList(MOCK_ID))
-            .caseTemplateConnIds(Lists.newArrayList(MOCK_ID))
+            .caseTemplateId(MOCK_ID)
             .envId(MOCK_ID)
             .dataCollectionRequest(
                 DataCollectionRequest.builder().id(MOCK_ID)
@@ -228,4 +233,17 @@ class SceneCaseJobServiceTest {
             .build();
     }
 
+    private List<SceneCaseApi> getSceneCaseApiList() {
+        return Lists.newArrayList(
+            SceneCaseApi.builder()
+                .id(MOCK_ID)
+                .order(MOCK_NUM)
+                .apiTestCase(ApiTestCase.builder().id(MOCK_ID).isExecute(Boolean.TRUE).build())
+                .build(),
+            SceneCaseApi.builder()
+                .caseTemplateId(MOCK_ID)
+                .order(MOCK_NUM)
+                .apiTestCase(ApiTestCase.builder().id(MOCK_ID).isExecute(Boolean.TRUE).build())
+                .build());
+    }
 }
