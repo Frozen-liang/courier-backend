@@ -23,7 +23,8 @@ task_test:
     - docker-runner
   stage: test
   only:
-    - to_gradle
+    - merge_requests
+    - develop
   except:
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
