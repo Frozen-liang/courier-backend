@@ -11,10 +11,6 @@ stages:
   - deploy
 
 variables:
-  MAVEN_SETTING_OPTS: "--settings ./.m2/settings.xml --batch-mode"
-  MAVEN_TEST_OPTS: "sonar:sonar"
-  MAVEN_BUILD_OPTS: " -Dmaven.test.skip=true -Dfindbugs.skip=true -Dcheckstyle.skip"
-  MAVEN_OPTS: "-Xmx2048m -Xms1024m -XX:MaxPermSize=512m -Djava.awt.headless=true"
   IMAGE: ${CI_REGISTRY}/${CI_PROJECT_PATH}
   IMAGE_TAG: ${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}-${CI_PIPELINE_IID}
   PROD_RELEASE_NAME: ${CI_PROJECT_NAME}
@@ -51,7 +47,7 @@ task_build_artifact:
   stage: build_code
   only:
     refs:
-      - to_gradle
+      - master
   script:
     - ./gradlew bootjar --build-cache
   cache:
@@ -72,7 +68,7 @@ task_build_image:
   stage: build_image
   only:
     refs:
-      - to_gradle
+      - master
   image: docker:19.03.1
   script:
     - echo "Running build docker image"
