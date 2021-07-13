@@ -25,6 +25,6 @@ public interface SceneCaseMapper {
     List<CaseTemplateApiConn> toCaseTemplateApiConnList(List<CaseTemplateApi> caseTemplateApiList);
 
     @Mapping(target = "caseTemplateApiId", source = "id")
-    @Mapping(target = "isExecute", source = "apiTestCase.isExecute")
+    @Mapping(target = "isExecute", source = "apiTestCase.execute")
     CaseTemplateApiConn toCaseTemplateApiConn(CaseTemplateApi caseTemplateApi);
 }

@@ -81,7 +81,8 @@ public class ApiTestCase extends BaseEntity {
 
     private ResponseTimeVerification responseTimeVerification;
 
-    private Boolean isExecute;
+    @Field(name = "isExecute")
+    private boolean execute;
 
     private String createUserName;
 }

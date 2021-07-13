@@ -238,12 +238,12 @@ class SceneCaseJobServiceTest {
             SceneCaseApi.builder()
                 .id(MOCK_ID)
                 .order(MOCK_NUM)
-                .apiTestCase(ApiTestCase.builder().id(MOCK_ID).isExecute(Boolean.TRUE).build())
+                .apiTestCase(ApiTestCase.builder().id(MOCK_ID).execute(Boolean.TRUE).build())
                 .build(),
             SceneCaseApi.builder()
                 .caseTemplateId(MOCK_ID)
                 .order(MOCK_NUM)
-                .apiTestCase(ApiTestCase.builder().id(MOCK_ID).isExecute(Boolean.TRUE).build())
+                .apiTestCase(ApiTestCase.builder().id(MOCK_ID).execute(Boolean.TRUE).build())
                 .build());
     }
 }

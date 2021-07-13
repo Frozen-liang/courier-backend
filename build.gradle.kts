@@ -130,7 +130,6 @@ tasks.spotbugsTest {
 }
 
 tasks.spotbugsMain {
-    finalizedBy(tasks.named("checkFindBugsReport"))
     group = "verification"
     showStackTraces = true
     reports.register("html")

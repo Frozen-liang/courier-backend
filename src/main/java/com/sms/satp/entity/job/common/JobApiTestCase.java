@@ -68,7 +68,7 @@ public class JobApiTestCase {
 
     private ResponseTimeVerification responseTimeVerification;
 
-    private Boolean isExecute;
+    private boolean execute;
 
     private Long modifyUserId;
 

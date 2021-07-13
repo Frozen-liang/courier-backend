@@ -182,7 +182,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             Integer index = 0;
             for (SceneCaseApi sceneCaseApi : sceneCaseApiList) {
                 if (Objects.isNull(sceneCaseApi.getCaseTemplateId())
-                    && sceneCaseApi.getApiTestCase().getIsExecute()) {
+                    && sceneCaseApi.getApiTestCase().isExecute()) {
                     sceneCaseApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : sceneCaseApi.getOrder());
                     caseList.add(jobMapper.toJobSceneCaseApi(sceneCaseApi));
                     index = sceneCaseApi.getOrder();

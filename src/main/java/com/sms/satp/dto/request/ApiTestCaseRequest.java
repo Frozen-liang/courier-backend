@@ -61,5 +61,5 @@ public class ApiTestCaseRequest {
     private ResponseHeadersVerification responseHeadersVerification;
     private ResponseResultVerification responseResultVerification;
     private ResponseTimeVerification responseTimeVerification;
-    private Boolean isExecute;
+    private boolean execute;
 }

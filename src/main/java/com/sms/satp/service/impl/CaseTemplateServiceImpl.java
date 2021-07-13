@@ -278,7 +278,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         Optional<ApiEntity> apiEntity = apiRepository.findById(addSceneCaseApi.getId());
         if (apiEntity.isPresent()) {
             ApiTestCase apiTestCase = apiTestCaseMapper.toEntityByApiEntity(apiEntity.get());
-            apiTestCase.setIsExecute(Boolean.TRUE);
+            apiTestCase.setExecute(Boolean.TRUE);
             CaseTemplateApi caseTemplateApi =
                 CaseTemplateApi.builder().apiTestCase(apiTestCase)
                     .caseTemplateId(caseTemplate.getId())
@@ -293,7 +293,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         Optional<ApiTestCase> apiTestCase = apiTestCaseRepository.findById(addSceneCaseApi.getId());
         if (apiTestCase.isPresent()) {
             ApiTestCase testCase = apiTestCase.get();
-            testCase.setIsExecute(Boolean.TRUE);
+            testCase.setExecute(Boolean.TRUE);
             CaseTemplateApi caseTemplateApi =
                 CaseTemplateApi.builder().apiTestCase(testCase).caseTemplateId(caseTemplate.getId())
                     .projectId(caseTemplate.getProjectId())

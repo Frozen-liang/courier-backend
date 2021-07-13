@@ -16,5 +16,5 @@ public class CaseTemplateApiConn {
     @Field(targetType = FieldType.OBJECT_ID)
     private String caseTemplateApiId;
 
-    private Boolean isExecute;
+    private boolean isExecute;
 }
