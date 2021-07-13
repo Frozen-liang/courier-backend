@@ -179,11 +179,11 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         List<JobSceneCaseApi> caseList = Lists.newArrayList();
         if (StringUtils.isNotBlank(request.getSceneCaseId())) {
             List<SceneCaseApi> sceneCaseApiList = sceneCaseApiRepository.findAllBySceneCaseId(request.getSceneCaseId());
-            int index = 0;
+            Integer index = 0;
             for (SceneCaseApi sceneCaseApi : sceneCaseApiList) {
                 if (Objects.isNull(sceneCaseApi.getCaseTemplateId())
                     && sceneCaseApi.getApiTestCase().getIsExecute()) {
-                    sceneCaseApi.setOrder(index > 0 ? index + 1 : sceneCaseApi.getOrder());
+                    sceneCaseApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : sceneCaseApi.getOrder());
                     caseList.add(jobMapper.toJobSceneCaseApi(sceneCaseApi));
                     index = sceneCaseApi.getOrder();
 
@@ -191,7 +191,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                     List<CaseTemplateApi> templateApiList =
                         caseTemplateApiRepository.findAllByCaseTemplateIdOrderByOrder(sceneCaseApi.getCaseTemplateId());
                     for (CaseTemplateApi caseTemplateApi : templateApiList) {
-                        caseTemplateApi.setOrder(index > 0 ? index + 1 : caseTemplateApi.getOrder());
+                        caseTemplateApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : caseTemplateApi.getOrder());
                         caseTemplateApi.setCaseTemplateId(null);
                         JobSceneCaseApi jobSceneCaseApi = jobMapper.toJobSceneCaseApiByTemplate(caseTemplateApi);
                         jobSceneCaseApi.setSceneCaseId(sceneCaseApi.getSceneCaseId());

@@ -129,6 +129,7 @@ tasks.spotbugsTest {
 
 tasks.spotbugsMain {
     group = "verification"
+    showStackTraces = true
 }
 
 tasks.jacocoTestReport {

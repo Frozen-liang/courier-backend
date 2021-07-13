@@ -129,20 +129,20 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
                 .listBySceneCaseId(convertCaseTemplateRequest.getSceneCaseId());
 
             List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList();
-            int index = 0;
+            Integer index = 0;
             for (SceneCaseApi sceneCaseApi : sceneCaseApiList) {
                 if (Objects.isNull(sceneCaseApi.getCaseTemplateId())) {
                     CaseTemplateApi caseTemplateApi =
                         caseTemplateApiMapper.toCaseTemplateApiBySceneCaseApi(sceneCaseApi);
                     caseTemplateApi.setCaseTemplateId(caseTemplate.getId());
-                    caseTemplateApi.setOrder(index > 0 ? index + 1 : caseTemplateApi.getOrder());
+                    caseTemplateApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : caseTemplateApi.getOrder());
                     caseTemplateApiList.add(caseTemplateApi);
                     index = caseTemplateApi.getOrder();
                 } else {
                     List<CaseTemplateApi> templateApiList =
                         caseTemplateApiRepository.findAllByCaseTemplateIdOrderByOrder(sceneCaseApi.getCaseTemplateId());
                     for (CaseTemplateApi caseTemplateApi : templateApiList) {
-                        caseTemplateApi.setOrder(index > 0 ? index + 1 : caseTemplateApi.getOrder());
+                        caseTemplateApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : caseTemplateApi.getOrder());
                         caseTemplateApi.setCaseTemplateId(caseTemplate.getId());
                         caseTemplateApi.setId(null);
                         index = caseTemplateApi.getOrder();
