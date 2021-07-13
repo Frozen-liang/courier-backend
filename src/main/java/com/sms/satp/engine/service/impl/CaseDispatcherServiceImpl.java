@@ -8,6 +8,7 @@ import com.sms.satp.engine.service.CaseDispatcherService;
 import com.sms.satp.entity.job.ApiTestCaseJob;
 import com.sms.satp.entity.job.SceneCaseJob;
 import com.sms.satp.entity.job.common.CaseReport;
+import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.websocket.Payload;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +36,7 @@ public class CaseDispatcherServiceImpl implements CaseDispatcherService {
             log.info("Send ApiTestCaseJob. destination {}", destination);
             simpMessagingTemplate.convertAndSend(destination, caseJob);
         });
+        throw ExceptionUtils.mpe("No engines are available.");
     }
 
     @Override
@@ -44,6 +46,7 @@ public class CaseDispatcherServiceImpl implements CaseDispatcherService {
             log.info("Run case job. destination {}", destination);
             simpMessagingTemplate.convertAndSend(destination, caseJob);
         });
+        throw ExceptionUtils.mpe("No engines are available.");
     }
 
     @Override

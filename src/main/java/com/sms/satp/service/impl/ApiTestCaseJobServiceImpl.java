@@ -104,12 +104,12 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                         apiTestCaseJob.setId(null);
                         jobDataCollection.setTestData(jobMapper.toTestDataEntity(dataList));
                         apiTestCaseJob.setDataCollection(jobDataCollection);
-                        apiTestCaseJobRepository.insert(apiTestCaseJob);
                         caseDispatcherService.dispatch(apiTestCaseJob);
+                        apiTestCaseJobRepository.insert(apiTestCaseJob);
                     });
                 } else {
-                    apiTestCaseJobRepository.insert(apiTestCaseJob);
                     caseDispatcherService.dispatch(apiTestCaseJob);
+                    apiTestCaseJobRepository.insert(apiTestCaseJob);
                 }
             });
             log.info("The use case takes {} milliseconds to send data! request:{}",
@@ -147,8 +147,8 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                 .environment(jobMapper.toJobEnvironment(projectEnvironment))
                 .apiTestCase(JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestRequest)).build())
                 .build();
-            apiTestCaseJobRepository.insert(apiTestCaseJob);
             caseDispatcherService.dispatch(apiTestCaseJob);
+            apiTestCaseJobRepository.insert(apiTestCaseJob);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
             caseDispatcherService.sendErrorMessage(currentUserId, apiTestPlatEx.getMessage());

@@ -133,8 +133,8 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             if (Objects.isNull(request.getDataCollectionRequest())) {
                 SceneCaseJob sceneCaseJob = SceneCaseJob.builder().environment(jobEnvironment).apiTestCase(caseList)
                     .sceneCaseId(request.getSceneCaseId()).build();
-                sceneCaseJobRepository.insert(sceneCaseJob);
                 caseDispatcherService.dispatch(sceneCaseJob);
+                sceneCaseJobRepository.insert(sceneCaseJob);
             } else {
                 for (TestDataRequest testData : request.getDataCollectionRequest().getDataList()) {
                     JobDataCollection jobDataCollection = jobMapper
@@ -146,8 +146,8 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                         .dataCollection(jobDataCollection)
                         .apiTestCase(caseList)
                         .build();
-                    sceneCaseJobRepository.insert(sceneCaseJob);
                     caseDispatcherService.dispatch(sceneCaseJob);
+                    sceneCaseJobRepository.insert(sceneCaseJob);
                 }
             }
             log.info("The use case takes {} milliseconds to send data! request:{}",

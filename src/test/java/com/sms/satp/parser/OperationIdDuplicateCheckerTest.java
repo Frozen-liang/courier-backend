@@ -4,12 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
 import com.sms.satp.parser.impl.OperationIdDuplicateChecker;
 import com.sms.satp.repository.ProjectImportFlowRepository;
+import com.sms.satp.utils.SecurityUtil;
 import com.sms.satp.websocket.Payload;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,11 @@ public class OperationIdDuplicateCheckerTest {
     private ApplicationContext applicationContext = mock(ApplicationContext.class);
     private ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
     private final SimpMessagingTemplate simpMessagingTemplate = mock(SimpMessagingTemplate.class);
+
+    static {
+        mockStatic(SecurityUtil.class).when(SecurityUtil::getCurrUserId).thenReturn(ObjectId.get().toString());
+    }
+
 
     @Test
     public void check_test() {

@@ -27,6 +27,8 @@ public class JobApiTestCase {
 
     private String caseName;
 
+    private boolean execute = true;
+
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 

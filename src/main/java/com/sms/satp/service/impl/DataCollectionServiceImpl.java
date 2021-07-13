@@ -27,6 +27,7 @@ import com.sms.satp.dto.request.DataCollectionImportRequest;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
+import com.sms.satp.entity.datacollection.DataParam;
 import com.sms.satp.entity.datacollection.TestData;
 import com.sms.satp.mapper.DataCollectionMapper;
 import com.sms.satp.repository.CustomizedDataCollectionRepository;
@@ -41,7 +42,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -50,12 +50,12 @@ import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
 public class DataCollectionServiceImpl implements DataCollectionService {
 
+    private static final String DELIMITER = ",";
     private final DataCollectionRepository dataCollectionRepository;
     private final DataCollectionMapper dataCollectionMapper;
     private final CustomizedDataCollectionRepository customizedDataCollectionRepository;
@@ -171,19 +171,23 @@ public class DataCollectionServiceImpl implements DataCollectionService {
                 paramList.clear();
                 dataList.clear();
             }
-            /*String[] keys = sourceList.get(0).split(",");
-            Arrays.stream(keys).forEach((key) -> {
-                if (!paramList.contains(key)) {
-                    paramList.add(key);
+            String[] keys = sourceList.get(0).split(DELIMITER);
+            for (int i = 1; i < keys.length; i++) {
+                if (!paramList.contains(keys[i])) {
+                    paramList.add(keys[i]);
                 }
-            });
+            }
             for (int i = 1; i < sourceList.size(); i++) {
-                String[] values = sourceList.get(i).split(",");
-                for (int j = 0; j < keys.length; j++) {
-
+                String[] values = sourceList.get(i).split(DELIMITER);
+                List<DataParam> dataParams = new ArrayList<>();
+                for (int j = 1; j < values.length; j++) {
+                    dataParams.add(DataParam.builder().key(keys[j]).value(values[j]).build());
                 }
-            }*/
-            return null;
+                TestData testData = TestData.builder().dataName(values[0]).data(dataParams).build();
+                dataList.add(testData);
+            }
+            dataCollectionRepository.save(dataCollection);
+            return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
             throw e;
