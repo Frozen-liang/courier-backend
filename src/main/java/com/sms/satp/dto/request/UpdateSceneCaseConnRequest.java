@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,17 +10,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateCaseTemplateConnRequest {
-
-    private String id;
+public class UpdateSceneCaseConnRequest {
 
     private String sceneCaseId;
 
-    private String caseTemplateId;
-
-    private Integer order;
-
-    private Boolean isExecute;
-
-    private Boolean removed;
+    private List<UpdateSceneCaseApiConnRequest> updateSceneCaseApiConnRequest;
 }

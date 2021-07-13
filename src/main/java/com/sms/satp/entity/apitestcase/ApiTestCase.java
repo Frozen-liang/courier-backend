@@ -4,8 +4,8 @@ import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
-import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.common.enums.ResponseParamsExtractionType;
 import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ParamInfo;
@@ -56,14 +56,14 @@ public class ApiTestCase extends BaseEntity {
 
     private ApiRequestParamType apiRequestParamType;
 
-    private String raw;
-
     private List<ParamInfo> requestHeaders;
     private List<ParamInfo> responseHeaders;
     private List<ParamInfo> pathParams;
     private List<ParamInfo> restfulParams;
     private List<ParamInfo> requestParams;
     private List<ParamInfo> responseParams;
+
+    private ResponseParamsExtractionType responseParamsExtractionType;
 
     private String preInject;
 
@@ -81,7 +81,8 @@ public class ApiTestCase extends BaseEntity {
 
     private ResponseTimeVerification responseTimeVerification;
 
-    private Boolean isExecute;
+    @Field(name = "isExecute")
+    private boolean execute;
 
     private String createUserName;
 }

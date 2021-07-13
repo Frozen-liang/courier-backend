@@ -28,5 +28,5 @@ public class AddSceneCaseApiRequest {
      */
     private ApiBindingStatus apiBindingStatus;
 
-    private ApiTestCaseRequest apiTestCaseRequest;
+    private ApiTestCaseRequest apiTestCase;
 }

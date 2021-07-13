@@ -1,9 +1,9 @@
 package com.sms.satp.entity.scenetest;
 
-import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,6 +27,9 @@ public class SceneCaseApi extends BaseEntity {
     private String sceneCaseId;
 
     @Field(targetType = FieldType.OBJECT_ID)
+    private String caseTemplateId;
+
+    @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
     private ApiType apiType;
@@ -36,4 +39,7 @@ public class SceneCaseApi extends BaseEntity {
     private Integer order;
 
     private ApiTestCase apiTestCase;
+
+    private List<CaseTemplateApiConn> caseTemplateApiConnList;
+
 }

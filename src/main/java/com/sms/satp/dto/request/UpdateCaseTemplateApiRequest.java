@@ -32,7 +32,7 @@ public class UpdateCaseTemplateApiRequest {
      */
     private ApiBindingStatus apiBindingStatus;
 
-    private ApiTestCaseRequest apiTestCaseRequest;
+    private ApiTestCaseRequest apiTestCase;
 
     private boolean removed;
 }

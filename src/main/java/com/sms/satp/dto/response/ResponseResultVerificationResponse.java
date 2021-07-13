@@ -14,6 +14,8 @@ public class ResponseResultVerificationResponse {
 
     private Boolean checkStatus;
 
+    private Integer resultVerificationType;
+
     private Integer apiResponseJsonType;
 
     private List<MatchParamInfoResponse> params;

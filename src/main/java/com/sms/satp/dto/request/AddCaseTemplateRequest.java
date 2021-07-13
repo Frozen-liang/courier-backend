@@ -20,6 +20,5 @@ public class AddCaseTemplateRequest {
     private String projectId;
     private String groupId;
     private String testStatus;
-    private List<String> tagIds;
-    private Boolean removed;
+    private List<String> tagId;
 }

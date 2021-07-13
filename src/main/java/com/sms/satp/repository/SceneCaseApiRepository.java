@@ -7,4 +7,9 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface SceneCaseApiRepository extends MongoRepository<SceneCaseApi, String> {
 
     Long deleteAllByIdIsIn(List<String> ids);
+
+    Long deleteByCaseTemplateId(String caseTemplateId);
+
+    List<SceneCaseApi> findAllBySceneCaseId(String sceneCaseId);
+
 }

@@ -1,5 +1,6 @@
 package com.sms.satp.dto.response;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,12 +12,21 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SceneCaseApiResponse extends BaseResponse {
+public class SceneCaseApiConnResponse extends BaseResponse {
 
     private String sceneCaseId;
+
+    private String caseTemplateId;
+
     private String projectId;
+
     private Integer apiType;
+
     private String shell;
+
     private Integer order;
+
     private ApiTestCaseResponse apiTestCase;
+
+    private List<CaseTemplateApiResponse> caseTemplateApiResponseList;
 }

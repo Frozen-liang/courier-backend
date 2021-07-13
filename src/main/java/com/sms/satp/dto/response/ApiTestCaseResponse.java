@@ -32,6 +32,7 @@ public class ApiTestCaseResponse extends BaseResponse {
     private List<ParamInfoResponse> restfulParams;
     private List<ParamInfoResponse> requestParams;
     private List<ParamInfoResponse> responseParams;
+    private Integer responseParamsExtractionType;
     private String preInject;
     private String postInject;
     private Integer apiResponseJsonType;
@@ -40,6 +41,6 @@ public class ApiTestCaseResponse extends BaseResponse {
     private ResponseHeadersVerificationResponse responseHeadersVerificationResponse;
     private ResponseResultVerificationResponse responseResultVerificationResponse;
     private ResponseTimeVerification responseTimeVerification;
-    private Boolean isExecute;
+    private Boolean execute;
     private Boolean removed;
 }

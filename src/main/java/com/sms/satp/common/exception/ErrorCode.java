@@ -165,6 +165,10 @@ public enum ErrorCode {
     DELETE_USER_BY_ID_ERROR("4157", "Failed to delete the User!"),
     EDIT_USER_ERROR("4158", "Failed to edit the User!"),
     GET_USER_BY_ID_ERROR("4159", "Failed to get the User by id!"),
+    GET_SCENE_CASE_ERROR("4160", "Failed to get the SceneCase!"),
+    GET_CASE_TEMPLATE_ERROR("4161", "Failed to get the CaseTemplate!"),
+    GET_CASE_TEMPLATE_BY_ID_ERROR("4162", "Failed to get the CaseTemplate by id!"),
+    DELETE_SCENE_CASE_CONN_ERROR("4163", "Failed to delete the SceneCase conn!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

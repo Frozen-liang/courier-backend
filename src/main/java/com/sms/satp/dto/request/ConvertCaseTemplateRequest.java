@@ -1,23 +1,20 @@
 package com.sms.satp.dto.request;
 
-import com.sms.satp.dto.PageDto;
-import java.util.List;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SceneCaseJobRequest extends PageDto {
+public class ConvertCaseTemplateRequest {
 
-    private List<String> userIds;
-
+    @NotNull(message = "The sceneCaseId can not be empty")
     private String sceneCaseId;
 
-    private String caseTemplateId;
+    @NotNull(message = "The groupId can not be empty")
+    private String groupId;
 }

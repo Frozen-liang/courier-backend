@@ -36,12 +36,10 @@ class CaseTemplateGroupServiceTest {
 
     private final CaseTemplateGroupRepository caseTemplateGroupRepository = mock(CaseTemplateGroupRepository.class);
     private final CaseTemplateGroupMapper caseTemplateGroupMapper = mock(CaseTemplateGroupMapper.class);
-    private final CustomizedCaseTemplateRepository customizedCaseTemplateRepository =
-        mock(CustomizedCaseTemplateRepository.class);
     private final CaseTemplateService caseTemplateService = mock(CaseTemplateService.class);
+
     private final CaseTemplateGroupService caseTemplateGroupService =
-        new CaseTemplateGroupServiceImpl(caseTemplateGroupRepository, caseTemplateGroupMapper,
-            customizedCaseTemplateRepository, caseTemplateService);
+        new CaseTemplateGroupServiceImpl(caseTemplateGroupRepository, caseTemplateGroupMapper, caseTemplateService);
 
     private final static String MOCK_ID = "1";
     private final static String MOCK_NAME = "name";
@@ -100,9 +98,8 @@ class CaseTemplateGroupServiceTest {
         Optional<CaseTemplateGroup> optional = Optional.ofNullable(caseGroup);
         when(caseTemplateGroupRepository.findById(any())).thenReturn(optional);
         doNothing().when(caseTemplateGroupRepository).deleteById(any());
-        Page<CaseTemplate> caseTemplatePage = mock(Page.class);
-        when(caseTemplatePage.getContent()).thenReturn(Lists.newArrayList(CaseTemplate.builder().id(MOCK_ID).build()));
-        when(customizedCaseTemplateRepository.search(any(), any())).thenReturn(caseTemplatePage);
+        List<CaseTemplate> caseTemplatePage = Lists.newArrayList(CaseTemplate.builder().id(MOCK_ID).build());
+        when(caseTemplateService.get(any(), any())).thenReturn(caseTemplatePage);
         when(caseTemplateService.batchEdit(any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = caseTemplateGroupService.deleteById(MOCK_ID);
         assertTrue(isSuccess);
