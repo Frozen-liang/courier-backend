@@ -107,6 +107,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.2.0")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.mockito:mockito-inline:3.6.28")
 
 }
 
@@ -130,7 +131,6 @@ tasks.spotbugsTest {
 }
 
 tasks.spotbugsMain {
-    finalizedBy(tasks.named("checkFindBugsReport"))
     group = "verification"
     showStackTraces = true
     reports.register("html")
