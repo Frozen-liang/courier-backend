@@ -1,3 +1,4 @@
+import groovy.xml.XmlSlurper
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
@@ -27,13 +28,14 @@ plugins {
 }
 
 spotbugs {
+    ignoreFailures.set(false)
     toolVersion.set("4.3.0")
     showProgress.set(true)
     effort.set(com.github.spotbugs.snom.Effort.MAX)
-    reportLevel.set(com.github.spotbugs.snom.Confidence.LOW)
+    reportLevel.set(com.github.spotbugs.snom.Confidence.MEDIUM)
     omitVisitors.addAll(listOf("FindReturnRef", "RuntimeExceptionCapture"))
+    maxHeapSize.set("1g")
     sourceSets.add(sourceSets.main.get())
-
 }
 
 allprojects {
@@ -121,6 +123,7 @@ tasks.checkstyleMain {
     group = "verification"
     sourceSets.add(sourceSets.main.get())
 
+
 }
 
 tasks.spotbugsTest {
@@ -128,8 +131,13 @@ tasks.spotbugsTest {
 }
 
 tasks.spotbugsMain {
+    finalizedBy(tasks.named("checkFindBugsReport"))
     group = "verification"
+    showStackTraces = true
+    reports.register("html")
 }
+
+
 
 tasks.jacocoTestReport {
     classDirectories.setFrom(sourceSets.main.get().output.asFileTree.matching {
@@ -211,7 +219,7 @@ tasks.test {
             forEach { test -> logger.lifecycle("\t\t${test.displayName()}") }
         }
 
-        private fun TestDescriptor.displayName() = parent?.let { "${it.name} - $name" } ?: "$name"
+        private fun TestDescriptor.displayName() = parent?.let { "${it.name} - $name" } ?: name
     })
 }
 
