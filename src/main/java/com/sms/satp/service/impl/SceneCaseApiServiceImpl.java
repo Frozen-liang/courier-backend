@@ -13,6 +13,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST_BY
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
+import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
@@ -21,12 +22,14 @@ import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.SceneCaseApiMapper;
+import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.service.SceneCaseApiService;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -38,16 +41,18 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     private final SceneCaseApiRepository sceneCaseApiRepository;
     private final SceneCaseApiMapper sceneCaseApiMapper;
+    private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository;
 
     public SceneCaseApiServiceImpl(SceneCaseApiRepository sceneCaseApiRepository,
-        SceneCaseApiMapper sceneCaseApiMapper) {
+        SceneCaseApiMapper sceneCaseApiMapper, CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository) {
         this.sceneCaseApiRepository = sceneCaseApiRepository;
         this.sceneCaseApiMapper = sceneCaseApiMapper;
+        this.customizedSceneCaseApiRepository = customizedSceneCaseApiRepository;
     }
 
     @Override
     @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API,
-        template = "{{#addSceneCaseApiDto.addSceneCaseApiRequestList?.![#this.apiTestCaseRequest.apiName]}}",
+        template = "{{#addSceneCaseApiDto.addSceneCaseApiRequestList?.![#this.apiTestCase.apiName]}}",
         projectId = "addSceneCaseApiRequestList[0].projectId")
     public Boolean batchAdd(BatchAddSceneCaseApiRequest addSceneCaseApiDto) {
         log.info("SceneCaseApiService-batchAdd()-params: [SceneCaseApi]={}", addSceneCaseApiDto.toString());
@@ -79,7 +84,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
-        template = "{{#updateSceneCaseApiRequest.apiTestCaseRequest.apiName}}")
+        template = "{{#updateSceneCaseApiRequest.apiTestCase.apiName}}")
     public Boolean edit(UpdateSceneCaseApiRequest updateSceneCaseApiRequest) {
         log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", updateSceneCaseApiRequest.toString());
         try {
@@ -108,7 +113,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
-        template = "{{#updateSceneCaseApiSortOrderDto.sceneCaseApiRequestList?.![#this.apiTestCaseRequest.apiName]}}",
+        template = "{{#updateSceneCaseApiSortOrderDto.sceneCaseApiRequestList?.![#this.apiTestCase.apiName]}}",
         projectId = "sceneCaseApiRequestList[0].projectId")
     public Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiSortOrderDto) {
         log.info("SceneCaseApiService-batchEdit()-params: [SceneCaseApi]={}",
@@ -127,10 +132,10 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public List<SceneCaseApiResponse> listBySceneCaseId(String sceneCaseId, boolean remove) {
+    public List<SceneCaseApiResponse> listBySceneCaseId(String sceneCaseId, boolean removed) {
         try {
             Example<SceneCaseApi> example = Example.of(
-                SceneCaseApi.builder().sceneCaseId(sceneCaseId).removed(remove).build());
+                SceneCaseApi.builder().sceneCaseId(sceneCaseId).removed(removed).build());
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
             List<SceneCaseApi> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(sceneCaseApiMapper::toSceneCaseApiDto).collect(Collectors.toList());
@@ -145,7 +150,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApi> example = Example.of(
                 SceneCaseApi.builder().sceneCaseId(sceneCaseId).build());
-            return sceneCaseApiRepository.findAll(example);
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
+            return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);
             throw new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR);
@@ -173,6 +179,23 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi by id!", e);
             throw new ApiTestPlatformException(GET_SCENE_CASE_API_BY_ID_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean updateStatusByApiIds(List<String> ids, ApiBindingStatus apiBindingStatus) {
+        try {
+            List<SceneCaseApi> sceneCaseApiList = customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(ids);
+            if (CollectionUtils.isNotEmpty(sceneCaseApiList)) {
+                for (SceneCaseApi sceneCaseApi : sceneCaseApiList) {
+                    sceneCaseApi.getApiTestCase().setStatus(apiBindingStatus);
+                }
+                sceneCaseApiRepository.saveAll(sceneCaseApiList);
+            }
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to update status the SceneCaseApi!", e);
+            throw new ApiTestPlatformException(ADD_SCENE_CASE_API_ERROR);
         }
     }
 

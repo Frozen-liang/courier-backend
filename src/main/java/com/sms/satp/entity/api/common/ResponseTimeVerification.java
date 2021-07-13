@@ -14,6 +14,4 @@ public class ResponseTimeVerification {
     private Boolean checkStatus;
 
     private Integer timeoutLimit;
-
-    private String verificationResult;
 }

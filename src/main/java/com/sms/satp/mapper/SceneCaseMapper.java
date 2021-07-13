@@ -3,7 +3,10 @@ package com.sms.satp.mapper;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseRequest;
 import com.sms.satp.dto.response.SceneCaseResponse;
+import com.sms.satp.entity.scenetest.CaseTemplateApi;
+import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
 import com.sms.satp.entity.scenetest.SceneCase;
+import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,7 +20,11 @@ public interface SceneCaseMapper {
 
     SceneCase toUpdateSceneCase(UpdateSceneCaseRequest sceneCaseDto);
 
-    @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     SceneCaseResponse toDto(SceneCase sceneCase);
+
+    List<CaseTemplateApiConn> toCaseTemplateApiConnList(List<CaseTemplateApi> caseTemplateApiList);
+
+    @Mapping(target = "caseTemplateApiId", source = "id")
+    @Mapping(target = "isExecute", source = "apiTestCase.execute")
+    CaseTemplateApiConn toCaseTemplateApiConn(CaseTemplateApi caseTemplateApi);
 }

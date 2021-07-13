@@ -51,6 +51,9 @@ public class JobApiTestCase {
     private List<ParamInfoResponse> restfulParams;
     private List<ParamInfoResponse> requestParams;
     private List<ParamInfoResponse> responseParams;
+
+    private Integer responseParamsExtractionType;
+
     private String preInject;
 
     private String postInject;
@@ -66,6 +69,8 @@ public class JobApiTestCase {
     private ResponseResultVerificationResponse responseResultVerification;
 
     private ResponseTimeVerification responseTimeVerification;
+
+    private boolean execute;
 
     private Long modifyUserId;
 

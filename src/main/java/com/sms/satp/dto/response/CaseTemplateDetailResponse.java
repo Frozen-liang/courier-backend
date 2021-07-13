@@ -6,13 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @Builder
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-public class SceneTemplateResponse {
+@AllArgsConstructor
+public class CaseTemplateDetailResponse {
 
-    private SceneCaseResponse sceneCaseDto;
+    private CaseTemplateResponse caseTemplateResponse;
 
-    private List<SceneCaseApiConnResponse> sceneCaseApiDtoList;
+    private List<CaseTemplateApiResponse> caseTemplateApiResponseList;
 }

@@ -1,20 +1,22 @@
 package com.sms.satp.service;
 
+import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.AddSceneCaseApiRequest;
 import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
-import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
+import com.sms.satp.dto.response.SceneCaseApiResponse;
+import com.sms.satp.entity.apitestcase.ApiTestCase;
 import com.sms.satp.entity.scenetest.SceneCaseApi;
 import com.sms.satp.mapper.SceneCaseApiMapper;
+import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.service.impl.SceneCaseApiServiceImpl;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Example;
@@ -29,7 +31,6 @@ import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST_BY
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -38,20 +39,16 @@ import static org.wildfly.common.Assert.assertTrue;
 @DisplayName("Test cases for SceneCaseApiServiceTest")
 class SceneCaseApiServiceTest {
 
-    private SceneCaseApiRepository sceneCaseApiRepository;
-    private SceneCaseApiMapper sceneCaseApiMapper;
-    private SceneCaseApiServiceImpl sceneCaseApiService;
+    private final SceneCaseApiRepository sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
+    private final SceneCaseApiMapper sceneCaseApiMapper = mock(SceneCaseApiMapper.class);
+    private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository =
+        mock(CustomizedSceneCaseApiRepository.class);
+    private final SceneCaseApiServiceImpl sceneCaseApiService = new SceneCaseApiServiceImpl(sceneCaseApiRepository,
+        sceneCaseApiMapper, customizedSceneCaseApiRepository);
 
     private final static String MOCK_SCENE_CASE_ID = "1";
     private final static String MOCK_ID = new ObjectId().toString();
     private final static Integer MOCK_ORDER_NUMBER = 1;
-
-    @BeforeEach
-    void setUpBean() {
-        sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
-        sceneCaseApiMapper = mock(SceneCaseApiMapper.class);
-        sceneCaseApiService = new SceneCaseApiServiceImpl(sceneCaseApiRepository, sceneCaseApiMapper);
-    }
 
     @Test
     @DisplayName("Test the batchAdd method in the SceneCaseApi service")
@@ -179,7 +176,7 @@ class SceneCaseApiServiceTest {
     @DisplayName("Test the list by sceneCaseId method in the SceneCaseApi service")
     void listBySceneCaseId_test_thenReturnSceneCaseApi() {
         List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(SceneCaseApi.builder().build());
-        when(sceneCaseApiRepository.findAll(any(Example.class))).thenReturn(sceneCaseApiList);
+        when(sceneCaseApiRepository.findAll(any(Example.class), any(Sort.class))).thenReturn(sceneCaseApiList);
         List<SceneCaseApi> dto = sceneCaseApiService.listBySceneCaseId(MOCK_SCENE_CASE_ID);
         assertThat(dto).isNotEmpty();
     }
@@ -187,7 +184,7 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the list by sceneCaseId method in the SceneCaseApi service")
     void listBySceneCaseId_test_thenThrowException() {
-        when(sceneCaseApiRepository.findAll(any(Example.class)))
+        when(sceneCaseApiRepository.findAll(any(Example.class), any(Sort.class)))
             .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR));
         assertThatThrownBy(() -> sceneCaseApiService.listBySceneCaseId(MOCK_SCENE_CASE_ID))
             .isInstanceOf(ApiTestPlatformException.class);
@@ -230,6 +227,27 @@ class SceneCaseApiServiceTest {
         when(sceneCaseApiRepository.findById(any()))
             .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_API_BY_ID_ERROR));
         assertThatThrownBy(() -> sceneCaseApiService.getSceneCaseApiById(MOCK_ID));
+    }
+
+    @Test
+    @DisplayName("Test the updateStatusByApiIds method in the SceneCaseApi service")
+    void updateStatusByApiIds_test() {
+        List<SceneCaseApi> sceneCaseApiList =
+            Lists.newArrayList(SceneCaseApi.builder().apiTestCase(ApiTestCase.builder().build()).build());
+        when(customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(any())).thenReturn(sceneCaseApiList);
+        when(sceneCaseApiRepository.saveAll(any())).thenReturn(sceneCaseApiList);
+        Boolean isSuccess = sceneCaseApiService.updateStatusByApiIds(Lists.newArrayList(MOCK_SCENE_CASE_ID),
+            ApiBindingStatus.BINDING);
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the updateStatusByApiIds method in the SceneCaseApi service throws exception")
+    void updateStatusByApiIds_testThrowException() {
+        when(customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(any()))
+            .thenThrow(new ApiTestPlatformException(ADD_SCENE_CASE_API_ERROR));
+        assertThatThrownBy(() -> sceneCaseApiService.updateStatusByApiIds(Lists.newArrayList(MOCK_SCENE_CASE_ID),
+            ApiBindingStatus.BINDING));
     }
 
     private BatchUpdateSceneCaseApiRequest getUpdateSortOrder() {

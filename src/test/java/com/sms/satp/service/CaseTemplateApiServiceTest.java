@@ -4,17 +4,17 @@ import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.AddCaseTemplateApiRequest;
 import com.sms.satp.dto.request.BatchAddCaseTemplateApiRequest;
 import com.sms.satp.dto.request.BatchUpdateCaseTemplateApiRequest;
-import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
+import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.mapper.CaseTemplateApiMapper;
 import com.sms.satp.repository.CaseTemplateApiRepository;
+import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.service.impl.CaseTemplateApiServiceImpl;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Example;
@@ -29,7 +29,6 @@ import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST_BY
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -38,20 +37,17 @@ import static org.wildfly.common.Assert.assertTrue;
 @DisplayName("Test cases for CaseTemplateApiServiceTest")
 class CaseTemplateApiServiceTest {
 
-    private CaseTemplateApiRepository caseTemplateApiRepository;
-    private CaseTemplateApiMapper caseTemplateApiMapper;
-    private CaseTemplateApiServiceImpl caseTemplateApiService;
+    private final CaseTemplateApiRepository caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
+    private final CaseTemplateApiMapper caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
+    private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository =
+        mock(CustomizedSceneCaseApiRepository.class);
+    private CaseTemplateApiServiceImpl caseTemplateApiService = new CaseTemplateApiServiceImpl(
+        caseTemplateApiRepository, caseTemplateApiMapper,
+        customizedSceneCaseApiRepository);
 
     private final static String MOCK_SCENE_CASE_ID = "1";
     private final static String MOCK_ID = new ObjectId().toString();
     private final static Integer MOCK_ORDER_NUMBER = 1;
-
-    @BeforeEach
-    void setUpBean() {
-        caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
-        caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
-        caseTemplateApiService = new CaseTemplateApiServiceImpl(caseTemplateApiRepository, caseTemplateApiMapper);
-    }
 
     @Test
     @DisplayName("Test the batchAdd method in the CaseTemplateApi service")
@@ -132,9 +128,30 @@ class CaseTemplateApiServiceTest {
     @DisplayName("Test the editAll method in the CaseTemplateApi service throws exception")
     void editAll_thenThrowException() {
         List<CaseTemplateApi> sceneCaseApi = Lists.newArrayList(CaseTemplateApi.builder().build());
-        when(caseTemplateApiRepository.saveAll(any())).thenThrow(new ApiTestPlatformException(EDIT_SCENE_CASE_API_ERROR));
+        when(caseTemplateApiRepository.saveAll(any()))
+            .thenThrow(new ApiTestPlatformException(EDIT_SCENE_CASE_API_ERROR));
         assertThatThrownBy(() -> caseTemplateApiService.editAll(sceneCaseApi))
             .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the batchEdit method in the CaseTemplateApi service")
+    void batchEdit_test() {
+        BatchUpdateCaseTemplateApiRequest dto = getUpdateSortOrder();
+        CaseTemplateApi caseTemplateApi = CaseTemplateApi.builder().id(MOCK_ID).build();
+        List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList(caseTemplateApi);
+        when(caseTemplateApiRepository.saveAll(any())).thenReturn(caseTemplateApiList);
+        Boolean isSuccess = caseTemplateApiService.batchEdit(dto);
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the batchEdit method in the CaseTemplateApi service throws exception")
+    void batchEdit_thenThrowException() {
+        BatchUpdateCaseTemplateApiRequest dto = getUpdateSortOrder();
+        when(caseTemplateApiRepository.saveAll(any()))
+            .thenThrow(new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR));
+        assertThatThrownBy(() -> caseTemplateApiService.batchEdit(dto)).isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test
@@ -219,6 +236,14 @@ class CaseTemplateApiServiceTest {
         return BatchAddCaseTemplateApiRequest.builder()
             .addCaseTemplateApiRequestList(Lists.newArrayList(AddCaseTemplateApiRequest.builder().build()))
             .build();
+    }
+
+    private BatchUpdateCaseTemplateApiRequest getUpdateSortOrder() {
+        return BatchUpdateCaseTemplateApiRequest.builder()
+            .updateCaseTemplateApiRequestList(Lists.newArrayList(UpdateCaseTemplateApiRequest.builder()
+                .caseTemplateId(MOCK_SCENE_CASE_ID)
+                .order(MOCK_ORDER_NUMBER)
+                .build())).build();
     }
 
 }

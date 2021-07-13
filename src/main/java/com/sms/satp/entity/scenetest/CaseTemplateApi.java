@@ -1,6 +1,5 @@
 package com.sms.satp.entity.scenetest;
 
-import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
@@ -34,11 +33,6 @@ public class CaseTemplateApi extends BaseEntity {
     private String shell;
 
     private Integer order;
-
-    /**
-     * API绑定状态.
-     */
-    private ApiBindingStatus apiBindingStatus;
 
     private ApiTestCase apiTestCase;
 }

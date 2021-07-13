@@ -15,7 +15,6 @@ import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.dto.request.AddCaseTemplateGroupRequest;
-import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.request.SearchCaseTemplateGroupRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateGroupRequest;
 import com.sms.satp.dto.response.CaseTemplateGroupResponse;
@@ -23,7 +22,6 @@ import com.sms.satp.entity.group.CaseTemplateGroup;
 import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.mapper.CaseTemplateGroupMapper;
 import com.sms.satp.repository.CaseTemplateGroupRepository;
-import com.sms.satp.repository.CustomizedCaseTemplateRepository;
 import com.sms.satp.service.CaseTemplateGroupService;
 import com.sms.satp.service.CaseTemplateService;
 import java.util.List;
@@ -33,7 +31,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -42,16 +39,13 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
 
     private final CaseTemplateGroupRepository caseTemplateGroupRepository;
     private final CaseTemplateGroupMapper caseTemplateGroupMapper;
-    private final CustomizedCaseTemplateRepository customizedCaseTemplateRepository;
     private final CaseTemplateService caseTemplateService;
 
     public CaseTemplateGroupServiceImpl(CaseTemplateGroupRepository caseTemplateGroupRepository,
         CaseTemplateGroupMapper caseTemplateGroupMapper,
-        CustomizedCaseTemplateRepository customizedCaseTemplateRepository,
         CaseTemplateService caseTemplateService) {
         this.caseTemplateGroupRepository = caseTemplateGroupRepository;
         this.caseTemplateGroupMapper = caseTemplateGroupMapper;
-        this.customizedCaseTemplateRepository = customizedCaseTemplateRepository;
         this.caseTemplateService = caseTemplateService;
     }
 
@@ -109,8 +103,6 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(CommonFiled.ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(SceneFiled.NAME.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(CommonFiled.PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(SceneFiled.PARENT_ID.getFiled(), GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
             Example<CaseTemplateGroup> example = Example.of(group, exampleMatcher);
             List<CaseTemplateGroup> caseTemplateGroups = caseTemplateGroupRepository.findAll(example);
@@ -122,9 +114,7 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
     }
 
     private void editCaseTemplateStatus(String id, String projectId) {
-        CaseTemplateSearchRequest request = CaseTemplateSearchRequest.builder().groupId(id).build();
-        Page<CaseTemplate> caseTemplatePage = customizedCaseTemplateRepository.search(request, projectId);
-        List<CaseTemplate> caseTemplateList = caseTemplatePage.getContent();
+        List<CaseTemplate> caseTemplateList = caseTemplateService.get(id, projectId);
         if (CollectionUtils.isNotEmpty(caseTemplateList)) {
             for (CaseTemplate caseTemplate : caseTemplateList) {
                 caseTemplate.setRemoved(true);

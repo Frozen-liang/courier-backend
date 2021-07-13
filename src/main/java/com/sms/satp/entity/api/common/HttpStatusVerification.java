@@ -14,6 +14,4 @@ public class HttpStatusVerification {
     private Boolean checkStatus;
 
     private String statusCode;
-
-    private String verificationResult;
 }

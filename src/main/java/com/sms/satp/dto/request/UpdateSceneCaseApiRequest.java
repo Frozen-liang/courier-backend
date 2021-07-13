@@ -32,7 +32,7 @@ public class UpdateSceneCaseApiRequest {
      */
     private ApiBindingStatus apiBindingStatus;
 
-    private ApiTestCaseRequest apiTestCaseRequest;
+    private ApiTestCaseRequest apiTestCase;
 
     private boolean removed;
 }

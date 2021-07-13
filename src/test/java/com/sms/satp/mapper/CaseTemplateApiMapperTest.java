@@ -74,7 +74,6 @@ class CaseTemplateApiMapperTest {
                 .apiRequestJsonType(ApiJsonType.OBJECT)
                 .apiId(MOCK_ID)
                 .build())
-            .apiBindingStatus(ApiBindingStatus.BINDING)
             .caseTemplateId(MOCK_ID)
             .build();
     }

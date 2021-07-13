@@ -1,5 +1,6 @@
 package com.sms.satp.service;
 
+import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
 import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
@@ -19,11 +20,13 @@ public interface SceneCaseApiService {
 
     Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiDto);
 
-    List<SceneCaseApiResponse> listBySceneCaseId(String sceneCaseId, boolean remove);
+    List<SceneCaseApiResponse> listBySceneCaseId(String sceneCaseId, boolean removed);
 
     List<SceneCaseApi> listBySceneCaseId(String sceneCaseId);
 
-    List<SceneCaseApi> getApiBySceneCaseId(String sceneCaseId, boolean remove);
+    List<SceneCaseApi> getApiBySceneCaseId(String sceneCaseId, boolean removed);
 
     SceneCaseApiResponse getSceneCaseApiById(String id);
+
+    Boolean updateStatusByApiIds(List<String> ids, ApiBindingStatus apiBindingStatus);
 }

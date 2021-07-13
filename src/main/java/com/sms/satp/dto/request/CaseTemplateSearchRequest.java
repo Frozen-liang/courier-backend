@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.bson.types.ObjectId;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -17,9 +17,9 @@ import lombok.experimental.SuperBuilder;
 public class CaseTemplateSearchRequest extends PageDto {
 
     private String name;
-    private String groupId;
-    private boolean remove;
+    private ObjectId groupId;
+    private boolean removed;
     private List<String> testStatus;
-    private List<String> tagIds;
+    private List<ObjectId> tagId;
     private List<String> createUserName;
 }

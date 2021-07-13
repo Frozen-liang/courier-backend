@@ -5,6 +5,7 @@ import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.common.enums.ResponseParamsExtractionType;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
@@ -51,6 +52,7 @@ public class ApiTestCaseRequest {
     private List<ParamInfo> restfulParams;
     private List<ParamInfo> requestParams;
     private List<ParamInfo> responseParams;
+    private ResponseParamsExtractionType responseParamsExtractionType;
     private String preInject;
     private String postInject;
     private ApiJsonType apiResponseJsonType;
@@ -59,5 +61,5 @@ public class ApiTestCaseRequest {
     private ResponseHeadersVerification responseHeadersVerification;
     private ResponseResultVerification responseResultVerification;
     private ResponseTimeVerification responseTimeVerification;
-    private Boolean isExecute;
+    private boolean execute;
 }

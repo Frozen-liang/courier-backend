@@ -1,10 +1,11 @@
 package com.sms.satp.repository;
 
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
-import com.sms.satp.entity.scenetest.SceneCase;
+import com.sms.satp.dto.response.SceneCaseResponse;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 
 public interface CustomizedSceneCaseRepository {
 
-    Page<SceneCase> search(SearchSceneCaseRequest searchDto, String projectId);
+    Page<SceneCaseResponse> search(SearchSceneCaseRequest searchDto, ObjectId projectId);
 }

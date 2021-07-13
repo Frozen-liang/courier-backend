@@ -2,6 +2,8 @@ package com.sms.satp.dto.request;
 
 import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiType;
+import javax.crypto.Mac;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AddCaseTemplateApiRequest {
 
+    @NotNull(message = "The caseTemplateId can not be empty")
     private String caseTemplateId;
 
     private String projectId;
@@ -28,5 +31,5 @@ public class AddCaseTemplateApiRequest {
      */
     private ApiBindingStatus apiBindingStatus;
 
-    private ApiTestCaseRequest apiTestCaseRequest;
+    private ApiTestCaseRequest apiTestCase;
 }

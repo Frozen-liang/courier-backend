@@ -28,4 +28,12 @@ public class CustomizedCaseTemplateApiRepositoryImpl implements CustomizedCaseTe
         return mongoTemplate.find(query, CaseTemplateApi.class);
     }
 
+    @Override
+    public List<CaseTemplateApi> findByCaseTemplateIdAndIsExecute(String caseTemplateId, Boolean isExecute) {
+        Query query = new Query();
+        SceneFiled.CASE_TEMPLATE_ID.is(caseTemplateId).ifPresent(query::addCriteria);
+        SceneFiled.API_IS_EXECUTE.is(isExecute).ifPresent(query::addCriteria);
+        return mongoTemplate.find(query, CaseTemplateApi.class);
+    }
+
 }

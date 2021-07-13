@@ -16,13 +16,11 @@ import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.dto.request.AddSceneCaseGroupRequest;
 import com.sms.satp.dto.request.SearchSceneCaseGroupRequest;
-import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseGroupRequest;
 import com.sms.satp.dto.response.SceneCaseGroupResponse;
 import com.sms.satp.entity.group.SceneCaseGroup;
 import com.sms.satp.entity.scenetest.SceneCase;
 import com.sms.satp.mapper.SceneCaseGroupMapper;
-import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.repository.SceneCaseGroupRepository;
 import com.sms.satp.service.SceneCaseGroupService;
 import com.sms.satp.service.SceneCaseService;
@@ -33,7 +31,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -42,16 +39,12 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
 
     private final SceneCaseGroupRepository sceneCaseGroupRepository;
     private final SceneCaseGroupMapper sceneCaseGroupMapper;
-    private final CustomizedSceneCaseRepository customizedSceneCaseRepository;
     private final SceneCaseService sceneCaseService;
 
     public SceneCaseGroupServiceImpl(SceneCaseGroupRepository sceneCaseGroupRepository,
-        SceneCaseGroupMapper sceneCaseGroupMapper,
-        CustomizedSceneCaseRepository customizedSceneCaseRepository,
-        SceneCaseService sceneCaseService) {
+        SceneCaseGroupMapper sceneCaseGroupMapper, SceneCaseService sceneCaseService) {
         this.sceneCaseGroupRepository = sceneCaseGroupRepository;
         this.sceneCaseGroupMapper = sceneCaseGroupMapper;
-        this.customizedSceneCaseRepository = customizedSceneCaseRepository;
         this.sceneCaseService = sceneCaseService;
     }
 
@@ -122,9 +115,7 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
     }
 
     private void editSceneCaseStatus(String id, String projectId) {
-        SearchSceneCaseRequest request = SearchSceneCaseRequest.builder().groupId(id).build();
-        Page<SceneCase> sceneCasePage = customizedSceneCaseRepository.search(request, projectId);
-        List<SceneCase> sceneCaseList = sceneCasePage.getContent();
+        List<SceneCase> sceneCaseList = sceneCaseService.get(id, projectId);
         if (CollectionUtils.isNotEmpty(sceneCaseList)) {
             for (SceneCase sceneCase : sceneCaseList) {
                 sceneCase.setRemoved(true);

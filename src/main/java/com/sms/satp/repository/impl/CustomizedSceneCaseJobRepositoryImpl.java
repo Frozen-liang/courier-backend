@@ -42,6 +42,7 @@ public class CustomizedSceneCaseJobRepositoryImpl implements CustomizedSceneCase
         BasicQuery query = new BasicQuery(new Document(), document);
         CommonFiled.CREATE_USER_ID.in(sceneCaseJobRequest.getUserIds()).ifPresent(query::addCriteria);
         SceneFiled.SCENE_CASE_ID.is(sceneCaseJobRequest.getSceneCaseId()).ifPresent(query::addCriteria);
+        SceneFiled.CASE_TEMPLATE_ID.is(sceneCaseJobRequest.getCaseTemplateId()).ifPresent(query::addCriteria);
         long total = mongoTemplate.count(query, SceneCaseJob.class);
         Sort sort = Sort.by(Direction.fromString(sceneCaseJobRequest.getOrder()), sceneCaseJobRequest.getSort());
         Pageable pageable = PageRequest
