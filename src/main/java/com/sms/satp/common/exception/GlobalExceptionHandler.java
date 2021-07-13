@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -39,6 +40,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("[Application = API Testing Platform][Exception Level=INTERNAL_SERVER_ERROR]:", e);
         return Response.error(Integer.toString(HttpStatus.INTERNAL_SERVER_ERROR.value()),
             e.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public Response<?> runtimeExceptionHandler(final AccessDeniedException e,
+        HttpServletResponse response) {
+        response.setStatus(HttpStatus.FORBIDDEN.value());
+        return Response.error(Integer.toString(HttpStatus.FORBIDDEN.value()),
+            "Forbidden");
     }
 
 

@@ -85,15 +85,15 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
     public void importApi(ImportSourceVo importSource) {
         String projectId = importSource.getProjectId();
         DocumentType documentType = importSource.getDocumentType();
-        DocumentDefinition definition = documentType.getReader().read(importSource.getSource());
         SaveMode saveMode = importSource.getSaveMode();
         final ProjectImportFlowEntity projectImportFlowEntity = projectImportFlowRepository.save(
             ProjectImportFlowEntity.builder().projectId(projectId).importStatus(ImportStatus.RUNNING)
                 .startTime(LocalDateTime.now())
                 .build());
-        simpMessagingTemplate.convertAndSend(getImportDest(), Payload.ok(projectImportFlowEntity));
-        log.info("The project whose Id is [{}] starts to import API documents.", projectId);
         try {
+            log.info("The project whose Id is [{}] starts to import API documents.", projectId);
+            simpMessagingTemplate.convertAndSend(getImportDest(), Payload.ok(projectImportFlowEntity));
+            DocumentDefinition definition = documentType.getReader().read(importSource.getSource());
             ApiDocumentTransformer<?> transformer = documentType.getTransformer();
             Set<ApiGroupEntity> apiGroupEntities = transformer.toApiGroupEntities(definition,
                 (apiGroupEntity -> apiGroupEntity.setProjectId(projectId)));

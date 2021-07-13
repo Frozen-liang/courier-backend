@@ -14,5 +14,5 @@ public interface SceneCaseJobService {
 
     void handleJobReport(SceneCaseJobReport jobReport);
 
-    void runJob(AddSceneCaseJobRequest addSceneCaseJobRequest);
+    void runJob(AddSceneCaseJobRequest addSceneCaseJobRequest, String currentUserId);
 }

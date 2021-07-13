@@ -8,6 +8,7 @@ import com.sms.satp.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -16,6 +17,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Document("ProjectImportSource")
+@SuperBuilder
 public class ProjectImportSourceEntity extends BaseEntity {
 
     private String name;

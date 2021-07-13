@@ -116,10 +116,8 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     }
 
     @Override
-    public void runJob(AddSceneCaseJobRequest request) {
+    public void runJob(AddSceneCaseJobRequest request, String currentUserId) {
         long start = System.currentTimeMillis();
-        // getCurrentUserId
-        String userId = "1";
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(request.getEnvId());
             if (Objects.isNull(projectEnvironment)) {
@@ -156,11 +154,11 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                 System.currentTimeMillis() - start, request.toString());
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
-            caseDispatcherService.sendErrorMessage(userId, apiTestPlatEx.getMessage());
+            caseDispatcherService.sendErrorMessage(currentUserId, apiTestPlatEx.getMessage());
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseJob!", e);
             e.printStackTrace();
-            caseDispatcherService.sendErrorMessage(userId, "Execute the SceneCaseJob error");
+            caseDispatcherService.sendErrorMessage(currentUserId, "Execute the SceneCaseJob error");
         }
     }
 

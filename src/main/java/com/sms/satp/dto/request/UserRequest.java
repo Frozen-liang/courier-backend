@@ -26,9 +26,4 @@ public class UserRequest {
 
     private List<String> associatedWorkspaces;
 
-
-
-
-
-
 }

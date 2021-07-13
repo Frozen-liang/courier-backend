@@ -11,24 +11,38 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.IMPORT_DATA_COLLECTION_ERROR;
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
+import static com.sms.satp.utils.Assert.isNull;
 import static com.sms.satp.utils.Assert.isTrue;
+import static com.sms.satp.utils.Assert.notEmpty;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
+import com.sms.satp.common.enums.ImportMode;
 import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.dto.request.DataCollectionImportRequest;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
+import com.sms.satp.entity.datacollection.TestData;
 import com.sms.satp.mapper.DataCollectionMapper;
 import com.sms.satp.repository.CustomizedDataCollectionRepository;
 import com.sms.satp.repository.DataCollectionRepository;
 import com.sms.satp.service.DataCollectionService;
 import com.sms.satp.utils.ExceptionUtils;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
@@ -36,6 +50,7 @@ import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -137,6 +152,44 @@ public class DataCollectionServiceImpl implements DataCollectionService {
         } catch (Exception e) {
             log.error("Failed to get the DataCollectionParamList by Id!", e);
             throw new ApiTestPlatformException(GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean importDataCollection(DataCollectionImportRequest request) {
+        try {
+            Optional<DataCollection> optional = dataCollectionRepository.findById(request.getId());
+            DataCollection dataCollection = optional
+                .orElseThrow(() -> ExceptionUtils.mpe("The dataCollection not exits. id = %s", request.getId()));
+            List<String> paramList = Objects.requireNonNullElse(dataCollection.getParamList(), new ArrayList<>());
+            List<TestData> dataList = Objects.requireNonNullElse(dataCollection.getDataList(), new ArrayList<>());
+            ImportMode importMode = ImportMode.getType(request.getImportMode());
+            InputStream inputStream = request.getFile().getInputStream();
+            List<String> sourceList = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
+            notEmpty(sourceList, "The file is empty.");
+            if (importMode == ImportMode.COVER) {
+                paramList.clear();
+                dataList.clear();
+            }
+            /*String[] keys = sourceList.get(0).split(",");
+            Arrays.stream(keys).forEach((key) -> {
+                if (!paramList.contains(key)) {
+                    paramList.add(key);
+                }
+            });
+            for (int i = 1; i < sourceList.size(); i++) {
+                String[] values = sourceList.get(i).split(",");
+                for (int j = 0; j < keys.length; j++) {
+
+                }
+            }*/
+            return null;
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to import the DataCollection!", e);
+            throw new ApiTestPlatformException(IMPORT_DATA_COLLECTION_ERROR);
         }
     }
 

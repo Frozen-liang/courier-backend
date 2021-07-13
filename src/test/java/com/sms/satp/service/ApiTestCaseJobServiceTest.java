@@ -73,6 +73,7 @@ class ApiTestCaseJobServiceTest {
         .id(ID).build();
     private final ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().build();
     private static final String ID = ObjectId.get().toString();
+    private static final String CURRENT_USER_ID = ObjectId.get().toString();
 
     @Test
     @DisplayName("Test the findById method in the ApiTestCaseJob service")
@@ -116,7 +117,7 @@ class ApiTestCaseJobServiceTest {
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(apiTestCaseJob);
         doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJob.class));
-        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest);
+        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest,CURRENT_USER_ID);
         verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJob.class));
     }
 
@@ -127,7 +128,7 @@ class ApiTestCaseJobServiceTest {
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(apiTestCaseJob);
         doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJob.class));
-        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest2);
+        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest2,CURRENT_USER_ID);
         verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJob.class));
     }
 
@@ -136,7 +137,7 @@ class ApiTestCaseJobServiceTest {
     public void environment_not_exist_exception_test() {
         when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
         when(projectEnvironmentService.findOne(any())).thenReturn(null);
-        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest);
+        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest,CURRENT_USER_ID);
         doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
         verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
     }
@@ -146,7 +147,7 @@ class ApiTestCaseJobServiceTest {
     public void execute_exception_test() {
         when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
         when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
-        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest);
+        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest,CURRENT_USER_ID);
         doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(CaseReport.class));
         doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
         verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());

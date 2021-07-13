@@ -12,11 +12,11 @@ public interface ApiTestCaseJobService {
 
     void handleJobReport(ApiTestCaseJobReport apiTestCaseJobReport);
 
-    void runJob(ApiTestCaseJobRunRequest apiTestCaseJobRunRequest);
+    void runJob(ApiTestCaseJobRunRequest apiTestCaseJobRunRequest, String currentUserId);
 
     Page<ApiTestCaseJobPageResponse> page(ApiTestCaseJobPageRequest pageRequest);
 
     ApiTestCaseJobResponse get(String jobId);
 
-    void apiTest(ApiTestRequest apiTestRequest);
+    void apiTest(ApiTestRequest apiTestRequest, String currentUserId);
 }

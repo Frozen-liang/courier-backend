@@ -11,6 +11,7 @@ import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.service.ApiService;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,13 +33,15 @@ public class ApiController {
     }
 
     @PostMapping("/import-by-file")
+    @PreAuthorize("hasRole(@role.API_IMPORT_BY_FILE)")
     public Boolean importDocumentByFile(@Validated ApiImportRequest apiImportRequest) {
         return apiService.importDocumentByFile(apiImportRequest);
     }
 
-    @PostMapping("/import")
-    public Boolean importDocumentByProImpSourceIds(@RequestBody List<String> proImpSourceIds) {
-        return apiService.importDocumentByProImpSourceIds(proImpSourceIds);
+    @PostMapping("/sync")
+    @PreAuthorize("hasRole(@role.API_SYNC)")
+    public Boolean syncApiByProImpSourceIds(@RequestBody List<String> proImpSourceIds) {
+        return apiService.syncApiByProImpSourceIds(proImpSourceIds);
     }
 
     @GetMapping("{id}")
@@ -47,36 +50,43 @@ public class ApiController {
     }
 
     @GetMapping("/page")
+    @PreAuthorize("hasRole(@role.API_QUERY_ALL)")
     public Page<ApiResponse> page(@Validated ApiPageRequest apiPageRequest) {
         return apiService.page(apiPageRequest);
     }
 
     @PostMapping
+    @PreAuthorize("hasRole(@role.API_CRE_UPD_DEL)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody ApiRequest apiRequest) {
         return apiService.add(apiRequest);
     }
 
     @PutMapping
+    @PreAuthorize("hasRole(@role.API_CRE_UPD_DEL)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody ApiRequest apiRequest) {
         return apiService.edit(apiRequest);
     }
 
     @DeleteMapping("{ids}")
+    @PreAuthorize("hasRole(@role.API_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable("ids") List<String> ids) {
         return apiService.delete(ids);
     }
 
     @DeleteMapping("/delete/{ids}")
+    @PreAuthorize("hasRole(@role.API_CRE_UPD_DEL)")
     public Boolean deleteByIds(@PathVariable List<String> ids) {
         return apiService.deleteByIds(ids);
     }
 
     @DeleteMapping("/deleteAll")
+    @PreAuthorize("hasRole(@role.API_CRE_UPD_DEL)")
     public Boolean deleteAll() {
         return apiService.deleteAll();
     }
 
     @PutMapping("/recover")
+    @PreAuthorize("hasRole(@role.API_CRE_UPD_DEL)")
     public Boolean recover(@RequestBody List<String> ids) {
         return apiService.recover(ids);
     }

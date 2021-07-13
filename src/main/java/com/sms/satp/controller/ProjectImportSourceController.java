@@ -7,6 +7,7 @@ import com.sms.satp.dto.request.ProjectImportSourceRequest;
 import com.sms.satp.dto.response.ProjectImportSourceResponse;
 import com.sms.satp.service.ProjectImportSourceService;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,11 +29,13 @@ public class ProjectImportSourceController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole(@role.PRO_IMP_SOU_CRE_UPD_DEL)")
     public Boolean create(@Validated @RequestBody ProjectImportSourceRequest request) {
         return projectImportSourceService.create(request);
     }
 
     @PatchMapping
+    @PreAuthorize("hasRole(@role.PRO_IMP_SOU_CRE_UPD_DEL)")
     public Boolean update(@Validated(UpdateGroup.class) @RequestBody ProjectImportSourceRequest request) {
         return projectImportSourceService.update(request);
     }
@@ -43,11 +46,13 @@ public class ProjectImportSourceController {
     }
 
     @GetMapping("/pid/{projectId}")
+    @PreAuthorize("hasRole(@role.PRO_IMP_SOU_QUERY_ALL)")
     public List<ProjectImportSourceResponse> findByProjectId(@PathVariable String projectId) {
         return projectImportSourceService.findByProjectId(projectId);
     }
 
     @DeleteMapping("/{ids}")
+    @PreAuthorize("hasRole(@role.PRO_IMP_SOU_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable List<String> ids) {
         return projectImportSourceService.delete(ids);
     }

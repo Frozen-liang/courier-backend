@@ -29,6 +29,7 @@
         <groovy.version>3.0.8</groovy.version>
         <spotbug.version>3.0.1</spotbug.version>
         <jwt.version>0.11.2</jwt.version>
+        <mockito-inline.version>3.6.28</mockito-inline.version>
         <sonar.coverage.exclusions>
             **/entity/**.java,
             **/SatpApplication.java,
@@ -129,6 +130,12 @@
             <artifactId>groovy</artifactId>
             <groupId>org.codehaus.groovy</groupId>
             <version>${groovy.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>${mockito-inline.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

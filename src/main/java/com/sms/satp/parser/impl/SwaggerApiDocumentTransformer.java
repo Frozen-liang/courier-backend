@@ -50,7 +50,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
-import org.springframework.data.mongodb.core.index.Index;
 
 @Slf4j
 public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<OpenAPI> {
@@ -63,7 +62,8 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
     };
     private static final Consumer<ApiGroupEntity> EMPTY_GROUP_CALLBACK = (apiGroupEntity) -> {
     };
-    public static final String DELIMITER = ":";
+    public static final String DELIMITER = "_";
+    public static final String SPLIT = "/";
 
     @Override
 
@@ -126,7 +126,9 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
             .groupId(Objects.requireNonNullElse(operation.getTags(), new ArrayList<String>()).get(0))
             .swaggerId(
                 Optional.ofNullable(operation.getOperationId())
-                    .orElse(String.join(DELIMITER, apiPath, requestMethod.name())))
+                    .orElse(
+                        StringUtils.removeStart(apiPath, SPLIT).replace(SPLIT, DELIMITER) + DELIMITER + requestMethod)
+                    .toLowerCase(Locale.US))
             .apiProtocol(ApiProtocol.HTTPS)
             .apiStatus(ApiStatus.DEVELOP)
             .description(operation.getDescription());
@@ -134,7 +136,7 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
         // Build request Header/PathParam/QueryParam.
         Optional.ofNullable(operation.getParameters()).ifPresent(parameters -> {
             Map<In, List<ParamInfo>> paramMapping = buildParamByInType(
-                parameters);
+                parameters, components);
             apiEntityBuilder.restfulParams(paramMapping.get(In.QUERY));
             apiEntityBuilder.pathParams(paramMapping.get(In.PATH));
             apiEntityBuilder.requestHeaders(paramMapping.get(In.HEADER));
@@ -157,7 +159,8 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
             .map(response -> response.get(DEFAULT_RESPONSE_KEY));
         // Build response body.
         apiResponse
-            .flatMap(response -> response.getContent().values().stream().findFirst()).stream()
+            .flatMap(response -> Objects.nonNull(response.getContent())
+                ? response.getContent().values().stream().findFirst() : Optional.empty()).stream()
             .peek(mediaType -> ifRequestOrResponseEqualArray(mediaType, apiEntityBuilder::apiResponseJsonType))
             .findFirst()
             .map(MediaType::getSchema)
@@ -192,10 +195,16 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
     }
 
     private Map<In, List<ParamInfo>> buildParamByInType(
-        List<Parameter> parameters) {
+        List<Parameter> parameters, Map<String, Schema> components) {
         return parameters.stream().map(parameter -> {
             Schema<?> schema = parameter.getSchema();
             SchemaType type = SchemaType.resolve(schema.getType(), schema.getFormat());
+            // The type is null when parameter is Enum.
+            if (type == null) {
+                String componentKey = getComponentKey(schema);
+                schema = components.get(componentKey);
+                type = SchemaType.resolve(schema.getType(), schema.getFormat());
+            }
             ParamInfo paramInfo =
                 ParamInfo.builder().required(parameter.getRequired()).description(parameter.getDescription())
                     .key(parameter.getName()).paramType(type.getParamType()).build();

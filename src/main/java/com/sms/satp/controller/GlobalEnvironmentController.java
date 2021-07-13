@@ -7,6 +7,7 @@ import com.sms.satp.dto.request.GlobalEnvironmentRequest;
 import com.sms.satp.dto.response.GlobalEnvironmentResponse;
 import com.sms.satp.service.GlobalEnvironmentService;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,21 +34,25 @@ public class GlobalEnvironmentController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole(@role.GLOBAL_ENV_CREATE)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody GlobalEnvironmentRequest globalEnvironmentRequest) {
         return globalEnvironmentService.add(globalEnvironmentRequest);
     }
 
     @PutMapping
+    @PreAuthorize("hasRole(@role.GLOBAL_ENV_UPDATE)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody GlobalEnvironmentRequest globalEnvironmentRequest) {
         return globalEnvironmentService.edit(globalEnvironmentRequest);
     }
 
     @GetMapping("/list/{workspaceId}")
+    @PreAuthorize("hasRole(@role.GLOBAL_ENV_QUERY_ALL)")
     public List<GlobalEnvironmentResponse> list(@PathVariable String workspaceId) {
         return globalEnvironmentService.list(workspaceId);
     }
 
     @DeleteMapping("/{ids}")
+    @PreAuthorize("hasRole(@role.GLOBAL_ENV_DELETE)")
     public Boolean delete(@PathVariable("ids") List<String> ids) {
         return globalEnvironmentService.delete(ids);
     }

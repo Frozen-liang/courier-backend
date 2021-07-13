@@ -11,6 +11,8 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_USER_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_USER_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_USER_LIST_ERROR;
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -27,6 +29,10 @@ import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.SecurityUtil;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -38,6 +44,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final CommonDeleteRepository commonDeleteRepository;
     private final UserMapper userMapper;
+    private static final String GROUP_ID = "groupId";
 
     public UserServiceImpl(UserRepository userRepository,
         CommonDeleteRepository commonDeleteRepository,
@@ -60,10 +67,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponse> list() {
+    public List<UserResponse> list(String username, String groupId) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
-            return userMapper.toDtoList(userRepository.findAll(sort));
+            UserEntity userEntity = UserEntity.builder().username(username).groupId(groupId).build();
+            ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+                .withMatcher(GROUP_ID, ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher(REMOVE.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
+                .withStringMatcher(StringMatcher.CONTAINING)
+                .withIgnoreNullValues();
+            Example<UserEntity> example = Example.of(userEntity, exampleMatcher);
+            return userMapper.toDtoList(userRepository.findAll(example, sort));
         } catch (Exception e) {
             log.error("Failed to get the User list!", e);
             throw new ApiTestPlatformException(GET_USER_LIST_ERROR);
@@ -99,6 +113,9 @@ public class UserServiceImpl implements UserService {
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
             throw apiTestPlatEx;
+        } catch (DuplicateKeyException e) {
+            log.error("The email:{} exist!", userRequest.getEmail());
+            throw ExceptionUtils.mpe("The email:%s exist!", userRequest.getEmail());
         } catch (Exception e) {
             log.error("Failed to add the User!", e);
             throw new ApiTestPlatformException(EDIT_USER_ERROR);

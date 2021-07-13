@@ -2,8 +2,10 @@ package com.sms.satp.service.impl;
 
 import static com.sms.satp.common.enums.OperationModule.API_TEST_CASE;
 import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.CLEAR_RECYCLE_BIN;
 import static com.sms.satp.common.enums.OperationType.DELETE;
 import static com.sms.satp.common.enums.OperationType.EDIT;
+import static com.sms.satp.common.enums.OperationType.RECOVER;
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_TEST_CASE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
@@ -19,6 +21,7 @@ import static com.sms.satp.utils.Assert.isTrue;
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.ApiBindingStatus;
+import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
@@ -133,6 +136,9 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     }
 
     @Override
+    @LogRecord(operationType = OperationType.REMOVE, operationModule = API_TEST_CASE,
+        template = "{{#result?.![#this.caseName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("Delete ApiTestCase ids:{}.", ids);
         apiTestCaseRepository.deleteAllByIdIn(ids);
@@ -140,6 +146,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     }
 
     @Override
+    @LogRecord(operationType = CLEAR_RECYCLE_BIN, operationModule = API_TEST_CASE)
     public Boolean deleteAll() {
         log.info("Delete all ApiTestCase when removed is true.");
         apiTestCaseRepository.deleteAllByRemovedIsTrue();
@@ -147,6 +154,9 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     }
 
     @Override
+    @LogRecord(operationType = RECOVER, operationModule = API_TEST_CASE,
+        template = "{{#result?.![#this.caseName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean recover(List<String> ids) {
         return customizedApiTestCaseRepository.recover(ids);
     }

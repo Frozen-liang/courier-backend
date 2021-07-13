@@ -7,6 +7,7 @@ import com.sms.satp.dto.request.ApiTagGroupRequest;
 import com.sms.satp.dto.response.ApiTagGroupResponse;
 import com.sms.satp.service.ApiTagGroupService;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,21 +34,25 @@ public class ApiTagGroupController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole(@role.TAG_GROUP_CRE_UPD_DEL)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody ApiTagGroupRequest apiTagGroupRequest) {
         return apiTagGroupService.add(apiTagGroupRequest);
     }
 
     @PutMapping
+    @PreAuthorize("hasRole(@role.TAG_GROUP_CRE_UPD_DEL)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody ApiTagGroupRequest apiTagGroupRequest) {
         return apiTagGroupService.edit(apiTagGroupRequest);
     }
 
     @GetMapping("/list/{projectId}")
+    @PreAuthorize("hasRole(@role.TAG_GROUP_QUERY_ALL)")
     public List<ApiTagGroupResponse> list(@PathVariable("projectId") String projectId) {
         return apiTagGroupService.list(projectId);
     }
 
     @DeleteMapping("/{ids}")
+    @PreAuthorize("hasRole(@role.TAG_GROUP_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable List<String> ids) {
         return apiTagGroupService.delete(ids);
     }
