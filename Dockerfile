@@ -7,7 +7,7 @@ MAINTAINER pader.zhang "pader.zhang@starlight-sms.com"
 # Executive working directory
 WORKDIR application
 # Configuration parameter
-ARG JAR_FILE=target/*.jar
+ARG JAR_FILE=build/libs/*.jar
 # Copy the jar file obtained by compiling and building to the mirror space
 COPY ${JAR_FILE} application.jar
 # Extract the split build result from application.jar by tool spring-boot-jarmode-layertools
@@ -24,7 +24,7 @@ COPY --from=builder application/dependencies/ ./
 COPY --from=builder application/spring-boot-loader/ ./
 COPY --from=builder application/snapshot-dependencies/ ./
 COPY --from=builder application/application/ ./
-COPY ./target/application.properties ./
+COPY ./build/application.properties ./
 # security patch - remove apt from container
 EXPOSE 5556
 ENTRYPOINT ["sh","-c","java $JAVA_OPTS -Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom org.springframework.boot.loader.JarLauncher"]
