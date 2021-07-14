@@ -35,25 +35,31 @@ public class WorkspaceController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole(@role.WORKSPACE_CREATE)")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody WorkspaceRequest workspaceRequest) {
         return workspaceService.add(workspaceRequest);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole(@role.WORKSPACE_UPDATE)")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody WorkspaceRequest workspaceRequest) {
         return workspaceService.edit(workspaceRequest);
     }
 
     @GetMapping("/list")
-    @PreAuthorize("hasRole(@role.WORKSPACE_QUERY_ALL)")
-    public List<WorkspaceResponse> list() {
-        return workspaceService.list();
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
+    public List<WorkspaceResponse> list(String userId) {
+        return workspaceService.list(userId);
+    }
+
+    @GetMapping("/uid/{userId}")
+    @PreAuthorize("hasRoleOrAdmin(@role.WORKSPACE_QUERY_OWN)")
+    public List<WorkspaceResponse> findByUserId(@PathVariable String userId) {
+        return workspaceService.list(userId);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole(@role.WORKSPACE_DELETE)")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean delete(@PathVariable String id) {
         return workspaceService.delete(id);
     }

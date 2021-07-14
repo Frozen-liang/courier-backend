@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(DATA_COLLECTION_PATH)
@@ -37,19 +36,19 @@ public class DataCollectionController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole(@role.DATA_COLLECTION_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.DATA_COLLECTION_CRE_UPD_DEL)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody DataCollectionRequest dataCollectionRequest) {
         return dataCollectionService.add(dataCollectionRequest);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole(@role.DATA_COLLECTION_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.DATA_COLLECTION_CRE_UPD_DEL)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody DataCollectionRequest dataCollectionRequest) {
         return dataCollectionService.edit(dataCollectionRequest);
     }
 
     @GetMapping("/list/{projectId}")
-    @PreAuthorize("hasRole(@role.DATA_COLLECTION_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.DATA_COLLECTION_QUERY_ALL)")
     public List<DataCollectionResponse> list(@PathVariable String projectId, String collectionName) {
         return dataCollectionService.list(projectId, collectionName);
     }
@@ -60,7 +59,7 @@ public class DataCollectionController {
     }
 
     @DeleteMapping("/{ids}")
-    @PreAuthorize("hasRole(@role.DATA_COLLECTION_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.DATA_COLLECTION_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable List<String> ids) {
         return dataCollectionService.delete(ids);
     }

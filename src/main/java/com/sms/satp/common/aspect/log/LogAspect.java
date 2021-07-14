@@ -2,7 +2,6 @@ package com.sms.satp.common.aspect.log;
 
 import static com.sms.satp.common.field.CommonFiled.ID;
 
-import com.mongodb.client.gridfs.model.GridFSFile;
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.OperationModule;
@@ -10,6 +9,7 @@ import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.entity.log.LogEntity;
 import com.sms.satp.service.FileService;
 import com.sms.satp.service.LogService;
+import com.sms.satp.utils.SecurityUtil;
 import com.sms.satp.utils.SpelUtils;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -24,7 +24,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Component;
 
@@ -66,7 +65,8 @@ public class LogAspect {
                 method, logRecord.template());
         }
         LogEntity logEntity = LogEntity.builder().operationType(operationType).operationModule(operationModule)
-            .operationDesc(operationDesc).projectId(projectId).build();
+            .operationDesc(operationDesc).operator(SecurityUtil.getCurrentUser().getUsername()).projectId(projectId)
+            .build();
         logService.add(logEntity);
         return result;
     }

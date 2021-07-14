@@ -21,7 +21,7 @@ public class ApiGroupController {
     }
 
     @GetMapping(value = "/{projectId}")
-    @PreAuthorize("hasRole(@role.API_GROUP_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.API_GROUP_QUERY_ALL)")
     public List<ApiGroupResponse> list(@PathVariable String projectId) {
         return apiGroupService.list(projectId);
     }

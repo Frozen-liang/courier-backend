@@ -1,7 +1,8 @@
-package com.sms.satp.service;
+package com.sms.satp.service.impl;
 
 import static com.sms.satp.utils.UserDestinationUtil.getProjectDest;
 
+import com.sms.satp.service.MessageService;
 import com.sms.satp.websocket.Payload;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

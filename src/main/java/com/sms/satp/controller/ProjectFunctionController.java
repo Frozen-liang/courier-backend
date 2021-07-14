@@ -34,7 +34,7 @@ public class ProjectFunctionController {
     }
 
     @GetMapping("/list/{projectId}/{workspaceId}")
-    @PreAuthorize("hasRole(@role.PRO_FUN_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PRO_FUN_QUERY_ALL)")
     public List<Object> list(@PathVariable("projectId") String projectId, @PathVariable String workspaceId,
         String functionKey,
         String functionName) {
@@ -50,19 +50,19 @@ public class ProjectFunctionController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole(@role.PRO_FUN_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PRO_FUN_CRE_UPD_DEL)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody ProjectFunctionRequest projectFunctionRequest) {
         return projectFunctionService.add(projectFunctionRequest);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole(@role.PRO_FUN_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PRO_FUN_CRE_UPD_DEL)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody ProjectFunctionRequest projectFunctionRequest) {
         return projectFunctionService.edit(projectFunctionRequest);
     }
 
     @DeleteMapping("/{ids}")
-    @PreAuthorize("hasRole(@role.PRO_FUN_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PRO_FUN_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable List<String> ids) {
         return projectFunctionService.delete(ids);
     }

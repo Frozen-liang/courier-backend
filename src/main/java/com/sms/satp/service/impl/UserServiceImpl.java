@@ -11,8 +11,8 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_USER_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_USER_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_USER_LIST_ERROR;
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
+import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -28,6 +28,7 @@ import com.sms.satp.service.UserService;
 import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.SecurityUtil;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Example;
@@ -35,6 +36,8 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -44,6 +47,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final CommonDeleteRepository commonDeleteRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static final String GROUP_ID = "groupId";
 
     public UserServiceImpl(UserRepository userRepository,
@@ -90,13 +94,20 @@ public class UserServiceImpl implements UserService {
     public Boolean add(UserRequest userRequest) {
         log.info("UserService-add()-params: [User]={}", userRequest.toString());
         try {
+            isTrue(checkPassword(userRequest.getPassword()), "Password validation failed.");
             UserEntity user = userMapper.toEntity(userRequest);
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.insert(user);
         } catch (Exception e) {
             log.error("Failed to add the User!", e);
             throw new ApiTestPlatformException(ADD_USER_ERROR);
         }
         return Boolean.TRUE;
+    }
+
+    private boolean checkPassword(String password) {
+        Pattern pattern = Pattern.compile("^(?=.*\\d)(?=.*\\w)(?=.*[a-z])(?=.*[A-Z]).{8,16}$");
+        return pattern.matcher(password).matches();
     }
 
     @Override

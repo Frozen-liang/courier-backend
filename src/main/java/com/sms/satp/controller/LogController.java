@@ -21,7 +21,7 @@ public class LogController {
     }
 
     @GetMapping("/page")
-    @PreAuthorize("hasRole(@role.LOG_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.LOG_QUERY_ALL)")
     public Page<LogResponse> page(LogPageRequest logPageRequest) {
         return logService.page(logPageRequest);
     }

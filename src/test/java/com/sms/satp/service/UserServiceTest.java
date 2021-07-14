@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
@@ -19,10 +18,10 @@ import com.sms.satp.dto.request.UserRequest;
 import com.sms.satp.dto.response.UserResponse;
 import com.sms.satp.entity.system.UserEntity;
 import com.sms.satp.mapper.UserMapper;
+import com.sms.satp.mapper.UserMapperImpl;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.UserRepository;
 import com.sms.satp.service.impl.UserServiceImpl;
-import com.sms.satp.utils.SecurityUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +29,6 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.springframework.data.domain.Sort;
 
 @DisplayName("Tests for UserService")
@@ -39,13 +37,11 @@ class UserServiceTest {
     private final UserRepository userRepository = mock(UserRepository.class);
     private final CommonDeleteRepository commonDeleteRepository = mock(
         CommonDeleteRepository.class);
-    private final UserMapper userMapper = mock(UserMapper.class);
+    private final UserMapper userMapper = new UserMapperImpl();
     private final UserService userService = new UserServiceImpl(
         userRepository, commonDeleteRepository, userMapper);
     private final UserEntity user = UserEntity.builder().id(ID).build();
-    private final UserResponse userResponse = UserResponse.builder()
-        .id(ID).build();
-    private final UserRequest userRequest = UserRequest.builder()
+    private final UserRequest userRequest = UserRequest.builder().password("123Wac!@#")
         .id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
@@ -56,7 +52,6 @@ class UserServiceTest {
     @DisplayName("Test the findById method in the User service")
     public void findById_test() {
         when(userRepository.findById(ID)).thenReturn(Optional.of(user));
-        when(userMapper.toDto(user)).thenReturn(userResponse);
         UserResponse result1 = userService.findById(ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
@@ -73,7 +68,6 @@ class UserServiceTest {
     @Test
     @DisplayName("Test the add method in the User service")
     public void add_test() {
-        when(userMapper.toEntity(userRequest)).thenReturn(user);
         when(userRepository.insert(any(UserEntity.class))).thenReturn(user);
         assertThat(userService.add(userRequest)).isTrue();
     }
@@ -81,7 +75,6 @@ class UserServiceTest {
     @Test
     @DisplayName("An exception occurred while adding User")
     public void add_exception_test() {
-        when(userMapper.toEntity(any())).thenReturn(UserEntity.builder().build());
         doThrow(new RuntimeException()).when(userRepository).insert(any(UserEntity.class));
         assertThatThrownBy(() -> userService.add(userRequest))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -91,7 +84,6 @@ class UserServiceTest {
     @Test
     @DisplayName("Test the edit method in the User service")
     public void edit_test() {
-        when(userMapper.toEntity(userRequest)).thenReturn(user);
         when(userRepository.existsById(any())).thenReturn(Boolean.TRUE);
         when(userRepository.save(any(UserEntity.class))).thenReturn(user);
         assertThat(userService.edit(userRequest)).isTrue();
@@ -100,7 +92,6 @@ class UserServiceTest {
     @Test
     @DisplayName("An exception occurred while edit User")
     public void edit_exception_test() {
-        when(userMapper.toEntity(userRequest)).thenReturn(user);
         when(userRepository.existsById(any())).thenReturn(Boolean.TRUE);
         doThrow(new RuntimeException()).when(userRepository).save(any(UserEntity.class));
         assertThatThrownBy(() -> userService.edit(userRequest))
@@ -111,7 +102,6 @@ class UserServiceTest {
     @Test
     @DisplayName("An not exist exception occurred while edit User")
     public void edit_not_exist_exception_test() {
-        when(userMapper.toEntity(userRequest)).thenReturn(user);
         when(userRepository.existsById(any())).thenReturn(Boolean.FALSE);
         assertThatThrownBy(() -> userService.edit(userRequest))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -130,7 +120,6 @@ class UserServiceTest {
             userResponseList.add(UserResponse.builder().build());
         }
         when(userRepository.findAll(any(), any(Sort.class))).thenReturn(userList);
-        when(userMapper.toDtoList(userList)).thenReturn(userResponseList);
         List<UserResponse> result = userService.list(USERNAME, GROUP_ID);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }

@@ -34,26 +34,26 @@ public class GlobalFunctionController {
     }
 
     @GetMapping("/list")
-    // @PreAuthorize("hasRole(@role.GLOBAL_FUN_QUERY_ALL)")
+    // @PreAuthorize("hasRoleOrAdmin(@role.GLOBAL_FUN_QUERY_ALL)")
     public List<GlobalFunctionResponse> list(String workspaceId, String functionKey,
         String functionName) {
         return globalFunctionService.list(workspaceId, functionKey, functionName);
     }
 
     @PostMapping
-    @PreAuthorize("hasRole(@role.GLOBAL_FUN_CREATE)")
+    @PreAuthorize("hasRoleOrAdmin(@role.GLOBAL_FUN_CREATE)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody GlobalFunctionRequest globalFunctionRequest) {
         return globalFunctionService.add(globalFunctionRequest);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole(@role.GLOBAL_FUN_UPDATE)")
+    @PreAuthorize("hasRoleOrAdmin(@role.GLOBAL_FUN_UPDATE)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody GlobalFunctionRequest globalFunctionRequest) {
         return globalFunctionService.edit(globalFunctionRequest);
     }
 
     @DeleteMapping("/{ids}")
-    @PreAuthorize("hasRole(@role.GLOBAL_FUN_DELETE)")
+    @PreAuthorize("hasRoleOrAdmin(@role.GLOBAL_FUN_DELETE)")
     public Boolean delete(@PathVariable List<String> ids) {
         return globalFunctionService.delete(ids);
     }

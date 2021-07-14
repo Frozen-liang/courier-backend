@@ -27,7 +27,6 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Sort;
 
 @DisplayName("Tests for WorkspaceService")
 class WorkspaceServiceTest {
@@ -46,7 +45,7 @@ class WorkspaceServiceTest {
         .id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
-    private static final String PROJECT_ID = ObjectId.get().toString();
+    private static final String USER_ID = ObjectId.get().toString();
 
     @Test
     @DisplayName("Test the findById method in the Workspace service")
@@ -127,7 +126,7 @@ class WorkspaceServiceTest {
         }
         when(workspaceRepository.findAllByRemovedIsFalseOrderByCreateDateTimeDesc()).thenReturn(workspaceList);
         when(workspaceMapper.toDtoList(workspaceList)).thenReturn(workspaceResponseList);
-        List<WorkspaceResponse> result = workspaceService.list();
+        List<WorkspaceResponse> result = workspaceService.list(USER_ID);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -135,7 +134,7 @@ class WorkspaceServiceTest {
     @DisplayName("An exception occurred while getting Workspace list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(workspaceRepository).findAllByRemovedIsFalseOrderByCreateDateTimeDesc();
-        assertThatThrownBy(workspaceService::list)
+        assertThatThrownBy(() -> workspaceService.list(USER_ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_WORKSPACE_LIST_ERROR.getCode());
     }

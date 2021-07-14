@@ -40,24 +40,25 @@ public class UserController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole(@role.ADMIN)")
+    @PreAuthorize("hasRoleOrAdmin(@role.USER_CREATE)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody UserRequest userRequest) {
         return userService.add(userRequest);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole(@role.ADMIN)")
+    @PreAuthorize("hasRoleOrAdmin(@role.USER_UPDATE)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody UserRequest userRequest) {
         return userService.edit(userRequest);
     }
 
     @GetMapping("/list")
-    @PreAuthorize("hasRole(@role.ADMIN)")
+    @PreAuthorize("hasRoleOrAdmin(@role.USER_QUERY_ALL)")
     public List<UserResponse> list(String username, String groupId) {
         return userService.list(username, groupId);
     }
 
     @DeleteMapping("/{ids}")
+    @PreAuthorize("hasRoleOrAdmin(@role.USER_DELETE)")
     public Boolean delete(@PathVariable List<String> ids) {
         return userService.delete(ids);
     }

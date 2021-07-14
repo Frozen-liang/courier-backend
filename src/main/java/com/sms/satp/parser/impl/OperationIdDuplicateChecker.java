@@ -1,7 +1,5 @@
 package com.sms.satp.parser.impl;
 
-import static com.sms.satp.utils.UserDestinationUtil.getProjectDest;
-
 import com.sms.satp.common.enums.ImportStatus;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
@@ -45,7 +43,7 @@ public class OperationIdDuplicateChecker implements ApiDocumentChecker {
                 projectImportFlowEntity.getProjectId(), projectImportFlowEntity.getErrorDetail());
             projectImportFlowRepository.save(projectImportFlowEntity);
             MessageService messageService = context.getBean(MessageService.class);
-            messageService.projectMessage(getProjectDest(projectImportFlowEntity.getProjectId()),
+            messageService.projectMessage(projectImportFlowEntity.getProjectId(),
                 Payload.ok(projectImportFlowEntity));
             return false;
 

@@ -23,6 +23,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 public class UserEntity extends BaseEntity {
 
     private String username;
+    private String nickname;
     @HashIndexed
     @Indexed(unique = true)
     private String email;
@@ -35,6 +36,4 @@ public class UserEntity extends BaseEntity {
     private List<String> associatedWorkspaces;
 
     private Boolean enabled;
-
-
 }

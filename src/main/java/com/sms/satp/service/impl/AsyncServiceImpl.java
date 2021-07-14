@@ -5,7 +5,6 @@ import static com.sms.satp.common.enums.OperationType.SYNC;
 import static com.sms.satp.common.enums.SaveMode.COVER;
 import static com.sms.satp.common.enums.SaveMode.INCREMENT;
 import static com.sms.satp.common.enums.SaveMode.REMAIN;
-import static com.sms.satp.utils.UserDestinationUtil.getProjectDest;
 
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.ApiStatus;
@@ -20,6 +19,7 @@ import com.sms.satp.entity.group.ApiGroupEntity;
 import com.sms.satp.entity.project.ImportSourceVo;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
 import com.sms.satp.mapper.ApiHistoryMapper;
+import com.sms.satp.mapper.ProjectImportFlowMapper;
 import com.sms.satp.parser.ApiDocumentChecker;
 import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.common.DocumentDefinition;
@@ -60,6 +60,7 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
     private final ApiHistoryMapper apiHistoryMapper;
     private final ApiGroupRepository apiGroupRepository;
     private final ProjectImportFlowRepository projectImportFlowRepository;
+    private final ProjectImportFlowMapper projectImportFlowMapper;
     private ApplicationContext applicationContext;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final MessageService messageService;
@@ -68,6 +69,7 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
         ApiHistoryMapper apiHistoryMapper,
         ApiGroupRepository apiGroupRepository,
         ProjectImportFlowRepository projectImportFlowRepository,
+        ProjectImportFlowMapper projectImportFlowMapper,
         ApplicationEventPublisher applicationEventPublisher,
         MessageService messageService) {
         this.apiRepository = apiRepository;
@@ -75,6 +77,7 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
         this.apiHistoryMapper = apiHistoryMapper;
         this.apiGroupRepository = apiGroupRepository;
         this.projectImportFlowRepository = projectImportFlowRepository;
+        this.projectImportFlowMapper = projectImportFlowMapper;
         this.applicationEventPublisher = applicationEventPublisher;
         this.messageService = messageService;
     }
@@ -93,7 +96,8 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
                 .build());
         try {
             log.info("The project whose Id is [{}] starts to import API documents.", projectId);
-            messageService.projectMessage(getProjectDest(projectId), Payload.ok(projectImportFlowEntity));
+            messageService.projectMessage(projectId,
+                Payload.ok(projectImportFlowMapper.toProjectImportFlowResponse(projectImportFlowEntity)));
             DocumentDefinition definition = documentType.getReader().read(importSource.getSource());
             ApiDocumentTransformer<?> transformer = documentType.getTransformer();
             Set<ApiGroupEntity> apiGroupEntities = transformer.toApiGroupEntities(definition,
@@ -128,17 +132,17 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
                 updateApiEntitiesIfNeed(projectId, diffApiEntities);
                 projectImportFlowEntity.setImportStatus(ImportStatus.SUCCESS);
                 projectImportFlowEntity.setEndTime(LocalDateTime.now());
-                projectImportFlowRepository.save(projectImportFlowEntity);
             }
         } catch (Exception e) {
             log.error(e.getMessage());
             projectImportFlowEntity.setImportStatus(ImportStatus.FAILED);
             projectImportFlowEntity.setEndTime(LocalDateTime.now());
             projectImportFlowEntity.setErrorDetail(e.getMessage());
-            projectImportFlowRepository.save(projectImportFlowEntity);
         }
+        projectImportFlowRepository.save(projectImportFlowEntity);
         // Send import message.
-        messageService.projectMessage(getProjectDest(projectId), Payload.ok(projectImportFlowEntity));
+        messageService.projectMessage(projectId,
+            Payload.ok(projectImportFlowMapper.toProjectImportFlowResponse(projectImportFlowEntity)));
     }
 
     private Collection<ApiEntity> buildDiffApiEntitiesBySaveMode(List<ApiEntity> newApiEntities,

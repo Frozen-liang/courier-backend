@@ -16,11 +16,17 @@ public class Role {
     public static final String ADMIN = "Admin";
 
     // Workspace
-    public static final String WORKSPACE_CREATE = "Workspace" + CREATE;
-    public static final String WORKSPACE_UPDATE = "Workspace" + UPDATE;
-    public static final String WORKSPACE_DELETE = "Workspace" + DELETE;
-    public static final String WORKSPACE_QUERY_ALL = "Workspace" + QUERY_ALL;
     public static final String WORKSPACE_QUERY_OWN = "Workspace" + QUERY_OWN;
+
+    // User
+    public static final String USER_CREATE = "User" + CREATE;
+    public static final String USER_UPDATE = "User" + UPDATE;
+    public static final String USER_DELETE = "User" + DELETE;
+    public static final String USER_QUERY_ALL = "User" + QUERY_ALL;
+
+    // User_Group
+    public static final String USER_GROUP_CRE_UPD_DEL = "User_Group" + CRE_UPD_DEL;
+    public static final String USER_GROUP_QUERY_ALL = "User_Group" + QUERY_ALL;
 
     // Project
     public static final String PROJECT_CREATE = "Project" + CREATE;

@@ -44,6 +44,7 @@ public class LogServiceImpl implements LogService {
         try {
             return customizedLogRepository.page(logPageRequest).map(logMapper::toDto);
         } catch (Exception e) {
+            log.error(e.getMessage());
             throw new ApiTestPlatformException(ErrorCode.GET_LOG_PAGE_ERROR);
         }
     }

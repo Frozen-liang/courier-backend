@@ -1,6 +1,7 @@
 package com.sms.satp.service.impl;
 
 import com.sms.satp.dto.request.ProjectImportSourceRequest;
+import com.sms.satp.dto.response.ProjectImportFlowResponse;
 import com.sms.satp.dto.response.ProjectImportSourceResponse;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
 import com.sms.satp.entity.project.ProjectImportSourceEntity;
@@ -76,5 +77,10 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
     @Override
     public Iterable<ProjectImportSourceEntity> findByIds(List<String> proImpSourceIds) {
         return this.projectImportSourceRepository.findAllById(proImpSourceIds);
+    }
+
+    @Override
+    public ProjectImportFlowResponse getProjectImportFlow(String projectId) {
+        return projectImportFlowRepository.findFirstByProjectId(projectId);
     }
 }

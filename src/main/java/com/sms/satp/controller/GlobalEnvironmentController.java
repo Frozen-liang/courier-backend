@@ -34,25 +34,25 @@ public class GlobalEnvironmentController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole(@role.GLOBAL_ENV_CREATE)")
+    @PreAuthorize("hasRoleOrAdmin(@role.GLOBAL_ENV_CREATE)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody GlobalEnvironmentRequest globalEnvironmentRequest) {
         return globalEnvironmentService.add(globalEnvironmentRequest);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole(@role.GLOBAL_ENV_UPDATE)")
+    @PreAuthorize("hasRoleOrAdmin(@role.GLOBAL_ENV_UPDATE)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody GlobalEnvironmentRequest globalEnvironmentRequest) {
         return globalEnvironmentService.edit(globalEnvironmentRequest);
     }
 
     @GetMapping("/list/{workspaceId}")
-    @PreAuthorize("hasRole(@role.GLOBAL_ENV_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.GLOBAL_ENV_QUERY_ALL)")
     public List<GlobalEnvironmentResponse> list(@PathVariable String workspaceId) {
         return globalEnvironmentService.list(workspaceId);
     }
 
     @DeleteMapping("/{ids}")
-    @PreAuthorize("hasRole(@role.GLOBAL_ENV_DELETE)")
+    @PreAuthorize("hasRoleOrAdmin(@role.GLOBAL_ENV_DELETE)")
     public Boolean delete(@PathVariable("ids") List<String> ids) {
         return globalEnvironmentService.delete(ids);
     }

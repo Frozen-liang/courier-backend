@@ -35,25 +35,25 @@ public class ApiTagController {
     }
 
     @GetMapping("/list")
-    @PreAuthorize("hasRole(@role.TAG_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.TAG_QUERY_ALL)")
     public List<ApiTagResponse> list(@Validated ApiTagListRequest apiTagListRequest) {
         return apiTagService.list(apiTagListRequest);
     }
 
     @PostMapping
-    @PreAuthorize("hasRole(@role.TAG_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.TAG_CRE_UPD_DEL)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody ApiTagRequest apiTagRequest) {
         return apiTagService.add(apiTagRequest);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole(@role.TAG_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.TAG_CRE_UPD_DEL)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody ApiTagRequest apiTagRequest) {
         return apiTagService.edit(apiTagRequest);
     }
 
     @DeleteMapping("/{ids}")
-    @PreAuthorize("hasRole(@role.TAG_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.TAG_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable List<String> ids) {
         return apiTagService.delete(ids);
     }

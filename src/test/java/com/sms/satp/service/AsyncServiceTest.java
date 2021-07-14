@@ -16,6 +16,7 @@ import com.sms.satp.entity.project.ImportSourceVo;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
 import com.sms.satp.mapper.ApiHistoryMapper;
 import com.sms.satp.mapper.ApiHistoryMapperImpl;
+import com.sms.satp.mapper.ProjectImportFlowMapper;
 import com.sms.satp.repository.ApiGroupRepository;
 import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
@@ -43,11 +44,13 @@ public class AsyncServiceTest {
     private final ApiHistoryMapper apiHistoryMapper = new ApiHistoryMapperImpl();
     private final ApiGroupRepository apiGroupRepository = mock(ApiGroupRepository.class);
     private final ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
+    private final ProjectImportFlowMapper projectImportFlowMapper = mock(ProjectImportFlowMapper.class);
     private ApplicationContext applicationContext = mock(ApplicationContext.class);
     private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final MessageService messageService = mock(MessageService.class);
     private final AsyncService asyncService = new AsyncServiceImpl(apiRepository, apiHistoryRepository,
-        apiHistoryMapper, apiGroupRepository, projectImportFlowRepository, applicationEventPublisher,
+        apiHistoryMapper, apiGroupRepository, projectImportFlowRepository, projectImportFlowMapper,
+        applicationEventPublisher,
         messageService);
 
     @Test

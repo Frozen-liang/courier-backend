@@ -34,43 +34,43 @@ public class ApiTestCaseController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole(@role.CASE_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_CRE_UPD_DEL)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody ApiTestCaseRequest apiTestCaseRequest) {
         return apiTestCaseService.add(apiTestCaseRequest);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole(@role.CASE_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_CRE_UPD_DEL)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody ApiTestCaseRequest apiTestCaseRequest) {
         return apiTestCaseService.edit(apiTestCaseRequest);
     }
 
     @GetMapping("/list")
-    @PreAuthorize("hasRole(@role.CASE_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_QUERY_ALL)")
     public List<ApiTestCaseResponse> list(String apiId, String projectId, boolean removed) {
         return apiTestCaseService.list(apiId, projectId, removed);
     }
 
     @DeleteMapping("/{ids}")
-    @PreAuthorize("hasRole(@role.CASE_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable List<String> ids) {
         return apiTestCaseService.delete(ids);
     }
 
     @DeleteMapping("/delete/{ids}")
-    @PreAuthorize("hasRole(@role.CASE_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_CRE_UPD_DEL)")
     public Boolean deleteByIds(@PathVariable List<String> ids) {
         return apiTestCaseService.deleteByIds(ids);
     }
 
     @DeleteMapping("/deleteAll")
-    @PreAuthorize("hasRole(@role.CASE_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_CRE_UPD_DEL)")
     public Boolean deleteAll() {
         return apiTestCaseService.deleteAll();
     }
 
     @PutMapping("/recover")
-    @PreAuthorize("hasRole(@role.CASE_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_CRE_UPD_DEL)")
     public Boolean recover(@RequestBody List<String> ids) {
         return apiTestCaseService.recover(ids);
     }

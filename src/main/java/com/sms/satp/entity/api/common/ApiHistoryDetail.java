@@ -62,8 +62,8 @@ public class ApiHistoryDetail {
     private ApiJsonType apiRequestJsonType;
     private String id;
     private Boolean removed;
-    private Long createUserId;
-    private Long modifyUserId;
+    private String createUserId;
+    private String modifyUserId;
     private LocalDateTime createDateTime;
     private LocalDateTime modifyDateTime;
 }

@@ -4,6 +4,7 @@ import static com.sms.satp.common.constant.Constants.PROJECT_IMPORT_SOURCE;
 
 import com.sms.satp.common.validate.UpdateGroup;
 import com.sms.satp.dto.request.ProjectImportSourceRequest;
+import com.sms.satp.dto.response.ProjectImportFlowResponse;
 import com.sms.satp.dto.response.ProjectImportSourceResponse;
 import com.sms.satp.service.ProjectImportSourceService;
 import java.util.List;
@@ -29,13 +30,13 @@ public class ProjectImportSourceController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole(@role.PRO_IMP_SOU_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PRO_IMP_SOU_CRE_UPD_DEL)")
     public Boolean create(@Validated @RequestBody ProjectImportSourceRequest request) {
         return projectImportSourceService.create(request);
     }
 
     @PatchMapping
-    @PreAuthorize("hasRole(@role.PRO_IMP_SOU_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PRO_IMP_SOU_CRE_UPD_DEL)")
     public Boolean update(@Validated(UpdateGroup.class) @RequestBody ProjectImportSourceRequest request) {
         return projectImportSourceService.update(request);
     }
@@ -46,15 +47,20 @@ public class ProjectImportSourceController {
     }
 
     @GetMapping("/pid/{projectId}")
-    @PreAuthorize("hasRole(@role.PRO_IMP_SOU_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PRO_IMP_SOU_QUERY_ALL)")
     public List<ProjectImportSourceResponse> findByProjectId(@PathVariable String projectId) {
         return projectImportSourceService.findByProjectId(projectId);
     }
 
     @DeleteMapping("/{ids}")
-    @PreAuthorize("hasRole(@role.PRO_IMP_SOU_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PRO_IMP_SOU_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable List<String> ids) {
         return projectImportSourceService.delete(ids);
+    }
+
+    @GetMapping("/flow/pid/{projectId}")
+    public ProjectImportFlowResponse getProjectImportFlow(@PathVariable String projectId) {
+        return projectImportSourceService.getProjectImportFlow(projectId);
     }
 
 }

@@ -11,12 +11,10 @@ public class CustomMethodSecurityExpression extends SecurityExpressionRoot imple
         super(authentication);
     }
 
-    public boolean isAdmin(String role) {
-        if (authentication.getAuthorities().stream()
-            .anyMatch((grantedAuthority) -> "ADMIN".equals(grantedAuthority.getAuthority()))) {
-            return true;
-        }
-        return hasRole(role);
+    public boolean hasRoleOrAdmin(String role) {
+        return authentication.getAuthorities().stream()
+            .anyMatch((grantedAuthority) -> "Admin"
+                .equals(grantedAuthority.getAuthority()) || grantedAuthority.getAuthority().equals(role));
     }
 
     private Object filterObject;

@@ -31,7 +31,7 @@ public class ProjectEnvironmentController {
     }
 
     @GetMapping("/page/{projectId}")
-    @PreAuthorize("hasRole(@role.PRO_ENV_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PRO_ENV_QUERY_ALL)")
     public Page<ProjectEnvironmentResponse> page(PageDto pageDto, @PathVariable String projectId) {
         return projectEnvironmentService.page(pageDto, projectId);
     }
@@ -42,7 +42,7 @@ public class ProjectEnvironmentController {
     }
 
     @GetMapping("/list/{projectId}/{workspaceId}")
-    @PreAuthorize("hasRole(@role.PRO_ENV_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PRO_ENV_QUERY_ALL)")
     public List<Object> list(@PathVariable String projectId, @PathVariable String workspaceId) {
         // Query global environment and project environment. Used for UI display.
         return projectEnvironmentService.list(projectId, workspaceId);
@@ -55,20 +55,20 @@ public class ProjectEnvironmentController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole(@role.PRO_ENV_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PRO_ENV_CRE_UPD_DEL)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody ProjectEnvironmentRequest projectEnvironmentRequest) {
         return projectEnvironmentService.add(projectEnvironmentRequest);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole(@role.PRO_ENV_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PRO_ENV_CRE_UPD_DEL)")
     public Boolean edit(
         @Validated(UpdateGroup.class) @RequestBody ProjectEnvironmentRequest projectEnvironmentRequest) {
         return projectEnvironmentService.edit(projectEnvironmentRequest);
     }
 
     @DeleteMapping("/{ids}")
-    @PreAuthorize("hasRole(@role.PRO_ENV_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PRO_ENV_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable List<String> ids) {
         return projectEnvironmentService.delete(ids);
     }

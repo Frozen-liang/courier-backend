@@ -52,7 +52,7 @@ public class ConnectChannelInterceptor implements ChannelInterceptor {
                     }
                 }
             }
-            return null;
+            return message;
         }
         return message;
     }

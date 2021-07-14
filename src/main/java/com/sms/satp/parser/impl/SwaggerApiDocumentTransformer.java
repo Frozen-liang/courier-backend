@@ -125,10 +125,8 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
             .apiName(operation.getSummary())
             .groupId(Objects.requireNonNullElse(operation.getTags(), new ArrayList<String>()).get(0))
             .swaggerId(
-                Optional.ofNullable(operation.getOperationId())
-                    .orElse(
-                        StringUtils.removeStart(apiPath, SPLIT).replace(SPLIT, DELIMITER) + DELIMITER + requestMethod)
-                    .toLowerCase(Locale.US))
+                Optional.ofNullable(operation.getOperationId()).orElse(generateSwaggerId(apiPath, requestMethod))
+            )
             .apiProtocol(ApiProtocol.HTTPS)
             .apiStatus(ApiStatus.DEVELOP)
             .description(operation.getDescription());
@@ -172,6 +170,10 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
             .ifPresent(headers -> buildResponseHeaders(headers, apiEntityBuilder::responseHeaders));
         return apiEntityBuilder.build();
 
+    }
+
+    private String generateSwaggerId(String apiPath, RequestMethod requestMethod) {
+        return (String.join(DELIMITER, apiPath.split(SPLIT)) + DELIMITER + requestMethod).toLowerCase(Locale.US);
     }
 
     private void ifRequestOrResponseEqualArray(MediaType mediaType, Consumer<ApiJsonType> callback) {

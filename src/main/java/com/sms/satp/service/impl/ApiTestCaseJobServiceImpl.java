@@ -33,9 +33,9 @@ import com.sms.satp.utils.ExceptionUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +49,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
     private final ProjectEnvironmentService projectEnvironmentService;
     private final ApiTestCaseService apiTestCaseService;
     private final JobMapper jobMapper;
+    private final Stream<String> requestProtocol = Stream.of("Http", "Https", "ws", "wss");
 
     public ApiTestCaseJobServiceImpl(ApiTestCaseJobRepository apiTestCaseJobRepository,
         CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository,
@@ -144,9 +145,9 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(apiTestRequest.getEnvId());
             String apiPath = apiTestRequest.getApiPath();
-            if (Objects.isNull(projectEnvironment) && (StringUtils.isEmpty(apiPath) || !apiPath.startsWith("http")
-                || !apiPath.startsWith("ws"))) {
-                throw ExceptionUtils.mpe("The request address is illegality, please check environment or api path.");
+
+            if (Objects.isNull(projectEnvironment)) {
+                checkApiPath(apiPath);
             }
             ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder()
                 .createDateTime(LocalDateTime.now())
@@ -166,5 +167,12 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
             caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the ApiTest error");
         }
+    }
+
+    private void checkApiPath(String apiPath) {
+        if (requestProtocol.anyMatch(apiPath::startsWith)) {
+            return;
+        }
+        throw ExceptionUtils.mpe("The request address is illegality, please check environment or api path.");
     }
 }

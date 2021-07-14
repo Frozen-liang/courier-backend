@@ -71,6 +71,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
                 .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(API_ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(REMOVE.getFiled(), GenericPropertyMatchers.exact())
+                .withIgnorePaths("isExecute")
                 .withIgnoreNullValues();
             Example<ApiTestCase> example = Example.of(apiTestCase, exampleMatcher);
             return apiTestCaseMapper.toDtoList(apiTestCaseRepository.findAll(example, sort));

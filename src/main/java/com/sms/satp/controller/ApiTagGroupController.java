@@ -34,25 +34,25 @@ public class ApiTagGroupController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole(@role.TAG_GROUP_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.TAG_GROUP_CRE_UPD_DEL)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody ApiTagGroupRequest apiTagGroupRequest) {
         return apiTagGroupService.add(apiTagGroupRequest);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole(@role.TAG_GROUP_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.TAG_GROUP_CRE_UPD_DEL)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody ApiTagGroupRequest apiTagGroupRequest) {
         return apiTagGroupService.edit(apiTagGroupRequest);
     }
 
     @GetMapping("/list/{projectId}")
-    @PreAuthorize("hasRole(@role.TAG_GROUP_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.TAG_GROUP_QUERY_ALL)")
     public List<ApiTagGroupResponse> list(@PathVariable("projectId") String projectId) {
         return apiTagGroupService.list(projectId);
     }
 
     @DeleteMapping("/{ids}")
-    @PreAuthorize("hasRole(@role.TAG_GROUP_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.TAG_GROUP_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable List<String> ids) {
         return apiTagGroupService.delete(ids);
     }

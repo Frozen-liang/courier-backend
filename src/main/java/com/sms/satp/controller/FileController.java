@@ -42,28 +42,28 @@ public class FileController {
 
     @GetMapping("/list/{projectId}")
     @ResponseBody
-    @PreAuthorize("hasRole(@role.FILE_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.FILE_QUERY_ALL)")
     public List<FileInfoResponse> list(@PathVariable("projectId") ObjectId projectId) {
         return fileService.list(projectId);
     }
 
     @PostMapping("/upload")
     @ResponseBody
-    @PreAuthorize("hasRole(@role.FILE_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
     public Boolean insertTestFile(@Validated(InsertGroup.class) TestFileRequest testFileRequest) {
         return fileService.insertTestFile(testFileRequest);
     }
 
     @PutMapping
     @ResponseBody
-    @PreAuthorize("hasRole(@role.FILE_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
     public Boolean updateTestFile(@Validated(UpdateGroup.class) TestFileRequest testFileRequest) {
         return fileService.updateTestFile(testFileRequest);
     }
 
     @SneakyThrows({IOException.class, IllegalStateException.class})
     @GetMapping(value = "/download/{id}")
-    @PreAuthorize("hasRole(@role.FILE_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
     public void downloadTestFile(@PathVariable("id") String id, HttpServletResponse response) {
         GridFsResource gridFsResource = fileService.downloadTestFile(id);
         String filename = gridFsResource.getFilename();
@@ -86,7 +86,7 @@ public class FileController {
 
     @DeleteMapping("/{id}")
     @ResponseBody
-    @PreAuthorize("hasRole(@role.FILE_CRE_UPD_DEL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable("id") String id) {
         return fileService.deleteTestFileById(id);
     }

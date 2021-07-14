@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Tests for ApiMapper")
 class ApiMapperTest {
 
-    private ApiMapper apiMapper = new ApiMapperImpl(new ParamInfoMapperImpl());
+    private final ApiMapper apiMapper = new ApiMapperImpl(new ParamInfoMapperImpl());
 
     private static final Integer SIZE = 10;
     private static final String API_NAME = "apiName";

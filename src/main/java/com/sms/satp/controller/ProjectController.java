@@ -35,25 +35,25 @@ public class ProjectController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole(@role.PROJECT_CREATE)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PROJECT_CREATE)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody ProjectRequest projectRequest) {
         return projectService.add(projectRequest);
     }
 
     @PutMapping
-    @PreAuthorize("hasRole(@role.PROJECT_UPDATE)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PROJECT_UPDATE)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody ProjectRequest projectRequest) {
         return projectService.edit(projectRequest);
     }
 
     @GetMapping("/list/{workspaceId}")
-    @PreAuthorize("hasRole(@role.PROJECT_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PROJECT_QUERY_ALL)")
     public List<ProjectResponse> list(@PathVariable String workspaceId) {
         return projectService.list(workspaceId);
     }
 
     @DeleteMapping("/{ids}")
-    @PreAuthorize("hasRole(@role.PROJECT_DELETE)")
+    @PreAuthorize("hasRoleOrAdmin(@role.PROJECT_DELETE)")
     public Boolean delete(@PathVariable List<String> ids) {
         return projectService.delete(ids);
     }
