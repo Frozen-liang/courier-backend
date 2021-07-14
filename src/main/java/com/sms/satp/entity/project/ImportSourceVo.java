@@ -11,10 +11,11 @@ import lombok.Data;
 @Builder
 public class ImportSourceVo {
 
-
+    private String id;
     private DocumentType documentType;
     private SaveMode saveMode;
     private String projectId;
+    private String workspaceId;
     private String source;
     /**
      * 新API文件状态预设.

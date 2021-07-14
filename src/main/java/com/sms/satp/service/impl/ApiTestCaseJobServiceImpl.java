@@ -4,7 +4,6 @@ import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_JOB_ERRO
 import static com.sms.satp.common.exception.ErrorCode.THE_ENVIRONMENT_NOT_EXITS_ERROR;
 import static com.sms.satp.utils.Assert.notEmpty;
 import static com.sms.satp.utils.Assert.notNull;
-import static com.sms.satp.utils.UserDestinationUtil.getCaseDest;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseJobPageRequest;
@@ -26,11 +25,12 @@ import com.sms.satp.entity.job.common.JobEnvironment;
 import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.repository.ApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
+import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.ApiTestCaseJobService;
 import com.sms.satp.service.ApiTestCaseService;
 import com.sms.satp.service.ProjectEnvironmentService;
 import com.sms.satp.utils.ExceptionUtils;
-import com.sms.satp.utils.SecurityUtil;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -79,7 +79,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
     }
 
     @Override
-    public void runJob(ApiTestCaseJobRunRequest apiTestCaseJobRunRequest, String currentUserId) {
+    public void runJob(ApiTestCaseJobRunRequest apiTestCaseJobRunRequest, CustomUser currentUser) {
         long start = System.currentTimeMillis();
         DataCollectionRequest dataCollectionRequest = apiTestCaseJobRunRequest.getDataCollectionRequest();
         try {
@@ -93,6 +93,11 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             apiTestCaseIds.forEach((apiTestCaseId) -> {
                 ApiTestCaseResponse apiTestCaseResponse = apiTestCaseService.findById(apiTestCaseId);
                 ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder()
+                    .createDateTime(LocalDateTime.now())
+                    .modifyUserId(currentUser.getId())
+                    .createUserId(currentUser.getId())
+                    .createUserName(currentUser.getUsername())
+                    .modifyDateTime(LocalDateTime.now())
                     .apiTestCase(
                         JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestCaseResponse)).build())
                     .environment(jobEnvironment)
@@ -104,22 +109,22 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                         apiTestCaseJob.setId(null);
                         jobDataCollection.setTestData(jobMapper.toTestDataEntity(dataList));
                         apiTestCaseJob.setDataCollection(jobDataCollection);
-                        caseDispatcherService.dispatch(apiTestCaseJob);
                         apiTestCaseJobRepository.insert(apiTestCaseJob);
+                        caseDispatcherService.dispatch(apiTestCaseJob);
                     });
                 } else {
-                    caseDispatcherService.dispatch(apiTestCaseJob);
                     apiTestCaseJobRepository.insert(apiTestCaseJob);
+                    caseDispatcherService.dispatch(apiTestCaseJob);
                 }
             });
             log.info("The use case takes {} milliseconds to send data! request:{}",
-                System.currentTimeMillis() - start, apiTestCaseJobRunRequest.toString());
+                System.currentTimeMillis() - start, apiTestCaseJobRunRequest);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUserId, apiTestPlatEx.getMessage());
+            caseDispatcherService.sendErrorMessage(currentUser.getId(), apiTestPlatEx.getMessage());
         } catch (Exception e) {
             log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUserId, "Execute the ApiTestCase error");
+            caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the ApiTestCase error");
         }
     }
 
@@ -135,7 +140,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
     }
 
     @Override
-    public void apiTest(ApiTestRequest apiTestRequest, String currentUserId) {
+    public void apiTest(ApiTestRequest apiTestRequest, CustomUser currentUser) {
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(apiTestRequest.getEnvId());
             String apiPath = apiTestRequest.getApiPath();
@@ -144,17 +149,22 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                 throw ExceptionUtils.mpe("The request address is illegality, please check environment or api path.");
             }
             ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder()
+                .createDateTime(LocalDateTime.now())
+                .modifyUserId(currentUser.getId())
+                .createUserId(currentUser.getId())
+                .createUserName(currentUser.getUsername())
+                .modifyDateTime(LocalDateTime.now())
                 .environment(jobMapper.toJobEnvironment(projectEnvironment))
                 .apiTestCase(JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestRequest)).build())
                 .build();
-            caseDispatcherService.dispatch(apiTestCaseJob);
             apiTestCaseJobRepository.insert(apiTestCaseJob);
+            caseDispatcherService.dispatch(apiTestCaseJob);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUserId, apiTestPlatEx.getMessage());
+            caseDispatcherService.sendErrorMessage(currentUser.getId(), apiTestPlatEx.getMessage());
         } catch (Exception e) {
             log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUserId, "Execute the ApiTest error");
+            caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the ApiTest error");
         }
     }
 }

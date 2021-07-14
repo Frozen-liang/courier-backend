@@ -13,10 +13,11 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -43,13 +44,15 @@ public class ConnectChannelInterceptor implements ChannelInterceptor {
                         String email = jwtTokenManager.getEmail(token);
                         String userId = jwtTokenManager.getUserId(token);
                         String username = jwtTokenManager.getUsername(token);
-                        accessor.setUser(
-                            SecurityUtil.newAuthentication(userId, email, username, 1L, Collections.emptyList()));
+                        Authentication authentication = SecurityUtil
+                            .newAuthentication(userId, email, username, 1L, Collections.emptyList());
+                        accessor.setUser(authentication);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
                         return message;
                     }
                 }
             }
-            return message;
+            return null;
         }
         return message;
     }

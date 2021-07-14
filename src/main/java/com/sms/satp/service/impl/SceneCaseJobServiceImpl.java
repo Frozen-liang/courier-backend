@@ -32,9 +32,11 @@ import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseRepository;
+import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.ProjectEnvironmentService;
 import com.sms.satp.service.SceneCaseJobService;
 import com.sms.satp.utils.ExceptionUtils;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +121,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     }
 
     @Override
-    public void runJob(AddSceneCaseJobRequest request, String currentUserId) {
+    public void runJob(AddSceneCaseJobRequest request, CustomUser currentUser) {
         long start = System.currentTimeMillis();
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(request.getEnvId());
@@ -142,37 +144,50 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
 
             if (Objects.isNull(request.getDataCollectionRequest())) {
                 SceneCaseJob sceneCaseJob = SceneCaseJob.builder().environment(jobEnvironment).apiTestCase(caseList)
-                    .sceneCaseId(request.getSceneCaseId()).build();
+                    .createDateTime(LocalDateTime.now())
+                    .modifyDateTime(LocalDateTime.now())
+                    .createUserId(currentUser.getId())
+                    .modifyUserId(currentUser.getId())
+                    .createUserName(currentUser.getUsername())
                     .sceneCaseId(request.getSceneCaseId()).caseTemplateId(request.getCaseTemplateId()).build();
                 sceneCaseJobRepository.insert(sceneCaseJob);
                 caseDispatcherService.dispatch(sceneCaseJob);
-                sceneCaseJobRepository.insert(sceneCaseJob);
             } else {
                 for (TestDataRequest testData : request.getDataCollectionRequest().getDataList()) {
                     JobDataCollection jobDataCollection = jobMapper
                         .toJobDataCollection(request.getDataCollectionRequest());
                     jobDataCollection.setTestData(jobMapper.toTestDataEntity(testData));
                     SceneCaseJob sceneCaseJob = SceneCaseJob.builder()
+                        .createDateTime(LocalDateTime.now())
+                        .modifyDateTime(LocalDateTime.now())
+                        .createUserId(currentUser.getId())
+                        .modifyUserId(currentUser.getId())
+                        .createUserName(currentUser.getUsername())
                         .sceneCaseId(request.getSceneCaseId())
                         .caseTemplateId(request.getCaseTemplateId())
                         .environment(jobEnvironment)
                         .dataCollection(jobDataCollection)
                         .apiTestCase(caseList)
                         .build();
-                    caseDispatcherService.dispatch(sceneCaseJob);
                     sceneCaseJobRepository.insert(sceneCaseJob);
+                    caseDispatcherService.dispatch(sceneCaseJob);
                 }
             }
             log.info("The use case takes {} milliseconds to send data! request:{}",
                 System.currentTimeMillis() - start, request.toString());
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUserId, apiTestPlatEx.getMessage());
+            caseDispatcherService.sendErrorMessage(currentUser.getId(), apiTestPlatEx.getMessage());
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseJob!", e);
             e.printStackTrace();
-            caseDispatcherService.sendErrorMessage(currentUserId, "Execute the SceneCaseJob error");
+            caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the SceneCaseJob error");
         }
+    }
+
+    @Override
+    public void deleteById(String id) {
+        sceneCaseRepository.deleteById(id);
     }
 
     private List<JobSceneCaseApi> getApiCaseList(AddSceneCaseJobRequest request) {

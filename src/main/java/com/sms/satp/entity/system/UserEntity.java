@@ -30,10 +30,6 @@ public class UserEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
-    @HashIndexed
-    @Indexed(background = true)
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String currentWorkspace;
 
     @Field(targetType = FieldType.OBJECT_ID)
     private List<String> associatedWorkspaces;

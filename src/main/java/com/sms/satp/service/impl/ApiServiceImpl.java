@@ -56,7 +56,8 @@ public class ApiServiceImpl implements ApiService {
 
     public ApiServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository, ApiMapper apiMapper,
         ApiHistoryMapper apiHistoryMapper, CustomizedApiRepository customizedApiRepository,
-        AsyncService asyncService, ProjectImportSourceService projectImportSourceService) {
+        AsyncService asyncService,
+        ProjectImportSourceService projectImportSourceService) {
         this.apiRepository = apiRepository;
         this.apiHistoryRepository = apiHistoryRepository;
         this.apiMapper = apiMapper;

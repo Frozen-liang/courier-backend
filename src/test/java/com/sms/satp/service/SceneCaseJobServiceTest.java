@@ -1,5 +1,16 @@
 package com.sms.satp.service;
 
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.sms.satp.common.enums.JobStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.AddSceneCaseJobRequest;
@@ -28,7 +39,9 @@ import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseRepository;
+import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.impl.SceneCaseJobServiceImpl;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.util.Lists;
@@ -37,17 +50,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @DisplayName("Test cases for SceneCaseJobServiceTest")
 class SceneCaseJobServiceTest {
@@ -78,7 +80,8 @@ class SceneCaseJobServiceTest {
 
     private final static String MOCK_ID = "1";
     private final static Integer MOCK_NUM = 1;
-    private static final String CURRENT_USER_ID = ObjectId.get().toString();
+    private final CustomUser customUser = new CustomUser("username", "", Collections.emptyList(),
+        ObjectId.get().toString(), "");
 
     @Test
     @DisplayName("Test the runJob method in the SceneCaseJob service")
@@ -111,7 +114,7 @@ class SceneCaseJobServiceTest {
         SceneCaseJob sceneCaseJob = SceneCaseJob.builder().id(MOCK_ID).build();
         when(sceneCaseJobRepository.insert(any(SceneCaseJob.class))).thenReturn(sceneCaseJob);
         AddSceneCaseJobRequest request = getAddRequest();
-        sceneCaseJobService.runJob(request,CURRENT_USER_ID);
+        sceneCaseJobService.runJob(request, customUser);
         verify(sceneCaseJobRepository, times(1)).insert(any(SceneCaseJob.class));
     }
 
@@ -126,7 +129,7 @@ class SceneCaseJobServiceTest {
         when(sceneCaseJobRepository.insert(any(SceneCaseJob.class))).thenReturn(sceneCaseJob);
         AddSceneCaseJobRequest request = getAddRequest();
         request.setDataCollectionRequest(null);
-        sceneCaseJobService.runJob(request,CURRENT_USER_ID);
+        sceneCaseJobService.runJob(request, customUser);
         verify(sceneCaseJobRepository, times(1)).insert(any(SceneCaseJob.class));
     }
 
@@ -135,7 +138,7 @@ class SceneCaseJobServiceTest {
     void runJob_test_EnvironmentIsNull() {
         when(projectEnvironmentService.findOne(any())).thenReturn(null);
         doNothing().when(caseDispatcherService).sendErrorMessage(any(), any());
-        sceneCaseJobService.runJob(getAddRequest(),CURRENT_USER_ID);
+        sceneCaseJobService.runJob(getAddRequest(), customUser);
         verify(projectEnvironmentService, times(1)).findOne(any());
     }
 
@@ -146,7 +149,7 @@ class SceneCaseJobServiceTest {
         when(projectEnvironmentService.findOne(any())).thenReturn(environment);
         when(sceneCaseRepository.findById(any())).thenReturn(Optional.empty());
         doNothing().when(caseDispatcherService).sendErrorMessage(any(), any());
-        sceneCaseJobService.runJob(getAddRequest(),CURRENT_USER_ID);
+        sceneCaseJobService.runJob(getAddRequest(), customUser);
         verify(sceneCaseRepository, times(1)).findById(any());
     }
 
@@ -155,7 +158,7 @@ class SceneCaseJobServiceTest {
     void runJob_test_thrownException() {
         when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
         doNothing().when(caseDispatcherService).sendErrorMessage(any(), any());
-        sceneCaseJobService.runJob(getAddRequest(),CURRENT_USER_ID);
+        sceneCaseJobService.runJob(getAddRequest(), customUser);
         verify(projectEnvironmentService, times(1)).findOne(MOCK_ID);
     }
 
