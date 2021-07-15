@@ -8,7 +8,7 @@ public interface WorkspaceService {
 
     WorkspaceResponse findById(String id);
 
-    List<WorkspaceResponse> list();
+    List<WorkspaceResponse> list(String userId);
 
     Boolean add(WorkspaceRequest workspaceRequest);
 

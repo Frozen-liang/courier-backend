@@ -23,6 +23,7 @@ public class ProjectImportFlowEntity {
     @MongoId(FieldType.OBJECT_ID)
     private String id;
     private String projectId;
+    private String importSourceId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private ImportStatus importStatus;

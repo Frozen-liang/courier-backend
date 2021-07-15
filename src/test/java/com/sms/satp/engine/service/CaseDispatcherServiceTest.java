@@ -13,6 +13,8 @@ import com.sms.satp.engine.service.impl.CaseDispatcherServiceImpl;
 import com.sms.satp.entity.job.ApiTestCaseJob;
 import com.sms.satp.entity.job.SceneCaseJob;
 import com.sms.satp.entity.job.common.CaseReport;
+import com.sms.satp.repository.ApiTestCaseJobRepository;
+import com.sms.satp.repository.SceneCaseJobRepository;
 import java.util.Set;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
@@ -25,8 +27,10 @@ public class CaseDispatcherServiceTest {
 
     private final EngineMemberManagement engineMemberManagement = mock(EngineMemberManagement.class);
     private final SimpMessagingTemplate simpMessagingTemplate = mock(SimpMessagingTemplate.class);
+    private final ApiTestCaseJobRepository apiTestCaseJobRepository = mock(ApiTestCaseJobRepository.class);
+    private final SceneCaseJobRepository sceneCaseJobRepository = mock(SceneCaseJobRepository.class);
     private final CaseDispatcherService caseDispatcherService = new CaseDispatcherServiceImpl(engineMemberManagement,
-        simpMessagingTemplate);
+        simpMessagingTemplate, apiTestCaseJobRepository, sceneCaseJobRepository);
     private final ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder().build();
     private final SceneCaseJob sceneCaseJob = SceneCaseJob.builder().build();
     private static final String USER_ID = ObjectId.get().toString();

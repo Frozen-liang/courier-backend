@@ -11,6 +11,7 @@ import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.enums.DocumentUrlType;
 import com.sms.satp.common.enums.EnumCommon;
 import com.sms.satp.common.enums.GroupImportType;
+import com.sms.satp.common.enums.ImportStatus;
 import com.sms.satp.common.enums.JobStatus;
 import com.sms.satp.common.enums.MatchType;
 import com.sms.satp.common.enums.OperationModule;
@@ -19,6 +20,7 @@ import com.sms.satp.common.enums.ParamType;
 import com.sms.satp.common.enums.ProjectType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.enums.SaveMode;
+import com.sms.satp.utils.SecurityUtil;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
@@ -51,14 +53,14 @@ public class MongoCustomConverterConfiguration {
                 IntegerToApiTypeConverter.INSTANCE, IntegerToMatchTypeConverter.INSTANCE,
                 IntegerToApiBindingStatusConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
                 IntegerToDocumentUrlTypeConverter.INSTANCE, IntegerToJobStatusConverter.INSTANCE,
-                IntegerToProjectTypeConverter.INSTANCE);
+                IntegerToProjectTypeConverter.INSTANCE, IntegerToImportStatusConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
     @Bean
     AuditorAware<String> auditorAware() {
         // get createUserId and modifyUserId
-        return () -> Optional.of("1");
+        return () -> Optional.of(SecurityUtil.getCurrUserId());
     }
 
 
@@ -240,4 +242,14 @@ public class MongoCustomConverterConfiguration {
             return ProjectType.getType(code);
         }
     }
+
+    @ReadingConverter
+    enum IntegerToImportStatusConverter implements Converter<Integer, ImportStatus> {
+        INSTANCE;
+
+        public ImportStatus convert(@NonNull Integer code) {
+            return ImportStatus.getType(code);
+        }
+    }
+
 }

@@ -5,6 +5,7 @@ import com.sms.satp.dto.request.LogPageRequest;
 import com.sms.satp.dto.response.LogResponse;
 import com.sms.satp.service.LogService;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +21,7 @@ public class LogController {
     }
 
     @GetMapping("/page")
+    @PreAuthorize("hasRoleOrAdmin(@role.LOG_QUERY_ALL)")
     public Page<LogResponse> page(LogPageRequest logPageRequest) {
         return logService.page(logPageRequest);
     }

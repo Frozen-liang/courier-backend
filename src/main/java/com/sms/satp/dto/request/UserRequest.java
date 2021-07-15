@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Builder
+@ToString(exclude = "password")
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRequest {
@@ -25,10 +27,5 @@ public class UserRequest {
     private Boolean enabled;
 
     private List<String> associatedWorkspaces;
-
-
-
-
-
 
 }

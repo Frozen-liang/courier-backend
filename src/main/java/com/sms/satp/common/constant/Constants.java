@@ -39,5 +39,6 @@ public class Constants {
     public static final String FILE_PATH = SDK_VERSION + "/file";
     public static final String WORKSPACE_PATH = SDK_VERSION + "/workspace";
     public static final String USER = SDK_VERSION + "/system/user";
-
+    public static final String USER_GROUP = SDK_VERSION + "/system/user-group";
+    public static final String ROLE = SDK_VERSION + "/system/role";
 }

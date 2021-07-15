@@ -32,9 +32,11 @@ import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseRepository;
+import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.ProjectEnvironmentService;
 import com.sms.satp.service.SceneCaseJobService;
 import com.sms.satp.utils.ExceptionUtils;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -119,10 +121,8 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     }
 
     @Override
-    public void runJob(AddSceneCaseJobRequest request) {
+    public void runJob(AddSceneCaseJobRequest request, CustomUser currentUser) {
         long start = System.currentTimeMillis();
-        // getCurrentUserId
-        String userId = "1";
         try {
             ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(request.getEnvId());
             if (Objects.isNull(projectEnvironment)) {
@@ -144,6 +144,11 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
 
             if (Objects.isNull(request.getDataCollectionRequest())) {
                 SceneCaseJob sceneCaseJob = SceneCaseJob.builder().environment(jobEnvironment).apiTestCase(caseList)
+                    .createDateTime(LocalDateTime.now())
+                    .modifyDateTime(LocalDateTime.now())
+                    .createUserId(currentUser.getId())
+                    .modifyUserId(currentUser.getId())
+                    .createUserName(currentUser.getUsername())
                     .sceneCaseId(request.getSceneCaseId()).caseTemplateId(request.getCaseTemplateId()).build();
                 sceneCaseJobRepository.insert(sceneCaseJob);
                 caseDispatcherService.dispatch(sceneCaseJob);
@@ -153,6 +158,11 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                         .toJobDataCollection(request.getDataCollectionRequest());
                     jobDataCollection.setTestData(jobMapper.toTestDataEntity(testData));
                     SceneCaseJob sceneCaseJob = SceneCaseJob.builder()
+                        .createDateTime(LocalDateTime.now())
+                        .modifyDateTime(LocalDateTime.now())
+                        .createUserId(currentUser.getId())
+                        .modifyUserId(currentUser.getId())
+                        .createUserName(currentUser.getUsername())
                         .sceneCaseId(request.getSceneCaseId())
                         .caseTemplateId(request.getCaseTemplateId())
                         .environment(jobEnvironment)
@@ -167,12 +177,17 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                 System.currentTimeMillis() - start, request.toString());
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
-            caseDispatcherService.sendErrorMessage(userId, apiTestPlatEx.getMessage());
+            caseDispatcherService.sendErrorMessage(currentUser.getId(), apiTestPlatEx.getMessage());
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseJob!", e);
             e.printStackTrace();
-            caseDispatcherService.sendErrorMessage(userId, "Execute the SceneCaseJob error");
+            caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the SceneCaseJob error");
         }
+    }
+
+    @Override
+    public void deleteById(String id) {
+        sceneCaseRepository.deleteById(id);
     }
 
     private List<JobSceneCaseApi> getApiCaseList(AddSceneCaseJobRequest request) {

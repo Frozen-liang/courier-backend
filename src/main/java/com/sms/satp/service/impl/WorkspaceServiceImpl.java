@@ -55,7 +55,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public List<WorkspaceResponse> list() {
+    public List<WorkspaceResponse> list(String userId) {
         try {
             return workspaceMapper.toDtoList(workspaceRepository.findAllByRemovedIsFalseOrderByCreateDateTimeDesc());
         } catch (Exception e) {

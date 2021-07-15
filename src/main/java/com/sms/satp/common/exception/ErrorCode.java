@@ -169,6 +169,11 @@ public enum ErrorCode {
     GET_CASE_TEMPLATE_ERROR("4161", "Failed to get the CaseTemplate!"),
     GET_CASE_TEMPLATE_BY_ID_ERROR("4162", "Failed to get the CaseTemplate by id!"),
     DELETE_SCENE_CASE_CONN_ERROR("4163", "Failed to delete the SceneCase conn!"),
+    ADD_USER_GROUP_ERROR("4164", "Failed to add the UserGroup!"),
+    GET_USER_GROUP_LIST_ERROR("4165", "Failed to get the UserGroup list!"),
+    DELETE_USER_GROUP_BY_ID_ERROR("4166", "Failed to delete the UserGroup!"),
+    EDIT_USER_GROUP_ERROR("4167", "Failed to edit the UserGroup!"),
+    IMPORT_DATA_COLLECTION_ERROR("4168", "Failed to import the DataCollection!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

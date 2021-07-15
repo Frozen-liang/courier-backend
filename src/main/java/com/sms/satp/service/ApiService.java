@@ -13,7 +13,7 @@ public interface ApiService {
 
     boolean importDocumentByFile(ApiImportRequest apiImportRequest);
 
-    Boolean importDocumentByProImpSourceIds(List<String> proImpSourceIds);
+    Boolean syncApiByProImpSourceIds(List<String> proImpSourceIds);
 
     ApiResponse findById(String id);
 

@@ -5,7 +5,6 @@ import static com.sms.satp.common.enums.OperationType.SYNC;
 import static com.sms.satp.common.enums.SaveMode.COVER;
 import static com.sms.satp.common.enums.SaveMode.INCREMENT;
 import static com.sms.satp.common.enums.SaveMode.REMAIN;
-import static com.sms.satp.utils.UserDestinationUtil.getImportDest;
 
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.ApiStatus;
@@ -20,6 +19,7 @@ import com.sms.satp.entity.group.ApiGroupEntity;
 import com.sms.satp.entity.project.ImportSourceVo;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
 import com.sms.satp.mapper.ApiHistoryMapper;
+import com.sms.satp.mapper.ProjectImportFlowMapper;
 import com.sms.satp.parser.ApiDocumentChecker;
 import com.sms.satp.parser.ApiDocumentTransformer;
 import com.sms.satp.parser.common.DocumentDefinition;
@@ -28,6 +28,7 @@ import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.ProjectImportFlowRepository;
 import com.sms.satp.service.AsyncService;
+import com.sms.satp.service.MessageService;
 import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.MD5Util;
 import com.sms.satp.websocket.Payload;
@@ -47,7 +48,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -60,23 +60,26 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
     private final ApiHistoryMapper apiHistoryMapper;
     private final ApiGroupRepository apiGroupRepository;
     private final ProjectImportFlowRepository projectImportFlowRepository;
+    private final ProjectImportFlowMapper projectImportFlowMapper;
     private ApplicationContext applicationContext;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final SimpMessagingTemplate simpMessagingTemplate;
+    private final MessageService messageService;
 
     public AsyncServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository,
         ApiHistoryMapper apiHistoryMapper,
         ApiGroupRepository apiGroupRepository,
         ProjectImportFlowRepository projectImportFlowRepository,
+        ProjectImportFlowMapper projectImportFlowMapper,
         ApplicationEventPublisher applicationEventPublisher,
-        SimpMessagingTemplate simpMessagingTemplate) {
+        MessageService messageService) {
         this.apiRepository = apiRepository;
         this.apiHistoryRepository = apiHistoryRepository;
         this.apiHistoryMapper = apiHistoryMapper;
         this.apiGroupRepository = apiGroupRepository;
         this.projectImportFlowRepository = projectImportFlowRepository;
+        this.projectImportFlowMapper = projectImportFlowMapper;
         this.applicationEventPublisher = applicationEventPublisher;
-        this.simpMessagingTemplate = simpMessagingTemplate;
+        this.messageService = messageService;
     }
 
     @Override
@@ -85,15 +88,17 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
     public void importApi(ImportSourceVo importSource) {
         String projectId = importSource.getProjectId();
         DocumentType documentType = importSource.getDocumentType();
-        DocumentDefinition definition = documentType.getReader().read(importSource.getSource());
         SaveMode saveMode = importSource.getSaveMode();
         final ProjectImportFlowEntity projectImportFlowEntity = projectImportFlowRepository.save(
-            ProjectImportFlowEntity.builder().projectId(projectId).importStatus(ImportStatus.RUNNING)
+            ProjectImportFlowEntity.builder().importSourceId(importSource.getId()).projectId(projectId)
+                .importStatus(ImportStatus.RUNNING)
                 .startTime(LocalDateTime.now())
                 .build());
-        simpMessagingTemplate.convertAndSend(getImportDest(), Payload.ok(projectImportFlowEntity));
-        log.info("The project whose Id is [{}] starts to import API documents.", projectId);
         try {
+            log.info("The project whose Id is [{}] starts to import API documents.", projectId);
+            messageService.projectMessage(projectId,
+                Payload.ok(projectImportFlowMapper.toProjectImportFlowResponse(projectImportFlowEntity)));
+            DocumentDefinition definition = documentType.getReader().read(importSource.getSource());
             ApiDocumentTransformer<?> transformer = documentType.getTransformer();
             Set<ApiGroupEntity> apiGroupEntities = transformer.toApiGroupEntities(definition,
                 (apiGroupEntity -> apiGroupEntity.setProjectId(projectId)));
@@ -127,17 +132,17 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
                 updateApiEntitiesIfNeed(projectId, diffApiEntities);
                 projectImportFlowEntity.setImportStatus(ImportStatus.SUCCESS);
                 projectImportFlowEntity.setEndTime(LocalDateTime.now());
-                projectImportFlowRepository.save(projectImportFlowEntity);
             }
         } catch (Exception e) {
             log.error(e.getMessage());
             projectImportFlowEntity.setImportStatus(ImportStatus.FAILED);
             projectImportFlowEntity.setEndTime(LocalDateTime.now());
             projectImportFlowEntity.setErrorDetail(e.getMessage());
-            projectImportFlowRepository.save(projectImportFlowEntity);
         }
+        projectImportFlowRepository.save(projectImportFlowEntity);
         // Send import message.
-        simpMessagingTemplate.convertAndSend(getImportDest(), Payload.ok(projectImportFlowEntity));
+        messageService.projectMessage(projectId,
+            Payload.ok(projectImportFlowMapper.toProjectImportFlowResponse(projectImportFlowEntity)));
     }
 
     private Collection<ApiEntity> buildDiffApiEntitiesBySaveMode(List<ApiEntity> newApiEntities,

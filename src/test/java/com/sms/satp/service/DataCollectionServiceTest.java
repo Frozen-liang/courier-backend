@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.dto.request.DataCollectionImportRequest;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
@@ -24,6 +25,7 @@ import com.sms.satp.mapper.DataCollectionMapper;
 import com.sms.satp.repository.CustomizedDataCollectionRepository;
 import com.sms.satp.repository.DataCollectionRepository;
 import com.sms.satp.service.impl.DataCollectionServiceImpl;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,7 +34,9 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.multipart.MultipartFile;
 
 @DisplayName("Tests for DataCollectionService")
 class DataCollectionServiceTest {
@@ -189,5 +193,19 @@ class DataCollectionServiceTest {
         assertThatThrownBy(() -> dataCollectionService.getParamListById(ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the importDataCollection method in the DataCollection service")
+    public void importDataCollection_test() throws IOException {
+        ClassPathResource classPathResource = new ClassPathResource("/datacollection/template.csv");
+        MultipartFile multipartFile = mock(MultipartFile.class);
+        DataCollectionImportRequest dataCollectionImportRequest = DataCollectionImportRequest.builder().importMode(1)
+            .file(multipartFile)
+            .build();
+        when(dataCollectionRepository.findById(any())).thenReturn(Optional.of(DataCollection.builder().build()));
+        when(multipartFile.getInputStream()).thenReturn(classPathResource.getInputStream());
+        when(dataCollectionRepository.save(any())).thenReturn(null);
+        assertThat(dataCollectionService.importDataCollection(dataCollectionImportRequest)).isTrue();
     }
 }

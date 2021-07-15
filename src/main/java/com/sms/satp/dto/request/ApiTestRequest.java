@@ -4,16 +4,12 @@ import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.RequestMethod;
-import com.sms.satp.common.validate.InsertGroup;
-import com.sms.satp.common.validate.UpdateGroup;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ParamInfo;
 import com.sms.satp.entity.api.common.ResponseHeadersVerification;
 import com.sms.satp.entity.api.common.ResponseResultVerification;
 import com.sms.satp.entity.api.common.ResponseTimeVerification;
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +23,7 @@ public class ApiTestRequest {
 
     private String envId;
     private String apiId;
+    private boolean execute;
     private String projectId;
     private String apiName;
     private String description;

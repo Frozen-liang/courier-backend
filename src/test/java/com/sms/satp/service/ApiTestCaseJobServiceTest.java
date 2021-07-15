@@ -31,6 +31,7 @@ import com.sms.satp.mapper.JobMapperImpl;
 import com.sms.satp.mapper.ParamInfoMapperImpl;
 import com.sms.satp.repository.ApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
+import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.impl.ApiTestCaseJobServiceImpl;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +41,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageImpl;
 
-@DisplayName("Tests for ApiTestCaseJobJobService")
+@DisplayName("Tests for ApiTestCaseJobService")
 class ApiTestCaseJobServiceTest {
 
     private final ApiTestCaseJobRepository apiTestCaseJobRepository = mock(ApiTestCaseJobRepository.class);
@@ -73,6 +74,10 @@ class ApiTestCaseJobServiceTest {
         .id(ID).build();
     private final ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().build();
     private static final String ID = ObjectId.get().toString();
+    private final CustomUser customUser =
+        new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "");
+    private static final String CURRENT_USER_ID =
+        ObjectId.get().toString();
 
     @Test
     @DisplayName("Test the findById method in the ApiTestCaseJob service")
@@ -116,7 +121,7 @@ class ApiTestCaseJobServiceTest {
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(apiTestCaseJob);
         doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJob.class));
-        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest);
+        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest, customUser);
         verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJob.class));
     }
 
@@ -127,7 +132,7 @@ class ApiTestCaseJobServiceTest {
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(apiTestCaseJob);
         doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJob.class));
-        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest2);
+        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest2, customUser);
         verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJob.class));
     }
 
@@ -136,7 +141,7 @@ class ApiTestCaseJobServiceTest {
     public void environment_not_exist_exception_test() {
         when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
         when(projectEnvironmentService.findOne(any())).thenReturn(null);
-        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest);
+        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest, customUser);
         doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
         verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
     }
@@ -146,7 +151,7 @@ class ApiTestCaseJobServiceTest {
     public void execute_exception_test() {
         when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
         when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
-        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest);
+        apiTestCaseJobService.runJob(apiTestCaseJobRunRequest, customUser);
         doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(CaseReport.class));
         doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
         verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());

@@ -10,7 +10,7 @@ public interface UserService {
 
     UserResponse findById(String id);
 
-    List<UserResponse> list();
+    List<UserResponse> list(String username, String groupId);
 
     Boolean add(UserRequest userRequest);
 
