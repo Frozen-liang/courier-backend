@@ -256,25 +256,24 @@ public class MongoCustomConverterConfiguration {
         }
     }
 
-}
 
-@ReadingConverter
-enum IntegerToResultVerificationTypeConverter implements Converter<Integer, ResultVerificationType> {
-    INSTANCE;
+    @ReadingConverter
+    enum IntegerToResultVerificationTypeConverter implements Converter<Integer, ResultVerificationType> {
+        INSTANCE;
 
-    public ResultVerificationType convert(@NonNull Integer code) {
-        return ResultVerificationType.getType(code);
+        public ResultVerificationType convert(@NonNull Integer code) {
+            return ResultVerificationType.getType(code);
+        }
     }
-}
 
-@ReadingConverter
-enum IntegerToResponseParamsExtractionTypeConverter implements Converter<Integer, ResponseParamsExtractionType> {
-    INSTANCE;
+    @ReadingConverter
+    enum IntegerToResponseParamsExtractionTypeConverter implements Converter<Integer, ResponseParamsExtractionType> {
+        INSTANCE;
 
-    public ResponseParamsExtractionType convert(@NonNull Integer code) {
-        return ResponseParamsExtractionType.getType(code);
+        public ResponseParamsExtractionType convert(@NonNull Integer code) {
+            return ResponseParamsExtractionType.getType(code);
+        }
     }
-}
 
 }
 
