@@ -1,25 +1,38 @@
 package com.sms.satp.entity.job;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sms.satp.common.enums.JobStatus;
-import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
-@SuperBuilder
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 @Document(collection = "ApiTestCaseJob")
-public class ApiTestCaseJob extends BaseEntity {
+public class ApiTestCaseJob {
+
+    @MongoId(FieldType.OBJECT_ID)
+    private String id;
+    @Builder.Default
+    @JsonIgnore
+    private Boolean removed = false;
+
+    private String createUserId;
+
+    private String modifyUserId;
+
+    private LocalDateTime createDateTime;
+
+    private LocalDateTime modifyDateTime;
 
     private JobCaseApi apiTestCase;
 

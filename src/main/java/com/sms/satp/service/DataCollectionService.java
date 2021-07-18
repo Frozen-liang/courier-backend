@@ -1,5 +1,6 @@
 package com.sms.satp.service;
 
+import com.sms.satp.dto.request.DataCollectionImportRequest;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollection;
@@ -20,4 +21,6 @@ public interface DataCollectionService {
     Boolean delete(List<String> ids);
 
     List<String> getParamListById(String id);
+
+    Boolean importDataCollection(DataCollectionImportRequest request);
 }

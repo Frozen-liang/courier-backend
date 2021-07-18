@@ -1,28 +1,40 @@
 package com.sms.satp.entity.job;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sms.satp.common.enums.JobStatus;
-import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-@SuperBuilder
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
 @Document(collection = "SceneCaseJob")
-public class SceneCaseJob extends BaseEntity {
+public class SceneCaseJob {
+
+    @MongoId(FieldType.OBJECT_ID)
+    private String id;
+    @Builder.Default
+    @JsonIgnore
+    private Boolean removed = false;
+    private String createUserId;
+    private String modifyUserId;
+    private LocalDateTime createDateTime;
+    @LastModifiedDate
+    private LocalDateTime modifyDateTime;
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String sceneCaseId;

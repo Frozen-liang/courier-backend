@@ -2,6 +2,7 @@ package com.sms.satp.dto.request;
 
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
+import java.util.List;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Null;
 import lombok.AllArgsConstructor;
@@ -21,4 +22,6 @@ public class WorkspaceRequest {
 
     @NotEmpty(message = "The name must not be empty.", groups = {UpdateGroup.class, InsertGroup.class})
     private String name;
+
+    private List<String> userIds;
 }

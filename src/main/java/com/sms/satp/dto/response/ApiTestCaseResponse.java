@@ -41,6 +41,6 @@ public class ApiTestCaseResponse extends BaseResponse {
     private ResponseHeadersVerificationResponse responseHeadersVerification;
     private ResponseResultVerificationResponse responseResultVerification;
     private ResponseTimeVerification responseTimeVerification;
-    private Boolean execute;
+    private boolean execute;
     private Boolean removed;
 }

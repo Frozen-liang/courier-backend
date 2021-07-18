@@ -71,8 +71,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             .and()
             .authorizeRequests()
-            .antMatchers("/**").permitAll()
+            .antMatchers("/user/**", "/engine/**", "/v1/engine/bind").permitAll()
             .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+            .anyRequest().authenticated()
             //            .anyRequest().access("@apiAccessEvaluator.hasPermission(authentication,request)")
             .and()
             .exceptionHandling()

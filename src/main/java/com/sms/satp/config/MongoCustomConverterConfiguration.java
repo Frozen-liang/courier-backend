@@ -11,6 +11,7 @@ import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.enums.DocumentUrlType;
 import com.sms.satp.common.enums.EnumCommon;
 import com.sms.satp.common.enums.GroupImportType;
+import com.sms.satp.common.enums.ImportStatus;
 import com.sms.satp.common.enums.JobStatus;
 import com.sms.satp.common.enums.MatchType;
 import com.sms.satp.common.enums.OperationModule;
@@ -21,6 +22,7 @@ import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.enums.ResponseParamsExtractionType;
 import com.sms.satp.common.enums.ResultVerificationType;
 import com.sms.satp.common.enums.SaveMode;
+import com.sms.satp.utils.SecurityUtil;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.context.annotation.Bean;
@@ -53,7 +55,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToApiTypeConverter.INSTANCE, IntegerToMatchTypeConverter.INSTANCE,
                 IntegerToApiBindingStatusConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
                 IntegerToDocumentUrlTypeConverter.INSTANCE, IntegerToJobStatusConverter.INSTANCE,
-                IntegerToProjectTypeConverter.INSTANCE, IntegerToResultVerificationTypeConverter.INSTANCE,
+                IntegerToProjectTypeConverter.INSTANCE, IntegerToImportStatusConverter.INSTANCE,
+                IntegerToResultVerificationTypeConverter.INSTANCE,
                 IntegerToResponseParamsExtractionTypeConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
@@ -61,7 +64,7 @@ public class MongoCustomConverterConfiguration {
     @Bean
     AuditorAware<String> auditorAware() {
         // get createUserId and modifyUserId
-        return () -> Optional.of("1");
+        return () -> Optional.of(SecurityUtil.getCurrUserId());
     }
 
 
@@ -245,22 +248,33 @@ public class MongoCustomConverterConfiguration {
     }
 
     @ReadingConverter
-    enum IntegerToResultVerificationTypeConverter implements Converter<Integer, ResultVerificationType> {
+    enum IntegerToImportStatusConverter implements Converter<Integer, ImportStatus> {
         INSTANCE;
 
-        public ResultVerificationType convert(@NonNull Integer code) {
-            return ResultVerificationType.getType(code);
+        public ImportStatus convert(@NonNull Integer code) {
+            return ImportStatus.getType(code);
         }
     }
 
-    @ReadingConverter
-    enum IntegerToResponseParamsExtractionTypeConverter implements Converter<Integer, ResponseParamsExtractionType> {
-        INSTANCE;
+}
 
-        public ResponseParamsExtractionType convert(@NonNull Integer code) {
-            return ResponseParamsExtractionType.getType(code);
-        }
+@ReadingConverter
+enum IntegerToResultVerificationTypeConverter implements Converter<Integer, ResultVerificationType> {
+    INSTANCE;
+
+    public ResultVerificationType convert(@NonNull Integer code) {
+        return ResultVerificationType.getType(code);
     }
+}
+
+@ReadingConverter
+enum IntegerToResponseParamsExtractionTypeConverter implements Converter<Integer, ResponseParamsExtractionType> {
+    INSTANCE;
+
+    public ResponseParamsExtractionType convert(@NonNull Integer code) {
+        return ResponseParamsExtractionType.getType(code);
+    }
+}
 
 }
 

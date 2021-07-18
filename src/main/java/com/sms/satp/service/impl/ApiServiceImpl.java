@@ -1,8 +1,11 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.enums.OperationModule.PROJECT;
+import static com.sms.satp.common.enums.OperationModule.API;
 import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.CLEAR_RECYCLE_BIN;
 import static com.sms.satp.common.enums.OperationType.EDIT;
+import static com.sms.satp.common.enums.OperationType.RECOVER;
+import static com.sms.satp.common.enums.OperationType.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_ERROR;
@@ -13,8 +16,6 @@ import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
-import com.sms.satp.common.enums.DocumentFileType;
-import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiImportRequest;
 import com.sms.satp.dto.request.ApiPageRequest;
@@ -25,8 +26,6 @@ import com.sms.satp.entity.api.ApiHistoryEntity;
 import com.sms.satp.entity.project.ProjectImportSourceEntity;
 import com.sms.satp.mapper.ApiHistoryMapper;
 import com.sms.satp.mapper.ApiMapper;
-import com.sms.satp.parser.DocumentReader;
-import com.sms.satp.parser.common.DocumentDefinition;
 import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
@@ -57,7 +56,8 @@ public class ApiServiceImpl implements ApiService {
 
     public ApiServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository, ApiMapper apiMapper,
         ApiHistoryMapper apiHistoryMapper, CustomizedApiRepository customizedApiRepository,
-        AsyncService asyncService, ProjectImportSourceService projectImportSourceService) {
+        AsyncService asyncService,
+        ProjectImportSourceService projectImportSourceService) {
         this.apiRepository = apiRepository;
         this.apiHistoryRepository = apiHistoryRepository;
         this.apiMapper = apiMapper;
@@ -76,7 +76,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Boolean importDocumentByProImpSourceIds(List<String> proImpSourceIds) {
+    public Boolean syncApiByProImpSourceIds(List<String> proImpSourceIds) {
         Iterable<ProjectImportSourceEntity> projectImportSources = projectImportSourceService
             .findByIds(proImpSourceIds);
         projectImportSources.forEach(projectImportSource -> {
@@ -263,7 +263,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = PROJECT, template = "{{#apiRequestDto.apiName}}")
+    @LogRecord(operationType = ADD, operationModule = API, template = "{{#apiRequestDto.apiName}}")
     public Boolean add(ApiRequest apiRequestDto) {
         log.info("ApiService-add()-params: [Api]={}", apiRequestDto.toString());
         try {
@@ -280,7 +280,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = PROJECT, template = "{{#apiRequestDto.apiName}}")
+    @LogRecord(operationType = EDIT, operationModule = API, template = "{{#apiRequestDto.apiName}}")
     public Boolean edit(ApiRequest apiRequest) {
         log.info("ApiService-edit()-params: [Api]={}", apiRequest.toString());
         try {
@@ -302,7 +302,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = PROJECT, template = "{{#result?.![#this.apiName]}}",
+    @LogRecord(operationType = ADD, operationModule = API, template = "{{#result?.![#this.apiName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
@@ -314,6 +314,8 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
+    @LogRecord(operationType = REMOVE, operationModule = API, template = "{{#result?.![#this.apiName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("Delete api ids:{}.", ids);
         apiRepository.deleteAllByIdIn(ids);
@@ -321,6 +323,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
+    @LogRecord(operationType = CLEAR_RECYCLE_BIN, operationModule = API)
     public Boolean deleteAll() {
         log.info("Delete all api when removed is true.");
         apiRepository.deleteAllByRemovedIsTrue();
@@ -328,6 +331,8 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
+    @LogRecord(operationType = RECOVER, operationModule = API, template = "{{#result?.![#this.apiName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean recover(List<String> ids) {
         return customizedApiRepository.recover(ids);
     }

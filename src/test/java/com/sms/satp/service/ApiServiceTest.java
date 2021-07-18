@@ -13,12 +13,15 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.common.enums.DocumentUrlType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.dto.request.ApiImportRequest;
 import com.sms.satp.dto.request.ApiPageRequest;
 import com.sms.satp.dto.request.ApiRequest;
 import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
+import com.sms.satp.entity.project.ProjectImportSourceEntity;
 import com.sms.satp.mapper.ApiHistoryMapper;
 import com.sms.satp.mapper.ApiMapper;
 import com.sms.satp.mapper.ApiMapperImpl;
@@ -27,6 +30,7 @@ import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.service.impl.ApiServiceImpl;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +38,7 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
+import org.springframework.mock.web.MockMultipartFile;
 
 @DisplayName("Tests for ApiService")
 class ApiServiceTest {
@@ -159,5 +164,27 @@ class ApiServiceTest {
     public void deleteAll_test() {
         doNothing().when(apiRepository).deleteAllByRemovedIsTrue();
         assertThat(apiService.deleteAll()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test the importDocumentByFile method in the Api service")
+    public void importDocumentByFile_test() throws IOException {
+        ApiImportRequest apiImportRequest = mock(ApiImportRequest.class);
+        byte[] bytes = {1, 2, 3, 4, 5, 6};
+        MockMultipartFile file = new MockMultipartFile("test", bytes);
+        when(apiImportRequest.getFile()).thenReturn(file);
+        doNothing().when(asyncService).importApi(any());
+        assertThat(apiService.importDocumentByFile(apiImportRequest)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test the syncApiByProImpSourceIds method in the Api service")
+    public void syncApiByProImpSourceIds_test() {
+        List<String> proImpSourceIds = List.of(ObjectId.get().toString());
+        when(projectImportSourceService.findByIds(any()))
+            .thenReturn(
+                List.of(ProjectImportSourceEntity.builder().documentType(DocumentUrlType.SWAGGER_FILE).build()));
+        doNothing().when(asyncService).importApi(any());
+        assertThat(apiService.syncApiByProImpSourceIds(proImpSourceIds)).isTrue();
     }
 }

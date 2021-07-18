@@ -32,6 +32,9 @@ public class SpelUtils {
     }
 
     public static <T> T getValue(EvaluationContext context, String template, Class<T> clazz) {
+        if (StringUtils.isEmpty(template)) {
+            return null;
+        }
         try {
             Expression expression = spelExpressionParser.parseExpression(template, templateParserContext);
             return expression.getValue(context, clazz);
@@ -43,6 +46,9 @@ public class SpelUtils {
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public static String getProjectId(EvaluationContext context, LogRecord logRecord, Method method, Object[] args) {
+        if (StringUtils.isEmpty(logRecord.projectId())) {
+            return null;
+        }
         try {
             Expression expression;
             String value = null;

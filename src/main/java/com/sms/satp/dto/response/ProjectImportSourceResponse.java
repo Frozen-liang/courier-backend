@@ -22,6 +22,7 @@ public class ProjectImportSourceResponse {
     private Integer saveMode;
     private String projectId;
     private String documentUrl;
+    private Integer importStatus;
     /**
      * 新API文件状态预设.
      */

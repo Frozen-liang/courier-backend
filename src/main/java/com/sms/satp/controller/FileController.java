@@ -19,6 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,24 +42,28 @@ public class FileController {
 
     @GetMapping("/list/{projectId}")
     @ResponseBody
+    @PreAuthorize("hasRoleOrAdmin(@role.FILE_QUERY_ALL)")
     public List<FileInfoResponse> list(@PathVariable("projectId") ObjectId projectId) {
         return fileService.list(projectId);
     }
 
     @PostMapping("/upload")
     @ResponseBody
+    @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
     public Boolean insertTestFile(@Validated(InsertGroup.class) TestFileRequest testFileRequest) {
         return fileService.insertTestFile(testFileRequest);
     }
 
     @PutMapping
     @ResponseBody
+    @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
     public Boolean updateTestFile(@Validated(UpdateGroup.class) TestFileRequest testFileRequest) {
         return fileService.updateTestFile(testFileRequest);
     }
 
     @SneakyThrows({IOException.class, IllegalStateException.class})
     @GetMapping(value = "/download/{id}")
+    @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
     public void downloadTestFile(@PathVariable("id") String id, HttpServletResponse response) {
         GridFsResource gridFsResource = fileService.downloadTestFile(id);
         String filename = gridFsResource.getFilename();
@@ -81,6 +86,7 @@ public class FileController {
 
     @DeleteMapping("/{id}")
     @ResponseBody
+    @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable("id") String id) {
         return fileService.deleteTestFileById(id);
     }

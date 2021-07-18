@@ -23,7 +23,7 @@ public class LogResponse {
 
     private String operator;
 
-    private Long operatorId;
+    private String operatorId;
 
     private String operationDateTime;
 }

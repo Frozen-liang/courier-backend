@@ -8,6 +8,7 @@ import com.sms.satp.dto.request.UserRequest;
 import com.sms.satp.dto.response.UserResponse;
 import com.sms.satp.service.UserService;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,21 +40,25 @@ public class UserController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.USER_CREATE)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody UserRequest userRequest) {
         return userService.add(userRequest);
     }
 
     @PutMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.USER_UPDATE)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody UserRequest userRequest) {
         return userService.edit(userRequest);
     }
 
     @GetMapping("/list")
-    public List<UserResponse> list() {
-        return userService.list();
+    @PreAuthorize("hasRoleOrAdmin(@role.USER_QUERY_ALL)")
+    public List<UserResponse> list(String username, String groupId) {
+        return userService.list(username, groupId);
     }
 
     @DeleteMapping("/{ids}")
+    @PreAuthorize("hasRoleOrAdmin(@role.USER_DELETE)")
     public Boolean delete(@PathVariable List<String> ids) {
         return userService.delete(ids);
     }

@@ -70,7 +70,7 @@ public class JobApiTestCase {
 
     private boolean execute;
 
-    private Long modifyUserId;
+    private String modifyUserId;
 
     private String modifyDateTime;
 

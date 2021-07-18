@@ -8,6 +8,7 @@ import com.sms.satp.dto.request.WorkspaceRequest;
 import com.sms.satp.dto.response.WorkspaceResponse;
 import com.sms.satp.service.WorkspaceService;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,21 +35,31 @@ public class WorkspaceController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody WorkspaceRequest workspaceRequest) {
         return workspaceService.add(workspaceRequest);
     }
 
     @PutMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody WorkspaceRequest workspaceRequest) {
         return workspaceService.edit(workspaceRequest);
     }
 
     @GetMapping("/list")
-    public List<WorkspaceResponse> list() {
-        return workspaceService.list();
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
+    public List<WorkspaceResponse> list(String userId) {
+        return workspaceService.list(userId);
+    }
+
+    @GetMapping("/uid/{userId}")
+    @PreAuthorize("hasRoleOrAdmin(@role.WORKSPACE_QUERY_OWN)")
+    public List<WorkspaceResponse> findByUserId(@PathVariable String userId) {
+        return workspaceService.list(userId);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean delete(@PathVariable String id) {
         return workspaceService.delete(id);
     }
