@@ -54,14 +54,14 @@ public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCase
         for (String id : caseTemplateApiId) {
             Query query = new Query();
             CaseTemplateApiConn build = CaseTemplateApiConn.builder().caseTemplateApiId(id)
-                .isExecute(Boolean.TRUE).build();
+                .execute(Boolean.TRUE).build();
             query.addCriteria(Criteria.where(SceneFiled.CASE_TEMPLATE_API_CONN_LIST.getFiled()).is(build));
             Update update = new Update();
             update.pullAll(SceneFiled.CASE_TEMPLATE_API_CONN_LIST.getFiled(), Lists.newArrayList(build).toArray());
 
             mongoTemplate.updateMulti(query, update, SceneCaseApi.class);
             CaseTemplateApiConn buildFalse = CaseTemplateApiConn.builder().caseTemplateApiId(id)
-                .isExecute(Boolean.FALSE).build();
+                .execute(Boolean.FALSE).build();
             update.pullAll(SceneFiled.CASE_TEMPLATE_API_CONN_LIST.getFiled(), Lists.newArrayList(buildFalse).toArray());
             mongoTemplate.updateMulti(query, update, SceneCaseApi.class);
         }

@@ -2,6 +2,7 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseRequest;
+import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
@@ -25,6 +26,13 @@ public interface SceneCaseMapper {
     List<CaseTemplateApiConn> toCaseTemplateApiConnList(List<CaseTemplateApi> caseTemplateApiList);
 
     @Mapping(target = "caseTemplateApiId", source = "id")
-    @Mapping(target = "isExecute", source = "apiTestCase.execute")
+    @Mapping(target = "execute", source = "apiTestCase.execute")
     CaseTemplateApiConn toCaseTemplateApiConn(CaseTemplateApi caseTemplateApi);
+
+    List<CaseTemplateApiConn> toCaseTemplateApiConnListByResponse(
+        List<CaseTemplateApiResponse> caseTemplateApiResponseList);
+
+    @Mapping(target = "caseTemplateApiId", source = "id")
+    @Mapping(target = "execute", source = "apiTestCase.execute")
+    CaseTemplateApiConn toCaseTemplateApiConnByResponse(CaseTemplateApiResponse caseTemplateApi);
 }

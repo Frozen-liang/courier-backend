@@ -17,6 +17,7 @@ public class AddSceneCaseRequest {
     private String name;
     @NotNull(message = "The projectId can not be empty")
     private String projectId;
+    private String dataCollId;
     @NotNull(message = "The groupId can not be empty")
     private String groupId;
     private List<String> tagId;

@@ -17,8 +17,6 @@ import org.mapstruct.ReportingPolicy;
         EnumCommonUtils.class})
 public interface ApiTestCaseMapper {
 
-    @Mapping(target = "responseResultVerificationResponse", source = "responseResultVerification")
-    @Mapping(target = "responseHeadersVerificationResponse", source = "responseHeadersVerification")
     ApiTestCaseResponse toDto(ApiTestCase apiTestCase);
 
     List<ApiTestCaseResponse> toDtoList(List<ApiTestCase> apiTestCaseList);

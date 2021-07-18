@@ -18,6 +18,8 @@ import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.common.enums.ParamType;
 import com.sms.satp.common.enums.ProjectType;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.common.enums.ResponseParamsExtractionType;
+import com.sms.satp.common.enums.ResultVerificationType;
 import com.sms.satp.common.enums.SaveMode;
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +53,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToApiTypeConverter.INSTANCE, IntegerToMatchTypeConverter.INSTANCE,
                 IntegerToApiBindingStatusConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
                 IntegerToDocumentUrlTypeConverter.INSTANCE, IntegerToJobStatusConverter.INSTANCE,
-                IntegerToProjectTypeConverter.INSTANCE);
+                IntegerToProjectTypeConverter.INSTANCE, IntegerToResultVerificationTypeConverter.INSTANCE,
+                IntegerToResponseParamsExtractionTypeConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -240,4 +243,24 @@ public class MongoCustomConverterConfiguration {
             return ProjectType.getType(code);
         }
     }
+
+    @ReadingConverter
+    enum IntegerToResultVerificationTypeConverter implements Converter<Integer, ResultVerificationType> {
+        INSTANCE;
+
+        public ResultVerificationType convert(@NonNull Integer code) {
+            return ResultVerificationType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToResponseParamsExtractionTypeConverter implements Converter<Integer, ResponseParamsExtractionType> {
+        INSTANCE;
+
+        public ResponseParamsExtractionType convert(@NonNull Integer code) {
+            return ResponseParamsExtractionType.getType(code);
+        }
+    }
+
 }
+

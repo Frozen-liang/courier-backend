@@ -33,8 +33,6 @@ public interface JobMapper {
 
     JobEnvironment toJobEnvironment(ProjectEnvironment projectEnvironment);
 
-    @Mapping(target = "responseHeadersVerification", source = "responseHeadersVerificationResponse")
-    @Mapping(target = "responseResultVerification", source = "responseResultVerificationResponse")
     JobApiTestCase toJobApiTestCase(ApiTestCaseResponse apiTestCaseResponse);
 
     JobApiTestCase toJobApiTestCase(ApiTestRequest apiTestRequest);

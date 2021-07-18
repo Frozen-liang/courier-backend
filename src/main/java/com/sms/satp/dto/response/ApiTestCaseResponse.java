@@ -38,8 +38,8 @@ public class ApiTestCaseResponse extends BaseResponse {
     private Integer apiResponseJsonType;
     private Integer apiRequestJsonType;
     private HttpStatusVerification httpStatusVerification;
-    private ResponseHeadersVerificationResponse responseHeadersVerificationResponse;
-    private ResponseResultVerificationResponse responseResultVerificationResponse;
+    private ResponseHeadersVerificationResponse responseHeadersVerification;
+    private ResponseResultVerificationResponse responseResultVerification;
     private ResponseTimeVerification responseTimeVerification;
     private Boolean execute;
     private Boolean removed;

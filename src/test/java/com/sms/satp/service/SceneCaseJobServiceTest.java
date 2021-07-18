@@ -42,6 +42,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ER
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -149,12 +150,22 @@ class SceneCaseJobServiceTest {
     }
 
     @Test
-    @DisplayName("Test the runJob method in the SceneCaseJob service thrown exception")
-    void runJob_test_thrownException() {
-        when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
-        doNothing().when(caseDispatcherService).sendErrorMessage(any(), any());
+    @DisplayName("An exception occurred while execute SceneCaseJob")
+    public void environment_not_exist_exception_test() {
+        when(projectEnvironmentService.findOne(any())).thenReturn(null);
         sceneCaseJobService.runJob(getAddRequest());
-        verify(projectEnvironmentService, times(1)).findOne(MOCK_ID);
+        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while execute SceneCaseJob")
+    public void execute_exception_test() {
+        when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
+        sceneCaseJobService.runJob(getAddRequest());
+        doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(CaseReport.class));
+        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
     }
 
     @Test

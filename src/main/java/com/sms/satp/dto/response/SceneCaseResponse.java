@@ -17,6 +17,7 @@ public class SceneCaseResponse extends BaseResponse {
     private String name;
     private String createUserName;
     private String projectId;
+    private String dataCollId;
     private String groupName;
     private String groupId;
     private String testStatus;
