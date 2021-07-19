@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SceneCaseGroupResponse extends BaseResponse{
+public class SceneCaseGroupResponse extends BaseResponse {
 
     private String projectId;
     private String name;

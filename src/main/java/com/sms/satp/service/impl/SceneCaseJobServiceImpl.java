@@ -1,5 +1,10 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
+
 import com.google.common.collect.Lists;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.AddSceneCaseJobRequest;
@@ -44,11 +49,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
-import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
 
 @Slf4j
 @Service
