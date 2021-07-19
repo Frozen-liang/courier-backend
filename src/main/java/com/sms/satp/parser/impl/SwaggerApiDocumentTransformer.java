@@ -191,7 +191,8 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
             Header header = headerEntry.getValue();
             Schema<?> schema = header.getSchema();
             SchemaType type = SchemaType.resolve(schema.getType(), schema.getFormat());
-            return ParamInfo.builder().required(BooleanUtils.toBoolean(header.getRequired())).description(header.getDescription())
+            return ParamInfo.builder().required(BooleanUtils.toBoolean(header.getRequired()))
+                .description(header.getDescription())
                 .key(headerEntry.getKey()).paramType(type.getParamType()).build();
         }).collect(toList());
         callback.accept(paramInfos);
@@ -209,7 +210,8 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
                 type = SchemaType.resolve(schema.getType(), schema.getFormat());
             }
             ParamInfo paramInfo =
-                ParamInfo.builder().required(BooleanUtils.toBoolean(parameter.getRequired())).description(parameter.getDescription())
+                ParamInfo.builder().required(BooleanUtils.toBoolean(parameter.getRequired()))
+                    .description(parameter.getDescription())
                     .key(parameter.getName()).paramType(type.getParamType()).build();
             In in = In.resolve(parameter.getIn().toUpperCase(Locale.US));
             return Tuple.of(in, paramInfo);

@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @SuperBuilder
-public class ResponseResultVerification extends BaseVerification{
+public class ResponseResultVerification extends BaseVerification {
 
     private ResultVerificationType resultVerificationType;
 
