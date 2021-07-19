@@ -9,4 +9,5 @@ public interface CustomizedCaseTemplateApiRepository {
 
     List<CaseTemplateApi> findByCaseTemplateIdAndIsExecute(String caseTemplateId, Boolean isExecute);
 
+    int findCurrentOrderByCaseTemplateId(String caseTemplateId);
 }

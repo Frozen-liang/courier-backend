@@ -84,7 +84,7 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
         CommonFiled.PROJECT_ID.is(projectId).ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         CommonFiled.REMOVE.is(searchSceneCaseRequest.isRemoved())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneFiled.NAME.is(searchSceneCaseRequest.getName())
+        SceneFiled.NAME.like(searchSceneCaseRequest.getName())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         SceneFiled.GROUP_ID.is(searchSceneCaseRequest.getGroupId())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));

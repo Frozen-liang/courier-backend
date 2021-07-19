@@ -41,6 +41,7 @@ import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.repository.CaseTemplateRepository;
+import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseRepository;
@@ -77,6 +78,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     private final ApiRepository apiRepository;
     private final ApiTestCaseMapper apiTestCaseMapper;
     private final ApiTestCaseRepository apiTestCaseRepository;
+    private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
 
     public CaseTemplateServiceImpl(CaseTemplateRepository caseTemplateRepository,
         CustomizedCaseTemplateRepository customizedCaseTemplateRepository,
@@ -85,7 +87,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         CaseTemplateApiMapper caseTemplateApiMapper,
         CaseTemplateApiRepository caseTemplateApiRepository,
         SceneCaseApiRepository sceneCaseApiRepository, ApiRepository apiRepository,
-        ApiTestCaseMapper apiTestCaseMapper, ApiTestCaseRepository apiTestCaseRepository) {
+        ApiTestCaseMapper apiTestCaseMapper, ApiTestCaseRepository apiTestCaseRepository,
+        CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository) {
         this.caseTemplateRepository = caseTemplateRepository;
         this.customizedCaseTemplateRepository = customizedCaseTemplateRepository;
         this.caseTemplateMapper = caseTemplateMapper;
@@ -98,6 +101,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         this.apiRepository = apiRepository;
         this.apiTestCaseMapper = apiTestCaseMapper;
         this.apiTestCaseRepository = apiTestCaseRepository;
+        this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
     }
 
     @Override
@@ -260,12 +264,15 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             if (caseTemplate.isEmpty()) {
                 throw new ApiTestPlatformException(GET_CASE_TEMPLATE_BY_ID_ERROR);
             }
+            int index =
+                customizedCaseTemplateApiRepository.findCurrentOrderByCaseTemplateId(request.getCaseTemplateId());
             for (AddSceneCaseApi addSceneCaseApi : request.getCaseTemplateApis()) {
                 if (BooleanUtils.isTrue(addSceneCaseApi.getIsCase())) {
-                    addCaseTemplateApiByTestCase(caseTemplate.get(), addSceneCaseApi);
+                    addCaseTemplateApiByTestCase(caseTemplate.get(), addSceneCaseApi, index);
                 } else {
-                    addCaseTemplateApiByApi(caseTemplate.get(), addSceneCaseApi);
+                    addCaseTemplateApiByApi(caseTemplate.get(), addSceneCaseApi, index);
                 }
+                index++;
             }
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -274,30 +281,34 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         }
     }
 
-    private void addCaseTemplateApiByApi(CaseTemplate caseTemplate, AddSceneCaseApi addSceneCaseApi) {
+    private void addCaseTemplateApiByApi(CaseTemplate caseTemplate, AddSceneCaseApi addSceneCaseApi, int index) {
         Optional<ApiEntity> apiEntity = apiRepository.findById(addSceneCaseApi.getId());
         if (apiEntity.isPresent()) {
             ApiTestCase apiTestCase = apiTestCaseMapper.toEntityByApiEntity(apiEntity.get());
             apiTestCase.setExecute(Boolean.TRUE);
             CaseTemplateApi caseTemplateApi =
-                CaseTemplateApi.builder().apiTestCase(apiTestCase)
+                CaseTemplateApi.builder()
+                    .apiTestCase(apiTestCase)
                     .caseTemplateId(caseTemplate.getId())
                     .projectId(caseTemplate.getProjectId())
-                    .order(addSceneCaseApi.getOrder()).apiType(ApiType.API)
+                    .order(index)
+                    .apiType(ApiType.API)
                     .build();
             caseTemplateApiRepository.insert(caseTemplateApi);
         }
     }
 
-    private void addCaseTemplateApiByTestCase(CaseTemplate caseTemplate, AddSceneCaseApi addSceneCaseApi) {
+    private void addCaseTemplateApiByTestCase(CaseTemplate caseTemplate, AddSceneCaseApi addSceneCaseApi, int index) {
         Optional<ApiTestCase> apiTestCase = apiTestCaseRepository.findById(addSceneCaseApi.getId());
         if (apiTestCase.isPresent()) {
             ApiTestCase testCase = apiTestCase.get();
             testCase.setExecute(Boolean.TRUE);
             CaseTemplateApi caseTemplateApi =
-                CaseTemplateApi.builder().apiTestCase(testCase).caseTemplateId(caseTemplate.getId())
+                CaseTemplateApi.builder()
+                    .apiTestCase(testCase)
+                    .caseTemplateId(caseTemplate.getId())
                     .projectId(caseTemplate.getProjectId())
-                    .order(addSceneCaseApi.getOrder())
+                    .order(index)
                     .apiType(ApiType.API)
                     .build();
             caseTemplateApiRepository.insert(caseTemplateApi);

@@ -6,18 +6,17 @@ import com.sms.satp.dto.request.AddCaseTemplateConnRequest;
 import com.sms.satp.dto.request.AddSceneCaseApi;
 import com.sms.satp.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
+import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiConnRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseConnRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseRequest;
 import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.dto.response.SceneCaseApiConnResponse;
-import com.sms.satp.dto.response.SceneCaseApiResponse;
 import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.dto.response.SceneTemplateResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
-import com.sms.satp.entity.scenetest.CaseTemplate;
 import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
 import com.sms.satp.entity.scenetest.SceneCase;
@@ -250,7 +249,7 @@ class SceneCaseServiceTest {
         List<SceneCaseApi> sceneCaseApiDtoList =
             Lists.newArrayList(
                 SceneCaseApi.builder().caseTemplateId(MOCK_ID).id(MOCK_ID).caseTemplateApiConnList(Lists.newArrayList(
-                    CaseTemplateApiConn.builder().caseTemplateApiId(MOCK_ID).isExecute(Boolean.TRUE).build())).build());
+                    CaseTemplateApiConn.builder().caseTemplateApiId(MOCK_ID).execute(Boolean.TRUE).build())).build());
         when(sceneCaseApiService.listBySceneCaseId(any())).thenReturn(sceneCaseApiDtoList);
         when(caseTemplateApiService.listByCaseTemplateId(any())).thenReturn(Lists.newArrayList());
         List<CaseTemplateApiResponse> caseTemplateApiResponses =
@@ -361,7 +360,7 @@ class SceneCaseServiceTest {
         List<CaseTemplateApi> caseTemplateApiList = Lists.newArrayList(CaseTemplateApi.builder().build());
         when(caseTemplateApiService.listByCaseTemplateId(any())).thenReturn(caseTemplateApiList);
         List<CaseTemplateApiConn> caseTemplateApiConnList = Lists
-            .newArrayList(CaseTemplateApiConn.builder().isExecute(Boolean.TRUE).caseTemplateApiId(MOCK_ID).build());
+            .newArrayList(CaseTemplateApiConn.builder().execute(Boolean.TRUE).caseTemplateApiId(MOCK_ID).build());
         when(sceneCaseMapper.toCaseTemplateApiConnList(any())).thenReturn(caseTemplateApiConnList);
         when(sceneCaseApiRepository.insert(any(SceneCaseApi.class))).thenReturn(SceneCaseApi.builder().build());
         AddCaseTemplateConnRequest request = getAddConnRequest();
@@ -421,8 +420,8 @@ class SceneCaseServiceTest {
             .updateSceneCaseApiConnRequest(
                 Lists.newArrayList(
                     UpdateSceneCaseApiConnRequest.builder()
-                        .isExecute(Boolean.TRUE)
-                        .caseTemplateApiConnList(Lists.newArrayList(CaseTemplateApiConn.builder().build()))
+                        .apiTestCase(ApiTestCaseRequest.builder().execute(Boolean.TRUE).build())
+                        .caseTemplateApiList(Lists.newArrayList(CaseTemplateApiResponse.builder().build()))
                         .build())
             ).build();
     }

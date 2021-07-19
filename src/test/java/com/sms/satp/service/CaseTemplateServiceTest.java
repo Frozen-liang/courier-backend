@@ -25,6 +25,7 @@ import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.repository.CaseTemplateRepository;
+import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseRepository;
@@ -71,10 +72,13 @@ class CaseTemplateServiceTest {
     private final ApiRepository apiRepository = mock(ApiRepository.class);
     private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
     private final ApiTestCaseRepository apiTestCaseRepository = mock(ApiTestCaseRepository.class);
+    private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository =
+        mock(CustomizedCaseTemplateApiRepository.class);
     private CaseTemplateServiceImpl caseTemplateService = new CaseTemplateServiceImpl(caseTemplateRepository,
         customizedCaseTemplateRepository, caseTemplateMapper, caseTemplateApiService,
         sceneCaseRepository, sceneCaseApiService, caseTemplateApiMapper,
-        caseTemplateApiRepository, sceneCaseApiRepository, apiRepository, apiTestCaseMapper, apiTestCaseRepository);
+        caseTemplateApiRepository, sceneCaseApiRepository, apiRepository, apiTestCaseMapper, apiTestCaseRepository,
+        customizedCaseTemplateApiRepository);
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";

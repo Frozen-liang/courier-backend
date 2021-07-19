@@ -29,11 +29,12 @@ public class CaseTemplate extends BaseEntity {
     private String projectId;
 
     @Field(targetType = FieldType.OBJECT_ID)
+    private String dataCollId;
+
+    @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
 
     private List<String> tagId;
-
-    private Integer priority;
 
     /**
      * 是否锁定，当前步骤出错或未通过时，依然执行下一个步骤.

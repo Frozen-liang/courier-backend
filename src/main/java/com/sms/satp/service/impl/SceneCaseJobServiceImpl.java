@@ -180,14 +180,8 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             caseDispatcherService.sendErrorMessage(currentUser.getId(), apiTestPlatEx.getMessage());
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseJob!", e);
-            e.printStackTrace();
             caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the SceneCaseJob error");
         }
-    }
-
-    @Override
-    public void deleteById(String id) {
-        sceneCaseRepository.deleteById(id);
     }
 
     private List<JobSceneCaseApi> getApiCaseList(AddSceneCaseJobRequest request) {

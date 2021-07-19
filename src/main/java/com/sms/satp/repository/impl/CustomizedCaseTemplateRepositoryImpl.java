@@ -89,7 +89,7 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         SceneFiled.TAG_ID.in(searchRequest.getTagId())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneFiled.NAME.is(searchRequest.getName())
+        SceneFiled.NAME.like(searchRequest.getName())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         SceneFiled.GROUP_ID.is(searchRequest.getGroupId())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
