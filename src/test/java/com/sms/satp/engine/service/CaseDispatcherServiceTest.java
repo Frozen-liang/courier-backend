@@ -10,8 +10,8 @@ import static org.mockito.Mockito.when;
 
 import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.service.impl.CaseDispatcherServiceImpl;
-import com.sms.satp.entity.job.ApiTestCaseJob;
-import com.sms.satp.entity.job.SceneCaseJob;
+import com.sms.satp.entity.job.ApiTestCaseJobEntity;
+import com.sms.satp.entity.job.SceneCaseJobEntity;
 import com.sms.satp.entity.job.common.CaseReport;
 import com.sms.satp.repository.ApiTestCaseJobRepository;
 import com.sms.satp.repository.SceneCaseJobRepository;
@@ -31,8 +31,8 @@ public class CaseDispatcherServiceTest {
     private final SceneCaseJobRepository sceneCaseJobRepository = mock(SceneCaseJobRepository.class);
     private final CaseDispatcherService caseDispatcherService = new CaseDispatcherServiceImpl(engineMemberManagement,
         simpMessagingTemplate, apiTestCaseJobRepository, sceneCaseJobRepository);
-    private final ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder().build();
-    private final SceneCaseJob sceneCaseJob = SceneCaseJob.builder().build();
+    private final ApiTestCaseJobEntity apiTestCaseJob = ApiTestCaseJobEntity.builder().build();
+    private final SceneCaseJobEntity sceneCaseJob = SceneCaseJobEntity.builder().build();
     private static final String USER_ID = ObjectId.get().toString();
     private static final String MESSAGE = "message";
     private final CaseReport caseReport = CaseReport.builder().build();

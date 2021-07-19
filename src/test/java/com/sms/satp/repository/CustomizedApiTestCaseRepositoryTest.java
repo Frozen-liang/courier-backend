@@ -8,7 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.enums.ApiBindingStatus;
-import com.sms.satp.entity.apitestcase.ApiTestCase;
+import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.satp.repository.impl.CustomizedApiTestCaseRepositoryImpl;
 import java.util.Collections;
 import java.util.List;
@@ -41,14 +41,14 @@ class CustomizedApiTestCaseRepositoryTest {
     @Test
     @DisplayName("Test the deleteById method in the CustomizedApiTestCaseRepository")
     public void deleteById_test() {
-        when(commonDeleteRepository.deleteById(ID, ApiTestCase.class)).thenReturn(Boolean.TRUE);
+        when(commonDeleteRepository.deleteById(ID, ApiTestCaseEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(customizedApiTestCaseRepository.deleteById(ID)).isTrue();
     }
 
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedApiTestCaseRepository")
     public void deleteByIds() {
-        when(commonDeleteRepository.deleteByIds(ID_LIST, ApiTestCase.class)).thenReturn(Boolean.TRUE);
+        when(commonDeleteRepository.deleteByIds(ID_LIST, ApiTestCaseEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(customizedApiTestCaseRepository.deleteByIds(ID_LIST)).isTrue();
     }
 }

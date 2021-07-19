@@ -7,8 +7,8 @@ import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
 import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.satp.dto.response.SceneCaseApiResponse;
-import com.sms.satp.entity.apitestcase.ApiTestCase;
-import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
+import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
 import com.sms.satp.mapper.SceneCaseApiMapper;
 import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
@@ -54,8 +54,8 @@ class SceneCaseApiServiceTest {
     @DisplayName("Test the batchAdd method in the SceneCaseApi service")
     void batchAdd_test() {
         BatchAddSceneCaseApiRequest addSceneCaseApiDto = getAddDto();
-        SceneCaseApi caseApi = SceneCaseApi.builder().build();
-        List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(caseApi);
+        SceneCaseApiEntity caseApi = SceneCaseApiEntity.builder().build();
+        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(caseApi);
         when(sceneCaseApiMapper.toSceneCaseApiList(any())).thenReturn(sceneCaseApiList);
         when(sceneCaseApiRepository.insert(any(List.class))).thenReturn(sceneCaseApiList);
         Boolean isSuccess = sceneCaseApiService.batchAdd(addSceneCaseApiDto);
@@ -66,8 +66,8 @@ class SceneCaseApiServiceTest {
     @DisplayName("Test the batchAdd method in the SceneCaseApi service throws exception")
     void batchAdd_test_thenThrowException() {
         BatchAddSceneCaseApiRequest addSceneCaseApiDto = getAddDto();
-        SceneCaseApi caseApi = SceneCaseApi.builder().build();
-        List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(caseApi);
+        SceneCaseApiEntity caseApi = SceneCaseApiEntity.builder().build();
+        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(caseApi);
         when(sceneCaseApiMapper.toSceneCaseApiList(any())).thenReturn(sceneCaseApiList);
         when(sceneCaseApiRepository.insert(any(List.class)))
             .thenThrow(new ApiTestPlatformException(ADD_SCENE_CASE_API_ERROR));
@@ -95,7 +95,7 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the edit method in the SceneCaseApi service")
     void edit_test() {
-        SceneCaseApi sceneCaseApi = SceneCaseApi.builder().build();
+        SceneCaseApiEntity sceneCaseApi = SceneCaseApiEntity.builder().build();
         when(sceneCaseApiMapper.toSceneCaseApiByUpdateRequest(any())).thenReturn(sceneCaseApi);
         when(sceneCaseApiRepository.save(any())).thenReturn(sceneCaseApi);
         Boolean isSuccess = sceneCaseApiService.edit(UpdateSceneCaseApiRequest.builder().build());
@@ -105,7 +105,7 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the edit method in the SceneCaseApi service throws exception")
     void edit_thenThrowException() {
-        SceneCaseApi sceneCaseApi = SceneCaseApi.builder().build();
+        SceneCaseApiEntity sceneCaseApi = SceneCaseApiEntity.builder().build();
         when(sceneCaseApiMapper.toSceneCaseApiByUpdateRequest(any())).thenReturn(sceneCaseApi);
         when(sceneCaseApiRepository.save(any())).thenThrow(new ApiTestPlatformException(EDIT_SCENE_CASE_API_ERROR));
         assertThatThrownBy(() -> sceneCaseApiService.edit(UpdateSceneCaseApiRequest.builder().build()))
@@ -115,7 +115,7 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the editAll method in the SceneCaseApi service throws exception")
     void editAll_test() {
-        List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(SceneCaseApi.builder().id(MOCK_ID).build());
+        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).build());
         when(sceneCaseApiRepository.saveAll(any())).thenReturn(sceneCaseApiList);
         Boolean isSuccess = sceneCaseApiService.editAll(sceneCaseApiList);
         assertTrue(isSuccess);
@@ -124,7 +124,7 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the editAll method in the SceneCaseApi service throws exception")
     void editAll_thenThrowException() {
-        List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(SceneCaseApi.builder().id(MOCK_ID).build());
+        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).build());
         when(sceneCaseApiRepository.saveAll(any()))
             .thenThrow(new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR));
         assertThatThrownBy(() -> sceneCaseApiService.editAll(sceneCaseApiList))
@@ -135,8 +135,8 @@ class SceneCaseApiServiceTest {
     @DisplayName("Test the batchEdit method in the SceneCaseApi service")
     void batchEdit_test() {
         BatchUpdateSceneCaseApiRequest dto = getUpdateSortOrder();
-        SceneCaseApi sceneCaseApi = SceneCaseApi.builder().id(MOCK_ID).build();
-        List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(sceneCaseApi);
+        SceneCaseApiEntity sceneCaseApi = SceneCaseApiEntity.builder().id(MOCK_ID).build();
+        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(sceneCaseApi);
         when(sceneCaseApiRepository.saveAll(any())).thenReturn(sceneCaseApiList);
         Boolean isSuccess = sceneCaseApiService.batchEdit(dto);
         assertTrue(isSuccess);
@@ -154,7 +154,7 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the list method in the SceneCaseApi service")
     void listBySceneCaseId_test() {
-        List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(SceneCaseApi.builder().build());
+        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(SceneCaseApiEntity.builder().build());
         when(sceneCaseApiRepository.findAll(any(), any(Sort.class))).thenReturn(sceneCaseApiList);
         SceneCaseApiResponse dto = SceneCaseApiResponse.builder().build();
         when(sceneCaseApiMapper.toSceneCaseApiDto(any())).thenReturn(dto);
@@ -175,9 +175,9 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the list by sceneCaseId method in the SceneCaseApi service")
     void listBySceneCaseId_test_thenReturnSceneCaseApi() {
-        List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(SceneCaseApi.builder().build());
+        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(SceneCaseApiEntity.builder().build());
         when(sceneCaseApiRepository.findAll(any(Example.class), any(Sort.class))).thenReturn(sceneCaseApiList);
-        List<SceneCaseApi> dto = sceneCaseApiService.listBySceneCaseId(MOCK_SCENE_CASE_ID);
+        List<SceneCaseApiEntity> dto = sceneCaseApiService.listBySceneCaseId(MOCK_SCENE_CASE_ID);
         assertThat(dto).isNotEmpty();
     }
 
@@ -193,9 +193,9 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the getApiBySceneCaseId method in the SceneCaseApi service")
     void getApiBySceneCaseId_test() {
-        List<SceneCaseApi> sceneCaseApiList = Lists.newArrayList(SceneCaseApi.builder().build());
+        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(SceneCaseApiEntity.builder().build());
         when(sceneCaseApiRepository.findAll(any(), any(Sort.class))).thenReturn(sceneCaseApiList);
-        List<SceneCaseApi> dtoList = sceneCaseApiService
+        List<SceneCaseApiEntity> dtoList = sceneCaseApiService
             .getApiBySceneCaseId(MOCK_SCENE_CASE_ID, Boolean.FALSE);
         assertThat(dtoList).isNotEmpty();
     }
@@ -212,8 +212,8 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the getSceneCaseApiById method in the SceneCaseApi service")
     void getSceneCaseApiById_test() {
-        SceneCaseApi sceneCaseApi = SceneCaseApi.builder().id(MOCK_ID).build();
-        Optional<SceneCaseApi> sceneCaseApiOptional = Optional.ofNullable(sceneCaseApi);
+        SceneCaseApiEntity sceneCaseApi = SceneCaseApiEntity.builder().id(MOCK_ID).build();
+        Optional<SceneCaseApiEntity> sceneCaseApiOptional = Optional.ofNullable(sceneCaseApi);
         when(sceneCaseApiRepository.findById(any())).thenReturn(sceneCaseApiOptional);
         SceneCaseApiResponse sceneCaseApiDto = SceneCaseApiResponse.builder().build();
         when(sceneCaseApiMapper.toSceneCaseApiDto(any())).thenReturn(sceneCaseApiDto);
@@ -232,8 +232,8 @@ class SceneCaseApiServiceTest {
     @Test
     @DisplayName("Test the updateStatusByApiIds method in the SceneCaseApi service")
     void updateStatusByApiIds_test() {
-        List<SceneCaseApi> sceneCaseApiList =
-            Lists.newArrayList(SceneCaseApi.builder().apiTestCase(ApiTestCase.builder().build()).build());
+        List<SceneCaseApiEntity> sceneCaseApiList =
+            Lists.newArrayList(SceneCaseApiEntity.builder().apiTestCase(ApiTestCaseEntity.builder().build()).build());
         when(customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(any())).thenReturn(sceneCaseApiList);
         when(sceneCaseApiRepository.saveAll(any())).thenReturn(sceneCaseApiList);
         Boolean isSuccess = sceneCaseApiService.updateStatusByApiIds(Lists.newArrayList(MOCK_SCENE_CASE_ID),

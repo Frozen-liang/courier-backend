@@ -18,7 +18,7 @@ import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.WorkspaceRequest;
 import com.sms.satp.dto.response.WorkspaceResponse;
-import com.sms.satp.entity.workspace.Workspace;
+import com.sms.satp.entity.workspace.WorkspaceEntity;
 import com.sms.satp.mapper.WorkspaceMapper;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.WorkspaceRepository;
@@ -70,7 +70,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public Boolean add(WorkspaceRequest workspaceRequest) {
         log.info("WorkspaceService-add()-params: [Workspace]={}", workspaceRequest.toString());
         try {
-            Workspace workspace = workspaceMapper.toEntity(workspaceRequest);
+            WorkspaceEntity workspace = workspaceMapper.toEntity(workspaceRequest);
             workspaceRepository.insert(workspace);
         } catch (Exception e) {
             log.error("Failed to add the Workspace!", e);
@@ -88,7 +88,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             if (!exists) {
                 throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "Workspace", workspaceRequest.getId());
             }
-            Workspace workspace = workspaceMapper.toEntity(workspaceRequest);
+            WorkspaceEntity workspace = workspaceMapper.toEntity(workspaceRequest);
             workspaceRepository.save(workspace);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
@@ -106,7 +106,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public Boolean delete(String id) {
         try {
             isFalse(projectService.existsByWorkspaceId(id), THE_WORKSPACE_CANNOT_DELETE_ERROR);
-            return commonDeleteRepository.deleteById(id, Workspace.class);
+            return commonDeleteRepository.deleteById(id, WorkspaceEntity.class);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
             throw apiTestPlatEx;

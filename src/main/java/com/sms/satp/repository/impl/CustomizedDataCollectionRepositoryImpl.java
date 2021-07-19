@@ -1,7 +1,7 @@
 package com.sms.satp.repository.impl;
 
 import com.sms.satp.common.field.CommonFiled;
-import com.sms.satp.entity.datacollection.DataCollection;
+import com.sms.satp.entity.datacollection.DataCollectionEntity;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedDataCollectionRepository;
 import java.util.Collections;
@@ -30,17 +30,17 @@ public class CustomizedDataCollectionRepositoryImpl implements CustomizedDataCol
     public List<String> getParamListById(String id) {
         Query query = new Query(Criteria.where(CommonFiled.ID.getFiled()).is(id));
         query.fields().include(PARAM_LIST);
-        DataCollection dataCollection = mongoTemplate.findOne(query, DataCollection.class);
+        DataCollectionEntity dataCollection = mongoTemplate.findOne(query, DataCollectionEntity.class);
         return Objects.nonNull(dataCollection) ? dataCollection.getParamList() : Collections.emptyList();
     }
 
     @Override
     public Boolean deleteById(String id) {
-        return commonDeleteRepository.deleteById(id, DataCollection.class);
+        return commonDeleteRepository.deleteById(id, DataCollectionEntity.class);
     }
 
     @Override
     public Boolean deleteByIds(List<String> ids) {
-        return commonDeleteRepository.deleteByIds(ids, DataCollection.class);
+        return commonDeleteRepository.deleteByIds(ids, DataCollectionEntity.class);
     }
 }

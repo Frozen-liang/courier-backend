@@ -23,7 +23,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @Document(collection = "SceneCaseJob")
-public class SceneCaseJob {
+public class SceneCaseJobEntity {
 
     @MongoId(FieldType.OBJECT_ID)
     private String id;

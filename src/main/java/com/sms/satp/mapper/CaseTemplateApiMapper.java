@@ -3,8 +3,8 @@ package com.sms.satp.mapper;
 import com.sms.satp.dto.request.AddCaseTemplateApiRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
 import com.sms.satp.dto.response.CaseTemplateApiResponse;
-import com.sms.satp.entity.scenetest.CaseTemplateApi;
-import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.entity.scenetest.CaseTemplateApiEntity;
+import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
 import com.sms.satp.utils.EnumCommonUtils;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -16,25 +16,25 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {ApiTestCaseMapper.class, EnumCommonUtils.class})
 public interface CaseTemplateApiMapper {
 
-    CaseTemplateApi toCaseTemplateApiByUpdateRequest(UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest);
+    CaseTemplateApiEntity toCaseTemplateApiByUpdateRequest(UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest);
 
-    CaseTemplateApiResponse toCaseTemplateApiDto(CaseTemplateApi caseTemplateApi);
+    CaseTemplateApiResponse toCaseTemplateApiDto(CaseTemplateApiEntity caseTemplateApi);
 
-    List<CaseTemplateApi> toCaseTemplateApiListByUpdateRequestList(
+    List<CaseTemplateApiEntity> toCaseTemplateApiListByUpdateRequestList(
         List<UpdateCaseTemplateApiRequest> updateCaseTemplateApiRequestList);
 
-    List<CaseTemplateApi> toCaseTemplateApiListByAddRequestList(
+    List<CaseTemplateApiEntity> toCaseTemplateApiListByAddRequestList(
         List<AddCaseTemplateApiRequest> addCaseTemplateApiRequestList);
 
     @Mapping(target = "apiTestCase.id", expression = "java(new org.bson.types.ObjectId().toString())")
-    CaseTemplateApi toCaseTemplateApi(AddCaseTemplateApiRequest addCaseTemplateApiRequest);
+    CaseTemplateApiEntity toCaseTemplateApi(AddCaseTemplateApiRequest addCaseTemplateApiRequest);
 
-    List<SceneCaseApi> toSceneCaseList(List<CaseTemplateApi> caseTemplateApiList);
+    List<SceneCaseApiEntity> toSceneCaseList(List<CaseTemplateApiEntity> caseTemplateApiList);
 
-    List<CaseTemplateApi> toCaseTemplateApiListBySceneCaseApiList(List<SceneCaseApi> sceneCaseApiList);
+    List<CaseTemplateApiEntity> toCaseTemplateApiListBySceneCaseApiList(List<SceneCaseApiEntity> sceneCaseApiList);
 
     @Mapping(target = "id", ignore = true)
-    CaseTemplateApi toCaseTemplateApiBySceneCaseApi(SceneCaseApi sceneCaseApi);
+    CaseTemplateApiEntity toCaseTemplateApiBySceneCaseApi(SceneCaseApiEntity sceneCaseApi);
 
-    List<CaseTemplateApiResponse> toCaseTemplateApiDtoList(List<CaseTemplateApi> caseTemplateApiList);
+    List<CaseTemplateApiResponse> toCaseTemplateApiDtoList(List<CaseTemplateApiEntity> caseTemplateApiList);
 }

@@ -1,12 +1,12 @@
 package com.sms.satp.repository;
 
-import com.sms.satp.entity.group.ApiTagGroup;
+import com.sms.satp.entity.group.ApiTagGroupEntity;
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface ApiTagGroupRepository extends MongoRepository<ApiTagGroup, String> {
+public interface ApiTagGroupRepository extends MongoRepository<ApiTagGroupEntity, String> {
 
-    List<ApiTagGroup> findByProjectId(String projectId);
+    List<ApiTagGroupEntity> findByProjectId(String projectId);
 
     boolean existsByProjectIdAndName(String projectId, String groupName);
 

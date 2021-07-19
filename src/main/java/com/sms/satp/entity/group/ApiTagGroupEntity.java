@@ -1,8 +1,6 @@
-package com.sms.satp.entity.scenetest;
+package com.sms.satp.entity.group;
 
-import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.entity.BaseEntity;
-import com.sms.satp.entity.apitestcase.ApiTestCase;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,26 +11,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
-@SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Data
 @ToString(callSuper = true)
-@Document(collection = "CaseTemplateApi")
-public class CaseTemplateApi extends BaseEntity {
-
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String caseTemplateId;
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
+@Document(collection = "ApiTagGroup")
+public class ApiTagGroupEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
-    private ApiType apiType;
-
-    private String shell;
-
-    private Integer order;
-
-    private ApiTestCase apiTestCase;
+    private String name;
 }

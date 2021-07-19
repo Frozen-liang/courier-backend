@@ -21,7 +21,7 @@ import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ProjectFunctionRequest;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
 import com.sms.satp.dto.response.ProjectFunctionResponse;
-import com.sms.satp.entity.function.ProjectFunction;
+import com.sms.satp.entity.function.ProjectFunctionEntity;
 import com.sms.satp.mapper.ProjectFunctionMapper;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.ProjectFunctionRepository;
@@ -86,7 +86,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     public Boolean add(ProjectFunctionRequest projectFunctionRequest) {
         log.info("ProjectFunctionService-add()-params: [ProjectFunction]={}", projectFunctionRequest.toString());
         try {
-            ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
+            ProjectFunctionEntity projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
             projectFunctionRepository.insert(projectFunction);
         } catch (Exception e) {
             log.error("Failed to add the ProjectFunction!", e);
@@ -103,7 +103,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         try {
             boolean exists = projectFunctionRepository.existsById(projectFunctionRequest.getId());
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "ProjectFunction", projectFunctionRequest.getId());
-            ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
+            ProjectFunctionEntity projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
             projectFunctionRepository.save(projectFunction);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
@@ -121,7 +121,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, ProjectFunction.class);
+            return commonDeleteRepository.deleteByIds(ids, ProjectFunctionEntity.class);
         } catch (Exception e) {
             log.error("Failed to delete the ProjectFunction!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_FUNCTION_BY_ID_ERROR);
@@ -130,7 +130,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
 
     @Override
     public List<ProjectFunctionResponse> findAll(String projectId, String functionKey, String functionName) {
-        ProjectFunction projectFunction = ProjectFunction.builder()
+        ProjectFunctionEntity projectFunction = ProjectFunctionEntity.builder()
             .projectId(projectId).functionKey(functionKey).functionName(functionName).build();
         Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
         ExampleMatcher matcher = ExampleMatcher.matching()
@@ -138,8 +138,8 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
             .withMatcher(FUNCTION_KEY, ExampleMatcher.GenericPropertyMatchers.exact())
             .withMatcher(REMOVE.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
             .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
-        Example<ProjectFunction> example = Example.of(projectFunction, matcher);
-        List<ProjectFunction> projectFunctionList = projectFunctionRepository.findAll(example, sort);
+        Example<ProjectFunctionEntity> example = Example.of(projectFunction, matcher);
+        List<ProjectFunctionEntity> projectFunctionList = projectFunctionRepository.findAll(example, sort);
         return projectFunctionMapper.toDtoList(projectFunctionList);
     }
 

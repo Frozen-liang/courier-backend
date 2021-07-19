@@ -18,8 +18,8 @@ import com.sms.satp.dto.request.AddSceneCaseGroupRequest;
 import com.sms.satp.dto.request.SearchSceneCaseGroupRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseGroupRequest;
 import com.sms.satp.dto.response.SceneCaseGroupResponse;
-import com.sms.satp.entity.group.SceneCaseGroup;
-import com.sms.satp.entity.scenetest.SceneCase;
+import com.sms.satp.entity.group.SceneCaseGroupEntity;
+import com.sms.satp.entity.scenetest.SceneCaseEntity;
 import com.sms.satp.mapper.SceneCaseGroupMapper;
 import com.sms.satp.repository.SceneCaseGroupRepository;
 import com.sms.satp.service.SceneCaseGroupService;
@@ -53,7 +53,7 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
     public Boolean add(AddSceneCaseGroupRequest request) {
         try {
             log.info("SceneCaseGroupService-add()-params: [SceneCaseGroup]={}", request.toString());
-            SceneCaseGroup caseGroup = sceneCaseGroupMapper.toSceneCaseGroupByAdd(request);
+            SceneCaseGroupEntity caseGroup = sceneCaseGroupMapper.toSceneCaseGroupByAdd(request);
             sceneCaseGroupRepository.insert(caseGroup);
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -67,8 +67,8 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
     public Boolean edit(UpdateSceneCaseGroupRequest request) {
         try {
             log.info("SceneCaseGroupService-edit()-params: [SceneCaseGroup]={}", request.toString());
-            SceneCaseGroup caseGroup = sceneCaseGroupMapper.toSceneCaseGroupByUpdate(request);
-            Optional<SceneCaseGroup> optional = sceneCaseGroupRepository.findById(caseGroup.getId());
+            SceneCaseGroupEntity caseGroup = sceneCaseGroupMapper.toSceneCaseGroupByUpdate(request);
+            Optional<SceneCaseGroupEntity> optional = sceneCaseGroupRepository.findById(caseGroup.getId());
             optional.ifPresent(sceneCaseGroup -> sceneCaseGroupRepository.save(caseGroup));
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -82,7 +82,7 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
         enhance = @Enhance(enable = true))
     public Boolean deleteById(String id) {
         try {
-            Optional<SceneCaseGroup> sceneCaseGroup = sceneCaseGroupRepository.findById(id);
+            Optional<SceneCaseGroupEntity> sceneCaseGroup = sceneCaseGroupRepository.findById(id);
             sceneCaseGroup.ifPresent(caseGroup -> {
                 sceneCaseGroupRepository.deleteById(caseGroup.getId());
                 editSceneCaseStatus(caseGroup.getId(), caseGroup.getProjectId());
@@ -97,16 +97,17 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
     @Override
     public List<SceneCaseGroupResponse> getList(SearchSceneCaseGroupRequest request) {
         try {
-            SceneCaseGroup group =
-                SceneCaseGroup.builder().projectId(request.getProjectId()).parentId(request.getParentId()).build();
+            SceneCaseGroupEntity group =
+                SceneCaseGroupEntity.builder().projectId(request.getProjectId()).parentId(request.getParentId())
+                    .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(CommonFiled.ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(SceneFiled.NAME.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(CommonFiled.PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(SceneFiled.PARENT_ID.getFiled(), GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
-            Example<SceneCaseGroup> example = Example.of(group, exampleMatcher);
-            List<SceneCaseGroup> sceneCaseGroups = sceneCaseGroupRepository.findAll(example);
+            Example<SceneCaseGroupEntity> example = Example.of(group, exampleMatcher);
+            List<SceneCaseGroupEntity> sceneCaseGroups = sceneCaseGroupRepository.findAll(example);
             return sceneCaseGroupMapper.toResponseList(sceneCaseGroups);
         } catch (Exception e) {
             log.error("Failed to getList the SceneCase page!", e);
@@ -115,9 +116,9 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
     }
 
     private void editSceneCaseStatus(String id, String projectId) {
-        List<SceneCase> sceneCaseList = sceneCaseService.get(id, projectId);
+        List<SceneCaseEntity> sceneCaseList = sceneCaseService.get(id, projectId);
         if (CollectionUtils.isNotEmpty(sceneCaseList)) {
-            for (SceneCase sceneCase : sceneCaseList) {
+            for (SceneCaseEntity sceneCase : sceneCaseList) {
                 sceneCase.setRemoved(true);
             }
             sceneCaseService.batchEdit(sceneCaseList);

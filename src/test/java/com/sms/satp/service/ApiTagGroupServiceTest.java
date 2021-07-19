@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTagGroupRequest;
 import com.sms.satp.dto.response.ApiTagGroupResponse;
-import com.sms.satp.entity.group.ApiTagGroup;
+import com.sms.satp.entity.group.ApiTagGroupEntity;
 import com.sms.satp.mapper.ApiTagGroupMapper;
 import com.sms.satp.repository.ApiTagGroupRepository;
 import com.sms.satp.service.impl.ApiTagGroupServiceImpl;
@@ -28,7 +28,6 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.mongodb.core.MongoTemplate;
 
 @DisplayName("Tests for ApiTagGroupService")
 class ApiTagGroupServiceTest {
@@ -37,7 +36,7 @@ class ApiTagGroupServiceTest {
     private final ApiTagGroupMapper apiTagGroupMapper = mock(ApiTagGroupMapper.class);
     private final ApiTagGroupService apiTagGroupService = new ApiTagGroupServiceImpl(
         apiTagGroupRepository, apiTagGroupMapper);
-    private final ApiTagGroup apiTagGroup = ApiTagGroup.builder().id(ID).build();
+    private final ApiTagGroupEntity apiTagGroup = ApiTagGroupEntity.builder().id(ID).build();
     private final ApiTagGroupResponse apiTagGroupResponse = ApiTagGroupResponse.builder()
         .id(ID).build();
     private final ApiTagGroupRequest apiTagGroupRequest = ApiTagGroupRequest.builder()
@@ -69,16 +68,16 @@ class ApiTagGroupServiceTest {
     public void add_test() {
         when(apiTagGroupMapper.toEntity(apiTagGroupRequest)).thenReturn(apiTagGroup);
         when(apiTagGroupRepository.existsByProjectIdAndName(any(), any())).thenReturn(Boolean.FALSE);
-        when(apiTagGroupRepository.insert(any(ApiTagGroup.class))).thenReturn(apiTagGroup);
+        when(apiTagGroupRepository.insert(any(ApiTagGroupEntity.class))).thenReturn(apiTagGroup);
         assertThat(apiTagGroupService.add(apiTagGroupRequest)).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while adding ApiTagGroup")
     public void add_exception_test() {
-        when(apiTagGroupMapper.toEntity(any())).thenReturn(ApiTagGroup.builder().build());
+        when(apiTagGroupMapper.toEntity(any())).thenReturn(ApiTagGroupEntity.builder().build());
         when(apiTagGroupRepository.existsByProjectIdAndName(any(), any())).thenReturn(Boolean.FALSE);
-        doThrow(new RuntimeException()).when(apiTagGroupRepository).insert(any(ApiTagGroup.class));
+        doThrow(new RuntimeException()).when(apiTagGroupRepository).insert(any(ApiTagGroupEntity.class));
         assertThatThrownBy(() -> apiTagGroupService.add(apiTagGroupRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_API_TAG_GROUP_ERROR.getCode());
@@ -87,7 +86,7 @@ class ApiTagGroupServiceTest {
     @Test
     @DisplayName("An group name exist exception occurred while adding ApiTagGroup")
     public void add_the_group_name_exist_exception_test() {
-        when(apiTagGroupMapper.toEntity(any())).thenReturn(ApiTagGroup.builder().build());
+        when(apiTagGroupMapper.toEntity(any())).thenReturn(ApiTagGroupEntity.builder().build());
         when(apiTagGroupRepository.existsByProjectIdAndName(any(), any())).thenReturn(Boolean.TRUE);
         assertThatThrownBy(() -> apiTagGroupService.add(apiTagGroupRequest))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -99,7 +98,7 @@ class ApiTagGroupServiceTest {
     public void edit_test() {
         when(apiTagGroupMapper.toEntity(apiTagGroupRequest)).thenReturn(apiTagGroup);
         when(apiTagGroupRepository.existsById(any())).thenReturn(Boolean.TRUE);
-        when(apiTagGroupRepository.save(any(ApiTagGroup.class))).thenReturn(apiTagGroup);
+        when(apiTagGroupRepository.save(any(ApiTagGroupEntity.class))).thenReturn(apiTagGroup);
         assertThat(apiTagGroupService.edit(apiTagGroupRequest)).isTrue();
     }
 
@@ -108,7 +107,7 @@ class ApiTagGroupServiceTest {
     public void edit_exception_test() {
         when(apiTagGroupMapper.toEntity(apiTagGroupRequest)).thenReturn(apiTagGroup);
         when(apiTagGroupRepository.existsById(any())).thenReturn(Boolean.TRUE);
-        doThrow(new RuntimeException()).when(apiTagGroupRepository).save(any(ApiTagGroup.class));
+        doThrow(new RuntimeException()).when(apiTagGroupRepository).save(any(ApiTagGroupEntity.class));
         assertThatThrownBy(() -> apiTagGroupService.edit(apiTagGroupRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_API_TAG_GROUP_ERROR.getCode());
@@ -127,7 +126,7 @@ class ApiTagGroupServiceTest {
     @Test
     @DisplayName("An group name exist exception occurred while edit ApiTagGroup")
     public void edit_the_group_name_exist_exception_test() {
-        when(apiTagGroupMapper.toEntity(any())).thenReturn(ApiTagGroup.builder().build());
+        when(apiTagGroupMapper.toEntity(any())).thenReturn(ApiTagGroupEntity.builder().build());
         when(apiTagGroupRepository.existsById(any())).thenReturn(Boolean.FALSE);
         when(apiTagGroupRepository.existsByProjectIdAndName(any(), any())).thenReturn(Boolean.TRUE);
         assertThatThrownBy(() -> apiTagGroupService.add(apiTagGroupRequest))
@@ -138,9 +137,9 @@ class ApiTagGroupServiceTest {
     @Test
     @DisplayName("Test the list method in the ApiTagGroup service")
     public void list_test() {
-        ArrayList<ApiTagGroup> apiTagGroupList = new ArrayList<>();
+        ArrayList<ApiTagGroupEntity> apiTagGroupList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            apiTagGroupList.add(ApiTagGroup.builder().build());
+            apiTagGroupList.add(ApiTagGroupEntity.builder().build());
         }
         ArrayList<ApiTagGroupResponse> apiTagGroupResponseList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {

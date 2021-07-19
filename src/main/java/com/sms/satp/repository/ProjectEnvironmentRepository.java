@@ -1,10 +1,10 @@
 package com.sms.satp.repository;
 
-import com.sms.satp.entity.env.ProjectEnvironment;
+import com.sms.satp.entity.env.ProjectEnvironmentEntity;
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface ProjectEnvironmentRepository extends MongoRepository<ProjectEnvironment, String> {
+public interface ProjectEnvironmentRepository extends MongoRepository<ProjectEnvironmentEntity, String> {
 
-    List<ProjectEnvironment> findAllByProjectIdAndRemoved(String projectId, Boolean removed);
+    List<ProjectEnvironmentEntity> findAllByProjectIdAndRemoved(String projectId, Boolean removed);
 }

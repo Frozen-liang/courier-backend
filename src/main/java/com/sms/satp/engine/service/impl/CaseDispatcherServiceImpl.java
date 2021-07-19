@@ -5,8 +5,8 @@ import static com.sms.satp.utils.UserDestinationUtil.getSceneCaseDest;
 
 import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.service.CaseDispatcherService;
-import com.sms.satp.entity.job.ApiTestCaseJob;
-import com.sms.satp.entity.job.SceneCaseJob;
+import com.sms.satp.entity.job.ApiTestCaseJobEntity;
+import com.sms.satp.entity.job.SceneCaseJobEntity;
 import com.sms.satp.entity.job.common.CaseReport;
 import com.sms.satp.repository.ApiTestCaseJobRepository;
 import com.sms.satp.repository.SceneCaseJobRepository;
@@ -39,7 +39,7 @@ public class CaseDispatcherServiceImpl implements CaseDispatcherService {
     }
 
     @Override
-    public void dispatch(ApiTestCaseJob caseJob) {
+    public void dispatch(ApiTestCaseJobEntity caseJob) {
         Set<String> availableMembers = engineMemberManagement.getAvailableMembers();
         if (CollectionUtils.isEmpty(availableMembers)) {
             apiTestCaseJobRepository.deleteById(caseJob.getId());
@@ -52,7 +52,7 @@ public class CaseDispatcherServiceImpl implements CaseDispatcherService {
     }
 
     @Override
-    public void dispatch(SceneCaseJob caseJob) {
+    public void dispatch(SceneCaseJobEntity caseJob) {
         Set<String> availableMembers = engineMemberManagement.getAvailableMembers();
         if (CollectionUtils.isEmpty(availableMembers)) {
             sceneCaseJobRepository.deleteById(caseJob.getId());

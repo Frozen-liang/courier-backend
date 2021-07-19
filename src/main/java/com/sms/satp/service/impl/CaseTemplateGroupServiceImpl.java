@@ -18,8 +18,8 @@ import com.sms.satp.dto.request.AddCaseTemplateGroupRequest;
 import com.sms.satp.dto.request.SearchCaseTemplateGroupRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateGroupRequest;
 import com.sms.satp.dto.response.CaseTemplateGroupResponse;
-import com.sms.satp.entity.group.CaseTemplateGroup;
-import com.sms.satp.entity.scenetest.CaseTemplate;
+import com.sms.satp.entity.group.CaseTemplateGroupEntity;
+import com.sms.satp.entity.scenetest.CaseTemplateEntity;
 import com.sms.satp.mapper.CaseTemplateGroupMapper;
 import com.sms.satp.repository.CaseTemplateGroupRepository;
 import com.sms.satp.service.CaseTemplateGroupService;
@@ -54,7 +54,7 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
     public Boolean add(AddCaseTemplateGroupRequest request) {
         try {
             log.info("CaseTemplateGroupService-add()-params: [CaseTemplateGroup]={}", request.toString());
-            CaseTemplateGroup caseGroup = caseTemplateGroupMapper.toCaseTemplateGroupByAdd(request);
+            CaseTemplateGroupEntity caseGroup = caseTemplateGroupMapper.toCaseTemplateGroupByAdd(request);
             caseTemplateGroupRepository.insert(caseGroup);
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -68,8 +68,8 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
     public Boolean edit(UpdateCaseTemplateGroupRequest request) {
         try {
             log.info("CaseTemplateGroupService-edit()-params: [CaseTemplateGroup]={}", request.toString());
-            CaseTemplateGroup caseGroup = caseTemplateGroupMapper.toCaseTemplateGroupByUpdate(request);
-            Optional<CaseTemplateGroup> optional = caseTemplateGroupRepository.findById(caseGroup.getId());
+            CaseTemplateGroupEntity caseGroup = caseTemplateGroupMapper.toCaseTemplateGroupByUpdate(request);
+            Optional<CaseTemplateGroupEntity> optional = caseTemplateGroupRepository.findById(caseGroup.getId());
             optional.ifPresent(caseTemplateGroup -> caseTemplateGroupRepository.save(caseGroup));
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -83,7 +83,7 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
         enhance = @Enhance(enable = true))
     public Boolean deleteById(String id) {
         try {
-            Optional<CaseTemplateGroup> caseTemplateGroup = caseTemplateGroupRepository.findById(id);
+            Optional<CaseTemplateGroupEntity> caseTemplateGroup = caseTemplateGroupRepository.findById(id);
             caseTemplateGroup.ifPresent(caseGroup -> {
                 caseTemplateGroupRepository.deleteById(caseGroup.getId());
                 editCaseTemplateStatus(caseGroup.getId(), caseGroup.getProjectId());
@@ -98,14 +98,15 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
     @Override
     public List<CaseTemplateGroupResponse> getList(SearchCaseTemplateGroupRequest request) {
         try {
-            CaseTemplateGroup group =
-                CaseTemplateGroup.builder().projectId(request.getProjectId()).parentId(request.getParentId()).build();
+            CaseTemplateGroupEntity group =
+                CaseTemplateGroupEntity.builder().projectId(request.getProjectId()).parentId(request.getParentId())
+                    .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(CommonFiled.ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(SceneFiled.NAME.getFiled(), GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
-            Example<CaseTemplateGroup> example = Example.of(group, exampleMatcher);
-            List<CaseTemplateGroup> caseTemplateGroups = caseTemplateGroupRepository.findAll(example);
+            Example<CaseTemplateGroupEntity> example = Example.of(group, exampleMatcher);
+            List<CaseTemplateGroupEntity> caseTemplateGroups = caseTemplateGroupRepository.findAll(example);
             return caseTemplateGroupMapper.toResponseList(caseTemplateGroups);
         } catch (Exception e) {
             log.error("Failed to getList the CaseTemplateGroup!", e);
@@ -114,9 +115,9 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
     }
 
     private void editCaseTemplateStatus(String id, String projectId) {
-        List<CaseTemplate> caseTemplateList = caseTemplateService.get(id, projectId);
+        List<CaseTemplateEntity> caseTemplateList = caseTemplateService.get(id, projectId);
         if (CollectionUtils.isNotEmpty(caseTemplateList)) {
-            for (CaseTemplate caseTemplate : caseTemplateList) {
+            for (CaseTemplateEntity caseTemplate : caseTemplateList) {
                 caseTemplate.setRemoved(true);
             }
             caseTemplateService.batchEdit(caseTemplateList);

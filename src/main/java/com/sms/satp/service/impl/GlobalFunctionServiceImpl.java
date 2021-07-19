@@ -19,7 +19,7 @@ import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.GlobalFunctionRequest;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
-import com.sms.satp.entity.function.GlobalFunction;
+import com.sms.satp.entity.function.GlobalFunctionEntity;
 import com.sms.satp.mapper.GlobalFunctionMapper;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.GlobalFunctionRepository;
@@ -60,13 +60,14 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     @Override
     public List<GlobalFunctionResponse> list(String workspaceId, String functionKey, String functionName) {
         try {
-            GlobalFunction globalFunction = GlobalFunction.builder().workspaceId(workspaceId).functionKey(functionKey)
+            GlobalFunctionEntity globalFunction = GlobalFunctionEntity.builder().workspaceId(workspaceId)
+                .functionKey(functionKey)
                 .functionName(functionName).build();
             ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher(REMOVE.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher(FUNCTION_KEY, ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
-            Example<GlobalFunction> example = Example.of(globalFunction, matcher);
+            Example<GlobalFunctionEntity> example = Example.of(globalFunction, matcher);
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
             return globalFunctionMapper.toDtoList(globalFunctionRepository.findAll(example, sort));
         } catch (Exception e) {
@@ -82,7 +83,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     public Boolean add(GlobalFunctionRequest globalFunctionRequest) {
         log.info("GlobalFunctionService-add()-params: [GlobalFunction]={}", globalFunctionRequest.toString());
         try {
-            GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionRequest);
+            GlobalFunctionEntity globalFunction = globalFunctionMapper.toEntity(globalFunctionRequest);
             globalFunctionRepository.insert(globalFunction);
         } catch (Exception e) {
             log.error("Failed to add the GlobalFunction!", e);
@@ -100,7 +101,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
             boolean exists = globalFunctionRepository.existsById(globalFunctionRequest.getId());
 
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "GlobalFunction", globalFunctionRequest.getId());
-            GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionRequest);
+            GlobalFunctionEntity globalFunction = globalFunctionMapper.toEntity(globalFunctionRequest);
             globalFunctionRepository.save(globalFunction);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
@@ -118,7 +119,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, GlobalFunction.class);
+            return commonDeleteRepository.deleteByIds(ids, GlobalFunctionEntity.class);
         } catch (Exception e) {
             log.error("Failed to delete the GlobalFunction!", e);
             throw new ApiTestPlatformException(DELETE_GLOBAL_FUNCTION_BY_ID_ERROR);

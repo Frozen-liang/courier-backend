@@ -2,8 +2,8 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.dto.request.ProjectEnvironmentRequest;
 import com.sms.satp.dto.response.ProjectEnvironmentResponse;
-import com.sms.satp.entity.env.GlobalEnvironment;
-import com.sms.satp.entity.env.ProjectEnvironment;
+import com.sms.satp.entity.env.GlobalEnvironmentEntity;
+import com.sms.satp.entity.env.ProjectEnvironmentEntity;
 import com.sms.satp.utils.EnumCommonUtils;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -15,12 +15,12 @@ import org.mapstruct.ReportingPolicy;
 public interface ProjectEnvironmentMapper {
 
 
-    ProjectEnvironmentResponse toDto(ProjectEnvironment projectEnvironment);
+    ProjectEnvironmentResponse toDto(ProjectEnvironmentEntity projectEnvironment);
 
-    ProjectEnvironment toEntityByGlobal(GlobalEnvironment globalEnvironment);
+    ProjectEnvironmentEntity toEntityByGlobal(GlobalEnvironmentEntity globalEnvironment);
 
-    List<ProjectEnvironmentResponse> toDtoList(List<ProjectEnvironment> projectEnvironments);
+    List<ProjectEnvironmentResponse> toDtoList(List<ProjectEnvironmentEntity> projectEnvironments);
 
-    ProjectEnvironment toEntity(ProjectEnvironmentRequest projectEnvironmentDto);
+    ProjectEnvironmentEntity toEntity(ProjectEnvironmentRequest projectEnvironmentDto);
 
 }
