@@ -61,8 +61,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToApiBindingStatusConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
                 IntegerToDocumentUrlTypeConverter.INSTANCE, IntegerToJobStatusConverter.INSTANCE,
                 IntegerToProjectTypeConverter.INSTANCE, IntegerToImportStatusConverter.INSTANCE,
-                IntegerToResponseParamsExtractionTypeConverter.INSTANCE,
-                IntegerToResultVerificationTypeConverter.INSTANCE);
+                IntegerToResultVerificationTypeConverter.INSTANCE,
+                IntegerToResponseParamsExtractionTypeConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -267,14 +267,6 @@ public class MongoCustomConverterConfiguration {
         }
     }
 
-    @ReadingConverter
-    enum IntegerToResponseParamsExtractionTypeConverter implements Converter<Integer, ResponseParamsExtractionType> {
-        INSTANCE;
-
-        public ResponseParamsExtractionType convert(@NonNull Integer code) {
-            return ResponseParamsExtractionType.getType(code);
-        }
-    }
 
     @ReadingConverter
     enum IntegerToResultVerificationTypeConverter implements Converter<Integer, ResultVerificationType> {
@@ -285,5 +277,14 @@ public class MongoCustomConverterConfiguration {
         }
     }
 
+    @ReadingConverter
+    enum IntegerToResponseParamsExtractionTypeConverter implements Converter<Integer, ResponseParamsExtractionType> {
+        INSTANCE;
+
+        public ResponseParamsExtractionType convert(@NonNull Integer code) {
+            return ResponseParamsExtractionType.getType(code);
+        }
+    }
 
 }
+

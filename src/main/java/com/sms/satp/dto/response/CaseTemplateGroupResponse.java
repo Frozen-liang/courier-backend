@@ -1,24 +1,19 @@
 package com.sms.satp.dto.response;
 
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CaseTemplateGroupResponse {
+public class CaseTemplateGroupResponse extends BaseResponse {
 
-    private String id;
     private String projectId;
     private String name;
     private String parentId;
-    private Boolean removed;
-    private Long createUserId;
-    private Long modifyUserId;
-    private LocalDateTime createDateTime;
-    private LocalDateTime modifyDateTime;
 }

@@ -12,9 +12,9 @@ public enum ResultVerificationType implements EnumCommon {
     JSON(0),
     JSON_PATH(1);
 
-    private Integer code;
+    private final int code;
 
-    ResultVerificationType(Integer code) {
+    ResultVerificationType(int code) {
         this.code = code;
     }
 
@@ -30,5 +30,4 @@ public enum ResultVerificationType implements EnumCommon {
     public static ResultVerificationType getType(@Nullable Integer code) {
         return MAPPINGS.getOrDefault(code, null);
     }
-
 }

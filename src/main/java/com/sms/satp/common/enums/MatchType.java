@@ -1,7 +1,11 @@
 package com.sms.satp.common.enums;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 public enum MatchType implements EnumCommon {
 
@@ -11,17 +15,17 @@ public enum MatchType implements EnumCommon {
     LENGTH_NE(9), LENGTH_GT(10), LENGTH_LT(11),
     REGEX_MATCH(12);
 
-    private static final Map<Integer, MatchType> mappings = new HashMap<>(16);
+    private static final Map<Integer, MatchType> MAPPINGS =
+        Arrays.stream(values()).collect(Collectors.toMap(MatchType::getCode, Function.identity()));
 
-    static {
-        for (MatchType matchType : values()) {
-            mappings.put(matchType.getCode(), matchType);
-        }
+    @NonNull
+    public static MatchType getMatchType(@Nullable Integer code) {
+        return MAPPINGS.getOrDefault(code, null);
     }
 
-    private Integer code;
+    private final int code;
 
-    MatchType(Integer code) {
+    MatchType(int code) {
         this.code = code;
     }
 
@@ -30,7 +34,4 @@ public enum MatchType implements EnumCommon {
         return this.code;
     }
 
-    public static MatchType getMatchType(Integer code) {
-        return mappings.get(code);
-    }
 }
