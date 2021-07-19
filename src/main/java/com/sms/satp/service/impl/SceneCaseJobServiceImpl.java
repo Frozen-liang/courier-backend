@@ -186,11 +186,6 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         }
     }
 
-    @Override
-    public void deleteById(String id) {
-        sceneCaseRepository.deleteById(id);
-    }
-
     private List<JobSceneCaseApi> getApiCaseList(AddSceneCaseJobRequest request) {
         List<JobSceneCaseApi> caseList = Lists.newArrayList();
         if (StringUtils.isNotBlank(request.getSceneCaseId())) {

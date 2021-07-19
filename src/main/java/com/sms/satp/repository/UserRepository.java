@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface UserRepository extends MongoRepository<UserEntity, String> {
 
-    Optional<UserEntity> findByUsernameOrEmailAndEnabledTrue(String username, String email);
+    Optional<UserEntity> findByUsernameOrEmail(String username, String email);
 
     boolean existsByUsername(String username);
 
