@@ -1,17 +1,23 @@
 package com.sms.satp.entity.api.common;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-@Builder
+@SuppressFBWarnings("EQ_OVERRIDING_EQUALS_NOT_SYMMETRIC")
 @Data
-@AllArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-public class ResponseTimeVerification {
+@SuperBuilder
+public class ResponseTimeVerification extends BaseVerification {
 
-    private Boolean checkStatus;
+    @Field("isCheckStatus")
+    private boolean checkStatus;
 
     private Integer timeoutLimit;
 }

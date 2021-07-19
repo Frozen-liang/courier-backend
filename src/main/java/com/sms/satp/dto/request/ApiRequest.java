@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
@@ -67,7 +68,7 @@ public class ApiRequest {
 
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiStatus must not be null.")
     private ApiStatus apiStatus;
-
+    @JsonProperty("isRemoved")
     private boolean removed;
 
     private String preInject;

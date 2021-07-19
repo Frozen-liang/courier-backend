@@ -35,5 +35,6 @@ public class UserEntity extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private List<String> associatedWorkspaces;
 
-    private Boolean enabled;
+    @Field("isEnabled")
+    private boolean enabled;
 }

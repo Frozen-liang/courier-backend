@@ -1,6 +1,5 @@
 package com.sms.satp.entity.job;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sms.satp.common.enums.JobStatus;
 import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
@@ -10,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
@@ -23,8 +23,8 @@ public class ApiTestCaseJob {
     @MongoId(FieldType.OBJECT_ID)
     private String id;
     @Builder.Default
-    @JsonIgnore
-    private Boolean removed = false;
+    @Field("isRemoved")
+    private boolean removed = false;
 
     private String createUserId;
 

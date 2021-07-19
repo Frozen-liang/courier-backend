@@ -68,6 +68,7 @@ public class JobApiTestCase {
 
     private ResponseTimeVerification responseTimeVerification;
 
+    @Field("isExecute")
     private boolean execute;
 
     private String modifyUserId;
