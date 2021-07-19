@@ -24,7 +24,7 @@ public class Role {
     public static final String USER_DELETE = "User" + DELETE;
     public static final String USER_QUERY_ALL = "User" + QUERY_ALL;
 
-    // User_Group
+    // UserGroup
     public static final String USER_GROUP_CRE_UPD_DEL = "User_Group" + CRE_UPD_DEL;
     public static final String USER_GROUP_QUERY_ALL = "User_Group" + QUERY_ALL;
 
@@ -96,7 +96,7 @@ public class Role {
     public static final String DATA_COLLECTION_QUERY_ALL = "Data_Collection" + QUERY_ALL;
     public static final String DATA_COLLECTION_QUERY_OWN = "Data_Collection" + QUERY_OWN;
 
-    // DataCollection
+    // TestFile
     public static final String FILE_CRE_UPD_DEL = "Test_File" + CRE_UPD_DEL;
     public static final String FILE_QUERY_ALL = "Test_File" + QUERY_ALL;
     public static final String FILE_QUERY_OWN = "Test_File" + QUERY_OWN;

@@ -12,11 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.request.ApiTestCaseJobPageRequest;
-import com.sms.satp.dto.request.ApiTestCaseJobRunRequest;
-import com.sms.satp.dto.request.DataCollectionRequest;
-import com.sms.satp.dto.request.DataParamRequest;
-import com.sms.satp.dto.request.TestDataRequest;
+import com.sms.satp.dto.request.*;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.engine.service.CaseDispatcherService;
@@ -33,9 +29,11 @@ import com.sms.satp.repository.ApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.impl.ApiTestCaseJobServiceImpl;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,35 +47,36 @@ class ApiTestCaseJobServiceTest {
     private final ProjectEnvironmentService projectEnvironmentService = mock(ProjectEnvironmentService.class);
     private final ApiTestCaseService apiTestCaseService = mock(ApiTestCaseService.class);
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository = mock(
-        CustomizedApiTestCaseJobRepository.class);
+            CustomizedApiTestCaseJobRepository.class);
+    private final ApiTestRequest apiTestRequest = ApiTestRequest.builder().apiPath("3Httt").build();
     private final JobMapper jobMapper = new JobMapperImpl(new ParamInfoMapperImpl());
     private final ApiTestCaseJobService apiTestCaseJobService = new ApiTestCaseJobServiceImpl(
-        apiTestCaseJobRepository, customizedApiTestCaseJobRepository, caseDispatcherService, projectEnvironmentService
-        , apiTestCaseService, jobMapper);
+            apiTestCaseJobRepository, customizedApiTestCaseJobRepository, caseDispatcherService, projectEnvironmentService
+            , apiTestCaseService, jobMapper);
     private final ApiTestCaseJob apiTestCaseJob =
-        ApiTestCaseJob.builder().id(ID)
-            .apiTestCase(JobCaseApi.builder().jobApiTestCase(JobApiTestCase.builder().build()).build()).build();
+            ApiTestCaseJob.builder().id(ID)
+                    .apiTestCase(JobCaseApi.builder().jobApiTestCase(JobApiTestCase.builder().build()).build()).build();
     private final TestDataRequest testDataRequest =
-        TestDataRequest.builder().dataName("test")
-            .data(List.of(DataParamRequest.builder().key("key").value("value").build())).build();
+            TestDataRequest.builder().dataName("test")
+                    .data(List.of(DataParamRequest.builder().key("key").value("value").build())).build();
     private final ApiTestCaseJobRunRequest apiTestCaseJobRunRequest =
-        ApiTestCaseJobRunRequest.builder().apiTestCaseIds(Collections.singletonList(ObjectId.get().toString()))
-            .envId(ObjectId.get().toString())
-            .dataCollectionRequest(
-                DataCollectionRequest.builder().collectionName("test")
-                    .dataList(Collections.singletonList(testDataRequest)).build()).build();
+            ApiTestCaseJobRunRequest.builder().apiTestCaseIds(Collections.singletonList(ObjectId.get().toString()))
+                    .envId(ObjectId.get().toString())
+                    .dataCollectionRequest(
+                            DataCollectionRequest.builder().collectionName("test")
+                                    .dataList(Collections.singletonList(testDataRequest)).build()).build();
     private final ApiTestCaseJobRunRequest apiTestCaseJobRunRequest2 =
-        ApiTestCaseJobRunRequest.builder().apiTestCaseIds(Collections.singletonList(ObjectId.get().toString()))
-            .envId(ObjectId.get().toString())
-            .build();
+            ApiTestCaseJobRunRequest.builder().apiTestCaseIds(Collections.singletonList(ObjectId.get().toString()))
+                    .envId(ObjectId.get().toString())
+                    .build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
-        .id(ID).build();
+            .id(ID).build();
     private final ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().build();
     private static final String ID = ObjectId.get().toString();
     private final CustomUser customUser =
-        new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "");
+            new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "");
     private static final String CURRENT_USER_ID =
-        ObjectId.get().toString();
+            ObjectId.get().toString();
 
     @Test
     @DisplayName("Test the findById method in the ApiTestCaseJob service")
@@ -93,7 +92,7 @@ class ApiTestCaseJobServiceTest {
     public void findById_exception_test() {
         when(apiTestCaseJobRepository.findById(ID)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> apiTestCaseJobService.get(ID)).isInstanceOf(ApiTestPlatformException.class)
-            .extracting("code").isEqualTo(GET_API_TEST_CASE_JOB_ERROR.getCode());
+                .extracting("code").isEqualTo(GET_API_TEST_CASE_JOB_ERROR.getCode());
     }
 
     @Test
@@ -155,6 +154,45 @@ class ApiTestCaseJobServiceTest {
         doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(CaseReport.class));
         doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
         verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("Test the apiTest method in the ApiTestCaseJob service")
+    public void apiTest1_test() {
+        ApiTestRequest apiTestRequestPath = ApiTestRequest.builder().apiPath("Http://").build();
+        when(projectEnvironmentService.findOne(any())).thenReturn(null);
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJob.class));
+        apiTestCaseJobService.apiTest(apiTestRequestPath, customUser);
+        verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJob.class));
+    }
+
+    @Test
+    @DisplayName("Test the apiTest method in the ApiTestCaseJob service")
+    public void apiTest2_test() {
+        when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJob.class));
+        apiTestCaseJobService.apiTest(apiTestRequest, customUser);
+        verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJob.class));
+    }
+
+    @Test
+    @DisplayName("An exception occurred while apiTest ApiTestCaseJob")
+    public void apiTest_exception1_test() {
+        when(projectEnvironmentService.findOne(any())).thenReturn(null);
+        apiTestCaseJobService.apiTest(apiTestRequest, customUser);
+        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+
+    }
+
+    @Test
+    @DisplayName("An exception occurred while apiTest ApiTestCaseJob")
+    public void apiTest_exception2_test() {
+        when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
+        apiTestCaseJobService.apiTest(null, customUser);
+        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+
     }
 
 }
