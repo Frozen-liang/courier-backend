@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.satp.dto.PageDto;
 import java.util.List;
 import javax.validation.constraints.NotNull;
@@ -22,6 +23,7 @@ public class ApiPageRequest extends PageDto {
 
     private String apiPath;
 
+    @JsonProperty("isRemoved")
     private boolean removed;
 
     private List<ObjectId> groupId;

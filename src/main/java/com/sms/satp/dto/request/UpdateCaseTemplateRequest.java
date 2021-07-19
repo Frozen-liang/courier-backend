@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -22,5 +23,6 @@ public class UpdateCaseTemplateRequest {
     private String groupId;
     private String testStatus;
     private List<String> tagIds;
+    @JsonProperty("isRemoved")
     private boolean removed;
 }

@@ -10,7 +10,7 @@ import org.springframework.lang.Nullable;
 public enum JobStatus implements EnumCommon {
     SUCCESS(0),
     FAIL(1);
-    private int code;
+    private final int code;
     private static final Map<Integer, JobStatus> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(JobStatus::getCode, Function.identity()));
 

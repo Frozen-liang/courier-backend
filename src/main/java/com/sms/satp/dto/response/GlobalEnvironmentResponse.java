@@ -1,6 +1,6 @@
 package com.sms.satp.dto.response;
 
-import com.sms.satp.common.enums.ApiRequestParamType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.satp.entity.api.common.HeaderInfo;
 import com.sms.satp.entity.env.EnvironmentAuth;
 import java.util.List;
@@ -33,5 +33,6 @@ public class GlobalEnvironmentResponse extends BaseResponse {
     private List<ParamInfoResponse> requestParams;
     private Integer requestParamType;
     @Default
-    private Boolean global = true;
+    @JsonProperty("isGlobal")
+    private boolean global = true;
 }

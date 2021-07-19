@@ -7,7 +7,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -35,7 +34,4 @@ public class UserRequest {
     @NotBlank(groups = {UpdateGroup.class, InsertGroup.class}, message = "The email cannot be empty.")
     @Email(groups = {UpdateGroup.class, InsertGroup.class}, message = "The email format is incorrect.")
     private String email;
-
-    @Default
-    private Boolean enabled = true;
 }

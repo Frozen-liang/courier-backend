@@ -14,7 +14,7 @@ public class AddSceneCaseApi {
     private String id;
 
     private Integer order;
-
+    
     private Boolean isCase;
 
 }

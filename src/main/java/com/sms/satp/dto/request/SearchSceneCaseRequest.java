@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.satp.dto.PageDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,7 @@ public class SearchSceneCaseRequest extends PageDto {
 
     private String name;
     private ObjectId groupId;
+    @JsonProperty("isRemoved")
     private boolean removed;
     private List<String> testStatus;
     private List<ObjectId> tagId;

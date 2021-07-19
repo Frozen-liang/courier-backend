@@ -3,7 +3,6 @@ package com.sms.satp.dto.request;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
-import com.sms.satp.entity.api.common.HeaderInfo;
 import com.sms.satp.entity.env.EnvironmentAuth;
 import java.util.List;
 import javax.validation.Valid;
@@ -45,7 +44,7 @@ public class GlobalEnvironmentRequest {
 
     private String globalAfterProcess;
 
-    private List<HeaderInfo> headers;
+    private List<ParamInfoRequest> headers;
 
     @Valid
     private List<ParamInfoRequest> envVariable;

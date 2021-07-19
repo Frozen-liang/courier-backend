@@ -1,5 +1,6 @@
 package com.sms.satp.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +23,9 @@ public class UserResponse {
 
     private List<String> roles;
 
-    private Boolean exists;
+    @JsonProperty("isExists")
+    private boolean exists;
 
+    @JsonProperty("isRemoved")
+    private boolean removed;
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @Builder
@@ -17,7 +18,8 @@ public class SystemVersion {
     private String name;
     private String group;
     private LocalDateTime buildTime;
-    private Boolean initialized;
+    @Field("isInitialized")
+    private boolean initialized;
     private Integer status;
     @CreatedDate
     private LocalDateTime createDateTime;

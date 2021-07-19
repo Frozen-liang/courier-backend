@@ -42,6 +42,7 @@ public class SceneCase extends BaseEntity {
     /**
      * 是否锁定，当前步骤出错或未通过时，依然执行下一个步骤.
      */
-    private Boolean isLock;
+    @Field("isLock")
+    private boolean lock;
 
 }

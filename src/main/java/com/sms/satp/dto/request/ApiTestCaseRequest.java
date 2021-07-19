@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
@@ -63,5 +64,6 @@ public class ApiTestCaseRequest {
     private String createUserName;
     private String dataCollId;
     @Default
+    @JsonProperty("isExecute")
     private boolean execute = true;
 }
