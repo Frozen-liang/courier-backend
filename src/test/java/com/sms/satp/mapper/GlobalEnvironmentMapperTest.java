@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.dto.request.GlobalEnvironmentRequest;
 import com.sms.satp.dto.response.GlobalEnvironmentResponse;
-import com.sms.satp.entity.env.GlobalEnvironment;
+import com.sms.satp.entity.env.GlobalEnvironmentEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ class GlobalEnvironmentMapperTest {
     @Test
     @DisplayName("Test the method to convert the GlobalEnvironment's entity object to a dto object")
     void entity_to_dto() {
-        GlobalEnvironment globalEnvironment = GlobalEnvironment.builder()
+        GlobalEnvironmentEntity globalEnvironment = GlobalEnvironmentEntity.builder()
             .envName(EVN_NAME)
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
@@ -37,9 +37,9 @@ class GlobalEnvironmentMapperTest {
     @Test
     @DisplayName("Test the method for converting an GlobalEnvironment entity list object to a dto list object")
     void globalEnvironmentList_to_globalEnvironmentDtoList() {
-        List<GlobalEnvironment> globalEnvironments = new ArrayList<>();
+        List<GlobalEnvironmentEntity> globalEnvironments = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
-            globalEnvironments.add(GlobalEnvironment.builder().envName(EVN_NAME).build());
+            globalEnvironments.add(GlobalEnvironmentEntity.builder().envName(EVN_NAME).build());
         }
         List<GlobalEnvironmentResponse> globalEnvironmentDtoList = globalEnvironmentMapper.toDtoList(globalEnvironments);
         assertThat(globalEnvironmentDtoList).hasSize(SIZE);
@@ -52,7 +52,7 @@ class GlobalEnvironmentMapperTest {
         GlobalEnvironmentRequest globalEnvironmentDto = GlobalEnvironmentRequest.builder()
             .envName(EVN_NAME)
             .build();
-        GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentDto);
+        GlobalEnvironmentEntity globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentDto);
         assertThat(globalEnvironment.getEnvName()).isEqualTo(EVN_NAME);
     }
 
@@ -66,7 +66,7 @@ class GlobalEnvironmentMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method to convert the GlobalEnvironment's dto object to a entity object")
     void null_dto_to_entity() {
-        GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(null);
+        GlobalEnvironmentEntity globalEnvironment = globalEnvironmentMapper.toEntity(null);
         assertThat(globalEnvironment).isNull();
     }
 

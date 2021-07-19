@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.dto.request.ProjectEnvironmentRequest;
 import com.sms.satp.dto.response.ProjectEnvironmentResponse;
-import com.sms.satp.entity.env.ProjectEnvironment;
+import com.sms.satp.entity.env.ProjectEnvironmentEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ class ProjectEnvironmentMapperTest {
     @Test
     @DisplayName("Test the method to convert the ProjectEnvironment's entity object to a dto object")
     void entity_to_dto() {
-        ProjectEnvironment projectEnvironment = ProjectEnvironment.builder()
+        ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder()
             .envDesc(ENV_DESC)
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
@@ -37,9 +37,9 @@ class ProjectEnvironmentMapperTest {
     @Test
     @DisplayName("Test the method for converting an ProjectEnvironment entity list object to a dto list object")
     void projectEnvironmentList_to_projectEnvironmentDtoList() {
-        List<ProjectEnvironment> projectEnvironments = new ArrayList<>();
+        List<ProjectEnvironmentEntity> projectEnvironments = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
-            projectEnvironments.add(ProjectEnvironment.builder().envDesc(ENV_DESC).build());
+            projectEnvironments.add(ProjectEnvironmentEntity.builder().envDesc(ENV_DESC).build());
         }
         List<ProjectEnvironmentResponse> projectEnvironmentDtoList = projectEnvironmentMapper.toDtoList(projectEnvironments);
         assertThat(projectEnvironmentDtoList).hasSize(SIZE);
@@ -52,7 +52,7 @@ class ProjectEnvironmentMapperTest {
         ProjectEnvironmentRequest projectEnvironmentDto = ProjectEnvironmentRequest.builder()
             .envDesc(ENV_DESC)
             .build();
-        ProjectEnvironment projectEnvironment = projectEnvironmentMapper.toEntity(projectEnvironmentDto);
+        ProjectEnvironmentEntity projectEnvironment = projectEnvironmentMapper.toEntity(projectEnvironmentDto);
         assertThat(projectEnvironment.getEnvDesc()).isEqualTo(ENV_DESC);
     }
 
@@ -66,7 +66,7 @@ class ProjectEnvironmentMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method to convert the ProjectEnvironment's dto object to a entity object")
     void null_dto_to_entity() {
-        ProjectEnvironment projectEnvironment = projectEnvironmentMapper.toEntity(null);
+        ProjectEnvironmentEntity projectEnvironment = projectEnvironmentMapper.toEntity(null);
         assertThat(projectEnvironment).isNull();
     }
 

@@ -6,7 +6,7 @@ import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.common.field.SceneCaseJobFiled;
 import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.dto.request.SceneCaseJobRequest;
-import com.sms.satp.entity.job.SceneCaseJob;
+import com.sms.satp.entity.job.SceneCaseJobEntity;
 import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.List;
@@ -31,7 +31,7 @@ public class CustomizedSceneCaseJobRepositoryImpl implements CustomizedSceneCase
     }
 
     @Override
-    public Page<SceneCaseJob> page(SceneCaseJobRequest sceneCaseJobRequest) {
+    public Page<SceneCaseJobEntity> page(SceneCaseJobRequest sceneCaseJobRequest) {
         PageDtoConverter.frontMapping(sceneCaseJobRequest);
         Document document = new Document();
         document.put(SceneCaseJobFiled.API_TEST_CASE.getFiled(), true);
@@ -43,11 +43,11 @@ public class CustomizedSceneCaseJobRepositoryImpl implements CustomizedSceneCase
         CommonFiled.CREATE_USER_ID.in(sceneCaseJobRequest.getUserIds()).ifPresent(query::addCriteria);
         SceneFiled.SCENE_CASE_ID.is(sceneCaseJobRequest.getSceneCaseId()).ifPresent(query::addCriteria);
         SceneFiled.CASE_TEMPLATE_ID.is(sceneCaseJobRequest.getCaseTemplateId()).ifPresent(query::addCriteria);
-        long total = mongoTemplate.count(query, SceneCaseJob.class);
+        long total = mongoTemplate.count(query, SceneCaseJobEntity.class);
         Sort sort = Sort.by(Direction.fromString(sceneCaseJobRequest.getOrder()), sceneCaseJobRequest.getSort());
         Pageable pageable = PageRequest
             .of(sceneCaseJobRequest.getPageNumber(), sceneCaseJobRequest.getPageSize(), sort);
-        List<SceneCaseJob> sceneCaseJobList = mongoTemplate.find(query.with(pageable), SceneCaseJob.class);
+        List<SceneCaseJobEntity> sceneCaseJobList = mongoTemplate.find(query.with(pageable), SceneCaseJobEntity.class);
         return new PageImpl<>(sceneCaseJobList, pageable, total);
     }
 

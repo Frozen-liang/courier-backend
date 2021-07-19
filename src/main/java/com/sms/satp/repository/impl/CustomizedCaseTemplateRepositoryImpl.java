@@ -8,7 +8,7 @@ import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.response.CaseTemplateResponse;
-import com.sms.satp.entity.scenetest.CaseTemplate;
+import com.sms.satp.entity.scenetest.CaseTemplateEntity;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
@@ -69,12 +69,12 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
         aggregationOperations.add(projectionOperation);
 
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
-        long count = mongoTemplate.count(query, CaseTemplate.class);
+        long count = mongoTemplate.count(query, CaseTemplateEntity.class);
         if (count == 0L || skipRecord >= count) {
             return Page.empty();
         }
         List<CaseTemplateResponse> records = mongoTemplate
-            .aggregate(aggregation, CaseTemplate.class, CaseTemplateResponse.class)
+            .aggregate(aggregation, CaseTemplateEntity.class, CaseTemplateResponse.class)
             .getMappedResults();
         return new PageImpl<CaseTemplateResponse>(records,
             PageRequest.of(searchDto.getPageNumber(), searchDto.getPageSize(), sort), count);

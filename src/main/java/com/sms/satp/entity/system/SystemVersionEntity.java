@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Data
 @Builder
 @Document(collection = "SystemVersion")
-public class SystemVersion {
+public class SystemVersionEntity {
 
     private String id;
     private String version;

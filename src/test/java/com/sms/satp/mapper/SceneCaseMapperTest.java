@@ -3,7 +3,7 @@ package com.sms.satp.mapper;
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.dto.request.UpdateSceneCaseRequest;
-import com.sms.satp.entity.scenetest.SceneCase;
+import com.sms.satp.entity.scenetest.SceneCaseEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ class SceneCaseMapperTest {
     @DisplayName("Test the toAddSceneCase method in the SceneCaseMapper")
     void toAddSceneCase_test() {
         AddSceneCaseRequest dto = AddSceneCaseRequest.builder().groupId(MOCK_ID).name(NAME).build();
-        SceneCase sceneCase = sceneCaseMapper.toAddSceneCase(dto);
+        SceneCaseEntity sceneCase = sceneCaseMapper.toAddSceneCase(dto);
         assertThat(sceneCase.getName()).isEqualTo(NAME);
     }
 
@@ -28,14 +28,14 @@ class SceneCaseMapperTest {
     @DisplayName("Test the toUpdateSceneCase method in the SceneCaseMapper")
     void toUpdateSceneCase_test() {
         UpdateSceneCaseRequest dto = UpdateSceneCaseRequest.builder().groupId(MOCK_ID).name(NAME).build();
-        SceneCase sceneCase = sceneCaseMapper.toUpdateSceneCase(dto);
+        SceneCaseEntity sceneCase = sceneCaseMapper.toUpdateSceneCase(dto);
         assertThat(sceneCase.getName()).isEqualTo(NAME);
     }
 
     @Test
     @DisplayName("Test the toDto method in the SceneCaseMapper")
     void toDto_test() {
-        SceneCase sceneCase = SceneCase.builder().id(MOCK_ID).name(NAME).build();
+        SceneCaseEntity sceneCase = SceneCaseEntity.builder().id(MOCK_ID).name(NAME).build();
         SceneCaseResponse dto = sceneCaseMapper.toDto(sceneCase);
         assertThat(dto.getId()).isEqualTo(MOCK_ID);
     }

@@ -20,7 +20,7 @@ import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.DataCollectionImportRequest;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.response.DataCollectionResponse;
-import com.sms.satp.entity.datacollection.DataCollection;
+import com.sms.satp.entity.datacollection.DataCollectionEntity;
 import com.sms.satp.mapper.DataCollectionMapper;
 import com.sms.satp.repository.CustomizedDataCollectionRepository;
 import com.sms.satp.repository.DataCollectionRepository;
@@ -47,7 +47,7 @@ class DataCollectionServiceTest {
         CustomizedDataCollectionRepository.class);
     private final DataCollectionService dataCollectionService = new DataCollectionServiceImpl(
         dataCollectionRepository, dataCollectionMapper, customizedDataCollectionRepository);
-    private final DataCollection dataCollection = DataCollection.builder().id(ID).build();
+    private final DataCollectionEntity dataCollection = DataCollectionEntity.builder().id(ID).build();
     private final DataCollectionResponse dataCollectionResponse = DataCollectionResponse.builder().id(ID).build();
     private final DataCollectionRequest dataCollectionRequest = DataCollectionRequest.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
@@ -69,7 +69,7 @@ class DataCollectionServiceTest {
     @DisplayName("Test the findOne method in the DataCollection service")
     public void findOne_test() {
         when(dataCollectionRepository.findById(ID)).thenReturn(Optional.of(dataCollection));
-        DataCollection result = dataCollectionService.findOne(ID);
+        DataCollectionEntity result = dataCollectionService.findOne(ID);
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(ID);
     }
@@ -87,16 +87,16 @@ class DataCollectionServiceTest {
     @DisplayName("Test the add method in the DataCollection service")
     public void add_test() {
         when(dataCollectionMapper.toEntity(dataCollectionRequest)).thenReturn(dataCollection);
-        when(dataCollectionRepository.insert(any(DataCollection.class))).thenReturn(dataCollection);
+        when(dataCollectionRepository.insert(any(DataCollectionEntity.class))).thenReturn(dataCollection);
         dataCollectionService.add(dataCollectionRequest);
-        verify(dataCollectionRepository, times(1)).insert(any(DataCollection.class));
+        verify(dataCollectionRepository, times(1)).insert(any(DataCollectionEntity.class));
     }
 
     @Test
     @DisplayName("An exception occurred while adding DataCollection")
     public void add_exception_test() {
-        when(dataCollectionMapper.toEntity(any())).thenReturn(DataCollection.builder().build());
-        doThrow(new RuntimeException()).when(dataCollectionRepository).insert(any(DataCollection.class));
+        when(dataCollectionMapper.toEntity(any())).thenReturn(DataCollectionEntity.builder().build());
+        doThrow(new RuntimeException()).when(dataCollectionRepository).insert(any(DataCollectionEntity.class));
         assertThatThrownBy(() -> dataCollectionService.add(dataCollectionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_DATA_COLLECTION_ERROR.getCode());
@@ -107,7 +107,7 @@ class DataCollectionServiceTest {
     public void edit_test() {
         when(dataCollectionMapper.toEntity(dataCollectionRequest)).thenReturn(dataCollection);
         when(dataCollectionRepository.existsById(any())).thenReturn(Boolean.TRUE);
-        when(dataCollectionRepository.save(any(DataCollection.class))).thenReturn(dataCollection);
+        when(dataCollectionRepository.save(any(DataCollectionEntity.class))).thenReturn(dataCollection);
         assertThat(dataCollectionService.edit(dataCollectionRequest)).isTrue();
     }
 
@@ -116,7 +116,7 @@ class DataCollectionServiceTest {
     public void edit_exception_test() {
         when(dataCollectionMapper.toEntity(dataCollectionRequest)).thenReturn(dataCollection);
         when(dataCollectionRepository.existsById(any())).thenReturn(Boolean.TRUE);
-        doThrow(new RuntimeException()).when(dataCollectionRepository).save(any(DataCollection.class));
+        doThrow(new RuntimeException()).when(dataCollectionRepository).save(any(DataCollectionEntity.class));
         assertThatThrownBy(() -> dataCollectionService.edit(dataCollectionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_DATA_COLLECTION_ERROR.getCode());
@@ -135,9 +135,9 @@ class DataCollectionServiceTest {
     @Test
     @DisplayName("Test the list method in the DataCollection service")
     public void list_test() {
-        ArrayList<DataCollection> dataCollectionList = new ArrayList<>();
+        ArrayList<DataCollectionEntity> dataCollectionList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            dataCollectionList.add(DataCollection.builder().build());
+            dataCollectionList.add(DataCollectionEntity.builder().build());
         }
         ArrayList<DataCollectionResponse> dataCollectionDtoList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
@@ -203,7 +203,7 @@ class DataCollectionServiceTest {
         DataCollectionImportRequest dataCollectionImportRequest = DataCollectionImportRequest.builder().importMode(1)
             .file(multipartFile)
             .build();
-        when(dataCollectionRepository.findById(any())).thenReturn(Optional.of(DataCollection.builder().build()));
+        when(dataCollectionRepository.findById(any())).thenReturn(Optional.of(DataCollectionEntity.builder().build()));
         when(multipartFile.getInputStream()).thenReturn(classPathResource.getInputStream());
         when(dataCollectionRepository.save(any())).thenReturn(null);
         assertThat(dataCollectionService.importDataCollection(dataCollectionImportRequest)).isTrue();

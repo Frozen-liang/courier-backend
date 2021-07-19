@@ -18,7 +18,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "ApiTestCaseJob")
-public class ApiTestCaseJob {
+public class ApiTestCaseJobEntity {
 
     @MongoId(FieldType.OBJECT_ID)
     private String id;
