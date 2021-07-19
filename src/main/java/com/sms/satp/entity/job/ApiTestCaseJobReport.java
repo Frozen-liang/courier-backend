@@ -15,6 +15,7 @@ public class ApiTestCaseJobReport {
 
     private String jobId;
     private JobStatus jobStatus;
+    private Integer time;
     private CaseReport caseReport;
     private String message;
 }

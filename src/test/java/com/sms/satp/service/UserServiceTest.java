@@ -17,10 +17,12 @@ import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.UserRequest;
 import com.sms.satp.dto.response.UserResponse;
 import com.sms.satp.entity.system.UserEntity;
+import com.sms.satp.entity.workspace.Workspace;
 import com.sms.satp.mapper.UserMapper;
 import com.sms.satp.mapper.UserMapperImpl;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.UserRepository;
+import com.sms.satp.repository.WorkspaceRepository;
 import com.sms.satp.service.impl.UserServiceImpl;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,17 +37,19 @@ import org.springframework.data.domain.Sort;
 class UserServiceTest {
 
     private final UserRepository userRepository = mock(UserRepository.class);
+    private final WorkspaceRepository workspaceRepository = mock(WorkspaceRepository.class);
     private final CommonDeleteRepository commonDeleteRepository = mock(
         CommonDeleteRepository.class);
     private final UserMapper userMapper = new UserMapperImpl();
     private final UserService userService = new UserServiceImpl(
-        userRepository, commonDeleteRepository, userMapper);
+        userRepository, workspaceRepository, commonDeleteRepository, userMapper);
     private final UserEntity user = UserEntity.builder().id(ID).build();
     private final UserRequest userRequest = UserRequest.builder().password("123Wac!@#")
         .id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String GROUP_ID = ObjectId.get().toString();
+    private static final String WORKSPACE_ID = ObjectId.get().toString();
     private static final String USERNAME = "test";
 
     @Test
@@ -84,7 +88,7 @@ class UserServiceTest {
     @Test
     @DisplayName("Test the edit method in the User service")
     public void edit_test() {
-        when(userRepository.existsById(any())).thenReturn(Boolean.TRUE);
+        when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(userRepository.save(any(UserEntity.class))).thenReturn(user);
         assertThat(userService.edit(userRequest)).isTrue();
     }
@@ -92,7 +96,7 @@ class UserServiceTest {
     @Test
     @DisplayName("An exception occurred while edit User")
     public void edit_exception_test() {
-        when(userRepository.existsById(any())).thenReturn(Boolean.TRUE);
+        when(userRepository.findById(any())).thenReturn(Optional.of(user));
         doThrow(new RuntimeException()).when(userRepository).save(any(UserEntity.class));
         assertThatThrownBy(() -> userService.edit(userRequest))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -102,7 +106,7 @@ class UserServiceTest {
     @Test
     @DisplayName("An not exist exception occurred while edit User")
     public void edit_not_exist_exception_test() {
-        when(userRepository.existsById(any())).thenReturn(Boolean.FALSE);
+        when(userRepository.findById(any())).thenReturn(Optional.empty());
         assertThatThrownBy(() -> userService.edit(userRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_NOT_EXIST_ERROR.getCode());
@@ -120,7 +124,9 @@ class UserServiceTest {
             userResponseList.add(UserResponse.builder().build());
         }
         when(userRepository.findAll(any(), any(Sort.class))).thenReturn(userList);
-        List<UserResponse> result = userService.list(USERNAME, GROUP_ID);
+        when(workspaceRepository.findById(any()))
+            .thenReturn(Optional.of(Workspace.builder().userIds(Collections.emptyList()).build()));
+        List<UserResponse> result = userService.list(USERNAME, GROUP_ID, WORKSPACE_ID);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -128,7 +134,7 @@ class UserServiceTest {
     @DisplayName("An exception occurred while getting User list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(userRepository).findAll(any(), any(Sort.class));
-        assertThatThrownBy(() -> userService.list(USERNAME, GROUP_ID))
+        assertThatThrownBy(() -> userService.list(USERNAME, GROUP_ID, WORKSPACE_ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_USER_LIST_ERROR.getCode());
     }

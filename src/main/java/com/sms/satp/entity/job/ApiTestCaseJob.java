@@ -47,4 +47,6 @@ public class ApiTestCaseJob {
      * 测试人员.
      */
     private String createUserName;
+
+    private Integer time;
 }

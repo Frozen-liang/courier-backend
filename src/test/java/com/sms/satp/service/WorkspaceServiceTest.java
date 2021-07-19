@@ -126,7 +126,7 @@ class WorkspaceServiceTest {
         }
         when(workspaceRepository.findAllByRemovedIsFalseOrderByCreateDateTimeDesc()).thenReturn(workspaceList);
         when(workspaceMapper.toDtoList(workspaceList)).thenReturn(workspaceResponseList);
-        List<WorkspaceResponse> result = workspaceService.list(USER_ID);
+        List<WorkspaceResponse> result = workspaceService.list();
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -134,9 +134,36 @@ class WorkspaceServiceTest {
     @DisplayName("An exception occurred while getting Workspace list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(workspaceRepository).findAllByRemovedIsFalseOrderByCreateDateTimeDesc();
-        assertThatThrownBy(() -> workspaceService.list(USER_ID))
+        assertThatThrownBy(workspaceService::list)
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_WORKSPACE_LIST_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the findByUserId method in the Workspace service")
+    public void findByUserId_test() {
+        ArrayList<Workspace> workspaceList = new ArrayList<>();
+        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
+            workspaceList.add(Workspace.builder().build());
+        }
+        ArrayList<WorkspaceResponse> workspaceResponseList = new ArrayList<>();
+        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
+            workspaceResponseList.add(WorkspaceResponse.builder().build());
+        }
+        when(workspaceRepository.findAllByRemovedIsFalseAndUserIdsContainsOrderByCreateDateTimeDesc(USER_ID))
+            .thenReturn(workspaceList);
+        when(workspaceMapper.toDtoList(workspaceList)).thenReturn(workspaceResponseList);
+        List<WorkspaceResponse> result = workspaceService.findByUserId(USER_ID);
+        assertThat(result).hasSize(TOTAL_ELEMENTS);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getting Workspace list")
+    public void findByUserId_exception_test() {
+        doThrow(new RuntimeException()).when(workspaceRepository)
+            .findAllByRemovedIsFalseAndUserIdsContainsOrderByCreateDateTimeDesc(USER_ID);
+        assertThatThrownBy(() -> workspaceService.findByUserId(USER_ID))
+            .isInstanceOf(RuntimeException.class);
     }
 
     @Test

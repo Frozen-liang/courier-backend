@@ -122,7 +122,7 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
         Operation operation = tuple._2;
         ApiEntityBuilder<?, ?> apiEntityBuilder = ApiEntity.builder().apiPath(apiPath)
             .requestMethod(requestMethod)
-            .apiName(operation.getSummary())
+            .apiName(StringUtils.defaultIfBlank(operation.getSummary(), apiPath))
             .groupId(Objects.requireNonNullElse(operation.getTags(), new ArrayList<String>()).get(0))
             .swaggerId(
                 Optional.ofNullable(operation.getOperationId()).orElse(generateSwaggerId(apiPath, requestMethod))

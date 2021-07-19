@@ -24,6 +24,7 @@ public class SystemRoleEntity {
     private String description;
     @Default
     private Boolean enable = true;
+    private Boolean defaultRole;
     @CreatedDate
     private LocalDateTime createDateTime;
 }

@@ -11,14 +11,17 @@ import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
 import com.sms.satp.parser.impl.OperationIdDuplicateChecker;
 import com.sms.satp.repository.ProjectImportFlowRepository;
+import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.MessageService;
 import com.sms.satp.utils.SecurityUtil;
 import com.sms.satp.websocket.Payload;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.context.ApplicationContext;
 
 @DisplayName("Test for OperationIdDuplicateChecker")
@@ -29,8 +32,12 @@ public class OperationIdDuplicateCheckerTest {
     private ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
     private final MessageService messageService = mock(MessageService.class);
 
+
     static {
-        mockStatic(SecurityUtil.class).when(SecurityUtil::getCurrUserId).thenReturn(ObjectId.get().toString());
+        MockedStatic<SecurityUtil> securityUtilMockedStatic = mockStatic(SecurityUtil.class);
+        securityUtilMockedStatic.when(SecurityUtil::getCurrUserId).thenReturn(ObjectId.get().toString());
+        securityUtilMockedStatic.when(SecurityUtil::getCurrentUser).thenReturn(new CustomUser("username", "password",
+            Collections.emptyList(), "", "username@qq.com"));
     }
 
 

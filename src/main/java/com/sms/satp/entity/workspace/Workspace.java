@@ -23,6 +23,10 @@ public class Workspace extends BaseEntity {
 
     private String name;
 
+    private Integer limit;
+
+    private String createUsername;
+
     @Field(targetType = FieldType.OBJECT_ID)
     private List<String> userIds;
 }

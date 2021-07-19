@@ -19,10 +19,13 @@ import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.common.enums.ParamType;
 import com.sms.satp.common.enums.ProjectType;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.common.enums.ResponseParamsExtractionType;
+import com.sms.satp.common.enums.ResultVerificationType;
 import com.sms.satp.common.enums.SaveMode;
-import com.sms.satp.utils.SecurityUtil;
+import com.sms.satp.security.pojo.CustomUser;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -34,8 +37,12 @@ import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Configuration
+@Slf4j
 public class MongoCustomConverterConfiguration {
 
     private static final String BUCKET = "TestFile";
@@ -53,14 +60,22 @@ public class MongoCustomConverterConfiguration {
                 IntegerToApiTypeConverter.INSTANCE, IntegerToMatchTypeConverter.INSTANCE,
                 IntegerToApiBindingStatusConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
                 IntegerToDocumentUrlTypeConverter.INSTANCE, IntegerToJobStatusConverter.INSTANCE,
-                IntegerToProjectTypeConverter.INSTANCE, IntegerToImportStatusConverter.INSTANCE);
+                IntegerToProjectTypeConverter.INSTANCE, IntegerToImportStatusConverter.INSTANCE,
+                IntegerToResponseParamsExtractionTypeConverter.INSTANCE,
+                IntegerToResultVerificationTypeConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
     @Bean
     AuditorAware<String> auditorAware() {
         // get createUserId and modifyUserId
-        return () -> Optional.of(SecurityUtil.getCurrUserId());
+        return () -> Optional.ofNullable(SecurityContextHolder.getContext())
+            .map(SecurityContext::getAuthentication)
+            .filter(Authentication::isAuthenticated)
+            .map(Authentication::getPrincipal)
+            .filter(user -> !"anonymousUser".equals(user.toString()))
+            .map(CustomUser.class::cast)
+            .map(CustomUser::getId);
     }
 
 
@@ -251,5 +266,24 @@ public class MongoCustomConverterConfiguration {
             return ImportStatus.getType(code);
         }
     }
+
+    @ReadingConverter
+    enum IntegerToResponseParamsExtractionTypeConverter implements Converter<Integer, ResponseParamsExtractionType> {
+        INSTANCE;
+
+        public ResponseParamsExtractionType convert(@NonNull Integer code) {
+            return ResponseParamsExtractionType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToResultVerificationTypeConverter implements Converter<Integer, ResultVerificationType> {
+        INSTANCE;
+
+        public ResultVerificationType convert(@NonNull Integer code) {
+            return ResultVerificationType.getType(code);
+        }
+    }
+
 
 }

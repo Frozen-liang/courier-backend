@@ -5,5 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface SystemVersionRepository extends MongoRepository<SystemVersion, String> {
 
-    SystemVersion findByVersion(String version);
+    SystemVersion findByName(String name);
 }

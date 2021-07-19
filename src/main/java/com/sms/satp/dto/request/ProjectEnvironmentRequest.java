@@ -7,7 +7,7 @@ import com.sms.satp.entity.api.common.HeaderInfo;
 import com.sms.satp.entity.env.EnvironmentAuth;
 import java.util.List;
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,21 +20,21 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProjectEnvironmentRequest {
 
-    @NotEmpty(groups = UpdateGroup.class, message = "The id cannot be empty.")
+    @NotBlank(groups = UpdateGroup.class, message = "The id cannot be empty.")
     @Null(groups = InsertGroup.class, message = "The id must be null.")
     private String id;
 
     private String workspaceId;
 
-    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId must not be empty")
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId must not be empty")
     private String projectId;
 
-    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The envName must not be empty")
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The envName must not be empty")
     private String envName;
 
     private String envDesc;
 
-    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The frontUri must not be empty")
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The frontUri must not be empty")
     private String frontUri;
 
     private EnvironmentAuth envAuth;

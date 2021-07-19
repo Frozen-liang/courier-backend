@@ -4,7 +4,7 @@ import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
 import java.util.List;
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class TestDataRequest {
 
-    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The dataName cannot be empty")
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The dataName cannot be empty")
     private String dataName;
 
     @Valid

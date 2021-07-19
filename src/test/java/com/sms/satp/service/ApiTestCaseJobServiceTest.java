@@ -76,8 +76,6 @@ class ApiTestCaseJobServiceTest {
     private static final String ID = ObjectId.get().toString();
     private final CustomUser customUser =
         new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "");
-    private static final String CURRENT_USER_ID =
-        ObjectId.get().toString();
 
     @Test
     @DisplayName("Test the findById method in the ApiTestCaseJob service")

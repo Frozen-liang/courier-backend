@@ -43,4 +43,8 @@ public class ApiTestCaseResponse extends BaseResponse {
     private ResponseTimeVerification responseTimeVerification;
     private boolean execute;
     private Boolean removed;
+    private Boolean result;
+    private String testTime;
+    private String createUsername;
+    private String jobId;
 }

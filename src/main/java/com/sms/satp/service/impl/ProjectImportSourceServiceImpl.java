@@ -61,7 +61,7 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
             .findByProjectIdAndRemovedIsFalse(projectId);
         result.forEach((projectImportSourceResponse -> {
             ProjectImportFlowEntity projectImportFlowEntity = projectImportFlowRepository
-                .findFirstByImportSourceId(projectImportSourceResponse.getId());
+                .findFirstByImportSourceIdOrderByCreateDateTimeDesc(projectImportSourceResponse.getId());
             projectImportSourceResponse.setImportStatus(
                 Objects.nonNull(projectImportFlowEntity) ? projectImportFlowEntity.getImportStatus().getCode() : null
             );

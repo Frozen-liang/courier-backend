@@ -1,9 +1,10 @@
 package com.sms.satp.repository.impl;
 
 import static com.sms.satp.common.field.ApiTestCaseJobFiled.API_TEST_CASE_ID;
-import static com.sms.satp.common.field.CommonFiled.API_ID;
+import static com.sms.satp.common.field.ApiTestCaseJobFiled.JOB_API_ID;
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.CREATE_USER_ID;
+import static com.sms.satp.common.field.CommonFiled.ID;
 
 import com.sms.satp.dto.request.ApiTestCaseJobPageRequest;
 import com.sms.satp.entity.job.ApiTestCaseJob;
@@ -36,6 +37,7 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
     public Page<ApiTestCaseJob> page(ApiTestCaseJobPageRequest apiTestCaseJobPageRequest) {
         Document document = new Document();
         document.put(CASE_REPORT, true);
+        document.put(ID.getFiled(), true);
         document.put(JOB_STATUS, true);
         document.put(CREATE_USER_NAME, true);
         document.put(CREATE_DATE_TIME.getFiled(), true);
@@ -43,7 +45,7 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
         BasicQuery query = new BasicQuery(new Document(), document);
         API_TEST_CASE_ID.is(apiTestCaseJobPageRequest.getApiTestCaseId()).ifPresent(query::addCriteria);
         CREATE_USER_ID.in(apiTestCaseJobPageRequest.getUserIds()).ifPresent(query::addCriteria);
-        API_ID.is((apiTestCaseJobPageRequest.getApiId())).ifPresent(query::addCriteria);
+        JOB_API_ID.is((apiTestCaseJobPageRequest.getApiId())).ifPresent(query::addCriteria);
         long count = mongoTemplate.count(query, ApiTestCaseJob.class);
         if (count <= 0) {
             return new PageImpl<>(Collections.emptyList());
@@ -53,5 +55,14 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
         List<ApiTestCaseJob> apiTestCaseJobs = mongoTemplate.find(query.with(pageable),
             ApiTestCaseJob.class);
         return new PageImpl<>(apiTestCaseJobs, pageable, count);
+    }
+
+    @Override
+    public ApiTestCaseJob findRecentlyCaseReportByCaseId(String apiTestCaseId) {
+        ApiTestCaseJobPageRequest pageRequest = ApiTestCaseJobPageRequest.builder().pageSize(1)
+            .apiTestCaseId(apiTestCaseId)
+            .pageNumber(1).build();
+        Page<ApiTestCaseJob> page = this.page(pageRequest);
+        return page.stream().findFirst().orElse(ApiTestCaseJob.builder().build());
     }
 }

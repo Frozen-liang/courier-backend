@@ -20,6 +20,8 @@ public class ApiPageRequest extends PageDto {
 
     private String apiName;
 
+    private String apiPath;
+
     private boolean removed;
 
     private List<ObjectId> groupId;

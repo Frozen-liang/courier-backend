@@ -78,7 +78,7 @@ class UserGroupServiceTest {
     @DisplayName("Test the edit method in the UserGroup service")
     public void edit_test() {
         when(userGroupMapper.toEntity(userGroupRequest)).thenReturn(userGroup);
-        when(userGroupRepository.existsById(any())).thenReturn(Boolean.TRUE);
+        when(userGroupRepository.findById(any())).thenReturn(Optional.of(userGroup));
         when(userGroupRepository.save(any(UserGroupEntity.class))).thenReturn(userGroup);
         assertThat(userGroupService.edit(userGroupRequest)).isTrue();
     }
@@ -87,7 +87,7 @@ class UserGroupServiceTest {
     @DisplayName("An exception occurred while edit UserGroup")
     public void edit_exception_test() {
         when(userGroupMapper.toEntity(userGroupRequest)).thenReturn(userGroup);
-        when(userGroupRepository.existsById(any())).thenReturn(Boolean.TRUE);
+        when(userGroupRepository.findById(ID)).thenReturn(Optional.of(userGroup));
         doThrow(new RuntimeException()).when(userGroupRepository).save(any(UserGroupEntity.class));
         assertThatThrownBy(() -> userGroupService.edit(userGroupRequest))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -98,7 +98,7 @@ class UserGroupServiceTest {
     @DisplayName("An not exist exception occurred while edit UserGroup")
     public void edit_not_exist_exception_test() {
         when(userGroupMapper.toEntity(userGroupRequest)).thenReturn(userGroup);
-        when(userGroupRepository.existsById(any())).thenReturn(Boolean.FALSE);
+        when(userGroupRepository.findById(ID)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> userGroupService.edit(userGroupRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_NOT_EXIST_ERROR.getCode());

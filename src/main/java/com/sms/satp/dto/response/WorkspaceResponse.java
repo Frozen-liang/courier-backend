@@ -14,4 +14,6 @@ import lombok.experimental.SuperBuilder;
 public class WorkspaceResponse extends BaseResponse {
 
     private String name;
+
+    private Integer limit;
 }

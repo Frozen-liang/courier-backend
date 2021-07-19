@@ -20,12 +20,8 @@ public class UserResponse {
 
     private String email;
 
-    private Boolean enabled;
-
-    private String currentWorkspace;
-
-    private List<String> associatedWorkspaces;
-
     private List<String> roles;
+
+    private Boolean exists;
 
 }

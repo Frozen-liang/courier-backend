@@ -61,7 +61,6 @@ public class FileController {
         return fileService.updateTestFile(testFileRequest);
     }
 
-    @SneakyThrows({IOException.class, IllegalStateException.class})
     @GetMapping(value = "/download/{id}")
     @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
     public void downloadTestFile(@PathVariable("id") String id, HttpServletResponse response) {
@@ -71,6 +70,25 @@ public class FileController {
         response.setHeader("Content-Disposition",
             "attachment;filename=" + URLEncoder
                 .encode(StringUtils.isEmpty(filename) ? ObjectId.get().toString() : filename, StandardCharsets.UTF_8));
+        writeStream(response, gridFsResource);
+    }
+
+    @GetMapping(value = "/stream/{id}")
+    public void getOutputStream(@PathVariable("id") String id, HttpServletResponse response) {
+        GridFsResource gridFsResource = fileService.downloadTestFile(id);
+        response.setContentType(gridFsResource.getContentType());
+        writeStream(response, gridFsResource);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
+    public Boolean delete(@PathVariable("id") String id) {
+        return fileService.deleteTestFileById(id);
+    }
+
+    @SneakyThrows(IOException.class)
+    private void writeStream(HttpServletResponse response, GridFsResource gridFsResource) {
         ServletOutputStream os = null;
         InputStream is = null;
         try {
@@ -82,13 +100,6 @@ public class FileController {
             close(is);
             close(os);
         }
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseBody
-    @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
-    public Boolean delete(@PathVariable("id") String id) {
-        return fileService.deleteTestFileById(id);
     }
 
     @SneakyThrows(IOException.class)
