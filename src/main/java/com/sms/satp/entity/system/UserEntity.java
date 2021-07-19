@@ -30,9 +30,4 @@ public class UserEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
-
-    @Field(targetType = FieldType.OBJECT_ID)
-    private List<String> associatedWorkspaces;
-
-    private Boolean enabled;
 }

@@ -107,7 +107,7 @@ class ApiTestCaseJobServiceTest {
         when(apiTestCaseJobRepository.findById(any())).thenReturn(Optional.of(apiTestCaseJob));
         when(apiTestCaseJobRepository.save(any(ApiTestCaseJob.class))).thenReturn(apiTestCaseJob);
         doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(CaseReport.class));
-        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJob.class));
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobResponse.class));
         apiTestCaseJobService.handleJobReport(ApiTestCaseJobReport.builder().jobId(ObjectId.get().toString()).build());
         verify(apiTestCaseJobRepository, times(1)).save(any(ApiTestCaseJob.class));
     }
@@ -118,7 +118,7 @@ class ApiTestCaseJobServiceTest {
         when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(apiTestCaseJob);
-        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJob.class));
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobResponse.class));
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest, customUser);
         verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJob.class));
     }
@@ -129,7 +129,7 @@ class ApiTestCaseJobServiceTest {
         when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(apiTestCaseJob);
-        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJob.class));
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobResponse.class));
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest2, customUser);
         verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJob.class));
     }

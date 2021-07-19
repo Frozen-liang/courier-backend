@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
                 Optional<Workspace> optional = workspaceRepository.findById(workspaceId);
                 optional.ifPresent(workspace -> {
                     userResponseList.forEach((user) -> {
-                        user.setExists(workspace.getUserIds().contains(user.getId()));
+                        user.setExist(workspace.getUserIds().contains(user.getId()));
                     });
                 });
             }

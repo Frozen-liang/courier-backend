@@ -31,6 +31,6 @@ public class CaseReport {
 
     private String failMessage;
 
-    private Long totalTimeCost;
+    private Long timeCost;
 
 }

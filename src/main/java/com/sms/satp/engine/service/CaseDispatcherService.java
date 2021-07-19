@@ -1,6 +1,6 @@
 package com.sms.satp.engine.service;
 
-import com.sms.satp.entity.job.ApiTestCaseJob;
+import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.entity.job.SceneCaseJob;
 import com.sms.satp.entity.job.common.CaseReport;
 import java.util.List;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface CaseDispatcherService {
 
-    void dispatch(ApiTestCaseJob caseJob);
+    void dispatch(ApiTestCaseJobResponse caseJob);
 
     void dispatch(SceneCaseJob caseJob);
 

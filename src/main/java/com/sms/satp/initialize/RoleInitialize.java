@@ -75,7 +75,7 @@ public class RoleInitialize implements InitializingBean {
     }
 
     private boolean checkInitialized(SystemVersion systemVersion, String version) {
-        return systemVersion == null || !version.equals(systemVersion.getVersion()) || !systemVersion.getInitialized()
+        return systemVersion == null || !version.equals(systemVersion.getVersion()) || !systemVersion.isInitialized()
             || FAIL.equals(systemVersion.getStatus());
     }
 }

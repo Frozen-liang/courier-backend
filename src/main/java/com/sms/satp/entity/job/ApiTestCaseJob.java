@@ -48,5 +48,5 @@ public class ApiTestCaseJob {
      */
     private String createUserName;
 
-    private Integer time;
+    private Integer totalTimeCost;
 }

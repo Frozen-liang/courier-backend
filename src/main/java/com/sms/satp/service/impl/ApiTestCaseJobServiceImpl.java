@@ -76,7 +76,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             jobApiTestCase.setCaseReport(caseReport);
             job.setJobStatus(apiTestCaseJobReport.getJobStatus());
             job.setMessage(apiTestCaseJobReport.getMessage());
-            job.setTime(apiTestCaseJobReport.getTime());
+            job.setTotalTimeCost(apiTestCaseJobReport.getTotalTimeCost());
             caseDispatcherService.sendJobReport(job.getCreateUserId(), caseReport);
             apiTestCaseJobRepository.save(job);
         });
@@ -110,12 +110,12 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                         apiTestCaseJob.setDataCollection(jobDataCollection);
                         apiTestCaseJobRepository.insert(apiTestCaseJob);
                         jobId.set(apiTestCaseJob.getId());
-                        caseDispatcherService.dispatch(apiTestCaseJob);
+                        caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
                     });
                 } else {
                     apiTestCaseJobRepository.insert(apiTestCaseJob);
                     jobId.set(apiTestCaseJob.getId());
-                    caseDispatcherService.dispatch(apiTestCaseJob);
+                    caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
                 }
             });
         } catch (ApiTestPlatformException apiTestPlatEx) {
@@ -164,7 +164,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             apiTestCaseJob.setApiTestCase(
                 JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestRequest)).build());
             apiTestCaseJobRepository.insert(apiTestCaseJob);
-            caseDispatcherService.dispatch(apiTestCaseJob);
+            caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
             caseDispatcherService.sendErrorMessage(currentUser.getId(), apiTestPlatEx.getMessage());

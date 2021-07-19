@@ -8,9 +8,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.service.impl.CaseDispatcherServiceImpl;
-import com.sms.satp.entity.job.ApiTestCaseJob;
 import com.sms.satp.entity.job.SceneCaseJob;
 import com.sms.satp.entity.job.common.CaseReport;
 import org.bson.types.ObjectId;
@@ -26,7 +26,7 @@ public class CaseDispatcherServiceTest {
     private final SimpMessagingTemplate simpMessagingTemplate = mock(SimpMessagingTemplate.class);
     private final CaseDispatcherService caseDispatcherService = new CaseDispatcherServiceImpl(engineMemberManagement,
         simpMessagingTemplate);
-    private final ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder().build();
+    private final ApiTestCaseJobResponse apiTestCaseJobResponse = ApiTestCaseJobResponse.builder().build();
     private final SceneCaseJob sceneCaseJob = SceneCaseJob.builder().build();
     private static final String USER_ID = ObjectId.get().toString();
     private static final String MESSAGE = "message";
@@ -37,7 +37,7 @@ public class CaseDispatcherServiceTest {
     public void dispatch_test() {
         when(engineMemberManagement.getAvailableMember()).thenReturn("1");
         doNothing().when(simpMessagingTemplate).convertAndSend(anyString(), any(Object.class));
-        caseDispatcherService.dispatch(apiTestCaseJob);
+        caseDispatcherService.dispatch(apiTestCaseJobResponse);
         verify(simpMessagingTemplate, times(1)).convertAndSend(anyString(), any(Object.class));
     }
 

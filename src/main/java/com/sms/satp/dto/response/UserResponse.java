@@ -23,8 +23,8 @@ public class UserResponse {
 
     private List<String> roles;
 
-    @JsonProperty("isExists")
-    private boolean exists;
+    @JsonProperty("isExist")
+    private boolean exist;
 
     @JsonProperty("isRemoved")
     private boolean removed;
