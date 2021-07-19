@@ -30,7 +30,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @Document(collection = "ApiTestCase")
-public class ApiTestCase extends BaseEntity {
+public class ApiTestCaseEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String apiId;

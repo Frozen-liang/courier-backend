@@ -14,10 +14,11 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
-@Document(collection = "SceneCaseGroup")
-public class SceneCaseGroup extends BaseEntity {
+@Document(collection = "CaseTemplateGroup")
+public class CaseTemplateGroupEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;

@@ -20,10 +20,9 @@ import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
-import com.sms.satp.entity.apitestcase.ApiTestCase;
+import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.repository.ApiTestCaseRepository;
-import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseRepository;
 import com.sms.satp.service.impl.ApiTestCaseServiceImpl;
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ class ApiTestCaseServiceTest {
     private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
     private final ApiTestCaseService apiTestCaseService = new ApiTestCaseServiceImpl(
         apiTestCaseRepository, customizedApiTestCaseRepository, apiTestCaseMapper);
-    private final ApiTestCase apiTestCase = ApiTestCase.builder().id(ID).build();
+    private final ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder().id(ID).build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
         .id(ID).build();
     private final ApiTestCaseRequest apiTestCaseRequest = ApiTestCaseRequest.builder()
@@ -77,15 +76,15 @@ class ApiTestCaseServiceTest {
     @DisplayName("Test the add method in the ApiTestCase service")
     public void add_test() {
         when(apiTestCaseMapper.toEntity(apiTestCaseRequest)).thenReturn(apiTestCase);
-        when(apiTestCaseRepository.insert(any(ApiTestCase.class))).thenReturn(apiTestCase);
+        when(apiTestCaseRepository.insert(any(ApiTestCaseEntity.class))).thenReturn(apiTestCase);
         assertThat(apiTestCaseService.add(apiTestCaseRequest)).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while adding ApiTestCase")
     public void add_exception_test() {
-        when(apiTestCaseMapper.toEntity(any())).thenReturn(ApiTestCase.builder().build());
-        doThrow(new RuntimeException()).when(apiTestCaseRepository).insert(any(ApiTestCase.class));
+        when(apiTestCaseMapper.toEntity(any())).thenReturn(ApiTestCaseEntity.builder().build());
+        doThrow(new RuntimeException()).when(apiTestCaseRepository).insert(any(ApiTestCaseEntity.class));
         assertThatThrownBy(() -> apiTestCaseService.add(apiTestCaseRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_API_TEST_CASE_ERROR.getCode());
@@ -96,7 +95,7 @@ class ApiTestCaseServiceTest {
     public void edit_test() {
         when(apiTestCaseMapper.toEntity(apiTestCaseRequest)).thenReturn(apiTestCase);
         when(apiTestCaseRepository.existsById(any())).thenReturn(Boolean.TRUE);
-        when(apiTestCaseRepository.save(any(ApiTestCase.class))).thenReturn(apiTestCase);
+        when(apiTestCaseRepository.save(any(ApiTestCaseEntity.class))).thenReturn(apiTestCase);
         assertThat(apiTestCaseService.edit(apiTestCaseRequest)).isTrue();
     }
 
@@ -105,7 +104,7 @@ class ApiTestCaseServiceTest {
     public void edit_exception_test() {
         when(apiTestCaseMapper.toEntity(apiTestCaseRequest)).thenReturn(apiTestCase);
         when(apiTestCaseRepository.existsById(any())).thenReturn(Boolean.TRUE);
-        doThrow(new RuntimeException()).when(apiTestCaseRepository).save(any(ApiTestCase.class));
+        doThrow(new RuntimeException()).when(apiTestCaseRepository).save(any(ApiTestCaseEntity.class));
         assertThatThrownBy(() -> apiTestCaseService.edit(apiTestCaseRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_API_TEST_CASE_ERROR.getCode());
@@ -124,9 +123,9 @@ class ApiTestCaseServiceTest {
     @Test
     @DisplayName("Test the list method in the ApiTestCase service")
     public void list_test() {
-        ArrayList<ApiTestCase> apiTestCaseList = new ArrayList<>();
+        ArrayList<ApiTestCaseEntity> apiTestCaseList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            apiTestCaseList.add(ApiTestCase.builder().build());
+            apiTestCaseList.add(ApiTestCaseEntity.builder().build());
         }
         ArrayList<ApiTestCaseResponse> apiTestCaseResponseList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {

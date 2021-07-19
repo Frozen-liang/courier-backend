@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.response.DataCollectionResponse;
-import com.sms.satp.entity.datacollection.DataCollection;
+import com.sms.satp.entity.datacollection.DataCollectionEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ class DataCollectionMapperTest {
     @Test
     @DisplayName("Test the method to convert the DataCollection's entity object to a dto object")
     void entity_to_dto() {
-        DataCollection dataCollection = DataCollection.builder()
+        DataCollectionEntity dataCollection = DataCollectionEntity.builder()
             .collectionName(COLLECTION_NAME)
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
@@ -37,9 +37,9 @@ class DataCollectionMapperTest {
     @Test
     @DisplayName("Test the method for converting an DataCollection entity list object to a dto list object")
     void dataCollectionList_to_dataCollectionDtoList() {
-        List<DataCollection> dataCollections = new ArrayList<>();
+        List<DataCollectionEntity> dataCollections = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
-            dataCollections.add(DataCollection.builder().collectionName(COLLECTION_NAME).build());
+            dataCollections.add(DataCollectionEntity.builder().collectionName(COLLECTION_NAME).build());
         }
         List<DataCollectionResponse> dataCollectionDtoList = dataCollectionMapper.toDtoList(dataCollections);
         assertThat(dataCollectionDtoList).hasSize(SIZE);
@@ -53,7 +53,7 @@ class DataCollectionMapperTest {
         DataCollectionRequest dataCollectionDto = DataCollectionRequest.builder()
             .collectionName(COLLECTION_NAME)
             .build();
-        DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionDto);
+        DataCollectionEntity dataCollection = dataCollectionMapper.toEntity(dataCollectionDto);
         assertThat(dataCollection.getCollectionName()).isEqualTo(COLLECTION_NAME);
     }
 
@@ -67,7 +67,7 @@ class DataCollectionMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method to convert the DataCollection's dto object to a entity object")
     void null_dto_to_entity() {
-        DataCollection dataCollection = dataCollectionMapper.toEntity(null);
+        DataCollectionEntity dataCollection = dataCollectionMapper.toEntity(null);
         assertThat(dataCollection).isNull();
     }
 

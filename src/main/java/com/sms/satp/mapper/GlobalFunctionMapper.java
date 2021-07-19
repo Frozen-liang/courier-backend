@@ -2,7 +2,7 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.dto.request.GlobalFunctionRequest;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
-import com.sms.satp.entity.function.GlobalFunction;
+import com.sms.satp.entity.function.GlobalFunctionEntity;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -12,9 +12,9 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = ParamInfoMapper.class)
 public interface GlobalFunctionMapper {
 
-    GlobalFunctionResponse toDto(GlobalFunction globalFunction);
+    GlobalFunctionResponse toDto(GlobalFunctionEntity globalFunction);
 
-    List<GlobalFunctionResponse> toDtoList(List<GlobalFunction> globalFunctions);
+    List<GlobalFunctionResponse> toDtoList(List<GlobalFunctionEntity> globalFunctions);
 
-    GlobalFunction toEntity(GlobalFunctionRequest globalFunctionDto);
+    GlobalFunctionEntity toEntity(GlobalFunctionRequest globalFunctionDto);
 }

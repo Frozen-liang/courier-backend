@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ProjectFunctionRequest;
 import com.sms.satp.dto.response.ProjectFunctionResponse;
-import com.sms.satp.entity.function.ProjectFunction;
+import com.sms.satp.entity.function.ProjectFunctionEntity;
 import com.sms.satp.mapper.ProjectFunctionMapper;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.ProjectFunctionRepository;
@@ -41,7 +41,7 @@ class ProjectFunctionServiceTest {
     private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
     private final ProjectFunctionService projectFunctionService = new ProjectFunctionServiceImpl(
         projectFunctionRepository, projectFunctionMapper, globalFunctionService, commonDeleteRepository);
-    private final ProjectFunction projectFunction = ProjectFunction.builder().id(ID).build();
+    private final ProjectFunctionEntity projectFunction = ProjectFunctionEntity.builder().id(ID).build();
     private final ProjectFunctionResponse projectFunctionResponse = ProjectFunctionResponse
         .builder().id(ID).build();
     private final ProjectFunctionRequest projectFunctionRequest = ProjectFunctionRequest
@@ -76,16 +76,16 @@ class ProjectFunctionServiceTest {
     @DisplayName("Test the add method in the ProjectFunction service")
     public void add_test() {
         when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
-        when(projectFunctionRepository.insert(any(ProjectFunction.class))).thenReturn(projectFunction);
+        when(projectFunctionRepository.insert(any(ProjectFunctionEntity.class))).thenReturn(projectFunction);
         projectFunctionService.add(projectFunctionRequest);
-        verify(projectFunctionRepository, times(1)).insert(any(ProjectFunction.class));
+        verify(projectFunctionRepository, times(1)).insert(any(ProjectFunctionEntity.class));
     }
 
     @Test
     @DisplayName("An exception occurred while adding ProjectFunction")
     public void add_exception_test() {
-        when(projectFunctionMapper.toEntity(any())).thenReturn(ProjectFunction.builder().build());
-        doThrow(new RuntimeException()).when(projectFunctionRepository).insert(any(ProjectFunction.class));
+        when(projectFunctionMapper.toEntity(any())).thenReturn(ProjectFunctionEntity.builder().build());
+        doThrow(new RuntimeException()).when(projectFunctionRepository).insert(any(ProjectFunctionEntity.class));
         assertThatThrownBy(() -> projectFunctionService.add(projectFunctionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_PROJECT_FUNCTION_ERROR.getCode());
@@ -96,7 +96,7 @@ class ProjectFunctionServiceTest {
     public void edit_test() {
         when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
         when(projectFunctionRepository.existsById(any())).thenReturn(Boolean.TRUE);
-        when(projectFunctionRepository.save(any(ProjectFunction.class))).thenReturn(projectFunction);
+        when(projectFunctionRepository.save(any(ProjectFunctionEntity.class))).thenReturn(projectFunction);
         assertThat(projectFunctionService.edit(projectFunctionRequest)).isTrue();
     }
 
@@ -105,7 +105,7 @@ class ProjectFunctionServiceTest {
     public void edit_exception_test() {
         when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
         when(projectFunctionRepository.existsById(any())).thenReturn(Boolean.TRUE);
-        doThrow(new RuntimeException()).when(projectFunctionRepository).save(any(ProjectFunction.class));
+        doThrow(new RuntimeException()).when(projectFunctionRepository).save(any(ProjectFunctionEntity.class));
         assertThatThrownBy(() -> projectFunctionService.edit(projectFunctionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_PROJECT_FUNCTION_ERROR.getCode());
@@ -124,9 +124,9 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("Test the list method in the ProjectFunction service")
     public void list_test() {
-        ArrayList<ProjectFunction> list = new ArrayList<>();
+        ArrayList<ProjectFunctionEntity> list = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            list.add(ProjectFunction.builder().build());
+            list.add(ProjectFunctionEntity.builder().build());
         }
         ArrayList<ProjectFunctionResponse> projectEnvironmentDtoList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
@@ -150,7 +150,7 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectFunction service")
     public void delete_test() {
-        when(commonDeleteRepository.deleteByIds(ID_LIST, ProjectFunction.class)).thenReturn(Boolean.TRUE);
+        when(commonDeleteRepository.deleteByIds(ID_LIST, ProjectFunctionEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(projectFunctionService.delete(ID_LIST)).isTrue();
     }
 
@@ -158,7 +158,7 @@ class ProjectFunctionServiceTest {
     @DisplayName("An exception occurred while delete ProjectFunction")
     public void delete_exception_test() {
         doThrow(new RuntimeException()).when(commonDeleteRepository)
-            .deleteByIds(ID_LIST, ProjectFunction.class);
+            .deleteByIds(ID_LIST, ProjectFunctionEntity.class);
         assertThatThrownBy(() -> projectFunctionService.delete(Collections.singletonList(ID)))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_PROJECT_FUNCTION_BY_ID_ERROR.getCode());

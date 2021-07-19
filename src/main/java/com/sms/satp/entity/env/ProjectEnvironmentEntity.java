@@ -1,5 +1,6 @@
-package com.sms.satp.entity.function;
+package com.sms.satp.entity.env;
 
+import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.api.common.ParamInfo;
 import java.util.List;
@@ -19,13 +20,22 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Document(collection = "ProjectFunction")
-public class ProjectFunction extends BaseEntity {
+@Document(collection = "ProjectEnvironment")
+public class ProjectEnvironmentEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
-    private String functionKey;
-    private String functionName;
-    private List<ParamInfo> functionParams;
-    private String functionCode;
+    private String envName;
+    private String envDesc;
+    private String frontUri;
+    private EnvironmentAuth envAuth;
+    private String beforeInject;
+    private String afterInject;
+    private String globalBeforeProcess;
+    private String globalAfterProcess;
+    private List<ParamInfo> headers;
+    private List<ParamInfo> envVariable;
+    private List<ParamInfo> urlParams;
+    private ApiRequestParamType requestParamType;
+    private List<ParamInfo> requestParams;
 }

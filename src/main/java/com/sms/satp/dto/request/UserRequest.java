@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +24,7 @@ public class UserRequest {
     private String groupId;
 
     private String email;
-
+    @JsonProperty("isEnabled")
     private Boolean enabled;
 
     private List<String> associatedWorkspaces;

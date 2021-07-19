@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @NoArgsConstructor
@@ -31,18 +32,17 @@ public class ParamInfoResponse {
      * @link ParamType
      */
     private Integer paramType;
-    /**
-     * 是否递归引用自己.
-     */
-    private Boolean reference;
+
     /**
      * 是否必填.
      */
-    private Boolean required;
+    @Field("isRequired")
+    private boolean required;
     /**
      * 是否传输.
      */
-    private Boolean checkbox;
+    @Field("isTransport")
+    private boolean transport;
     /**
      * 对象子属性. JSON/Object/JsonArray.
      */

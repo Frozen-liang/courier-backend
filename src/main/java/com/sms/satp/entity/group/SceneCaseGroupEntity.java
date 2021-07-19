@@ -1,8 +1,6 @@
-package com.sms.satp.entity.function;
+package com.sms.satp.entity.group;
 
 import com.sms.satp.entity.BaseEntity;
-import com.sms.satp.entity.api.common.ParamInfo;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,19 +11,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
-@SuperBuilder
-@Data
-@AllArgsConstructor
 @NoArgsConstructor
-@ToString(callSuper = true)
+@AllArgsConstructor
+@Data
 @EqualsAndHashCode(callSuper = true)
-@Document(collection = "GlobalFunction")
-public class GlobalFunction extends BaseEntity {
+@SuperBuilder
+@Document(collection = "SceneCaseGroup")
+public class SceneCaseGroupEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
-    private String workspaceId;
-    private String functionKey;
-    private String functionName;
-    private List<ParamInfo> functionParams;
-    private String functionCode;
+    private String projectId;
+
+    private String name;
+
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String parentId;
 }

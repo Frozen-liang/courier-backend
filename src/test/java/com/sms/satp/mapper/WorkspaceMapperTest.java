@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.dto.request.WorkspaceRequest;
 import com.sms.satp.dto.response.WorkspaceResponse;
-import com.sms.satp.entity.workspace.Workspace;
+import com.sms.satp.entity.workspace.WorkspaceEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ class WorkspaceMapperTest {
     @Test
     @DisplayName("Test the method to convert the Workspace's entity object to a dto object")
     void entity_to_dto() {
-        Workspace workspace = Workspace.builder()
+        WorkspaceEntity workspace = WorkspaceEntity.builder()
             .name(NAME)
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
@@ -37,9 +37,9 @@ class WorkspaceMapperTest {
     @Test
     @DisplayName("Test the method for converting an Workspace entity list object to a dto list object")
     void workspaceList_to_workspaceDtoList() {
-        List<Workspace> workspaces = new ArrayList<>();
+        List<WorkspaceEntity> workspaces = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
-            workspaces.add(Workspace.builder().name(NAME).build());
+            workspaces.add(WorkspaceEntity.builder().name(NAME).build());
         }
         List<WorkspaceResponse> workspaceResponseList = workspaceMapper.toDtoList(workspaces);
         assertThat(workspaceResponseList).hasSize(SIZE);
@@ -52,7 +52,7 @@ class WorkspaceMapperTest {
         WorkspaceRequest workspaceRequest = WorkspaceRequest.builder()
             .name(NAME)
             .build();
-        Workspace workspace = workspaceMapper.toEntity(workspaceRequest);
+        WorkspaceEntity workspace = workspaceMapper.toEntity(workspaceRequest);
         assertThat(workspace.getName()).isEqualTo(NAME);
     }
 

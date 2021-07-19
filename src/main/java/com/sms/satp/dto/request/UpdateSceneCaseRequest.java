@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -19,9 +20,11 @@ public class UpdateSceneCaseRequest {
     private String createUserName;
     @NotNull(message = "The projectId can not be empty")
     private String projectId;
+    private String dataCollId;
     private String groupId;
     private String testStatus;
     private List<String> tagIds;
     private Integer priority;
+    @JsonProperty("isRemoved")
     private boolean removed;
 }

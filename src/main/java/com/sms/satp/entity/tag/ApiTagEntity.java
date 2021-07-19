@@ -1,5 +1,6 @@
-package com.sms.satp.entity.group;
+package com.sms.satp.entity.tag;
 
+import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,17 +12,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder
-@Document(collection = "ApiTagGroup")
-public class ApiTagGroup extends BaseEntity {
+@Document(collection = "ApiTag")
+public class ApiTagEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
-
-    private String name;
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String groupId;
+    private ApiTagType tagType;
+    private String tagName;
 }

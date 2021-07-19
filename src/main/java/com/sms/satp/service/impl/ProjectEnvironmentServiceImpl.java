@@ -23,7 +23,7 @@ import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.ProjectEnvironmentRequest;
 import com.sms.satp.dto.response.GlobalEnvironmentResponse;
 import com.sms.satp.dto.response.ProjectEnvironmentResponse;
-import com.sms.satp.entity.env.ProjectEnvironment;
+import com.sms.satp.entity.env.ProjectEnvironmentEntity;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
@@ -33,7 +33,6 @@ import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -68,10 +67,10 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     public Page<ProjectEnvironmentResponse> page(PageDto pageDto, String projectId) {
         try {
             PageDtoConverter.frontMapping(pageDto);
-            ProjectEnvironment projectEnvironment = ProjectEnvironment.builder()
+            ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder()
                 .projectId(projectId)
                 .build();
-            Example<ProjectEnvironment> example = Example.of(projectEnvironment);
+            Example<ProjectEnvironmentEntity> example = Example.of(projectEnvironment);
             Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
             Pageable pageable = PageRequest.of(
                 pageDto.getPageNumber(), pageDto.getPageSize(), sort);
@@ -87,15 +86,16 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     public List<Object> list(String projectId, String workspaceId) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
-            ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().projectId(projectId).build();
+            ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder().projectId(projectId)
+                .build();
             List<Object> result = new ArrayList<>();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(REMOVE.getFiled(), GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
-            Example<ProjectEnvironment> example = Example.of(projectEnvironment, exampleMatcher);
+            Example<ProjectEnvironmentEntity> example = Example.of(projectEnvironment, exampleMatcher);
             List<GlobalEnvironmentResponse> globalEnvironments = globalEnvironmentService.list(workspaceId);
-            List<ProjectEnvironment> projectEnvironments = projectEnvironmentRepository.findAll(example, sort);
+            List<ProjectEnvironmentEntity> projectEnvironments = projectEnvironmentRepository.findAll(example, sort);
             result.addAll(globalEnvironments);
             result.addAll(projectEnvironmentMapper.toDtoList(projectEnvironments));
             return result;
@@ -112,7 +112,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
         log.info("ProjectEnvironmentService-add()-params: [ProjectEnvironment]={}",
             projectEnvironmentRequest.toString());
         try {
-            ProjectEnvironment projectEnvironment = projectEnvironmentMapper
+            ProjectEnvironmentEntity projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentRequest);
             projectEnvironmentRepository.insert(projectEnvironment);
         } catch (Exception e) {
@@ -131,7 +131,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
         try {
             boolean exists = projectEnvironmentRepository.existsById(projectEnvironmentRequest.getId());
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "ProjectEnvironment", projectEnvironmentRequest.getId());
-            ProjectEnvironment projectEnvironment = projectEnvironmentMapper
+            ProjectEnvironmentEntity projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentRequest);
             projectEnvironmentRepository.save(projectEnvironment);
         } catch (ApiTestPlatformException apiTestPlatEx) {
@@ -150,7 +150,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, ProjectEnvironment.class);
+            return commonDeleteRepository.deleteByIds(ids, ProjectEnvironmentEntity.class);
         } catch (Exception e) {
             log.error("Failed to delete the projectEnvironment!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR);
@@ -170,7 +170,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
-    public ProjectEnvironment findOne(String id) {
+    public ProjectEnvironmentEntity findOne(String id) {
         return projectEnvironmentRepository.findById(id)
             .orElse(projectEnvironmentMapper.toEntityByGlobal(globalEnvironmentService.findOne(id)));
     }

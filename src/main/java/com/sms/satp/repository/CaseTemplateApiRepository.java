@@ -1,14 +1,14 @@
 package com.sms.satp.repository;
 
-import com.sms.satp.entity.scenetest.CaseTemplateApi;
+import com.sms.satp.entity.scenetest.CaseTemplateApiEntity;
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface CaseTemplateApiRepository extends MongoRepository<CaseTemplateApi, String> {
+public interface CaseTemplateApiRepository extends MongoRepository<CaseTemplateApiEntity, String> {
 
     Long deleteAllByIdIsIn(List<String> ids);
 
-    List<CaseTemplateApi> findAllByIdIsIn(List<String> ids);
+    List<CaseTemplateApiEntity> findAllByIdIsIn(List<String> ids);
 
-    List<CaseTemplateApi> findAllByCaseTemplateIdOrderByOrder(String caseTemplateId);
+    List<CaseTemplateApiEntity> findAllByCaseTemplateIdOrderByOrder(String caseTemplateId);
 }

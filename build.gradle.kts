@@ -16,6 +16,7 @@ version = "1.0.0-SNAPSHOT"
 description = "sms-satp"
 
 
+
 plugins {
     val springVersion = "2.4.5"
     java
@@ -68,7 +69,9 @@ repositories {
     mavenCentral()
 }
 
-
+springBoot {
+    buildInfo()
+}
 
 
 dependencies {
@@ -113,12 +116,12 @@ dependencies {
 
 }
 
-
-tasks.withType<BootJar> {
-    manifest {
-        attributes(mapOf(Pair("Product-Version", project.version.toString())))
-    }
-}
+// Temporarily cancel writing to the list through packaging.
+//tasks.withType<BootJar> {
+//    manifest {
+//        attributes("Product-Version" to project.version.toString())
+//    }
+//}
 
 
 tasks.checkstyleTest {
@@ -147,7 +150,7 @@ tasks.spotbugsMain {
 
 tasks.jacocoTestReport {
     classDirectories.setFrom(sourceSets.main.get().output.asFileTree.matching {
-        exclude("com/sms/satp/utils/**", "com/sms/satp/engine/**", "com/sms/satp/parser/converter/**.class", "com/sms/satp/common/**", "**/entity/**/**.class", "**/SatpApplication.class", "com/sms/satp/infrastructure/**", "com/sms/satp/websocket/**.class", "com/sms/satp/config/**.class", "com/sms/satp/controller/**")
+        exclude("com/sms/satp/security/SecurityConfig.class", "com/sms/satp/utils/**", "com/sms/satp/engine/**", "com/sms/satp/parser/converter/**.class", "com/sms/satp/common/**", "**/entity/**/**.class", "**/SatpApplication.class", "com/sms/satp/infrastructure/**", "com/sms/satp/websocket/**.class", "com/sms/satp/config/**.class", "com/sms/satp/controller/**")
     })
     dependsOn(tasks.test)
     reports {
@@ -163,8 +166,6 @@ tasks.jacocoTestReport {
 tasks.jacocoTestCoverageVerification {
     violationRules {
         rule {
-
-//            excludes = listOf("**/entity/**.class","**/pojo/**.class","**/SatpApplication.class","**/response/Response.class","**/parser/common/**.class")
             limit {
                 counter = "INSTRUCTION"
                 value = "COVEREDRATIO"

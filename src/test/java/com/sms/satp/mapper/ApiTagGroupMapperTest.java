@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.dto.request.ApiTagGroupRequest;
 import com.sms.satp.dto.response.ApiTagGroupResponse;
-import com.sms.satp.entity.group.ApiTagGroup;
+import com.sms.satp.entity.group.ApiTagGroupEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ class ApiTagGroupMapperTest {
     @Test
     @DisplayName("Test the method to convert the ApiTagGroup's entity object to a dto object")
     void entity_to_dto() {
-        ApiTagGroup apiTagGroup = ApiTagGroup.builder()
+        ApiTagGroupEntity apiTagGroup = ApiTagGroupEntity.builder()
             .name(NAME)
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
@@ -37,9 +37,9 @@ class ApiTagGroupMapperTest {
     @Test
     @DisplayName("Test the method for converting an ApiTagGroup entity list object to a dto list object")
     void apiTagGroupList_to_apiTagGroupResponseList() {
-        List<ApiTagGroup> apiTagGroups = new ArrayList<>();
+        List<ApiTagGroupEntity> apiTagGroups = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
-            apiTagGroups.add(ApiTagGroup.builder().name(NAME).build());
+            apiTagGroups.add(ApiTagGroupEntity.builder().name(NAME).build());
         }
         List<ApiTagGroupResponse> apiTagGroupResponseList = apiTagGroupMapper.toDtoList(apiTagGroups);
         assertThat(apiTagGroupResponseList).hasSize(SIZE);
@@ -52,7 +52,7 @@ class ApiTagGroupMapperTest {
         ApiTagGroupRequest apiTagGroupRequest = ApiTagGroupRequest.builder()
             .name(NAME)
             .build();
-        ApiTagGroup apiTagGroup = apiTagGroupMapper.toEntity(apiTagGroupRequest);
+        ApiTagGroupEntity apiTagGroup = apiTagGroupMapper.toEntity(apiTagGroupRequest);
         assertThat(apiTagGroup.getName()).isEqualTo(NAME);
     }
 
@@ -66,7 +66,7 @@ class ApiTagGroupMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method to convert the ApiTagGroup's dto object to a entity object")
     void null_dto_to_entity() {
-        ApiTagGroup apiTagGroup = apiTagGroupMapper.toEntity(null);
+        ApiTagGroupEntity apiTagGroup = apiTagGroupMapper.toEntity(null);
         assertThat(apiTagGroup).isNull();
     }
 

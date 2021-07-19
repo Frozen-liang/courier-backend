@@ -22,7 +22,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = "GlobalEnvironment")
-public class GlobalEnvironment extends BaseEntity {
+public class GlobalEnvironmentEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String workspaceId;

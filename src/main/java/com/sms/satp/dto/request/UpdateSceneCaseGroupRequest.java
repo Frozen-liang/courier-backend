@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +21,6 @@ public class UpdateSceneCaseGroupRequest {
     private String name;
 
     private String parentId;
-
+    @JsonProperty("isRemoved")
     private boolean removed;
 }

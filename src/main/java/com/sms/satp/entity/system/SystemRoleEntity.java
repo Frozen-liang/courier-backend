@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
@@ -23,7 +24,8 @@ public class SystemRoleEntity {
     private String name;
     private String description;
     @Default
-    private Boolean enable = true;
+    @Field("isEnable")
+    private boolean enable = true;
     @CreatedDate
     private LocalDateTime createDateTime;
 }
