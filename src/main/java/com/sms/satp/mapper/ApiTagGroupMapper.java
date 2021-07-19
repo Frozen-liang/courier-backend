@@ -2,7 +2,7 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.dto.request.ApiTagGroupRequest;
 import com.sms.satp.dto.response.ApiTagGroupResponse;
-import com.sms.satp.entity.group.ApiTagGroup;
+import com.sms.satp.entity.group.ApiTagGroupEntity;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -12,9 +12,9 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ApiTagGroupMapper {
 
-    ApiTagGroupResponse toDto(ApiTagGroup apiTagGroup);
+    ApiTagGroupResponse toDto(ApiTagGroupEntity apiTagGroup);
 
-    List<ApiTagGroupResponse> toDtoList(List<ApiTagGroup> apiTagGroupList);
+    List<ApiTagGroupResponse> toDtoList(List<ApiTagGroupEntity> apiTagGroupList);
 
-    ApiTagGroup toEntity(ApiTagGroupRequest apiTagGroupRequest);
+    ApiTagGroupEntity toEntity(ApiTagGroupRequest apiTagGroupRequest);
 }

@@ -14,8 +14,8 @@ import com.sms.satp.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.engine.service.CaseDispatcherService;
-import com.sms.satp.entity.env.ProjectEnvironment;
-import com.sms.satp.entity.job.ApiTestCaseJob;
+import com.sms.satp.entity.env.ProjectEnvironmentEntity;
+import com.sms.satp.entity.job.ApiTestCaseJobEntity;
 import com.sms.satp.entity.job.ApiTestCaseJobReport;
 import com.sms.satp.entity.job.JobCaseApi;
 import com.sms.satp.entity.job.common.CaseReport;
@@ -127,9 +127,9 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
         }
     }
 
-    private ApiTestCaseJob createApiTestCaseJob(JobEnvironment jobEnvironment,
+    private ApiTestCaseJobEntity createApiTestCaseJob(JobEnvironment jobEnvironment,
         CustomUser currentUser) {
-        return ApiTestCaseJob.builder()
+        return ApiTestCaseJobEntity.builder()
             .createDateTime(LocalDateTime.now())
             .modifyUserId(currentUser.getId())
             .createUserId(currentUser.getId())
@@ -153,14 +153,14 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
     @Override
     public void apiTest(ApiTestRequest apiTestRequest, CustomUser currentUser) {
         try {
-            ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(apiTestRequest.getEnvId());
+            ProjectEnvironmentEntity projectEnvironment = projectEnvironmentService.findOne(apiTestRequest.getEnvId());
             String apiPath = apiTestRequest.getApiPath();
 
             if (Objects.isNull(projectEnvironment)) {
                 checkApiPath(apiPath);
             }
             JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
-            ApiTestCaseJob apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
+            ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
             apiTestCaseJob.setApiTestCase(
                 JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestRequest)).build());
             apiTestCaseJobRepository.insert(apiTestCaseJob);

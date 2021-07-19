@@ -2,7 +2,7 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.dto.request.GlobalEnvironmentRequest;
 import com.sms.satp.dto.response.GlobalEnvironmentResponse;
-import com.sms.satp.entity.env.GlobalEnvironment;
+import com.sms.satp.entity.env.GlobalEnvironmentEntity;
 import com.sms.satp.utils.EnumCommonUtils;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -13,9 +13,9 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {ParamInfoMapper.class, EnumCommonUtils.class})
 public interface GlobalEnvironmentMapper {
 
-    GlobalEnvironmentResponse toDto(GlobalEnvironment globalEnvironment);
+    GlobalEnvironmentResponse toDto(GlobalEnvironmentEntity globalEnvironment);
 
-    List<GlobalEnvironmentResponse> toDtoList(List<GlobalEnvironment> globalEnvironments);
+    List<GlobalEnvironmentResponse> toDtoList(List<GlobalEnvironmentEntity> globalEnvironments);
 
-    GlobalEnvironment toEntity(GlobalEnvironmentRequest globalEnvironmentDto);
+    GlobalEnvironmentEntity toEntity(GlobalEnvironmentRequest globalEnvironmentDto);
 }

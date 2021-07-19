@@ -19,7 +19,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = "Workspace")
-public class Workspace extends BaseEntity {
+public class WorkspaceEntity extends BaseEntity {
 
     private String name;
 

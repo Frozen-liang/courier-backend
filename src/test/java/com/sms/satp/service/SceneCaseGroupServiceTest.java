@@ -5,11 +5,9 @@ import com.sms.satp.dto.request.AddSceneCaseGroupRequest;
 import com.sms.satp.dto.request.SearchSceneCaseGroupRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseGroupRequest;
 import com.sms.satp.dto.response.SceneCaseGroupResponse;
-import com.sms.satp.dto.response.SceneCaseResponse;
-import com.sms.satp.entity.group.SceneCaseGroup;
-import com.sms.satp.entity.scenetest.SceneCase;
+import com.sms.satp.entity.group.SceneCaseGroupEntity;
+import com.sms.satp.entity.scenetest.SceneCaseEntity;
 import com.sms.satp.mapper.SceneCaseGroupMapper;
-import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.repository.SceneCaseGroupRepository;
 import com.sms.satp.service.impl.SceneCaseGroupServiceImpl;
 import java.util.List;
@@ -18,7 +16,6 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
 
 import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_GROUP_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_GROUP_ERROR;
@@ -47,9 +44,9 @@ class SceneCaseGroupServiceTest {
     @Test
     @DisplayName("Test the add method in the SceneCaseGroup service")
     void add_test() {
-        SceneCaseGroup caseGroup = getGroup();
+        SceneCaseGroupEntity caseGroup = getGroup();
         when(sceneCaseGroupMapper.toSceneCaseGroupByAdd(any())).thenReturn(caseGroup);
-        when(sceneCaseGroupRepository.insert(any(SceneCaseGroup.class))).thenReturn(caseGroup);
+        when(sceneCaseGroupRepository.insert(any(SceneCaseGroupEntity.class))).thenReturn(caseGroup);
         AddSceneCaseGroupRequest request = AddSceneCaseGroupRequest.builder().name(MOCK_NAME).build();
         Boolean isSuccess = sceneCaseGroupService.add(request);
         assertTrue(isSuccess);
@@ -58,9 +55,9 @@ class SceneCaseGroupServiceTest {
     @Test
     @DisplayName("Test the add method in the SceneCaseGroup service thrown exception")
     void add_test_thrownException() {
-        SceneCaseGroup caseGroup = getGroup();
+        SceneCaseGroupEntity caseGroup = getGroup();
         when(sceneCaseGroupMapper.toSceneCaseGroupByAdd(any())).thenReturn(caseGroup);
-        when(sceneCaseGroupRepository.insert(any(SceneCaseGroup.class)))
+        when(sceneCaseGroupRepository.insert(any(SceneCaseGroupEntity.class)))
             .thenThrow(new ApiTestPlatformException(ADD_SCENE_CASE_GROUP_ERROR));
         AddSceneCaseGroupRequest request = AddSceneCaseGroupRequest.builder().name(MOCK_NAME).build();
         assertThatThrownBy(() -> sceneCaseGroupService.add(request)).isInstanceOf(ApiTestPlatformException.class);
@@ -69,9 +66,9 @@ class SceneCaseGroupServiceTest {
     @Test
     @DisplayName("Test the edit method in the SceneCaseGroup service")
     void edit_test() {
-        SceneCaseGroup caseGroup = getGroup();
+        SceneCaseGroupEntity caseGroup = getGroup();
         when(sceneCaseGroupMapper.toSceneCaseGroupByUpdate(any())).thenReturn(caseGroup);
-        Optional<SceneCaseGroup> optional = Optional.ofNullable(caseGroup);
+        Optional<SceneCaseGroupEntity> optional = Optional.ofNullable(caseGroup);
         when(sceneCaseGroupRepository.findById(any())).thenReturn(optional);
         when(sceneCaseGroupRepository.save(any())).thenReturn(caseGroup);
         Boolean isSuccess =
@@ -82,7 +79,7 @@ class SceneCaseGroupServiceTest {
     @Test
     @DisplayName("Test the edit method in the SceneCaseGroup service thrown exception")
     void edit_test_thrownException() {
-        SceneCaseGroup caseGroup = getGroup();
+        SceneCaseGroupEntity caseGroup = getGroup();
         when(sceneCaseGroupMapper.toSceneCaseGroupByUpdate(any())).thenReturn(caseGroup);
         when(sceneCaseGroupRepository.findById(any()))
             .thenThrow(new ApiTestPlatformException(EDIT_SCENE_CASE_GROUP_ERROR));
@@ -94,11 +91,11 @@ class SceneCaseGroupServiceTest {
     @Test
     @DisplayName("Test the deleteById method in the SceneCaseGroup service")
     void deleteById_test() {
-        SceneCaseGroup caseGroup = getGroup();
-        Optional<SceneCaseGroup> optional = Optional.ofNullable(caseGroup);
+        SceneCaseGroupEntity caseGroup = getGroup();
+        Optional<SceneCaseGroupEntity> optional = Optional.ofNullable(caseGroup);
         when(sceneCaseGroupRepository.findById(any())).thenReturn(optional);
         doNothing().when(sceneCaseGroupRepository).deleteById(any());
-        List<SceneCase> sceneCaseList = Lists.newArrayList(SceneCase.builder().build());
+        List<SceneCaseEntity> sceneCaseList = Lists.newArrayList(SceneCaseEntity.builder().build());
         when(sceneCaseService.get(any(),any())).thenReturn(sceneCaseList);
         when(sceneCaseService.batchEdit(any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = sceneCaseGroupService.deleteById(MOCK_ID);
@@ -117,8 +114,8 @@ class SceneCaseGroupServiceTest {
     @Test
     @DisplayName("Test the getList method in the SceneCaseGroup service")
     void getList_test() {
-        List<SceneCaseGroup> caseTemplateGroups =
-            Lists.newArrayList(SceneCaseGroup.builder().id(MOCK_ID).build());
+        List<SceneCaseGroupEntity> caseTemplateGroups =
+            Lists.newArrayList(SceneCaseGroupEntity.builder().id(MOCK_ID).build());
         when(sceneCaseGroupRepository.findAll(any(Example.class))).thenReturn(caseTemplateGroups);
         List<SceneCaseGroupResponse> caseTemplateGroupResponseList = Lists.newArrayList(
             SceneCaseGroupResponse.builder().id(MOCK_ID).build());
@@ -138,8 +135,8 @@ class SceneCaseGroupServiceTest {
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
-    private SceneCaseGroup getGroup() {
-        return SceneCaseGroup.builder().id(MOCK_ID).build();
+    private SceneCaseGroupEntity getGroup() {
+        return SceneCaseGroupEntity.builder().id(MOCK_ID).build();
     }
 
 

@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.WorkspaceRequest;
 import com.sms.satp.dto.response.WorkspaceResponse;
-import com.sms.satp.entity.workspace.Workspace;
+import com.sms.satp.entity.workspace.WorkspaceEntity;
 import com.sms.satp.mapper.WorkspaceMapper;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.WorkspaceRepository;
@@ -38,7 +38,7 @@ class WorkspaceServiceTest {
     private final ProjectService projectService = mock(ProjectService.class);
     private final WorkspaceService workspaceService = new WorkspaceServiceImpl(projectService,
         workspaceRepository, commonDeleteRepository, workspaceMapper);
-    private final Workspace workspace = Workspace.builder().id(ID).build();
+    private final WorkspaceEntity workspace = WorkspaceEntity.builder().id(ID).build();
     private final WorkspaceResponse workspaceResponse = WorkspaceResponse.builder()
         .id(ID).build();
     private final WorkspaceRequest workspaceRequest = WorkspaceRequest.builder()
@@ -69,15 +69,15 @@ class WorkspaceServiceTest {
     @DisplayName("Test the add method in the Workspace service")
     public void add_test() {
         when(workspaceMapper.toEntity(workspaceRequest)).thenReturn(workspace);
-        when(workspaceRepository.insert(any(Workspace.class))).thenReturn(workspace);
+        when(workspaceRepository.insert(any(WorkspaceEntity.class))).thenReturn(workspace);
         assertThat(workspaceService.add(workspaceRequest)).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while adding Workspace")
     public void add_exception_test() {
-        when(workspaceMapper.toEntity(any())).thenReturn(Workspace.builder().build());
-        doThrow(new RuntimeException()).when(workspaceRepository).insert(any(Workspace.class));
+        when(workspaceMapper.toEntity(any())).thenReturn(WorkspaceEntity.builder().build());
+        doThrow(new RuntimeException()).when(workspaceRepository).insert(any(WorkspaceEntity.class));
         assertThatThrownBy(() -> workspaceService.add(workspaceRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_WORKSPACE_ERROR.getCode());
@@ -88,7 +88,7 @@ class WorkspaceServiceTest {
     public void edit_test() {
         when(workspaceMapper.toEntity(workspaceRequest)).thenReturn(workspace);
         when(workspaceRepository.existsById(any())).thenReturn(Boolean.TRUE);
-        when(workspaceRepository.save(any(Workspace.class))).thenReturn(workspace);
+        when(workspaceRepository.save(any(WorkspaceEntity.class))).thenReturn(workspace);
         assertThat(workspaceService.edit(workspaceRequest)).isTrue();
     }
 
@@ -97,7 +97,7 @@ class WorkspaceServiceTest {
     public void edit_exception_test() {
         when(workspaceMapper.toEntity(workspaceRequest)).thenReturn(workspace);
         when(workspaceRepository.existsById(any())).thenReturn(Boolean.TRUE);
-        doThrow(new RuntimeException()).when(workspaceRepository).save(any(Workspace.class));
+        doThrow(new RuntimeException()).when(workspaceRepository).save(any(WorkspaceEntity.class));
         assertThatThrownBy(() -> workspaceService.edit(workspaceRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_WORKSPACE_ERROR.getCode());
@@ -116,9 +116,9 @@ class WorkspaceServiceTest {
     @Test
     @DisplayName("Test the list method in the Workspace service")
     public void list_test() {
-        ArrayList<Workspace> workspaceList = new ArrayList<>();
+        ArrayList<WorkspaceEntity> workspaceList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            workspaceList.add(Workspace.builder().build());
+            workspaceList.add(WorkspaceEntity.builder().build());
         }
         ArrayList<WorkspaceResponse> workspaceResponseList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
@@ -169,7 +169,7 @@ class WorkspaceServiceTest {
     @Test
     @DisplayName("Test the delete method in the Workspace service")
     public void delete_test() {
-        when(commonDeleteRepository.deleteById(ID, Workspace.class)).thenReturn(Boolean.TRUE);
+        when(commonDeleteRepository.deleteById(ID, WorkspaceEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(workspaceService.delete(ID)).isTrue();
     }
 
@@ -178,7 +178,7 @@ class WorkspaceServiceTest {
     public void delete_exception_test() {
 
         doThrow(new RuntimeException()).when(commonDeleteRepository)
-            .deleteById(ID, Workspace.class);
+            .deleteById(ID, WorkspaceEntity.class);
         assertThatThrownBy(() -> workspaceService.delete(ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_WORKSPACE_BY_ID_ERROR.getCode());

@@ -20,8 +20,8 @@ import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.engine.service.CaseDispatcherService;
-import com.sms.satp.entity.env.ProjectEnvironment;
-import com.sms.satp.entity.job.ApiTestCaseJob;
+import com.sms.satp.entity.env.ProjectEnvironmentEntity;
+import com.sms.satp.entity.job.ApiTestCaseJobEntity;
 import com.sms.satp.entity.job.ApiTestCaseJobReport;
 import com.sms.satp.entity.job.JobCaseApi;
 import com.sms.satp.entity.job.common.CaseReport;
@@ -54,8 +54,8 @@ class ApiTestCaseJobServiceTest {
     private final ApiTestCaseJobService apiTestCaseJobService = new ApiTestCaseJobServiceImpl(
         apiTestCaseJobRepository, customizedApiTestCaseJobRepository, caseDispatcherService, projectEnvironmentService
         , apiTestCaseService, jobMapper);
-    private final ApiTestCaseJob apiTestCaseJob =
-        ApiTestCaseJob.builder().id(ID)
+    private final ApiTestCaseJobEntity apiTestCaseJob =
+        ApiTestCaseJobEntity.builder().id(ID)
             .apiTestCase(JobCaseApi.builder().jobApiTestCase(JobApiTestCase.builder().build()).build()).build();
     private final TestDataRequest testDataRequest =
         TestDataRequest.builder().dataName("test")
@@ -72,7 +72,7 @@ class ApiTestCaseJobServiceTest {
             .build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
         .id(ID).build();
-    private final ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().build();
+    private final ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder().build();
     private static final String ID = ObjectId.get().toString();
     private final CustomUser customUser =
         new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "");
@@ -117,10 +117,10 @@ class ApiTestCaseJobServiceTest {
     public void runJob_test() {
         when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
-        when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(apiTestCaseJob);
-        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobResponse.class));
+        when(apiTestCaseJobRepository.insert(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobEntity.class));
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest, customUser);
-        verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJob.class));
+        verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJobEntity.class));
     }
 
     @Test
@@ -129,7 +129,7 @@ class ApiTestCaseJobServiceTest {
         when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(apiTestCaseJob);
-        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobResponse.class));
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJob.class));
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest2, customUser);
         verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJob.class));
     }

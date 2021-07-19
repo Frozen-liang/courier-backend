@@ -26,7 +26,7 @@ import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.DataCollectionImportRequest;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.response.DataCollectionResponse;
-import com.sms.satp.entity.datacollection.DataCollection;
+import com.sms.satp.entity.datacollection.DataCollectionEntity;
 import com.sms.satp.entity.datacollection.DataParam;
 import com.sms.satp.entity.datacollection.TestData;
 import com.sms.satp.mapper.DataCollectionMapper;
@@ -37,7 +37,6 @@ import com.sms.satp.utils.ExceptionUtils;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -75,7 +74,7 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
-    public DataCollection findOne(String id) {
+    public DataCollectionEntity findOne(String id) {
         return dataCollectionRepository.findById(id).orElse(null);
     }
 
@@ -83,13 +82,14 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     public List<DataCollectionResponse> list(String projectId, String collectionName) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
-            DataCollection dataCollection = DataCollection.builder().projectId(projectId).collectionName(collectionName)
+            DataCollectionEntity dataCollection = DataCollectionEntity.builder().projectId(projectId)
+                .collectionName(collectionName)
                 .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(REMOVE.getFiled(), GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING);
-            Example<DataCollection> example = Example.of(dataCollection, exampleMatcher);
+            Example<DataCollectionEntity> example = Example.of(dataCollection, exampleMatcher);
             return dataCollectionMapper.toDtoList(dataCollectionRepository.findAll(example, sort));
         } catch (Exception e) {
             log.error("Failed to get the DataCollection list!", e);
@@ -103,7 +103,7 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     public Boolean add(DataCollectionRequest dataCollectionRequest) {
         log.info("DataCollectionService-add()-params: [DataCollection]={}", dataCollectionRequest.toString());
         try {
-            DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
+            DataCollectionEntity dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
             dataCollectionRepository.insert(dataCollection);
         } catch (Exception e) {
             log.error("Failed to add the DataCollection!", e);
@@ -120,7 +120,7 @@ public class DataCollectionServiceImpl implements DataCollectionService {
         try {
             boolean exists = dataCollectionRepository.existsById(dataCollectionRequest.getId());
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "DataCollection", dataCollectionRequest.getId());
-            DataCollection dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
+            DataCollectionEntity dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
             dataCollectionRepository.save(dataCollection);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
@@ -158,8 +158,8 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     @Override
     public Boolean importDataCollection(DataCollectionImportRequest request) {
         try {
-            Optional<DataCollection> optional = dataCollectionRepository.findById(request.getId());
-            DataCollection dataCollection = optional
+            Optional<DataCollectionEntity> optional = dataCollectionRepository.findById(request.getId());
+            DataCollectionEntity dataCollection = optional
                 .orElseThrow(() -> ExceptionUtils.mpe("The dataCollection not exits. id = %s", request.getId()));
             List<String> paramList = Objects.requireNonNullElse(dataCollection.getParamList(), new ArrayList<>());
             List<TestData> dataList = Objects.requireNonNullElse(dataCollection.getDataList(), new ArrayList<>());

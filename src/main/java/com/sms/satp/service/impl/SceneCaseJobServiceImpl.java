@@ -12,18 +12,18 @@ import com.sms.satp.dto.request.SceneCaseJobRequest;
 import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.SceneCaseJobResponse;
 import com.sms.satp.engine.service.CaseDispatcherService;
-import com.sms.satp.entity.env.ProjectEnvironment;
+import com.sms.satp.entity.env.ProjectEnvironmentEntity;
 import com.sms.satp.entity.job.JobSceneCaseApi;
-import com.sms.satp.entity.job.SceneCaseJob;
+import com.sms.satp.entity.job.SceneCaseJobEntity;
 import com.sms.satp.entity.job.SceneCaseJobReport;
 import com.sms.satp.entity.job.common.CaseReport;
 import com.sms.satp.entity.job.common.JobApiTestCase;
 import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
-import com.sms.satp.entity.scenetest.CaseTemplate;
-import com.sms.satp.entity.scenetest.CaseTemplateApi;
-import com.sms.satp.entity.scenetest.SceneCase;
-import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.entity.scenetest.CaseTemplateApiEntity;
+import com.sms.satp.entity.scenetest.CaseTemplateEntity;
+import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
+import com.sms.satp.entity.scenetest.SceneCaseEntity;
 import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.repository.CaseTemplateRepository;
@@ -125,13 +125,13 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     public void runJob(AddSceneCaseJobRequest request, CustomUser currentUser) {
         AtomicReference<String> jobId = new AtomicReference<>();
         try {
-            ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(request.getEnvId());
+            ProjectEnvironmentEntity projectEnvironment = projectEnvironmentService.findOne(request.getEnvId());
             if (Objects.isNull(projectEnvironment)) {
                 throw new ApiTestPlatformException(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR);
             }
             JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
-            Optional<SceneCase> sceneCase = Optional.empty();
-            Optional<CaseTemplate> caseTemplate = Optional.empty();
+            Optional<SceneCaseEntity> sceneCase = Optional.empty();
+            Optional<CaseTemplateEntity> caseTemplate = Optional.empty();
             if (Objects.nonNull(request.getSceneCaseId())) {
                 sceneCase = sceneCaseRepository.findById(request.getSceneCaseId());
             }
@@ -144,7 +144,8 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             List<JobSceneCaseApi> caseList = getApiCaseList(request);
 
             if (Objects.isNull(request.getDataCollectionRequest())) {
-                SceneCaseJob sceneCaseJob = SceneCaseJob.builder().environment(jobEnvironment).apiTestCase(caseList)
+                SceneCaseJobEntity sceneCaseJob = SceneCaseJobEntity.builder().environment(jobEnvironment)
+                    .apiTestCase(caseList)
                     .createDateTime(LocalDateTime.now())
                     .modifyDateTime(LocalDateTime.now())
                     .createUserId(currentUser.getId())
@@ -160,7 +161,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                     JobDataCollection jobDataCollection = jobMapper
                         .toJobDataCollection(request.getDataCollectionRequest());
                     jobDataCollection.setTestData(jobMapper.toTestDataEntity(testData));
-                    SceneCaseJob sceneCaseJob = SceneCaseJob.builder()
+                    SceneCaseJobEntity sceneCaseJob = SceneCaseJobEntity.builder()
                         .createDateTime(LocalDateTime.now())
                         .modifyDateTime(LocalDateTime.now())
                         .createUserId(currentUser.getId())
@@ -189,9 +190,10 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     private List<JobSceneCaseApi> getApiCaseList(AddSceneCaseJobRequest request) {
         List<JobSceneCaseApi> caseList = Lists.newArrayList();
         if (StringUtils.isNotBlank(request.getSceneCaseId())) {
-            List<SceneCaseApi> sceneCaseApiList = sceneCaseApiRepository.findAllBySceneCaseId(request.getSceneCaseId());
+            List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiRepository
+                .findAllBySceneCaseId(request.getSceneCaseId());
             Integer index = 0;
-            for (SceneCaseApi sceneCaseApi : sceneCaseApiList) {
+            for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
                 if (Objects.isNull(sceneCaseApi.getCaseTemplateId())
                     && sceneCaseApi.getApiTestCase().isExecute()) {
                     sceneCaseApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : sceneCaseApi.getOrder());
@@ -199,9 +201,9 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                     index = sceneCaseApi.getOrder();
 
                 } else {
-                    List<CaseTemplateApi> templateApiList =
+                    List<CaseTemplateApiEntity> templateApiList =
                         caseTemplateApiRepository.findAllByCaseTemplateIdOrderByOrder(sceneCaseApi.getCaseTemplateId());
-                    for (CaseTemplateApi caseTemplateApi : templateApiList) {
+                    for (CaseTemplateApiEntity caseTemplateApi : templateApiList) {
                         caseTemplateApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : caseTemplateApi.getOrder());
                         caseTemplateApi.setCaseTemplateId(null);
                         JobSceneCaseApi jobSceneCaseApi = jobMapper.toJobSceneCaseApiByTemplate(caseTemplateApi);
@@ -214,7 +216,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         }
 
         if (StringUtils.isNotBlank(request.getCaseTemplateId())) {
-            List<CaseTemplateApi> caseTemplateApiList = customizedCaseTemplateApiRepository
+            List<CaseTemplateApiEntity> caseTemplateApiList = customizedCaseTemplateApiRepository
                 .findByCaseTemplateIdAndIsExecute(request.getCaseTemplateId(), Boolean.TRUE);
             caseList.addAll(jobMapper.toJobSceneCaseApiListByTemplate(caseTemplateApiList));
         }

@@ -17,7 +17,7 @@ import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.GlobalEnvironmentRequest;
 import com.sms.satp.dto.response.GlobalEnvironmentResponse;
-import com.sms.satp.entity.env.GlobalEnvironment;
+import com.sms.satp.entity.env.GlobalEnvironmentEntity;
 import com.sms.satp.mapper.GlobalEnvironmentMapper;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.GlobalEnvironmentRepository;
@@ -50,7 +50,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     }
 
     @Override
-    public GlobalEnvironment findOne(String id) {
+    public GlobalEnvironmentEntity findOne(String id) {
         return globalEnvironmentRepository.findById(id).orElse(null);
     }
 
@@ -60,7 +60,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     public Boolean add(GlobalEnvironmentRequest globalEnvironmentRequest) {
         log.info("GlobalEnvironmentService-add()-params: [GlobalEnvironment]={}", globalEnvironmentRequest.toString());
         try {
-            GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentRequest);
+            GlobalEnvironmentEntity globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentRequest);
             globalEnvironmentRepository.insert(globalEnvironment);
         } catch (Exception e) {
             log.error("Failed to add the globalEnvironment!", e);
@@ -77,7 +77,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
         try {
             boolean exists = globalEnvironmentRepository.existsById(globalEnvironmentRequest.getId());
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "GlobalEnvironment", globalEnvironmentRequest.getId());
-            GlobalEnvironment globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentRequest);
+            GlobalEnvironmentEntity globalEnvironment = globalEnvironmentMapper.toEntity(globalEnvironmentRequest);
             globalEnvironmentRepository.save(globalEnvironment);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
@@ -92,7 +92,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     @Override
     public List<GlobalEnvironmentResponse> list(String workspaceId) {
         try {
-            List<GlobalEnvironment> globalEnvironments = globalEnvironmentRepository
+            List<GlobalEnvironmentEntity> globalEnvironments = globalEnvironmentRepository
                 .findByRemovedIsFalseAndWorkspaceIdOrderByCreateDateTimeDesc(workspaceId);
             return globalEnvironmentMapper.toDtoList(globalEnvironments);
         } catch (Exception e) {
@@ -107,7 +107,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, GlobalEnvironment.class);
+            return commonDeleteRepository.deleteByIds(ids, GlobalEnvironmentEntity.class);
         } catch (Exception e) {
             log.error("Failed to delete the GlobalEnvironment!", e);
             throw new ApiTestPlatformException(DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID);

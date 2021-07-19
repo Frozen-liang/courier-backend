@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.dto.request.GlobalFunctionRequest;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
-import com.sms.satp.entity.function.GlobalFunction;
+import com.sms.satp.entity.function.GlobalFunctionEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ class GlobalFunctionMapperTest {
     @Test
     @DisplayName("Test the method to convert the GlobalFunction's entity object to a dto object")
     void entity_to_dto() {
-        GlobalFunction globalFunction = GlobalFunction.builder()
+        GlobalFunctionEntity globalFunction = GlobalFunctionEntity.builder()
             .functionName(FUNCTION_NAME)
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
@@ -37,9 +37,9 @@ class GlobalFunctionMapperTest {
     @Test
     @DisplayName("Test the method for converting an GlobalFunction entity list object to a dto list object")
     void globalFunctionList_to_globalFunctionDtoList() {
-        List<GlobalFunction> globalFunctions = new ArrayList<>();
+        List<GlobalFunctionEntity> globalFunctions = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
-            globalFunctions.add(GlobalFunction.builder().functionName(FUNCTION_NAME).build());
+            globalFunctions.add(GlobalFunctionEntity.builder().functionName(FUNCTION_NAME).build());
         }
         List<GlobalFunctionResponse> globalFunctionDtoList = globalFunctionMapper.toDtoList(globalFunctions);
         assertThat(globalFunctionDtoList).hasSize(SIZE);
@@ -52,7 +52,7 @@ class GlobalFunctionMapperTest {
         GlobalFunctionRequest globalFunctionDto = GlobalFunctionRequest.builder()
             .functionName(FUNCTION_NAME)
             .build();
-        GlobalFunction globalFunction = globalFunctionMapper.toEntity(globalFunctionDto);
+        GlobalFunctionEntity globalFunction = globalFunctionMapper.toEntity(globalFunctionDto);
         assertThat(globalFunction.getFunctionName()).isEqualTo(FUNCTION_NAME);
     }
 
@@ -66,7 +66,7 @@ class GlobalFunctionMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method to convert the GlobalFunction's dto object to a entity object")
     void null_dto_to_entity() {
-        GlobalFunction globalFunction = globalFunctionMapper.toEntity(null);
+        GlobalFunctionEntity globalFunction = globalFunctionMapper.toEntity(null);
         assertThat(globalFunction).isNull();
     }
 

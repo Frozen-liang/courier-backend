@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.dto.request.ApiTestCaseJobPageRequest;
-import com.sms.satp.entity.job.ApiTestCaseJob;
+import com.sms.satp.entity.job.ApiTestCaseJobEntity;
 import com.sms.satp.repository.impl.CustomizedApiTestCaseJobRepositoryImpl;
 import java.util.Collections;
 import org.junit.jupiter.api.DisplayName;
@@ -28,8 +28,8 @@ public class CustomizedApiTestCaseJobRepositoryTest {
     void page_test() {
         when(mongoTemplate.count(any(BasicQuery.class), any(Class.class))).thenReturn(1L);
         when(mongoTemplate.find(any(BasicQuery.class), any(Class.class)))
-            .thenReturn(Collections.singletonList(ApiTestCaseJob.builder().build()));
-        Page<ApiTestCaseJob> page = customizedApiTestCaseJobRepository.page(apiTestCaseJobPageRequest);
+            .thenReturn(Collections.singletonList(ApiTestCaseJobEntity.builder().build()));
+        Page<ApiTestCaseJobEntity> page = customizedApiTestCaseJobRepository.page(apiTestCaseJobPageRequest);
         assertThat(page).isNotNull();
         assertThat(page.getTotalElements()).isEqualTo(1L);
     }

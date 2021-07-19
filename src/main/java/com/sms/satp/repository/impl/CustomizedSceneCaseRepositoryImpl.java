@@ -8,7 +8,7 @@ import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.response.SceneCaseResponse;
-import com.sms.satp.entity.scenetest.SceneCase;
+import com.sms.satp.entity.scenetest.SceneCaseEntity;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
@@ -69,11 +69,12 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
         aggregationOperations.add(projectionOperation);
 
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
-        long count = mongoTemplate.count(query, SceneCase.class);
+        long count = mongoTemplate.count(query, SceneCaseEntity.class);
         if (count == 0L || skipRecord >= count) {
             return Page.empty();
         }
-        List<SceneCaseResponse> records = mongoTemplate.aggregate(aggregation, SceneCase.class, SceneCaseResponse.class)
+        List<SceneCaseResponse> records = mongoTemplate
+            .aggregate(aggregation, SceneCaseEntity.class, SceneCaseResponse.class)
             .getMappedResults();
         return new PageImpl<SceneCaseResponse>(records,
             PageRequest.of(searchSceneCaseRequest.getPageNumber(), searchSceneCaseRequest.getPageSize(), sort), count);

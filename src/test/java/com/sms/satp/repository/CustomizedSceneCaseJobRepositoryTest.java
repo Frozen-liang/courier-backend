@@ -1,8 +1,7 @@
 package com.sms.satp.repository;
 
-import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.request.SceneCaseJobRequest;
-import com.sms.satp.entity.job.SceneCaseJob;
+import com.sms.satp.entity.job.SceneCaseJobEntity;
 import com.sms.satp.repository.impl.CustomizedSceneCaseJobRepositoryImpl;
 import java.util.List;
 import org.assertj.core.util.Lists;
@@ -31,12 +30,12 @@ class CustomizedSceneCaseJobRepositoryTest {
     @Test
     @DisplayName("Test the page method in the CustomizedSceneCaseJobRepository")
     void page_test() {
-        List<SceneCaseJob> sceneCaseJobList = Lists.newArrayList(SceneCaseJob.builder().id(MOCK_ID).build());
-        when(mongoTemplate.find(any(Query.class), eq(SceneCaseJob.class))).thenReturn(sceneCaseJobList);
-        when(mongoTemplate.count(any(Query.class), eq(SceneCaseJob.class))).thenReturn(COUNT);
+        List<SceneCaseJobEntity> sceneCaseJobList = Lists.newArrayList(SceneCaseJobEntity.builder().id(MOCK_ID).build());
+        when(mongoTemplate.find(any(Query.class), eq(SceneCaseJobEntity.class))).thenReturn(sceneCaseJobList);
+        when(mongoTemplate.count(any(Query.class), eq(SceneCaseJobEntity.class))).thenReturn(COUNT);
         SceneCaseJobRequest request =
             SceneCaseJobRequest.builder().sceneCaseId(MOCK_ID).userIds(Lists.newArrayList(MOCK_ID)).build();
-        Page<SceneCaseJob> page = customizedSceneCaseJobRepository.page(request);
+        Page<SceneCaseJobEntity> page = customizedSceneCaseJobRepository.page(request);
         assertThat(page).isNotNull();
     }
 

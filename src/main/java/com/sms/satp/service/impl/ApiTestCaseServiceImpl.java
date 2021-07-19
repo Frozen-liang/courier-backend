@@ -28,6 +28,7 @@ import com.sms.satp.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.apitestcase.ApiTestCase;
 import com.sms.satp.entity.job.ApiTestCaseJob;
+import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.repository.ApiTestCaseRepository;
@@ -77,7 +78,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     public List<ApiTestCaseResponse> list(String apiId, String projectId, boolean removed) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
-            ApiTestCase apiTestCase = ApiTestCase.builder().apiId(apiId).removed(removed).projectId(projectId).build();
+            ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder().apiId(apiId).removed(removed).projectId(projectId).build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(API_ID.getFiled(), GenericPropertyMatchers.exact())
@@ -112,7 +113,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     public Boolean add(ApiTestCaseRequest apiTestCaseRequest) {
         log.info("ApiTestCaseService-add()-params: [ApiTestCase]={}", apiTestCaseRequest.toString());
         try {
-            ApiTestCase apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
+            ApiTestCaseEntity apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
             apiTestCase.setCreateUsername(SecurityUtil.getCurrentUser().getUsername());
             apiTestCaseRepository.insert(apiTestCase);
         } catch (Exception e) {

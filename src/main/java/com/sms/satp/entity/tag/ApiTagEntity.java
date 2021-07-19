@@ -1,7 +1,7 @@
-package com.sms.satp.entity.scenetest;
+package com.sms.satp.entity.tag;
 
+import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.entity.BaseEntity;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,37 +12,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
 @SuperBuilder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
-@Document(collection = "SceneCase")
-public class SceneCase extends BaseEntity {
-
-    private String name;
-
-    private String createUserName;
+@EqualsAndHashCode(callSuper = true)
+@Document(collection = "ApiTag")
+public class ApiTagEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
-
     @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
-
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String dataCollId;
-
-    @Field(targetType = FieldType.OBJECT_ID)
-    private List<String> tagId;
-
-    private Integer priority;
-
-    /**
-     * 是否锁定，当前步骤出错或未通过时，依然执行下一个步骤.
-     */
-    @Field("isLock")
-    private boolean lock;
-
+    private ApiTagType tagType;
+    private String tagName;
 }

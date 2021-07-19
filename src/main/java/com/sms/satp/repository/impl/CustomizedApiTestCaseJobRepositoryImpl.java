@@ -7,7 +7,7 @@ import static com.sms.satp.common.field.CommonFiled.CREATE_USER_ID;
 import static com.sms.satp.common.field.CommonFiled.ID;
 
 import com.sms.satp.dto.request.ApiTestCaseJobPageRequest;
-import com.sms.satp.entity.job.ApiTestCaseJob;
+import com.sms.satp.entity.job.ApiTestCaseJobEntity;
 import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.Collections;
@@ -34,7 +34,7 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
     }
 
     @Override
-    public Page<ApiTestCaseJob> page(ApiTestCaseJobPageRequest apiTestCaseJobPageRequest) {
+    public Page<ApiTestCaseJobEntity> page(ApiTestCaseJobPageRequest apiTestCaseJobPageRequest) {
         Document document = new Document();
         document.put(CASE_REPORT, true);
         document.put(ID.getFiled(), true);
@@ -52,8 +52,8 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
         }
         PageDtoConverter.frontMapping(apiTestCaseJobPageRequest);
         Pageable pageable = PageDtoConverter.createPageable(apiTestCaseJobPageRequest);
-        List<ApiTestCaseJob> apiTestCaseJobs = mongoTemplate.find(query.with(pageable),
-            ApiTestCaseJob.class);
+        List<ApiTestCaseJobEntity> apiTestCaseJobs = mongoTemplate.find(query.with(pageable),
+            ApiTestCaseJobEntity.class);
         return new PageImpl<>(apiTestCaseJobs, pageable, count);
     }
 

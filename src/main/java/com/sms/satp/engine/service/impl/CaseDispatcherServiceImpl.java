@@ -7,6 +7,8 @@ import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.service.CaseDispatcherService;
 import com.sms.satp.entity.job.SceneCaseJob;
+import com.sms.satp.entity.job.ApiTestCaseJobEntity;
+import com.sms.satp.entity.job.SceneCaseJobEntity;
 import com.sms.satp.entity.job.common.CaseReport;
 import com.sms.satp.websocket.Payload;
 import java.util.List;
