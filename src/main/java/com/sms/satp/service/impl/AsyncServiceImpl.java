@@ -220,7 +220,8 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
             .forEach(apiEntity -> {
                 ApiEntity oldApiEntity = oldApiEntities.get(apiEntity.getSwaggerId());
                 apiEntity.setId(oldApiEntity.getId());
-                apiEntity.setApiStatus(Objects.isNull(apiChangeStatus) ? oldApiEntity.getApiStatus() : apiChangeStatus);
+                apiEntity.setGroupId(oldApiEntity.getGroupId());
+                apiEntity.setApiStatus(Objects.requireNonNullElse(apiChangeStatus, oldApiEntity.getApiStatus()));
                 apiEntity.setPreInject(oldApiEntity.getPreInject());
                 apiEntity.setPostInject(oldApiEntity.getPostInject());
                 apiEntity.setTagId(oldApiEntity.getTagId());
