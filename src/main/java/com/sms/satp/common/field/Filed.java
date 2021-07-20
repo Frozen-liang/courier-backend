@@ -11,7 +11,7 @@ public interface Filed {
 
     String getFiled();
 
-    String[] charArr = {"(", ")",   ".", "[",  "?", "^", "{", "}", "|"};
+    //String[] charArr = {"(", ")",   ".", "[",  "?", "^", "{", "}", "|"};
 
 
     default Optional<Criteria> is(Object value) {
@@ -63,12 +63,12 @@ public interface Filed {
         return Optional.of(Criteria.where(getFiled()).regex(pattern));
     }
 
-    private String converterSpecialChar(String value) {
+    /*private String converterSpecialChar(String value) {
         for (String key : charArr) {
             if (value.contains(key)) {
                 value = value.replace(key, "\\" + key);
             }
         }
         return value;
-    }
+    }*/
 }
