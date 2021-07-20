@@ -162,7 +162,7 @@ public enum ErrorCode {
     THE_WORKSPACE_CANNOT_DELETE_ERROR("4154", "There are project under this workspace that cannot be deleted!"),
     ADD_USER_ERROR("4155", "Failed to add the User!"),
     GET_USER_LIST_ERROR("4156", "Failed to get the User list!"),
-    DELETE_USER_BY_ID_ERROR("4157", "Failed to delete the User!"),
+    LOCK_USER_BY_ID_ERROR("4157", "Failed to lock the User!"),
     EDIT_USER_ERROR("4158", "Failed to edit the User!"),
     GET_USER_BY_ID_ERROR("4159", "Failed to get the User by id!"),
     GET_SCENE_CASE_ERROR("4160", "Failed to get the SceneCase!"),
@@ -174,6 +174,7 @@ public enum ErrorCode {
     DELETE_USER_GROUP_BY_ID_ERROR("4166", "Failed to delete the UserGroup!"),
     EDIT_USER_GROUP_ERROR("4167", "Failed to edit the UserGroup!"),
     IMPORT_DATA_COLLECTION_ERROR("4168", "Failed to import the DataCollection!"),
+    UNLOCK_USER_BY_ID_ERROR("4157", "Failed to unlock the User!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

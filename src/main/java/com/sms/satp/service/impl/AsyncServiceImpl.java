@@ -1,5 +1,6 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.ImportStatus.RUNNING;
 import static com.sms.satp.common.enums.OperationModule.API;
 import static com.sms.satp.common.enums.OperationType.SYNC;
 import static com.sms.satp.common.enums.SaveMode.COVER;
@@ -11,6 +12,7 @@ import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.enums.ImportStatus;
 import com.sms.satp.common.enums.SaveMode;
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.common.listener.event.ApiDeleteEvent;
 import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.api.ApiEntity;
@@ -89,16 +91,26 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
         String projectId = importSource.getProjectId();
         DocumentType documentType = importSource.getDocumentType();
         SaveMode saveMode = importSource.getSaveMode();
+        String id = importSource.getId();
+        // Only one API source is in sync.
+        if (Objects.nonNull(id) && projectImportFlowRepository.existsByIdAndImportStatus(id, RUNNING.getCode())) {
+            messageService.projectMessage(projectId, Payload.fail(String.format("The %s is in sync.",
+                importSource.getName())));
+            return;
+        }
         final ProjectImportFlowEntity projectImportFlowEntity = projectImportFlowRepository.save(
-            ProjectImportFlowEntity.builder().importSourceId(importSource.getId()).projectId(projectId)
-                .importStatus(ImportStatus.RUNNING)
+            ProjectImportFlowEntity.builder().importSourceId(id).projectId(projectId)
+                .importStatus(RUNNING)
                 .startTime(LocalDateTime.now())
                 .build());
         try {
             log.info("The project whose Id is [{}] starts to import API documents.", projectId);
             messageService.projectMessage(projectId,
                 Payload.ok(projectImportFlowMapper.toProjectImportFlowResponse(projectImportFlowEntity)));
+
+            //Parse swagger or file.
             DocumentDefinition definition = documentType.getReader().read(importSource.getSource());
+
             ApiDocumentTransformer<?> transformer = documentType.getTransformer();
             Set<ApiGroupEntity> apiGroupEntities = transformer.toApiGroupEntities(definition,
                 (apiGroupEntity -> apiGroupEntity.setProjectId(projectId)));
@@ -133,11 +145,16 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
                 projectImportFlowEntity.setImportStatus(ImportStatus.SUCCESS);
                 projectImportFlowEntity.setEndTime(LocalDateTime.now());
             }
-        } catch (Exception e) {
+        } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
             projectImportFlowEntity.setImportStatus(ImportStatus.FAILED);
             projectImportFlowEntity.setEndTime(LocalDateTime.now());
             projectImportFlowEntity.setErrorDetail(e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            projectImportFlowEntity.setImportStatus(ImportStatus.FAILED);
+            projectImportFlowEntity.setEndTime(LocalDateTime.now());
+            projectImportFlowEntity.setErrorDetail("System error.");
         }
         projectImportFlowRepository.save(projectImportFlowEntity);
         // Send import message.

@@ -1,5 +1,10 @@
 package com.sms.satp.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.sms.satp.common.enums.ImportStatus;
 import com.sms.satp.dto.request.ProjectImportSourceRequest;
 import com.sms.satp.dto.response.ProjectImportFlowResponse;
@@ -11,18 +16,12 @@ import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.ProjectImportFlowRepository;
 import com.sms.satp.repository.ProjectImportSourceRepository;
 import com.sms.satp.service.impl.ProjectImportSourceServiceImpl;
-import org.bson.types.ObjectId;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author zixi.gao
@@ -84,7 +83,7 @@ public class ProjectImportSourceServiceTest {
     public void findByProjectId_test() {
         when(projectImportSourceRepository.findByProjectIdAndRemovedIsFalse(ID))
             .thenReturn(List.of(ProjectImportSourceResponse.builder().build()));
-        when(projectImportFlowRepository.findFirstByImportSourceId(any()))
+        when(projectImportFlowRepository.findFirstByImportSourceIdOrderByCreateDateTimeDesc(any()))
             .thenReturn(ProjectImportFlowEntity.builder().importStatus(ImportStatus.SUCCESS).build());
         List<ProjectImportSourceResponse> result = projectImportSourceService.findByProjectId(ID);
         assertThat(result).allMatch(

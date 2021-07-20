@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -122,7 +123,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
 
     @Override
     public void runJob(AddSceneCaseJobRequest request, CustomUser currentUser) {
-        long start = System.currentTimeMillis();
+        AtomicReference<String> jobId = new AtomicReference<>();
         try {
             ProjectEnvironmentEntity projectEnvironment = projectEnvironmentService.findOne(request.getEnvId());
             if (Objects.isNull(projectEnvironment)) {
@@ -152,9 +153,11 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                     .createUserName(currentUser.getUsername())
                     .sceneCaseId(request.getSceneCaseId()).caseTemplateId(request.getCaseTemplateId()).build();
                 sceneCaseJobRepository.insert(sceneCaseJob);
+                jobId.set(sceneCaseJob.getId());
                 caseDispatcherService.dispatch(sceneCaseJob);
             } else {
                 for (TestDataRequest testData : request.getDataCollectionRequest().getDataList()) {
+                    jobId.set(null);
                     JobDataCollection jobDataCollection = jobMapper
                         .toJobDataCollection(request.getDataCollectionRequest());
                     jobDataCollection.setTestData(jobMapper.toTestDataEntity(testData));
@@ -171,17 +174,16 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                         .apiTestCase(caseList)
                         .build();
                     sceneCaseJobRepository.insert(sceneCaseJob);
+                    jobId.set(sceneCaseJob.getId());
                     caseDispatcherService.dispatch(sceneCaseJob);
                 }
             }
-            log.info("The use case takes {} milliseconds to send data! request:{}",
-                System.currentTimeMillis() - start, request.toString());
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUser.getId(), apiTestPlatEx.getMessage());
+            errorHandler(currentUser.getId(), jobId, apiTestPlatEx.getMessage());
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseJob!", e);
-            caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the SceneCaseJob error");
+            errorHandler(currentUser.getId(), jobId, "Execute the SceneCaseJob error");
         }
     }
 
@@ -223,6 +225,13 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             caseList.sort(Comparator.comparingInt(JobSceneCaseApi::getOrder));
         }
         return caseList;
+    }
+
+    private void errorHandler(String userId, AtomicReference<String> jobId, String message) {
+        caseDispatcherService.sendErrorMessage(userId, message);
+        if (StringUtils.isNotBlank(jobId.get())) {
+            sceneCaseRepository.deleteById(jobId.get());
+        }
     }
 
 }

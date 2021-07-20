@@ -47,4 +47,6 @@ public class ApiTestCaseJobEntity {
      * 测试人员.
      */
     private String createUserName;
+
+    private Integer totalTimeCost;
 }

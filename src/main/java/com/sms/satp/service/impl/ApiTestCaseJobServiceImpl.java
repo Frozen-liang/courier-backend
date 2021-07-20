@@ -33,9 +33,11 @@ import com.sms.satp.utils.ExceptionUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -68,12 +70,13 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
     @Override
     public void handleJobReport(ApiTestCaseJobReport apiTestCaseJobReport) {
         apiTestCaseJobRepository.findById(apiTestCaseJobReport.getJobId()).ifPresent(job -> {
-            log.info("Handle job report. jobReport:{}", apiTestCaseJobReport.toString());
+            log.info("Handle job report. jobReport:{}", apiTestCaseJobReport);
             JobApiTestCase jobApiTestCase = job.getApiTestCase().getJobApiTestCase();
             CaseReport caseReport = apiTestCaseJobReport.getCaseReport();
             jobApiTestCase.setCaseReport(caseReport);
             job.setJobStatus(apiTestCaseJobReport.getJobStatus());
             job.setMessage(apiTestCaseJobReport.getMessage());
+            job.setTotalTimeCost(apiTestCaseJobReport.getTotalTimeCost());
             caseDispatcherService.sendJobReport(job.getCreateUserId(), caseReport);
             apiTestCaseJobRepository.save(job);
         });
@@ -81,8 +84,8 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
 
     @Override
     public void runJob(ApiTestCaseJobRunRequest apiTestCaseJobRunRequest, CustomUser currentUser) {
-        long start = System.currentTimeMillis();
         DataCollectionRequest dataCollectionRequest = apiTestCaseJobRunRequest.getDataCollectionRequest();
+        AtomicReference<String> jobId = new AtomicReference<>();
         try {
             List<String> apiTestCaseIds = apiTestCaseJobRunRequest.getApiTestCaseIds();
             String envId = apiTestCaseJobRunRequest.getEnvId();
@@ -92,17 +95,12 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             notNull(projectEnvironment, THE_ENVIRONMENT_NOT_EXITS_ERROR);
             JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
             apiTestCaseIds.forEach((apiTestCaseId) -> {
+                jobId.set(null);
                 ApiTestCaseResponse apiTestCaseResponse = apiTestCaseService.findById(apiTestCaseId);
-                ApiTestCaseJobEntity apiTestCaseJob = ApiTestCaseJobEntity.builder()
-                    .createDateTime(LocalDateTime.now())
-                    .modifyUserId(currentUser.getId())
-                    .createUserId(currentUser.getId())
-                    .createUserName(currentUser.getUsername())
-                    .modifyDateTime(LocalDateTime.now())
-                    .apiTestCase(
-                        JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestCaseResponse)).build())
-                    .environment(jobEnvironment)
-                    .build();
+                ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
+                apiTestCaseJob.setApiTestCase(
+                    JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestCaseResponse)).build());
+                // Multiple job are sent if a data collection exists.
                 if (Objects.nonNull(dataCollectionRequest) && CollectionUtils
                     .isNotEmpty(dataCollectionRequest.getDataList())) {
                     JobDataCollection jobDataCollection = jobMapper.toJobDataCollection(dataCollectionRequest);
@@ -111,22 +109,34 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                         jobDataCollection.setTestData(jobMapper.toTestDataEntity(dataList));
                         apiTestCaseJob.setDataCollection(jobDataCollection);
                         apiTestCaseJobRepository.insert(apiTestCaseJob);
-                        caseDispatcherService.dispatch(apiTestCaseJob);
+                        jobId.set(apiTestCaseJob.getId());
+                        caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
                     });
                 } else {
                     apiTestCaseJobRepository.insert(apiTestCaseJob);
-                    caseDispatcherService.dispatch(apiTestCaseJob);
+                    jobId.set(apiTestCaseJob.getId());
+                    caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
                 }
             });
-            log.info("The use case takes {} milliseconds to send data! request:{}",
-                System.currentTimeMillis() - start, apiTestCaseJobRunRequest);
         } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUser.getId(), apiTestPlatEx.getMessage());
+            log.error("Execute the ApiTestCase error. errorMessage:{}", apiTestPlatEx.getMessage());
+            errorHandler(currentUser.getId(), jobId, apiTestPlatEx.getMessage());
         } catch (Exception e) {
             log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the ApiTestCase error");
+            errorHandler(currentUser.getId(), jobId, "Execute the ApiTestCase error");
         }
+    }
+
+    private ApiTestCaseJobEntity createApiTestCaseJob(JobEnvironment jobEnvironment,
+        CustomUser currentUser) {
+        return ApiTestCaseJobEntity.builder()
+            .createDateTime(LocalDateTime.now())
+            .modifyUserId(currentUser.getId())
+            .createUserId(currentUser.getId())
+            .createUserName(currentUser.getUsername())
+            .modifyDateTime(LocalDateTime.now())
+            .environment(jobEnvironment)
+            .build();
     }
 
     @Override
@@ -149,17 +159,12 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             if (Objects.isNull(projectEnvironment)) {
                 checkApiPath(apiPath);
             }
-            ApiTestCaseJobEntity apiTestCaseJob = ApiTestCaseJobEntity.builder()
-                .createDateTime(LocalDateTime.now())
-                .modifyUserId(currentUser.getId())
-                .createUserId(currentUser.getId())
-                .createUserName(currentUser.getUsername())
-                .modifyDateTime(LocalDateTime.now())
-                .environment(jobMapper.toJobEnvironment(projectEnvironment))
-                .apiTestCase(JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestRequest)).build())
-                .build();
+            JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
+            ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
+            apiTestCaseJob.setApiTestCase(
+                JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestRequest)).build());
             apiTestCaseJobRepository.insert(apiTestCaseJob);
-            caseDispatcherService.dispatch(apiTestCaseJob);
+            caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
             caseDispatcherService.sendErrorMessage(currentUser.getId(), apiTestPlatEx.getMessage());
@@ -174,5 +179,12 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             return;
         }
         throw ExceptionUtils.mpe("The request address is illegality, please check environment or api path.");
+    }
+
+    private void errorHandler(String userId, AtomicReference<String> jobId, String message) {
+        caseDispatcherService.sendErrorMessage(userId, message);
+        if (StringUtils.isNotBlank(jobId.get())) {
+            apiTestCaseJobRepository.deleteById(jobId.get());
+        }
     }
 }

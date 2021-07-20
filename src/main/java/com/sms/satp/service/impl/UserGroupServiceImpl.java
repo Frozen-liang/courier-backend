@@ -80,11 +80,10 @@ public class UserGroupServiceImpl implements UserGroupService {
     public Boolean edit(UserGroupRequest userGroupRequest) {
         log.info("UserGroupService-edit()-params: [UserGroup]={}", userGroupRequest.toString());
         try {
-            boolean exists = userGroupRepository.existsById(userGroupRequest.getId());
-            if (!exists) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "UserGroup", userGroupRequest.getId());
-            }
+            UserGroupEntity oldUserGroup = userGroupRepository.findById(userGroupRequest.getId())
+                .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "UserGroup", userGroupRequest.getId()));
             UserGroupEntity userGroup = userGroupMapper.toEntity(userGroupRequest);
+            userGroup.setDefaultGroup(oldUserGroup.isDefaultGroup());
             userGroupRepository.save(userGroup);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());

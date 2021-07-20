@@ -21,6 +21,8 @@ public class ApiPageRequest extends PageDto {
 
     private String apiName;
 
+    private String apiPath;
+
     @JsonProperty("isRemoved")
     private boolean removed;
 

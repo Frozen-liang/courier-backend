@@ -7,4 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface UserGroupRepository extends MongoRepository<UserGroupEntity, String> {
 
     List<UserGroupEntity> findAllByRemovedIsFalseOrderByCreateDateTimeDesc();
+
+    boolean existsByDefaultGroupIsTrue();
 }

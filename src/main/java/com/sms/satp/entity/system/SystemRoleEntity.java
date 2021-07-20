@@ -26,6 +26,8 @@ public class SystemRoleEntity {
     @Default
     @Field("isEnable")
     private boolean enable = true;
+    @Field("isDefaultRole")
+    private boolean defaultRole;
     @CreatedDate
     private LocalDateTime createDateTime;
 }

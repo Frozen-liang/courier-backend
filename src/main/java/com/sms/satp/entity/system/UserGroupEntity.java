@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @ToString(callSuper = true)
@@ -18,5 +19,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class UserGroupEntity extends BaseEntity {
 
     private String name;
+
     private List<String> roleIds;
+
+    @Field(name = "isDefaultGroup")
+    private boolean defaultGroup;
 }

@@ -37,7 +37,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // Query user info
         UserEntity userEntity =
-            userRepository.findByUsernameOrEmailAndEnabledTrue(username, username)
+            userRepository.findByUsernameOrEmail(username, username)
                 .orElseThrow(
                     () -> new UsernameNotFoundException(String.format("The user %s was not found.", username)));
 
@@ -54,7 +54,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // Build UserDetails info of the Security
         UserDetails userDetails = User.withUsername(userEntity.getUsername()).password(userEntity.getPassword())
-            .disabled(!userEntity.isEnabled()).accountExpired(false)
+            .disabled(userEntity.getRemoved()).accountExpired(false)
             .credentialsExpired(false).accountLocked(false).authorities(authorities).build();
 
         return new CustomUser(userDetails, userEntity.getId(),

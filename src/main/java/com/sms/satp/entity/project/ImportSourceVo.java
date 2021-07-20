@@ -12,6 +12,7 @@ import lombok.Data;
 public class ImportSourceVo {
 
     private String id;
+    private String name;
     private DocumentType documentType;
     private SaveMode saveMode;
     private String projectId;
