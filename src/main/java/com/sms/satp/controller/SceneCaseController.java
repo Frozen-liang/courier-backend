@@ -38,7 +38,7 @@ public class SceneCaseController {
         return sceneCaseService.add(sceneCaseDto);
     }
 
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/delete/{ids}")
     public Boolean deleteByIds(@PathVariable List<String> ids) {
         return sceneCaseService.deleteByIds(ids);
     }
@@ -48,8 +48,9 @@ public class SceneCaseController {
         return sceneCaseService.edit(sceneCaseDto);
     }
 
-    @GetMapping("/page/{projectId}")
-    public Page<SceneCaseResponse> page(SearchSceneCaseRequest searchDto, @PathVariable ObjectId projectId) {
+    @PostMapping("/page/{projectId}")
+    public Page<SceneCaseResponse> page(@RequestBody SearchSceneCaseRequest searchDto,
+        @PathVariable ObjectId projectId) {
         return sceneCaseService.page(searchDto, projectId);
     }
 
@@ -78,4 +79,13 @@ public class SceneCaseController {
         return sceneCaseService.addTemplate(addCaseTemplateConnRequest);
     }
 
+    @DeleteMapping("/{ids}")
+    public Boolean delete(@PathVariable List<String> ids) {
+        return sceneCaseService.delete(ids);
+    }
+
+    @PutMapping("/recover")
+    public Boolean recover(@RequestBody List<String> ids) {
+        return sceneCaseService.recover(ids);
+    }
 }

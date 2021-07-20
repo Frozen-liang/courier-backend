@@ -1,7 +1,9 @@
 package com.sms.satp.repository.impl;
 
+import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.entity.scenetest.CaseTemplateApiEntity;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
 import java.util.Collections;
 import java.util.List;
@@ -16,9 +18,12 @@ import org.springframework.stereotype.Component;
 public class CustomizedCaseTemplateApiRepositoryImpl implements CustomizedCaseTemplateApiRepository {
 
     private final MongoTemplate mongoTemplate;
+    private final CommonDeleteRepository commonDeleteRepository;
 
-    public CustomizedCaseTemplateApiRepositoryImpl(MongoTemplate mongoTemplate) {
+    public CustomizedCaseTemplateApiRepositoryImpl(MongoTemplate mongoTemplate,
+        CommonDeleteRepository commonDeleteRepository) {
         this.mongoTemplate = mongoTemplate;
+        this.commonDeleteRepository = commonDeleteRepository;
     }
 
     @Override
@@ -47,6 +52,24 @@ public class CustomizedCaseTemplateApiRepositoryImpl implements CustomizedCaseTe
         query.limit(1);
         CaseTemplateApiEntity caseTemplateApi = mongoTemplate.findOne(query, CaseTemplateApiEntity.class);
         return Objects.isNull(caseTemplateApi) ? 1 : caseTemplateApi.getOrder() + 1;
+    }
+
+    @Override
+    public List<CaseTemplateApiEntity> findCaseTemplateApiIdsByCaseTemplateIds(List<String> ids) {
+        Query query = new Query();
+        query.fields().include(CommonFiled.ID.getFiled());
+        SceneFiled.CASE_TEMPLATE_ID.in(ids).ifPresent(query::addCriteria);
+        return mongoTemplate.find(query, CaseTemplateApiEntity.class);
+    }
+
+    @Override
+    public Boolean deleteByIds(List<String> caseTemplateApiIds) {
+        return commonDeleteRepository.deleteByIds(caseTemplateApiIds, CaseTemplateApiEntity.class);
+    }
+
+    @Override
+    public Boolean recover(List<String> caseTemplateApiIds) {
+        return commonDeleteRepository.recover(caseTemplateApiIds, CaseTemplateApiEntity.class);
     }
 
 }

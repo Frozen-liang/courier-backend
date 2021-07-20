@@ -22,8 +22,9 @@ import static org.mockito.Mockito.when;
 class CustomizedSceneCaseRepositoryTest {
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
+    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
     private final CustomizedSceneCaseRepository customizedSceneCaseRepository =
-        new CustomizedSceneCaseRepositoryImpl(mongoTemplate);
+        new CustomizedSceneCaseRepositoryImpl(mongoTemplate, commonDeleteRepository);
 
     private final static String MOCK_ID = "1";
     private final static String NAME = "test";

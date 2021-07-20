@@ -24,5 +24,5 @@ public class BaseResponse {
     private String createUserId;
     private String modifyUserId;
     @JsonProperty("isRemoved")
-    private boolean removed;
+    private boolean isRemoved;
 }

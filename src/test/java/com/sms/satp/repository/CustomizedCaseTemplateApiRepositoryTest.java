@@ -17,8 +17,9 @@ import static org.mockito.Mockito.when;
 class CustomizedCaseTemplateApiRepositoryTest {
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
+    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository =
-        new CustomizedCaseTemplateApiRepositoryImpl(mongoTemplate);
+        new CustomizedCaseTemplateApiRepositoryImpl(mongoTemplate, commonDeleteRepository);
 
     private final static String MOCK_ID = "1";
     private final static String NAME = "test";
@@ -48,7 +49,7 @@ class CustomizedCaseTemplateApiRepositoryTest {
         when(mongoTemplate.find(any(), any()))
             .thenReturn(Lists.newArrayList(CaseTemplateApiEntity.builder().build()));
         List<CaseTemplateApiEntity> dto =
-            customizedCaseTemplateApiRepository.findByCaseTemplateIdAndIsExecute(MOCK_ID,Boolean.TRUE);
+            customizedCaseTemplateApiRepository.findByCaseTemplateIdAndIsExecute(MOCK_ID, Boolean.TRUE);
         assertThat(dto).isNotEmpty();
     }
 }
