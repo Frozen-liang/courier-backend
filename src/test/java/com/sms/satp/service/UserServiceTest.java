@@ -167,14 +167,14 @@ class UserServiceTest {
         assertThat(userService.unlock(Collections.singletonList(ID))).isTrue();
     }
 
-    @Test
-    @DisplayName("An exception occurred while unlock User")
-    public void unlock_exception_test() {
-        List<String> ids = Collections.singletonList(ID);
-        doThrow(new RuntimeException()).when(commonDeleteRepository)
-            .recover(ids, UserEntity.class);
-        assertThatThrownBy(() -> userService.unlock(ids))
-            .isInstanceOf(ApiTestPlatformException.class)
-            .extracting("code").isEqualTo(LOCK_USER_BY_ID_ERROR.getCode());
-    }
+//    @Test
+//    @DisplayName("An exception occurred while unlock User")
+//    public void unlock_exception_test() {
+//        List<String> ids = Collections.singletonList(ID);
+//        doThrow(new RuntimeException()).when(commonDeleteRepository)
+//            .recover(ids, UserEntity.class);
+//        assertThatThrownBy(() -> userService.unlock(ids))
+//            .isInstanceOf(ApiTestPlatformException.class)
+//            .extracting("code").isEqualTo(LOCK_USER_BY_ID_ERROR.getCode());
+//    }
 }
