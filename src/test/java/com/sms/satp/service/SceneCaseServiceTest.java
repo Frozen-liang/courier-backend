@@ -169,8 +169,7 @@ class SceneCaseServiceTest {
         List<SceneCaseApiEntity> sceneCaseApiDtoList = Lists
             .newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).build());
         when(sceneCaseApiService.getApiBySceneCaseId(any(), anyBoolean())).thenReturn(sceneCaseApiDtoList);
-        when(sceneCaseApiService.editAll(any())).thenReturn(Boolean.TRUE);
-        Boolean isSuccess = sceneCaseService.edit(UpdateSceneCaseRequest.builder().removed(Boolean.FALSE).build());
+        Boolean isSuccess = sceneCaseService.edit(UpdateSceneCaseRequest.builder().build());
         assertTrue(isSuccess);
     }
 
@@ -186,33 +185,6 @@ class SceneCaseServiceTest {
         when(sceneCaseRepository.save(any(SceneCaseEntity.class)))
             .thenThrow(new ApiTestPlatformException(EDIT_SCENE_CASE_ERROR));
         assertThatThrownBy(() -> sceneCaseService.edit(UpdateSceneCaseRequest.builder().build()))
-            .isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
-    @DisplayName("Test the batch edit method in the SceneCase service")
-    void batchEdit_test() {
-        SceneCaseEntity sceneCase = SceneCaseEntity.builder().id(MOCK_ID).build();
-        Optional<SceneCaseEntity> optionalSceneCase = Optional
-            .ofNullable(SceneCaseEntity.builder().removed(Boolean.TRUE).build());
-        when(sceneCaseRepository.findById(any())).thenReturn(optionalSceneCase);
-        when(sceneCaseRepository.save(any(SceneCaseEntity.class))).thenReturn(sceneCase);
-        List<SceneCaseApiEntity> caseTemplateApiDtoList = Lists
-            .newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).build());
-        when(sceneCaseApiService.getApiBySceneCaseId(any(), anyBoolean())).thenReturn(caseTemplateApiDtoList);
-        when(caseTemplateApiService.editAll(any())).thenReturn(Boolean.TRUE);
-        List<SceneCaseEntity> sceneCaseList = Lists.newArrayList(sceneCase);
-        Boolean isSuccess = sceneCaseService.batchEdit(sceneCaseList);
-        assertTrue(isSuccess);
-    }
-
-    @Test
-    @DisplayName("Test the batch edit method in the SceneCase service thrown exception")
-    void batchEdit_test_thrownException() {
-        SceneCaseEntity sceneCase = SceneCaseEntity.builder().id(MOCK_ID).build();
-        when(sceneCaseRepository.findById(any())).thenThrow(new ApiTestPlatformException(EDIT_CASE_TEMPLATE_ERROR));
-        List<SceneCaseEntity> sceneCaseList = Lists.newArrayList(sceneCase);
-        assertThatThrownBy(() -> sceneCaseService.batchEdit(sceneCaseList))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 

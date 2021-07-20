@@ -21,8 +21,6 @@ public interface SceneCaseService {
 
     Boolean edit(UpdateSceneCaseRequest updateSceneCaseRequest);
 
-    Boolean batchEdit(List<SceneCaseEntity> sceneCaseList);
-
     Page<SceneCaseResponse> page(SearchSceneCaseRequest searchDto, ObjectId projectId);
 
     SceneTemplateResponse getConn(String id);
@@ -36,4 +34,8 @@ public interface SceneCaseService {
     Boolean addTemplate(AddCaseTemplateConnRequest addCaseTemplateConnRequest);
 
     Boolean deleteConn(String sceneCaseApiId);
+
+    Boolean delete(List<String> ids);
+
+    Boolean recover(List<String> ids);
 }

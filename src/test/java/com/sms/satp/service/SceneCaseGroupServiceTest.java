@@ -8,6 +8,7 @@ import com.sms.satp.dto.response.SceneCaseGroupResponse;
 import com.sms.satp.entity.group.SceneCaseGroupEntity;
 import com.sms.satp.entity.scenetest.SceneCaseEntity;
 import com.sms.satp.mapper.SceneCaseGroupMapper;
+import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.repository.SceneCaseGroupRepository;
 import com.sms.satp.service.impl.SceneCaseGroupServiceImpl;
 import java.util.List;
@@ -35,8 +36,11 @@ class SceneCaseGroupServiceTest {
     private final SceneCaseGroupRepository sceneCaseGroupRepository = mock(SceneCaseGroupRepository.class);
     private final SceneCaseGroupMapper sceneCaseGroupMapper = mock(SceneCaseGroupMapper.class);
     private final SceneCaseService sceneCaseService = mock(SceneCaseService.class);
+    private final CustomizedSceneCaseRepository customizedSceneCaseRepository = mock(
+        CustomizedSceneCaseRepository.class);
     private final SceneCaseGroupService sceneCaseGroupService =
-        new SceneCaseGroupServiceImpl(sceneCaseGroupRepository, sceneCaseGroupMapper, sceneCaseService);
+        new SceneCaseGroupServiceImpl(sceneCaseGroupRepository, sceneCaseGroupMapper, sceneCaseService,
+            customizedSceneCaseRepository);
 
     private final static String MOCK_ID = "1";
     private final static String MOCK_NAME = "name";
@@ -96,8 +100,7 @@ class SceneCaseGroupServiceTest {
         when(sceneCaseGroupRepository.findById(any())).thenReturn(optional);
         doNothing().when(sceneCaseGroupRepository).deleteById(any());
         List<SceneCaseEntity> sceneCaseList = Lists.newArrayList(SceneCaseEntity.builder().build());
-        when(sceneCaseService.get(any(),any())).thenReturn(sceneCaseList);
-        when(sceneCaseService.batchEdit(any())).thenReturn(Boolean.TRUE);
+        when(sceneCaseService.get(any(), any())).thenReturn(sceneCaseList);
         Boolean isSuccess = sceneCaseGroupService.deleteById(MOCK_ID);
         assertTrue(isSuccess);
     }

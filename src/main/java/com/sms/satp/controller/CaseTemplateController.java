@@ -43,7 +43,7 @@ public class CaseTemplateController {
         return caseTemplateService.add(convertCaseTemplateRequest);
     }
 
-    @DeleteMapping("/{ids}")
+    @DeleteMapping("/delete/{ids}")
     public Boolean deleteByIds(@PathVariable List<String> ids) {
         return caseTemplateService.deleteByIds(ids);
     }
@@ -53,16 +53,15 @@ public class CaseTemplateController {
         return caseTemplateService.edit(updateCaseTemplateRequest);
     }
 
-    @GetMapping("/page/{projectId}")
-    public Page<CaseTemplateResponse> page(CaseTemplateSearchRequest searchDto,
+    @PostMapping("/page/{projectId}")
+    public Page<CaseTemplateResponse> page(@RequestBody CaseTemplateSearchRequest searchDto,
         @PathVariable ObjectId projectId) {
         return caseTemplateService.page(searchDto, projectId);
     }
 
-    @GetMapping("/list/{caseTemplateId}/{removed}")
-    public CaseTemplateDetailResponse getApiList(@PathVariable String caseTemplateId,
-        @PathVariable boolean removed) {
-        return caseTemplateService.getApiList(caseTemplateId, removed);
+    @GetMapping("/list/{caseTemplateId}")
+    public CaseTemplateDetailResponse getApiList(@PathVariable String caseTemplateId) {
+        return caseTemplateService.getApiList(caseTemplateId);
     }
 
     @PostMapping("/api")
@@ -70,4 +69,13 @@ public class CaseTemplateController {
         return caseTemplateService.addApi(request);
     }
 
+    @DeleteMapping("/{ids}")
+    public Boolean delete(@PathVariable List<String> ids) {
+        return caseTemplateService.delete(ids);
+    }
+
+    @PutMapping("/recover")
+    public Boolean recover(@RequestBody List<String> ids) {
+        return caseTemplateService.recover(ids);
+    }
 }

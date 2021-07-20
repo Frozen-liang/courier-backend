@@ -20,14 +20,16 @@ import com.sms.satp.dto.request.UpdateCaseTemplateGroupRequest;
 import com.sms.satp.dto.response.CaseTemplateGroupResponse;
 import com.sms.satp.entity.group.CaseTemplateGroupEntity;
 import com.sms.satp.entity.scenetest.CaseTemplateEntity;
+import com.sms.satp.entity.scenetest.SceneCaseEntity;
 import com.sms.satp.mapper.CaseTemplateGroupMapper;
 import com.sms.satp.repository.CaseTemplateGroupRepository;
+import com.sms.satp.repository.CustomizedCaseTemplateRepository;
 import com.sms.satp.service.CaseTemplateGroupService;
 import com.sms.satp.service.CaseTemplateService;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
@@ -40,13 +42,16 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
     private final CaseTemplateGroupRepository caseTemplateGroupRepository;
     private final CaseTemplateGroupMapper caseTemplateGroupMapper;
     private final CaseTemplateService caseTemplateService;
+    private final CustomizedCaseTemplateRepository customizedCaseTemplateRepository;
 
     public CaseTemplateGroupServiceImpl(CaseTemplateGroupRepository caseTemplateGroupRepository,
         CaseTemplateGroupMapper caseTemplateGroupMapper,
-        CaseTemplateService caseTemplateService) {
+        CaseTemplateService caseTemplateService,
+        CustomizedCaseTemplateRepository customizedCaseTemplateRepository) {
         this.caseTemplateGroupRepository = caseTemplateGroupRepository;
         this.caseTemplateGroupMapper = caseTemplateGroupMapper;
         this.caseTemplateService = caseTemplateService;
+        this.customizedCaseTemplateRepository = customizedCaseTemplateRepository;
     }
 
     @Override
@@ -86,7 +91,10 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
             Optional<CaseTemplateGroupEntity> caseTemplateGroup = caseTemplateGroupRepository.findById(id);
             caseTemplateGroup.ifPresent(caseGroup -> {
                 caseTemplateGroupRepository.deleteById(caseGroup.getId());
-                editCaseTemplateStatus(caseGroup.getId(), caseGroup.getProjectId());
+                List<CaseTemplateEntity> caseTemplateEntityList = customizedCaseTemplateRepository.getIdsByGroupId(id);
+                List<String> caseTemplateIds = caseTemplateEntityList.stream().map(CaseTemplateEntity::getId)
+                    .collect(Collectors.toList());
+                caseTemplateService.delete(caseTemplateIds);
             });
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -111,16 +119,6 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
         } catch (Exception e) {
             log.error("Failed to getList the CaseTemplateGroup!", e);
             throw new ApiTestPlatformException(GET_CASE_TEMPLATE_GROUP_LIST_ERROR);
-        }
-    }
-
-    private void editCaseTemplateStatus(String id, String projectId) {
-        List<CaseTemplateEntity> caseTemplateList = caseTemplateService.get(id, projectId);
-        if (CollectionUtils.isNotEmpty(caseTemplateList)) {
-            for (CaseTemplateEntity caseTemplate : caseTemplateList) {
-                caseTemplate.setRemoved(true);
-            }
-            caseTemplateService.batchEdit(caseTemplateList);
         }
     }
 

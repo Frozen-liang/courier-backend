@@ -4,12 +4,15 @@ import static com.sms.satp.common.enums.OperationModule.CASE_TEMPLATE;
 import static com.sms.satp.common.enums.OperationType.ADD;
 import static com.sms.satp.common.enums.OperationType.DELETE;
 import static com.sms.satp.common.enums.OperationType.EDIT;
+import static com.sms.satp.common.enums.OperationType.RECOVER;
+import static com.sms.satp.common.enums.OperationType.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.RECOVER_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
 
 import com.google.common.collect.Lists;
@@ -43,7 +46,6 @@ import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
-import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.CaseTemplateApiService;
 import com.sms.satp.service.CaseTemplateService;
@@ -74,7 +76,6 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     private final SceneCaseApiService sceneCaseApiService;
     private final CaseTemplateApiMapper caseTemplateApiMapper;
     private final CaseTemplateApiRepository caseTemplateApiRepository;
-    private final SceneCaseApiRepository sceneCaseApiRepository;
     private final ApiRepository apiRepository;
     private final ApiTestCaseMapper apiTestCaseMapper;
     private final ApiTestCaseRepository apiTestCaseRepository;
@@ -85,8 +86,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         CaseTemplateMapper caseTemplateMapper, CaseTemplateApiService caseTemplateApiService,
         SceneCaseRepository sceneCaseRepository, SceneCaseApiService sceneCaseApiService,
         CaseTemplateApiMapper caseTemplateApiMapper,
-        CaseTemplateApiRepository caseTemplateApiRepository,
-        SceneCaseApiRepository sceneCaseApiRepository, ApiRepository apiRepository,
+        CaseTemplateApiRepository caseTemplateApiRepository, ApiRepository apiRepository,
         ApiTestCaseMapper apiTestCaseMapper, ApiTestCaseRepository apiTestCaseRepository,
         CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository) {
         this.caseTemplateRepository = caseTemplateRepository;
@@ -97,7 +97,6 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         this.sceneCaseApiService = sceneCaseApiService;
         this.caseTemplateApiMapper = caseTemplateApiMapper;
         this.caseTemplateApiRepository = caseTemplateApiRepository;
-        this.sceneCaseApiRepository = sceneCaseApiRepository;
         this.apiRepository = apiRepository;
         this.apiTestCaseMapper = apiTestCaseMapper;
         this.apiTestCaseRepository = apiTestCaseRepository;
@@ -167,16 +166,14 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE, template = "{{#result?.![#this.name]}}",
+    @LogRecord(operationType = REMOVE, operationModule = CASE_TEMPLATE, template = "{{#result?.![#this.name]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("CaseTemplateService-deleteById()-params: [id]={}", ids);
         try {
             for (String id : ids) {
                 caseTemplateRepository.deleteById(id);
-                List<CaseTemplateApiEntity> caseTemplateApiList = caseTemplateApiService.listByCaseTemplateId(id);
-                deleteCaseTemplateApi(caseTemplateApiList);
-                sceneCaseApiRepository.deleteByCaseTemplateId(id);
+                deleteCaseTemplateApi(id);
             }
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -192,22 +189,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         try {
             CaseTemplateEntity caseTemplate = caseTemplateMapper
                 .toCaseTemplateByUpdateRequest(updateCaseTemplateRequest);
-            updateCaseTemplate(caseTemplate);
-            return Boolean.TRUE;
-        } catch (Exception e) {
-            log.error("Failed to edit the CaseTemplate!", e);
-            throw new ApiTestPlatformException(EDIT_CASE_TEMPLATE_ERROR);
-        }
-    }
-
-    @Override
-    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE, template = "{{#caseTemplateList[0].name}}")
-    public Boolean batchEdit(List<CaseTemplateEntity> caseTemplateList) {
-        log.info("CaseTemplateService-edit()-params: [caseTemplateList]={}", caseTemplateList.toString());
-        try {
-            for (CaseTemplateEntity caseTemplate : caseTemplateList) {
-                updateCaseTemplate(caseTemplate);
-            }
+            caseTemplateRepository.save(caseTemplate);
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to edit the CaseTemplate!", e);
@@ -243,7 +225,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     @Override
-    public CaseTemplateDetailResponse getApiList(String caseTemplateId, boolean removed) {
+    public CaseTemplateDetailResponse getApiList(String caseTemplateId) {
         try {
             Optional<CaseTemplateEntity> caseTemplate = caseTemplateRepository.findById(caseTemplateId);
             if (caseTemplate.isEmpty()) {
@@ -251,7 +233,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             }
             CaseTemplateResponse caseTemplateResponse = caseTemplateMapper.toDto(caseTemplate.get());
             List<CaseTemplateApiResponse> caseTemplateApiResponseList =
-                caseTemplateApiService.listByCaseTemplateId(caseTemplateId, removed);
+                caseTemplateApiService.listResponseByCaseTemplateId(caseTemplateId);
             return CaseTemplateDetailResponse.builder().caseTemplateResponse(caseTemplateResponse)
                 .caseTemplateApiResponseList(caseTemplateApiResponseList).build();
         } catch (Exception e) {
@@ -281,6 +263,50 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         } catch (Exception e) {
             log.error("Failed to get the CaseTemplateApi by id!", e);
             throw new ApiTestPlatformException(ADD_CASE_TEMPLATE_ERROR);
+        }
+    }
+
+    @Override
+    @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE,
+        template = "{{#result?.![#this.caseName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
+    public Boolean delete(List<String> ids) {
+        try {
+            customizedCaseTemplateRepository.deleteByIds(ids);
+            List<CaseTemplateApiEntity> caseTemplateApiEntityList = customizedCaseTemplateApiRepository
+                .findCaseTemplateApiIdsByCaseTemplateIds(ids);
+            if (CollectionUtils.isNotEmpty(caseTemplateApiEntityList)) {
+                List<String> caseTemplateApiIds =
+                    caseTemplateApiEntityList.stream().map(CaseTemplateApiEntity::getId).collect(
+                    Collectors.toList());
+                customizedCaseTemplateApiRepository.deleteByIds(caseTemplateApiIds);
+            }
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to delete the CaseTemplate!", e);
+            throw new ApiTestPlatformException(DELETE_CASE_TEMPLATE_ERROR);
+        }
+    }
+
+    @Override
+    @LogRecord(operationType = RECOVER, operationModule = CASE_TEMPLATE,
+        template = "{{#result?.![#this.caseName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
+    public Boolean recover(List<String> ids) {
+        try {
+            customizedCaseTemplateRepository.recover(ids);
+            List<CaseTemplateApiEntity> caseTemplateApiEntityList = customizedCaseTemplateApiRepository
+                .findCaseTemplateApiIdsByCaseTemplateIds(ids);
+            if (CollectionUtils.isNotEmpty(caseTemplateApiEntityList)) {
+                List<String> caseTemplateApiIds =
+                    caseTemplateApiEntityList.stream().map(CaseTemplateApiEntity::getId).collect(
+                        Collectors.toList());
+                customizedCaseTemplateApiRepository.recover(caseTemplateApiIds);
+            }
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to recover the CaseTemplate!", e);
+            throw new ApiTestPlatformException(RECOVER_CASE_TEMPLATE_ERROR);
         }
     }
 
@@ -319,33 +345,11 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         }
     }
 
-    private void updateCaseTemplate(CaseTemplateEntity caseTemplate) {
-        Optional<CaseTemplateEntity> optionalSceneCase = caseTemplateRepository.findById(caseTemplate.getId());
-        optionalSceneCase.ifPresent(sceneCaseFindById -> {
-            caseTemplate.setCreateUserId(sceneCaseFindById.getCreateUserId());
-            caseTemplate.setCreateDateTime(sceneCaseFindById.getCreateDateTime());
-            if (!Objects.equals(caseTemplate.isRemoved(), sceneCaseFindById.isRemoved())) {
-                editCaseTemplateApiStatus(caseTemplate, sceneCaseFindById.isRemoved());
-            }
-            caseTemplateRepository.save(caseTemplate);
-        });
-    }
-
-    private void deleteCaseTemplateApi(List<CaseTemplateApiEntity> caseTemplateApiList) {
+    private void deleteCaseTemplateApi(String id) {
+        List<CaseTemplateApiEntity> caseTemplateApiList = caseTemplateApiService.listByCaseTemplateId(id);
         List<String> ids = caseTemplateApiList.stream().map(CaseTemplateApiEntity::getId).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(ids)) {
             caseTemplateApiService.deleteByIds(ids);
-        }
-    }
-
-    private void editCaseTemplateApiStatus(CaseTemplateEntity caseTemplate, Boolean oldRemove) {
-        List<CaseTemplateApiEntity> caseTemplateApiList = caseTemplateApiService
-            .getApiByCaseTemplateId(caseTemplate.getId(), oldRemove);
-        if (CollectionUtils.isNotEmpty(caseTemplateApiList)) {
-            for (CaseTemplateApiEntity caseTemplateApi : caseTemplateApiList) {
-                caseTemplateApi.setRemoved(caseTemplate.isRemoved());
-            }
-            caseTemplateApiService.editAll(caseTemplateApiList);
         }
     }
 

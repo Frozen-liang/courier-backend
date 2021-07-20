@@ -9,6 +9,7 @@ import com.sms.satp.entity.group.CaseTemplateGroupEntity;
 import com.sms.satp.entity.scenetest.CaseTemplateEntity;
 import com.sms.satp.mapper.CaseTemplateGroupMapper;
 import com.sms.satp.repository.CaseTemplateGroupRepository;
+import com.sms.satp.repository.CustomizedCaseTemplateRepository;
 import com.sms.satp.service.impl.CaseTemplateGroupServiceImpl;
 import java.util.List;
 import java.util.Optional;
@@ -35,9 +36,12 @@ class CaseTemplateGroupServiceTest {
     private final CaseTemplateGroupRepository caseTemplateGroupRepository = mock(CaseTemplateGroupRepository.class);
     private final CaseTemplateGroupMapper caseTemplateGroupMapper = mock(CaseTemplateGroupMapper.class);
     private final CaseTemplateService caseTemplateService = mock(CaseTemplateService.class);
+    private final CustomizedCaseTemplateRepository customizedCaseTemplateRepository =
+        mock(CustomizedCaseTemplateRepository.class);
 
     private final CaseTemplateGroupService caseTemplateGroupService =
-        new CaseTemplateGroupServiceImpl(caseTemplateGroupRepository, caseTemplateGroupMapper, caseTemplateService);
+        new CaseTemplateGroupServiceImpl(caseTemplateGroupRepository, caseTemplateGroupMapper, caseTemplateService,
+            customizedCaseTemplateRepository);
 
     private final static String MOCK_ID = "1";
     private final static String MOCK_NAME = "name";
@@ -98,7 +102,6 @@ class CaseTemplateGroupServiceTest {
         doNothing().when(caseTemplateGroupRepository).deleteById(any());
         List<CaseTemplateEntity> caseTemplatePage = Lists.newArrayList(CaseTemplateEntity.builder().id(MOCK_ID).build());
         when(caseTemplateService.get(any(), any())).thenReturn(caseTemplatePage);
-        when(caseTemplateService.batchEdit(any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = caseTemplateGroupService.deleteById(MOCK_ID);
         assertTrue(isSuccess);
     }

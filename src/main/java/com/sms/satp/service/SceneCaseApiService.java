@@ -16,8 +16,6 @@ public interface SceneCaseApiService {
 
     Boolean edit(UpdateSceneCaseApiRequest updateSceneCaseApiRequest);
 
-    Boolean editAll(List<SceneCaseApiEntity> sceneCaseApiList);
-
     Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiDto);
 
     List<SceneCaseApiResponse> listBySceneCaseId(String sceneCaseId, boolean removed);

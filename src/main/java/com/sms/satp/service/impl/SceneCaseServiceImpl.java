@@ -4,6 +4,8 @@ import static com.sms.satp.common.enums.OperationModule.SCENE_CASE;
 import static com.sms.satp.common.enums.OperationType.ADD;
 import static com.sms.satp.common.enums.OperationType.DELETE;
 import static com.sms.satp.common.enums.OperationType.EDIT;
+import static com.sms.satp.common.enums.OperationType.RECOVER;
+import static com.sms.satp.common.enums.OperationType.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_CONN_ERROR;
@@ -13,6 +15,7 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.RECOVER_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
 
 import com.google.common.collect.Lists;
@@ -121,7 +124,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = SCENE_CASE, template = "{{#result?.![#this.name]}}",
+    @LogRecord(operationType = REMOVE, operationModule = SCENE_CASE, template = "{{#result?.![#this.name]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("SceneCaseService-deleteById()-params: [ids]={}", ids.toString());
@@ -143,22 +146,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         log.info("SceneCaseService-edit()-params: [SceneCase]={}", updateSceneCaseRequest.toString());
         try {
             SceneCaseEntity sceneCase = sceneCaseMapper.toUpdateSceneCase(updateSceneCaseRequest);
-            updateSceneCase(sceneCase);
-            return Boolean.TRUE;
-        } catch (Exception e) {
-            log.error("Failed to edit the SceneCase!", e);
-            throw new ApiTestPlatformException(EDIT_SCENE_CASE_ERROR);
-        }
-    }
-
-    @Override
-    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE, template = "{{#sceneCaseList[0].name}}")
-    public Boolean batchEdit(List<SceneCaseEntity> sceneCaseList) {
-        log.info("SceneCaseService-batchEdit()-params: [SceneCase]={}", sceneCaseList.toString());
-        try {
-            for (SceneCaseEntity sceneCase : sceneCaseList) {
-                updateSceneCase(sceneCase);
-            }
+            sceneCaseRepository.save(sceneCase);
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to edit the SceneCase!", e);
@@ -310,14 +298,46 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         }
     }
 
-    private void updateSceneCase(SceneCaseEntity sceneCase) {
-        Optional<SceneCaseEntity> optionalSceneCase = sceneCaseRepository.findById(sceneCase.getId());
-        optionalSceneCase.ifPresent(sceneCaseFindById -> {
-            if (!Objects.equals(sceneCase.isRemoved(), sceneCaseFindById.isRemoved())) {
-                editSceneCaseApiStatus(sceneCase, sceneCaseFindById.isRemoved());
+    @Override
+    @LogRecord(operationType = DELETE, operationModule = SCENE_CASE,
+        template = "{{#result?.![#this.caseName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
+    public Boolean delete(List<String> ids) {
+        try {
+            customizedSceneCaseRepository.deleteByIds(ids);
+            List<SceneCaseApiEntity> sceneCaseApiEntityList = customizedSceneCaseApiRepository
+                .findSceneCaseApiIdsBySceneCaseIds(ids);
+            if (CollectionUtils.isNotEmpty(sceneCaseApiEntityList)) {
+                List<String> sceneCaseApiIds = sceneCaseApiEntityList.stream().map(SceneCaseApiEntity::getId).collect(
+                    Collectors.toList());
+                customizedSceneCaseApiRepository.deleteByIds(sceneCaseApiIds);
             }
-            sceneCaseRepository.save(sceneCase);
-        });
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to delete the SceneCase!", e);
+            throw new ApiTestPlatformException(DELETE_SCENE_CASE_ERROR);
+        }
+    }
+
+    @Override
+    @LogRecord(operationType = RECOVER, operationModule = SCENE_CASE,
+        template = "{{#result?.![#this.caseName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
+    public Boolean recover(List<String> ids) {
+        try {
+            customizedSceneCaseRepository.recover(ids);
+            List<SceneCaseApiEntity> sceneCaseApiEntityList = customizedSceneCaseApiRepository
+                .findSceneCaseApiIdsBySceneCaseIds(ids);
+            if (CollectionUtils.isNotEmpty(sceneCaseApiEntityList)) {
+                List<String> sceneCaseApiIds = sceneCaseApiEntityList.stream().map(SceneCaseApiEntity::getId).collect(
+                    Collectors.toList());
+                customizedSceneCaseApiRepository.recover(sceneCaseApiIds);
+            }
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to recover the SceneCase!", e);
+            throw new ApiTestPlatformException(RECOVER_SCENE_CASE_ERROR);
+        }
     }
 
     private void deleteSceneCaseApi(String id) {
@@ -325,17 +345,6 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         if (CollectionUtils.isNotEmpty(sceneCaseApiList)) {
             List<String> ids = sceneCaseApiList.stream().map(SceneCaseApiEntity::getId).collect(Collectors.toList());
             sceneCaseApiService.deleteByIds(ids);
-        }
-    }
-
-    private void editSceneCaseApiStatus(SceneCaseEntity sceneCase, Boolean oldRemove) {
-        List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiService
-            .getApiBySceneCaseId(sceneCase.getId(), oldRemove);
-        if (CollectionUtils.isNotEmpty(sceneCaseApiList)) {
-            for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
-                sceneCaseApi.setRemoved(sceneCase.isRemoved());
-            }
-            sceneCaseApiService.editAll(sceneCaseApiList);
         }
     }
 

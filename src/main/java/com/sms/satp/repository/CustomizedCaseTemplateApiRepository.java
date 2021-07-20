@@ -10,4 +10,11 @@ public interface CustomizedCaseTemplateApiRepository {
     List<CaseTemplateApiEntity> findByCaseTemplateIdAndIsExecute(String caseTemplateId, Boolean isExecute);
 
     int findCurrentOrderByCaseTemplateId(String caseTemplateId);
+
+    List<CaseTemplateApiEntity> findCaseTemplateApiIdsByCaseTemplateIds(List<String> ids);
+
+    Boolean deleteByIds(List<String> caseTemplateApiIds);
+
+    Boolean recover(List<String> caseTemplateApiIds);
+
 }

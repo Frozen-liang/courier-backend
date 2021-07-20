@@ -9,6 +9,7 @@ import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.entity.scenetest.SceneCaseEntity;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
@@ -31,9 +32,12 @@ import org.springframework.stereotype.Component;
 public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRepository {
 
     private final MongoTemplate mongoTemplate;
+    private final CommonDeleteRepository commonDeleteRepository;
 
-    public CustomizedSceneCaseRepositoryImpl(MongoTemplate mongoTemplate) {
+    public CustomizedSceneCaseRepositoryImpl(MongoTemplate mongoTemplate,
+        CommonDeleteRepository commonDeleteRepository) {
         this.mongoTemplate = mongoTemplate;
+        this.commonDeleteRepository = commonDeleteRepository;
     }
 
     @Override
@@ -78,6 +82,24 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
             .getMappedResults();
         return new PageImpl<SceneCaseResponse>(records,
             PageRequest.of(searchSceneCaseRequest.getPageNumber(), searchSceneCaseRequest.getPageSize(), sort), count);
+    }
+
+    @Override
+    public Boolean deleteByIds(List<String> ids) {
+        return commonDeleteRepository.deleteByIds(ids, SceneCaseEntity.class);
+    }
+
+    @Override
+    public Boolean recover(List<String> ids) {
+        return commonDeleteRepository.recover(ids, SceneCaseEntity.class);
+    }
+
+    @Override
+    public List<SceneCaseEntity> getIdsByGroupId(String id) {
+        Query query = new Query();
+        query.fields().include(ID.getFiled());
+        CommonFiled.GROUP_ID.is(id).ifPresent(query::addCriteria);
+        return mongoTemplate.find(query, SceneCaseEntity.class);
     }
 
     private void buildCriteria(SearchSceneCaseRequest searchSceneCaseRequest, Query query,

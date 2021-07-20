@@ -21,7 +21,9 @@ class CustomizedSceneCaseApiRepositoryTest {
 
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
-    private final CustomizedSceneCaseApiRepository repository = new CustomizedSceneCaseApiRepositoryImpl(mongoTemplate);
+    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final CustomizedSceneCaseApiRepository repository = new CustomizedSceneCaseApiRepositoryImpl(mongoTemplate,
+        commonDeleteRepository);
 
     private final static String MOCK_ID = "1";
 

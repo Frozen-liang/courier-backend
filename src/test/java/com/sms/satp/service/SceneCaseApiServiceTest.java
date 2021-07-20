@@ -113,25 +113,6 @@ class SceneCaseApiServiceTest {
     }
 
     @Test
-    @DisplayName("Test the editAll method in the SceneCaseApi service throws exception")
-    void editAll_test() {
-        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).build());
-        when(sceneCaseApiRepository.saveAll(any())).thenReturn(sceneCaseApiList);
-        Boolean isSuccess = sceneCaseApiService.editAll(sceneCaseApiList);
-        assertTrue(isSuccess);
-    }
-
-    @Test
-    @DisplayName("Test the editAll method in the SceneCaseApi service throws exception")
-    void editAll_thenThrowException() {
-        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).build());
-        when(sceneCaseApiRepository.saveAll(any()))
-            .thenThrow(new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR));
-        assertThatThrownBy(() -> sceneCaseApiService.editAll(sceneCaseApiList))
-            .isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
     @DisplayName("Test the batchEdit method in the SceneCaseApi service")
     void batchEdit_test() {
         BatchUpdateSceneCaseApiRequest dto = getUpdateSortOrder();

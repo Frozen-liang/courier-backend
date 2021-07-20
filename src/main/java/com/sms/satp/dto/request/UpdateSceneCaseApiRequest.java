@@ -1,6 +1,5 @@
 package com.sms.satp.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiType;
 import javax.validation.constraints.NotNull;
@@ -34,6 +33,5 @@ public class UpdateSceneCaseApiRequest {
     private ApiBindingStatus apiBindingStatus;
 
     private ApiTestCaseRequest apiTestCase;
-    @JsonProperty("isRemoved")
-    private boolean removed;
+
 }
