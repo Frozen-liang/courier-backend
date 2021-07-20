@@ -4,6 +4,7 @@ import static com.sms.satp.common.constant.Constants.USER;
 
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
+import com.sms.satp.dto.request.UserPasswordUpdateRequest;
 import com.sms.satp.dto.request.UserRequest;
 import com.sms.satp.dto.response.UserResponse;
 import com.sms.satp.service.UserService;
@@ -53,13 +54,24 @@ public class UserController {
 
     @GetMapping("/list")
     @PreAuthorize("hasRoleOrAdmin(@role.USER_QUERY_ALL)")
-    public List<UserResponse> list(String username, String groupId) {
-        return userService.list(username, groupId);
+    public List<UserResponse> list(String username, String groupId, String workspaceId) {
+        return userService.list(username, groupId, workspaceId);
     }
 
-    @DeleteMapping("/{ids}")
-    @PreAuthorize("hasRoleOrAdmin(@role.USER_DELETE)")
-    public Boolean delete(@PathVariable List<String> ids) {
-        return userService.delete(ids);
+    @DeleteMapping("/lock/{ids}")
+    @PreAuthorize("hasRoleOrAdmin(@role.USER_STATUS_CONTROL)")
+    public Boolean lock(@PathVariable List<String> ids) {
+        return userService.lock(ids);
+    }
+
+    @DeleteMapping("/unlock/{ids}")
+    @PreAuthorize("hasRoleOrAdmin(@role.USER_STATUS_CONTROL)")
+    public Boolean unlock(@PathVariable List<String> ids) {
+        return userService.unlock(ids);
+    }
+
+    @PutMapping("/update/password")
+    public Boolean updatePassword(@Validated @RequestBody UserPasswordUpdateRequest userPasswordUpdateRequest) {
+        return userService.updatePassword(userPasswordUpdateRequest);
     }
 }

@@ -5,15 +5,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.Document;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 public interface Filed {
 
     String getFiled();
+
+    //String[] charArr = {"(", ")",   ".", "[",  "?", "^", "{", "}", "|"};
+
 
     default Optional<Criteria> is(Object value) {
         return Objects.nonNull(value) ? Optional.of(Criteria.where(getFiled()).is(value)) : Optional.empty();
@@ -63,4 +62,13 @@ public interface Filed {
         Pattern pattern = Pattern.compile("^.*" + value + ".*$", Pattern.CASE_INSENSITIVE);
         return Optional.of(Criteria.where(getFiled()).regex(pattern));
     }
+
+    /*private String converterSpecialChar(String value) {
+        for (String key : charArr) {
+            if (value.contains(key)) {
+                value = value.replace(key, "\\" + key);
+            }
+        }
+        return value;
+    }*/
 }

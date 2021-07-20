@@ -8,11 +8,13 @@ public interface WorkspaceService {
 
     WorkspaceResponse findById(String id);
 
-    List<WorkspaceResponse> list(String userId);
+    List<WorkspaceResponse> list();
 
     Boolean add(WorkspaceRequest workspaceRequest);
 
     Boolean edit(WorkspaceRequest workspaceRequest);
 
     Boolean delete(String id);
+
+    List<WorkspaceResponse> findByUserId();
 }

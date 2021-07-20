@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseJobPageRequest;
 import com.sms.satp.dto.request.ApiTestCaseJobRunRequest;
+import com.sms.satp.dto.request.ApiTestRequest;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.request.DataParamRequest;
 import com.sms.satp.dto.request.TestDataRequest;
@@ -50,6 +51,7 @@ class ApiTestCaseJobServiceTest {
     private final ApiTestCaseService apiTestCaseService = mock(ApiTestCaseService.class);
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository = mock(
         CustomizedApiTestCaseJobRepository.class);
+    private final ApiTestRequest apiTestRequest = ApiTestRequest.builder().apiPath("3Httt").build();
     private final JobMapper jobMapper = new JobMapperImpl(new ParamInfoMapperImpl());
     private final ApiTestCaseJobService apiTestCaseJobService = new ApiTestCaseJobServiceImpl(
         apiTestCaseJobRepository, customizedApiTestCaseJobRepository, caseDispatcherService, projectEnvironmentService
@@ -76,8 +78,6 @@ class ApiTestCaseJobServiceTest {
     private static final String ID = ObjectId.get().toString();
     private final CustomUser customUser =
         new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "");
-    private static final String CURRENT_USER_ID =
-        ObjectId.get().toString();
 
     @Test
     @DisplayName("Test the findById method in the ApiTestCaseJob service")
@@ -109,7 +109,7 @@ class ApiTestCaseJobServiceTest {
         when(apiTestCaseJobRepository.findById(any())).thenReturn(Optional.of(apiTestCaseJob));
         when(apiTestCaseJobRepository.save(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
         doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(CaseReport.class));
-        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobEntity.class));
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobResponse.class));
         apiTestCaseJobService.handleJobReport(ApiTestCaseJobReport.builder().jobId(ObjectId.get().toString()).build());
         verify(apiTestCaseJobRepository, times(1)).save(any(ApiTestCaseJobEntity.class));
     }
@@ -120,7 +120,7 @@ class ApiTestCaseJobServiceTest {
         when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         when(apiTestCaseJobRepository.insert(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
-        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobEntity.class));
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobResponse.class));
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest, customUser);
         verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJobEntity.class));
     }
@@ -131,7 +131,7 @@ class ApiTestCaseJobServiceTest {
         when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         when(apiTestCaseJobRepository.insert(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
-        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobEntity.class));
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobResponse.class));
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest2, customUser);
         verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJobEntity.class));
     }
@@ -155,6 +155,47 @@ class ApiTestCaseJobServiceTest {
         doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(CaseReport.class));
         doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
         verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("Test the apiTest method in the ApiTestCaseJob service")
+    public void apiTest1_test() {
+        ApiTestRequest apiTestRequestPath = ApiTestRequest.builder().apiPath("Http://").build();
+        when(projectEnvironmentService.findOne(any())).thenReturn(null);
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobResponse.class));
+        when(apiTestCaseJobRepository.insert(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
+        apiTestCaseJobService.apiTest(apiTestRequestPath, customUser);
+        verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJobEntity.class));
+    }
+
+    @Test
+    @DisplayName("Test the apiTest method in the ApiTestCaseJob service")
+    public void apiTest2_test() {
+        when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobResponse.class));
+        apiTestCaseJobService.apiTest(apiTestRequest, customUser);
+        when(apiTestCaseJobRepository.insert(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
+        verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJobEntity.class));
+    }
+
+    @Test
+    @DisplayName("An exception occurred while apiTest ApiTestCaseJob")
+    public void apiTest_exception1_test() {
+        when(projectEnvironmentService.findOne(any())).thenReturn(null);
+        apiTestCaseJobService.apiTest(apiTestRequest, customUser);
+        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+
+    }
+
+    @Test
+    @DisplayName("An exception occurred while apiTest ApiTestCaseJob")
+    public void apiTest_exception2_test() {
+        when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
+        apiTestCaseJobService.apiTest(null, customUser);
+        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+
     }
 
 }

@@ -40,6 +40,9 @@ public class ApiTestCaseEntity extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String dataCollId;
+
     private List<String> tagIds;
 
     private ApiBindingStatus status;
@@ -84,5 +87,5 @@ public class ApiTestCaseEntity extends BaseEntity {
     @Field(name = "isExecute")
     private boolean execute;
 
-    private String createUserName;
+    private String createUsername;
 }

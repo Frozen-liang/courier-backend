@@ -21,13 +21,11 @@ public class UserResponse {
 
     private String email;
 
-    @JsonProperty("isEnabled")
-    private boolean enabled;
-
-    private String currentWorkspace;
-
-    private List<String> associatedWorkspaces;
-
     private List<String> roles;
 
+    @JsonProperty("isExist")
+    private boolean exist;
+
+    @JsonProperty("isRemoved")
+    private boolean removed;
 }

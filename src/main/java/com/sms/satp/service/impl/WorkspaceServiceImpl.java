@@ -25,6 +25,7 @@ import com.sms.satp.repository.WorkspaceRepository;
 import com.sms.satp.service.ProjectService;
 import com.sms.satp.service.WorkspaceService;
 import com.sms.satp.utils.ExceptionUtils;
+import com.sms.satp.utils.SecurityUtil;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public List<WorkspaceResponse> list(String userId) {
+    public List<WorkspaceResponse> list() {
         try {
             return workspaceMapper.toDtoList(workspaceRepository.findAllByRemovedIsFalseOrderByCreateDateTimeDesc());
         } catch (Exception e) {
@@ -71,6 +72,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         log.info("WorkspaceService-add()-params: [Workspace]={}", workspaceRequest.toString());
         try {
             WorkspaceEntity workspace = workspaceMapper.toEntity(workspaceRequest);
+            workspace.setCreateUsername(SecurityUtil.getCurrentUser().getUsername());
             workspaceRepository.insert(workspace);
         } catch (Exception e) {
             log.error("Failed to add the Workspace!", e);
@@ -114,6 +116,13 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             log.error("Failed to delete the Workspace!", e);
             throw new ApiTestPlatformException(DELETE_WORKSPACE_BY_ID_ERROR);
         }
+    }
+
+    @Override
+    public List<WorkspaceResponse> findByUserId() {
+        return workspaceMapper
+            .toDtoList(workspaceRepository
+                .findAllByRemovedIsFalseAndUserIdsContainsOrderByCreateDateTimeDesc(SecurityUtil.getCurrUserId()));
     }
 
 }

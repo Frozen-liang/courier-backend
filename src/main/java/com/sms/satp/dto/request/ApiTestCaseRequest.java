@@ -14,7 +14,7 @@ import com.sms.satp.entity.api.common.ResponseHeadersVerification;
 import com.sms.satp.entity.api.common.ResponseResultVerification;
 import com.sms.satp.entity.api.common.ResponseTimeVerification;
 import java.util.List;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,20 +28,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ApiTestCaseRequest {
 
-    @NotEmpty(groups = UpdateGroup.class, message = "The id can not be empty")
+    @NotBlank(groups = UpdateGroup.class, message = "The id can not be empty")
     @Null(groups = InsertGroup.class, message = "The id must be null.")
     private String id;
-    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The caseName can not be empty")
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The caseName can not be empty.")
     private String caseName;
-    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiId can not be empty")
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiId can not be empty.")
     private String apiId;
     private List<String> tagIds;
-    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId can not be empty")
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId can not be empty.")
     private String projectId;
-    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiName can not be empty")
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiName can not be empty.")
     private String apiName;
     private String description;
-    @NotEmpty(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiPath can not be empty")
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiPath can not be empty.")
     private String apiPath;
     private ApiProtocol apiProtocol;
     private RequestMethod requestMethod;
@@ -61,6 +61,8 @@ public class ApiTestCaseRequest {
     private ResponseHeadersVerification responseHeadersVerification;
     private ResponseResultVerification responseResultVerification;
     private ResponseTimeVerification responseTimeVerification;
+    private String createUserName;
+    private String dataCollId;
     @Default
     @JsonProperty("isExecute")
     private boolean execute = true;

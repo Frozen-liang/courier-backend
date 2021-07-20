@@ -8,14 +8,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.service.impl.CaseDispatcherServiceImpl;
-import com.sms.satp.entity.job.ApiTestCaseJobEntity;
 import com.sms.satp.entity.job.SceneCaseJobEntity;
 import com.sms.satp.entity.job.common.CaseReport;
-import com.sms.satp.repository.ApiTestCaseJobRepository;
-import com.sms.satp.repository.SceneCaseJobRepository;
-import java.util.Set;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,11 +24,9 @@ public class CaseDispatcherServiceTest {
 
     private final EngineMemberManagement engineMemberManagement = mock(EngineMemberManagement.class);
     private final SimpMessagingTemplate simpMessagingTemplate = mock(SimpMessagingTemplate.class);
-    private final ApiTestCaseJobRepository apiTestCaseJobRepository = mock(ApiTestCaseJobRepository.class);
-    private final SceneCaseJobRepository sceneCaseJobRepository = mock(SceneCaseJobRepository.class);
     private final CaseDispatcherService caseDispatcherService = new CaseDispatcherServiceImpl(engineMemberManagement,
-        simpMessagingTemplate, apiTestCaseJobRepository, sceneCaseJobRepository);
-    private final ApiTestCaseJobEntity apiTestCaseJob = ApiTestCaseJobEntity.builder().build();
+        simpMessagingTemplate);
+    private final ApiTestCaseJobResponse apiTestCaseJobResponse = ApiTestCaseJobResponse.builder().build();
     private final SceneCaseJobEntity sceneCaseJob = SceneCaseJobEntity.builder().build();
     private static final String USER_ID = ObjectId.get().toString();
     private static final String MESSAGE = "message";
@@ -40,16 +35,16 @@ public class CaseDispatcherServiceTest {
     @Test
     @DisplayName("Test the dispatch method in the CaseDispatcherService service")
     public void dispatch_test() {
-        when(engineMemberManagement.getAvailableMembers()).thenReturn(Set.of("1", "2"));
+        when(engineMemberManagement.getAvailableMember()).thenReturn("1");
         doNothing().when(simpMessagingTemplate).convertAndSend(anyString(), any(Object.class));
-        caseDispatcherService.dispatch(apiTestCaseJob);
+        caseDispatcherService.dispatch(apiTestCaseJobResponse);
         verify(simpMessagingTemplate, times(1)).convertAndSend(anyString(), any(Object.class));
     }
 
     @Test
     @DisplayName("Test the dispatch method in the CaseDispatcherService service")
     public void dispatch2_test() {
-        when(engineMemberManagement.getAvailableMembers()).thenReturn(Set.of("1", "2"));
+        when(engineMemberManagement.getAvailableMember()).thenReturn("1");
         doNothing().when(simpMessagingTemplate).convertAndSend(anyString(), any(Object.class));
         caseDispatcherService.dispatch(sceneCaseJob);
         verify(simpMessagingTemplate, times(1)).convertAndSend(anyString(), any(Object.class));

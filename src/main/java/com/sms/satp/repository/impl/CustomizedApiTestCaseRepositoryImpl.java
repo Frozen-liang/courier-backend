@@ -52,4 +52,5 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
     public Boolean recover(List<String> ids) {
         return commonDeleteRepository.recover(ids, ApiTestCaseEntity.class);
     }
+
 }

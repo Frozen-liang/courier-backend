@@ -21,8 +21,13 @@ import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
+import com.sms.satp.entity.job.ApiTestCaseJobEntity;
 import com.sms.satp.mapper.ApiTestCaseMapper;
+import com.sms.satp.mapper.JobMapper;
+import com.sms.satp.mapper.JobMapperImpl;
+import com.sms.satp.mapper.ParamInfoMapperImpl;
 import com.sms.satp.repository.ApiTestCaseRepository;
+import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseRepository;
 import com.sms.satp.service.impl.ApiTestCaseServiceImpl;
 import java.util.ArrayList;
@@ -41,8 +46,12 @@ class ApiTestCaseServiceTest {
     private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository = mock(
         CustomizedApiTestCaseRepository.class);
     private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
+    private final JobMapper jobMapper = new JobMapperImpl(new ParamInfoMapperImpl());
+    private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository = mock(
+        CustomizedApiTestCaseJobRepository.class);
     private final ApiTestCaseService apiTestCaseService = new ApiTestCaseServiceImpl(
-        apiTestCaseRepository, customizedApiTestCaseRepository, apiTestCaseMapper);
+        apiTestCaseRepository, customizedApiTestCaseRepository, customizedApiTestCaseJobRepository, apiTestCaseMapper,
+        jobMapper);
     private final ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder().id(ID).build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
         .id(ID).build();
@@ -53,6 +62,7 @@ class ApiTestCaseServiceTest {
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String API_ID = ObjectId.get().toString();
     private static final String PROJECT_ID = ObjectId.get().toString();
+
 
     @Test
     @DisplayName("Test the findById method in the ApiTestCase service")
@@ -133,6 +143,8 @@ class ApiTestCaseServiceTest {
         }
         when(apiTestCaseRepository.findAll(any(), any(Sort.class))).thenReturn(apiTestCaseList);
         when(apiTestCaseMapper.toDtoList(apiTestCaseList)).thenReturn(apiTestCaseResponseList);
+        when(customizedApiTestCaseJobRepository.findRecentlyCaseReportByCaseId(any()))
+            .thenReturn(ApiTestCaseJobEntity.builder().build());
         List<ApiTestCaseResponse> result = apiTestCaseService.list(API_ID, PROJECT_ID, REMOVED);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }

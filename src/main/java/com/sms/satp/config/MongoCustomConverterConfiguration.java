@@ -22,9 +22,10 @@ import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.enums.ResponseParamsExtractionType;
 import com.sms.satp.common.enums.ResultVerificationType;
 import com.sms.satp.common.enums.SaveMode;
-import com.sms.satp.utils.SecurityUtil;
+import com.sms.satp.security.pojo.CustomUser;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -36,8 +37,12 @@ import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Configuration
+@Slf4j
 public class MongoCustomConverterConfiguration {
 
     private static final String BUCKET = "TestFile";
@@ -64,7 +69,13 @@ public class MongoCustomConverterConfiguration {
     @Bean
     AuditorAware<String> auditorAware() {
         // get createUserId and modifyUserId
-        return () -> Optional.of(SecurityUtil.getCurrUserId());
+        return () -> Optional.ofNullable(SecurityContextHolder.getContext())
+            .map(SecurityContext::getAuthentication)
+            .filter(Authentication::isAuthenticated)
+            .map(Authentication::getPrincipal)
+            .filter(user -> !"anonymousUser".equals(user.toString()))
+            .map(CustomUser.class::cast)
+            .map(CustomUser::getId);
     }
 
 

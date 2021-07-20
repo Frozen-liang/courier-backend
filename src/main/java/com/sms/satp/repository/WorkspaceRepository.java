@@ -6,5 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface WorkspaceRepository extends MongoRepository<WorkspaceEntity, String> {
 
+    List<WorkspaceEntity> findAllByRemovedIsFalseAndUserIdsContainsOrderByCreateDateTimeDesc(String userId);
+
     List<WorkspaceEntity> findAllByRemovedIsFalseOrderByCreateDateTimeDesc();
 }
