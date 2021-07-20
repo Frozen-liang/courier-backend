@@ -313,8 +313,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private void updateSceneCase(SceneCaseEntity sceneCase) {
         Optional<SceneCaseEntity> optionalSceneCase = sceneCaseRepository.findById(sceneCase.getId());
         optionalSceneCase.ifPresent(sceneCaseFindById -> {
-            if (!Objects.equals(sceneCase.getRemoved(), sceneCaseFindById.getRemoved())) {
-                editSceneCaseApiStatus(sceneCase, sceneCaseFindById.getRemoved());
+            if (!Objects.equals(sceneCase.isRemoved(), sceneCaseFindById.isRemoved())) {
+                editSceneCaseApiStatus(sceneCase, sceneCaseFindById.isRemoved());
             }
             sceneCaseRepository.save(sceneCase);
         });
@@ -333,7 +333,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             .getApiBySceneCaseId(sceneCase.getId(), oldRemove);
         if (CollectionUtils.isNotEmpty(sceneCaseApiList)) {
             for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
-                sceneCaseApi.setRemoved(sceneCase.getRemoved());
+                sceneCaseApi.setRemoved(sceneCase.isRemoved());
             }
             sceneCaseApiService.editAll(sceneCaseApiList);
         }

@@ -1,25 +1,24 @@
 package com.sms.satp.service;
 
-import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.response.ApiGroupResponse;
-import com.sms.satp.entity.group.ApiGroupEntity;
-import com.sms.satp.mapper.ApiGroupMapper;
-import com.sms.satp.repository.ApiGroupRepository;
-import com.sms.satp.repository.ApiRepository;
-import com.sms.satp.repository.CommonDeleteRepository;
-import com.sms.satp.repository.CustomizedApiRepository;
-import com.sms.satp.service.impl.ApiGroupServiceImpl;
-import java.util.List;
-import org.assertj.core.util.Lists;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import static com.sms.satp.common.exception.ErrorCode.GET_API_GROUP_LIST_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.dto.response.ApiGroupResponse;
+import com.sms.satp.entity.group.ApiGroupEntity;
+import com.sms.satp.mapper.ApiGroupMapper;
+import com.sms.satp.repository.ApiGroupRepository;
+import com.sms.satp.repository.CustomizedApiRepository;
+import com.sms.satp.service.impl.ApiGroupServiceImpl;
+import java.util.List;
+import org.assertj.core.util.Lists;
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Test cases for ApiGroupServiceTest")
 class ApiGroupServiceTest {
@@ -30,6 +29,7 @@ class ApiGroupServiceTest {
     private final ApiGroupService apiGroupService = new ApiGroupServiceImpl(apiGroupRepository, customizedApiRepository,
         apiGroupMapper);
     private final static String MOCK_ID = "1";
+    private final static String GROUP_ID = ObjectId.get().toString();
 
     @Test
     @DisplayName("Test the list method in the ApiGroup service")
@@ -39,16 +39,17 @@ class ApiGroupServiceTest {
         List<ApiGroupResponse> apiGroupResponseList =
             Lists.newArrayList(ApiGroupResponse.builder().id(MOCK_ID).build());
         when(apiGroupMapper.toResponse(any())).thenReturn(apiGroupResponseList);
-        List<ApiGroupResponse> dtoResponse = apiGroupService.list(MOCK_ID);
+        List<ApiGroupResponse> dtoResponse = apiGroupService.list(MOCK_ID, GROUP_ID);
+
         assertThat(dtoResponse).isNotEmpty();
     }
 
     @Test
     @DisplayName("Test the list method in the ApiGroup service thrown exception")
     void list_test_thrownException() {
-        when(apiGroupRepository.findApiGroupEntitiesByProjectId(any()))
+        when(apiGroupRepository.findByParentId(any()))
             .thenThrow(new ApiTestPlatformException(GET_API_GROUP_LIST_ERROR));
-        assertThatThrownBy(() -> apiGroupService.list(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
+        assertThatThrownBy(() -> apiGroupService.list(MOCK_ID, GROUP_ID)).isInstanceOf(ApiTestPlatformException.class);
     }
 
 }

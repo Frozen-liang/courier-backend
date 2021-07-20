@@ -41,7 +41,6 @@ public class ApiEntity extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
-    @JsonIgnore
     @Field(targetType = FieldType.OBJECT_ID)
     @Indexed(background = true)
     @JsonIgnore

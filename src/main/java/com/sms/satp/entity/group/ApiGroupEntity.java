@@ -10,7 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -32,8 +31,10 @@ public class ApiGroupEntity extends BaseEntity {
     @EqualsAndHashCode.Include
     private String name;
     @Indexed(unique = true)
+    @EqualsAndHashCode.Exclude
     private Long realGroupId;
     @Default
+    @EqualsAndHashCode.Exclude
     private List<Long> path = new ArrayList<>();
     @Field(targetType = FieldType.OBJECT_ID)
     private String parentId;

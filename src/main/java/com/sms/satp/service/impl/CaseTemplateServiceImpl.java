@@ -324,8 +324,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         optionalSceneCase.ifPresent(sceneCaseFindById -> {
             caseTemplate.setCreateUserId(sceneCaseFindById.getCreateUserId());
             caseTemplate.setCreateDateTime(sceneCaseFindById.getCreateDateTime());
-            if (!Objects.equals(caseTemplate.getRemoved(), sceneCaseFindById.getRemoved())) {
-                editCaseTemplateApiStatus(caseTemplate, sceneCaseFindById.getRemoved());
+            if (!Objects.equals(caseTemplate.isRemoved(), sceneCaseFindById.isRemoved())) {
+                editCaseTemplateApiStatus(caseTemplate, sceneCaseFindById.isRemoved());
             }
             caseTemplateRepository.save(caseTemplate);
         });
@@ -343,7 +343,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             .getApiByCaseTemplateId(caseTemplate.getId(), oldRemove);
         if (CollectionUtils.isNotEmpty(caseTemplateApiList)) {
             for (CaseTemplateApiEntity caseTemplateApi : caseTemplateApiList) {
-                caseTemplateApi.setRemoved(caseTemplate.getRemoved());
+                caseTemplateApi.setRemoved(caseTemplate.isRemoved());
             }
             caseTemplateApiService.editAll(caseTemplateApiList);
         }
