@@ -162,6 +162,7 @@ class ApiTestCaseJobServiceTest {
         ApiTestRequest apiTestRequestPath = ApiTestRequest.builder().apiPath("Http://").build();
         when(projectEnvironmentService.findOne(any())).thenReturn(null);
         doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJob.class));
+        when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(apiTestCaseJob);
         apiTestCaseJobService.apiTest(apiTestRequestPath, customUser);
         verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJob.class));
     }
@@ -172,27 +173,17 @@ class ApiTestCaseJobServiceTest {
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJob.class));
         apiTestCaseJobService.apiTest(apiTestRequest, customUser);
+        when(apiTestCaseJobRepository.insert(any(ApiTestCaseJob.class))).thenReturn(apiTestCaseJob);
         verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJob.class));
     }
 
     @Test
     @DisplayName("An exception occurred while apiTest ApiTestCaseJob")
-    public void apiTest_exception1_test() {
+    public void apiTest_exception_test() {
         when(projectEnvironmentService.findOne(any())).thenReturn(null);
         apiTestCaseJobService.apiTest(apiTestRequest, customUser);
         doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
         verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
-
-    }
-
-    @Test
-    @DisplayName("An exception occurred while apiTest ApiTestCaseJob")
-    public void apiTest_exception2_test() {
-        when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
-        apiTestCaseJobService.apiTest(null, customUser);
-        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
-        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
-
     }
 
 }
