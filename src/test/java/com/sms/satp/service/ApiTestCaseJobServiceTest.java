@@ -12,7 +12,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.request.*;
+import com.sms.satp.dto.request.ApiTestCaseJobPageRequest;
+import com.sms.satp.dto.request.ApiTestCaseJobRunRequest;
+import com.sms.satp.dto.request.ApiTestRequest;
+import com.sms.satp.dto.request.DataCollectionRequest;
+import com.sms.satp.dto.request.DataParamRequest;
+import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.engine.service.CaseDispatcherService;
@@ -29,11 +34,9 @@ import com.sms.satp.repository.ApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.impl.ApiTestCaseJobServiceImpl;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -159,7 +162,7 @@ class ApiTestCaseJobServiceTest {
     public void apiTest1_test() {
         ApiTestRequest apiTestRequestPath = ApiTestRequest.builder().apiPath("Http://").build();
         when(projectEnvironmentService.findOne(any())).thenReturn(null);
-        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobEntity.class));
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobResponse.class));
         when(apiTestCaseJobRepository.insert(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
         apiTestCaseJobService.apiTest(apiTestRequestPath, customUser);
         verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJobEntity.class));
@@ -169,7 +172,7 @@ class ApiTestCaseJobServiceTest {
     @DisplayName("Test the apiTest method in the ApiTestCaseJob service")
     public void apiTest2_test() {
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
-        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobEntity.class));
+        doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobResponse.class));
         apiTestCaseJobService.apiTest(apiTestRequest, customUser);
         when(apiTestCaseJobRepository.insert(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
         verify(apiTestCaseJobRepository, times(1)).insert(any(ApiTestCaseJobEntity.class));

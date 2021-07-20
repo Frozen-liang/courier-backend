@@ -2,8 +2,9 @@ package com.sms.satp.service.impl;
 
 import static com.sms.satp.common.enums.OperationModule.USER;
 import static com.sms.satp.common.enums.OperationType.ADD;
-import static com.sms.satp.common.enums.OperationType.DELETE;
 import static com.sms.satp.common.enums.OperationType.EDIT;
+import static com.sms.satp.common.enums.OperationType.LOCK;
+import static com.sms.satp.common.enums.OperationType.UNLOCK;
 import static com.sms.satp.common.exception.ErrorCode.ADD_USER_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_USER_ERROR;
@@ -160,7 +161,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = USER, template = "{{#result?.![#this.username]}}",
+    @LogRecord(operationType = LOCK, operationModule = USER, template = "{{#result?.![#this.username]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean lock(List<String> ids) {
         try {
@@ -172,6 +173,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @LogRecord(operationType = UNLOCK, operationModule = USER, template = "{{#result?.![#this.username]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean unlock(List<String> ids) {
         try {
             return commonDeleteRepository.recover(ids, UserEntity.class);
