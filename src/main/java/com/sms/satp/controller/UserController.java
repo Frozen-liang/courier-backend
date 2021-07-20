@@ -58,10 +58,16 @@ public class UserController {
         return userService.list(username, groupId, workspaceId);
     }
 
-    @DeleteMapping("/{ids}")
-    @PreAuthorize("hasRoleOrAdmin(@role.USER_DELETE)")
-    public Boolean delete(@PathVariable List<String> ids) {
-        return userService.delete(ids);
+    @DeleteMapping("/lock/{ids}")
+    @PreAuthorize("hasRoleOrAdmin(@role.USER_STATUS_CONTROL)")
+    public Boolean lock(@PathVariable List<String> ids) {
+        return userService.lock(ids);
+    }
+
+    @DeleteMapping("/unlock/{ids}")
+    @PreAuthorize("hasRoleOrAdmin(@role.USER_STATUS_CONTROL)")
+    public Boolean unlock(@PathVariable List<String> ids) {
+        return userService.unlock(ids);
     }
 
     @PutMapping("/update/password")

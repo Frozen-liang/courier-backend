@@ -26,9 +26,8 @@ import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
-import com.sms.satp.entity.apitestcase.ApiTestCase;
-import com.sms.satp.entity.job.ApiTestCaseJob;
 import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
+import com.sms.satp.entity.job.ApiTestCaseJobEntity;
 import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.repository.ApiTestCaseRepository;
@@ -78,18 +77,19 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     public List<ApiTestCaseResponse> list(String apiId, String projectId, boolean removed) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
-            ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder().apiId(apiId).removed(removed).projectId(projectId).build();
+            ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder().apiId(apiId).removed(removed)
+                .projectId(projectId).build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(API_ID.getFiled(), GenericPropertyMatchers.exact())
                 .withMatcher(REMOVE.getFiled(), GenericPropertyMatchers.exact())
                 .withIgnorePaths("isExecute")
                 .withIgnoreNullValues();
-            Example<ApiTestCase> example = Example.of(apiTestCase, exampleMatcher);
+            Example<ApiTestCaseEntity> example = Example.of(apiTestCase, exampleMatcher);
             List<ApiTestCaseResponse> apiTestCaseResponses = apiTestCaseMapper
                 .toDtoList(apiTestCaseRepository.findAll(example, sort));
             apiTestCaseResponses.forEach(response -> {
-                ApiTestCaseJob apiTestCaseJob = customizedApiTestCaseJobRepository
+                ApiTestCaseJobEntity apiTestCaseJob = customizedApiTestCaseJobRepository
                     .findRecentlyCaseReportByCaseId(response.getId());
                 ApiTestCaseJobPageResponse jobResponse = jobMapper
                     .toApiTestCaseJobPageResponse(apiTestCaseJob);
@@ -131,7 +131,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         try {
             boolean exists = apiTestCaseRepository.existsById(apiTestCaseRequest.getId());
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "ApiTestCase", apiTestCaseRequest.getId());
-            ApiTestCase apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
+            ApiTestCaseEntity apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
             apiTestCaseRepository.save(apiTestCase);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());

@@ -2,7 +2,7 @@ package com.sms.satp.initialize;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.satp.entity.system.SystemRoleEntity;
-import com.sms.satp.entity.system.SystemVersion;
+import com.sms.satp.entity.system.SystemVersionEntity;
 import com.sms.satp.repository.SystemRoleRepository;
 import com.sms.satp.repository.SystemVersionRepository;
 import java.time.LocalDateTime;
@@ -46,11 +46,11 @@ public class RoleInitialize implements InitializingBean {
             log.info("version:{},name:{},group:{},buildTime:{}", version, name, group, buildTime);
             Objects.requireNonNull(name);
             Objects.requireNonNull(version);
-            SystemVersion systemVersion = systemVersionRepository.findByName(name);
+            SystemVersionEntity systemVersion = systemVersionRepository.findByName(name);
             if (checkInitialized(systemVersion, version)) {
                 String path = PREFIX + version + SUFFIX;
                 final ClassPathResource classPathResource = new ClassPathResource(path);
-                systemVersion = Objects.requireNonNullElse(systemVersion, SystemVersion.builder().build());
+                systemVersion = Objects.requireNonNullElse(systemVersion, SystemVersionEntity.builder().build());
                 systemVersion.setVersion(version);
                 systemVersion.setBuildTime(buildTime);
                 systemVersion.setName(name);
@@ -74,7 +74,7 @@ public class RoleInitialize implements InitializingBean {
 
     }
 
-    private boolean checkInitialized(SystemVersion systemVersion, String version) {
+    private boolean checkInitialized(SystemVersionEntity systemVersion, String version) {
         return systemVersion == null || !version.equals(systemVersion.getVersion()) || !systemVersion.isInitialized()
             || FAIL.equals(systemVersion.getStatus());
     }

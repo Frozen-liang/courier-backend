@@ -91,13 +91,13 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             String envId = apiTestCaseJobRunRequest.getEnvId();
             notEmpty(apiTestCaseIds, "The ApiTestCaseIds must not be empty.");
             notEmpty(envId, "The EnvId must not be empty.");
-            ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(envId);
+            ProjectEnvironmentEntity projectEnvironment = projectEnvironmentService.findOne(envId);
             notNull(projectEnvironment, THE_ENVIRONMENT_NOT_EXITS_ERROR);
             JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
             apiTestCaseIds.forEach((apiTestCaseId) -> {
                 jobId.set(null);
                 ApiTestCaseResponse apiTestCaseResponse = apiTestCaseService.findById(apiTestCaseId);
-                ApiTestCaseJob apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
+                ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
                 apiTestCaseJob.setApiTestCase(
                     JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestCaseResponse)).build());
                 // Multiple job are sent if a data collection exists.

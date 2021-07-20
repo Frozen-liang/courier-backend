@@ -119,9 +119,10 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public List<WorkspaceResponse> findByUserId(String userId) {
+    public List<WorkspaceResponse> findByUserId() {
         return workspaceMapper
-            .toDtoList(workspaceRepository.findAllByRemovedIsFalseAndUserIdsContainsOrderByCreateDateTimeDesc(userId));
+            .toDtoList(workspaceRepository
+                .findAllByRemovedIsFalseAndUserIdsContainsOrderByCreateDateTimeDesc(SecurityUtil.getCurrUserId()));
     }
 
 }

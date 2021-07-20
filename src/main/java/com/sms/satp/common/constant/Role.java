@@ -21,7 +21,7 @@ public class Role {
     // User
     public static final String USER_CREATE = "User" + CREATE;
     public static final String USER_UPDATE = "User" + UPDATE;
-    public static final String USER_DELETE = "User" + DELETE;
+    public static final String USER_STATUS_CONTROL = "User_Status_Control";
     public static final String USER_QUERY_ALL = "User" + QUERY_ALL;
 
     // User_Group

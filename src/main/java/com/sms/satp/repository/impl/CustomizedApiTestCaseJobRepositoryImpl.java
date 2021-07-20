@@ -46,7 +46,7 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
         API_TEST_CASE_ID.is(apiTestCaseJobPageRequest.getApiTestCaseId()).ifPresent(query::addCriteria);
         CREATE_USER_ID.in(apiTestCaseJobPageRequest.getUserIds()).ifPresent(query::addCriteria);
         JOB_API_ID.is((apiTestCaseJobPageRequest.getApiId())).ifPresent(query::addCriteria);
-        long count = mongoTemplate.count(query, ApiTestCaseJob.class);
+        long count = mongoTemplate.count(query, ApiTestCaseJobEntity.class);
         if (count <= 0) {
             return new PageImpl<>(Collections.emptyList());
         }
@@ -58,11 +58,11 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
     }
 
     @Override
-    public ApiTestCaseJob findRecentlyCaseReportByCaseId(String apiTestCaseId) {
+    public ApiTestCaseJobEntity findRecentlyCaseReportByCaseId(String apiTestCaseId) {
         ApiTestCaseJobPageRequest pageRequest = ApiTestCaseJobPageRequest.builder().pageSize(1)
             .apiTestCaseId(apiTestCaseId)
             .pageNumber(1).build();
-        Page<ApiTestCaseJob> page = this.page(pageRequest);
-        return page.stream().findFirst().orElse(ApiTestCaseJob.builder().build());
+        Page<ApiTestCaseJobEntity> page = this.page(pageRequest);
+        return page.stream().findFirst().orElse(ApiTestCaseJobEntity.builder().build());
     }
 }

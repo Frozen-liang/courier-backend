@@ -17,7 +17,9 @@ public interface UserService {
 
     Boolean edit(UserRequest userRequest);
 
-    Boolean delete(List<String> ids);
+    Boolean lock(List<String> ids);
+
+    Boolean unlock(List<String> ids);
 
     Boolean updatePassword(UserPasswordUpdateRequest userPasswordUpdateRequest);
 }

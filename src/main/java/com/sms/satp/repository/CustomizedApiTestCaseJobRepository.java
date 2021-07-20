@@ -8,5 +8,5 @@ public interface CustomizedApiTestCaseJobRepository {
 
     Page<ApiTestCaseJobEntity> page(ApiTestCaseJobPageRequest apiTestCaseJobPageRequest);
 
-    ApiTestCaseJob findRecentlyCaseReportByCaseId(String apiTestCaseId);
+    ApiTestCaseJobEntity findRecentlyCaseReportByCaseId(String apiTestCaseId);
 }

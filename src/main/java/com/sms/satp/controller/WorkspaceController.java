@@ -52,10 +52,10 @@ public class WorkspaceController {
         return workspaceService.list();
     }
 
-    @GetMapping("/uid/{userId}")
+    @GetMapping("/own")
     @PreAuthorize("hasRoleOrAdmin(@role.WORKSPACE_QUERY_OWN)")
-    public List<WorkspaceResponse> findByUserId(@PathVariable String userId) {
-        return workspaceService.findByUserId(userId);
+    public List<WorkspaceResponse> findByUserId() {
+        return workspaceService.findByUserId();
     }
 
     @DeleteMapping("/{id}")

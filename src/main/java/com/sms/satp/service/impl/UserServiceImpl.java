@@ -5,11 +5,12 @@ import static com.sms.satp.common.enums.OperationType.ADD;
 import static com.sms.satp.common.enums.OperationType.DELETE;
 import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_USER_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.DELETE_USER_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_USER_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_USER_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_USER_LIST_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.LOCK_USER_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.UNLOCK_USER_BY_ID_ERROR;
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
 import static com.sms.satp.utils.Assert.isFalse;
@@ -22,7 +23,7 @@ import com.sms.satp.dto.request.UserPasswordUpdateRequest;
 import com.sms.satp.dto.request.UserRequest;
 import com.sms.satp.dto.response.UserResponse;
 import com.sms.satp.entity.system.UserEntity;
-import com.sms.satp.entity.workspace.Workspace;
+import com.sms.satp.entity.workspace.WorkspaceEntity;
 import com.sms.satp.mapper.UserMapper;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.UserRepository;
@@ -91,7 +92,7 @@ public class UserServiceImpl implements UserService {
             Example<UserEntity> example = Example.of(userEntity, exampleMatcher);
             List<UserResponse> userResponseList = userMapper.toDtoList(userRepository.findAll(example, sort));
             if (StringUtils.isNotBlank(workspaceId)) {
-                Optional<Workspace> optional = workspaceRepository.findById(workspaceId);
+                Optional<WorkspaceEntity> optional = workspaceRepository.findById(workspaceId);
                 optional.ifPresent(workspace -> {
                     userResponseList.forEach((user) -> {
                         user.setExist(workspace.getUserIds().contains(user.getId()));
@@ -161,12 +162,22 @@ public class UserServiceImpl implements UserService {
     @Override
     @LogRecord(operationType = DELETE, operationModule = USER, template = "{{#result?.![#this.username]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
-    public Boolean delete(List<String> ids) {
+    public Boolean lock(List<String> ids) {
         try {
             return commonDeleteRepository.deleteByIds(ids, UserEntity.class);
         } catch (Exception e) {
-            log.error("Failed to delete the User!", e);
-            throw new ApiTestPlatformException(DELETE_USER_BY_ID_ERROR);
+            log.error("Failed to lock the User!", e);
+            throw new ApiTestPlatformException(LOCK_USER_BY_ID_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean unlock(List<String> ids) {
+        try {
+            return commonDeleteRepository.recover(ids, UserEntity.class);
+        } catch (Exception e) {
+            log.error("Failed to unlock the User!", e);
+            throw new ApiTestPlatformException(UNLOCK_USER_BY_ID_ERROR);
         }
     }
 

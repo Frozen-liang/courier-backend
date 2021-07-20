@@ -16,5 +16,5 @@ public interface WorkspaceService {
 
     Boolean delete(String id);
 
-    List<WorkspaceResponse> findByUserId(String userId);
+    List<WorkspaceResponse> findByUserId();
 }

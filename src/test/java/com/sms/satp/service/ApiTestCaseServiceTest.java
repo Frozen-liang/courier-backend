@@ -20,9 +20,8 @@ import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
-import com.sms.satp.entity.apitestcase.ApiTestCase;
-import com.sms.satp.entity.job.ApiTestCaseJob;
 import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
+import com.sms.satp.entity.job.ApiTestCaseJobEntity;
 import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.mapper.JobMapperImpl;
@@ -31,7 +30,6 @@ import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseRepository;
 import com.sms.satp.service.impl.ApiTestCaseServiceImpl;
-import com.sms.satp.utils.SecurityUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,8 +52,6 @@ class ApiTestCaseServiceTest {
     private final ApiTestCaseService apiTestCaseService = new ApiTestCaseServiceImpl(
         apiTestCaseRepository, customizedApiTestCaseRepository, customizedApiTestCaseJobRepository, apiTestCaseMapper,
         jobMapper);
-    private final ApiTestCase apiTestCase = ApiTestCase.builder().id(ID).build();
-        apiTestCaseRepository, customizedApiTestCaseRepository, apiTestCaseMapper);
     private final ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder().id(ID).build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
         .id(ID).build();
@@ -148,7 +144,7 @@ class ApiTestCaseServiceTest {
         when(apiTestCaseRepository.findAll(any(), any(Sort.class))).thenReturn(apiTestCaseList);
         when(apiTestCaseMapper.toDtoList(apiTestCaseList)).thenReturn(apiTestCaseResponseList);
         when(customizedApiTestCaseJobRepository.findRecentlyCaseReportByCaseId(any()))
-            .thenReturn(ApiTestCaseJob.builder().build());
+            .thenReturn(ApiTestCaseJobEntity.builder().build());
         List<ApiTestCaseResponse> result = apiTestCaseService.list(API_ID, PROJECT_ID, REMOVED);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
