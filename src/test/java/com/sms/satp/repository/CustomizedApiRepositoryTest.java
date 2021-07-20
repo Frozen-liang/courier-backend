@@ -26,8 +26,9 @@ class CustomizedApiRepositoryTest {
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
     private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final ApiGroupRepository apiGroupRepository = mock(ApiGroupRepository.class);
     private final CustomizedApiRepository customizedApiRepository = new CustomizedApiRepositoryImpl(mongoTemplate,
-        commonDeleteRepository);
+        commonDeleteRepository, apiGroupRepository);
     private static final Long TOTAL_ELEMENTS = 20L;
     private static final String ID = ObjectId.get().toString();
     private static final List<String> ID_LIST = Collections.singletonList(ID);
@@ -43,7 +44,6 @@ class CustomizedApiRepositoryTest {
         apiPageRequest.setApiProtocol(Arrays.asList(1, 2));
         apiPageRequest.setApiStatus(Arrays.asList(1, 2));
         apiPageRequest.setProjectId(new ObjectId());
-        apiPageRequest.setGroupId(Arrays.asList(new ObjectId(), new ObjectId()));
         apiPageRequest.setRequestMethod(Arrays.asList(1, 2));
         apiPageRequest.setApiProtocol(Arrays.asList(1, 2));
         apiPageRequest.setTagId(Arrays.asList(new ObjectId(), new ObjectId()));

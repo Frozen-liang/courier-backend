@@ -43,6 +43,7 @@ public class ApiEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     @Indexed(background = true)
+    @JsonIgnore
     private String groupId;
 
     @JsonIgnore

@@ -10,18 +10,24 @@ import static com.sms.satp.common.field.ApiFiled.GROUP_ID;
 import static com.sms.satp.common.field.ApiFiled.REQUEST_METHOD;
 import static com.sms.satp.common.field.ApiFiled.TAG_ID;
 import static com.sms.satp.common.field.CommonFiled.ID;
+import static com.sms.satp.common.field.CommonFiled.MODIFY_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
 import static com.sms.satp.common.field.CommonFiled.REMOVE;
 
 import com.sms.satp.dto.request.ApiPageRequest;
 import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
+import com.sms.satp.repository.ApiGroupRepository;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.utils.PageDtoConverter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +39,7 @@ import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -40,10 +47,13 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
 
     private final MongoTemplate mongoTemplate;
     private final CommonDeleteRepository commonDeleteRepository;
+    private final ApiGroupRepository apiGroupRepository;
 
-    public CustomizedApiRepositoryImpl(MongoTemplate mongoTemplate, CommonDeleteRepository commonDeleteRepository) {
+    public CustomizedApiRepositoryImpl(MongoTemplate mongoTemplate, CommonDeleteRepository commonDeleteRepository,
+        ApiGroupRepository apiGroupRepository) {
         this.mongoTemplate = mongoTemplate;
         this.commonDeleteRepository = commonDeleteRepository;
+        this.apiGroupRepository = apiGroupRepository;
     }
 
 
@@ -110,6 +120,14 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         return commonDeleteRepository.recover(ids, ApiEntity.class);
     }
 
+    @Override
+    public void deleteByGroupIds(List<String> groupIds) {
+        Query query = new Query(Criteria.where(GROUP_ID.getFiled()).in(groupIds));
+        Update update = Update.update(REMOVE.getFiled(), Boolean.TRUE);
+        update.set(MODIFY_DATE_TIME.getFiled(), LocalDateTime.now());
+        mongoTemplate.updateMulti(query, update, ApiEntity.class);
+    }
+
     private void createLookUpOperation(List<AggregationOperation> aggregationOperations) {
         LookupOperation apiTagLookupOperation =
             LookupOperation.newLookup().from(API_TAG.getCollectionName()).localField(TAG_ID.getFiled())
@@ -137,8 +155,16 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         API_STATUS.in(apiPageRequest.getApiStatus())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        GROUP_ID.in(apiPageRequest.getGroupId())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+        ObjectId groupId = apiPageRequest.getGroupId();
+        if (Objects.nonNull(groupId)) {
+            apiGroupRepository.findById(groupId.toString()).ifPresent((apiGroupEntity -> {
+                List<ObjectId> ids = apiGroupRepository.findAllByPathContains(apiGroupEntity.getRealGroupId())
+                    .map((entity) -> new ObjectId(entity.getId())).collect(
+                        Collectors.toList());
+                GROUP_ID.in(ids)
+                    .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+            }));
+        }
         REQUEST_METHOD.in(apiPageRequest.getRequestMethod())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         TAG_ID.in(apiPageRequest.getTagId()).ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));

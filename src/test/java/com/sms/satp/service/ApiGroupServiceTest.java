@@ -5,6 +5,9 @@ import com.sms.satp.dto.response.ApiGroupResponse;
 import com.sms.satp.entity.group.ApiGroupEntity;
 import com.sms.satp.mapper.ApiGroupMapper;
 import com.sms.satp.repository.ApiGroupRepository;
+import com.sms.satp.repository.ApiRepository;
+import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.service.impl.ApiGroupServiceImpl;
 import java.util.List;
 import org.assertj.core.util.Lists;
@@ -22,8 +25,10 @@ import static org.mockito.Mockito.when;
 class ApiGroupServiceTest {
 
     private final ApiGroupRepository apiGroupRepository = mock(ApiGroupRepository.class);
+    private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
     private final ApiGroupMapper apiGroupMapper = mock(ApiGroupMapper.class);
-    private final ApiGroupService apiGroupService = new ApiGroupServiceImpl(apiGroupRepository, apiGroupMapper);
+    private final ApiGroupService apiGroupService = new ApiGroupServiceImpl(apiGroupRepository, customizedApiRepository,
+        apiGroupMapper);
     private final static String MOCK_ID = "1";
 
     @Test
