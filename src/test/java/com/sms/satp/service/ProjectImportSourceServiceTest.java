@@ -32,31 +32,39 @@ import static org.mockito.Mockito.when;
 @DisplayName("Tests for ProjectImportSourceService")
 public class ProjectImportSourceServiceTest {
 
-    private final ProjectImportSourceRepository projectImportSourceRepository = mock(ProjectImportSourceRepository.class);
+    private final ProjectImportSourceRepository projectImportSourceRepository = mock(
+        ProjectImportSourceRepository.class);
     private final ProjectImportSourceMapper projectImportSourceMapper = mock(ProjectImportSourceMapper.class);
     private final ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
     private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
     private final ProjectImportSourceService projectImportSourceService = new ProjectImportSourceServiceImpl(
-            projectImportSourceMapper, projectImportSourceRepository, projectImportFlowRepository, commonDeleteRepository);
-    private final ProjectImportSourceEntity projectImportSourceEntity = ProjectImportSourceEntity.builder().id(ID).build();
+        projectImportSourceMapper, projectImportSourceRepository, projectImportFlowRepository, commonDeleteRepository);
+    private final ProjectImportSourceEntity projectImportSourceEntity = ProjectImportSourceEntity.builder().id(ID)
+        .build();
     private final ProjectImportSourceResponse projectImportSourceResponse = ProjectImportSourceResponse
-            .builder().id(ID).build();
-    private final ProjectImportSourceRequest projectImportSourceRequest = ProjectImportSourceRequest.builder().id(ID).build();
-    private final ProjectImportFlowResponse projectImportFlowResponse = ProjectImportFlowResponse.builder().id(ID).build();
+        .builder().id(ID).build();
+    private final ProjectImportSourceRequest projectImportSourceRequest = ProjectImportSourceRequest.builder().id(ID)
+        .build();
+    private final ProjectImportFlowResponse projectImportFlowResponse = ProjectImportFlowResponse.builder().id(ID)
+        .build();
     private static final String ID = ObjectId.get().toString();
     private static final List<String> ID_LIST = Collections.singletonList(ID);
 
     @Test
     @DisplayName("Test the create method in the ProjectImportSource Service")
     public void create_test() {
-        when(projectImportSourceRepository.insert(projectImportSourceMapper.toProjectImportSourceEntity(projectImportSourceRequest))).thenReturn(projectImportSourceEntity);
+        when(projectImportSourceRepository
+            .insert(projectImportSourceMapper.toProjectImportSourceEntity(projectImportSourceRequest)))
+            .thenReturn(projectImportSourceEntity);
         assertThat(projectImportSourceService.create(projectImportSourceRequest)).isTrue();
     }
 
     @Test
     @DisplayName("Test the update method in the ProjectImportSource Service")
     public void update_test() {
-        when(projectImportSourceRepository.save(projectImportSourceMapper.toProjectImportSourceEntity(projectImportSourceRequest))).thenReturn(projectImportSourceEntity);
+        when(projectImportSourceRepository
+            .save(projectImportSourceMapper.toProjectImportSourceEntity(projectImportSourceRequest)))
+            .thenReturn(projectImportSourceEntity);
         assertThat(projectImportSourceService.update(projectImportSourceRequest)).isTrue();
     }
 
@@ -64,7 +72,8 @@ public class ProjectImportSourceServiceTest {
     @DisplayName("Test the findById method in the ProjectImportSource Service")
     public void findById_test() {
         when(projectImportSourceRepository.findById(ID)).thenReturn(Optional.of(projectImportSourceEntity));
-        when(projectImportSourceMapper.toProjectImportSourceResponse(projectImportSourceEntity)).thenReturn(projectImportSourceResponse);
+        when(projectImportSourceMapper.toProjectImportSourceResponse(projectImportSourceEntity))
+            .thenReturn(projectImportSourceResponse);
         ProjectImportSourceResponse result = projectImportSourceService.findById(ID);
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(ID);
@@ -73,10 +82,14 @@ public class ProjectImportSourceServiceTest {
     @Test
     @DisplayName("Test the findByProjectId method in the ProjectImportSource Service")
     public void findByProjectId_test() {
-        when(projectImportSourceRepository.findByProjectIdAndRemovedIsFalse(ID)).thenReturn(List.of(ProjectImportSourceResponse.builder().build()));
-        when(projectImportFlowRepository.findFirstByImportSourceId(any())).thenReturn(ProjectImportFlowEntity.builder().importStatus(ImportStatus.SUCCESS).build());
+        when(projectImportSourceRepository.findByProjectIdAndRemovedIsFalse(ID))
+            .thenReturn(List.of(ProjectImportSourceResponse.builder().build()));
+        when(projectImportFlowRepository.findFirstByImportSourceId(any()))
+            .thenReturn(ProjectImportFlowEntity.builder().importStatus(ImportStatus.SUCCESS).build());
         List<ProjectImportSourceResponse> result = projectImportSourceService.findByProjectId(ID);
-        assertThat(result).allMatch((projectImportSourceResponse) -> ImportStatus.SUCCESS.getCode() == projectImportSourceResponse.getImportStatus());
+        assertThat(result).allMatch(
+            (projectImportSourceResponse) -> ImportStatus.SUCCESS.getCode() == projectImportSourceResponse
+                .getImportStatus());
     }
 
     @Test
@@ -89,7 +102,8 @@ public class ProjectImportSourceServiceTest {
     @Test
     @DisplayName("Test the findByIds method in the ProjectImportSource Service")
     public void findByIds_test() {
-        when(projectImportSourceRepository.findAllById(ID_LIST)).thenReturn(List.of(ProjectImportSourceEntity.builder().build()));
+        when(projectImportSourceRepository.findAllById(ID_LIST))
+            .thenReturn(List.of(ProjectImportSourceEntity.builder().build()));
         assertThat(projectImportSourceService.findByIds(ID_LIST)).isNotNull();
     }
 

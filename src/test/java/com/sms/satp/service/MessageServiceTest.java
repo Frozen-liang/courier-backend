@@ -15,6 +15,7 @@ import static org.mockito.Mockito.*;
  */
 @DisplayName("Tests for MessageService")
 public class MessageServiceTest {
+
     private final SimpMessagingTemplate simpMessagingTemplate = mock(SimpMessagingTemplate.class);
     private final MessageService messageService = new MessageServiceImpl(simpMessagingTemplate);
     private static final String ID = ObjectId.get().toString();

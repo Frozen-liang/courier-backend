@@ -26,6 +26,7 @@ import static org.mockito.Mockito.when;
  */
 @DisplayName("Tests for RoleService")
 public class RoleServiceTest {
+
     private final SystemRoleRepository systemRoleRepository = mock(SystemRoleRepository.class);
     private final UserGroupService userGroupService = mock(UserGroupService.class);
     private final RoleMapper roleMapper = new RoleMapperImpl();
@@ -48,7 +49,8 @@ public class RoleServiceTest {
     @DisplayName("Test the findRolesByGroupId method in the Role Service")
     public void findRolesByGroupId_test() {
         String roleId = ObjectId.get().toString();
-        when(userGroupService.findById(GROUP_ID)).thenReturn(UserGroupEntity.builder().roleIds(List.of(roleId)).build());
+        when(userGroupService.findById(GROUP_ID))
+            .thenReturn(UserGroupEntity.builder().roleIds(List.of(roleId)).build());
         when(systemRoleRepository.findAll()).thenReturn(List.of(SystemRoleEntity.builder().id(roleId).build()));
         List<RoleResponse> result = roleService.findRolesByGroupId(GROUP_ID);
         assertThat(result).allMatch(RoleResponse::isExist);
