@@ -17,5 +17,4 @@ public interface SceneCaseJobService {
 
     void runJob(AddSceneCaseJobRequest addSceneCaseJobRequest, CustomUser customUser);
 
-    void deleteById(String id);
 }

@@ -1,5 +1,6 @@
 package com.sms.satp.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +21,8 @@ public class UserResponse {
 
     private String email;
 
-    private Boolean enabled;
+    @JsonProperty("isEnabled")
+    private boolean enabled;
 
     private String currentWorkspace;
 

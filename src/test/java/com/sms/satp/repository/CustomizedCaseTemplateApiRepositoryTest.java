@@ -1,13 +1,12 @@
 package com.sms.satp.repository;
 
-import com.sms.satp.entity.scenetest.CaseTemplateApi;
+import com.sms.satp.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.satp.repository.impl.CustomizedCaseTemplateApiRepositoryImpl;
 import java.util.List;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -29,8 +28,8 @@ class CustomizedCaseTemplateApiRepositoryTest {
     @DisplayName("Test the findByCaseTemplateIds method in the CustomizedCaseTemplateApiRepository")
     void findByCaseTemplateIds_test() {
         when(mongoTemplate.find(any(), any()))
-            .thenReturn(Lists.newArrayList(CaseTemplateApi.builder().build()));
-        List<CaseTemplateApi> dto =
+            .thenReturn(Lists.newArrayList(CaseTemplateApiEntity.builder().build()));
+        List<CaseTemplateApiEntity> dto =
             customizedCaseTemplateApiRepository.findByCaseTemplateIds(Lists.newArrayList(MOCK_ID));
         assertThat(dto).isNotEmpty();
     }
@@ -38,7 +37,7 @@ class CustomizedCaseTemplateApiRepositoryTest {
     @Test
     @DisplayName("Test the findByCaseTemplateIds method in the CustomizedCaseTemplateApiRepository")
     void findByCaseTemplateIds_test_thenNull() {
-        List<CaseTemplateApi> dto =
+        List<CaseTemplateApiEntity> dto =
             customizedCaseTemplateApiRepository.findByCaseTemplateIds(Lists.newArrayList());
         assertThat(dto).isEmpty();
     }
@@ -47,8 +46,8 @@ class CustomizedCaseTemplateApiRepositoryTest {
     @DisplayName("Test the findByCaseTemplateIdAndIsExecute method in the CustomizedCaseTemplateApiRepository")
     void findByCaseTemplateIdAndIsExecute_test() {
         when(mongoTemplate.find(any(), any()))
-            .thenReturn(Lists.newArrayList(CaseTemplateApi.builder().build()));
-        List<CaseTemplateApi> dto =
+            .thenReturn(Lists.newArrayList(CaseTemplateApiEntity.builder().build()));
+        List<CaseTemplateApiEntity> dto =
             customizedCaseTemplateApiRepository.findByCaseTemplateIdAndIsExecute(MOCK_ID,Boolean.TRUE);
         assertThat(dto).isNotEmpty();
     }

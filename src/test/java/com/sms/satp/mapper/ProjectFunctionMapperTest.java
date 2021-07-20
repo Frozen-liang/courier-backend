@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.dto.request.ProjectFunctionRequest;
 import com.sms.satp.dto.response.ProjectFunctionResponse;
-import com.sms.satp.entity.function.ProjectFunction;
+import com.sms.satp.entity.function.ProjectFunctionEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ class ProjectFunctionMapperTest {
     @Test
     @DisplayName("Test the method to convert the ProjectFunction's entity object to a dto object")
     void entity_to_dto() {
-        ProjectFunction projectFunction = ProjectFunction.builder()
+        ProjectFunctionEntity projectFunction = ProjectFunctionEntity.builder()
             .functionCode(FUNCTION_CODE)
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
@@ -37,9 +37,9 @@ class ProjectFunctionMapperTest {
     @Test
     @DisplayName("Test the method for converting an ProjectFunction entity list object to a dto list object")
     void projectFunctionList_to_projectFunctionDtoList() {
-        List<ProjectFunction> projectFunctions = new ArrayList<>();
+        List<ProjectFunctionEntity> projectFunctions = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
-            projectFunctions.add(ProjectFunction.builder().functionCode(FUNCTION_CODE).build());
+            projectFunctions.add(ProjectFunctionEntity.builder().functionCode(FUNCTION_CODE).build());
         }
         List<ProjectFunctionResponse> projectFunctionDtoList = projectFunctionMapper.toDtoList(projectFunctions);
         assertThat(projectFunctionDtoList).hasSize(SIZE);
@@ -52,7 +52,7 @@ class ProjectFunctionMapperTest {
         ProjectFunctionRequest projectFunctionDto = ProjectFunctionRequest.builder()
             .functionCode(FUNCTION_CODE)
             .build();
-        ProjectFunction projectFunction = projectFunctionMapper.toEntity(projectFunctionDto);
+        ProjectFunctionEntity projectFunction = projectFunctionMapper.toEntity(projectFunctionDto);
         assertThat(projectFunction.getFunctionCode()).isEqualTo(FUNCTION_CODE);
     }
 
@@ -66,7 +66,7 @@ class ProjectFunctionMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method to convert the ProjectFunction's dto object to a entity object")
     void null_dto_to_entity() {
-        ProjectFunction projectFunction = projectFunctionMapper.toEntity(null);
+        ProjectFunctionEntity projectFunction = projectFunctionMapper.toEntity(null);
         assertThat(projectFunction).isNull();
     }
 

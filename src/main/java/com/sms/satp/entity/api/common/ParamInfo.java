@@ -4,9 +4,11 @@ import com.sms.satp.common.enums.ParamType;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Builder
 @Data
@@ -33,11 +35,14 @@ public class ParamInfo {
     /**
      * 是否必填.
      */
-    private Boolean required;
+    @Field("isRequired")
+    @Default
+    private boolean required = false;
     /**
      * 是否传输.
      */
-    private Boolean checkbox;
+    @Field("isTransport")
+    private boolean transport;
     /**
      * 对象子属性. JSON/Object/JsonArray.
      */

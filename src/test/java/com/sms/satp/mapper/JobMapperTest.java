@@ -8,8 +8,8 @@ import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.datacollection.TestData;
-import com.sms.satp.entity.env.ProjectEnvironment;
-import com.sms.satp.entity.job.ApiTestCaseJob;
+import com.sms.satp.entity.env.ProjectEnvironmentEntity;
+import com.sms.satp.entity.job.ApiTestCaseJobEntity;
 import com.sms.satp.entity.job.JobCaseApi;
 import com.sms.satp.entity.job.common.CaseReport;
 import com.sms.satp.entity.job.common.JobApiTestCase;
@@ -28,7 +28,7 @@ class JobMapperTest {
     @Test
     @DisplayName("Test the method to convert the projectEnvironment object to a jobEnvironment object")
     void projectEnvironment_to_jobEnvironment() {
-        ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().envName(NAME).build();
+        ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder().envName(NAME).build();
         JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
         assertThat(jobEnvironment.getEnvName()).isEqualTo(NAME);
     }
@@ -60,7 +60,7 @@ class JobMapperTest {
     @Test
     @DisplayName("Test the method to convert the apiTestCaseJob object to a apiTestCaseJobResponse object")
     void apiTestCaseJob_to_apiTestCaseJobResponse() {
-        ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder().jobStatus(JobStatus.SUCCESS).build();
+        ApiTestCaseJobEntity apiTestCaseJob = ApiTestCaseJobEntity.builder().jobStatus(JobStatus.SUCCESS).build();
         ApiTestCaseJobResponse apiTestCaseJobResponse = jobMapper.toApiTestCaseJobResponse(apiTestCaseJob);
         assertThat(apiTestCaseJobResponse.getJobStatus()).isEqualTo(JobStatus.SUCCESS.getCode());
     }
@@ -70,7 +70,7 @@ class JobMapperTest {
     void apiTestCaseJob_to_apiTestCaseJobPageResponse() {
         String message = "success";
         String requestUrl = "localhost";
-        ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder().message(message)
+        ApiTestCaseJobEntity apiTestCaseJob = ApiTestCaseJobEntity.builder().message(message)
             .apiTestCase(JobCaseApi.builder().jobApiTestCase(
                 JobApiTestCase.builder().caseReport(CaseReport.builder().requestUrl(requestUrl).build()).build())
                 .build()).build();

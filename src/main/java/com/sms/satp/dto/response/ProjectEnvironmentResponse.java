@@ -1,6 +1,5 @@
 package com.sms.satp.dto.response;
 
-import com.sms.satp.entity.api.common.HeaderInfo;
 import com.sms.satp.entity.env.EnvironmentAuth;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -26,7 +25,7 @@ public class ProjectEnvironmentResponse extends BaseResponse {
     private String afterInject;
     private String globalBeforeProcess;
     private String globalAfterProcess;
-    private List<HeaderInfo> headers;
+    private List<ParamInfoResponse> headers;
     private List<ParamInfoResponse> envVariable;
     private List<ParamInfoResponse> urlParams;
     private List<ParamInfoResponse> requestParams;

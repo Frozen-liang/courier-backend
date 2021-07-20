@@ -20,7 +20,7 @@ import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTagListRequest;
 import com.sms.satp.dto.request.ApiTagRequest;
 import com.sms.satp.dto.response.ApiTagResponse;
-import com.sms.satp.entity.tag.ApiTag;
+import com.sms.satp.entity.tag.ApiTagEntity;
 import com.sms.satp.mapper.ApiTagMapper;
 import com.sms.satp.mapper.ApiTagMapperImpl;
 import com.sms.satp.repository.ApiTagRepository;
@@ -44,7 +44,7 @@ class ApiTagServiceTest {
     private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
     private final ApiTagService apiTagService = new ApiTagServiceImpl(
         apiTagRepository, commonDeleteRepository, apiTagMapper);
-    private final ApiTag apiTag = ApiTag.builder().id(ID).build();
+    private final ApiTagEntity apiTag = ApiTagEntity.builder().id(ID).build();
     private final ApiTagResponse apiTagResponse = ApiTagResponse.builder().id(ID).build();
     private final ApiTagRequest apiTagRequest = ApiTagRequest.builder().id(ID).build();
     private final ApiTagListRequest apiTagListRequest = ApiTagListRequest.builder().projectId(PROJECT_ID).build();
@@ -72,15 +72,15 @@ class ApiTagServiceTest {
     @Test
     @DisplayName("Test the add method in the ApiTag service")
     public void add_test() {
-        when(apiTagRepository.insert(any(ApiTag.class))).thenReturn(apiTag);
+        when(apiTagRepository.insert(any(ApiTagEntity.class))).thenReturn(apiTag);
         apiTagService.add(apiTagRequest);
-        verify(apiTagRepository, times(1)).insert(any(ApiTag.class));
+        verify(apiTagRepository, times(1)).insert(any(ApiTagEntity.class));
     }
 
     @Test
     @DisplayName("An exception occurred while adding ApiTag")
     public void add_exception_test() {
-        doThrow(new RuntimeException()).when(apiTagRepository).insert(any(ApiTag.class));
+        doThrow(new RuntimeException()).when(apiTagRepository).insert(any(ApiTagEntity.class));
         assertThatThrownBy(() -> apiTagService.add(apiTagRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_API_TAG_ERROR.getCode());
@@ -90,16 +90,16 @@ class ApiTagServiceTest {
     @DisplayName("Test the edit method in the ApiTag service")
     public void edit_test() {
         when(apiTagRepository.existsById(any())).thenReturn(Boolean.TRUE);
-        when(apiTagRepository.save(any(ApiTag.class))).thenReturn(apiTag);
+        when(apiTagRepository.save(any(ApiTagEntity.class))).thenReturn(apiTag);
         apiTagService.edit(apiTagRequest);
-        verify(apiTagRepository, times(1)).save(any(ApiTag.class));
+        verify(apiTagRepository, times(1)).save(any(ApiTagEntity.class));
     }
 
     @Test
     @DisplayName("An exception occurred while edit ApiTag")
     public void edit_exception_test() {
         when(apiTagRepository.existsById(any())).thenReturn(Boolean.TRUE);
-        doThrow(new RuntimeException()).when(apiTagRepository).save(any(ApiTag.class));
+        doThrow(new RuntimeException()).when(apiTagRepository).save(any(ApiTagEntity.class));
         assertThatThrownBy(() -> apiTagService.edit(apiTagRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_API_TAG_ERROR.getCode());
@@ -117,9 +117,9 @@ class ApiTagServiceTest {
     @Test
     @DisplayName("Test the list method in the ApiTag service")
     public void list_test() {
-        ArrayList<ApiTag> list = new ArrayList<>();
+        ArrayList<ApiTagEntity> list = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            list.add(ApiTag.builder().build());
+            list.add(ApiTagEntity.builder().build());
         }
         when(apiTagRepository.findAll(any(), any(Sort.class))).thenReturn(list);
         List<ApiTagResponse> result = apiTagService.list(apiTagListRequest);
@@ -139,7 +139,7 @@ class ApiTagServiceTest {
     @DisplayName("Test the delete method in the ApiTag service")
     public void delete_test() {
         when(apiTagRepository.findAllByIdIn(Collections.singletonList(ID)))
-            .thenReturn(Stream.of(ApiTag.builder().tagType(
+            .thenReturn(Stream.of(ApiTagEntity.builder().tagType(
                 ApiTagType.API).id(ObjectId.get().toString()).build()));
         when(commonDeleteRepository.removeTags(any(), any(), any())).thenReturn(Boolean.TRUE);
         when(apiTagRepository.deleteAllByIdIsIn(any())).thenReturn(1L);

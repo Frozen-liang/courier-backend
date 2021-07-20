@@ -1,1 +1,0 @@
-{{printf "DevOps/%s/settings.xml" (env "REPO") | key}}

@@ -1,6 +1,6 @@
 package com.sms.satp.dto.request;
 
-import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
+import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,8 +21,8 @@ public class UpdateSceneCaseApiConnRequest {
 
     private Integer order;
 
-    private Boolean isExecute;
+    private ApiTestCaseRequest apiTestCase;
 
-    private List<CaseTemplateApiConn> caseTemplateApiConnList;
+    private List<CaseTemplateApiResponse> caseTemplateApiList;
 
 }

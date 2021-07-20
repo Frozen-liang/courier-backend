@@ -9,6 +9,8 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 @SuppressFBWarnings("EQ_OVERRIDING_EQUALS_NOT_SYMMETRIC")
 @NoArgsConstructor
@@ -22,6 +24,7 @@ public class ApiGroupEntity extends BaseEntity {
 
 
     @EqualsAndHashCode.Include
+    @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
     @EqualsAndHashCode.Include
     private String name;

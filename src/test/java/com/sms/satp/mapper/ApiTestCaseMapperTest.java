@@ -7,11 +7,10 @@ import static org.mockito.Mockito.mock;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
-import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
-import com.sms.satp.entity.apitestcase.ApiTestCase;
+import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +28,7 @@ class ApiTestCaseMapperTest {
     private ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
     private ApiTestCaseMapper apiTestCaseMapper = new ApiTestCaseMapperImpl(responseResultVerificationMapper,
         responseHeadersVerificationMapper, paramInfoMapper);
-    private ApiTestCase apiTestCase = ApiTestCase.builder()
+    private ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder()
         .caseName(CASE_NAME).apiProtocol(ApiProtocol.HTTP).createDateTime(CREATE_TIME).modifyDateTime(MODIFY_TIME)
         .apiRequestJsonType(ApiJsonType.OBJECT).apiResponseJsonType(ApiJsonType.ARRAY).requestMethod(RequestMethod.GET)
         .apiRequestParamType(ApiRequestParamType.JSON).build();
@@ -49,7 +48,7 @@ class ApiTestCaseMapperTest {
     @Test
     @DisplayName("Test the method for converting an ApiTestCase entity list object to a dto list object")
     void apiTestCaseList_to_apiTestCaseDtoList() {
-        List<ApiTestCase> apiTestCases = new ArrayList<>();
+        List<ApiTestCaseEntity> apiTestCases = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
             apiTestCases.add(apiTestCase);
         }
@@ -64,7 +63,7 @@ class ApiTestCaseMapperTest {
         ApiTestCaseRequest apiTestCaseRequest = ApiTestCaseRequest.builder()
             .caseName(CASE_NAME)
             .build();
-        ApiTestCase apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
+        ApiTestCaseEntity apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
         assertThat(apiTestCase.getCaseName()).isEqualTo(CASE_NAME);
     }
 
@@ -78,7 +77,7 @@ class ApiTestCaseMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]Test the method to convert the ApiTestCase's dto object to a entity object")
     void null_dto_to_entity() {
-        ApiTestCase apiTestCase = apiTestCaseMapper.toEntity(null);
+        ApiTestCaseEntity apiTestCase = apiTestCaseMapper.toEntity(null);
         assertThat(apiTestCase).isNull();
     }
 

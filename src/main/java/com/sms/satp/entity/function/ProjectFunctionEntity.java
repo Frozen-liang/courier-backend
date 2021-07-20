@@ -1,6 +1,7 @@
-package com.sms.satp.entity.workspace;
+package com.sms.satp.entity.function;
 
 import com.sms.satp.entity.BaseEntity;
+import com.sms.satp.entity.api.common.ParamInfo;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,11 +19,13 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Document(collection = "Workspace")
-public class Workspace extends BaseEntity {
-
-    private String name;
+@Document(collection = "ProjectFunction")
+public class ProjectFunctionEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
-    private List<String> userIds;
+    private String projectId;
+    private String functionKey;
+    private String functionName;
+    private List<ParamInfo> functionParams;
+    private String functionCode;
 }

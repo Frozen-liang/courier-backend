@@ -3,7 +3,7 @@ package com.sms.satp.mapper;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.api.ApiEntity;
-import com.sms.satp.entity.apitestcase.ApiTestCase;
+import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.satp.utils.EnumCommonUtils;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -17,14 +17,12 @@ import org.mapstruct.ReportingPolicy;
         EnumCommonUtils.class})
 public interface ApiTestCaseMapper {
 
-    @Mapping(target = "responseResultVerificationResponse", source = "responseResultVerification")
-    @Mapping(target = "responseHeadersVerificationResponse", source = "responseHeadersVerification")
-    ApiTestCaseResponse toDto(ApiTestCase apiTestCase);
+    ApiTestCaseResponse toDto(ApiTestCaseEntity apiTestCase);
 
-    List<ApiTestCaseResponse> toDtoList(List<ApiTestCase> apiTestCaseList);
+    List<ApiTestCaseResponse> toDtoList(List<ApiTestCaseEntity> apiTestCaseList);
 
-    ApiTestCase toEntity(ApiTestCaseRequest apiTestCaseRequest);
+    ApiTestCaseEntity toEntity(ApiTestCaseRequest apiTestCaseRequest);
 
     @Mapping(target = "apiId", source = "id")
-    ApiTestCase toEntityByApiEntity(ApiEntity apiEntity);
+    ApiTestCaseEntity toEntityByApiEntity(ApiEntity apiEntity);
 }

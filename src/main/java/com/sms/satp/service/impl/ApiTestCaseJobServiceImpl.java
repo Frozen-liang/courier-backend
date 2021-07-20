@@ -14,8 +14,8 @@ import com.sms.satp.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.engine.service.CaseDispatcherService;
-import com.sms.satp.entity.env.ProjectEnvironment;
-import com.sms.satp.entity.job.ApiTestCaseJob;
+import com.sms.satp.entity.env.ProjectEnvironmentEntity;
+import com.sms.satp.entity.job.ApiTestCaseJobEntity;
 import com.sms.satp.entity.job.ApiTestCaseJobReport;
 import com.sms.satp.entity.job.JobCaseApi;
 import com.sms.satp.entity.job.common.CaseReport;
@@ -88,12 +88,12 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             String envId = apiTestCaseJobRunRequest.getEnvId();
             notEmpty(apiTestCaseIds, "The ApiTestCaseIds must not be empty.");
             notEmpty(envId, "The EnvId must not be empty.");
-            ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(envId);
+            ProjectEnvironmentEntity projectEnvironment = projectEnvironmentService.findOne(envId);
             notNull(projectEnvironment, THE_ENVIRONMENT_NOT_EXITS_ERROR);
             JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
             apiTestCaseIds.forEach((apiTestCaseId) -> {
                 ApiTestCaseResponse apiTestCaseResponse = apiTestCaseService.findById(apiTestCaseId);
-                ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder()
+                ApiTestCaseJobEntity apiTestCaseJob = ApiTestCaseJobEntity.builder()
                     .createDateTime(LocalDateTime.now())
                     .modifyUserId(currentUser.getId())
                     .createUserId(currentUser.getId())
@@ -143,13 +143,13 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
     @Override
     public void apiTest(ApiTestRequest apiTestRequest, CustomUser currentUser) {
         try {
-            ProjectEnvironment projectEnvironment = projectEnvironmentService.findOne(apiTestRequest.getEnvId());
+            ProjectEnvironmentEntity projectEnvironment = projectEnvironmentService.findOne(apiTestRequest.getEnvId());
             String apiPath = apiTestRequest.getApiPath();
 
             if (Objects.isNull(projectEnvironment)) {
                 checkApiPath(apiPath);
             }
-            ApiTestCaseJob apiTestCaseJob = ApiTestCaseJob.builder()
+            ApiTestCaseJobEntity apiTestCaseJob = ApiTestCaseJobEntity.builder()
                 .createDateTime(LocalDateTime.now())
                 .modifyUserId(currentUser.getId())
                 .createUserId(currentUser.getId())

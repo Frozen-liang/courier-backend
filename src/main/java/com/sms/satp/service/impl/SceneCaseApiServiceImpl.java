@@ -20,7 +20,7 @@ import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
 import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.satp.dto.response.SceneCaseApiResponse;
-import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
 import com.sms.satp.mapper.SceneCaseApiMapper;
 import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
@@ -57,7 +57,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     public Boolean batchAdd(BatchAddSceneCaseApiRequest addSceneCaseApiDto) {
         log.info("SceneCaseApiService-batchAdd()-params: [SceneCaseApi]={}", addSceneCaseApiDto.toString());
         try {
-            List<SceneCaseApi> caseApiList =
+            List<SceneCaseApiEntity> caseApiList =
                 sceneCaseApiMapper.toSceneCaseApiListByAddRequest(addSceneCaseApiDto.getAddSceneCaseApiRequestList());
             sceneCaseApiRepository.insert(caseApiList);
             return Boolean.TRUE;
@@ -88,7 +88,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     public Boolean edit(UpdateSceneCaseApiRequest updateSceneCaseApiRequest) {
         log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", updateSceneCaseApiRequest.toString());
         try {
-            SceneCaseApi sceneCaseApi = sceneCaseApiMapper.toSceneCaseApiByUpdateRequest(updateSceneCaseApiRequest);
+            SceneCaseApiEntity sceneCaseApi = sceneCaseApiMapper
+                .toSceneCaseApiByUpdateRequest(updateSceneCaseApiRequest);
             sceneCaseApiRepository.save(sceneCaseApi);
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -100,7 +101,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     @Override
     @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
         template = "{{#sceneCaseApiList[0].apiTestCase.apiName}}")
-    public Boolean editAll(List<SceneCaseApi> sceneCaseApiList) {
+    public Boolean editAll(List<SceneCaseApiEntity> sceneCaseApiList) {
         log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", sceneCaseApiList.toString());
         try {
             sceneCaseApiRepository.saveAll(sceneCaseApiList);
@@ -120,7 +121,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
             updateSceneCaseApiSortOrderDto.toString());
         try {
             if (!updateSceneCaseApiSortOrderDto.getSceneCaseApiRequestList().isEmpty()) {
-                List<SceneCaseApi> caseApiList = sceneCaseApiMapper
+                List<SceneCaseApiEntity> caseApiList = sceneCaseApiMapper
                     .toSceneCaseApiList(updateSceneCaseApiSortOrderDto.getSceneCaseApiRequestList());
                 sceneCaseApiRepository.saveAll(caseApiList);
             }
@@ -134,10 +135,10 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     @Override
     public List<SceneCaseApiResponse> listBySceneCaseId(String sceneCaseId, boolean removed) {
         try {
-            Example<SceneCaseApi> example = Example.of(
-                SceneCaseApi.builder().sceneCaseId(sceneCaseId).removed(removed).build());
+            Example<SceneCaseApiEntity> example = Example.of(
+                SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(removed).build());
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
-            List<SceneCaseApi> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
+            List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(sceneCaseApiMapper::toSceneCaseApiDto).collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);
@@ -146,10 +147,10 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public List<SceneCaseApi> listBySceneCaseId(String sceneCaseId) {
+    public List<SceneCaseApiEntity> listBySceneCaseId(String sceneCaseId) {
         try {
-            Example<SceneCaseApi> example = Example.of(
-                SceneCaseApi.builder().sceneCaseId(sceneCaseId).build());
+            Example<SceneCaseApiEntity> example = Example.of(
+                SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).build());
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
             return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {
@@ -159,10 +160,10 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public List<SceneCaseApi> getApiBySceneCaseId(String sceneCaseId, boolean remove) {
+    public List<SceneCaseApiEntity> getApiBySceneCaseId(String sceneCaseId, boolean remove) {
         try {
-            Example<SceneCaseApi> example = Example.of(
-                SceneCaseApi.builder().sceneCaseId(sceneCaseId).removed(remove).build());
+            Example<SceneCaseApiEntity> example = Example.of(
+                SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(remove).build());
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
             return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {
@@ -174,7 +175,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     @Override
     public SceneCaseApiResponse getSceneCaseApiById(String id) {
         try {
-            Optional<SceneCaseApi> sceneCaseApi = sceneCaseApiRepository.findById(id);
+            Optional<SceneCaseApiEntity> sceneCaseApi = sceneCaseApiRepository.findById(id);
             return sceneCaseApi.map(sceneCaseApiMapper::toSceneCaseApiDto).orElse(null);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi by id!", e);
@@ -185,9 +186,9 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     @Override
     public Boolean updateStatusByApiIds(List<String> ids, ApiBindingStatus apiBindingStatus) {
         try {
-            List<SceneCaseApi> sceneCaseApiList = customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(ids);
+            List<SceneCaseApiEntity> sceneCaseApiList = customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(ids);
             if (CollectionUtils.isNotEmpty(sceneCaseApiList)) {
-                for (SceneCaseApi sceneCaseApi : sceneCaseApiList) {
+                for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
                     sceneCaseApi.getApiTestCase().setStatus(apiBindingStatus);
                 }
                 sceneCaseApiRepository.saveAll(sceneCaseApiList);

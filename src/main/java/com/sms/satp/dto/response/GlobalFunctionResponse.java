@@ -1,5 +1,6 @@
 package com.sms.satp.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder.Default;
@@ -20,5 +21,6 @@ public class GlobalFunctionResponse extends BaseResponse {
     private List<ParamInfoResponse> functionParams;
     private String functionCode;
     @Default
-    private Boolean global = true;
+    @JsonProperty("isGlobal")
+    private boolean global = true;
 }

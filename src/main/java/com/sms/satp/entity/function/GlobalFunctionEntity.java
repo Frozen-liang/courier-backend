@@ -1,8 +1,8 @@
-package com.sms.satp.entity.scenetest;
+package com.sms.satp.entity.function;
 
-import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.entity.BaseEntity;
-import com.sms.satp.entity.apitestcase.ApiTestCase;
+import com.sms.satp.entity.api.common.ParamInfo;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,26 +13,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
-@EqualsAndHashCode(callSuper = true)
-@Data
 @SuperBuilder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
-@Document(collection = "CaseTemplateApi")
-public class CaseTemplateApi extends BaseEntity {
+@EqualsAndHashCode(callSuper = true)
+@Document(collection = "GlobalFunction")
+public class GlobalFunctionEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
-    private String caseTemplateId;
-
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String projectId;
-
-    private ApiType apiType;
-
-    private String shell;
-
-    private Integer order;
-
-    private ApiTestCase apiTestCase;
+    private String workspaceId;
+    private String functionKey;
+    private String functionName;
+    private List<ParamInfo> functionParams;
+    private String functionCode;
 }
