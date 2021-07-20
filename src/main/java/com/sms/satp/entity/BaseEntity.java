@@ -24,7 +24,7 @@ public class BaseEntity {
     private String id;
     @Builder.Default
     @JsonIgnore
-    private Boolean removed = false;
+    private boolean removed = false;
     @CreatedBy
     private String createUserId;
     @LastModifiedBy

@@ -8,12 +8,10 @@ import com.sms.satp.engine.enums.EngineStatus;
 import com.sms.satp.engine.model.EngineMember;
 import com.sms.satp.engine.request.EngineRegistrationRequest;
 import com.sms.satp.utils.ExceptionUtils;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +60,6 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
         if (CollectionUtils.isEmpty(availableMembers)) {
             throw ExceptionUtils.mpe("No engines are available.");
         }
-
         return availableMembers.get(random.nextInt(availableMembers.size()));
     }
 
