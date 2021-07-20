@@ -99,20 +99,6 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API,
-        template = "{{#caseTemplateApiList[0].apiTestCase.apiName}}")
-    public Boolean editAll(List<CaseTemplateApiEntity> caseTemplateApiList) {
-        log.info("CaseTemplateApiService-edit()-params: [CaseTemplateApi]={}", caseTemplateApiList.toString());
-        try {
-            caseTemplateApiRepository.saveAll(caseTemplateApiList);
-            return Boolean.TRUE;
-        } catch (Exception e) {
-            log.error("Failed to edit the CaseTemplateApi!", e);
-            throw new ApiTestPlatformException(EDIT_CASE_TEMPLATE_API_ERROR);
-        }
-    }
-
-    @Override
     @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API, template = "{{#updateCaseTemplateApiDto"
         + ".updateCaseTemplateApiRequestList?.![#this.apiTestCase.apiName]}}",
         projectId = "updateCaseTemplateApiRequestList[0].projectId")
@@ -131,10 +117,10 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    public List<CaseTemplateApiResponse> listByCaseTemplateId(String caseTemplateId, boolean removed) {
+    public List<CaseTemplateApiResponse> listResponseByCaseTemplateId(String caseTemplateId) {
         try {
             Example<CaseTemplateApiEntity> example = Example
-                .of(CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).removed(removed).build());
+                .of(CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).build());
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
             List<CaseTemplateApiEntity> sceneCaseApiList = caseTemplateApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(aseTemplateApiMapper::toCaseTemplateApiDto)

@@ -15,11 +15,9 @@ public interface CaseTemplateApiService {
 
     Boolean edit(UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest);
 
-    Boolean editAll(List<CaseTemplateApiEntity> caseTemplateApiList);
-
     Boolean batchEdit(BatchUpdateCaseTemplateApiRequest updateCaseTemplateApiDto);
 
-    List<CaseTemplateApiResponse> listByCaseTemplateId(String caseTemplateId, boolean removed);
+    List<CaseTemplateApiResponse> listResponseByCaseTemplateId(String caseTemplateId);
 
     List<CaseTemplateApiEntity> listByCaseTemplateId(String caseTemplateId);
 

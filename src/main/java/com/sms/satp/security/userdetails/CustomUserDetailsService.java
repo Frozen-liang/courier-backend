@@ -54,7 +54,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // Build UserDetails info of the Security
         UserDetails userDetails = User.withUsername(userEntity.getUsername()).password(userEntity.getPassword())
-            .disabled(userEntity.getRemoved()).accountExpired(false)
+            .disabled(userEntity.isRemoved()).accountExpired(false)
             .credentialsExpired(false).accountLocked(false).authorities(authorities).build();
 
         return new CustomUser(userDetails, userEntity.getId(),

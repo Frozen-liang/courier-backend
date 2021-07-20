@@ -118,25 +118,6 @@ class CaseTemplateApiServiceTest {
     }
 
     @Test
-    @DisplayName("Test the editAll method in the CaseTemplateApi service")
-    void editAll_test() {
-        List<CaseTemplateApiEntity> sceneCaseApi = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
-        when(caseTemplateApiRepository.saveAll(any())).thenReturn(sceneCaseApi);
-        Boolean isSuccess = caseTemplateApiService.editAll(sceneCaseApi);
-        assertTrue(isSuccess);
-    }
-
-    @Test
-    @DisplayName("Test the editAll method in the CaseTemplateApi service throws exception")
-    void editAll_thenThrowException() {
-        List<CaseTemplateApiEntity> sceneCaseApi = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
-        when(caseTemplateApiRepository.saveAll(any()))
-            .thenThrow(new ApiTestPlatformException(EDIT_SCENE_CASE_API_ERROR));
-        assertThatThrownBy(() -> caseTemplateApiService.editAll(sceneCaseApi))
-            .isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
     @DisplayName("Test the batchEdit method in the CaseTemplateApi service")
     void batchEdit_test() {
         BatchUpdateCaseTemplateApiRequest dto = getUpdateSortOrder();
@@ -154,27 +135,6 @@ class CaseTemplateApiServiceTest {
         when(caseTemplateApiRepository.saveAll(any()))
             .thenThrow(new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR));
         assertThatThrownBy(() -> caseTemplateApiService.batchEdit(dto)).isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
-    @DisplayName("Test the list method in the CaseTemplateApi service")
-    void listBySceneCaseId_test() {
-        List<CaseTemplateApiEntity> caseTemplateApiList = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
-        when(caseTemplateApiRepository.findAll(any(), any(Sort.class))).thenReturn(caseTemplateApiList);
-        CaseTemplateApiResponse dto = CaseTemplateApiResponse.builder().build();
-        when(caseTemplateApiMapper.toCaseTemplateApiDto(any())).thenReturn(dto);
-        List<CaseTemplateApiResponse> dtoList = caseTemplateApiService
-            .listByCaseTemplateId(MOCK_SCENE_CASE_ID, Boolean.FALSE);
-        assertThat(dtoList).isNotEmpty();
-    }
-
-    @Test
-    @DisplayName("Test the list method in the CaseTemplateApi service throws exception")
-    void listBySceneCaseId_thenThrowException() {
-        when(caseTemplateApiRepository.findAll(any(), any(Sort.class)))
-            .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR));
-        assertThatThrownBy(() -> caseTemplateApiService.listByCaseTemplateId(MOCK_SCENE_CASE_ID, Boolean.FALSE))
-            .isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test

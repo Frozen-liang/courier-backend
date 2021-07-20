@@ -3,7 +3,6 @@ package com.sms.satp.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -11,6 +10,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
@@ -22,9 +22,9 @@ public class BaseEntity {
 
     @MongoId(FieldType.OBJECT_ID)
     private String id;
-    @Builder.Default
+    @Field(name = "isRemoved")
     @JsonIgnore
-    private boolean removed = false;
+    private boolean removed;
     @CreatedBy
     private String createUserId;
     @LastModifiedBy

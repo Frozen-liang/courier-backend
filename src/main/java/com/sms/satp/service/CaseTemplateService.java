@@ -23,13 +23,15 @@ public interface CaseTemplateService {
 
     Boolean edit(UpdateCaseTemplateRequest updateCaseTemplateRequest);
 
-    Boolean batchEdit(List<CaseTemplateEntity> caseTemplateList);
-
     Page<CaseTemplateResponse> page(CaseTemplateSearchRequest searchDto, ObjectId projectId);
 
     List<CaseTemplateEntity> get(String groupId, String projectId);
 
-    CaseTemplateDetailResponse getApiList(String caseTemplateId, boolean removed);
+    CaseTemplateDetailResponse getApiList(String caseTemplateId);
 
     Boolean addApi(AddCaseTemplateApiByIdsRequest request);
+
+    Boolean delete(List<String> ids);
+
+    Boolean recover(List<String> ids);
 }

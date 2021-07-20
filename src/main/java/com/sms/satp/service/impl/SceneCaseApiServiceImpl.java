@@ -2,8 +2,8 @@ package com.sms.satp.service.impl;
 
 import static com.sms.satp.common.enums.OperationModule.SCENE_CASE_API;
 import static com.sms.satp.common.enums.OperationType.ADD;
-import static com.sms.satp.common.enums.OperationType.DELETE;
 import static com.sms.satp.common.enums.OperationType.EDIT;
+import static com.sms.satp.common.enums.OperationType.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.BATCH_EDIT_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_API_ERROR;
@@ -68,7 +68,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = SCENE_CASE_API,
+    @LogRecord(operationType = REMOVE, operationModule = SCENE_CASE_API,
         template = "{{#result?.![#this.apiTestCase.apiName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
@@ -91,20 +91,6 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
             SceneCaseApiEntity sceneCaseApi = sceneCaseApiMapper
                 .toSceneCaseApiByUpdateRequest(updateSceneCaseApiRequest);
             sceneCaseApiRepository.save(sceneCaseApi);
-            return Boolean.TRUE;
-        } catch (Exception e) {
-            log.error("Failed to edit the SceneCaseApi!", e);
-            throw new ApiTestPlatformException(EDIT_SCENE_CASE_API_ERROR);
-        }
-    }
-
-    @Override
-    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
-        template = "{{#sceneCaseApiList[0].apiTestCase.apiName}}")
-    public Boolean editAll(List<SceneCaseApiEntity> sceneCaseApiList) {
-        log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", sceneCaseApiList.toString());
-        try {
-            sceneCaseApiRepository.saveAll(sceneCaseApiList);
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to edit the SceneCaseApi!", e);

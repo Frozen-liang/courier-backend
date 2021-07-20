@@ -1,9 +1,11 @@
 package com.sms.satp.repository.impl;
 
 import com.google.common.collect.Lists;
+import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
 import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import java.util.List;
 import java.util.Objects;
@@ -19,9 +21,12 @@ import org.springframework.stereotype.Component;
 public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCaseApiRepository {
 
     private final MongoTemplate mongoTemplate;
+    private final CommonDeleteRepository commonDeleteRepository;
 
-    public CustomizedSceneCaseApiRepositoryImpl(MongoTemplate mongoTemplate) {
+    public CustomizedSceneCaseApiRepositoryImpl(MongoTemplate mongoTemplate,
+        CommonDeleteRepository commonDeleteRepository) {
         this.mongoTemplate = mongoTemplate;
+        this.commonDeleteRepository = commonDeleteRepository;
     }
 
     @Override
@@ -68,5 +73,22 @@ public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCase
         return Boolean.TRUE;
     }
 
+    @Override
+    public List<SceneCaseApiEntity> findSceneCaseApiIdsBySceneCaseIds(List<String> ids) {
+        Query query = new Query();
+        query.fields().include(CommonFiled.ID.getFiled());
+        SceneFiled.SCENE_CASE_ID.in(ids).ifPresent(query::addCriteria);
+        return mongoTemplate.find(query, SceneCaseApiEntity.class);
+    }
+
+    @Override
+    public Boolean deleteByIds(List<String> sceneCaseApiIds) {
+        return commonDeleteRepository.deleteByIds(sceneCaseApiIds, SceneCaseApiEntity.class);
+    }
+
+    @Override
+    public Boolean recover(List<String> sceneCaseApiIds) {
+        return commonDeleteRepository.recover(sceneCaseApiIds, SceneCaseApiEntity.class);
+    }
 
 }

@@ -174,7 +174,9 @@ public enum ErrorCode {
     DELETE_USER_GROUP_BY_ID_ERROR("4166", "Failed to delete the UserGroup!"),
     EDIT_USER_GROUP_ERROR("4167", "Failed to edit the UserGroup!"),
     IMPORT_DATA_COLLECTION_ERROR("4168", "Failed to import the DataCollection!"),
-    UNLOCK_USER_BY_ID_ERROR("4157", "Failed to unlock the User!"),
+    UNLOCK_USER_BY_ID_ERROR("4169", "Failed to unlock the User!"),
+    RECOVER_SCENE_CASE_ERROR("4070", "Failed to recover the SceneCase!"),
+    RECOVER_CASE_TEMPLATE_ERROR("4071", "Failed to recover the CaseTemplate!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 

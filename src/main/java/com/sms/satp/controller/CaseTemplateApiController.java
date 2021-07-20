@@ -32,7 +32,7 @@ public class CaseTemplateApiController {
         return caseTemplateApiService.batchAdd(addCaseTemplateApiRequest);
     }
 
-    @DeleteMapping(value = "/{ids}")
+    @DeleteMapping(value = "/delete/{ids}")
     public Boolean deleteByIds(@PathVariable List<String> ids) {
         return caseTemplateApiService.deleteByIds(ids);
     }
