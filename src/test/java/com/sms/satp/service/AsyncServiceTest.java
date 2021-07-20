@@ -3,7 +3,6 @@ package com.sms.satp.service;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -22,20 +21,17 @@ import com.sms.satp.repository.ApiGroupRepository;
 import com.sms.satp.repository.ApiHistoryRepository;
 import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.ProjectImportFlowRepository;
-import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.impl.AsyncServiceImpl;
-import com.sms.satp.utils.SecurityUtil;
 import com.sms.satp.websocket.Payload;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.util.Streamable;
@@ -51,17 +47,14 @@ public class AsyncServiceTest {
     private final ProjectImportFlowMapper projectImportFlowMapper = mock(ProjectImportFlowMapper.class);
     private ApplicationContext applicationContext = mock(ApplicationContext.class);
     private final MessageService messageService = mock(MessageService.class);
-    private final AsyncService asyncService = new AsyncServiceImpl(apiRepository, apiHistoryRepository,
+    private final AsyncServiceImpl asyncService = new AsyncServiceImpl(apiRepository, apiHistoryRepository,
         apiHistoryMapper, apiGroupRepository, projectImportFlowRepository, projectImportFlowMapper,
         messageService);
 
-    static {
-        MockedStatic<SecurityUtil> securityUtilMockedStatic = mockStatic(SecurityUtil.class);
-        securityUtilMockedStatic.when(SecurityUtil::getCurrUserId).thenReturn(ObjectId.get().toString());
-        securityUtilMockedStatic.when(SecurityUtil::getCurrentUser).thenReturn(new CustomUser("username", "password",
-            Collections.emptyList(), "", "username@qq.com"));
+    @BeforeEach
+    public void beforeEach() {
+        asyncService.setApplicationContext(applicationContext);
     }
-
 
     @Test
     @DisplayName("Test the importApi method in the async service")

@@ -1,6 +1,7 @@
 package com.sms.satp.entity.job.common;
 
 
+import com.sms.satp.common.enums.RequestMethod;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,8 @@ public class CaseReport {
     private String caseId;
 
     private Integer status;
+
+    private RequestMethod requestMethod;
 
     private String requestUrl;
 

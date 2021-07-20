@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApiGroupServiceImpl implements ApiGroupService {
 
-    private final static int MAX_DEPTH = 3;
+    private static final int MAX_DEPTH = 3;
     private final ApiGroupRepository apiGroupRepository;
     private final CustomizedApiRepository customizedApiRepository;
     private final ApiGroupMapper apiGroupMapper;

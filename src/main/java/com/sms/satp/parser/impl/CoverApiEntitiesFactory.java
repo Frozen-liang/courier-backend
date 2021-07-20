@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEventPublisher;
 
 public class CoverApiEntitiesFactory implements DiffApiEntitiesFactory {
 
@@ -19,12 +18,11 @@ public class CoverApiEntitiesFactory implements DiffApiEntitiesFactory {
     public Collection<ApiEntity> build(List<ApiEntity> newApiEntities, Map<String, ApiEntity> oldApiEntities,
         ApplicationContext applicationContext, ApiStatus apiChangeStatus) {
         ApiRepository apiRepository = applicationContext.getBean(ApiRepository.class);
-        ApplicationEventPublisher applicationEventPublisher = applicationContext
-            .getBean(ApplicationEventPublisher.class);
+
         // Delete all old api.
         apiRepository.deleteAll(oldApiEntities.values());
         // Publish delete event. Update case status.
-        applicationEventPublisher
+        applicationContext
             .publishEvent(new ApiDeleteEvent(oldApiEntities.values().parallelStream().map(BaseEntity::getId)
                 .collect(Collectors.toList())));
         return newApiEntities;
