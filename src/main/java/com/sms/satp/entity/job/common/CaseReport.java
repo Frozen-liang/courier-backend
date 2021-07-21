@@ -2,12 +2,12 @@ package com.sms.satp.entity.job.common;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sms.satp.common.enums.RequestMethod;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @NoArgsConstructor
@@ -18,6 +18,8 @@ public class CaseReport {
     private String caseId;
 
     private Integer status;
+
+    private RequestMethod requestMethod;
 
     private String requestUrl;
 

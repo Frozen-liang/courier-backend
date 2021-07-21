@@ -29,10 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.util.Streamable;
 
@@ -46,12 +46,15 @@ public class AsyncServiceTest {
     private final ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
     private final ProjectImportFlowMapper projectImportFlowMapper = mock(ProjectImportFlowMapper.class);
     private ApplicationContext applicationContext = mock(ApplicationContext.class);
-    private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final MessageService messageService = mock(MessageService.class);
-    private final AsyncService asyncService = new AsyncServiceImpl(apiRepository, apiHistoryRepository,
+    private final AsyncServiceImpl asyncService = new AsyncServiceImpl(apiRepository, apiHistoryRepository,
         apiHistoryMapper, apiGroupRepository, projectImportFlowRepository, projectImportFlowMapper,
-        applicationEventPublisher,
         messageService);
+
+    @BeforeEach
+    public void beforeEach() {
+        asyncService.setApplicationContext(applicationContext);
+    }
 
     @Test
     @DisplayName("Test the importApi method in the async service")
@@ -104,8 +107,9 @@ public class AsyncServiceTest {
         when(apiRepository.saveAll(any())).thenReturn(getApi());
         when(applicationContext.getBean(ProjectImportFlowRepository.class)).thenReturn(projectImportFlowRepository);
         when(applicationContext.getBean(MessageService.class)).thenReturn(messageService);
+        when(applicationContext.getBean(ApiRepository.class)).thenReturn(apiRepository);
         doNothing().when(apiRepository).deleteAll();
-        doNothing().when(applicationEventPublisher).publishEvent(any());
+        doNothing().when(applicationContext).publishEvent(any());
         when(apiRepository.saveAll(any())).thenReturn(getApi());
         when(apiHistoryRepository.insert(any(ApiHistoryEntity.class))).thenReturn(null);
     }

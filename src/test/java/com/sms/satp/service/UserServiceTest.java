@@ -6,6 +6,7 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_USER_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_USER_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_USER_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.LOCK_USER_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.UNLOCK_USER_BY_ID_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -167,14 +168,14 @@ class UserServiceTest {
         assertThat(userService.unlock(Collections.singletonList(ID))).isTrue();
     }
 
-//    @Test
-//    @DisplayName("An exception occurred while unlock User")
-//    public void unlock_exception_test() {
-//        List<String> ids = Collections.singletonList(ID);
-//        doThrow(new RuntimeException()).when(commonDeleteRepository)
-//            .recover(ids, UserEntity.class);
-//        assertThatThrownBy(() -> userService.unlock(ids))
-//            .isInstanceOf(ApiTestPlatformException.class)
-//            .extracting("code").isEqualTo(LOCK_USER_BY_ID_ERROR.getCode());
-//    }
+    @Test
+    @DisplayName("An exception occurred while unlock User")
+    public void unlock_exception_test() {
+        List<String> ids = Collections.singletonList(ID);
+        doThrow(new RuntimeException()).when(commonDeleteRepository)
+            .recover(ids, UserEntity.class);
+        assertThatThrownBy(() -> userService.unlock(ids))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(UNLOCK_USER_BY_ID_ERROR.getCode());
+    }
 }

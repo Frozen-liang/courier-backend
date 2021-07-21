@@ -1,8 +1,13 @@
 package com.sms.satp.security;
 
+import com.sms.satp.common.constant.Role;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 
 public class CustomMethodSecurityExpression extends SecurityExpressionRoot implements
     MethodSecurityExpressionOperations {
@@ -13,8 +18,17 @@ public class CustomMethodSecurityExpression extends SecurityExpressionRoot imple
 
     public boolean hasRoleOrAdmin(String role) {
         return authentication.getAuthorities().stream()
-            .anyMatch((grantedAuthority) -> "Admin"
+            .anyMatch((grantedAuthority) -> Role.ADMIN
                 .equals(grantedAuthority.getAuthority()) || grantedAuthority.getAuthority().equals(role));
+    }
+
+    public boolean hasAllRoleOrAdmin(String... roles) {
+        Set<String> roleList = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toUnmodifiableSet());
+        if (roleList.contains(Role.ADMIN)) {
+            return true;
+        }
+        return roleList.containsAll(Arrays.asList(roles));
     }
 
     private Object filterObject;

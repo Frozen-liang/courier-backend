@@ -4,8 +4,6 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.messaging.simp.stomp.StompCommand.CONNECT;
 
 import com.sms.satp.security.jwt.JwtTokenManager;
-import com.sms.satp.utils.SecurityUtil;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +15,6 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -41,13 +38,8 @@ public class ConnectChannelInterceptor implements ChannelInterceptor {
                 if (StringUtils.isNotBlank(header) || header.startsWith("Bearer ")) {
                     String token = header.split(" ")[1].trim();
                     if (jwtTokenManager.validate(token)) {
-                        String email = jwtTokenManager.getEmail(token);
-                        String userId = jwtTokenManager.getUserId(token);
-                        String username = jwtTokenManager.getUsername(token);
-                        Authentication authentication = SecurityUtil
-                            .newAuthentication(userId, email, username, 1L, Collections.emptyList());
+                        Authentication authentication = jwtTokenManager.createAuthentication(token);
                         accessor.setUser(authentication);
-                        SecurityContextHolder.getContext().setAuthentication(authentication);
                         return message;
                     }
                 }

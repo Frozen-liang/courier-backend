@@ -26,7 +26,7 @@ public class ApiPageRequest extends PageDto {
     @JsonProperty("isRemoved")
     private boolean removed;
 
-    private List<ObjectId> groupId;
+    private ObjectId groupId;
 
     private List<ObjectId> tagId;
 
