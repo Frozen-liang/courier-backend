@@ -23,6 +23,7 @@ import com.sms.satp.entity.workspace.WorkspaceEntity;
 import com.sms.satp.mapper.UserMapper;
 import com.sms.satp.mapper.UserMapperImpl;
 import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.repository.UserRepository;
 import com.sms.satp.repository.WorkspaceRepository;
 import com.sms.satp.service.impl.UserServiceImpl;
@@ -40,11 +41,12 @@ class UserServiceTest {
 
     private final UserRepository userRepository = mock(UserRepository.class);
     private final WorkspaceRepository workspaceRepository = mock(WorkspaceRepository.class);
+    private final UserGroupRepository userGroupRepository = mock(UserGroupRepository.class);
     private final CommonDeleteRepository commonDeleteRepository = mock(
         CommonDeleteRepository.class);
     private final UserMapper userMapper = new UserMapperImpl();
     private final UserService userService = new UserServiceImpl(
-        userRepository, workspaceRepository, commonDeleteRepository, userMapper);
+        userRepository, userGroupRepository, workspaceRepository, commonDeleteRepository, userMapper);
     private final UserEntity user = UserEntity.builder().id(ID).build();
     private final UserRequest userRequest = UserRequest.builder().password("123Wac!@#")
         .id(ID).build();

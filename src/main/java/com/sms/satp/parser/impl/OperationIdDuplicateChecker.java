@@ -20,26 +20,14 @@ public class OperationIdDuplicateChecker implements ApiDocumentChecker {
             .filter(entry -> entry.getValue().size() > 1)
             .collect(Collectors.toConcurrentMap(Entry::getKey, Entry::getValue));
         if (checkResult.size() > 0) {
-            StringBuilder builder = new StringBuilder();
+            StringBuilder errorMessageBuilder = new StringBuilder();
             for (Entry<String, List<ApiEntity>> entry : checkResult.entrySet()) {
                 String key = entry.getKey();
                 String apiPaths = entry.getValue().stream().map(ApiEntity::getApiPath).collect(Collectors.joining(","));
                 String errorDetail = String.format("OperationId [%s] is repeated in [%s].", key, apiPaths);
-                builder.append(errorDetail).append("\n");
+                errorMessageBuilder.append(errorDetail).append("\n");
             }
-            throw ExceptionUtils.mpe(builder.toString());
-            /*projectImportFlowEntity.setImportStatus(ImportStatus.FAILED);
-            projectImportFlowEntity.setEndTime(LocalDateTime.now());
-            projectImportFlowEntity.setErrorDetail(builder.toString());
-            ProjectImportFlowRepository projectImportFlowRepository =
-                context.getBean(ProjectImportFlowRepository.class);
-
-            log.error("The project whose id is {},{}",
-                projectImportFlowEntity.getProjectId(), projectImportFlowEntity.getErrorDetail());
-            projectImportFlowRepository.save(projectImportFlowEntity);
-            MessageService messageService = context.getBean(MessageService.class);
-            messageService.projectMessage(projectImportFlowEntity.getProjectId(),
-                Payload.ok(projectImportFlowEntity));*/
+            throw ExceptionUtils.mpe(errorMessageBuilder.toString());
         }
     }
 }

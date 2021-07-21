@@ -25,18 +25,23 @@ import com.sms.satp.dto.request.UserQueryListRequest;
 import com.sms.satp.dto.request.UserRequest;
 import com.sms.satp.dto.response.UserResponse;
 import com.sms.satp.entity.system.UserEntity;
+import com.sms.satp.entity.system.UserGroupEntity;
 import com.sms.satp.entity.workspace.WorkspaceEntity;
 import com.sms.satp.mapper.UserMapper;
 import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.repository.UserRepository;
 import com.sms.satp.repository.WorkspaceRepository;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.UserService;
 import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.SecurityUtil;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DuplicateKeyException;
@@ -54,6 +59,7 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserGroupRepository userGroupRepository;
     private final WorkspaceRepository workspaceRepository;
     private final CommonDeleteRepository commonDeleteRepository;
     private final UserMapper userMapper;
@@ -61,9 +67,11 @@ public class UserServiceImpl implements UserService {
     private static final String GROUP_ID = "groupId";
 
     public UserServiceImpl(UserRepository userRepository,
-        WorkspaceRepository workspaceRepository, CommonDeleteRepository commonDeleteRepository,
+        UserGroupRepository userGroupRepository, WorkspaceRepository workspaceRepository,
+        CommonDeleteRepository commonDeleteRepository,
         UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.userGroupRepository = userGroupRepository;
         this.workspaceRepository = workspaceRepository;
         this.commonDeleteRepository = commonDeleteRepository;
         this.userMapper = userMapper;
@@ -93,16 +101,20 @@ public class UserServiceImpl implements UserService {
                 .withIgnoreNullValues();
             Example<UserEntity> example = Example.of(userEntity, exampleMatcher);
             List<UserResponse> userResponseList = userMapper.toDtoList(userRepository.findAll(example, sort));
-            Optional.ofNullable(request.getWorkspaceId())
+            List<String> userIds = Optional.ofNullable(request.getWorkspaceId())
                 .map(workspaceRepository::findById)
                 .map(Optional::get)
-                .map(WorkspaceEntity::getUserIds)
-                .ifPresent(userIds -> {
-                    userResponseList.forEach(user -> {
-                        user.setExist(userIds.contains(user.getId()));
-                    });
-                });
 
+                .map(WorkspaceEntity::getUserIds)
+                .orElse(Collections.emptyList());
+            List<String> groupIds = userResponseList.stream().map(UserResponse::getGroupId)
+                .collect(Collectors.toList());
+            Map<String, String> groupMap = userGroupRepository.findAllByIdIn(groupIds)
+                .collect(Collectors.toMap(UserGroupEntity::getId, UserGroupEntity::getName));
+            userResponseList.forEach(user -> {
+                user.setExist(userIds.contains(user.getId()));
+                user.setGroupName(groupMap.get(user.getGroupId()));
+            });
             return userResponseList;
         } catch (Exception e) {
             log.error("Failed to get the User list!", e);
