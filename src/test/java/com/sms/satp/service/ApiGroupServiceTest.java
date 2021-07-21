@@ -6,10 +6,11 @@ import com.sms.satp.entity.group.ApiGroupEntity;
 import com.sms.satp.mapper.ApiGroupMapper;
 import com.sms.satp.repository.ApiGroupRepository;
 import com.sms.satp.service.impl.ApiGroupServiceImpl;
-import java.util.List;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static com.sms.satp.common.exception.ErrorCode.GET_API_GROUP_LIST_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;

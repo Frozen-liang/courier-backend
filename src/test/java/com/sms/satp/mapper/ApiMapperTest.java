@@ -1,24 +1,29 @@
 package com.sms.satp.mapper;
 
+import com.sms.satp.common.enums.ApiJsonType;
+import com.sms.satp.common.enums.ApiProtocol;
+import com.sms.satp.common.enums.DocumentUrlType;
+import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.dto.request.ApiImportRequest;
+import com.sms.satp.dto.request.ApiRequest;
+import com.sms.satp.dto.response.ApiResponse;
+import com.sms.satp.entity.api.ApiEntity;
+import com.sms.satp.entity.project.ProjectImportSourceEntity;
+import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.sms.satp.common.enums.ApiJsonType.OBJECT;
 import static com.sms.satp.common.enums.ApiProtocol.HTTP;
 import static com.sms.satp.common.enums.ApiRequestParamType.JSON;
 import static com.sms.satp.common.enums.ApiStatus.DEVELOP;
 import static com.sms.satp.common.enums.RequestMethod.GET;
 import static org.assertj.core.api.Assertions.assertThat;
-
-import com.sms.satp.common.enums.ApiJsonType;
-import com.sms.satp.common.enums.ApiProtocol;
-import com.sms.satp.common.enums.RequestMethod;
-import com.sms.satp.dto.request.ApiRequest;
-import com.sms.satp.dto.response.ApiResponse;
-import com.sms.satp.entity.api.ApiEntity;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 @DisplayName("Tests for ApiMapper")
 class ApiMapperTest {
@@ -28,12 +33,13 @@ class ApiMapperTest {
     private static final Integer SIZE = 10;
     private static final String API_NAME = "apiName";
     ApiEntity api = ApiEntity.builder().apiProtocol(ApiProtocol.HTTPS).requestMethod(RequestMethod.DELETE)
-        .apiStatus(DEVELOP).apiRequestJsonType(ApiJsonType.ARRAY)
-        .apiRequestParamType(JSON).apiRequestJsonType(ApiJsonType.ARRAY)
-        .apiResponseJsonType(ApiJsonType.ARRAY).createDateTime(CREATE_TIME)
-        .modifyDateTime(MODIFY_TIME).apiName(API_NAME).build();
+            .apiStatus(DEVELOP).apiRequestJsonType(ApiJsonType.ARRAY)
+            .apiRequestParamType(JSON).apiRequestJsonType(ApiJsonType.ARRAY)
+            .apiResponseJsonType(ApiJsonType.ARRAY).createDateTime(CREATE_TIME)
+            .modifyDateTime(MODIFY_TIME).apiName(API_NAME).build();
     private static final LocalDateTime CREATE_TIME = LocalDateTime.now();
     private static final LocalDateTime MODIFY_TIME = LocalDateTime.now();
+    private static final String API_TAG_ID = "1";
 
     @Test
     @DisplayName("Test the method to convert the Api's entity object to a dto object")
@@ -62,8 +68,8 @@ class ApiMapperTest {
     @DisplayName("Test the method to convert the Api's dto object to a entity object")
     void dto_to_entity() {
         ApiRequest apiDto = ApiRequest.builder()
-            .apiProtocol(HTTP).apiRequestJsonType(OBJECT).apiRequestParamType(JSON)
-            .apiStatus(DEVELOP).apiResponseJsonType(OBJECT).requestMethod(GET).build();
+                .apiProtocol(HTTP).apiRequestJsonType(OBJECT).apiRequestParamType(JSON)
+                .apiStatus(DEVELOP).apiResponseJsonType(OBJECT).requestMethod(GET).build();
         ApiEntity api = apiMapper.toEntity(apiDto);
         assertThat(api.getApiProtocol().getCode()).isEqualTo(HTTP.getCode());
         assertThat(api.getApiRequestJsonType().getCode()).isEqualTo(OBJECT.getCode());
@@ -94,4 +100,36 @@ class ApiMapperTest {
         assertThat(apiDtoList).isNull();
     }
 
+    @Test
+    void notNull_entityList_to_List() {
+        ApiRequest toDto = ApiRequest.builder().apiName(API_NAME)
+                .tagId(Lists.newArrayList(API_TAG_ID)).build();
+        ApiEntity apiEntity = apiMapper.toEntity(toDto);
+        assertThat(apiEntity).isNotNull();
+    }
+
+    @Test
+    void Null_toImportSource() {
+        ApiImportRequest request = ApiImportRequest.builder().documentFileType(0).saveMode(0).build();
+        assertThat(apiMapper.toImportSource(request, "test")).isNotNull();
+    }
+
+    @Test
+    void Null_toImportSource_project() {
+        ProjectImportSourceEntity projectImportSourceEntity = ProjectImportSourceEntity.builder()
+                .documentType(DocumentUrlType.SWAGGER_FILE)
+                .build();
+        assertThat(apiMapper.toImportSource(projectImportSourceEntity)).isNotNull();
+    }
+
+    @Test
+    void Null_toImportSource_isNull() {
+        assertThat(apiMapper.toImportSource(null, null)).isNull();
+
+    }
+
+    @Test
+    void Null_toImportSource_projectNull() {
+        assertThat(apiMapper.toImportSource(null)).isNull();
+    }
 }
