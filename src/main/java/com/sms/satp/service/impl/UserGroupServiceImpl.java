@@ -21,6 +21,7 @@ import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.service.UserGroupService;
 import com.sms.satp.utils.ExceptionUtils;
+import com.sms.satp.utils.SecurityUtil;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -67,6 +68,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         log.info("UserGroupService-add()-params: [UserGroup]={}", userGroupRequest.toString());
         try {
             UserGroupEntity userGroup = userGroupMapper.toEntity(userGroupRequest);
+            userGroup.setCreateUsername(SecurityUtil.getCurrentUser().getUsername());
             userGroupRepository.insert(userGroup);
         } catch (Exception e) {
             log.error("Failed to add the UserGroup!", e);

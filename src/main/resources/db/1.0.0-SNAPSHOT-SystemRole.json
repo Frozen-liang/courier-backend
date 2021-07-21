@@ -21,7 +21,7 @@
   },
   {
     "name": "User_Group_Create_Update_Delete",
-    "description": "用户分组增加修改删除,删除分组时还需要Api删除权限"
+    "description": "用户分组增加修改删除,删除分组时需要Api删除权限"
   },
   {
     "name": "User_Group_Query_All",

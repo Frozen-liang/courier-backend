@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.dto.request.UserQueryListRequest;
 import com.sms.satp.dto.request.UserRequest;
 import com.sms.satp.dto.response.UserResponse;
 import com.sms.satp.entity.system.UserEntity;
@@ -52,6 +53,8 @@ class UserServiceTest {
     private static final String GROUP_ID = ObjectId.get().toString();
     private static final String WORKSPACE_ID = ObjectId.get().toString();
     private static final String USERNAME = "test";
+    private final UserQueryListRequest request =
+        UserQueryListRequest.builder().username(USERNAME).groupId(GROUP_ID).workspaceId(WORKSPACE_ID).build();
 
     @Test
     @DisplayName("Test the findById method in the User service")
@@ -127,7 +130,7 @@ class UserServiceTest {
         when(userRepository.findAll(any(), any(Sort.class))).thenReturn(userList);
         when(workspaceRepository.findById(any()))
             .thenReturn(Optional.of(WorkspaceEntity.builder().userIds(Collections.emptyList()).build()));
-        List<UserResponse> result = userService.list(USERNAME, GROUP_ID, WORKSPACE_ID);
+        List<UserResponse> result = userService.list(request);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -135,7 +138,7 @@ class UserServiceTest {
     @DisplayName("An exception occurred while getting User list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(userRepository).findAll(any(), any(Sort.class));
-        assertThatThrownBy(() -> userService.list(USERNAME, GROUP_ID, WORKSPACE_ID))
+        assertThatThrownBy(() -> userService.list(request))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_USER_LIST_ERROR.getCode());
     }

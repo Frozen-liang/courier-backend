@@ -28,4 +28,6 @@ public class UserGroupRequest {
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The roleIds must not be empty.")
     @Size(min = 1, groups = {InsertGroup.class, UpdateGroup.class}, message = "The roleIds must not be empty.")
     private List<String> roleIds;
+
+    private String createUsername;
 }

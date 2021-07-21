@@ -1,12 +1,13 @@
 package com.sms.satp.parser;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
 import com.sms.satp.parser.impl.OperationIdDuplicateChecker;
@@ -48,8 +49,8 @@ public class OperationIdDuplicateCheckerTest {
         when(applicationContext.getBean(MessageService.class)).thenReturn(messageService);
         doNothing().when(messageService).projectMessage(any(), any(Payload.class));
         when(projectImportFlowRepository.save(any(ProjectImportFlowEntity.class))).thenReturn(projectImportFlowEntity);
-        boolean result = operationIdDuplicateChecker.check(getApi(), projectImportFlowEntity, applicationContext);
-        assertThat(result).isFalse();
+        assertThatThrownBy(() -> operationIdDuplicateChecker.check(getApi()))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
     private List<ApiEntity> getApi() {

@@ -16,6 +16,6 @@ public class ApiGroupResponse extends BaseResponse {
     private String projectId;
     private String name;
     private String parentId;
-    private Integer line;
+    private Integer depth;
     private boolean hasNext;
 }

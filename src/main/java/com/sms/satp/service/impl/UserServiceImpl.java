@@ -21,6 +21,7 @@ import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.UserPasswordUpdateRequest;
+import com.sms.satp.dto.request.UserQueryListRequest;
 import com.sms.satp.dto.request.UserRequest;
 import com.sms.satp.dto.response.UserResponse;
 import com.sms.satp.entity.system.UserEntity;
@@ -81,10 +82,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserResponse> list(String username, String groupId, String workspaceId) {
+    public List<UserResponse> list(UserQueryListRequest request) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
-            UserEntity userEntity = UserEntity.builder().username(username).groupId(groupId).build();
+            UserEntity userEntity = userMapper.toEntity(request);
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(GROUP_ID, ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher(REMOVE.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
@@ -92,14 +93,16 @@ public class UserServiceImpl implements UserService {
                 .withIgnoreNullValues();
             Example<UserEntity> example = Example.of(userEntity, exampleMatcher);
             List<UserResponse> userResponseList = userMapper.toDtoList(userRepository.findAll(example, sort));
-            if (StringUtils.isNotBlank(workspaceId)) {
-                Optional<WorkspaceEntity> optional = workspaceRepository.findById(workspaceId);
-                optional.ifPresent(workspace -> {
-                    userResponseList.forEach((user) -> {
-                        user.setExist(workspace.getUserIds().contains(user.getId()));
+            Optional.ofNullable(request.getWorkspaceId())
+                .map(workspaceRepository::findById)
+                .map(Optional::get)
+                .map(WorkspaceEntity::getUserIds)
+                .ifPresent(userIds -> {
+                    userResponseList.forEach(user -> {
+                        user.setExist(userIds.contains(user.getId()));
                     });
                 });
-            }
+
             return userResponseList;
         } catch (Exception e) {
             log.error("Failed to get the User list!", e);
