@@ -50,7 +50,10 @@ public class ApiGroupServiceImpl implements ApiGroupService {
             } else {
                 apiGroupEntityList = apiGroupRepository.findByParentId(groupId);
             }
-            return apiGroupMapper.toResponse(apiGroupEntityList);
+            List<ApiGroupResponse> apiGroupResponses = apiGroupMapper.toResponse(apiGroupEntityList);
+            apiGroupResponses
+                .forEach(response -> response.setHasNext(apiGroupRepository.existsByParentId(response.getId())));
+            return apiGroupResponses;
         } catch (Exception e) {
             log.error("Failed to list the ApiGroupService!", e);
             throw new ApiTestPlatformException(GET_API_GROUP_LIST_ERROR);

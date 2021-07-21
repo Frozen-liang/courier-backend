@@ -1,7 +1,5 @@
 package com.sms.satp.dto.response;
 
-import com.sms.satp.common.enums.JobStatus;
-import com.sms.satp.entity.job.common.CaseReport;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +15,5 @@ public class ApiTestCaseJobPageResponse {
     private String message;
     private String testDateTime;
     private String testUser;
-    private CaseReport testReport;
+    private CaseReportResponse testReport;
 }

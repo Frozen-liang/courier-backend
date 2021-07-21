@@ -49,9 +49,7 @@ public class ApiRequest {
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The requestMethod must not be null.")
     private RequestMethod requestMethod;
 
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiRequestParamType must not be null.")
     private ApiRequestParamType apiRequestParamType;
-
 
     @Valid
     private List<ParamInfoRequest> requestHeaders;

@@ -16,4 +16,6 @@ public interface ApiGroupRepository extends MongoRepository<ApiGroupEntity, Stri
     void deleteAllByIdIn(List<String> ids);
 
     List<ApiGroupEntity> findApiGroupEntitiesByProjectId(String projectId);
+
+    boolean existsByParentId(String id);
 }
