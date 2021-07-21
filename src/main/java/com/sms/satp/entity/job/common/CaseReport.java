@@ -1,11 +1,13 @@
 package com.sms.satp.entity.job.common;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @NoArgsConstructor
@@ -27,6 +29,7 @@ public class CaseReport {
 
     private Object requestData;
 
+    @JsonProperty("isSuccess")
     private boolean isSuccess;
 
     private String failMessage;

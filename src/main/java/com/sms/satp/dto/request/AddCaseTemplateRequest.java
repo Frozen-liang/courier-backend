@@ -19,6 +19,7 @@ public class AddCaseTemplateRequest {
     @NotNull(message = "The projectId can not be empty")
     private String projectId;
     private String groupId;
+    private String dataCollId;
     private String testStatus;
     private List<String> tagId;
 }

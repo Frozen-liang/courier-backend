@@ -54,6 +54,7 @@ import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.CaseTemplateApiService;
 import com.sms.satp.service.SceneCaseApiService;
 import com.sms.satp.service.SceneCaseService;
+import com.sms.satp.utils.SecurityUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -114,7 +115,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         log.info("SceneCaseService-add()-params: [SceneCase]={}", addSceneCaseRequest.toString());
         try {
             SceneCaseEntity sceneCase = sceneCaseMapper.toAddSceneCase(addSceneCaseRequest);
-            //query user by "createUserId",write for filed createUserName.
+            sceneCase.setCreateUserName(SecurityUtil.getCurrentUser().getUsername());
             sceneCaseRepository.insert(sceneCase);
             return Boolean.TRUE;
         } catch (Exception e) {

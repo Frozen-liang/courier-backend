@@ -50,6 +50,7 @@ import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.CaseTemplateApiService;
 import com.sms.satp.service.CaseTemplateService;
 import com.sms.satp.service.SceneCaseApiService;
+import com.sms.satp.utils.SecurityUtil;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -110,7 +111,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         try {
             CaseTemplateEntity sceneCaseTemplate = caseTemplateMapper
                 .toCaseTemplateByAddRequest(addCaseTemplateRequest);
-            //query user by "createUserId",write for filed createUserName.
+            sceneCaseTemplate.setCreateUserName(SecurityUtil.getCurrentUser().getUsername());
             caseTemplateRepository.insert(sceneCaseTemplate);
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -120,6 +121,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE, template = "{{#convertCaseTemplateRequest.name}}")
     public IdResponse add(ConvertCaseTemplateRequest convertCaseTemplateRequest) {
         try {
             Optional<SceneCaseEntity> sceneCase = sceneCaseRepository
