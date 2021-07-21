@@ -1,5 +1,6 @@
 package com.sms.satp.mapper;
 
+import com.sms.satp.dto.request.ApiGroupRequest;
 import com.sms.satp.dto.response.ApiGroupResponse;
 import com.sms.satp.entity.group.ApiGroupEntity;
 import java.util.List;
@@ -12,4 +13,6 @@ import org.mapstruct.ReportingPolicy;
 public interface ApiGroupMapper {
 
     List<ApiGroupResponse> toResponse(List<ApiGroupEntity> apiGroupEntityList);
+
+    ApiGroupEntity toEntity(ApiGroupRequest request);
 }

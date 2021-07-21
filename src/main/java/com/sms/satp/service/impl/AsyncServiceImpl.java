@@ -3,23 +3,18 @@ package com.sms.satp.service.impl;
 import static com.sms.satp.common.enums.ImportStatus.RUNNING;
 import static com.sms.satp.common.enums.OperationModule.API;
 import static com.sms.satp.common.enums.OperationType.SYNC;
-import static com.sms.satp.common.enums.SaveMode.COVER;
-import static com.sms.satp.common.enums.SaveMode.INCREMENT;
-import static com.sms.satp.common.enums.SaveMode.REMAIN;
 
 import com.sms.satp.common.aspect.annotation.LogRecord;
-import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.enums.ImportStatus;
 import com.sms.satp.common.enums.SaveMode;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.common.listener.event.ApiDeleteEvent;
-import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.api.ApiHistoryEntity;
 import com.sms.satp.entity.group.ApiGroupEntity;
 import com.sms.satp.entity.project.ImportSourceVo;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
+import com.sms.satp.infrastructure.id.DefaultIdentifierGenerator;
 import com.sms.satp.mapper.ApiHistoryMapper;
 import com.sms.satp.mapper.ProjectImportFlowMapper;
 import com.sms.satp.parser.ApiDocumentChecker;
@@ -31,17 +26,16 @@ import com.sms.satp.repository.ApiRepository;
 import com.sms.satp.repository.ProjectImportFlowRepository;
 import com.sms.satp.service.AsyncService;
 import com.sms.satp.service.MessageService;
-import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.MD5Util;
 import com.sms.satp.websocket.Payload;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -49,7 +43,6 @@ import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +50,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
 
+    private final DefaultIdentifierGenerator identifierGenerator = DefaultIdentifierGenerator.getSharedInstance();
     private final ApiRepository apiRepository;
     private final ApiHistoryRepository apiHistoryRepository;
     private final ApiHistoryMapper apiHistoryMapper;
@@ -64,7 +58,6 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
     private final ProjectImportFlowRepository projectImportFlowRepository;
     private final ProjectImportFlowMapper projectImportFlowMapper;
     private ApplicationContext applicationContext;
-    private final ApplicationEventPublisher applicationEventPublisher;
     private final MessageService messageService;
 
     public AsyncServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository,
@@ -72,7 +65,6 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
         ApiGroupRepository apiGroupRepository,
         ProjectImportFlowRepository projectImportFlowRepository,
         ProjectImportFlowMapper projectImportFlowMapper,
-        ApplicationEventPublisher applicationEventPublisher,
         MessageService messageService) {
         this.apiRepository = apiRepository;
         this.apiHistoryRepository = apiHistoryRepository;
@@ -80,7 +72,6 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
         this.apiGroupRepository = apiGroupRepository;
         this.projectImportFlowRepository = projectImportFlowRepository;
         this.projectImportFlowMapper = projectImportFlowMapper;
-        this.applicationEventPublisher = applicationEventPublisher;
         this.messageService = messageService;
     }
 
@@ -103,6 +94,7 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
                 .importStatus(RUNNING)
                 .startTime(LocalDateTime.now())
                 .build());
+        projectImportFlowRepository.save(projectImportFlowEntity);
         try {
             log.info("The project whose Id is [{}] starts to import API documents.", projectId);
             messageService.projectMessage(projectId,
@@ -136,8 +128,8 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
 
                 if (MapUtils.isNotEmpty(oldApiEntities)) {
                     // Create different api entity by save mode.
-                    diffApiEntities = buildDiffApiEntitiesBySaveMode(apiEntities, oldApiEntities, saveMode,
-                        importSource.getApiChangeStatus());
+                    diffApiEntities = saveMode.getBuildDiffApiEntities().build(apiEntities, oldApiEntities,
+                        applicationContext, importSource.getApiChangeStatus());
                 }
 
                 // Save different api.
@@ -162,37 +154,6 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
             Payload.ok(projectImportFlowMapper.toProjectImportFlowResponse(projectImportFlowEntity)));
     }
 
-    private Collection<ApiEntity> buildDiffApiEntitiesBySaveMode(List<ApiEntity> newApiEntities,
-        Map<String, ApiEntity> oldApiEntities, SaveMode saveMode, ApiStatus apiChangeStatus) {
-
-        if (saveMode == COVER) {
-            // Delete all old api.
-            apiRepository.deleteAll(oldApiEntities.values());
-            // Publish delete event. Update case status.
-            applicationEventPublisher.publishEvent(new ApiDeleteEvent(this,
-                oldApiEntities.values().parallelStream().map(BaseEntity::getId)
-                    .collect(Collectors.toList())));
-            return newApiEntities;
-        }
-        if (saveMode == REMAIN) {
-            // Get new api.
-            return getNewApiEntities(newApiEntities, oldApiEntities);
-        }
-
-        if (saveMode == INCREMENT) {
-            // Remove invalid api.
-            removeInvalidApi(newApiEntities, oldApiEntities);
-            // Get different api.
-            return compareApiEntities(newApiEntities, oldApiEntities, apiChangeStatus);
-        }
-
-        throw ExceptionUtils.mpe("The save mode must not be null");
-    }
-
-    private Collection<ApiEntity> getNewApiEntities(List<ApiEntity> apiEntities, Map<String, ApiEntity> oldApis) {
-        return apiEntities.parallelStream().filter(apiEntity -> !oldApis.containsKey(apiEntity.getSwaggerId()))
-            .collect(Collectors.toList());
-    }
 
     private void updateApiEntitiesIfNeed(String projectId, Collection<ApiEntity> diffApiEntities) {
         if (CollectionUtils.isEmpty(diffApiEntities)) {
@@ -211,43 +172,6 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
         }
     }
 
-    private Collection<ApiEntity> compareApiEntities(List<ApiEntity> apiEntities,
-        Map<String, ApiEntity> oldApiEntities, ApiStatus apiChangeStatus) {
-        Collection<ApiEntity> diffApiEntities;
-        diffApiEntities = CollectionUtils.subtract(apiEntities, oldApiEntities.values());
-        diffApiEntities.parallelStream()
-            .filter(apiEntity -> oldApiEntities.containsKey(apiEntity.getSwaggerId()))
-            .forEach(apiEntity -> {
-                ApiEntity oldApiEntity = oldApiEntities.get(apiEntity.getSwaggerId());
-                apiEntity.setId(oldApiEntity.getId());
-                apiEntity.setGroupId(oldApiEntity.getGroupId());
-                apiEntity.setApiStatus(Objects.requireNonNullElse(apiChangeStatus, oldApiEntity.getApiStatus()));
-                apiEntity.setPreInject(oldApiEntity.getPreInject());
-                apiEntity.setPostInject(oldApiEntity.getPostInject());
-                apiEntity.setTagId(oldApiEntity.getTagId());
-                apiEntity.setCreateUserId(oldApiEntity.getCreateUserId());
-                apiEntity.setCreateDateTime(oldApiEntity.getCreateDateTime());
-            });
-        return diffApiEntities;
-    }
-
-    private void removeInvalidApi(List<ApiEntity> apiEntities, Map<String, ApiEntity> oldApiEntities) {
-        List<String> swaggerIds =
-            apiEntities.stream().map(ApiEntity::getSwaggerId).collect(Collectors.toList());
-        Predicate<String> existSwaggerId = swaggerIds::contains;
-        // Get invalid api.
-        Collection<ApiEntity> invalidApiEntities = oldApiEntities.values().stream()
-            .filter(apiEntity -> existSwaggerId.negate().test(apiEntity.getSwaggerId()))
-            .collect(Collectors.toList());
-        log.info("Remove expired API=[{}]",
-            invalidApiEntities.stream().map(ApiEntity::getApiPath).collect(Collectors.joining(",")));
-        // Delete invalid api.
-        apiRepository.deleteAll(invalidApiEntities);
-        // Publish delete event. Update case status.
-        applicationEventPublisher.publishEvent(new ApiDeleteEvent(this,
-            invalidApiEntities.stream().map(BaseEntity::getId).collect(Collectors.toList())));
-    }
-
     private boolean isAllCheckPass(ProjectImportFlowEntity projectImportFlowEntity, List<ApiEntity> apiEntities,
         List<ApiDocumentChecker> apiDocumentCheckers) {
         boolean allCheckPass = apiDocumentCheckers.stream()
@@ -262,6 +186,11 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
             apiGroupRepository.findApiGroupEntitiesByProjectId(projectId);
         Collection<ApiGroupEntity> unsavedGroupEntities = CollectionUtils
             .subtract(apiGroupEntities, oldGroupEntities);
+        unsavedGroupEntities.forEach((entity) -> {
+            Long realGroupId = identifierGenerator.nextId();
+            entity.setRealGroupId(realGroupId);
+            entity.setPath(Collections.singletonList(realGroupId));
+        });
         // Save new api group.
         List<ApiGroupEntity> newApiGroupEntities = apiGroupRepository.saveAll(unsavedGroupEntities);
         newApiGroupEntities.addAll(oldGroupEntities);

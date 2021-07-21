@@ -177,6 +177,9 @@ public enum ErrorCode {
     UNLOCK_USER_BY_ID_ERROR("4169", "Failed to unlock the User!"),
     RECOVER_SCENE_CASE_ERROR("4070", "Failed to recover the SceneCase!"),
     RECOVER_CASE_TEMPLATE_ERROR("4071", "Failed to recover the CaseTemplate!"),
+    ADD_API_GROUP_ERROR("4072", "Failed to add the ApiGroup!"),
+    DELETE_API_GROUP_BY_ID_ERROR("4073", "Failed to delete the ApiGroup!"),
+    EDIT_API_GROUP_ERROR("4074", "Failed to edit the ApiGroup!"),
     // 60001 describes the test exception
     NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
 
