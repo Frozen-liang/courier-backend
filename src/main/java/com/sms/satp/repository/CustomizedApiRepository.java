@@ -17,4 +17,6 @@ public interface CustomizedApiRepository {
     Boolean deleteByIds(List<String> ids);
 
     Boolean recover(List<String> ids);
+
+    void deleteByGroupIds(List<String> groupIds);
 }

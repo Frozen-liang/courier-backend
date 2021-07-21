@@ -1,8 +1,7 @@
-package com.sms.satp.entity.job.common;
+package com.sms.satp.dto.response;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sms.satp.common.enums.RequestMethod;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,13 +12,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CaseReport {
+public class CaseReportResponse {
 
     private String caseId;
 
     private Integer status;
 
-    private RequestMethod requestMethod;
+    private Integer requestMethod;
 
     private String requestUrl;
 
