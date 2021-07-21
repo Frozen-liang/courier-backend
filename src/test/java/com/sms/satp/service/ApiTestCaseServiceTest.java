@@ -29,14 +29,19 @@ import com.sms.satp.mapper.ParamInfoMapperImpl;
 import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseRepository;
+import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.impl.ApiTestCaseServiceImpl;
+import com.sms.satp.utils.SecurityUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.data.domain.Sort;
 
 @DisplayName("Tests for ApiTestCaseService")
@@ -62,7 +67,16 @@ class ApiTestCaseServiceTest {
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String API_ID = ObjectId.get().toString();
     private static final String PROJECT_ID = ObjectId.get().toString();
+    private static MockedStatic<SecurityUtil> securityUtilMockedStatic;
 
+    static {
+        securityUtilMockedStatic = Mockito.mockStatic(SecurityUtil.class);
+    }
+
+    @AfterAll
+    public static void close() {
+        securityUtilMockedStatic.close();
+    }
 
     @Test
     @DisplayName("Test the findById method in the ApiTestCase service")
@@ -85,6 +99,8 @@ class ApiTestCaseServiceTest {
     @Test
     @DisplayName("Test the add method in the ApiTestCase service")
     public void add_test() {
+        CustomUser customUser = mock(CustomUser.class);
+        securityUtilMockedStatic.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
         when(apiTestCaseMapper.toEntity(apiTestCaseRequest)).thenReturn(apiTestCase);
         when(apiTestCaseRepository.insert(any(ApiTestCaseEntity.class))).thenReturn(apiTestCase);
         assertThat(apiTestCaseService.add(apiTestCaseRequest)).isTrue();
