@@ -32,6 +32,7 @@ import com.sms.satp.mapper.JobMapperImpl;
 import com.sms.satp.mapper.ParamInfoMapperImpl;
 import com.sms.satp.repository.ApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
+import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.impl.ApiTestCaseJobServiceImpl;
 import java.util.Collections;
@@ -77,7 +78,7 @@ class ApiTestCaseJobServiceTest {
     private final ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder().build();
     private static final String ID = ObjectId.get().toString();
     private final CustomUser customUser =
-        new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "");
+        new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "", TokenType.USER);
 
     @Test
     @DisplayName("Test the findById method in the ApiTestCaseJob service")

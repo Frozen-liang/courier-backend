@@ -1,90 +1,77 @@
 package com.sms.satp.security.jwt;
 
-import com.sms.satp.security.AccessTokenProperties;
+import static com.sms.satp.utils.JwtUtils.TOKEN_AUTHORITIES;
+import static com.sms.satp.utils.JwtUtils.TOKEN_EMAIL;
+import static com.sms.satp.utils.JwtUtils.TOKEN_TYPE;
+import static com.sms.satp.utils.JwtUtils.TOKEN_USERNAME;
+import static com.sms.satp.utils.JwtUtils.TOKEN_USER_ID;
+
+import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
+import com.sms.satp.security.strategy.SatpSecurityStrategy;
+import com.sms.satp.security.strategy.SecurityStrategyFactory;
+import com.sms.satp.utils.JwtUtils;
+import com.sms.satp.utils.SecurityUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SigningKeyResolver;
 import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import java.util.Date;
-import javax.crypto.SecretKey;
+import java.time.Duration;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.security.auth.login.AccountNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class JwtTokenManager implements InitializingBean {
+public class JwtTokenManager {
 
-    private static final String JWT_ISSUER = "x-api.com";
-    public static final String API_AUTH = "Api-Auth";
-    public static final String USER_ID = "user_id";
-    public static final String USERNAME = "username";
-    public static final String EMAIL = "email";
-    private final AccessTokenProperties accessTokenProperties;
-    private SecretKey secretKey;
+    private final SecurityStrategyFactory securityStrategyFactory;
+    private final SigningKeyResolver signingKeyResolver;
 
-    public JwtTokenManager(AccessTokenProperties accessTokenProperties) {
-        this.accessTokenProperties = accessTokenProperties;
+    public JwtTokenManager(SecurityStrategyFactory securityStrategyFactory,
+        SigningKeyResolver signingKeyResolver) {
+        this.securityStrategyFactory = securityStrategyFactory;
+        this.signingKeyResolver = signingKeyResolver;
     }
 
     public String generateAccessToken(CustomUser user) {
-        return Jwts.builder()
-            .setSubject(API_AUTH)
-            .claim(USER_ID, user.getId())
-            .claim(USERNAME, user.getUsername())
-            .claim(EMAIL, user.getEmail())
-            .setIssuer(JWT_ISSUER)
-            .setIssuedAt(new Date())
-            // 1 week
-            .setExpiration(
-                new Date(System.currentTimeMillis() + accessTokenProperties.getExpire().toMillis()))
-            .signWith(secretKey)
-            .compact();
+        SatpSecurityStrategy satpSecurityStrategy = securityStrategyFactory.fetchSecurityStrategy(user.getTokenType());
+        Duration expirationTime = satpSecurityStrategy.obtainTokenExpirationTime();
+        Optional<String> tokenOptional = JwtUtils.encodeJwt(user, signingKeyResolver, expirationTime);
+        return tokenOptional.orElseThrow(() -> new RuntimeException(new AccountNotFoundException()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public Authentication createAuthentication(String token) {
+        Claims claims = JwtUtils.decodeJwt(token, signingKeyResolver);
+        String id = claims.get(TOKEN_USER_ID, String.class);
+        String username = claims.get(TOKEN_USERNAME, String.class);
+        String email = claims.get(TOKEN_EMAIL, String.class);
+        TokenType tokenType = TokenType.valueOf(claims.get(TOKEN_TYPE, String.class));
+        Collection<GrantedAuthority> authorities =
+            ((List<String>) claims.get(TOKEN_AUTHORITIES)).stream().map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+        return SecurityUtil.newAuthentication(id, email, username, authorities, tokenType);
     }
 
     public String getUserId(String token) {
-        Claims claims = Jwts.parserBuilder()
-            .setSigningKey(secretKey).build()
-            .parseClaimsJws(token)
-            .getBody();
-
-        return claims.get(USER_ID, String.class);
-    }
-
-    public String getUsername(String token) {
-        Claims claims = Jwts.parserBuilder()
-            .setSigningKey(secretKey).build()
-            .parseClaimsJws(token)
-            .getBody();
-        return claims.get(USERNAME, String.class);
-    }
-
-    public String getEmail(String token) {
-        Claims claims = Jwts.parserBuilder()
-            .setSigningKey(secretKey).build()
-            .parseClaimsJws(token)
-            .getBody();
-        return claims.get(EMAIL, String.class);
-    }
-
-    public Date getExpirationDate(String token) {
-        Claims claims = Jwts.parserBuilder()
-            .setSigningKey(secretKey).build()
-            .parseClaimsJws(token)
-            .getBody();
-
-        return claims.getExpiration();
+        Claims claims = JwtUtils.decodeJwt(token, signingKeyResolver);
+        return claims.get(TOKEN_USER_ID, String.class);
     }
 
     public boolean validate(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-            return true;
+            return Objects.nonNull(JwtUtils.decodeJwt(token, signingKeyResolver));
         } catch (SignatureException ex) {
             log.error("Invalid JWT signature - {}", ex.getMessage());
         } catch (MalformedJwtException ex) {
@@ -97,13 +84,6 @@ public class JwtTokenManager implements InitializingBean {
             log.error("JWT claims string is empty - {}", ex.getMessage());
         }
         return false;
-    }
-
-
-    @Override
-    public void afterPropertiesSet() {
-
-        secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessTokenProperties.getSecretKey()));
     }
 
 }

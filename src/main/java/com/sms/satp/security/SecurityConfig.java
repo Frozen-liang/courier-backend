@@ -18,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsUtils;
 
@@ -28,13 +29,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final ObjectMapper objectMapper;
     private final UserDetailsService userDetailsService;
     private final JwtTokenManager jwtTokenManager;
+    private final SecurityProperties securityProperties;
 
     public SecurityConfig(
         ObjectMapper objectMapper, UserDetailsService userDetailsService,
-        JwtTokenManager jwtTokenManager) {
+        JwtTokenManager jwtTokenManager, SecurityProperties securityProperties) {
         this.objectMapper = objectMapper;
         this.userDetailsService = userDetailsService;
         this.jwtTokenManager = jwtTokenManager;
+        this.securityProperties = securityProperties;
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 
@@ -43,10 +46,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new GrantedAuthorityDefaults("");
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Override
@@ -56,7 +63,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         RestAccessDeniedHandler accessDeniedHandler = new RestAccessDeniedHandler(objectMapper);
         CustomLoginUrlAuthenticationEntryPoint authenticationEntryPoint = new CustomLoginUrlAuthenticationEntryPoint(
             objectMapper);
-        //        JwtAuthenticationTokenFilter filter = new JwtAuthenticationTokenFilter();
         http.csrf().disable()
             .cors()
             .and()
@@ -71,16 +77,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
             .and()
             .authorizeRequests()
-            .antMatchers("/user/**", "/engine/**", "/v1/engine/bind", "/global-function/list").permitAll()
+            .antMatchers(securityProperties.getIgnorePath().toArray(new String[]{})).permitAll()
             .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
             .anyRequest().authenticated()
-            //            .anyRequest().access("@apiAccessEvaluator.hasPermission(authentication,request)")
             .and()
             .exceptionHandling()
             .accessDeniedHandler(accessDeniedHandler)
             .authenticationEntryPoint(authenticationEntryPoint);
         http.headers().cacheControl();
-        JwtTokenFilter jwtTokenFilter = new JwtTokenFilter(jwtTokenManager, userDetailsService);
+        JwtTokenFilter jwtTokenFilter = new JwtTokenFilter(jwtTokenManager);
         http.addFilterBefore(jwtTokenFilter,
             UsernamePasswordAuthenticationFilter.class);
     }

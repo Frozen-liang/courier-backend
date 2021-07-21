@@ -6,6 +6,7 @@ import com.sms.satp.entity.system.UserGroupEntity;
 import com.sms.satp.repository.SystemRoleRepository;
 import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.repository.UserRepository;
+import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,23 +42,29 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(
                     () -> new UsernameNotFoundException(String.format("The user %s was not found.", username)));
 
-        // Query user group
-        UserGroupEntity userGroupEntity = userGroupRepository.findById(userEntity.getGroupId())
-            .orElseThrow(() -> new UsernameNotFoundException(String.format("The user %s was not found.", username)));
+        Collection<String> roleNames;
+        try {
+            // Query user group
+            UserGroupEntity userGroupEntity = userGroupRepository.findById(userEntity.getGroupId())
+                .orElseThrow(() -> new RuntimeException(
+                    String.format("The user group for user - %s was not found.", username)));
+            // Query permissions by group id
+            Iterable<SystemRoleEntity> roles = systemRoleRepository.findAllById(userGroupEntity.getRoleIds());
+            roleNames = CollectionUtils.collect(roles, SystemRoleEntity::getName);
+        } catch (Exception exception) {
+            roleNames = Collections.emptyList();
+        }
 
-        // Query permissions by group id
-        Iterable<SystemRoleEntity> roles = systemRoleRepository.findAllById(userGroupEntity.getRoleIds());
-        Collection<String> roleNames = CollectionUtils.collect(roles, SystemRoleEntity::getName);
         List<SimpleGrantedAuthority> authorities =
             CollectionUtils.isNotEmpty(roleNames) ? roleNames.stream().map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList()) : Collections.emptyList();
 
         // Build UserDetails info of the Security
-        UserDetails userDetails = User.withUsername(userEntity.getUsername()).password(userEntity.getPassword())
+        UserDetails userDetails = User.withUsername(userEntity.getUsername())
+            .password(userEntity.getPassword())
             .disabled(userEntity.isRemoved()).accountExpired(false)
             .credentialsExpired(false).accountLocked(false).authorities(authorities).build();
 
-        return new CustomUser(userDetails, userEntity.getId(),
-            userEntity.getEmail());
+        return new CustomUser(userDetails, userEntity.getId(), userEntity.getEmail(), TokenType.USER);
     }
 }

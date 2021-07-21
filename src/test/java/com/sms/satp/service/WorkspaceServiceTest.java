@@ -20,13 +20,18 @@ import com.sms.satp.entity.workspace.WorkspaceEntity;
 import com.sms.satp.mapper.WorkspaceMapper;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.WorkspaceRepository;
+import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.impl.WorkspaceServiceImpl;
+import com.sms.satp.utils.SecurityUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 @DisplayName("Tests for WorkspaceService")
 class WorkspaceServiceTest {
@@ -45,6 +50,17 @@ class WorkspaceServiceTest {
         .id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
+
+    private static MockedStatic<SecurityUtil> securityUtilMockedStatic;
+
+    static {
+        securityUtilMockedStatic = Mockito.mockStatic(SecurityUtil.class);
+    }
+
+    @AfterAll
+    public static void close() {
+        securityUtilMockedStatic.close();
+    }
 
     @Test
     @DisplayName("Test the findById method in the Workspace service")
@@ -67,6 +83,8 @@ class WorkspaceServiceTest {
     @Test
     @DisplayName("Test the add method in the Workspace service")
     public void add_test() {
+        CustomUser customUser = mock(CustomUser.class);
+        securityUtilMockedStatic.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
         when(workspaceMapper.toEntity(workspaceRequest)).thenReturn(workspace);
         when(workspaceRepository.insert(any(WorkspaceEntity.class))).thenReturn(workspace);
         assertThat(workspaceService.add(workspaceRequest)).isTrue();
@@ -141,6 +159,7 @@ class WorkspaceServiceTest {
     @Test
     @DisplayName("Test the findByUserId method in the Workspace service")
     public void findByUserId_test() {
+        securityUtilMockedStatic.when(SecurityUtil::getCurrUserId).thenReturn("id");
         ArrayList<WorkspaceEntity> workspaceList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             workspaceList.add(WorkspaceEntity.builder().build());
