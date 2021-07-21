@@ -49,9 +49,9 @@ public class ApiController {
         return apiService.findById(id);
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     @PreAuthorize("hasRoleOrAdmin(@role.API_QUERY_ALL)")
-    public Page<ApiResponse> page(@Validated ApiPageRequest apiPageRequest) {
+    public Page<ApiResponse> page(@RequestBody @Validated ApiPageRequest apiPageRequest) {
         return apiService.page(apiPageRequest);
     }
 

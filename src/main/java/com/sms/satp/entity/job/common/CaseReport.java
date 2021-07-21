@@ -15,7 +15,7 @@ public class CaseReport {
 
     private String caseId;
 
-    private int status;
+    private Integer status;
 
     private String requestUrl;
 
@@ -27,10 +27,10 @@ public class CaseReport {
 
     private Object requestData;
 
-    private Boolean result;
+    private boolean isSuccess;
 
     private String failMessage;
 
-    private Long runtime;
+    private Long timeCost;
 
 }

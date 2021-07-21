@@ -18,7 +18,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @Document(collection = "CaseTemplateGroup")
-public class CaseTemplateGroup extends BaseEntity {
+public class CaseTemplateGroupEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;

@@ -18,8 +18,8 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
-@Document(collection = "CaseTemplate")
-public class CaseTemplate extends BaseEntity {
+@Document(collection = "SceneCase")
+public class SceneCaseEntity extends BaseEntity {
 
     private String name;
 
@@ -31,6 +31,10 @@ public class CaseTemplate extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String dataCollId;
+
+    @Field(targetType = FieldType.OBJECT_ID)
     private List<String> tagId;
 
     private Integer priority;
@@ -38,5 +42,7 @@ public class CaseTemplate extends BaseEntity {
     /**
      * 是否锁定，当前步骤出错或未通过时，依然执行下一个步骤.
      */
-    private Boolean isLock;
+    @Field("isLock")
+    private boolean lock;
+
 }

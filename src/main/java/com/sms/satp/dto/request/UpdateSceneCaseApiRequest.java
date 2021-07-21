@@ -34,5 +34,4 @@ public class UpdateSceneCaseApiRequest {
 
     private ApiTestCaseRequest apiTestCase;
 
-    private boolean removed;
 }

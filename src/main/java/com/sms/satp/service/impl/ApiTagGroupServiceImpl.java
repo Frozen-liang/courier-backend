@@ -19,7 +19,7 @@ import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTagGroupRequest;
 import com.sms.satp.dto.response.ApiTagGroupResponse;
-import com.sms.satp.entity.group.ApiTagGroup;
+import com.sms.satp.entity.group.ApiTagGroupEntity;
 import com.sms.satp.mapper.ApiTagGroupMapper;
 import com.sms.satp.repository.ApiTagGroupRepository;
 import com.sms.satp.service.ApiTagGroupService;
@@ -66,7 +66,7 @@ public class ApiTagGroupServiceImpl implements ApiTagGroupService {
             boolean exists = apiTagGroupRepository.existsByProjectIdAndName(apiTagGroupRequest.getProjectId(),
                 apiTagGroupRequest.getName());
             isFalse(exists, THE_API_TAG_GROUP_NAME_EXIST_ERROR, apiTagGroupRequest.getName());
-            ApiTagGroup apiTagGroup = apiTagGroupMapper.toEntity(apiTagGroupRequest);
+            ApiTagGroupEntity apiTagGroup = apiTagGroupMapper.toEntity(apiTagGroupRequest);
             apiTagGroupRepository.insert(apiTagGroup);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
@@ -88,7 +88,7 @@ public class ApiTagGroupServiceImpl implements ApiTagGroupService {
             exists = apiTagGroupRepository.existsByProjectIdAndName(apiTagGroupRequest.getProjectId(),
                 apiTagGroupRequest.getName());
             isFalse(exists, THE_API_TAG_GROUP_NAME_EXIST_ERROR, apiTagGroupRequest.getName());
-            ApiTagGroup apiTagGroup = apiTagGroupMapper.toEntity(apiTagGroupRequest);
+            ApiTagGroupEntity apiTagGroup = apiTagGroupMapper.toEntity(apiTagGroupRequest);
             apiTagGroupRepository.save(apiTagGroup);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());

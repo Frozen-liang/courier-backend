@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
@@ -23,6 +24,7 @@ public class ApiTestRequest {
 
     private String envId;
     private String apiId;
+    @JsonProperty("isExecute")
     private boolean execute;
     private String projectId;
     private String apiName;

@@ -1,4 +1,4 @@
-package com.sms.satp.entity.datacollection;
+package com.sms.satp.entity.scenetest;
 
 import com.sms.satp.entity.BaseEntity;
 import java.util.List;
@@ -12,18 +12,33 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-@Document(collection = "DataCollection")
-public class DataCollection extends BaseEntity {
+@Document(collection = "CaseTemplate")
+public class CaseTemplateEntity extends BaseEntity {
+
+    private String name;
+
+    private String createUserName;
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
-    private String collectionName;
-    private List<String> paramList;
-    private List<TestData> dataList;
+
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String dataCollId;
+
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String groupId;
+
+    private List<String> tagId;
+
+    /**
+     * 是否锁定，当前步骤出错或未通过时，依然执行下一个步骤.
+     */
+    @Field("isLock")
+    private boolean lock;
 }

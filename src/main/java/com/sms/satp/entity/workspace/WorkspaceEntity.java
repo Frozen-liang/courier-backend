@@ -19,9 +19,13 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = "Workspace")
-public class Workspace extends BaseEntity {
+public class WorkspaceEntity extends BaseEntity {
 
     private String name;
+
+    private Integer limit;
+
+    private String createUsername;
 
     @Field(targetType = FieldType.OBJECT_ID)
     private List<String> userIds;

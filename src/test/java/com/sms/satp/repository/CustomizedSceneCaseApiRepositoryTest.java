@@ -1,7 +1,7 @@
 package com.sms.satp.repository;
 
 import com.mongodb.client.result.UpdateResult;
-import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
 import com.sms.satp.repository.impl.CustomizedSceneCaseApiRepositoryImpl;
 import java.util.List;
 import org.assertj.core.util.Lists;
@@ -21,15 +21,17 @@ class CustomizedSceneCaseApiRepositoryTest {
 
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
-    private final CustomizedSceneCaseApiRepository repository = new CustomizedSceneCaseApiRepositoryImpl(mongoTemplate);
+    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final CustomizedSceneCaseApiRepository repository = new CustomizedSceneCaseApiRepositoryImpl(mongoTemplate,
+        commonDeleteRepository);
 
     private final static String MOCK_ID = "1";
 
     @Test
     @DisplayName("Test the findMaxOrderBySceneCaseId method in the CustomizedSceneCaseApiRepository")
     void findMaxOrderBySceneCaseId_test() {
-        SceneCaseApi sceneCaseApi = SceneCaseApi.builder().id(MOCK_ID).order(0).build();
-        when(mongoTemplate.findOne(any(), eq(SceneCaseApi.class))).thenReturn(sceneCaseApi);
+        SceneCaseApiEntity sceneCaseApi = SceneCaseApiEntity.builder().id(MOCK_ID).order(0).build();
+        when(mongoTemplate.findOne(any(), eq(SceneCaseApiEntity.class))).thenReturn(sceneCaseApi);
         int result = repository.findCurrentOrderBySceneCaseId(MOCK_ID);
         assertThat(result).isEqualTo(1);
     }
@@ -38,8 +40,8 @@ class CustomizedSceneCaseApiRepositoryTest {
     @DisplayName("Test the findSceneCaseApiByApiIds method in the CustomizedSceneCaseApiRepository")
     void findSceneCaseApiByApiIds_test() {
         when(mongoTemplate.find(any(), any()))
-            .thenReturn(Lists.newArrayList(SceneCaseApi.builder().build()));
-        List<SceneCaseApi> sceneCaseApiList = repository.findSceneCaseApiByApiIds(Lists.newArrayList(MOCK_ID));
+            .thenReturn(Lists.newArrayList(SceneCaseApiEntity.builder().build()));
+        List<SceneCaseApiEntity> sceneCaseApiList = repository.findSceneCaseApiByApiIds(Lists.newArrayList(MOCK_ID));
         assertThat(sceneCaseApiList).isNotEmpty();
     }
 
@@ -47,8 +49,8 @@ class CustomizedSceneCaseApiRepositoryTest {
     @DisplayName("Test the findSceneCaseApiBySceneCaseIdAndIsExecute method in the CustomizedSceneCaseApiRepository")
     void findSceneCaseApiBySceneCaseIdAndIsExecute_test() {
         when(mongoTemplate.find(any(), any()))
-            .thenReturn(Lists.newArrayList(SceneCaseApi.builder().build()));
-        List<SceneCaseApi> sceneCaseApiList = repository
+            .thenReturn(Lists.newArrayList(SceneCaseApiEntity.builder().build()));
+        List<SceneCaseApiEntity> sceneCaseApiList = repository
             .findSceneCaseApiBySceneCaseIdAndIsExecute(MOCK_ID, Boolean.TRUE);
         assertThat(sceneCaseApiList).isNotEmpty();
     }

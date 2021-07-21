@@ -8,7 +8,8 @@ import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.response.SceneCaseResponse;
-import com.sms.satp.entity.scenetest.SceneCase;
+import com.sms.satp.entity.scenetest.SceneCaseEntity;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
@@ -31,9 +32,12 @@ import org.springframework.stereotype.Component;
 public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRepository {
 
     private final MongoTemplate mongoTemplate;
+    private final CommonDeleteRepository commonDeleteRepository;
 
-    public CustomizedSceneCaseRepositoryImpl(MongoTemplate mongoTemplate) {
+    public CustomizedSceneCaseRepositoryImpl(MongoTemplate mongoTemplate,
+        CommonDeleteRepository commonDeleteRepository) {
         this.mongoTemplate = mongoTemplate;
+        this.commonDeleteRepository = commonDeleteRepository;
     }
 
     @Override
@@ -69,14 +73,33 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
         aggregationOperations.add(projectionOperation);
 
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
-        long count = mongoTemplate.count(query, SceneCase.class);
+        long count = mongoTemplate.count(query, SceneCaseEntity.class);
         if (count == 0L || skipRecord >= count) {
             return Page.empty();
         }
-        List<SceneCaseResponse> records = mongoTemplate.aggregate(aggregation, SceneCase.class, SceneCaseResponse.class)
+        List<SceneCaseResponse> records = mongoTemplate
+            .aggregate(aggregation, SceneCaseEntity.class, SceneCaseResponse.class)
             .getMappedResults();
         return new PageImpl<SceneCaseResponse>(records,
             PageRequest.of(searchSceneCaseRequest.getPageNumber(), searchSceneCaseRequest.getPageSize(), sort), count);
+    }
+
+    @Override
+    public Boolean deleteByIds(List<String> ids) {
+        return commonDeleteRepository.deleteByIds(ids, SceneCaseEntity.class);
+    }
+
+    @Override
+    public Boolean recover(List<String> ids) {
+        return commonDeleteRepository.recover(ids, SceneCaseEntity.class);
+    }
+
+    @Override
+    public List<SceneCaseEntity> getIdsByGroupId(String id) {
+        Query query = new Query();
+        query.fields().include(ID.getFiled());
+        CommonFiled.GROUP_ID.is(id).ifPresent(query::addCriteria);
+        return mongoTemplate.find(query, SceneCaseEntity.class);
     }
 
     private void buildCriteria(SearchSceneCaseRequest searchSceneCaseRequest, Query query,
@@ -84,7 +107,7 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
         CommonFiled.PROJECT_ID.is(projectId).ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         CommonFiled.REMOVE.is(searchSceneCaseRequest.isRemoved())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneFiled.NAME.is(searchSceneCaseRequest.getName())
+        SceneFiled.NAME.like(searchSceneCaseRequest.getName())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         SceneFiled.GROUP_ID.is(searchSceneCaseRequest.getGroupId())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));

@@ -1,15 +1,13 @@
 package com.sms.satp.repository;
 
-import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
 import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface SceneCaseApiRepository extends MongoRepository<SceneCaseApi, String> {
+public interface SceneCaseApiRepository extends MongoRepository<SceneCaseApiEntity, String> {
 
     Long deleteAllByIdIsIn(List<String> ids);
 
-    Long deleteByCaseTemplateId(String caseTemplateId);
-
-    List<SceneCaseApi> findAllBySceneCaseId(String sceneCaseId);
+    List<SceneCaseApiEntity> findAllBySceneCaseId(String sceneCaseId);
 
 }

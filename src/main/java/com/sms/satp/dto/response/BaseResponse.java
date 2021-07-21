@@ -3,6 +3,7 @@ package com.sms.satp.dto.response;
 import static com.sms.satp.common.constant.TimePatternConstant.DEFAULT_PATTERN;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,5 +23,6 @@ public class BaseResponse {
     private LocalDateTime modifyDateTime;
     private String createUserId;
     private String modifyUserId;
-    private Boolean removed;
+    @JsonProperty("isRemoved")
+    private boolean isRemoved;
 }

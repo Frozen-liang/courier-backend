@@ -1,12 +1,13 @@
 package com.sms.satp.repository.impl;
 
 import static com.sms.satp.common.field.ApiTestCaseJobFiled.API_TEST_CASE_ID;
-import static com.sms.satp.common.field.CommonFiled.API_ID;
+import static com.sms.satp.common.field.ApiTestCaseJobFiled.JOB_API_ID;
 import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonFiled.CREATE_USER_ID;
+import static com.sms.satp.common.field.CommonFiled.ID;
 
 import com.sms.satp.dto.request.ApiTestCaseJobPageRequest;
-import com.sms.satp.entity.job.ApiTestCaseJob;
+import com.sms.satp.entity.job.ApiTestCaseJobEntity;
 import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.Collections;
@@ -33,9 +34,10 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
     }
 
     @Override
-    public Page<ApiTestCaseJob> page(ApiTestCaseJobPageRequest apiTestCaseJobPageRequest) {
+    public Page<ApiTestCaseJobEntity> page(ApiTestCaseJobPageRequest apiTestCaseJobPageRequest) {
         Document document = new Document();
         document.put(CASE_REPORT, true);
+        document.put(ID.getFiled(), true);
         document.put(JOB_STATUS, true);
         document.put(CREATE_USER_NAME, true);
         document.put(CREATE_DATE_TIME.getFiled(), true);
@@ -43,15 +45,24 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
         BasicQuery query = new BasicQuery(new Document(), document);
         API_TEST_CASE_ID.is(apiTestCaseJobPageRequest.getApiTestCaseId()).ifPresent(query::addCriteria);
         CREATE_USER_ID.in(apiTestCaseJobPageRequest.getUserIds()).ifPresent(query::addCriteria);
-        API_ID.is((apiTestCaseJobPageRequest.getApiId())).ifPresent(query::addCriteria);
-        long count = mongoTemplate.count(query, ApiTestCaseJob.class);
+        JOB_API_ID.is((apiTestCaseJobPageRequest.getApiId())).ifPresent(query::addCriteria);
+        long count = mongoTemplate.count(query, ApiTestCaseJobEntity.class);
         if (count <= 0) {
             return new PageImpl<>(Collections.emptyList());
         }
         PageDtoConverter.frontMapping(apiTestCaseJobPageRequest);
         Pageable pageable = PageDtoConverter.createPageable(apiTestCaseJobPageRequest);
-        List<ApiTestCaseJob> apiTestCaseJobs = mongoTemplate.find(query.with(pageable),
-            ApiTestCaseJob.class);
+        List<ApiTestCaseJobEntity> apiTestCaseJobs = mongoTemplate.find(query.with(pageable),
+            ApiTestCaseJobEntity.class);
         return new PageImpl<>(apiTestCaseJobs, pageable, count);
+    }
+
+    @Override
+    public ApiTestCaseJobEntity findRecentlyCaseReportByCaseId(String apiTestCaseId) {
+        ApiTestCaseJobPageRequest pageRequest = ApiTestCaseJobPageRequest.builder().pageSize(1)
+            .apiTestCaseId(apiTestCaseId)
+            .pageNumber(1).build();
+        Page<ApiTestCaseJobEntity> page = this.page(pageRequest);
+        return page.stream().findFirst().orElse(ApiTestCaseJobEntity.builder().build());
     }
 }

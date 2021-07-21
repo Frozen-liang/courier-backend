@@ -1,23 +1,28 @@
 package com.sms.satp.engine.impl;
 
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.CaseRecordRequest;
 import com.sms.satp.engine.EngineId;
 import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.enums.EngineStatus;
 import com.sms.satp.engine.model.EngineMember;
 import com.sms.satp.engine.request.EngineRegistrationRequest;
+import com.sms.satp.utils.ExceptionUtils;
+import java.security.SecureRandom;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
 public class EngineMemberManagementImpl implements EngineMemberManagement {
 
+    private final SecureRandom random = new SecureRandom();
     private final Map<String, EngineMember> engineMembers = new ConcurrentHashMap<>();
 
     @Override
@@ -47,11 +52,15 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     }
 
     @Override
-    public Set<String> getAvailableMembers() {
-        return engineMembers.values().stream()
+    public String getAvailableMember() throws ApiTestPlatformException {
+        List<String> availableMembers = engineMembers.values().stream()
             .filter(engineMember -> engineMember.getStatus().equals(EngineStatus.RUNNING))
             .map(EngineMember::getDestination)
-            .collect(Collectors.toUnmodifiableSet());
+            .collect(Collectors.toUnmodifiableList());
+        if (CollectionUtils.isEmpty(availableMembers)) {
+            throw ExceptionUtils.mpe("No engines are available.");
+        }
+        return availableMembers.get(random.nextInt(availableMembers.size()));
     }
 
     @Override

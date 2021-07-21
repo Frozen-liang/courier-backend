@@ -8,7 +8,7 @@ import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
 import com.sms.satp.dto.response.CaseTemplateDetailResponse;
 import com.sms.satp.dto.response.CaseTemplateResponse;
 import com.sms.satp.dto.response.IdResponse;
-import com.sms.satp.entity.scenetest.CaseTemplate;
+import com.sms.satp.entity.scenetest.CaseTemplateEntity;
 import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
@@ -23,13 +23,15 @@ public interface CaseTemplateService {
 
     Boolean edit(UpdateCaseTemplateRequest updateCaseTemplateRequest);
 
-    Boolean batchEdit(List<CaseTemplate> caseTemplateList);
-
     Page<CaseTemplateResponse> page(CaseTemplateSearchRequest searchDto, ObjectId projectId);
 
-    List<CaseTemplate> get(String groupId, String projectId);
+    List<CaseTemplateEntity> get(String groupId, String projectId);
 
-    CaseTemplateDetailResponse getApiList(String caseTemplateId, boolean removed);
+    CaseTemplateDetailResponse getApiList(String caseTemplateId);
 
     Boolean addApi(AddCaseTemplateApiByIdsRequest request);
+
+    Boolean delete(List<String> ids);
+
+    Boolean recover(List<String> ids);
 }

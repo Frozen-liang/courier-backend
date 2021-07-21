@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.sms.satp.entity.datacollection.DataCollection;
+import com.sms.satp.entity.datacollection.DataCollectionEntity;
 import com.sms.satp.repository.impl.CustomizedDataCollectionRepositoryImpl;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,7 +29,7 @@ class CustomizedDataCollectionRepositoryTest {
     @DisplayName("Test the getParamList method in the CustomizedDataCollectionRepository")
     public void getParamList_test() {
         List<String> paramList = Arrays.asList("active", "city", "code");
-        when(mongoTemplate.findOne(any(), any())).thenReturn(DataCollection.builder().paramList(paramList).build());
+        when(mongoTemplate.findOne(any(), any())).thenReturn(DataCollectionEntity.builder().paramList(paramList).build());
         List<String> result = customizedDataCollectionRepository.getParamListById(ID);
         assertThat(result).hasSize(paramList.size());
     }
@@ -37,14 +37,14 @@ class CustomizedDataCollectionRepositoryTest {
     @Test
     @DisplayName("Test the deleteById method in the CustomizedDataCollectionRepository")
     public void deleteById_test() {
-        when(commonDeleteRepository.deleteById(ID, DataCollection.class)).thenReturn(Boolean.TRUE);
+        when(commonDeleteRepository.deleteById(ID, DataCollectionEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(customizedDataCollectionRepository.deleteById(ID)).isTrue();
     }
 
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedDataCollectionRepository")
     public void deleteByIds() {
-        when(commonDeleteRepository.deleteByIds(ID_LIST, DataCollection.class)).thenReturn(Boolean.TRUE);
+        when(commonDeleteRepository.deleteByIds(ID_LIST, DataCollectionEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(customizedDataCollectionRepository.deleteByIds(ID_LIST)).isTrue();
     }
 }

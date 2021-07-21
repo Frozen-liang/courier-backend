@@ -4,7 +4,7 @@ import static com.sms.satp.common.field.CommonFiled.API_ID;
 import static com.sms.satp.common.field.CommonFiled.MODIFY_DATE_TIME;
 
 import com.sms.satp.common.enums.ApiBindingStatus;
-import com.sms.satp.entity.apitestcase.ApiTestCase;
+import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseRepository;
 import java.time.LocalDateTime;
@@ -35,21 +35,22 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
         Update update = new Update();
         update.set(STATUS, status.getCode());
         update.set(MODIFY_DATE_TIME.getFiled(), LocalDateTime.now());
-        mongoTemplate.updateMulti(query, update, ApiTestCase.class);
+        mongoTemplate.updateMulti(query, update, ApiTestCaseEntity.class);
     }
 
     @Override
     public Boolean deleteById(String id) {
-        return commonDeleteRepository.deleteById(id, ApiTestCase.class);
+        return commonDeleteRepository.deleteById(id, ApiTestCaseEntity.class);
     }
 
     @Override
     public Boolean deleteByIds(List<String> ids) {
-        return commonDeleteRepository.deleteByIds(ids, ApiTestCase.class);
+        return commonDeleteRepository.deleteByIds(ids, ApiTestCaseEntity.class);
     }
 
     @Override
     public Boolean recover(List<String> ids) {
-        return commonDeleteRepository.recover(ids, ApiTestCase.class);
+        return commonDeleteRepository.recover(ids, ApiTestCaseEntity.class);
     }
+
 }

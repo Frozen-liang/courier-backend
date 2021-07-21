@@ -48,6 +48,7 @@ import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.MethodUtils;
 
@@ -122,7 +123,7 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
         Operation operation = tuple._2;
         ApiEntityBuilder<?, ?> apiEntityBuilder = ApiEntity.builder().apiPath(apiPath)
             .requestMethod(requestMethod)
-            .apiName(operation.getSummary())
+            .apiName(StringUtils.defaultIfBlank(operation.getSummary(), apiPath))
             .groupId(Objects.requireNonNullElse(operation.getTags(), new ArrayList<String>()).get(0))
             .swaggerId(
                 Optional.ofNullable(operation.getOperationId()).orElse(generateSwaggerId(apiPath, requestMethod))
@@ -190,7 +191,8 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
             Header header = headerEntry.getValue();
             Schema<?> schema = header.getSchema();
             SchemaType type = SchemaType.resolve(schema.getType(), schema.getFormat());
-            return ParamInfo.builder().required(header.getRequired()).description(header.getDescription())
+            return ParamInfo.builder().required(BooleanUtils.toBoolean(header.getRequired()))
+                .description(header.getDescription())
                 .key(headerEntry.getKey()).paramType(type.getParamType()).build();
         }).collect(toList());
         callback.accept(paramInfos);
@@ -208,7 +210,8 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
                 type = SchemaType.resolve(schema.getType(), schema.getFormat());
             }
             ParamInfo paramInfo =
-                ParamInfo.builder().required(parameter.getRequired()).description(parameter.getDescription())
+                ParamInfo.builder().required(BooleanUtils.toBoolean(parameter.getRequired()))
+                    .description(parameter.getDescription())
                     .key(parameter.getName()).paramType(type.getParamType()).build();
             In in = In.resolve(parameter.getIn().toUpperCase(Locale.US));
             return Tuple.of(in, paramInfo);

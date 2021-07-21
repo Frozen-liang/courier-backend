@@ -2,7 +2,7 @@ package com.sms.satp.entity.scenetest;
 
 import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.entity.BaseEntity;
-import com.sms.satp.entity.apitestcase.ApiTestCase;
+import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +21,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @Document(collection = "SceneCaseApi")
-public class SceneCaseApi extends BaseEntity {
+public class SceneCaseApiEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String sceneCaseId;
@@ -38,7 +38,7 @@ public class SceneCaseApi extends BaseEntity {
 
     private Integer order;
 
-    private ApiTestCase apiTestCase;
+    private ApiTestCaseEntity apiTestCase;
 
     private List<CaseTemplateApiConn> caseTemplateApiConnList;
 

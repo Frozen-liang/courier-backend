@@ -1,6 +1,7 @@
-package com.sms.satp.entity.group;
+package com.sms.satp.entity.datacollection;
 
 import com.sms.satp.entity.BaseEntity;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,17 +12,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder
-@Document(collection = "ApiTagGroup")
-public class ApiTagGroup extends BaseEntity {
+@Document(collection = "DataCollection")
+public class DataCollectionEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
-
-    private String name;
+    private String collectionName;
+    private List<String> paramList;
+    private List<TestData> dataList;
 }

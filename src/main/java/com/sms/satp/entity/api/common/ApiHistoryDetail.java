@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Builder
 @Data
@@ -61,7 +62,8 @@ public class ApiHistoryDetail {
 
     private ApiJsonType apiRequestJsonType;
     private String id;
-    private Boolean removed;
+    @Field(name = "isRemove")
+    private boolean remove;
     private String createUserId;
     private String modifyUserId;
     private LocalDateTime createDateTime;

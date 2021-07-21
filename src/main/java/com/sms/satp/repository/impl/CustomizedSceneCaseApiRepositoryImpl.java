@@ -1,9 +1,11 @@
 package com.sms.satp.repository.impl;
 
 import com.google.common.collect.Lists;
+import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
-import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import java.util.List;
 import java.util.Objects;
@@ -19,9 +21,12 @@ import org.springframework.stereotype.Component;
 public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCaseApiRepository {
 
     private final MongoTemplate mongoTemplate;
+    private final CommonDeleteRepository commonDeleteRepository;
 
-    public CustomizedSceneCaseApiRepositoryImpl(MongoTemplate mongoTemplate) {
+    public CustomizedSceneCaseApiRepositoryImpl(MongoTemplate mongoTemplate,
+        CommonDeleteRepository commonDeleteRepository) {
         this.mongoTemplate = mongoTemplate;
+        this.commonDeleteRepository = commonDeleteRepository;
     }
 
     @Override
@@ -30,23 +35,23 @@ public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCase
         SceneFiled.SCENE_CASE_ID.is(sceneCaseId).ifPresent(query::addCriteria);
         query.with(Sort.by(Direction.DESC, SceneFiled.ORDER.getFiled()));
         query.limit(1);
-        SceneCaseApi sceneCaseApi = mongoTemplate.findOne(query, SceneCaseApi.class);
+        SceneCaseApiEntity sceneCaseApi = mongoTemplate.findOne(query, SceneCaseApiEntity.class);
         return Objects.isNull(sceneCaseApi) ? 1 : sceneCaseApi.getOrder() + 1;
     }
 
     @Override
-    public List<SceneCaseApi> findSceneCaseApiByApiIds(List<String> ids) {
+    public List<SceneCaseApiEntity> findSceneCaseApiByApiIds(List<String> ids) {
         Query query = new Query();
         SceneFiled.API_ID.in(ids).ifPresent(query::addCriteria);
-        return mongoTemplate.find(query, SceneCaseApi.class);
+        return mongoTemplate.find(query, SceneCaseApiEntity.class);
     }
 
     @Override
-    public List<SceneCaseApi> findSceneCaseApiBySceneCaseIdAndIsExecute(String sceneCaseId, Boolean isExecute) {
+    public List<SceneCaseApiEntity> findSceneCaseApiBySceneCaseIdAndIsExecute(String sceneCaseId, Boolean isExecute) {
         Query query = new Query();
         SceneFiled.SCENE_CASE_ID.is(sceneCaseId).ifPresent(query::addCriteria);
         SceneFiled.API_IS_EXECUTE.is(isExecute).ifPresent(query::addCriteria);
-        return mongoTemplate.find(query, SceneCaseApi.class);
+        return mongoTemplate.find(query, SceneCaseApiEntity.class);
     }
 
     @Override
@@ -54,19 +59,36 @@ public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCase
         for (String id : caseTemplateApiId) {
             Query query = new Query();
             CaseTemplateApiConn build = CaseTemplateApiConn.builder().caseTemplateApiId(id)
-                .isExecute(Boolean.TRUE).build();
+                .execute(Boolean.TRUE).build();
             query.addCriteria(Criteria.where(SceneFiled.CASE_TEMPLATE_API_CONN_LIST.getFiled()).is(build));
             Update update = new Update();
             update.pullAll(SceneFiled.CASE_TEMPLATE_API_CONN_LIST.getFiled(), Lists.newArrayList(build).toArray());
 
-            mongoTemplate.updateMulti(query, update, SceneCaseApi.class);
+            mongoTemplate.updateMulti(query, update, SceneCaseApiEntity.class);
             CaseTemplateApiConn buildFalse = CaseTemplateApiConn.builder().caseTemplateApiId(id)
-                .isExecute(Boolean.FALSE).build();
+                .execute(Boolean.FALSE).build();
             update.pullAll(SceneFiled.CASE_TEMPLATE_API_CONN_LIST.getFiled(), Lists.newArrayList(buildFalse).toArray());
-            mongoTemplate.updateMulti(query, update, SceneCaseApi.class);
+            mongoTemplate.updateMulti(query, update, SceneCaseApiEntity.class);
         }
         return Boolean.TRUE;
     }
 
+    @Override
+    public List<SceneCaseApiEntity> findSceneCaseApiIdsBySceneCaseIds(List<String> ids) {
+        Query query = new Query();
+        query.fields().include(CommonFiled.ID.getFiled());
+        SceneFiled.SCENE_CASE_ID.in(ids).ifPresent(query::addCriteria);
+        return mongoTemplate.find(query, SceneCaseApiEntity.class);
+    }
+
+    @Override
+    public Boolean deleteByIds(List<String> sceneCaseApiIds) {
+        return commonDeleteRepository.deleteByIds(sceneCaseApiIds, SceneCaseApiEntity.class);
+    }
+
+    @Override
+    public Boolean recover(List<String> sceneCaseApiIds) {
+        return commonDeleteRepository.recover(sceneCaseApiIds, SceneCaseApiEntity.class);
+    }
 
 }

@@ -28,5 +28,5 @@ public class SceneCaseApiConnResponse extends BaseResponse {
 
     private ApiTestCaseResponse apiTestCase;
 
-    private List<CaseTemplateApiResponse> caseTemplateApiResponseList;
+    private List<CaseTemplateApiResponse> caseTemplateApiList;
 }

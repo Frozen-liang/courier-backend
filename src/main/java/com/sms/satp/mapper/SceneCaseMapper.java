@@ -2,10 +2,11 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.dto.request.AddSceneCaseRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseRequest;
+import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.dto.response.SceneCaseResponse;
-import com.sms.satp.entity.scenetest.CaseTemplateApi;
 import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
-import com.sms.satp.entity.scenetest.SceneCase;
+import com.sms.satp.entity.scenetest.CaseTemplateApiEntity;
+import com.sms.satp.entity.scenetest.SceneCaseEntity;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -16,15 +17,22 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SceneCaseMapper {
 
-    SceneCase toAddSceneCase(AddSceneCaseRequest sceneCaseDto);
+    SceneCaseEntity toAddSceneCase(AddSceneCaseRequest sceneCaseDto);
 
-    SceneCase toUpdateSceneCase(UpdateSceneCaseRequest sceneCaseDto);
+    SceneCaseEntity toUpdateSceneCase(UpdateSceneCaseRequest sceneCaseDto);
 
-    SceneCaseResponse toDto(SceneCase sceneCase);
+    SceneCaseResponse toDto(SceneCaseEntity sceneCase);
 
-    List<CaseTemplateApiConn> toCaseTemplateApiConnList(List<CaseTemplateApi> caseTemplateApiList);
+    List<CaseTemplateApiConn> toCaseTemplateApiConnList(List<CaseTemplateApiEntity> caseTemplateApiList);
 
     @Mapping(target = "caseTemplateApiId", source = "id")
-    @Mapping(target = "isExecute", source = "apiTestCase.execute")
-    CaseTemplateApiConn toCaseTemplateApiConn(CaseTemplateApi caseTemplateApi);
+    @Mapping(target = "execute", source = "apiTestCase.execute")
+    CaseTemplateApiConn toCaseTemplateApiConn(CaseTemplateApiEntity caseTemplateApi);
+
+    List<CaseTemplateApiConn> toCaseTemplateApiConnListByResponse(
+        List<CaseTemplateApiResponse> caseTemplateApiResponseList);
+
+    @Mapping(target = "caseTemplateApiId", source = "id")
+    @Mapping(target = "execute", source = "apiTestCase.execute")
+    CaseTemplateApiConn toCaseTemplateApiConnByResponse(CaseTemplateApiResponse caseTemplateApi);
 }

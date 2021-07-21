@@ -3,7 +3,7 @@ package com.sms.satp.mapper;
 import com.sms.satp.dto.request.AddCaseTemplateRequest;
 import com.sms.satp.dto.response.CaseTemplateResponse;
 import com.sms.satp.dto.request.UpdateCaseTemplateRequest;
-import com.sms.satp.entity.scenetest.CaseTemplate;
+import com.sms.satp.entity.scenetest.CaseTemplateEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ class CaseTemplateMapperTest {
     @DisplayName("Test the toCaseTemplate method in the CaseTemplateMapper")
     void toCaseTemplate_test() {
         CaseTemplateResponse dto = CaseTemplateResponse.builder().id(MOCK_ID).groupId(MOCK_ID).build();
-        CaseTemplate caseTemplate = caseTemplateMapper.toCaseTemplate(dto);
+        CaseTemplateEntity caseTemplate = caseTemplateMapper.toCaseTemplate(dto);
         assertThat(caseTemplate.getId()).isEqualTo(MOCK_ID);
     }
 
@@ -28,7 +28,7 @@ class CaseTemplateMapperTest {
     @DisplayName("Test the toCaseTemplateByUpdateRequest method in the CaseTemplateMapper")
     void toCaseTemplateByUpdateRequest_test() {
         UpdateCaseTemplateRequest request = UpdateCaseTemplateRequest.builder().id(MOCK_ID).build();
-        CaseTemplate caseTemplate = caseTemplateMapper.toCaseTemplateByUpdateRequest(request);
+        CaseTemplateEntity caseTemplate = caseTemplateMapper.toCaseTemplateByUpdateRequest(request);
         assertThat(caseTemplate.getId()).isEqualTo(MOCK_ID);
     }
 
@@ -36,14 +36,14 @@ class CaseTemplateMapperTest {
     @DisplayName("Test the toCaseTemplateByAddRequest method in the CaseTemplateMapper")
     void toCaseTemplateByAddRequest_test() {
         AddCaseTemplateRequest addCaseTemplateRequest = AddCaseTemplateRequest.builder().name(NAME).build();
-        CaseTemplate caseTemplate = caseTemplateMapper.toCaseTemplateByAddRequest(addCaseTemplateRequest);
+        CaseTemplateEntity caseTemplate = caseTemplateMapper.toCaseTemplateByAddRequest(addCaseTemplateRequest);
         assertThat(caseTemplate.getName()).isEqualTo(NAME);
     }
 
     @Test
     @DisplayName("Test the toDto method in the CaseTemplateMapper")
     void toDto_test() {
-        CaseTemplate caseTemplate = CaseTemplate.builder().id(MOCK_ID).groupId(MOCK_ID).build();
+        CaseTemplateEntity caseTemplate = CaseTemplateEntity.builder().id(MOCK_ID).groupId(MOCK_ID).build();
         CaseTemplateResponse dto = caseTemplateMapper.toDto(caseTemplate);
         assertThat(dto.getId()).isEqualTo(MOCK_ID);
     }

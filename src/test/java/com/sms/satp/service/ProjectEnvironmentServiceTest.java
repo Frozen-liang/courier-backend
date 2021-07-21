@@ -22,7 +22,7 @@ import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.response.GlobalEnvironmentResponse;
 import com.sms.satp.dto.request.ProjectEnvironmentRequest;
 import com.sms.satp.dto.response.ProjectEnvironmentResponse;
-import com.sms.satp.entity.env.ProjectEnvironment;
+import com.sms.satp.entity.env.ProjectEnvironmentEntity;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
 import com.sms.satp.repository.CommonDeleteRepository;
@@ -43,7 +43,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.mongodb.core.MongoTemplate;
 
 @DisplayName("Test cases for ProjectEnvironmentService")
 class ProjectEnvironmentServiceTest {
@@ -72,18 +71,18 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("Test the paging method with no parameters in the ProjectEnvironment service")
     void page_default_test() {
-        ProjectEnvironment projectEnvironment = ProjectEnvironment.builder()
+        ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder()
             .projectId(PROJECT_ID)
             .build();
-        Example<ProjectEnvironment> example = Example.of(projectEnvironment);
+        Example<ProjectEnvironmentEntity> example = Example.of(projectEnvironment);
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
         Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
-        List<ProjectEnvironment> projectEnvironmentList = new ArrayList<>();
+        List<ProjectEnvironmentEntity> projectEnvironmentList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            projectEnvironmentList.add(ProjectEnvironment.builder().envName(EVN_NAME).build());
+            projectEnvironmentList.add(ProjectEnvironmentEntity.builder().envName(EVN_NAME).build());
         }
-        Page<ProjectEnvironment> projectEnvironmentPage = new PageImpl<>(projectEnvironmentList, pageable,
+        Page<ProjectEnvironmentEntity> projectEnvironmentPage = new PageImpl<>(projectEnvironmentList, pageable,
             TOTAL_ELEMENTS);
         when(projectEnvironmentRepository.findAll(example, pageable)).thenReturn(projectEnvironmentPage);
         when(projectEnvironmentMapper.toDto(any()))
@@ -101,10 +100,10 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("Test the paging method with specified parameters in the ProjectEnvironment service")
     void page_test() {
-        ProjectEnvironment projectEnvironment = ProjectEnvironment.builder()
+        ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder()
             .projectId(PROJECT_ID)
             .build();
-        Example<ProjectEnvironment> example = Example.of(projectEnvironment);
+        Example<ProjectEnvironmentEntity> example = Example.of(projectEnvironment);
         PageDto pageDto = PageDto.builder()
             .pageNumber(PAGE_NUMBER)
             .pageSize(PAGE_SIZE)
@@ -112,11 +111,11 @@ class ProjectEnvironmentServiceTest {
             .build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
         Pageable pageable = PageRequest.of(pageDto.getPageNumber() - FRONT_FIRST_NUMBER, pageDto.getPageSize(), sort);
-        List<ProjectEnvironment> projectEnvironmentList = new ArrayList<>();
+        List<ProjectEnvironmentEntity> projectEnvironmentList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            projectEnvironmentList.add(ProjectEnvironment.builder().envName(EVN_NAME).build());
+            projectEnvironmentList.add(ProjectEnvironmentEntity.builder().envName(EVN_NAME).build());
         }
-        Page<ProjectEnvironment> projectEnvironmentPage = new PageImpl<>(projectEnvironmentList, pageable,
+        Page<ProjectEnvironmentEntity> projectEnvironmentPage = new PageImpl<>(projectEnvironmentList, pageable,
             TOTAL_ELEMENTS);
         when(projectEnvironmentRepository.findAll(example, pageable)).thenReturn(projectEnvironmentPage);
         when(projectEnvironmentMapper.toDto(any()))
@@ -132,17 +131,17 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("Test the add method in the ProjectEnvironment service")
     void add_test() {
-        ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().build();
+        ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder().build();
         when(projectEnvironmentMapper.toEntity(projectEnvironmentRequest)).thenReturn(projectEnvironment);
         when(projectEnvironmentRepository.insert(projectEnvironment)).thenReturn(projectEnvironment);
         projectEnvironmentService.add(projectEnvironmentRequest);
-        verify(projectEnvironmentRepository, times(1)).insert(any(ProjectEnvironment.class));
+        verify(projectEnvironmentRepository, times(1)).insert(any(ProjectEnvironmentEntity.class));
     }
 
     @Test
     @DisplayName("Test the edit method in the ProjectEnvironment service")
     void edit_test() {
-        ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().id(ID).build();
+        ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder().id(ID).build();
         when(projectEnvironmentMapper.toEntity(projectEnvironmentRequest)).thenReturn(projectEnvironment);
         when(projectEnvironmentRepository.existsById(any())).thenReturn(Boolean.TRUE);
         when(projectEnvironmentRepository.save(projectEnvironment)).thenReturn(projectEnvironment);
@@ -152,10 +151,10 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("Test the method of querying the ProjectEnvironment by id")
     void findProjectEnvironmentById() {
-        ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().envName(EVN_NAME).build();
+        ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder().envName(EVN_NAME).build();
         ProjectEnvironmentResponse projectEnvironmentResponse = ProjectEnvironmentResponse
             .builder().envName(EVN_NAME).build();
-        Optional<ProjectEnvironment> projectEnvironmentOptional = Optional.ofNullable(projectEnvironment);
+        Optional<ProjectEnvironmentEntity> projectEnvironmentOptional = Optional.ofNullable(projectEnvironment);
         when(projectEnvironmentRepository.findById(ID)).thenReturn(projectEnvironmentOptional);
         when(projectEnvironmentMapper.toDto(projectEnvironment)).thenReturn(projectEnvironmentResponse);
         ProjectEnvironmentResponse result1 = projectEnvironmentService.findById(ID);
@@ -165,14 +164,14 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectEnvironment service")
     void delete_test() {
-        when(commonDeleteRepository.deleteByIds(ID_LIST, ProjectEnvironment.class)).thenReturn(Boolean.TRUE);
+        when(commonDeleteRepository.deleteByIds(ID_LIST, ProjectEnvironmentEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(projectEnvironmentService.delete(ID_LIST)).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while getting ProjectEnvironment page")
     void page_exception_test() {
-        ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().projectId(PROJECT_ID).build();
+        ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder().projectId(PROJECT_ID).build();
         PageDto pageDto = PageDto.builder().build();
         Sort sort = Sort.by(Direction.fromString(pageDto.getOrder()), pageDto.getSort());
         Pageable pageable = PageRequest.of(
@@ -187,8 +186,8 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("An exception occurred while adding ProjectEnvironment")
     void add_exception_test() {
-        when(projectEnvironmentMapper.toEntity(any())).thenReturn(ProjectEnvironment.builder().build());
-        doThrow(new RuntimeException()).when(projectEnvironmentRepository).insert(any(ProjectEnvironment.class));
+        when(projectEnvironmentMapper.toEntity(any())).thenReturn(ProjectEnvironmentEntity.builder().build());
+        doThrow(new RuntimeException()).when(projectEnvironmentRepository).insert(any(ProjectEnvironmentEntity.class));
         assertThatThrownBy(() -> projectEnvironmentService.add(ProjectEnvironmentRequest.builder().build()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_PROJECT_ENVIRONMENT_ERROR.getCode());
@@ -197,7 +196,7 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("An exception occurred while edit ProjectEnvironment")
     void edit_exception_test() {
-        when(projectEnvironmentMapper.toEntity(any())).thenReturn(ProjectEnvironment.builder().id(ID).build());
+        when(projectEnvironmentMapper.toEntity(any())).thenReturn(ProjectEnvironmentEntity.builder().id(ID).build());
         when(projectEnvironmentRepository.existsById(any())).thenReturn(Boolean.TRUE);
         doThrow(new RuntimeException()).when(projectEnvironmentRepository).save(argThat(t -> true));
         assertThatThrownBy(() -> projectEnvironmentService.edit(ProjectEnvironmentRequest.builder().id(ID).build()))
@@ -208,7 +207,7 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("An not exist exception occurred while edit ProjectEnvironment")
     public void edit_not_exist_exception_test() {
-        when(projectEnvironmentMapper.toEntity(any())).thenReturn(ProjectEnvironment.builder().id(ID).build());
+        when(projectEnvironmentMapper.toEntity(any())).thenReturn(ProjectEnvironmentEntity.builder().id(ID).build());
         when(projectEnvironmentRepository.existsById(any())).thenReturn(Boolean.FALSE);
         assertThatThrownBy(() -> projectEnvironmentService.edit(ProjectEnvironmentRequest.builder().id(ID).build()))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -228,7 +227,7 @@ class ProjectEnvironmentServiceTest {
     @DisplayName("An exception occurred while delete ProjectEnvironment")
     void delete_exception_test() {
         doThrow(new RuntimeException()).when(commonDeleteRepository)
-            .deleteByIds(ID_LIST, ProjectEnvironment.class);
+            .deleteByIds(ID_LIST, ProjectEnvironmentEntity.class);
         assertThatThrownBy(() -> projectEnvironmentService.delete(ID_LIST))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR.getCode());
@@ -237,9 +236,9 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("Test the list method in the ProjectEnvironment service")
     public void list_test() {
-        ArrayList<ProjectEnvironment> list = new ArrayList<>();
+        ArrayList<ProjectEnvironmentEntity> list = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            list.add(ProjectEnvironment.builder().build());
+            list.add(ProjectEnvironmentEntity.builder().build());
         }
         ArrayList<ProjectEnvironmentResponse> projectEnvironmentDtos = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
@@ -266,10 +265,10 @@ class ProjectEnvironmentServiceTest {
     @Test
     @DisplayName("Test the method of find the ProjectEnvironment by id")
     void findOne_test() {
-        ProjectEnvironment projectEnvironment = ProjectEnvironment.builder().envName(EVN_NAME).build();
-        Optional<ProjectEnvironment> projectEnvironmentOptional = Optional.ofNullable(projectEnvironment);
+        ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder().envName(EVN_NAME).build();
+        Optional<ProjectEnvironmentEntity> projectEnvironmentOptional = Optional.ofNullable(projectEnvironment);
         when(projectEnvironmentRepository.findById(ID)).thenReturn(projectEnvironmentOptional);
-        ProjectEnvironment result = projectEnvironmentService.findOne(ID);
+        ProjectEnvironmentEntity result = projectEnvironmentService.findOne(ID);
         assertThat(result.getEnvName()).isEqualTo(EVN_NAME);
     }
 }

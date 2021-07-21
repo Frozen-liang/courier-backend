@@ -1,7 +1,6 @@
 package com.sms.satp.entity.system;
 
 import com.sms.satp.entity.BaseEntity;
-import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -31,9 +30,4 @@ public class UserEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
-
-    @Field(targetType = FieldType.OBJECT_ID)
-    private List<String> associatedWorkspaces;
-
-    private Boolean enabled;
 }

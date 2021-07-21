@@ -2,7 +2,7 @@ package com.sms.satp.mapper;
 
 import com.sms.satp.dto.request.ProjectFunctionRequest;
 import com.sms.satp.dto.response.ProjectFunctionResponse;
-import com.sms.satp.entity.function.ProjectFunction;
+import com.sms.satp.entity.function.ProjectFunctionEntity;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -12,9 +12,9 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = ParamInfoMapper.class)
 public interface ProjectFunctionMapper {
 
-    ProjectFunctionResponse toDto(ProjectFunction projectFunction);
+    ProjectFunctionResponse toDto(ProjectFunctionEntity projectFunction);
 
-    List<ProjectFunctionResponse> toDtoList(List<ProjectFunction> projectFunctions);
+    List<ProjectFunctionResponse> toDtoList(List<ProjectFunctionEntity> projectFunctions);
 
-    ProjectFunction toEntity(ProjectFunctionRequest projectFunctionDto);
+    ProjectFunctionEntity toEntity(ProjectFunctionRequest projectFunctionDto);
 }

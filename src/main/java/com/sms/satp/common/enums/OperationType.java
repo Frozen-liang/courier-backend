@@ -17,7 +17,9 @@ public enum OperationType implements EnumCommon {
     // 真实删除
     REMOVE(4),
     CLEAR_RECYCLE_BIN(5),
-    RECOVER(6);
+    RECOVER(6),
+    LOCK(7),
+    UNLOCK(8);
 
     private static final Map<Integer, OperationType> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationType::getCode, Function.identity()));

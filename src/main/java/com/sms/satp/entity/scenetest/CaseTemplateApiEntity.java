@@ -1,7 +1,8 @@
 package com.sms.satp.entity.scenetest;
 
+import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.entity.BaseEntity;
-import java.util.List;
+import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,27 +19,20 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
-@Document(collection = "SceneCase")
-public class SceneCase extends BaseEntity {
+@Document(collection = "CaseTemplateApi")
+public class CaseTemplateApiEntity extends BaseEntity {
 
-    private String name;
-
-    private String createUserName;
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String caseTemplateId;
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String groupId;
+    private ApiType apiType;
 
-    @Field(targetType = FieldType.OBJECT_ID)
-    private List<String> tagId;
+    private String shell;
 
-    private Integer priority;
+    private Integer order;
 
-    /**
-     * 是否锁定，当前步骤出错或未通过时，依然执行下一个步骤.
-     */
-    private Boolean isLock;
-
+    private ApiTestCaseEntity apiTestCase;
 }

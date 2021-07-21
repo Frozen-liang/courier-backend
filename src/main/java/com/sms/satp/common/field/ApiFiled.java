@@ -6,6 +6,7 @@ public enum ApiFiled implements Filed {
     GROUP_ID("groupId"),
     API_PROTOCOL("apiProtocol"),
     API_NAME("apiName"),
+    API_PATH("apiPath"),
     REQUEST_METHOD("requestMethod"),
     API_STATUS("apiStatus");
 

@@ -5,7 +5,7 @@ import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
 import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.satp.dto.response.SceneCaseApiResponse;
-import com.sms.satp.entity.scenetest.SceneCaseApi;
+import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
 import java.util.List;
 
 public interface SceneCaseApiService {
@@ -16,15 +16,13 @@ public interface SceneCaseApiService {
 
     Boolean edit(UpdateSceneCaseApiRequest updateSceneCaseApiRequest);
 
-    Boolean editAll(List<SceneCaseApi> sceneCaseApiList);
-
     Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiDto);
 
     List<SceneCaseApiResponse> listBySceneCaseId(String sceneCaseId, boolean removed);
 
-    List<SceneCaseApi> listBySceneCaseId(String sceneCaseId);
+    List<SceneCaseApiEntity> listBySceneCaseId(String sceneCaseId);
 
-    List<SceneCaseApi> getApiBySceneCaseId(String sceneCaseId, boolean removed);
+    List<SceneCaseApiEntity> getApiBySceneCaseId(String sceneCaseId, boolean removed);
 
     SceneCaseApiResponse getSceneCaseApiById(String id);
 

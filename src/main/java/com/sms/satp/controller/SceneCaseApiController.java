@@ -31,7 +31,7 @@ public class SceneCaseApiController {
         return sceneCaseApiService.batchAdd(addSceneCaseApiDto);
     }
 
-    @DeleteMapping(value = "/{ids}")
+    @DeleteMapping(value = "/delete/{ids}")
     public Boolean deleteByIds(@PathVariable List<String> ids) {
         return sceneCaseApiService.deleteByIds(ids);
     }

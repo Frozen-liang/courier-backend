@@ -19,9 +19,9 @@ public class UpdateSceneCaseRequest {
     private String createUserName;
     @NotNull(message = "The projectId can not be empty")
     private String projectId;
+    private String dataCollId;
     private String groupId;
     private String testStatus;
     private List<String> tagIds;
     private Integer priority;
-    private boolean removed;
 }

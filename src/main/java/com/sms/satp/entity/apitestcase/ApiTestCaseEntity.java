@@ -30,7 +30,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @NoArgsConstructor
 @ToString(callSuper = true)
 @Document(collection = "ApiTestCase")
-public class ApiTestCase extends BaseEntity {
+public class ApiTestCaseEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String apiId;
@@ -39,6 +39,9 @@ public class ApiTestCase extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
+
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String dataCollId;
 
     private List<String> tagIds;
 
@@ -84,5 +87,5 @@ public class ApiTestCase extends BaseEntity {
     @Field(name = "isExecute")
     private boolean execute;
 
-    private String createUserName;
+    private String createUsername;
 }

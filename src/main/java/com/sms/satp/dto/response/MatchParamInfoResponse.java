@@ -1,5 +1,6 @@
 package com.sms.satp.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -33,19 +34,18 @@ public class MatchParamInfoResponse {
     /**
      * 是否校验参数类型.
      */
-    private Boolean isVerificationParamType;
+    @JsonProperty("isVerificationParamType")
+    private boolean verificationParamType;
     /**
      * 是否校验数组内元素.
      */
-    private Boolean isVerificationArrayElement;
+    @JsonProperty("isVerificationArrayElement")
+    private boolean verificationArrayElement;
     /**
      * 是否必含.
      */
-    private Boolean required;
-    /**
-     * 校验结果.
-     */
-    private String verificationResult;
+    @JsonProperty("isRequired")
+    private boolean required;
     /**
      * 对象子属性. JSON/Object/JsonArray.
      */

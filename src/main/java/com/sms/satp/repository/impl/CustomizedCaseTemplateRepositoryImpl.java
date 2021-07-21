@@ -8,7 +8,8 @@ import com.sms.satp.common.field.CommonFiled;
 import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.response.CaseTemplateResponse;
-import com.sms.satp.entity.scenetest.CaseTemplate;
+import com.sms.satp.entity.scenetest.CaseTemplateEntity;
+import com.sms.satp.repository.CommonDeleteRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
@@ -31,9 +32,12 @@ import org.springframework.stereotype.Component;
 public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTemplateRepository {
 
     private final MongoTemplate mongoTemplate;
+    private final CommonDeleteRepository commonDeleteRepository;
 
-    public CustomizedCaseTemplateRepositoryImpl(MongoTemplate mongoTemplate) {
+    public CustomizedCaseTemplateRepositoryImpl(MongoTemplate mongoTemplate,
+        CommonDeleteRepository commonDeleteRepository) {
         this.mongoTemplate = mongoTemplate;
+        this.commonDeleteRepository = commonDeleteRepository;
     }
 
     @Override
@@ -69,15 +73,33 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
         aggregationOperations.add(projectionOperation);
 
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
-        long count = mongoTemplate.count(query, CaseTemplate.class);
+        long count = mongoTemplate.count(query, CaseTemplateEntity.class);
         if (count == 0L || skipRecord >= count) {
             return Page.empty();
         }
         List<CaseTemplateResponse> records = mongoTemplate
-            .aggregate(aggregation, CaseTemplate.class, CaseTemplateResponse.class)
+            .aggregate(aggregation, CaseTemplateEntity.class, CaseTemplateResponse.class)
             .getMappedResults();
         return new PageImpl<CaseTemplateResponse>(records,
             PageRequest.of(searchDto.getPageNumber(), searchDto.getPageSize(), sort), count);
+    }
+
+    @Override
+    public Boolean deleteByIds(List<String> ids) {
+        return commonDeleteRepository.deleteByIds(ids, CaseTemplateEntity.class);
+    }
+
+    @Override
+    public Boolean recover(List<String> ids) {
+        return commonDeleteRepository.recover(ids, CaseTemplateEntity.class);
+    }
+
+    @Override
+    public List<CaseTemplateEntity> getIdsByGroupId(String id) {
+        Query query = new Query();
+        query.fields().include(ID.getFiled());
+        CommonFiled.GROUP_ID.is(id).ifPresent(query::addCriteria);
+        return mongoTemplate.find(query, CaseTemplateEntity.class);
     }
 
     private void buildCriteria(CaseTemplateSearchRequest searchRequest, Query query,
@@ -89,7 +111,7 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         SceneFiled.TAG_ID.in(searchRequest.getTagId())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneFiled.NAME.is(searchRequest.getName())
+        SceneFiled.NAME.like(searchRequest.getName())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         SceneFiled.GROUP_ID.is(searchRequest.getGroupId())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
