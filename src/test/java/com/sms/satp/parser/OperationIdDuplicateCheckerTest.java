@@ -11,6 +11,7 @@ import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
 import com.sms.satp.parser.impl.OperationIdDuplicateChecker;
 import com.sms.satp.repository.ProjectImportFlowRepository;
+import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.MessageService;
 import com.sms.satp.utils.SecurityUtil;
@@ -37,7 +38,7 @@ public class OperationIdDuplicateCheckerTest {
         MockedStatic<SecurityUtil> securityUtilMockedStatic = mockStatic(SecurityUtil.class);
         securityUtilMockedStatic.when(SecurityUtil::getCurrUserId).thenReturn(ObjectId.get().toString());
         securityUtilMockedStatic.when(SecurityUtil::getCurrentUser).thenReturn(new CustomUser("username", "password",
-            Collections.emptyList(), "", "username@qq.com"));
+            Collections.emptyList(), "", "username@qq.com", TokenType.USER));
     }
 
 
