@@ -16,6 +16,7 @@ import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.security.strategy.SecurityStrategyFactory;
 import com.sms.satp.security.strategy.impl.UserSecurityStrategy;
 import com.sms.satp.utils.JwtUtils;
+import com.sms.satp.utils.SecurityUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -24,16 +25,47 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 public class JwtTokenManagerTest {
+
+    private static String token = "token";
+    private static String id = "id";
+    private static String username = "username";
+    private static String email = "email";
+    private static String userTokenType = "USER";
+    private static List<String> authorities = Arrays.asList("role1", "role2");
+    private static Claims claims;
+    private static MockedStatic<JwtUtils> jwtUtilsMockedStatic;
+    private static MockedStatic<SecurityUtil> securityUtilMockedStatic;
+
+    static {
+        claims = mock(Claims.class);
+        when(claims.get(TOKEN_USER_ID, String.class)).thenReturn(id);
+        when(claims.get(TOKEN_USERNAME, String.class)).thenReturn(username);
+        when(claims.get(TOKEN_EMAIL, String.class)).thenReturn(email);
+        when(claims.get(TOKEN_TYPE, String.class)).thenReturn(userTokenType);
+        when(claims.get(TOKEN_AUTHORITIES)).thenReturn(authorities);
+        jwtUtilsMockedStatic = Mockito.mockStatic(JwtUtils.class);
+        securityUtilMockedStatic = Mockito.mockStatic(SecurityUtil.class);
+    }
+
+    @AfterAll
+    public static void close() {
+        jwtUtilsMockedStatic.close();
+        securityUtilMockedStatic.close();
+    }
 
     SecurityStrategyFactory securityStrategyFactory = mock(SecurityStrategyFactory.class);
     SigningKeyResolver signingKeyResolver = mock(SigningKeyResolver.class);
@@ -51,12 +83,10 @@ public class JwtTokenManagerTest {
             Arrays.asList(new SimpleGrantedAuthority("role1"), new SimpleGrantedAuthority("role2")),
             "id", "name", TokenType.USER);
         String token = "123";
-        try (MockedStatic<JwtUtils> jwtUtilsMockedStatic = Mockito.mockStatic(JwtUtils.class)) {
-            jwtUtilsMockedStatic.when(() -> JwtUtils.encodeJwt(any(CustomUser.class),
-                any(SigningKeyResolver.class), any(Duration.class))).thenReturn(Optional.of(token));
-            String accessToken = jwtTokenManager.generateAccessToken(customUser);
-            assertThat(accessToken).isEqualTo(token);
-        }
+        jwtUtilsMockedStatic.when(() -> JwtUtils.encodeJwt(any(CustomUser.class),
+            any(SigningKeyResolver.class), any(Duration.class))).thenReturn(Optional.of(token));
+        String accessToken = jwtTokenManager.generateAccessToken(customUser);
+        assertThat(accessToken).isEqualTo(token);
     }
 
     @Test
@@ -68,116 +98,80 @@ public class JwtTokenManagerTest {
         CustomUser customUser = new CustomUser("username", "password",
             Arrays.asList(new SimpleGrantedAuthority("role1"), new SimpleGrantedAuthority("role2")),
             "id", "name", TokenType.USER);
-        try (MockedStatic<JwtUtils> jwtUtilsMockedStatic = Mockito.mockStatic(JwtUtils.class)) {
-            jwtUtilsMockedStatic.when(() -> JwtUtils.encodeJwt(any(CustomUser.class),
-                any(SigningKeyResolver.class), any(Duration.class))).thenReturn(Optional.empty());
-            assertThatThrownBy(() -> jwtTokenManager.generateAccessToken(customUser))
-                .isInstanceOf(RuntimeException.class);
-        }
+        jwtUtilsMockedStatic.when(() -> JwtUtils.encodeJwt(any(CustomUser.class),
+            any(SigningKeyResolver.class), any(Duration.class))).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> jwtTokenManager.generateAccessToken(customUser))
+            .isInstanceOf(RuntimeException.class);
     }
 
     @Test
     @DisplayName("Parsing out identity information based on token")
     public void createAuthenticationTest() {
-        String token = "token";
-        String id = "id";
-        String username = "username";
-        String email = "email";
-        String userTokenType = "USER";
-        List<String> authorities = Arrays.asList("role1", "role2");
-        try (MockedStatic<JwtUtils> jwtUtilsMockedStatic = Mockito.mockStatic(JwtUtils.class)) {
-            Claims claims = mock(Claims.class);
-            jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
-                .thenReturn(claims);
-            when(claims.get(TOKEN_USER_ID, String.class)).thenReturn(id);
-            when(claims.get(TOKEN_USERNAME, String.class)).thenReturn(username);
-            when(claims.get(TOKEN_EMAIL, String.class)).thenReturn(email);
-            when(claims.get(TOKEN_TYPE, String.class)).thenReturn(userTokenType);
-            when(claims.get(TOKEN_AUTHORITIES)).thenReturn(authorities);
-            Authentication authentication = jwtTokenManager.createAuthentication(token);
-            assertThat(authentication.getName()).isEqualTo(username);
-        }
+        jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
+            .thenReturn(claims);
+        Collection<GrantedAuthority> grantedAuthorities = authorities.stream()
+            .map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+        Authentication mockAuthentication = mock(Authentication.class);
+        securityUtilMockedStatic.when(() -> SecurityUtil.newAuthentication(id, email, username, grantedAuthorities,
+            TokenType.USER)).thenReturn(mockAuthentication);
+        Authentication authentication = jwtTokenManager.createAuthentication(token);
+        assertThat(mockAuthentication).isEqualTo(authentication);
     }
 
     @Test
     @DisplayName("Parsing out user id based on token")
     public void getUserIdTest() {
-        String token = "token";
-        String id = "id";
-        try (MockedStatic<JwtUtils> jwtUtilsMockedStatic = Mockito.mockStatic(JwtUtils.class)) {
-            Claims claims = mock(Claims.class);
-            jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
-                .thenReturn(claims);
-            when(claims.get(TOKEN_USER_ID, String.class)).thenReturn(id);
-            assertThat(jwtTokenManager.getUserId(token)).isEqualTo(id);
-        }
+        jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
+            .thenReturn(claims);
+        assertThat(jwtTokenManager.getUserId(token)).isEqualTo(id);
     }
 
     @Test
     @DisplayName("Verify token")
     public void validateTest() {
-        String token = "token";
-        try (MockedStatic<JwtUtils> jwtUtilsMockedStatic = Mockito.mockStatic(JwtUtils.class)) {
-            Claims claims = mock(Claims.class);
-            jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
-                .thenReturn(claims);
-            assertThat(jwtTokenManager.validate(token)).isEqualTo(true);
-        }
+        jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
+            .thenReturn(claims);
+        assertThat(jwtTokenManager.validate(token)).isEqualTo(true);
     }
 
     @Test
     @DisplayName("Throw SignatureException when verify token")
     public void validateSignatureExceptionTest() {
-        String token = "token";
-        try (MockedStatic<JwtUtils> jwtUtilsMockedStatic = Mockito.mockStatic(JwtUtils.class)) {
-            jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
-                .thenThrow(SignatureException.class);
-            assertThat(jwtTokenManager.validate(token)).isEqualTo(false);
-        }
+        jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
+            .thenThrow(SignatureException.class);
+        assertThat(jwtTokenManager.validate(token)).isEqualTo(false);
     }
 
     @Test
     @DisplayName("Throw MalformedJwtException when verify token")
     public void validateMalformedJwtExceptionTest() {
-        String token = "token";
-        try (MockedStatic<JwtUtils> jwtUtilsMockedStatic = Mockito.mockStatic(JwtUtils.class)) {
-            jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
-                .thenThrow(MalformedJwtException.class);
-            assertThat(jwtTokenManager.validate(token)).isEqualTo(false);
-        }
+        jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
+            .thenThrow(MalformedJwtException.class);
+        assertThat(jwtTokenManager.validate(token)).isEqualTo(false);
     }
 
     @Test
     @DisplayName("Throw ExpiredJwtException when verify token")
     public void validateExpiredJwtExceptionTest() {
-        String token = "token";
-        try (MockedStatic<JwtUtils> jwtUtilsMockedStatic = Mockito.mockStatic(JwtUtils.class)) {
-            jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
-                .thenThrow(ExpiredJwtException.class);
-            assertThat(jwtTokenManager.validate(token)).isEqualTo(false);
-        }
+        jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
+            .thenThrow(ExpiredJwtException.class);
+        assertThat(jwtTokenManager.validate(token)).isEqualTo(false);
     }
 
     @Test
     @DisplayName("Throw UnsupportedJwtException when verify token")
     public void validateUnsupportedJwtExceptionTest() {
-        String token = "token";
-        try (MockedStatic<JwtUtils> jwtUtilsMockedStatic = Mockito.mockStatic(JwtUtils.class)) {
-            jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
-                .thenThrow(UnsupportedJwtException.class);
-            assertThat(jwtTokenManager.validate(token)).isEqualTo(false);
-        }
+        jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
+            .thenThrow(UnsupportedJwtException.class);
+        assertThat(jwtTokenManager.validate(token)).isEqualTo(false);
     }
 
     @Test
     @DisplayName("Throw IllegalArgumentException when verify token")
     public void validateIllegalArgumentExceptionTest() {
-        String token = "token";
-        try (MockedStatic<JwtUtils> jwtUtilsMockedStatic = Mockito.mockStatic(JwtUtils.class)) {
-            jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
-                .thenThrow(IllegalArgumentException.class);
-            assertThat(jwtTokenManager.validate(token)).isEqualTo(false);
-        }
+        jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
+            .thenThrow(IllegalArgumentException.class);
+        assertThat(jwtTokenManager.validate(token)).isEqualTo(false);
     }
 
 }
