@@ -1,7 +1,6 @@
 package com.sms.satp.service.impl;
 
 import static com.sms.satp.common.enums.OperationModule.PROJECT;
-import static com.sms.satp.common.enums.OperationType.ADD;
 import static com.sms.satp.common.enums.OperationType.DELETE;
 import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_ERROR;
@@ -65,8 +64,8 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = PROJECT, projectId = "id",
-        template = "{{#projectRequest.name}}")
+    /*@LogRecord(operationType = ADD, operationModule = PROJECT, projectId = "id",
+        template = "{{#projectRequest.name}}")*/
     public Boolean add(ProjectRequest projectRequest) {
         log.info("ProjectService-add()-params: [Project]={}", projectRequest.toString());
         try {

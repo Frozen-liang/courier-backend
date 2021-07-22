@@ -1,7 +1,6 @@
 package com.sms.satp.dto.response;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,8 +29,7 @@ public class CaseReportResponse {
 
     private Object requestData;
 
-    @JsonProperty("isSuccess")
-    private boolean isSuccess;
+    private Integer isSuccess;
 
     private String failMessage;
 

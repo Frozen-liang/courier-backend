@@ -1,5 +1,6 @@
 package com.sms.satp.mapper;
 
+import com.sms.satp.dto.request.UserQueryListRequest;
 import com.sms.satp.dto.request.UserRequest;
 import com.sms.satp.dto.response.UserResponse;
 import com.sms.satp.entity.system.UserEntity;
@@ -21,6 +22,8 @@ public interface UserMapper {
     List<UserResponse> toDtoList(List<UserEntity> userList);
 
     UserEntity toEntity(UserRequest userRequest);
+
+    UserEntity toEntity(UserQueryListRequest userRequest);
 
     @Mapping(target = "roles",
         expression = "java(customUser.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect"

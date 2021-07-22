@@ -5,6 +5,11 @@ target/
 !**/src/test/**
 /src/main/resources/application.properties
 
+
+### gradle ###
+*.gradle
+*.build
+
 ### STS ###
 .apt_generated
 .classpath

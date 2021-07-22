@@ -18,6 +18,7 @@ import com.sms.satp.dto.request.AddSceneCaseJobRequest;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.request.SceneCaseJobRequest;
 import com.sms.satp.dto.request.TestDataRequest;
+import com.sms.satp.dto.response.ApiTestCaseJobReportResponse;
 import com.sms.satp.dto.response.SceneCaseJobResponse;
 import com.sms.satp.engine.service.CaseDispatcherService;
 import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
@@ -169,7 +170,7 @@ class SceneCaseJobServiceTest {
     public void execute_exception_test() {
         when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
         sceneCaseJobService.runJob(getAddRequest(), customUser);
-        doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(CaseReport.class));
+        doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(ApiTestCaseJobReportResponse.class));
         doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
         verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
     }

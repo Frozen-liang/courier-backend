@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.dto.request.UserQueryListRequest;
 import com.sms.satp.dto.request.UserPasswordUpdateRequest;
 import com.sms.satp.dto.request.UserRequest;
 import com.sms.satp.dto.response.UserResponse;
@@ -25,6 +26,7 @@ import com.sms.satp.entity.workspace.WorkspaceEntity;
 import com.sms.satp.mapper.UserMapper;
 import com.sms.satp.mapper.UserMapperImpl;
 import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.repository.UserRepository;
 import com.sms.satp.repository.WorkspaceRepository;
 import com.sms.satp.service.impl.UserServiceImpl;
@@ -44,12 +46,13 @@ class UserServiceTest {
 
     private final UserRepository userRepository = mock(UserRepository.class);
     private final WorkspaceRepository workspaceRepository = mock(WorkspaceRepository.class);
+    private final UserGroupRepository userGroupRepository = mock(UserGroupRepository.class);
     private final CommonDeleteRepository commonDeleteRepository = mock(
         CommonDeleteRepository.class);
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final UserMapper userMapper = new UserMapperImpl();
     private final UserService userService = new UserServiceImpl(
-        userRepository, workspaceRepository, commonDeleteRepository, userMapper);
+        userRepository, userGroupRepository, workspaceRepository, commonDeleteRepository, userMapper);
     private final UserEntity user = UserEntity.builder().id(ID).build();
     private final UserRequest userRequest = UserRequest.builder().password("123Wac!@#")
         .id(ID).build();
@@ -68,6 +71,8 @@ class UserServiceTest {
     private static final String GROUP_ID = ObjectId.get().toString();
     private static final String WORKSPACE_ID = ObjectId.get().toString();
     private static final String USERNAME = "test";
+    private final UserQueryListRequest request =
+        UserQueryListRequest.builder().username(USERNAME).groupId(GROUP_ID).workspaceId(WORKSPACE_ID).build();
 
     @Test
     @DisplayName("Test the findById method in the User service")
@@ -143,7 +148,7 @@ class UserServiceTest {
         when(userRepository.findAll(any(), any(Sort.class))).thenReturn(userList);
         when(workspaceRepository.findById(any()))
             .thenReturn(Optional.of(WorkspaceEntity.builder().userIds(Collections.emptyList()).build()));
-        List<UserResponse> result = userService.list(USERNAME, GROUP_ID, WORKSPACE_ID);
+        List<UserResponse> result = userService.list(request);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -151,7 +156,7 @@ class UserServiceTest {
     @DisplayName("An exception occurred while getting User list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(userRepository).findAll(any(), any(Sort.class));
-        assertThatThrownBy(() -> userService.list(USERNAME, GROUP_ID, WORKSPACE_ID))
+        assertThatThrownBy(() -> userService.list(request))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_USER_LIST_ERROR.getCode());
     }

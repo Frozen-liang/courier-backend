@@ -77,7 +77,8 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             job.setJobStatus(apiTestCaseJobReport.getJobStatus());
             job.setMessage(apiTestCaseJobReport.getMessage());
             job.setTotalTimeCost(apiTestCaseJobReport.getTotalTimeCost());
-            caseDispatcherService.sendJobReport(job.getCreateUserId(), caseReport);
+            caseDispatcherService
+                .sendJobReport(job.getCreateUserId(), jobMapper.toApiTestCaseJobReportResponse(apiTestCaseJobReport));
             apiTestCaseJobRepository.save(job);
         });
     }
