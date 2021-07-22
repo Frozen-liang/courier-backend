@@ -1,16 +1,13 @@
 package com.sms.satp.service;
 
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_GROUP_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_GROUP_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_GROUP_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_GROUP_LIST_ERROR;
-import static com.sms.satp.utils.Assert.isTrue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -29,9 +26,6 @@ import com.sms.satp.service.impl.ApiGroupServiceImpl;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import java.util.List;
-import org.assertj.core.util.Lists;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -54,26 +48,22 @@ class ApiGroupServiceTest {
     private final static String MOCK_ID = "1";
     private final static String ID = "1";
     private final static String PROJECT_NAME = "test";
-    private final static Integer MAX_DEPTH = 3;
-    private final static String GROUP_ID = ObjectId.get().toString();
 
     @Test
     @DisplayName("Test the list method in the ApiGroup service")
     void list_test() {
-        List<ApiGroupEntity> apiGroupEntityList = Lists.newArrayList(ApiGroupEntity.builder().id(MOCK_ID).build());
-        when(apiGroupRepository.findApiGroupEntitiesByProjectId(any())).thenReturn(apiGroupEntityList);
-        List<ApiGroupResponse> apiGroupResponseList =
-            Lists.newArrayList(ApiGroupResponse.builder().id(MOCK_ID).build());
-        when(apiGroupMapper.toResponse(any())).thenReturn(apiGroupResponseList);
+        when(apiGroupRepository.findApiGroupEntitiesByProjectId(any())).thenReturn(null);
+        when(apiGroupMapper.toResponse(any()))
+            .thenReturn(List.of(ApiGroupResponse.builder().id("1").depth(1).build(),
+                ApiGroupResponse.builder().id("2").parentId("1").depth(2).build()));
         List<TreeResponse> dtoResponse = apiGroupService.list(MOCK_ID);
-
         assertThat(dtoResponse).isNotEmpty();
     }
 
     @Test
     @DisplayName("Test the list method in the ApiGroup service throw exception")
     void list_test_throwException() {
-        when(apiGroupRepository.findByParentId(any()))
+        when(apiGroupRepository.findApiGroupEntitiesByProjectId(any()))
             .thenThrow(new ApiTestPlatformException(GET_API_GROUP_LIST_ERROR));
         assertThatThrownBy(() -> apiGroupService.list(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
     }

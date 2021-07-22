@@ -115,7 +115,7 @@ class UserGroupServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             userGroupResponseList.add(UserGroupResponse.builder().build());
         }
-        when(userGroupRepository.findAllByOrderByCreateDateTimeDesc()).thenReturn(userGroupList);
+        when(userGroupRepository.findAllByRemovedIsFalseOrderByCreateDateTimeDesc()).thenReturn(userGroupList);
         when(userGroupMapper.toDtoList(userGroupList)).thenReturn(userGroupResponseList);
         List<UserGroupResponse> result = userGroupService.list();
         assertThat(result).hasSize(TOTAL_ELEMENTS);
@@ -124,7 +124,7 @@ class UserGroupServiceTest {
     @Test
     @DisplayName("An exception occurred while getting UserGroup list")
     public void list_exception_test() {
-        doThrow(new RuntimeException()).when(userGroupRepository).findAllByOrderByCreateDateTimeDesc();
+        doThrow(new RuntimeException()).when(userGroupRepository).findAllByRemovedIsFalseOrderByCreateDateTimeDesc();
         assertThatThrownBy(userGroupService::list)
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_USER_GROUP_LIST_ERROR.getCode());

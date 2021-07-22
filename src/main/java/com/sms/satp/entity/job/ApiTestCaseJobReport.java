@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 public class ApiTestCaseJobReport {
 
     private String jobId;
-    private Integer errCode;
     private JobStatus jobStatus;
     private Integer totalTimeCost;
     private CaseReport caseReport;

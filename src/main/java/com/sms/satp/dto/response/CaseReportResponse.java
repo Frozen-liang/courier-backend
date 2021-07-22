@@ -31,6 +31,8 @@ public class CaseReportResponse {
 
     private Integer isSuccess;
 
+    private Integer errCode;
+
     private String failMessage;
 
     private Long timeCost;

@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SuspiciousEngineManagementImpl implements SuspiciousEngineManagement {
 
     private final AtomicReference<Integer> currentIndex = new AtomicReference<>(0);
@@ -47,6 +49,11 @@ public class SuspiciousEngineManagementImpl implements SuspiciousEngineManagemen
             // equals remove operation.
             return null;
         });
+    }
+
+    @Override
+    public List<String> get(Integer cursor) {
+        return suspiciousEngineQueue.remove(cursor);
     }
 
 

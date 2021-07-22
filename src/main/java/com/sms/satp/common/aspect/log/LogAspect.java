@@ -52,11 +52,11 @@ public class LogAspect {
 
     @Around("pointCut() && @annotation(logRecord)")
     public Object around(ProceedingJoinPoint jp, LogRecord logRecord) throws Throwable {
-        MethodSignature signature = (MethodSignature) jp.getSignature();
-        Method method = signature.getMethod();
-        Object[] args = jp.getArgs();
-        OperationType operationType = logRecord.operationType();
-        OperationModule operationModule = logRecord.operationModule();
+        final MethodSignature signature = (MethodSignature) jp.getSignature();
+        final Method method = signature.getMethod();
+        final Object[] args = jp.getArgs();
+        final OperationType operationType = logRecord.operationType();
+        final OperationModule operationModule = logRecord.operationModule();
         Enhance enhance = logRecord.enhance();
         EvaluationContext context = threadLocal.get();
         if (Objects.isNull(context)) {

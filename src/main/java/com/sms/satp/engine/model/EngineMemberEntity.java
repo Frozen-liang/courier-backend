@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
@@ -18,6 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "EngineMember")
 public class EngineMemberEntity extends BaseEntity {
 
+    @Indexed(unique = true)
     private String destination;
     private String sessionId;
     private String host;

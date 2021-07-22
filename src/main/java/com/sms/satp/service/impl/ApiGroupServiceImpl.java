@@ -45,7 +45,6 @@ public class ApiGroupServiceImpl implements ApiGroupService {
     @Override
     public List<TreeResponse> list(String projectId) {
         try {
-
             List<ApiGroupEntity> apiGroupEntities = apiGroupRepository
                 .findApiGroupEntitiesByProjectId(projectId);
             return TreeUtils.createTree(apiGroupMapper.toResponse(apiGroupEntities));
@@ -68,8 +67,7 @@ public class ApiGroupServiceImpl implements ApiGroupService {
             isTrue(parentGroup.getDepth() < MAX_DEPTH, "The group depth must be less than three.");
             Long realGroupId = identifierGenerator.nextId();
             parentGroup.getPath().add(realGroupId);
-            apiGroupEntity
-                .setDepth(parentGroup.getDepth() + 1);
+            apiGroupEntity.setDepth(parentGroup.getDepth() + 1);
             apiGroupEntity.setRealGroupId(realGroupId);
             apiGroupEntity.setPath(parentGroup.getPath());
             apiGroupRepository.insert(apiGroupEntity);

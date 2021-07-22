@@ -9,7 +9,8 @@ import java.util.stream.Collectors;
 public enum EngineStatus implements EnumCommon {
     PENDING(0),
     RUNNING(1),
-    WAITING_FOR_RECONNECTION(2);
+    WAITING_FOR_RECONNECTION(2),
+    INVALID(3);
 
     EngineStatus(Integer code) {
         this.code = code;
