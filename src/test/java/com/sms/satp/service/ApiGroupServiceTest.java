@@ -9,17 +9,17 @@ import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.response.ApiGroupResponse;
+import com.sms.satp.dto.response.TreeResponse;
 import com.sms.satp.entity.group.ApiGroupEntity;
 import com.sms.satp.mapper.ApiGroupMapper;
 import com.sms.satp.repository.ApiGroupRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.service.impl.ApiGroupServiceImpl;
+import java.util.List;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 @DisplayName("Test cases for ApiGroupServiceTest")
 class ApiGroupServiceTest {
@@ -40,7 +40,7 @@ class ApiGroupServiceTest {
         List<ApiGroupResponse> apiGroupResponseList =
             Lists.newArrayList(ApiGroupResponse.builder().id(MOCK_ID).build());
         when(apiGroupMapper.toResponse(any())).thenReturn(apiGroupResponseList);
-        List<ApiGroupResponse> dtoResponse = apiGroupService.list(MOCK_ID, GROUP_ID);
+        List<TreeResponse> dtoResponse = apiGroupService.list(MOCK_ID);
 
         assertThat(dtoResponse).isNotEmpty();
     }
@@ -50,7 +50,7 @@ class ApiGroupServiceTest {
     void list_test_thrownException() {
         when(apiGroupRepository.findByParentId(any()))
             .thenThrow(new ApiTestPlatformException(GET_API_GROUP_LIST_ERROR));
-        assertThatThrownBy(() -> apiGroupService.list(MOCK_ID, GROUP_ID)).isInstanceOf(ApiTestPlatformException.class);
+        assertThatThrownBy(() -> apiGroupService.list(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
     }
 
 }

@@ -9,7 +9,7 @@ import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiGroupRequest;
-import com.sms.satp.dto.response.ApiGroupResponse;
+import com.sms.satp.dto.response.TreeResponse;
 import com.sms.satp.entity.group.ApiGroupEntity;
 import com.sms.satp.infrastructure.id.DefaultIdentifierGenerator;
 import com.sms.satp.mapper.ApiGroupMapper;
@@ -17,6 +17,7 @@ import com.sms.satp.repository.ApiGroupRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.service.ApiGroupService;
 import com.sms.satp.utils.ExceptionUtils;
+import com.sms.satp.utils.TreeUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -42,18 +43,12 @@ public class ApiGroupServiceImpl implements ApiGroupService {
     }
 
     @Override
-    public List<ApiGroupResponse> list(String projectId, String groupId) {
+    public List<TreeResponse> list(String projectId) {
         try {
-            List<ApiGroupEntity> apiGroupEntityList;
-            if (StringUtils.isBlank(groupId)) {
-                apiGroupEntityList = apiGroupRepository.findByProjectIdAndDepth(projectId, 1);
-            } else {
-                apiGroupEntityList = apiGroupRepository.findByParentId(groupId);
-            }
-            List<ApiGroupResponse> apiGroupResponses = apiGroupMapper.toResponse(apiGroupEntityList);
-            apiGroupResponses
-                .forEach(response -> response.setHasNext(apiGroupRepository.existsByParentId(response.getId())));
-            return apiGroupResponses;
+
+            List<ApiGroupEntity> apiGroupEntities = apiGroupRepository
+                .findApiGroupEntitiesByProjectId(projectId);
+            return TreeUtils.createTree(apiGroupMapper.toResponse(apiGroupEntities));
         } catch (Exception e) {
             log.error("Failed to list the ApiGroupService!", e);
             throw new ApiTestPlatformException(GET_API_GROUP_LIST_ERROR);

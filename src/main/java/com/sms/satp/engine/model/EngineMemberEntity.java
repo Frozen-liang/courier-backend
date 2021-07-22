@@ -1,17 +1,22 @@
 package com.sms.satp.engine.model;
 
 import com.sms.satp.engine.enums.EngineStatus;
+import com.sms.satp.entity.BaseEntity;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class EngineMember {
+@SuperBuilder
+@Document(collection = "EngineMember")
+public class EngineMemberEntity extends BaseEntity {
 
     private String destination;
     private String sessionId;

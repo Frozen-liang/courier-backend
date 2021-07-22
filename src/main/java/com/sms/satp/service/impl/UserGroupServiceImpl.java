@@ -54,7 +54,7 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     public List<UserGroupResponse> list() {
         try {
-            return userGroupMapper.toDtoList(userGroupRepository.findAllByRemovedIsFalseOrderByCreateDateTimeDesc());
+            return userGroupMapper.toDtoList(userGroupRepository.findAllByOrderByCreateDateTimeDesc());
         } catch (Exception e) {
             log.error("Failed to get the UserGroup list!", e);
             throw new ApiTestPlatformException(GET_USER_GROUP_LIST_ERROR);

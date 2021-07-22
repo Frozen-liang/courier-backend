@@ -4,7 +4,7 @@ import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
 import com.sms.satp.dto.request.ApiGroupRequest;
-import com.sms.satp.dto.response.ApiGroupResponse;
+import com.sms.satp.dto.response.TreeResponse;
 import com.sms.satp.service.ApiGroupService;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,8 +30,8 @@ public class ApiGroupController {
 
     @GetMapping(value = "/list/{projectId}")
     @PreAuthorize("hasRoleOrAdmin(@role.API_GROUP_QUERY_ALL)")
-    public List<ApiGroupResponse> list(@PathVariable String projectId, String groupId) {
-        return apiGroupService.list(projectId, groupId);
+    public List<TreeResponse> list(@PathVariable String projectId) {
+        return apiGroupService.list(projectId);
     }
 
     @PostMapping

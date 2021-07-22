@@ -1,7 +1,9 @@
 package com.sms.satp.utils;
 
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.REMOVE;
+
 import com.sms.satp.common.aspect.annotation.LogRecord;
-import com.sms.satp.common.enums.OperationType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -46,14 +48,14 @@ public class SpelUtils {
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public static String getProjectId(EvaluationContext context, LogRecord logRecord, Method method, Object[] args) {
-        if (StringUtils.isEmpty(logRecord.projectId())) {
+        if (StringUtils.isBlank(logRecord.projectId())) {
             return null;
         }
         try {
             Expression expression;
             String value = null;
             String exp;
-            if (logRecord.operationType() == OperationType.DELETE) {
+            if (logRecord.operationType() == DELETE || logRecord.operationType() == REMOVE) {
                 if (!logRecord.enhance().enable()) {
                     return null;
                 }
@@ -65,7 +67,7 @@ public class SpelUtils {
                 } catch (EvaluationException e) {
                     log.warn("The expression:{} cannot get the value.", exp);
                 }
-                if (StringUtils.isEmpty(value)) {
+                if (StringUtils.isBlank(value)) {
                     exp = createObjectExpression(resultKey, logRecord.projectId());
                     expression = spelExpressionParser.parseExpression(exp, templateParserContext);
                     return expression.getValue(context, String.class);
@@ -96,6 +98,20 @@ public class SpelUtils {
             log.error("Parse expression:{} error,methodName:{}", logRecord.projectId(), method);
         }
         return null;
+    }
+
+    public static void addVariable(EvaluationContext context, Object[] arguments, Method signatureMethod) {
+        try {
+            String[] parameterNames = parameterNameDiscoverer.getParameterNames(signatureMethod);
+            if (parameterNames == null || parameterNames.length == 0) {
+                return;
+            }
+            for (int i = 0; i < arguments.length; i++) {
+                context.setVariable(parameterNames[i], arguments[i]);
+            }
+        } catch (Exception e) {
+            log.error("EvaluationContext set variable error.");
+        }
     }
 
     public static EvaluationContext getContext(Object[] arguments, Method signatureMethod) {
