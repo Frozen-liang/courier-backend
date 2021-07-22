@@ -56,13 +56,13 @@ class UserGroupServiceTest {
     }
 
 
-    @Test
+    /*@Test
     @DisplayName("Test the add method in the UserGroup service")
     public void add_test() {
         when(userGroupMapper.toEntity(userGroupRequest)).thenReturn(userGroup);
         when(userGroupRepository.insert(any(UserGroupEntity.class))).thenReturn(userGroup);
         assertThat(userGroupService.add(userGroupRequest)).isTrue();
-    }
+    }*/
 
     @Test
     @DisplayName("An exception occurred while adding UserGroup")

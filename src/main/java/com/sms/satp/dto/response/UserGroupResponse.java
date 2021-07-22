@@ -1,5 +1,6 @@
 package com.sms.satp.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,11 @@ import lombok.experimental.SuperBuilder;
 public class UserGroupResponse extends BaseResponse {
 
     private String name;
+
+    private String createUsername;
+
+    @JsonProperty("isDefaultGroup")
+    private boolean defaultGroup;
 
     private List<String> roleIds;
 

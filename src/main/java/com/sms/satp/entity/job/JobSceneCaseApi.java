@@ -1,5 +1,6 @@
 package com.sms.satp.entity.job;
 
+import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.entity.job.common.JobApiTestCase;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +23,7 @@ public class JobSceneCaseApi {
     @Field(targetType = FieldType.OBJECT_ID)
     private String caseTemplateId;
 
-    private Integer apiType;
+    private ApiType apiType;
 
     private String shell;
 

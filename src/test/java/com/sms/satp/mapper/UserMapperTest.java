@@ -64,13 +64,6 @@ class UserMapperTest {
     }
 
     @Test
-    @DisplayName("[Null Input Parameter]Test the method to convert the User's dto object to a entity object")
-    void null_dto_to_entity() {
-        UserEntity user = userMapper.toEntity(null);
-        assertThat(user).isNull();
-    }
-
-    @Test
     @DisplayName("[Null Input Parameter]Test the method for converting an User entity list object to a dto list object")
     void null_entityList_to_dtoList() {
         List<UserResponse> userDtoList = userMapper.toDtoList(null);
