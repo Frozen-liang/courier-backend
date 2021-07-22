@@ -15,5 +15,7 @@ public class WorkspaceResponse extends BaseResponse {
 
     private String name;
 
+    private String createUsername;
+
     private Integer limit;
 }

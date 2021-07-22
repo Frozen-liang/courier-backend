@@ -96,8 +96,9 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
                 response.setTestTime(jobResponse.getTestDateTime());
                 response.setJobId(apiTestCaseJob.getId());
                 response
-                    .setResult(
-                        Objects.nonNull(jobResponse.getTestReport()) ? jobResponse.getTestReport().isSuccess() : null);
+                    .setIsSuccess(
+                        Objects.nonNull(jobResponse.getTestReport()) ? jobResponse.getTestReport().getIsSuccess()
+                            : null);
             });
             return apiTestCaseResponses;
         } catch (Exception e) {

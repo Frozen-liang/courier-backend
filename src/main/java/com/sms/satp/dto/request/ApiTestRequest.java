@@ -13,6 +13,7 @@ import com.sms.satp.entity.api.common.ResponseTimeVerification;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -25,7 +26,8 @@ public class ApiTestRequest {
     private String envId;
     private String apiId;
     @JsonProperty("isExecute")
-    private boolean execute;
+    @Default
+    private boolean execute = true;
     private String projectId;
     private String apiName;
     private String description;

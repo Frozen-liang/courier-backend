@@ -116,7 +116,8 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             }
             job.setJobStatus(jobReport.getJobStatus());
             job.setMessage(jobReport.getMessage());
-            caseDispatcherService.sendJobReport(job.getCreateUserId(), jobReport.getCaseReportList());
+            caseDispatcherService
+                .sendJobReport(job.getCreateUserId(), jobMapper.toSceneCaseJobReportResponse(jobReport));
             sceneCaseJobRepository.save(job);
         });
     }
@@ -154,7 +155,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                     .sceneCaseId(request.getSceneCaseId()).caseTemplateId(request.getCaseTemplateId()).build();
                 sceneCaseJobRepository.insert(sceneCaseJob);
                 jobId.set(sceneCaseJob.getId());
-                caseDispatcherService.dispatch(sceneCaseJob);
+                caseDispatcherService.dispatch(jobMapper.toSceneCaseJobResponse(sceneCaseJob));
             } else {
                 for (TestDataRequest testData : request.getDataCollectionRequest().getDataList()) {
                     jobId.set(null);
@@ -175,7 +176,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                         .build();
                     sceneCaseJobRepository.insert(sceneCaseJob);
                     jobId.set(sceneCaseJob.getId());
-                    caseDispatcherService.dispatch(sceneCaseJob);
+                    caseDispatcherService.dispatch(jobMapper.toSceneCaseJobResponse(sceneCaseJob));
                 }
             }
         } catch (ApiTestPlatformException apiTestPlatEx) {

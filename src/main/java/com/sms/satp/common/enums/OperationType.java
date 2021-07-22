@@ -9,16 +9,23 @@ import org.springframework.lang.Nullable;
 
 public enum OperationType implements EnumCommon {
 
+    // 增加
     ADD(0),
+    // 修改
     EDIT(1),
     // 逻辑删除
     DELETE(2),
+    // 同步Api
     SYNC(3),
     // 真实删除
     REMOVE(4),
+    // 清空回收站
     CLEAR_RECYCLE_BIN(5),
+    // 恢复
     RECOVER(6),
+    // 用户加锁
     LOCK(7),
+    // 用户解锁
     UNLOCK(8);
 
     private static final Map<Integer, OperationType> MAPPINGS =

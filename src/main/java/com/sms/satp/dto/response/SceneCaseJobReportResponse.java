@@ -1,23 +1,21 @@
-package com.sms.satp.entity.job;
+package com.sms.satp.dto.response;
 
-import com.sms.satp.common.enums.JobStatus;
-import com.sms.satp.entity.job.common.CaseReport;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SceneCaseJobReport {
+@Data
+public class SceneCaseJobReportResponse {
 
     private String jobId;
+    private Integer jobStatus;
     private Integer errCode;
-    private JobStatus jobStatus;
-    private List<CaseReport> caseReportList;
+    private List<CaseReportResponse> caseReportList;
     private String message;
     private Integer totalTimeCost;
 }

@@ -28,6 +28,8 @@ public class UserRequest {
     @NotBlank(groups = {UpdateGroup.class, InsertGroup.class}, message = "The username cannot be empty.")
     private String username;
 
+    private String nickname;
+
     @NotBlank(groups = {UpdateGroup.class, InsertGroup.class}, message = "The groupId cannot be empty.")
     private String groupId;
 

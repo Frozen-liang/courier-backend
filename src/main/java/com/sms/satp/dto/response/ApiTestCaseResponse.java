@@ -44,8 +44,7 @@ public class ApiTestCaseResponse extends BaseResponse {
     private ResponseTimeVerification responseTimeVerification;
     @JsonProperty("isExecute")
     private boolean execute;
-    private Boolean removed;
-    private Boolean result;
+    private Integer isSuccess;
     private String testTime;
     private String createUsername;
     private String jobId;
