@@ -96,8 +96,8 @@ public class UserServiceImpl implements UserService {
             UserEntity userEntity = userMapper.toEntity(request);
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(GROUP_ID, ExampleMatcher.GenericPropertyMatchers.exact())
-                .withMatcher(REMOVE.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING)
+                .withIgnorePaths(REMOVE.getFiled())
                 .withIgnoreNullValues();
             Example<UserEntity> example = Example.of(userEntity, exampleMatcher);
             List<UserResponse> userResponseList = userMapper.toDtoList(userRepository.findAll(example, sort));

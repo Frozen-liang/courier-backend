@@ -14,7 +14,6 @@ public class SceneCaseJobReportResponse {
 
     private String jobId;
     private Integer jobStatus;
-    private Integer errCode;
     private List<CaseReportResponse> caseReportList;
     private String message;
     private Integer totalTimeCost;

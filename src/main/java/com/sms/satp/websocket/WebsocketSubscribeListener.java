@@ -1,8 +1,6 @@
 package com.sms.satp.websocket;
 
 import com.sms.satp.engine.EngineMemberManagement;
-import com.sms.satp.engine.enums.EngineStatus;
-import com.sms.satp.engine.model.EngineMember;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.MessageHeaders;
@@ -29,8 +27,7 @@ public class WebsocketSubscribeListener {
         MessageHeaders headers = event.getMessage().getHeaders();
         String destination = headers.get(SimpMessageHeaderAccessor.DESTINATION_HEADER, String.class);
         String sessionId = headers.get(SimpMessageHeaderAccessor.SESSION_ID_HEADER, String.class);
-        engineMemberManagement.active(
-            EngineMember.builder().destination(destination).sessionId(sessionId).status(EngineStatus.RUNNING).build());
+        engineMemberManagement.active(sessionId, destination);
 
     }
 
