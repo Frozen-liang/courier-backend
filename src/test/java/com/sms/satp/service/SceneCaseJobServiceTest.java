@@ -37,6 +37,7 @@ import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
+import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseJobRepository;
@@ -57,7 +58,6 @@ import org.springframework.data.domain.Pageable;
 @DisplayName("Test cases for SceneCaseJobServiceTest")
 class SceneCaseJobServiceTest {
 
-    private final SceneCaseApiRepository sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
     private final ProjectEnvironmentService projectEnvironmentService = mock(ProjectEnvironmentService.class);
     private final SceneCaseRepository sceneCaseRepository = mock(SceneCaseRepository.class);
     private final SceneCaseJobRepository sceneCaseJobRepository = mock(SceneCaseJobRepository.class);
@@ -70,7 +70,9 @@ class SceneCaseJobServiceTest {
 
     private final CaseTemplateRepository caseTemplateRepository = mock(CaseTemplateRepository.class);
     private final CaseTemplateApiRepository caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
-    private final SceneCaseJobService sceneCaseJobService = new SceneCaseJobServiceImpl(sceneCaseApiRepository,
+    private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository =
+        mock(CustomizedSceneCaseApiRepository.class);
+    private final SceneCaseJobService sceneCaseJobService = new SceneCaseJobServiceImpl(
         projectEnvironmentService,
         sceneCaseRepository,
         sceneCaseJobRepository,
@@ -79,7 +81,7 @@ class SceneCaseJobServiceTest {
         caseDispatcherService,
         customizedCaseTemplateApiRepository,
         caseTemplateRepository,
-        caseTemplateApiRepository);
+        caseTemplateApiRepository, customizedSceneCaseApiRepository);
 
     private final static String MOCK_ID = "1";
     private final static Integer MOCK_NUM = 1;
@@ -96,7 +98,6 @@ class SceneCaseJobServiceTest {
         Optional<CaseTemplateEntity> sceneCaseApi = Optional.ofNullable(CaseTemplateEntity.builder().build());
         when(caseTemplateRepository.findById(any())).thenReturn(sceneCaseApi);
         List<SceneCaseApiEntity> sceneCaseApiList1 = getSceneCaseApiList();
-        when(sceneCaseApiRepository.findAllBySceneCaseId(any())).thenReturn(sceneCaseApiList1);
         List<CaseTemplateApiEntity> templateApiList =
             Lists.newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID).order(MOCK_NUM).build());
         when(caseTemplateApiRepository.findAllByCaseTemplateIdOrderByOrder(any())).thenReturn(templateApiList);

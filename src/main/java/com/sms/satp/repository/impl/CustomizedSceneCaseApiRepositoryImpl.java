@@ -47,10 +47,12 @@ public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCase
     }
 
     @Override
-    public List<SceneCaseApiEntity> findSceneCaseApiBySceneCaseIdAndIsExecute(String sceneCaseId, Boolean isExecute) {
+    public List<SceneCaseApiEntity> findSceneCaseApiBySceneCaseIdAndIsExecuteAndIsRemove(String sceneCaseId,
+        boolean isExecute, boolean isRemove) {
         Query query = new Query();
         SceneFiled.SCENE_CASE_ID.is(sceneCaseId).ifPresent(query::addCriteria);
         SceneFiled.API_IS_EXECUTE.is(isExecute).ifPresent(query::addCriteria);
+        CommonFiled.REMOVE.is(isRemove).ifPresent(query::addCriteria);
         return mongoTemplate.find(query, SceneCaseApiEntity.class);
     }
 

@@ -51,7 +51,7 @@ class CustomizedSceneCaseApiRepositoryTest {
         when(mongoTemplate.find(any(), any()))
             .thenReturn(Lists.newArrayList(SceneCaseApiEntity.builder().build()));
         List<SceneCaseApiEntity> sceneCaseApiList = repository
-            .findSceneCaseApiBySceneCaseIdAndIsExecute(MOCK_ID, Boolean.TRUE);
+            .findSceneCaseApiBySceneCaseIdAndIsExecuteAndIsRemove(MOCK_ID, Boolean.TRUE,Boolean.FALSE);
         assertThat(sceneCaseApiList).isNotEmpty();
     }
 

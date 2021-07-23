@@ -4,6 +4,7 @@ import static com.sms.satp.common.enums.OperationModule.CASE_TEMPLATE_GROUP;
 import static com.sms.satp.common.enums.OperationType.ADD;
 import static com.sms.satp.common.enums.OperationType.DELETE;
 import static com.sms.satp.common.enums.OperationType.EDIT;
+import static com.sms.satp.common.enums.OperationType.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_GROUP_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_GROUP_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_GROUP_ERROR;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
@@ -84,7 +86,7 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE_GROUP, template = "{{#result?.name}}",
+    @LogRecord(operationType = REMOVE, operationModule = CASE_TEMPLATE_GROUP, template = "{{#result?.name}}",
         enhance = @Enhance(enable = true))
     public Boolean deleteById(String id) {
         try {
@@ -92,9 +94,11 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
             caseTemplateGroup.ifPresent(caseGroup -> {
                 caseTemplateGroupRepository.deleteById(caseGroup.getId());
                 List<CaseTemplateEntity> caseTemplateEntityList = customizedCaseTemplateRepository.getIdsByGroupId(id);
-                List<String> caseTemplateIds = caseTemplateEntityList.stream().map(CaseTemplateEntity::getId)
-                    .collect(Collectors.toList());
-                caseTemplateService.delete(caseTemplateIds);
+                if (CollectionUtils.isNotEmpty(caseTemplateEntityList)) {
+                    List<String> caseTemplateIds = caseTemplateEntityList.stream().map(CaseTemplateEntity::getId)
+                        .collect(Collectors.toList());
+                    caseTemplateService.delete(caseTemplateIds);
+                }
             });
             return Boolean.TRUE;
         } catch (Exception e) {

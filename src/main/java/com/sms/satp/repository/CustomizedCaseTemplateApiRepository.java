@@ -7,7 +7,8 @@ public interface CustomizedCaseTemplateApiRepository {
 
     List<CaseTemplateApiEntity> findByCaseTemplateIds(List<String> caseTemplateIds);
 
-    List<CaseTemplateApiEntity> findByCaseTemplateIdAndIsExecute(String caseTemplateId, Boolean isExecute);
+    List<CaseTemplateApiEntity> findByCaseTemplateIdAndIsExecuteAndIsRemove(String caseTemplateId, boolean isExecute,
+        boolean isRemove);
 
     int findCurrentOrderByCaseTemplateId(String caseTemplateId);
 

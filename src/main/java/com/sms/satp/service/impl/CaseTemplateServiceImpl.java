@@ -280,7 +280,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             if (CollectionUtils.isNotEmpty(caseTemplateApiEntityList)) {
                 List<String> caseTemplateApiIds =
                     caseTemplateApiEntityList.stream().map(CaseTemplateApiEntity::getId).collect(
-                    Collectors.toList());
+                        Collectors.toList());
                 customizedCaseTemplateApiRepository.deleteByIds(caseTemplateApiIds);
             }
             return Boolean.TRUE;
@@ -349,8 +349,9 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
 
     private void deleteCaseTemplateApi(String id) {
         List<CaseTemplateApiEntity> caseTemplateApiList = caseTemplateApiService.listByCaseTemplateId(id);
-        List<String> ids = caseTemplateApiList.stream().map(CaseTemplateApiEntity::getId).collect(Collectors.toList());
-        if (CollectionUtils.isNotEmpty(ids)) {
+        if (CollectionUtils.isNotEmpty(caseTemplateApiList)) {
+            List<String> ids = caseTemplateApiList.stream().map(CaseTemplateApiEntity::getId)
+                .collect(Collectors.toList());
             caseTemplateApiService.deleteByIds(ids);
         }
     }

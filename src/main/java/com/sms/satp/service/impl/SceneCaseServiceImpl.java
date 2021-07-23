@@ -387,10 +387,13 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         SceneCaseApiEntity sceneCaseApi) {
         List<CaseTemplateApiEntity> caseTemplateApiList =
             caseTemplateApiService.listByCaseTemplateId(sceneCaseApi.getCaseTemplateId());
-        Map<String, Boolean> isExecute =
-            sceneCaseApi.getCaseTemplateApiConnList().stream().collect(
-                Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::isExecute));
-        caseTemplateApiList.forEach(api -> api.getApiTestCase().setExecute(isExecute.get(api.getId())));
-        response.setCaseTemplateApiList(caseTemplateApiMapper.toCaseTemplateApiDtoList(caseTemplateApiList));
+        if (CollectionUtils.isNotEmpty(caseTemplateApiList)) {
+            Map<String, Boolean> isExecute =
+                sceneCaseApi.getCaseTemplateApiConnList().stream().collect(
+                    Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::isExecute));
+            caseTemplateApiList.forEach(api -> api.getApiTestCase().setExecute(isExecute.get(api.getId())));
+            response.setCaseTemplateApiList(caseTemplateApiMapper.toCaseTemplateApiDtoList(caseTemplateApiList));
+        }
     }
+
 }

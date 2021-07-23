@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
@@ -90,9 +91,11 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
             sceneCaseGroup.ifPresent(caseGroup -> {
                 sceneCaseGroupRepository.deleteById(caseGroup.getId());
                 List<SceneCaseEntity> sceneCaseEntityList = customizedSceneCaseRepository.getIdsByGroupId(id);
-                List<String> sceneCaseIds = sceneCaseEntityList.stream().map(SceneCaseEntity::getId)
-                    .collect(Collectors.toList());
-                sceneCaseService.delete(sceneCaseIds);
+                if (CollectionUtils.isNotEmpty(sceneCaseEntityList)) {
+                    List<String> sceneCaseIds = sceneCaseEntityList.stream().map(SceneCaseEntity::getId)
+                        .collect(Collectors.toList());
+                    sceneCaseService.delete(sceneCaseIds);
+                }
             });
             return Boolean.TRUE;
         } catch (Exception e) {

@@ -49,7 +49,8 @@ class CustomizedCaseTemplateApiRepositoryTest {
         when(mongoTemplate.find(any(), any()))
             .thenReturn(Lists.newArrayList(CaseTemplateApiEntity.builder().build()));
         List<CaseTemplateApiEntity> dto =
-            customizedCaseTemplateApiRepository.findByCaseTemplateIdAndIsExecute(MOCK_ID, Boolean.TRUE);
+            customizedCaseTemplateApiRepository.findByCaseTemplateIdAndIsExecuteAndIsRemove(MOCK_ID, Boolean.TRUE,
+                Boolean.FALSE);
         assertThat(dto).isNotEmpty();
     }
 }

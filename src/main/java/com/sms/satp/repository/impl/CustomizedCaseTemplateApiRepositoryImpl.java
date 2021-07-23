@@ -37,10 +37,12 @@ public class CustomizedCaseTemplateApiRepositoryImpl implements CustomizedCaseTe
     }
 
     @Override
-    public List<CaseTemplateApiEntity> findByCaseTemplateIdAndIsExecute(String caseTemplateId, Boolean isExecute) {
+    public List<CaseTemplateApiEntity> findByCaseTemplateIdAndIsExecuteAndIsRemove(String caseTemplateId,
+        boolean isExecute, boolean isRemove) {
         Query query = new Query();
         SceneFiled.CASE_TEMPLATE_ID.is(caseTemplateId).ifPresent(query::addCriteria);
         SceneFiled.API_IS_EXECUTE.is(isExecute).ifPresent(query::addCriteria);
+        CommonFiled.REMOVE.is(isRemove).ifPresent(query::addCriteria);
         return mongoTemplate.find(query, CaseTemplateApiEntity.class);
     }
 

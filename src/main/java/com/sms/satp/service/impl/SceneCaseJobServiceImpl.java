@@ -28,6 +28,7 @@ import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
+import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseJobRepository;
@@ -55,7 +56,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class SceneCaseJobServiceImpl implements SceneCaseJobService {
 
-    private final SceneCaseApiRepository sceneCaseApiRepository;
     private final ProjectEnvironmentService projectEnvironmentService;
     private final SceneCaseRepository sceneCaseRepository;
     private final SceneCaseJobRepository sceneCaseJobRepository;
@@ -65,8 +65,9 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
     private final CaseTemplateRepository caseTemplateRepository;
     private final CaseTemplateApiRepository caseTemplateApiRepository;
+    private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository;
 
-    public SceneCaseJobServiceImpl(SceneCaseApiRepository sceneCaseApiRepository,
+    public SceneCaseJobServiceImpl(
         ProjectEnvironmentService projectEnvironmentService,
         SceneCaseRepository sceneCaseRepository,
         SceneCaseJobRepository sceneCaseJobRepository,
@@ -75,8 +76,8 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         CaseDispatcherService caseDispatcherService,
         CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository,
         CaseTemplateRepository caseTemplateRepository,
-        CaseTemplateApiRepository caseTemplateApiRepository) {
-        this.sceneCaseApiRepository = sceneCaseApiRepository;
+        CaseTemplateApiRepository caseTemplateApiRepository,
+        CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository) {
         this.projectEnvironmentService = projectEnvironmentService;
         this.sceneCaseRepository = sceneCaseRepository;
         this.sceneCaseJobRepository = sceneCaseJobRepository;
@@ -86,6 +87,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
         this.caseTemplateRepository = caseTemplateRepository;
         this.caseTemplateApiRepository = caseTemplateApiRepository;
+        this.customizedSceneCaseApiRepository = customizedSceneCaseApiRepository;
     }
 
     @Override
@@ -191,8 +193,9 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     private List<JobSceneCaseApi> getApiCaseList(AddSceneCaseJobRequest request) {
         List<JobSceneCaseApi> caseList = Lists.newArrayList();
         if (StringUtils.isNotBlank(request.getSceneCaseId())) {
-            List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiRepository
-                .findAllBySceneCaseId(request.getSceneCaseId());
+            List<SceneCaseApiEntity> sceneCaseApiList = customizedSceneCaseApiRepository
+                .findSceneCaseApiBySceneCaseIdAndIsExecuteAndIsRemove(request.getSceneCaseId(), Boolean.TRUE,
+                    Boolean.FALSE);
             Integer index = 0;
             for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
                 if (Objects.isNull(sceneCaseApi.getCaseTemplateId())
@@ -218,7 +221,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
 
         if (StringUtils.isNotBlank(request.getCaseTemplateId())) {
             List<CaseTemplateApiEntity> caseTemplateApiList = customizedCaseTemplateApiRepository
-                .findByCaseTemplateIdAndIsExecute(request.getCaseTemplateId(), Boolean.TRUE);
+                .findByCaseTemplateIdAndIsExecuteAndIsRemove(request.getCaseTemplateId(), Boolean.TRUE, Boolean.FALSE);
             caseList.addAll(jobMapper.toJobSceneCaseApiListByTemplate(caseTemplateApiList));
         }
 
