@@ -196,10 +196,10 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             if (sceneCase.isEmpty()) {
                 throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
             }
-            if (CollectionUtils.isNotEmpty(updateSceneTemplateRequest.getUpdateSceneCaseApiConnRequest())) {
+            if (CollectionUtils.isNotEmpty(updateSceneTemplateRequest.getUpdateSceneCaseApiRequests())) {
                 List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList();
                 for (UpdateSceneCaseApiConnRequest request :
-                    updateSceneTemplateRequest.getUpdateSceneCaseApiConnRequest()) {
+                    updateSceneTemplateRequest.getUpdateSceneCaseApiRequests()) {
                     Optional<SceneCaseApiEntity> sceneCaseApi = sceneCaseApiRepository.findById(request.getId());
                     sceneCaseApi.ifPresent(api -> {
                         api.setOrder(request.getOrder());

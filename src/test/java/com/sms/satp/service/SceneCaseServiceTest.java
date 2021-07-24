@@ -417,7 +417,7 @@ class SceneCaseServiceTest {
     private UpdateSceneCaseConnRequest getUpdateRequest() {
         return UpdateSceneCaseConnRequest.builder()
             .sceneCaseId(MOCK_ID)
-            .updateSceneCaseApiConnRequest(
+            .updateSceneCaseApiRequests(
                 Lists.newArrayList(
                     UpdateSceneCaseApiConnRequest.builder()
                         .apiTestCase(ApiTestCaseRequest.builder().execute(Boolean.TRUE).build())
