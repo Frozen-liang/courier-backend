@@ -2,6 +2,7 @@ package com.sms.satp.service;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.dto.request.AddCaseTemplateApi;
 import com.sms.satp.dto.request.AddCaseTemplateConnRequest;
 import com.sms.satp.dto.request.AddSceneCaseApi;
 import com.sms.satp.dto.request.AddSceneCaseApiByIdsRequest;
@@ -238,8 +239,10 @@ class SceneCaseServiceTest {
         when(sceneCaseMapper.toDto(any())).thenReturn(sceneCaseDto);
         List<SceneCaseApiEntity> sceneCaseApiDtoList =
             Lists.newArrayList(
-                SceneCaseApiEntity.builder().caseTemplateId(MOCK_ID).id(MOCK_ID).caseTemplateApiConnList(Lists.newArrayList(
-                    CaseTemplateApiConn.builder().caseTemplateApiId(MOCK_ID).execute(Boolean.TRUE).build())).build());
+                SceneCaseApiEntity.builder().caseTemplateId(MOCK_ID).id(MOCK_ID)
+                    .caseTemplateApiConnList(Lists.newArrayList(
+                        CaseTemplateApiConn.builder().caseTemplateApiId(MOCK_ID).execute(Boolean.TRUE).build()))
+                    .build());
         when(sceneCaseApiService.listBySceneCaseId(any())).thenReturn(sceneCaseApiDtoList);
         when(caseTemplateApiService.listByCaseTemplateId(any())).thenReturn(Lists.newArrayList());
         List<CaseTemplateApiResponse> caseTemplateApiResponses =
@@ -267,7 +270,8 @@ class SceneCaseServiceTest {
         Optional<SceneCaseApiEntity> sceneCaseApi =
             Optional.ofNullable(SceneCaseApiEntity.builder().apiTestCase(ApiTestCaseEntity.builder().build()).build());
         when(sceneCaseApiRepository.findById(any())).thenReturn(sceneCaseApi);
-        when(sceneCaseApiRepository.saveAll(any())).thenReturn(Lists.newArrayList(SceneCaseApiEntity.builder().build()));
+        when(sceneCaseApiRepository.saveAll(any()))
+            .thenReturn(Lists.newArrayList(SceneCaseApiEntity.builder().build()));
         UpdateSceneCaseConnRequest request = getUpdateRequest();
         Boolean isSuccess = sceneCaseService.editConn(request);
         assertTrue(isSuccess);
@@ -280,9 +284,11 @@ class SceneCaseServiceTest {
         when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
         Optional<SceneCaseApiEntity> sceneCaseApi =
             Optional.ofNullable(
-                SceneCaseApiEntity.builder().caseTemplateId(MOCK_ID).apiTestCase(ApiTestCaseEntity.builder().build()).build());
+                SceneCaseApiEntity.builder().caseTemplateId(MOCK_ID).apiTestCase(ApiTestCaseEntity.builder().build())
+                    .build());
         when(sceneCaseApiRepository.findById(any())).thenReturn(sceneCaseApi);
-        when(sceneCaseApiRepository.saveAll(any())).thenReturn(Lists.newArrayList(SceneCaseApiEntity.builder().build()));
+        when(sceneCaseApiRepository.saveAll(any()))
+            .thenReturn(Lists.newArrayList(SceneCaseApiEntity.builder().build()));
         UpdateSceneCaseConnRequest request = getUpdateRequest();
         Boolean isSuccess = sceneCaseService.editConn(request);
         assertTrue(isSuccess);
@@ -321,12 +327,14 @@ class SceneCaseServiceTest {
         when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
         Optional<ApiTestCaseEntity> apiTestCase = Optional.ofNullable(ApiTestCaseEntity.builder().build());
         when(apiTestCaseRepository.findById(any())).thenReturn(apiTestCase);
-        when(sceneCaseApiRepository.insert(any(SceneCaseApiEntity.class))).thenReturn(SceneCaseApiEntity.builder().build());
+        when(sceneCaseApiRepository.insert(any(SceneCaseApiEntity.class)))
+            .thenReturn(SceneCaseApiEntity.builder().build());
         Optional<ApiEntity> apiEntity = Optional.ofNullable(ApiEntity.builder().build());
         when(apiRepository.findById(any())).thenReturn(apiEntity);
         ApiTestCaseEntity testCase = ApiTestCaseEntity.builder().id(MOCK_ID).build();
         when(apiTestCaseMapper.toEntityByApiEntity(any())).thenReturn(testCase);
-        when(sceneCaseApiRepository.insert(any(SceneCaseApiEntity.class))).thenReturn(SceneCaseApiEntity.builder().build());
+        when(sceneCaseApiRepository.insert(any(SceneCaseApiEntity.class)))
+            .thenReturn(SceneCaseApiEntity.builder().build());
         AddSceneCaseApiByIdsRequest request = getAddRequest();
         Boolean isSuccess = sceneCaseService.addApi(request);
         assertTrue(isSuccess);
@@ -352,7 +360,8 @@ class SceneCaseServiceTest {
         List<CaseTemplateApiConn> caseTemplateApiConnList = Lists
             .newArrayList(CaseTemplateApiConn.builder().execute(Boolean.TRUE).caseTemplateApiId(MOCK_ID).build());
         when(sceneCaseMapper.toCaseTemplateApiConnList(any())).thenReturn(caseTemplateApiConnList);
-        when(sceneCaseApiRepository.insert(any(SceneCaseApiEntity.class))).thenReturn(SceneCaseApiEntity.builder().build());
+        when(sceneCaseApiRepository.insert(any(SceneCaseApiEntity.class)))
+            .thenReturn(SceneCaseApiEntity.builder().build());
         AddCaseTemplateConnRequest request = getAddConnRequest();
         Boolean isSuccess = sceneCaseService.addTemplate(request);
         assertTrue(isSuccess);
@@ -386,7 +395,8 @@ class SceneCaseServiceTest {
     private AddCaseTemplateConnRequest getAddConnRequest() {
         return AddCaseTemplateConnRequest.builder()
             .sceneCaseId(MOCK_ID)
-            .caseTemplateIds(Lists.newArrayList(MOCK_ID)).build();
+            .caseTemplateIds(Lists.newArrayList(AddCaseTemplateApi.builder().id(MOCK_ID).order(MOCK_SIZE).build()))
+            .build();
     }
 
     private AddSceneCaseApiByIdsRequest getAddRequest() {

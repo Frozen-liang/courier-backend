@@ -24,6 +24,7 @@ import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.common.field.CommonFiled;
+import com.sms.satp.dto.request.AddCaseTemplateApi;
 import com.sms.satp.dto.request.AddCaseTemplateConnRequest;
 import com.sms.satp.dto.request.AddSceneCaseApi;
 import com.sms.satp.dto.request.AddSceneCaseApiByIdsRequest;
@@ -243,14 +244,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             if (sceneCase.isEmpty()) {
                 throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
             }
-            int index = customizedSceneCaseApiRepository.findCurrentOrderBySceneCaseId(request.getSceneCaseId());
             for (AddSceneCaseApi addSceneCaseApi : request.getSceneCaseApis()) {
                 if (BooleanUtils.isTrue(addSceneCaseApi.getIsCase())) {
-                    addSceneCaseApiByTestCase(sceneCase.get(), addSceneCaseApi, index);
+                    addSceneCaseApiByTestCase(sceneCase.get(), addSceneCaseApi);
                 } else {
-                    addSceneCaseApiByApi(sceneCase.get(), addSceneCaseApi, index);
+                    addSceneCaseApiByApi(sceneCase.get(), addSceneCaseApi);
                 }
-                index++;
             }
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -267,19 +266,18 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             if (sceneCase.isEmpty()) {
                 throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
             }
-            int index = customizedSceneCaseApiRepository
-                .findCurrentOrderBySceneCaseId(addCaseTemplateConnRequest.getSceneCaseId());
-            for (String caseTemplateId : addCaseTemplateConnRequest.getCaseTemplateIds()) {
+            for (AddCaseTemplateApi addCaseTemplateApi : addCaseTemplateConnRequest.getCaseTemplateIds()) {
                 List<CaseTemplateApiEntity> caseTemplateApiList =
-                    caseTemplateApiService.listByCaseTemplateId(caseTemplateId);
+                    caseTemplateApiService.listByCaseTemplateId(addCaseTemplateApi.getId());
                 SceneCaseApiEntity sceneCaseApi = SceneCaseApiEntity.builder()
                     .sceneCaseId(addCaseTemplateConnRequest.getSceneCaseId())
-                    .caseTemplateId(caseTemplateId).apiType(ApiType.API)
-                    .projectId(sceneCase.get().getProjectId()).order(index)
+                    .caseTemplateId(addCaseTemplateApi.getId())
+                    .apiType(ApiType.API)
+                    .projectId(sceneCase.get().getProjectId())
+                    .order(addCaseTemplateApi.getOrder())
                     .caseTemplateApiConnList(sceneCaseMapper.toCaseTemplateApiConnList(caseTemplateApiList))
                     .build();
                 sceneCaseApiRepository.insert(sceneCaseApi);
-                index++;
             }
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -349,7 +347,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         }
     }
 
-    private void addSceneCaseApiByApi(SceneCaseEntity sceneCase, AddSceneCaseApi addSceneCaseApi, int index) {
+    private void addSceneCaseApiByApi(SceneCaseEntity sceneCase, AddSceneCaseApi addSceneCaseApi) {
         Optional<ApiEntity> apiEntity = apiRepository.findById(addSceneCaseApi.getId());
         if (apiEntity.isPresent()) {
             ApiTestCaseEntity apiTestCase = apiTestCaseMapper.toEntityByApiEntity(apiEntity.get());
@@ -358,7 +356,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 SceneCaseApiEntity.builder()
                     .apiTestCase(apiTestCase)
                     .sceneCaseId(sceneCase.getId())
-                    .order(index)
+                    .order(addSceneCaseApi.getOrder())
                     .projectId(sceneCase.getProjectId())
                     .apiType(ApiType.API)
                     .build();
@@ -366,7 +364,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         }
     }
 
-    private void addSceneCaseApiByTestCase(SceneCaseEntity sceneCase, AddSceneCaseApi addSceneCaseApi, int index) {
+    private void addSceneCaseApiByTestCase(SceneCaseEntity sceneCase, AddSceneCaseApi addSceneCaseApi) {
         Optional<ApiTestCaseEntity> apiTestCase = apiTestCaseRepository.findById(addSceneCaseApi.getId());
         if (apiTestCase.isPresent()) {
             ApiTestCaseEntity testCase = apiTestCase.get();
@@ -375,7 +373,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 SceneCaseApiEntity.builder()
                     .apiTestCase(testCase)
                     .sceneCaseId(sceneCase.getId())
-                    .order(index)
+                    .order(addSceneCaseApi.getOrder())
                     .projectId(sceneCase.getProjectId())
                     .apiType(ApiType.API)
                     .build();

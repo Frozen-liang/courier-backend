@@ -251,15 +251,12 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             if (caseTemplate.isEmpty()) {
                 throw new ApiTestPlatformException(GET_CASE_TEMPLATE_BY_ID_ERROR);
             }
-            int index =
-                customizedCaseTemplateApiRepository.findCurrentOrderByCaseTemplateId(request.getCaseTemplateId());
             for (AddSceneCaseApi addSceneCaseApi : request.getCaseTemplateApis()) {
                 if (BooleanUtils.isTrue(addSceneCaseApi.getIsCase())) {
-                    addCaseTemplateApiByTestCase(caseTemplate.get(), addSceneCaseApi, index);
+                    addCaseTemplateApiByTestCase(caseTemplate.get(), addSceneCaseApi);
                 } else {
-                    addCaseTemplateApiByApi(caseTemplate.get(), addSceneCaseApi, index);
+                    addCaseTemplateApiByApi(caseTemplate.get(), addSceneCaseApi);
                 }
-                index++;
             }
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -312,7 +309,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         }
     }
 
-    private void addCaseTemplateApiByApi(CaseTemplateEntity caseTemplate, AddSceneCaseApi addSceneCaseApi, int index) {
+    private void addCaseTemplateApiByApi(CaseTemplateEntity caseTemplate, AddSceneCaseApi addSceneCaseApi) {
         Optional<ApiEntity> apiEntity = apiRepository.findById(addSceneCaseApi.getId());
         if (apiEntity.isPresent()) {
             ApiTestCaseEntity apiTestCase = apiTestCaseMapper.toEntityByApiEntity(apiEntity.get());
@@ -322,15 +319,14 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
                     .apiTestCase(apiTestCase)
                     .caseTemplateId(caseTemplate.getId())
                     .projectId(caseTemplate.getProjectId())
-                    .order(index)
+                    .order(addSceneCaseApi.getOrder())
                     .apiType(ApiType.API)
                     .build();
             caseTemplateApiRepository.insert(caseTemplateApi);
         }
     }
 
-    private void addCaseTemplateApiByTestCase(CaseTemplateEntity caseTemplate, AddSceneCaseApi addSceneCaseApi,
-        int index) {
+    private void addCaseTemplateApiByTestCase(CaseTemplateEntity caseTemplate, AddSceneCaseApi addSceneCaseApi) {
         Optional<ApiTestCaseEntity> apiTestCase = apiTestCaseRepository.findById(addSceneCaseApi.getId());
         if (apiTestCase.isPresent()) {
             ApiTestCaseEntity testCase = apiTestCase.get();
@@ -340,7 +336,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
                     .apiTestCase(testCase)
                     .caseTemplateId(caseTemplate.getId())
                     .projectId(caseTemplate.getProjectId())
-                    .order(index)
+                    .order(addSceneCaseApi.getOrder())
                     .apiType(ApiType.API)
                     .build();
             caseTemplateApiRepository.insert(caseTemplateApi);
