@@ -1,6 +1,7 @@
 package com.sms.satp.common.field;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -11,7 +12,7 @@ public interface Field {
 
     String getName();
 
-    String[] charArr = {"\\", "(", ")", ".", "[", "?", "^", "{", "}", "|"};
+    List<String> charArr = List.of("\\", "(", ")", ".", "[", "?", "^", "{", "}", "|");
 
 
     default Optional<Criteria> is(Object value) {
