@@ -1,10 +1,10 @@
 package com.sms.satp.repository.impl;
 
-import static com.sms.satp.common.field.ApiTestCaseJobFiled.API_TEST_CASE_ID;
-import static com.sms.satp.common.field.ApiTestCaseJobFiled.JOB_API_ID;
-import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.field.CommonFiled.CREATE_USER_ID;
-import static com.sms.satp.common.field.CommonFiled.ID;
+import static com.sms.satp.common.field.ApiTestCaseJobField.API_TEST_CASE_ID;
+import static com.sms.satp.common.field.ApiTestCaseJobField.JOB_API_ID;
+import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonField.CREATE_USER_ID;
+import static com.sms.satp.common.field.CommonField.ID;
 
 import com.sms.satp.dto.request.ApiTestCaseJobPageRequest;
 import com.sms.satp.entity.job.ApiTestCaseJobEntity;
@@ -37,10 +37,10 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
     public Page<ApiTestCaseJobEntity> page(ApiTestCaseJobPageRequest apiTestCaseJobPageRequest) {
         Document document = new Document();
         document.put(CASE_REPORT, true);
-        document.put(ID.getFiled(), true);
+        document.put(ID.getName(), true);
         document.put(JOB_STATUS, true);
         document.put(CREATE_USER_NAME, true);
-        document.put(CREATE_DATE_TIME.getFiled(), true);
+        document.put(CREATE_DATE_TIME.getName(), true);
         document.put(MESSAGE, true);
         BasicQuery query = new BasicQuery(new Document(), document);
         API_TEST_CASE_ID.is(apiTestCaseJobPageRequest.getApiTestCaseId()).ifPresent(query::addCriteria);

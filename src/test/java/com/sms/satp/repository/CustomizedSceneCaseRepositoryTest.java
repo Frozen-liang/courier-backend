@@ -1,5 +1,10 @@
 package com.sms.satp.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.repository.impl.CustomizedSceneCaseRepositoryImpl;
@@ -13,18 +18,13 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Query;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @DisplayName("Tests for CustomizedSceneCaseRepositoryTest")
 class CustomizedSceneCaseRepositoryTest {
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final CustomizedSceneCaseRepository customizedSceneCaseRepository =
-        new CustomizedSceneCaseRepositoryImpl(mongoTemplate, commonDeleteRepository);
+        new CustomizedSceneCaseRepositoryImpl(mongoTemplate, commonRepository);
 
     private final static String MOCK_ID = "1";
     private final static String NAME = "test";

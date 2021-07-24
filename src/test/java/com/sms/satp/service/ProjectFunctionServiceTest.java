@@ -20,7 +20,7 @@ import com.sms.satp.dto.request.ProjectFunctionRequest;
 import com.sms.satp.dto.response.ProjectFunctionResponse;
 import com.sms.satp.entity.function.ProjectFunctionEntity;
 import com.sms.satp.mapper.ProjectFunctionMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.ProjectFunctionRepository;
 import com.sms.satp.service.impl.ProjectFunctionServiceImpl;
 import java.util.ArrayList;
@@ -38,9 +38,9 @@ class ProjectFunctionServiceTest {
     private final ProjectFunctionRepository projectFunctionRepository = mock(ProjectFunctionRepository.class);
     private final ProjectFunctionMapper projectFunctionMapper = mock(ProjectFunctionMapper.class);
     private final GlobalFunctionService globalFunctionService = mock(GlobalFunctionService.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final ProjectFunctionService projectFunctionService = new ProjectFunctionServiceImpl(
-        projectFunctionRepository, projectFunctionMapper, globalFunctionService, commonDeleteRepository);
+        projectFunctionRepository, projectFunctionMapper, globalFunctionService, commonRepository);
     private final ProjectFunctionEntity projectFunction = ProjectFunctionEntity.builder().id(ID).build();
     private final ProjectFunctionResponse projectFunctionResponse = ProjectFunctionResponse
         .builder().id(ID).build();
@@ -150,14 +150,14 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectFunction service")
     public void delete_test() {
-        when(commonDeleteRepository.deleteByIds(ID_LIST, ProjectFunctionEntity.class)).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(ID_LIST, ProjectFunctionEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(projectFunctionService.delete(ID_LIST)).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while delete ProjectFunction")
     public void delete_exception_test() {
-        doThrow(new RuntimeException()).when(commonDeleteRepository)
+        doThrow(new RuntimeException()).when(commonRepository)
             .deleteByIds(ID_LIST, ProjectFunctionEntity.class);
         assertThatThrownBy(() -> projectFunctionService.delete(Collections.singletonList(ID)))
             .isInstanceOf(ApiTestPlatformException.class)

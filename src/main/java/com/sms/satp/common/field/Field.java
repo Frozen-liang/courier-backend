@@ -7,39 +7,39 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.query.Criteria;
 
-public interface Filed {
+public interface Field {
 
-    String getFiled();
+    String getName();
 
-    //String[] charArr = {"(", ")",   ".", "[",  "?", "^", "{", "}", "|"};
+    String[] charArr = {"\\", "(", ")", ".", "[", "?", "^", "{", "}", "|"};
 
 
     default Optional<Criteria> is(Object value) {
-        return Objects.nonNull(value) ? Optional.of(Criteria.where(getFiled()).is(value)) : Optional.empty();
+        return Objects.nonNull(value) ? Optional.of(Criteria.where(getName()).is(value)) : Optional.empty();
     }
 
     default Optional<Criteria> is(String value) {
-        return StringUtils.isNotEmpty(value) ? Optional.of(Criteria.where(getFiled()).is(value)) : Optional.empty();
+        return StringUtils.isNotEmpty(value) ? Optional.of(Criteria.where(getName()).is(value)) : Optional.empty();
     }
 
     default Optional<Criteria> in(Collection<?> values) {
         return Objects.isNull(values) || values.isEmpty() ? Optional.empty()
-            : Optional.of(Criteria.where(getFiled()).in(values));
+            : Optional.of(Criteria.where(getName()).in(values));
     }
 
     default Optional<Criteria> nin(Collection<?> values) {
         return Objects.isNull(values) || values.isEmpty() ? Optional.empty()
-            : Optional.of(Criteria.where(getFiled()).nin(values));
+            : Optional.of(Criteria.where(getName()).nin(values));
     }
 
     default Optional<Criteria> lte(Object value) {
         return Objects.isNull(value) ? Optional.empty()
-            : Optional.of(Criteria.where(getFiled()).lte(value));
+            : Optional.of(Criteria.where(getName()).lte(value));
     }
 
     default Optional<Criteria> gte(Object value) {
         return Objects.isNull(value) ? Optional.empty()
-            : Optional.of(Criteria.where(getFiled()).gte(value));
+            : Optional.of(Criteria.where(getName()).gte(value));
     }
 
     default Optional<Criteria> lteAndGte(Object ltValue, Object gtValue) {
@@ -47,28 +47,28 @@ public interface Filed {
             return Optional.empty();
         }
         if (Objects.nonNull(ltValue) && Objects.nonNull(gtValue)) {
-            return Optional.of(Criteria.where(getFiled()).gte(ltValue).lte(gtValue));
+            return Optional.of(Criteria.where(getName()).gte(ltValue).lte(gtValue));
         }
         if (Objects.nonNull(ltValue)) {
-            return Optional.of(Criteria.where(getFiled()).gte(ltValue));
+            return Optional.of(Criteria.where(getName()).gte(ltValue));
         }
-        return Optional.of(Criteria.where(getFiled()).lte(gtValue));
+        return Optional.of(Criteria.where(getName()).lte(gtValue));
     }
 
     default Optional<Criteria> like(String value) {
         if (Objects.isNull(value)) {
             return Optional.empty();
         }
-        Pattern pattern = Pattern.compile("^.*" + value + ".*$", Pattern.CASE_INSENSITIVE);
-        return Optional.of(Criteria.where(getFiled()).regex(pattern));
+        Pattern pattern = Pattern.compile("^.*" + converterSpecialChar(value) + ".*$", Pattern.CASE_INSENSITIVE);
+        return Optional.of(Criteria.where(getName()).regex(pattern));
     }
 
-    /*private String converterSpecialChar(String value) {
+    private String converterSpecialChar(String value) {
         for (String key : charArr) {
             if (value.contains(key)) {
                 value = value.replace(key, "\\" + key);
             }
         }
         return value;
-    }*/
+    }
 }

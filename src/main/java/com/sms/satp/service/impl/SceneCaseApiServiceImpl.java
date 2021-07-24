@@ -15,7 +15,7 @@ import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.common.field.SceneFiled;
+import com.sms.satp.common.field.SceneField;
 import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
 import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
@@ -123,7 +123,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
                 SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(removed).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(sceneCaseApiMapper::toSceneCaseApiDto).collect(Collectors.toList());
         } catch (Exception e) {
@@ -137,7 +137,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
                 SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);
@@ -150,7 +150,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
                 SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(remove).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);

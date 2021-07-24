@@ -1,10 +1,10 @@
 package com.sms.satp.repository.impl;
 
-import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
 
-import com.sms.satp.common.field.CommonFiled;
-import com.sms.satp.common.field.SceneCaseJobFiled;
-import com.sms.satp.common.field.SceneFiled;
+import com.sms.satp.common.field.CommonField;
+import com.sms.satp.common.field.SceneCaseJobField;
+import com.sms.satp.common.field.SceneField;
 import com.sms.satp.dto.request.SceneCaseJobRequest;
 import com.sms.satp.entity.job.SceneCaseJobEntity;
 import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
@@ -34,15 +34,15 @@ public class CustomizedSceneCaseJobRepositoryImpl implements CustomizedSceneCase
     public Page<SceneCaseJobEntity> page(SceneCaseJobRequest sceneCaseJobRequest) {
         PageDtoConverter.frontMapping(sceneCaseJobRequest);
         Document document = new Document();
-        document.put(SceneCaseJobFiled.API_TEST_CASE.getFiled(), true);
-        document.put(SceneCaseJobFiled.JOB_STATUS.getFiled(), true);
-        document.put(SceneCaseJobFiled.CREATE_USER_NAME.getFiled(), true);
-        document.put(CREATE_DATE_TIME.getFiled(), true);
-        document.put(SceneCaseJobFiled.MESSAGE.getFiled(), true);
+        document.put(SceneCaseJobField.API_TEST_CASE.getName(), true);
+        document.put(SceneCaseJobField.JOB_STATUS.getName(), true);
+        document.put(SceneCaseJobField.CREATE_USER_NAME.getName(), true);
+        document.put(CREATE_DATE_TIME.getName(), true);
+        document.put(SceneCaseJobField.MESSAGE.getName(), true);
         BasicQuery query = new BasicQuery(new Document(), document);
-        CommonFiled.CREATE_USER_ID.in(sceneCaseJobRequest.getUserIds()).ifPresent(query::addCriteria);
-        SceneFiled.SCENE_CASE_ID.is(sceneCaseJobRequest.getSceneCaseId()).ifPresent(query::addCriteria);
-        SceneFiled.CASE_TEMPLATE_ID.is(sceneCaseJobRequest.getCaseTemplateId()).ifPresent(query::addCriteria);
+        CommonField.CREATE_USER_ID.in(sceneCaseJobRequest.getUserIds()).ifPresent(query::addCriteria);
+        SceneField.SCENE_CASE_ID.is(sceneCaseJobRequest.getSceneCaseId()).ifPresent(query::addCriteria);
+        SceneField.CASE_TEMPLATE_ID.is(sceneCaseJobRequest.getCaseTemplateId()).ifPresent(query::addCriteria);
         long total = mongoTemplate.count(query, SceneCaseJobEntity.class);
         Sort sort = Sort.by(Direction.fromString(sceneCaseJobRequest.getOrder()), sceneCaseJobRequest.getSort());
         Pageable pageable = PageRequest

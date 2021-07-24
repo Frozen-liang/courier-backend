@@ -12,15 +12,14 @@ import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_GROUP_LI
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.common.field.CommonFiled;
-import com.sms.satp.common.field.SceneFiled;
+import com.sms.satp.common.field.CommonField;
+import com.sms.satp.common.field.SceneField;
 import com.sms.satp.dto.request.AddCaseTemplateGroupRequest;
 import com.sms.satp.dto.request.SearchCaseTemplateGroupRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateGroupRequest;
 import com.sms.satp.dto.response.CaseTemplateGroupResponse;
 import com.sms.satp.entity.group.CaseTemplateGroupEntity;
 import com.sms.satp.entity.scenetest.CaseTemplateEntity;
-import com.sms.satp.entity.scenetest.SceneCaseEntity;
 import com.sms.satp.mapper.CaseTemplateGroupMapper;
 import com.sms.satp.repository.CaseTemplateGroupRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
@@ -110,8 +109,8 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
                 CaseTemplateGroupEntity.builder().projectId(request.getProjectId()).parentId(request.getParentId())
                     .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(CommonFiled.ID.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(SceneFiled.NAME.getFiled(), GenericPropertyMatchers.exact())
+                .withMatcher(CommonField.ID.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(SceneField.NAME.getName(), GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
             Example<CaseTemplateGroupEntity> example = Example.of(group, exampleMatcher);
             List<CaseTemplateGroupEntity> caseTemplateGroups = caseTemplateGroupRepository.findAll(example);

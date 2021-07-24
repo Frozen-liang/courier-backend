@@ -1,8 +1,8 @@
 package com.sms.satp.repository.impl;
 
-import com.sms.satp.common.field.CommonFiled;
+import com.sms.satp.common.field.CommonField;
 import com.sms.satp.entity.datacollection.DataCollectionEntity;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.CustomizedDataCollectionRepository;
 import java.util.Collections;
 import java.util.List;
@@ -16,19 +16,19 @@ import org.springframework.stereotype.Repository;
 public class CustomizedDataCollectionRepositoryImpl implements CustomizedDataCollectionRepository {
 
     private final MongoTemplate mongoTemplate;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
     private static final String PARAM_LIST = "paramList";
 
     public CustomizedDataCollectionRepositoryImpl(MongoTemplate mongoTemplate,
-        CommonDeleteRepository commonDeleteRepository) {
+        CommonRepository commonRepository) {
         this.mongoTemplate = mongoTemplate;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
     }
 
 
     @Override
     public List<String> getParamListById(String id) {
-        Query query = new Query(Criteria.where(CommonFiled.ID.getFiled()).is(id));
+        Query query = new Query(Criteria.where(CommonField.ID.getName()).is(id));
         query.fields().include(PARAM_LIST);
         DataCollectionEntity dataCollection = mongoTemplate.findOne(query, DataCollectionEntity.class);
         return Objects.nonNull(dataCollection) ? dataCollection.getParamList() : Collections.emptyList();
@@ -36,11 +36,11 @@ public class CustomizedDataCollectionRepositoryImpl implements CustomizedDataCol
 
     @Override
     public Boolean deleteById(String id) {
-        return commonDeleteRepository.deleteById(id, DataCollectionEntity.class);
+        return commonRepository.deleteById(id, DataCollectionEntity.class);
     }
 
     @Override
     public Boolean deleteByIds(List<String> ids) {
-        return commonDeleteRepository.deleteByIds(ids, DataCollectionEntity.class);
+        return commonRepository.deleteByIds(ids, DataCollectionEntity.class);
     }
 }

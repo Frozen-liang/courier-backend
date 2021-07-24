@@ -14,7 +14,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_API_LIST
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.common.field.SceneFiled;
+import com.sms.satp.common.field.SceneField;
 import com.sms.satp.dto.request.BatchAddCaseTemplateApiRequest;
 import com.sms.satp.dto.request.BatchUpdateCaseTemplateApiRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
@@ -121,7 +121,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
         try {
             Example<CaseTemplateApiEntity> example = Example
                 .of(CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             List<CaseTemplateApiEntity> sceneCaseApiList = caseTemplateApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(aseTemplateApiMapper::toCaseTemplateApiDto)
                 .collect(Collectors.toList());
@@ -148,7 +148,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
         try {
             Example<CaseTemplateApiEntity> example = Example
                 .of(CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).removed(removed).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             return caseTemplateApiRepository.findAll(example, sort);
         } catch (Exception e) {
             log.error("Failed to get the CaseTemplateApi list by caseTemplateId!", e);

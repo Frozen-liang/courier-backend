@@ -84,6 +84,7 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
             engineMember.setCaseTaskSize(caseRecordRequest.getCaseCount());
             engineMember.setSceneCaseTaskSize(caseRecordRequest.getSceneCaseCount());
             engineMember.setCurrentTaskSize(caseRecordRequest.getCaseCount() + caseRecordRequest.getSceneCaseCount());
+            engineMemberRepository.save(engineMember);
             log.info("The destination {} currentTask {} caseTask {} sceneCaseTask {}.", engineMember.getDestination(),
                 engineMember.getCurrentTaskSize(), engineMember.getCaseTaskSize(), engineMember.getSceneCaseTaskSize());
         });

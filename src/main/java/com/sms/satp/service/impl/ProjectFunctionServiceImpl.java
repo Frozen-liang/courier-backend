@@ -10,9 +10,9 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_LIST_ERROR;
-import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
-import static com.sms.satp.common.field.CommonFiled.REMOVE;
+import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonField.PROJECT_ID;
+import static com.sms.satp.common.field.CommonField.REMOVE;
 import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
@@ -23,7 +23,7 @@ import com.sms.satp.dto.response.GlobalFunctionResponse;
 import com.sms.satp.dto.response.ProjectFunctionResponse;
 import com.sms.satp.entity.function.ProjectFunctionEntity;
 import com.sms.satp.mapper.ProjectFunctionMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.ProjectFunctionRepository;
 import com.sms.satp.service.GlobalFunctionService;
 import com.sms.satp.service.ProjectFunctionService;
@@ -45,16 +45,16 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     private final ProjectFunctionRepository projectFunctionRepository;
     private final ProjectFunctionMapper projectFunctionMapper;
     private final GlobalFunctionService globalFunctionService;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
     private static final String FUNCTION_KEY = "functionKey";
 
     public ProjectFunctionServiceImpl(ProjectFunctionRepository projectFunctionRepository,
         ProjectFunctionMapper projectFunctionMapper, GlobalFunctionService globalFunctionService,
-        CommonDeleteRepository commonDeleteRepository) {
+        CommonRepository commonRepository) {
         this.projectFunctionRepository = projectFunctionRepository;
         this.projectFunctionMapper = projectFunctionMapper;
         this.globalFunctionService = globalFunctionService;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
     }
 
     @Override
@@ -121,7 +121,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, ProjectFunctionEntity.class);
+            return commonRepository.deleteByIds(ids, ProjectFunctionEntity.class);
         } catch (Exception e) {
             log.error("Failed to delete the ProjectFunction!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_FUNCTION_BY_ID_ERROR);
@@ -132,11 +132,11 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     public List<ProjectFunctionResponse> findAll(String projectId, String functionKey, String functionName) {
         ProjectFunctionEntity projectFunction = ProjectFunctionEntity.builder()
             .projectId(projectId).functionKey(functionKey).functionName(functionName).build();
-        Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
+        Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
         ExampleMatcher matcher = ExampleMatcher.matching()
-            .withMatcher(PROJECT_ID.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
+            .withMatcher(PROJECT_ID.getName(), ExampleMatcher.GenericPropertyMatchers.exact())
             .withMatcher(FUNCTION_KEY, ExampleMatcher.GenericPropertyMatchers.exact())
-            .withMatcher(REMOVE.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
+            .withMatcher(REMOVE.getName(), ExampleMatcher.GenericPropertyMatchers.exact())
             .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
         Example<ProjectFunctionEntity> example = Example.of(projectFunction, matcher);
         List<ProjectFunctionEntity> projectFunctionList = projectFunctionRepository.findAll(example, sort);

@@ -21,10 +21,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 class CustomizedApiTestCaseRepositoryTest {
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository =
         new CustomizedApiTestCaseRepositoryImpl(mongoTemplate,
-            commonDeleteRepository);
+            commonRepository);
     private static final String ID = ObjectId.get().toString();
     private static final List<String> ID_LIST = Collections.singletonList(ID);
 
@@ -41,14 +41,14 @@ class CustomizedApiTestCaseRepositoryTest {
     @Test
     @DisplayName("Test the deleteById method in the CustomizedApiTestCaseRepository")
     public void deleteById_test() {
-        when(commonDeleteRepository.deleteById(ID, ApiTestCaseEntity.class)).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteById(ID, ApiTestCaseEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(customizedApiTestCaseRepository.deleteById(ID)).isTrue();
     }
 
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedApiTestCaseRepository")
     public void deleteByIds() {
-        when(commonDeleteRepository.deleteByIds(ID_LIST, ApiTestCaseEntity.class)).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(ID_LIST, ApiTestCaseEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(customizedApiTestCaseRepository.deleteByIds(ID_LIST)).isTrue();
     }
 }

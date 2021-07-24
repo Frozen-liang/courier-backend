@@ -1,5 +1,10 @@
 package com.sms.satp.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.sms.satp.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.satp.repository.impl.CustomizedCaseTemplateApiRepositoryImpl;
 import java.util.List;
@@ -8,18 +13,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 @DisplayName("Tests for CustomizedCaseTemplateApiRepositoryTest")
 class CustomizedCaseTemplateApiRepositoryTest {
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository =
-        new CustomizedCaseTemplateApiRepositoryImpl(mongoTemplate, commonDeleteRepository);
+        new CustomizedCaseTemplateApiRepositoryImpl(mongoTemplate, commonRepository);
 
     private final static String MOCK_ID = "1";
     private final static String NAME = "test";

@@ -16,6 +16,8 @@ public class ApiTestCaseJobRunRequest {
 
     private String envId;
 
+    private String workspaceId;
+
     private DataCollectionRequest dataCollectionRequest;
 
 }

@@ -17,7 +17,7 @@ import com.sms.satp.dto.request.UserGroupRequest;
 import com.sms.satp.dto.response.UserGroupResponse;
 import com.sms.satp.entity.system.UserGroupEntity;
 import com.sms.satp.mapper.UserGroupMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.service.UserGroupService;
 import com.sms.satp.utils.ExceptionUtils;
@@ -32,14 +32,14 @@ import org.springframework.stereotype.Service;
 public class UserGroupServiceImpl implements UserGroupService {
 
     private final UserGroupRepository userGroupRepository;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
     private final UserGroupMapper userGroupMapper;
 
     public UserGroupServiceImpl(UserGroupRepository userGroupRepository,
-        CommonDeleteRepository commonDeleteRepository,
+        CommonRepository commonRepository,
         UserGroupMapper userGroupMapper) {
         this.userGroupRepository = userGroupRepository;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
         this.userGroupMapper = userGroupMapper;
     }
 
@@ -102,7 +102,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, UserGroupEntity.class);
+            return commonRepository.deleteByIds(ids, UserGroupEntity.class);
         } catch (Exception e) {
             log.error("Failed to delete the UserGroup!", e);
             throw new ApiTestPlatformException(DELETE_USER_GROUP_BY_ID_ERROR);

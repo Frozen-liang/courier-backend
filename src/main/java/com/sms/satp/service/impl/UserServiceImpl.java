@@ -12,8 +12,8 @@ import static com.sms.satp.common.exception.ErrorCode.GET_USER_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_USER_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.LOCK_USER_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.UNLOCK_USER_BY_ID_ERROR;
-import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.field.CommonFiled.REMOVE;
+import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonField.REMOVE;
 import static com.sms.satp.utils.Assert.isFalse;
 import static com.sms.satp.utils.Assert.isTrue;
 
@@ -28,7 +28,7 @@ import com.sms.satp.entity.system.UserEntity;
 import com.sms.satp.entity.system.UserGroupEntity;
 import com.sms.satp.entity.workspace.WorkspaceEntity;
 import com.sms.satp.mapper.UserMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.repository.UserRepository;
 import com.sms.satp.repository.WorkspaceRepository;
@@ -61,19 +61,19 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserGroupRepository userGroupRepository;
     private final WorkspaceRepository workspaceRepository;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static final String GROUP_ID = "groupId";
 
     public UserServiceImpl(UserRepository userRepository,
         UserGroupRepository userGroupRepository, WorkspaceRepository workspaceRepository,
-        CommonDeleteRepository commonDeleteRepository,
+        CommonRepository commonRepository,
         UserMapper userMapper) {
         this.userRepository = userRepository;
         this.userGroupRepository = userGroupRepository;
         this.workspaceRepository = workspaceRepository;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
         this.userMapper = userMapper;
     }
 
@@ -92,12 +92,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponse> list(UserQueryListRequest request) {
         try {
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
             UserEntity userEntity = userMapper.toEntity(request);
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(GROUP_ID, ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING)
-                .withIgnorePaths(REMOVE.getFiled())
+                .withIgnorePaths(REMOVE.getName())
                 .withIgnoreNullValues();
             Example<UserEntity> example = Example.of(userEntity, exampleMatcher);
             List<UserResponse> userResponseList = userMapper.toDtoList(userRepository.findAll(example, sort));
@@ -155,12 +155,12 @@ public class UserServiceImpl implements UserService {
     public Boolean edit(UserRequest userRequest) {
         log.info("UserService-edit()-params: [User]={}", userRequest.toString());
         try {
-            Optional<UserEntity> optional = userRepository.findById(userRequest.getId());
-            if (optional.isEmpty()) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "User", userRequest.getId());
-            }
+            UserEntity oldUser = userRepository.findById(userRequest.getId())
+                .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "User", userRequest.getId()));
             UserEntity user = userMapper.toEntity(userRequest);
-            user.setPassword(optional.get().getPassword());
+            isFalse(userRepository.existsByUsername(userRequest.getUsername()), "The username exists.");
+            isFalse(userRepository.existsByEmail(userRequest.getEmail()), "The email exists.");
+            user.setPassword(oldUser.getPassword());
             userRepository.save(user);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
@@ -180,7 +180,7 @@ public class UserServiceImpl implements UserService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean lock(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, UserEntity.class);
+            return commonRepository.deleteByIds(ids, UserEntity.class);
         } catch (Exception e) {
             log.error("Failed to lock the User!", e);
             throw new ApiTestPlatformException(LOCK_USER_BY_ID_ERROR);
@@ -192,7 +192,7 @@ public class UserServiceImpl implements UserService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean unlock(List<String> ids) {
         try {
-            return commonDeleteRepository.recover(ids, UserEntity.class);
+            return commonRepository.recover(ids, UserEntity.class);
         } catch (Exception e) {
             log.error("Failed to unlock the User!", e);
             throw new ApiTestPlatformException(UNLOCK_USER_BY_ID_ERROR);

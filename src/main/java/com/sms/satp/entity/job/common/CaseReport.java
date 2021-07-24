@@ -23,9 +23,9 @@ public class CaseReport {
 
     private String requestUrl;
 
-    private Map<String, String> requestHeader;
+    private Map<String, Object> requestHeader;
 
-    private Map<String, String> responseHeader;
+    private Map<String, Object> responseHeader;
 
     private Object responseData;
 

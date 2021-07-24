@@ -22,7 +22,7 @@ import com.sms.satp.entity.system.UserEntity;
 import com.sms.satp.entity.workspace.WorkspaceEntity;
 import com.sms.satp.mapper.UserMapper;
 import com.sms.satp.mapper.UserMapperImpl;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.repository.UserRepository;
 import com.sms.satp.repository.WorkspaceRepository;
@@ -42,11 +42,11 @@ class UserServiceTest {
     private final UserRepository userRepository = mock(UserRepository.class);
     private final WorkspaceRepository workspaceRepository = mock(WorkspaceRepository.class);
     private final UserGroupRepository userGroupRepository = mock(UserGroupRepository.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(
-        CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(
+        CommonRepository.class);
     private final UserMapper userMapper = new UserMapperImpl();
     private final UserService userService = new UserServiceImpl(
-        userRepository, userGroupRepository, workspaceRepository, commonDeleteRepository, userMapper);
+        userRepository, userGroupRepository, workspaceRepository, commonRepository, userMapper);
     private final UserEntity user = UserEntity.builder().id(ID).build();
     private final UserRequest userRequest = UserRequest.builder().password("123Wac!@#")
         .id(ID).build();
@@ -149,7 +149,7 @@ class UserServiceTest {
     @DisplayName("Test the lock method in the User service")
     public void delete_test() {
         List<String> ids = Collections.singletonList(ID);
-        when(commonDeleteRepository.deleteByIds(ids, UserEntity.class)).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(ids, UserEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(userService.lock(Collections.singletonList(ID))).isTrue();
     }
 
@@ -157,7 +157,7 @@ class UserServiceTest {
     @DisplayName("An exception occurred while lock User")
     public void delete_exception_test() {
         List<String> ids = Collections.singletonList(ID);
-        doThrow(new RuntimeException()).when(commonDeleteRepository)
+        doThrow(new RuntimeException()).when(commonRepository)
             .deleteByIds(ids, UserEntity.class);
         assertThatThrownBy(() -> userService.lock(ids))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -169,7 +169,7 @@ class UserServiceTest {
     @DisplayName("Test the unlock method in the User service")
     public void unlock_test() {
         List<String> ids = Collections.singletonList(ID);
-        when(commonDeleteRepository.recover(ids, UserEntity.class)).thenReturn(Boolean.TRUE);
+        when(commonRepository.recover(ids, UserEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(userService.unlock(Collections.singletonList(ID))).isTrue();
     }
 
@@ -177,7 +177,7 @@ class UserServiceTest {
     @DisplayName("An exception occurred while unlock User")
     public void unlock_exception_test() {
         List<String> ids = Collections.singletonList(ID);
-        doThrow(new RuntimeException()).when(commonDeleteRepository)
+        doThrow(new RuntimeException()).when(commonRepository)
             .recover(ids, UserEntity.class);
         assertThatThrownBy(() -> userService.unlock(ids))
             .isInstanceOf(ApiTestPlatformException.class)

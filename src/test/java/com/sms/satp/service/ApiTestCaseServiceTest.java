@@ -25,7 +25,10 @@ import com.sms.satp.entity.job.ApiTestCaseJobEntity;
 import com.sms.satp.mapper.ApiTestCaseMapper;
 import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.mapper.JobMapperImpl;
+import com.sms.satp.mapper.MatchParamInfoMapperImpl;
+import com.sms.satp.mapper.ParamInfoMapper;
 import com.sms.satp.mapper.ParamInfoMapperImpl;
+import com.sms.satp.mapper.ResponseResultVerificationMapperImpl;
 import com.sms.satp.repository.ApiTestCaseRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseRepository;
@@ -51,7 +54,10 @@ class ApiTestCaseServiceTest {
     private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository = mock(
         CustomizedApiTestCaseRepository.class);
     private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
-    private final JobMapper jobMapper = new JobMapperImpl(new ParamInfoMapperImpl());
+    private final ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
+    private final JobMapper jobMapper = new JobMapperImpl(paramInfoMapper, new MatchParamInfoMapperImpl(),
+        new ResponseResultVerificationMapperImpl(new MatchParamInfoMapperImpl()));
+
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository = mock(
         CustomizedApiTestCaseJobRepository.class);
     private final ApiTestCaseService apiTestCaseService = new ApiTestCaseServiceImpl(

@@ -10,8 +10,8 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_GLOBAL_FUNCTION_ERROR
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_GLOBAL_FUNCTION_LIST_ERROR;
-import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.field.CommonFiled.REMOVE;
+import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonField.REMOVE;
 import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
@@ -21,7 +21,7 @@ import com.sms.satp.dto.request.GlobalFunctionRequest;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
 import com.sms.satp.entity.function.GlobalFunctionEntity;
 import com.sms.satp.mapper.GlobalFunctionMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.GlobalFunctionRepository;
 import com.sms.satp.service.GlobalFunctionService;
 import com.sms.satp.utils.ExceptionUtils;
@@ -40,15 +40,15 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
 
     private final GlobalFunctionRepository globalFunctionRepository;
     private final GlobalFunctionMapper globalFunctionMapper;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
     private static final String FUNCTION_KEY = "functionKey";
 
     public GlobalFunctionServiceImpl(GlobalFunctionRepository globalFunctionRepository,
         GlobalFunctionMapper globalFunctionMapper,
-        CommonDeleteRepository commonDeleteRepository) {
+        CommonRepository commonRepository) {
         this.globalFunctionRepository = globalFunctionRepository;
         this.globalFunctionMapper = globalFunctionMapper;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
     }
 
     @Override
@@ -64,11 +64,11 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
                 .functionKey(functionKey)
                 .functionName(functionName).build();
             ExampleMatcher matcher = ExampleMatcher.matching()
-                .withMatcher(REMOVE.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher(REMOVE.getName(), ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher(FUNCTION_KEY, ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
             Example<GlobalFunctionEntity> example = Example.of(globalFunction, matcher);
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
             return globalFunctionMapper.toDtoList(globalFunctionRepository.findAll(example, sort));
         } catch (Exception e) {
             log.error("Failed to get the GlobalFunction list!", e);
@@ -119,7 +119,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, GlobalFunctionEntity.class);
+            return commonRepository.deleteByIds(ids, GlobalFunctionEntity.class);
         } catch (Exception e) {
             log.error("Failed to delete the GlobalFunction!", e);
             throw new ApiTestPlatformException(DELETE_GLOBAL_FUNCTION_BY_ID_ERROR);

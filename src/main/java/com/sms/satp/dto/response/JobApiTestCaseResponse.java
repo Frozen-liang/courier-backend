@@ -1,8 +1,6 @@
 package com.sms.satp.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sms.satp.entity.api.common.HttpStatusVerification;
-import com.sms.satp.entity.api.common.ResponseTimeVerification;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,13 +51,13 @@ public class JobApiTestCaseResponse {
 
     private Integer apiRequestJsonType;
 
-    private HttpStatusVerification httpStatusVerification;
+    private HttpStatusVerificationResponse httpStatusVerification;
 
     private ResponseHeadersVerificationResponse responseHeadersVerification;
 
     private ResponseResultVerificationResponse responseResultVerification;
 
-    private ResponseTimeVerification responseTimeVerification;
+    private ResponseTimeVerificationResponse responseTimeVerification;
 
     @JsonProperty("isExecute")
     private boolean execute;
