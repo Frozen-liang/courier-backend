@@ -33,6 +33,8 @@ public class CaseReport {
 
     private ResultType isSuccess;
 
+    private Integer errCode;
+
     private String failMessage;
 
     private Long timeCost;

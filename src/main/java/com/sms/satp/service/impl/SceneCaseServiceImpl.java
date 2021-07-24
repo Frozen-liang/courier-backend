@@ -299,8 +299,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
 
     @Override
     @LogRecord(operationType = DELETE, operationModule = SCENE_CASE,
-        template = "{{#result?.![#this.caseName]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        template = "{{#res?.![#this.caseName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids", queryResultKey = "res"))
     public Boolean delete(List<String> ids) {
         try {
             customizedSceneCaseRepository.deleteByIds(ids);

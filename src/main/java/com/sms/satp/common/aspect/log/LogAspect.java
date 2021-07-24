@@ -17,6 +17,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -25,6 +26,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -35,6 +37,7 @@ public class LogAspect {
     private final LogService logService;
     private final MongoTemplate mongoTemplate;
     private final FileService fileService;
+    private final ThreadLocal<EvaluationContext> threadLocal = new ThreadLocal<>();
 
     public LogAspect(LogService logService, MongoTemplate mongoTemplate,
         FileService fileService) {
@@ -49,13 +52,18 @@ public class LogAspect {
 
     @Around("pointCut() && @annotation(logRecord)")
     public Object around(ProceedingJoinPoint jp, LogRecord logRecord) throws Throwable {
-        MethodSignature signature = (MethodSignature) jp.getSignature();
-        Method method = signature.getMethod();
-        Object[] args = jp.getArgs();
-        OperationType operationType = logRecord.operationType();
-        OperationModule operationModule = logRecord.operationModule();
+        final MethodSignature signature = (MethodSignature) jp.getSignature();
+        final Method method = signature.getMethod();
+        final Object[] args = jp.getArgs();
+        final OperationType operationType = logRecord.operationType();
+        final OperationModule operationModule = logRecord.operationModule();
         Enhance enhance = logRecord.enhance();
-        EvaluationContext context = SpelUtils.getContext(args, method);
+        EvaluationContext context = threadLocal.get();
+        if (Objects.isNull(context)) {
+            context = new StandardEvaluationContext();
+            threadLocal.set(context);
+        }
+        SpelUtils.addVariable(context, args, method);
         enhance(enhance, context, operationModule, method);
         Object result = jp.proceed();
         String operationDesc = SpelUtils.getValue(context, logRecord.template(), String.class);
@@ -69,6 +77,11 @@ public class LogAspect {
             .build();
         logService.add(logEntity);
         return result;
+    }
+
+    @After("pointCut()")
+    public void after() {
+        threadLocal.remove();
     }
 
     private void enhance(Enhance enhance, EvaluationContext context, OperationModule operationModule, Method method) {

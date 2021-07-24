@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 public class SceneCaseJobReport {
 
     private String jobId;
-    private Integer errCode;
     private JobStatus jobStatus;
     private List<CaseReport> caseReportList;
     private String message;

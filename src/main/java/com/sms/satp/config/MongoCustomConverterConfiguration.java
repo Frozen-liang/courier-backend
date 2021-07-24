@@ -23,6 +23,7 @@ import com.sms.satp.common.enums.ResponseParamsExtractionType;
 import com.sms.satp.common.enums.ResultType;
 import com.sms.satp.common.enums.ResultVerificationType;
 import com.sms.satp.common.enums.SaveMode;
+import com.sms.satp.engine.enums.EngineStatus;
 import com.sms.satp.security.pojo.CustomUser;
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +64,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToDocumentUrlTypeConverter.INSTANCE, IntegerToJobStatusConverter.INSTANCE,
                 IntegerToProjectTypeConverter.INSTANCE, IntegerToImportStatusConverter.INSTANCE,
                 IntegerToResultVerificationTypeConverter.INSTANCE,
-                IntegerToResponseParamsExtractionTypeConverter.INSTANCE, IntegerToResultTypeConverter.INSTANCE);
+                IntegerToResponseParamsExtractionTypeConverter.INSTANCE, IntegerToResultTypeConverter.INSTANCE,
+                IntegerToEngineStatusConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -293,6 +295,15 @@ public class MongoCustomConverterConfiguration {
 
         public ResultType convert(@NonNull Integer code) {
             return ResultType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToEngineStatusConverter implements Converter<Integer, EngineStatus> {
+        INSTANCE;
+
+        public EngineStatus convert(@NonNull Integer code) {
+            return EngineStatus.getType(code);
         }
     }
 
