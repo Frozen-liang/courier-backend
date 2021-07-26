@@ -44,7 +44,7 @@ public class UserGroupServiceImpl implements UserGroupService {
     private final SystemRoleRepository systemRoleRepository;
 
     public UserGroupServiceImpl(UserGroupRepository userGroupRepository,
-        CommonRepository commonRepository, userGroupMapper userGroupMapper, SystemRoleRepository systemRoleRepository) {
+        CommonRepository commonRepository, UserGroupMapper userGroupMapper, SystemRoleRepository systemRoleRepository) {
         this.userGroupRepository = userGroupRepository;
         this.commonRepository = commonRepository;
         this.userGroupMapper = userGroupMapper;
