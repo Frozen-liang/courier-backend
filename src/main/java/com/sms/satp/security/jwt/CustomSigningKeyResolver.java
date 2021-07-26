@@ -23,11 +23,11 @@ public class CustomSigningKeyResolver implements SigningKeyResolver {
 
     @Override
     public Key resolveSigningKey(JwsHeader header, Claims claims) {
-        String type = (String) claims.getOrDefault(TOKEN_TYPE, TokenType.USER.name());
-        TokenType tokenType = TokenType.valueOf(type);
-        SatpSecurityStrategy satpSecurityStrategy = securityStrategyFactory.fetchSecurityStrategy(tokenType);
         try {
-            return satpSecurityStrategy.generateSecretKeySpec(header, claims);
+            String type = (String) header.get(TOKEN_TYPE);
+            TokenType tokenType = TokenType.valueOf(type);
+            SatpSecurityStrategy satpSecurityStrategy = securityStrategyFactory.fetchSecurityStrategy(tokenType);
+            return satpSecurityStrategy.generateSecretKey(header);
         } catch (Exception e) {
             throw new UnsupportedJwtException(
                 "The specified SigningKeyResolver implementation does not support "
