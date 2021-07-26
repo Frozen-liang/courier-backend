@@ -8,10 +8,11 @@ import static org.mockito.Mockito.when;
 import com.sms.satp.entity.system.SystemRoleEntity;
 import com.sms.satp.entity.system.UserEntity;
 import com.sms.satp.entity.system.UserGroupEntity;
-import com.sms.satp.repository.SystemRoleRepository;
 import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.repository.UserRepository;
+import com.sms.satp.service.UserGroupService;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -24,10 +25,9 @@ public class CustomUserDetailsServiceTest {
 
     UserRepository userRepository = mock(UserRepository.class);
     UserGroupRepository userGroupRepository = mock(UserGroupRepository.class);
-    SystemRoleRepository systemRoleRepository = mock(SystemRoleRepository.class);
+    UserGroupService userGroupService = mock(UserGroupService.class);
 
-    UserDetailsService userDetailsService = new CustomUserDetailsService(userRepository, userGroupRepository,
-        systemRoleRepository);
+    UserDetailsService userDetailsService = new CustomUserDetailsService(userRepository, userGroupService);
 
     private String userId = "userId";
     private String username = "testUser";
@@ -47,10 +47,9 @@ public class CustomUserDetailsServiceTest {
     public void normal() {
         when(userRepository.findByUsernameOrEmail(username, username))
             .thenReturn(Optional.of(userEntity));
-        when(userGroupRepository.findById(groupId)).thenReturn(Optional.of(userGroupEntity));
-        when(systemRoleRepository.findAllById(roles)).thenReturn(systemRoleEntities);
+        when(userGroupService.getAuthoritiesByUserGroup(groupId)).thenReturn(Collections.emptyList());
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        assertThat(userDetails.getAuthorities().isEmpty()).isEqualTo(false);
+        assertThat(userDetails.getAuthorities().isEmpty()).isEqualTo(true);
     }
 
     @Test
