@@ -9,6 +9,8 @@ target/
 ### gradle ###
 *.gradle
 *.build
+/.gradle/
+/logs/
 
 ### STS ###
 .apt_generated
