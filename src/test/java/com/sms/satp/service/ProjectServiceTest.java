@@ -19,7 +19,7 @@ import com.sms.satp.dto.request.ProjectRequest;
 import com.sms.satp.dto.response.ProjectResponse;
 import com.sms.satp.entity.project.ProjectEntity;
 import com.sms.satp.mapper.ProjectMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.ProjectRepository;
 import com.sms.satp.service.impl.ProjectServiceImpl;
 import java.util.ArrayList;
@@ -34,11 +34,11 @@ import org.junit.jupiter.api.Test;
 class ProjectServiceTest {
 
     private final ProjectRepository projectRepository = mock(ProjectRepository.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(
-        CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(
+        CommonRepository.class);
     private final ProjectMapper projectMapper = mock(ProjectMapper.class);
     private final ProjectService projectService = new ProjectServiceImpl(
-        projectRepository, commonDeleteRepository, projectMapper);
+        projectRepository, commonRepository, projectMapper);
     private final ProjectEntity project = ProjectEntity.builder().id(ID).build();
     private final ProjectResponse projectResponse = ProjectResponse.builder()
         .id(ID).build();
@@ -158,7 +158,7 @@ class ProjectServiceTest {
     @DisplayName("Test the delete method in the Project service")
     public void delete_test() {
         List<String> ids = Collections.singletonList(ID);
-        when(commonDeleteRepository.deleteByIds(ids, ProjectEntity.class)).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(ids, ProjectEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(projectService.delete(Collections.singletonList(ID))).isTrue();
     }
 
@@ -166,7 +166,7 @@ class ProjectServiceTest {
     @DisplayName("An exception occurred while delete Project")
     public void delete_exception_test() {
         List<String> ids = Collections.singletonList(ID);
-        doThrow(new RuntimeException()).when(commonDeleteRepository)
+        doThrow(new RuntimeException()).when(commonRepository)
             .deleteByIds(ids, ProjectEntity.class);
         assertThatThrownBy(() -> projectService.delete(ids))
             .isInstanceOf(ApiTestPlatformException.class)

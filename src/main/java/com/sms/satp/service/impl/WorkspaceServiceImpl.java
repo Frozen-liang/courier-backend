@@ -1,5 +1,6 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.USER;
 import static com.sms.satp.common.enums.OperationModule.WORKSPACE;
 import static com.sms.satp.common.enums.OperationType.ADD;
 import static com.sms.satp.common.enums.OperationType.DELETE;
@@ -11,6 +12,11 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_WORKSPACE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_WORKSPACE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_WORKSPACE_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.THE_WORKSPACE_CANNOT_DELETE_ERROR;
+import static com.sms.satp.common.field.CommonField.CREATE_USER_ID;
+import static com.sms.satp.common.field.CommonField.ID;
+import static com.sms.satp.common.field.CommonField.REMOVE;
+import static com.sms.satp.common.field.UserField.NICKNAME;
+import static com.sms.satp.common.field.UserField.USERNAME;
 import static com.sms.satp.utils.Assert.isFalse;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
@@ -18,9 +24,11 @@ import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.WorkspaceRequest;
 import com.sms.satp.dto.response.WorkspaceResponse;
+import com.sms.satp.entity.mongo.LookupQueryField;
+import com.sms.satp.entity.mongo.LookupVo;
 import com.sms.satp.entity.workspace.WorkspaceEntity;
 import com.sms.satp.mapper.WorkspaceMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.WorkspaceRepository;
 import com.sms.satp.service.ProjectService;
 import com.sms.satp.service.WorkspaceService;
@@ -36,16 +44,16 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final ProjectService projectService;
     private final WorkspaceRepository workspaceRepository;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
     private final WorkspaceMapper workspaceMapper;
 
     public WorkspaceServiceImpl(ProjectService projectService,
         WorkspaceRepository workspaceRepository,
-        CommonDeleteRepository commonDeleteRepository,
+        CommonRepository commonRepository,
         WorkspaceMapper workspaceMapper) {
         this.projectService = projectService;
         this.workspaceRepository = workspaceRepository;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
         this.workspaceMapper = workspaceMapper;
     }
 
@@ -58,7 +66,18 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public List<WorkspaceResponse> list() {
         try {
-            return workspaceMapper.toDtoList(workspaceRepository.findAllByRemovedIsFalseOrderByCreateDateTimeDesc());
+            String collectionName = WORKSPACE.getCollectionName();
+            List<LookupQueryField> lookupQueryFields = List.of(
+                LookupQueryField.builder().field(USERNAME).build(),
+                LookupQueryField.builder().field(NICKNAME).build()
+            );
+            LookupVo lookupVo = LookupVo.builder()
+                .from(USER)
+                .localField(CREATE_USER_ID)
+                .foreignField(ID).as("user")
+                .queryFields(lookupQueryFields).build();
+            return commonRepository
+                .list(collectionName, lookupVo, List.of(REMOVE.is(Boolean.FALSE)), WorkspaceResponse.class);
         } catch (Exception e) {
             log.error("Failed to get the Workspace list!", e);
             throw new ApiTestPlatformException(GET_WORKSPACE_LIST_ERROR);
@@ -108,7 +127,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public Boolean delete(String id) {
         try {
             isFalse(projectService.existsByWorkspaceId(id), THE_WORKSPACE_CANNOT_DELETE_ERROR);
-            return commonDeleteRepository.deleteById(id, WorkspaceEntity.class);
+            return commonRepository.deleteById(id, WorkspaceEntity.class);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
             throw apiTestPlatEx;

@@ -12,10 +12,9 @@ import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_BY_ID_
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.IMPORT_DATA_COLLECTION_ERROR;
-import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
-import static com.sms.satp.common.field.CommonFiled.REMOVE;
-import static com.sms.satp.utils.Assert.isNull;
+import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonField.PROJECT_ID;
+import static com.sms.satp.common.field.CommonField.REMOVE;
 import static com.sms.satp.utils.Assert.isTrue;
 import static com.sms.satp.utils.Assert.notEmpty;
 
@@ -81,13 +80,13 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     @Override
     public List<DataCollectionResponse> list(String projectId, String collectionName) {
         try {
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
             DataCollectionEntity dataCollection = DataCollectionEntity.builder().projectId(projectId)
                 .collectionName(collectionName)
                 .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(REMOVE.getFiled(), GenericPropertyMatchers.exact())
+                .withMatcher(PROJECT_ID.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(REMOVE.getName(), GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING);
             Example<DataCollectionEntity> example = Example.of(dataCollection, exampleMatcher);
             return dataCollectionMapper.toDtoList(dataCollectionRepository.findAll(example, sort));

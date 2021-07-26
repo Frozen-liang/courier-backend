@@ -20,7 +20,7 @@ import com.sms.satp.dto.request.GlobalFunctionRequest;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
 import com.sms.satp.entity.function.GlobalFunctionEntity;
 import com.sms.satp.mapper.GlobalFunctionMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.GlobalFunctionRepository;
 import com.sms.satp.service.impl.GlobalFunctionServiceImpl;
 import java.util.ArrayList;
@@ -37,10 +37,10 @@ class GlobalFunctionServiceTest {
 
     private final GlobalFunctionRepository globalFunctionRepository = mock(GlobalFunctionRepository.class);
     private final GlobalFunctionMapper globalFunctionMapper = mock(GlobalFunctionMapper.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final GlobalFunctionService globalFunctionService = new GlobalFunctionServiceImpl(
         globalFunctionRepository,
-        globalFunctionMapper, commonDeleteRepository);
+        globalFunctionMapper, commonRepository);
     private final GlobalFunctionEntity globalFunction = GlobalFunctionEntity.builder().id(ID).build();
     private final GlobalFunctionResponse globalFunctionResponse = GlobalFunctionResponse.builder().id(ID).build();
     private final GlobalFunctionRequest globalFunctionRequest = GlobalFunctionRequest.builder().id(ID).build();
@@ -149,14 +149,14 @@ class GlobalFunctionServiceTest {
     @Test
     @DisplayName("Test the delete method in the GlobalFunction service")
     public void delete_test() {
-        when(commonDeleteRepository.deleteByIds(ID_LIST, GlobalFunctionEntity.class)).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(ID_LIST, GlobalFunctionEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(globalFunctionService.delete(Collections.singletonList(ID))).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while delete GlobalFunction")
     public void delete_exception_test() {
-        doThrow(new RuntimeException()).when(commonDeleteRepository)
+        doThrow(new RuntimeException()).when(commonRepository)
             .deleteByIds(ID_LIST, GlobalFunctionEntity.class);
         assertThatThrownBy(() -> globalFunctionService.delete(ID_LIST))
             .isInstanceOf(ApiTestPlatformException.class)

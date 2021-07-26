@@ -10,17 +10,17 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TAG_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TAG_LIST_ERROR;
-import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonField.PROJECT_ID;
 import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.common.field.ApiFiled;
-import com.sms.satp.common.field.ApiTestCaseFiled;
-import com.sms.satp.common.field.SceneFiled;
+import com.sms.satp.common.field.ApiField;
+import com.sms.satp.common.field.ApiTestCaseField;
+import com.sms.satp.common.field.SceneField;
 import com.sms.satp.dto.request.ApiTagListRequest;
 import com.sms.satp.dto.request.ApiTagRequest;
 import com.sms.satp.dto.response.ApiTagResponse;
@@ -30,7 +30,7 @@ import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
 import com.sms.satp.entity.tag.ApiTagEntity;
 import com.sms.satp.mapper.ApiTagMapper;
 import com.sms.satp.repository.ApiTagRepository;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.service.ApiTagService;
 import com.sms.satp.utils.ExceptionUtils;
 import java.util.List;
@@ -49,14 +49,14 @@ import org.springframework.stereotype.Service;
 public class ApiTagServiceImpl implements ApiTagService {
 
     private final ApiTagRepository apiTagRepository;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
     private final ApiTagMapper apiTagMapper;
     private static final String TAG_TYPE = "tagType";
 
     public ApiTagServiceImpl(ApiTagRepository apiTagRepository,
-        CommonDeleteRepository commonDeleteRepository, ApiTagMapper apiTagMapper) {
+        CommonRepository commonRepository, ApiTagMapper apiTagMapper) {
         this.apiTagRepository = apiTagRepository;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
         this.apiTagMapper = apiTagMapper;
     }
 
@@ -71,12 +71,12 @@ public class ApiTagServiceImpl implements ApiTagService {
         try {
             ApiTagEntity apiTag = apiTagMapper.listRequestToApiTag(apiTagListRequest);
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(PROJECT_ID.getFiled(), ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher(PROJECT_ID.getName(), ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher(TAG_TYPE, ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING)
                 .withIgnoreNullValues();
             Example<ApiTagEntity> example = Example.of(apiTag, exampleMatcher);
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
             List<ApiTagEntity> list = apiTagRepository.findAll(example, sort);
             return apiTagMapper.toDtoList(list);
         } catch (Exception e) {
@@ -128,16 +128,16 @@ public class ApiTagServiceImpl implements ApiTagService {
             map.forEach((key, value) -> {
                 switch (key) {
                     case API:
-                        commonDeleteRepository.removeTags(ApiFiled.TAG_ID,
+                        commonRepository.removeTags(ApiField.TAG_ID,
                             value.stream().map(ApiTagEntity::getId).collect(Collectors.toList()), ApiEntity.class);
                         break;
                     case CASE:
-                        commonDeleteRepository.removeTags(ApiTestCaseFiled.TAG_IDS,
+                        commonRepository.removeTags(ApiTestCaseField.TAG_IDS,
                             value.stream().map(ApiTagEntity::getId).collect(Collectors.toList()),
                             ApiTestCaseEntity.class);
                         break;
                     case SCENE:
-                        commonDeleteRepository.removeTags(SceneFiled.TAG_ID,
+                        commonRepository.removeTags(SceneField.TAG_ID,
                             value.stream().map(ApiTagEntity::getId).collect(Collectors.toList()),
                             SceneCaseApiEntity.class);
                         break;

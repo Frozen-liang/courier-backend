@@ -1,8 +1,8 @@
 package com.sms.satp.repository.impl;
 
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
-import static com.sms.satp.common.field.CommonFiled.ID;
-import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
+import static com.sms.satp.common.field.CommonField.ID;
+import static com.sms.satp.common.field.CommonField.PROJECT_ID;
 
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -47,7 +47,7 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
     public Boolean insertTestFile(TestFileRequest testFileRequest) throws IOException {
         MultipartFile testFile = testFileRequest.getTestFile();
         Document document = new Document();
-        document.put(PROJECT_ID.getFiled(), testFileRequest.getProjectId());
+        document.put(PROJECT_ID.getName(), testFileRequest.getProjectId());
         gridFsTemplate
             .store(testFile.getInputStream(), testFile.getOriginalFilename(), testFile.getContentType(), document);
         return true;

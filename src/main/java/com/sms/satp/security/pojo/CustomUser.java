@@ -17,6 +17,7 @@ public class CustomUser extends User {
     private static final long serialVersionUID = 1L;
     private String id;
     private String email;
+    private String nickname;
     private TokenType tokenType;
 
     public CustomUser(String username, String password,

@@ -73,9 +73,9 @@ public class ApiRequest {
 
     private String postInject;
 
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiResponseJsonType must not be null.")
+    //@NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiResponseJsonType must not be null.")
     private ApiJsonType apiResponseJsonType;
 
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiRequestJsonType must not be null.")
+    //@NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiRequestJsonType must not be null.")
     private ApiJsonType apiRequestJsonType;
 }

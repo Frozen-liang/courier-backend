@@ -12,10 +12,10 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_LIST_ERROR;
-import static com.sms.satp.common.field.CommonFiled.API_ID;
-import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
-import static com.sms.satp.common.field.CommonFiled.REMOVE;
+import static com.sms.satp.common.field.CommonField.API_ID;
+import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonField.PROJECT_ID;
+import static com.sms.satp.common.field.CommonField.REMOVE;
 import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
@@ -76,13 +76,13 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     @Override
     public List<ApiTestCaseResponse> list(String apiId, String projectId, boolean removed) {
         try {
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
             ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder().apiId(apiId).removed(removed)
                 .projectId(projectId).build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(API_ID.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(REMOVE.getFiled(), GenericPropertyMatchers.exact())
+                .withMatcher(PROJECT_ID.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(API_ID.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(REMOVE.getName(), GenericPropertyMatchers.exact())
                 .withIgnorePaths("isExecute")
                 .withIgnoreNullValues();
             Example<ApiTestCaseEntity> example = Example.of(apiTestCase, exampleMatcher);

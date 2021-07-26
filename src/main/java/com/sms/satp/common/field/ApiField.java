@@ -1,6 +1,6 @@
 package com.sms.satp.common.field;
 
-public enum ApiFiled implements Filed {
+public enum ApiField implements Field {
 
     TAG_ID("tagId"),
     GROUP_ID("groupId"),
@@ -10,13 +10,13 @@ public enum ApiFiled implements Filed {
     REQUEST_METHOD("requestMethod"),
     API_STATUS("apiStatus");
 
-    private final String filed;
+    private final String name;
 
-    ApiFiled(String filed) {
-        this.filed = filed;
+    ApiField(String name) {
+        this.name = name;
     }
 
-    public String getFiled() {
-        return filed;
+    public String getName() {
+        return name;
     }
 }

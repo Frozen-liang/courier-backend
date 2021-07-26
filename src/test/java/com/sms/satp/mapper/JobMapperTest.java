@@ -22,7 +22,8 @@ import org.junit.jupiter.api.Test;
 class JobMapperTest {
 
     private ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
-    private JobMapper jobMapper = new JobMapperImpl(paramInfoMapper);
+    private JobMapper jobMapper = new JobMapperImpl(paramInfoMapper, new MatchParamInfoMapperImpl(),
+        new ResponseResultVerificationMapperImpl(new MatchParamInfoMapperImpl()));
     private static final String NAME = "testName";
 
     @Test

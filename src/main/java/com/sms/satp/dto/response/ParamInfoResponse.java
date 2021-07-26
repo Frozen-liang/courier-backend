@@ -1,12 +1,12 @@
 package com.sms.satp.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @NoArgsConstructor
@@ -36,12 +36,12 @@ public class ParamInfoResponse {
     /**
      * 是否必填.
      */
-    @Field("isRequired")
+    @JsonProperty("isRequired")
     private boolean required;
     /**
      * 是否传输.
      */
-    @Field("isTransport")
+    @JsonProperty("isTransport")
     private boolean transport;
     /**
      * 对象子属性. JSON/Object/JsonArray.

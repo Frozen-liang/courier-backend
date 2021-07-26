@@ -18,7 +18,7 @@ import com.sms.satp.dto.response.UserGroupResponse;
 import com.sms.satp.entity.system.SystemRoleEntity;
 import com.sms.satp.entity.system.UserGroupEntity;
 import com.sms.satp.mapper.UserGroupMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.SystemRoleRepository;
 import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.service.impl.UserGroupServiceImpl;
@@ -35,12 +35,12 @@ import org.junit.jupiter.api.Test;
 class UserGroupServiceTest {
 
     private final UserGroupRepository userGroupRepository = mock(UserGroupRepository.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(
-        CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(
+        CommonRepository.class);
     private final UserGroupMapper userGroupMapper = mock(UserGroupMapper.class);
     private final SystemRoleRepository systemRoleRepository = mock(SystemRoleRepository.class);
     private final UserGroupService userGroupService = new UserGroupServiceImpl(
-        userGroupRepository, commonDeleteRepository, userGroupMapper, systemRoleRepository);
+        userGroupRepository, commonRepository, userGroupMapper, systemRoleRepository);
     private final UserGroupEntity userGroup = UserGroupEntity.builder().id(ID).build();
     private final UserGroupResponse userGroupResponse = UserGroupResponse.builder()
         .id(ID).build();
@@ -138,7 +138,7 @@ class UserGroupServiceTest {
     @DisplayName("Test the delete method in the UserGroup service")
     public void delete_test() {
         List<String> ids = Collections.singletonList(ID);
-        when(commonDeleteRepository.deleteByIds(ids, UserGroupEntity.class)).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(ids, UserGroupEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(userGroupService.delete(Collections.singletonList(ID))).isTrue();
     }
 
@@ -146,7 +146,7 @@ class UserGroupServiceTest {
     @DisplayName("An exception occurred while delete UserGroup")
     public void delete_exception_test() {
         List<String> ids = Collections.singletonList(ID);
-        doThrow(new RuntimeException()).when(commonDeleteRepository)
+        doThrow(new RuntimeException()).when(commonRepository)
             .deleteByIds(ids, UserGroupEntity.class);
         assertThatThrownBy(() -> userGroupService.delete(ids))
             .isInstanceOf(ApiTestPlatformException.class)

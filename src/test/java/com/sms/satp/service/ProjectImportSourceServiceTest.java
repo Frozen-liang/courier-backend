@@ -12,7 +12,7 @@ import com.sms.satp.dto.response.ProjectImportSourceResponse;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
 import com.sms.satp.entity.project.ProjectImportSourceEntity;
 import com.sms.satp.mapper.ProjectImportSourceMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.ProjectImportFlowRepository;
 import com.sms.satp.repository.ProjectImportSourceRepository;
 import com.sms.satp.service.impl.ProjectImportSourceServiceImpl;
@@ -35,9 +35,9 @@ public class ProjectImportSourceServiceTest {
         ProjectImportSourceRepository.class);
     private final ProjectImportSourceMapper projectImportSourceMapper = mock(ProjectImportSourceMapper.class);
     private final ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final ProjectImportSourceService projectImportSourceService = new ProjectImportSourceServiceImpl(
-        projectImportSourceMapper, projectImportSourceRepository, projectImportFlowRepository, commonDeleteRepository);
+        projectImportSourceMapper, projectImportSourceRepository, projectImportFlowRepository, commonRepository);
     private final ProjectImportSourceEntity projectImportSourceEntity = ProjectImportSourceEntity.builder().id(ID)
         .build();
     private final ProjectImportSourceResponse projectImportSourceResponse = ProjectImportSourceResponse
@@ -94,7 +94,7 @@ public class ProjectImportSourceServiceTest {
     @Test
     @DisplayName("Test the delete method in the ProjectImportSource Service")
     public void delete_test() {
-        when(commonDeleteRepository.deleteByIds(ID_LIST, ProjectImportSourceEntity.class)).thenReturn(true);
+        when(commonRepository.deleteByIds(ID_LIST, ProjectImportSourceEntity.class)).thenReturn(true);
         assertThat(projectImportSourceService.delete(ID_LIST)).isTrue();
     }
 

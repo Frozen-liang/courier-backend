@@ -12,8 +12,8 @@ import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_GROUP_LIST_
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.common.field.CommonFiled;
-import com.sms.satp.common.field.SceneFiled;
+import com.sms.satp.common.field.CommonField;
+import com.sms.satp.common.field.SceneField;
 import com.sms.satp.dto.request.AddSceneCaseGroupRequest;
 import com.sms.satp.dto.request.SearchSceneCaseGroupRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseGroupRequest;
@@ -108,10 +108,10 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
                 SceneCaseGroupEntity.builder().projectId(request.getProjectId()).parentId(request.getParentId())
                     .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(CommonFiled.ID.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(SceneFiled.NAME.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(CommonFiled.PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(SceneFiled.PARENT_ID.getFiled(), GenericPropertyMatchers.exact())
+                .withMatcher(CommonField.ID.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(SceneField.NAME.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(CommonField.PROJECT_ID.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(SceneField.PARENT_ID.getName(), GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
             Example<SceneCaseGroupEntity> example = Example.of(group, exampleMatcher);
             List<SceneCaseGroupEntity> sceneCaseGroups = sceneCaseGroupRepository.findAll(example);

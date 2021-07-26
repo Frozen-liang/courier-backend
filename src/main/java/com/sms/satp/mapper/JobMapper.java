@@ -32,7 +32,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-    unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {EnumCommonUtils.class, ParamInfoMapper.class})
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    uses = {EnumCommonUtils.class, ParamInfoMapper.class, MatchParamInfoMapper.class,
+        ResponseResultVerificationMapper.class})
 public interface JobMapper {
 
     JobEnvironment toJobEnvironment(ProjectEnvironmentEntity projectEnvironment);

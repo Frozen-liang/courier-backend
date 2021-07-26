@@ -33,6 +33,7 @@ import com.sms.satp.service.ApiService;
 import com.sms.satp.service.AsyncService;
 import com.sms.satp.service.ProjectImportSourceService;
 import com.sms.satp.utils.ExceptionUtils;
+import com.sms.satp.utils.MD5Util;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.SneakyThrows;
@@ -87,7 +88,6 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     public ApiResponse findById(String id) {
-
         return customizedApiRepository.findById(id).orElseThrow(() -> ExceptionUtils.mpe(GET_API_BY_ID_ERROR));
     }
 
@@ -107,6 +107,7 @@ public class ApiServiceImpl implements ApiService {
         log.info("ApiService-add()-params: [Api]={}", apiRequestDto.toString());
         try {
             ApiEntity apiEntity = apiMapper.toEntity(apiRequestDto);
+            apiEntity.setMd5(MD5Util.getMD5(apiEntity));
             ApiEntity newApiEntity = apiRepository.insert(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
@@ -127,6 +128,7 @@ public class ApiServiceImpl implements ApiService {
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "Api", apiRequest.getId());
             ApiEntity apiEntity = apiMapper.toEntity(apiRequest);
             ApiEntity newApiEntity = apiRepository.save(apiEntity);
+            newApiEntity.setMd5(MD5Util.getMD5(newApiEntity));
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             apiHistoryRepository.insert(apiHistoryEntity);

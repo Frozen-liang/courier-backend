@@ -24,7 +24,7 @@ import com.sms.satp.entity.tag.ApiTagEntity;
 import com.sms.satp.mapper.ApiTagMapper;
 import com.sms.satp.mapper.ApiTagMapperImpl;
 import com.sms.satp.repository.ApiTagRepository;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.service.impl.ApiTagServiceImpl;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,9 +41,9 @@ class ApiTagServiceTest {
 
     private final ApiTagRepository apiTagRepository = mock(ApiTagRepository.class);
     private final ApiTagMapper apiTagMapper = new ApiTagMapperImpl();
-    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final ApiTagService apiTagService = new ApiTagServiceImpl(
-        apiTagRepository, commonDeleteRepository, apiTagMapper);
+        apiTagRepository, commonRepository, apiTagMapper);
     private final ApiTagEntity apiTag = ApiTagEntity.builder().id(ID).build();
     private final ApiTagResponse apiTagResponse = ApiTagResponse.builder().id(ID).build();
     private final ApiTagRequest apiTagRequest = ApiTagRequest.builder().id(ID).build();
@@ -141,7 +141,7 @@ class ApiTagServiceTest {
         when(apiTagRepository.findAllByIdIn(Collections.singletonList(ID)))
             .thenReturn(Stream.of(ApiTagEntity.builder().tagType(
                 ApiTagType.API).id(ObjectId.get().toString()).build()));
-        when(commonDeleteRepository.removeTags(any(), any(), any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.removeTags(any(), any(), any())).thenReturn(Boolean.TRUE);
         when(apiTagRepository.deleteAllByIdIsIn(any())).thenReturn(1L);
         assertThat(apiTagService.delete(Collections.singletonList(ID))).isTrue();
     }

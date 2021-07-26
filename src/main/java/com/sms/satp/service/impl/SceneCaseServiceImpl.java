@@ -23,7 +23,7 @@ import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.common.field.CommonFiled;
+import com.sms.satp.common.field.CommonField;
 import com.sms.satp.dto.request.AddCaseTemplateConnRequest;
 import com.sms.satp.dto.request.AddSceneCaseApi;
 import com.sms.satp.dto.request.AddSceneCaseApiByIdsRequest;
@@ -224,8 +224,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         try {
             SceneCaseEntity sceneCase = SceneCaseEntity.builder().groupId(groupId).projectId(projectId).build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(CommonFiled.PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(CommonFiled.GROUP_ID.getFiled(), GenericPropertyMatchers.exact())
+                .withMatcher(CommonField.PROJECT_ID.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(CommonField.GROUP_ID.getName(), GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
             Example<SceneCaseEntity> example = Example.of(sceneCase, exampleMatcher);
             return sceneCaseRepository.findAll(example);
