@@ -5,16 +5,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.dto.UserEntityAuthority;
 import com.sms.satp.entity.system.SystemRoleEntity;
 import com.sms.satp.entity.system.UserEntity;
 import com.sms.satp.entity.system.UserGroupEntity;
-import com.sms.satp.repository.UserGroupRepository;
-import com.sms.satp.repository.UserRepository;
-import com.sms.satp.service.UserGroupService;
+import com.sms.satp.service.UserService;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,11 +21,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public class CustomUserDetailsServiceTest {
 
-    UserRepository userRepository = mock(UserRepository.class);
-    UserGroupRepository userGroupRepository = mock(UserGroupRepository.class);
-    UserGroupService userGroupService = mock(UserGroupService.class);
-
-    UserDetailsService userDetailsService = new CustomUserDetailsService(userRepository, userGroupService);
+    UserService userService = mock(UserService.class);
+    UserDetailsService userDetailsService = new CustomUserDetailsService(userService);
 
     private String userId = "userId";
     private String username = "testUser";
@@ -45,9 +40,10 @@ public class CustomUserDetailsServiceTest {
     @Test
     @DisplayName("Load users by username under normal circumstances")
     public void normal() {
-        when(userRepository.findByUsernameOrEmail(username, username))
-            .thenReturn(Optional.of(userEntity));
-        when(userGroupService.getAuthoritiesByUserGroup(groupId)).thenReturn(Collections.emptyList());
+        UserEntityAuthority userEntityAuthority = UserEntityAuthority.builder()
+            .userEntity(UserEntity.builder().username(username).password(password).email(email).id(userId).build())
+            .authorities(Collections.emptyList()).build();
+        when(userService.getUserDetailsByUsernameOrEmail(username)).thenReturn(userEntityAuthority);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         assertThat(userDetails.getAuthorities().isEmpty()).isEqualTo(true);
     }
@@ -55,19 +51,8 @@ public class CustomUserDetailsServiceTest {
     @Test
     @DisplayName("Failed to findByUsernameOrEmailAndEnabledTrue")
     public void findByUsernameOrEmailAndEnabledTrueError() {
-        when(userRepository.findByUsernameOrEmail(username, username))
-            .thenReturn(Optional.empty());
+        when(userService.getUserDetailsByUsernameOrEmail(username)).thenThrow(UsernameNotFoundException.class);
         assertThatThrownBy(() -> userDetailsService.loadUserByUsername(username))
             .isInstanceOf(UsernameNotFoundException.class);
-    }
-
-    @Test
-    @DisplayName("Load users by username when the user's user group is empty")
-    public void findUserGroupByIdError() {
-        when(userRepository.findByUsernameOrEmail(username, username))
-            .thenReturn(Optional.of(userEntity));
-        when(userGroupRepository.findById(groupId)).thenReturn(Optional.empty());
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        assertThat(userDetails.getAuthorities().isEmpty()).isEqualTo(true);
     }
 }
