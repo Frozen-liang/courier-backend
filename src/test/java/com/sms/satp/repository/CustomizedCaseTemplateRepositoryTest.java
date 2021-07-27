@@ -2,7 +2,6 @@ package com.sms.satp.repository;
 
 import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.response.CaseTemplateResponse;
-import com.sms.satp.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.satp.entity.scenetest.CaseTemplateEntity;
 import com.sms.satp.repository.impl.CustomizedCaseTemplateRepositoryImpl;
 import java.util.ArrayList;
@@ -26,9 +25,9 @@ import static org.wildfly.common.Assert.assertTrue;
 class CustomizedCaseTemplateRepositoryTest {
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final CustomizedCaseTemplateRepository customizedCaseTemplateRepository =
-        new CustomizedCaseTemplateRepositoryImpl(mongoTemplate, commonDeleteRepository);
+        new CustomizedCaseTemplateRepositoryImpl(mongoTemplate, commonRepository);
 
     private final static String MOCK_ID = "1";
     private final static String NAME = "test";
@@ -62,7 +61,7 @@ class CustomizedCaseTemplateRepositoryTest {
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedCaseTemplateRepository")
     void deleteByIds_test() {
-        when(commonDeleteRepository.deleteByIds(any(),any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(any(),any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = customizedCaseTemplateRepository.deleteByIds(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }
@@ -70,7 +69,7 @@ class CustomizedCaseTemplateRepositoryTest {
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedCaseTemplateRepository")
     void recover_test() {
-        when(commonDeleteRepository.recover(any(),any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.recover(any(),any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = customizedCaseTemplateRepository.recover(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }

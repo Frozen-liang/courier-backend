@@ -62,7 +62,7 @@ class CustomizedSceneCaseRepositoryTest {
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedSceneCaseRepository")
     void deleteByIds_test() {
-        when(commonDeleteRepository.deleteByIds(any(),any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(any(),any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = customizedSceneCaseRepository.deleteByIds(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }
@@ -70,7 +70,7 @@ class CustomizedSceneCaseRepositoryTest {
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedSceneCaseRepository")
     void recover_test() {
-        when(commonDeleteRepository.recover(any(),any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.recover(any(),any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = customizedSceneCaseRepository.recover(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }

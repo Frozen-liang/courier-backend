@@ -1,5 +1,16 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.CASE_TEMPLATE_GROUP;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.EDIT;
+import static com.sms.satp.common.enums.OperationType.REMOVE;
+import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_GROUP_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_GROUP_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_GROUP_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_GROUP_LIST_ERROR;
+import static com.sms.satp.utils.Assert.isTrue;
+
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.constant.Constants;
@@ -22,17 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-
-import static com.sms.satp.common.enums.OperationModule.CASE_TEMPLATE_GROUP;
-import static com.sms.satp.common.enums.OperationType.ADD;
-import static com.sms.satp.common.enums.OperationType.EDIT;
-import static com.sms.satp.common.enums.OperationType.REMOVE;
-import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_GROUP_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_GROUP_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_GROUP_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_GROUP_LIST_ERROR;
-import static com.sms.satp.utils.Assert.isTrue;
 
 @Slf4j
 @Service

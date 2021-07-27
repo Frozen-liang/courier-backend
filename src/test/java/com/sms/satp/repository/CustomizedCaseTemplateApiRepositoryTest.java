@@ -18,9 +18,9 @@ import static org.wildfly.common.Assert.assertTrue;
 class CustomizedCaseTemplateApiRepositoryTest {
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository =
-        new CustomizedCaseTemplateApiRepositoryImpl(mongoTemplate, commonDeleteRepository);
+        new CustomizedCaseTemplateApiRepositoryImpl(mongoTemplate, commonRepository);
 
     private final static String MOCK_ID = "1";
     private final static String NAME = "test";
@@ -50,7 +50,7 @@ class CustomizedCaseTemplateApiRepositoryTest {
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedCaseTemplateApiRepository")
     void deleteByIds_test() {
-        when(commonDeleteRepository.deleteByIds(any(),any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(any(),any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = customizedCaseTemplateApiRepository.deleteByIds(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }
@@ -58,7 +58,7 @@ class CustomizedCaseTemplateApiRepositoryTest {
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedCaseTemplateApiRepository")
     void recover_test() {
-        when(commonDeleteRepository.recover(any(),any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.recover(any(),any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = customizedCaseTemplateApiRepository.recover(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }

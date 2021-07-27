@@ -1,6 +1,6 @@
 # Application Listeners
 org.springframework.context.ApplicationListener=\
 com.sms.satp.initialize.DestroyRunningEngine,\
-com.sms.satp.initialize.RoleInitialize,\
-com.sms.satp.initialize.DefaultUserGroupInitialize
+com.sms.satp.initialize.RoleInitializer,\
+com.sms.satp.initialize.DefaultUserGroupInitializer
 

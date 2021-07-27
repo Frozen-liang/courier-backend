@@ -1,6 +1,7 @@
 package com.sms.satp.repository;
 
 import com.mongodb.client.result.UpdateResult;
+import com.sms.satp.entity.scenetest.CaseTemplateEntity;
 import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
 import com.sms.satp.repository.impl.CustomizedSceneCaseApiRepositoryImpl;
 import java.util.List;
@@ -20,9 +21,10 @@ class CustomizedSceneCaseApiRepositoryTest {
 
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
-    private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository = new CustomizedSceneCaseApiRepositoryImpl(mongoTemplate,
-        commonDeleteRepository);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
+    private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository = new CustomizedSceneCaseApiRepositoryImpl(
+        mongoTemplate,
+        commonRepository);
 
     private final static String MOCK_ID = "1";
 
@@ -31,7 +33,8 @@ class CustomizedSceneCaseApiRepositoryTest {
     void findSceneCaseApiByApiIds_test() {
         when(mongoTemplate.find(any(), any()))
             .thenReturn(Lists.newArrayList(SceneCaseApiEntity.builder().build()));
-        List<SceneCaseApiEntity> sceneCaseApiList = customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(Lists.newArrayList(MOCK_ID));
+        List<SceneCaseApiEntity> sceneCaseApiList = customizedSceneCaseApiRepository
+            .findSceneCaseApiByApiIds(Lists.newArrayList(MOCK_ID));
         assertThat(sceneCaseApiList).isNotEmpty();
     }
 
@@ -41,7 +44,7 @@ class CustomizedSceneCaseApiRepositoryTest {
         when(mongoTemplate.find(any(), any()))
             .thenReturn(Lists.newArrayList(SceneCaseApiEntity.builder().build()));
         List<SceneCaseApiEntity> sceneCaseApiList = customizedSceneCaseApiRepository
-            .findSceneCaseApiBySceneCaseIdAndIsExecuteAndIsRemove(MOCK_ID, Boolean.TRUE,Boolean.FALSE);
+            .findSceneCaseApiBySceneCaseIdAndIsExecuteAndIsRemove(MOCK_ID, Boolean.TRUE, Boolean.FALSE);
         assertThat(sceneCaseApiList).isNotEmpty();
     }
 
@@ -57,7 +60,7 @@ class CustomizedSceneCaseApiRepositoryTest {
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedSceneCaseApiRepository")
     void deleteByIds_test() {
-        when(commonDeleteRepository.deleteByIds(any(),any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(any(), any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = customizedSceneCaseApiRepository.deleteByIds(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }
@@ -65,7 +68,7 @@ class CustomizedSceneCaseApiRepositoryTest {
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedSceneCaseApiRepository")
     void recover_test() {
-        when(commonDeleteRepository.recover(any(),any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.recover(any(), any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = customizedSceneCaseApiRepository.recover(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }
