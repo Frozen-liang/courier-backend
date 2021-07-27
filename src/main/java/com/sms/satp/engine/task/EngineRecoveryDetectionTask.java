@@ -4,6 +4,7 @@ import static com.sms.satp.engine.enums.EngineStatus.INVALID;
 
 import com.sms.satp.engine.model.EngineMemberEntity;
 import com.sms.satp.repository.EngineMemberRepository;
+import com.sms.satp.service.ApiTestCaseJobService;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -17,15 +18,16 @@ public class EngineRecoveryDetectionTask {
 
     private final SuspiciousEngineManagement suspiciousEngineManagement;
     private final EngineMemberRepository engineMemberRepository;
+    private final ApiTestCaseJobService apiTestCaseJobService;
 
     public EngineRecoveryDetectionTask(SuspiciousEngineManagement suspiciousEngineManagement,
-        EngineMemberRepository engineMemberRepository) {
+        EngineMemberRepository engineMemberRepository, ApiTestCaseJobService apiTestCaseJobService) {
         this.suspiciousEngineManagement = suspiciousEngineManagement;
         this.engineMemberRepository = engineMemberRepository;
+        this.apiTestCaseJobService = apiTestCaseJobService;
     }
 
-//    @Scheduled(cron = "* * * * * ?")
-    @Async("engineDetection")
+    @Scheduled(cron = "* * * * * ?")
     public void increaseIndex() {
         suspiciousEngineManagement.increaseIndex();
     }
@@ -35,8 +37,12 @@ public class EngineRecoveryDetectionTask {
     public void detection() {
         Integer currentIndex = suspiciousEngineManagement.getCurrentIndex();
         List<String> engineIds = suspiciousEngineManagement.get(currentIndex);
-        Optional.ofNullable(engineIds).ifPresent(this::updateEngineStatus);
-        // TODO publish event
+        Optional.ofNullable(engineIds).ifPresent((engineId) -> {
+            updateEngineStatus(engineIds);
+            // Reallocate api test job to engine.
+            apiTestCaseJobService.reallocateJob(engineIds);
+            // TODO  Reallocate scene  job to engine.
+        });
     }
 
     private void updateEngineStatus(List<String> engineIds) {
