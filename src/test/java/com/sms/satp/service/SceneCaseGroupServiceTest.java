@@ -74,9 +74,7 @@ class SceneCaseGroupServiceTest {
     @DisplayName("Test the add method in the SceneCaseGroup service thrown exception")
     void add_test_thrown_Exception() {
         SceneCaseGroupEntity caseGroup = getGroup();
-        when(sceneCaseGroupMapper.toSceneCaseGroupEntity(any())).thenReturn(caseGroup);
-        when(sceneCaseGroupRepository.insert(any(SceneCaseGroupEntity.class)))
-            .thenThrow(new RuntimeException());
+        when(sceneCaseGroupMapper.toSceneCaseGroupEntity(any())).thenThrow(new RuntimeException());
         SceneCaseGroupRequest request = SceneCaseGroupRequest.builder().name(MOCK_NAME).build();
         assertThatThrownBy(() -> sceneCaseGroupService.add(request)).isInstanceOf(ApiTestPlatformException.class);
     }

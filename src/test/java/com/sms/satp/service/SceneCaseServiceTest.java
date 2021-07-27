@@ -56,6 +56,7 @@ import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.RECOVER_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -174,6 +175,16 @@ class SceneCaseServiceTest {
     }
 
     @Test
+    @DisplayName("Test the deleteByIds method in the SceneCase service throws exception")
+    void deleteByIds_test_thenThrown_Exception() {
+        Optional<SceneCaseEntity> sceneCase = Optional.ofNullable(SceneCaseEntity.builder().id(MOCK_ID).build());
+        when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
+        doThrow(new RuntimeException()).when(sceneCaseRepository).deleteById(any());
+        assertThatThrownBy(() -> sceneCaseService.deleteByIds(Lists.newArrayList(MOCK_ID)))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
     @DisplayName("Test the edit method in the SceneCase service")
     void edit_test() {
         SceneCaseEntity sceneCase =
@@ -244,7 +255,10 @@ class SceneCaseServiceTest {
                         CaseTemplateApiConn.builder().caseTemplateApiId(MOCK_ID).execute(Boolean.TRUE).build()))
                     .build());
         when(sceneCaseApiService.listBySceneCaseId(any())).thenReturn(sceneCaseApiDtoList);
-        when(caseTemplateApiService.listByCaseTemplateId(any())).thenReturn(Lists.newArrayList());
+        List<CaseTemplateApiEntity> caseTemplateApiList =
+            Lists.newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID)
+                .apiTestCase(ApiTestCaseEntity.builder().id(MOCK_ID).execute(Boolean.TRUE).build()).build());
+        when(caseTemplateApiService.listByCaseTemplateId(any())).thenReturn(caseTemplateApiList);
         List<CaseTemplateApiResponse> caseTemplateApiResponses =
             Lists.newArrayList(CaseTemplateApiResponse.builder().build());
         when(caseTemplateApiMapper.toCaseTemplateApiDtoList(any())).thenReturn(caseTemplateApiResponses);
@@ -259,6 +273,13 @@ class SceneCaseServiceTest {
     @DisplayName("Test the getConn method in the SceneCase service thrown exception")
     void getConn_test_thrownException() {
         when(sceneCaseRepository.findById(any())).thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_CONN_ERROR));
+        assertThatThrownBy(() -> sceneCaseService.getConn(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the getConn method in the SceneCase service thrown exception")
+    void getConn_test_thrown_Exception() {
+        when(sceneCaseRepository.findById(any())).thenThrow(new RuntimeException());
         assertThatThrownBy(() -> sceneCaseService.getConn(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
     }
 
@@ -299,6 +320,14 @@ class SceneCaseServiceTest {
     void editConn_test_thrownException() {
         Optional<SceneCaseEntity> sceneCase = Optional.empty();
         when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
+        UpdateSceneCaseConnRequest request = getUpdateRequest();
+        assertThatThrownBy(() -> sceneCaseService.editConn(request)).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the editConn method in the SceneCase service thrown exception")
+    void editConn_test_thrown_Exception() {
+        when(sceneCaseRepository.findById(any())).thenThrow(new RuntimeException());
         UpdateSceneCaseConnRequest request = getUpdateRequest();
         assertThatThrownBy(() -> sceneCaseService.editConn(request)).isInstanceOf(ApiTestPlatformException.class);
     }
@@ -350,6 +379,14 @@ class SceneCaseServiceTest {
     }
 
     @Test
+    @DisplayName("Test the addApi method in the SceneCase service thrown exception")
+    void addApi_test_thrown_Exception() {
+        when(sceneCaseRepository.findById(any())).thenThrow(new RuntimeException());
+        AddSceneCaseApiByIdsRequest request = getAddRequest();
+        assertThatThrownBy(() -> sceneCaseService.addApi(request)).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
     @DisplayName("Test the addTemplate method in the SceneCase service")
     void addTemplate_thenRight() {
         Optional<SceneCaseEntity> sceneCase = Optional.ofNullable(SceneCaseEntity.builder().build());
@@ -376,6 +413,14 @@ class SceneCaseServiceTest {
     }
 
     @Test
+    @DisplayName("Test the addTemplate method in the SceneCase service thrown exception")
+    void addTemplate_thenThrow_Exception() {
+        when(sceneCaseRepository.findById(any())).thenThrow(new RuntimeException());
+        AddCaseTemplateConnRequest request = getAddConnRequest();
+        assertThatThrownBy(() -> sceneCaseService.addTemplate(request)).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
     @DisplayName("Test the deleteConn method in the SceneCase service")
     void deleteConn_thenRight() {
         doNothing().when(sceneCaseApiRepository).deleteById(any());
@@ -389,6 +434,68 @@ class SceneCaseServiceTest {
         doThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_CONN_ERROR)).when(sceneCaseApiRepository)
             .deleteById(any());
         assertThatThrownBy(() -> sceneCaseService.deleteConn(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the delete method in the SceneCase service")
+    void delete_thenRight() {
+        when(customizedSceneCaseRepository.deleteByIds(any())).thenReturn(Boolean.TRUE);
+        List<SceneCaseApiEntity> sceneCaseApiEntityList =
+            Lists.newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).build());
+        when(customizedSceneCaseApiRepository.findSceneCaseApiIdsBySceneCaseIds(any()))
+            .thenReturn(sceneCaseApiEntityList);
+        when(customizedSceneCaseApiRepository.deleteByIds(any())).thenReturn(Boolean.TRUE);
+        Boolean isSuccess = sceneCaseService.delete(Lists.newArrayList(MOCK_ID));
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the delete method in the SceneCase service thrown exception")
+    void delete_thenRight_throwApiException() {
+        when(customizedSceneCaseRepository.deleteByIds(any()))
+            .thenThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_ERROR));
+        assertThatThrownBy(() -> sceneCaseService.delete(Lists.newArrayList(MOCK_ID)))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the delete method in the SceneCase service thrown exception")
+    void delete_thenRight_throwException() {
+        when(customizedSceneCaseRepository.deleteByIds(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> sceneCaseService.delete(Lists.newArrayList(MOCK_ID)))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the recover method in the SceneCase service")
+    void recover_thenRight() {
+        when(customizedSceneCaseRepository.recover(any())).thenReturn(Boolean.TRUE);
+        List<SceneCaseApiEntity> sceneCaseApiEntityList =
+            Lists.newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).build());
+        when(customizedSceneCaseApiRepository.findSceneCaseApiIdsBySceneCaseIds(any()))
+            .thenReturn(sceneCaseApiEntityList);
+        when(customizedSceneCaseApiRepository.recover(any())).thenReturn(Boolean.TRUE);
+        Boolean isSuccess = sceneCaseService.recover(Lists.newArrayList(MOCK_ID));
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the recover method in the SceneCase service thrown exception")
+    void recover_thenRight_thrownApiException() {
+        when(customizedSceneCaseRepository.recover(any()))
+            .thenThrow(new ApiTestPlatformException(RECOVER_SCENE_CASE_ERROR));
+        assertThatThrownBy(() -> sceneCaseService.recover(Lists.newArrayList(MOCK_ID)))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the recover method in the SceneCase service thrown exception")
+    void recover_thenRight_thrownException() {
+        when(customizedSceneCaseRepository.recover(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> sceneCaseService.recover(Lists.newArrayList(MOCK_ID)))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
     private AddCaseTemplateConnRequest getAddConnRequest() {

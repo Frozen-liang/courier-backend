@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Tests for CustomizedCaseTemplateApiRepositoryTest")
 class CustomizedCaseTemplateApiRepositoryTest {
@@ -35,4 +36,31 @@ class CustomizedCaseTemplateApiRepositoryTest {
                 Boolean.FALSE);
         assertThat(dto).isNotEmpty();
     }
+
+    @Test
+    @DisplayName("Test the findCaseTemplateApiIdsByCaseTemplateIds method in the CustomizedCaseTemplateApiRepository")
+    void findCaseTemplateApiIdsByCaseTemplateIds_test() {
+        when(mongoTemplate.find(any(), any()))
+            .thenReturn(Lists.newArrayList(CaseTemplateApiEntity.builder().build()));
+        List<CaseTemplateApiEntity> dto =
+            customizedCaseTemplateApiRepository.findCaseTemplateApiIdsByCaseTemplateIds(Lists.newArrayList(MOCK_ID));
+        assertThat(dto).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Test the deleteByIds method in the CustomizedCaseTemplateApiRepository")
+    void deleteByIds_test() {
+        when(commonDeleteRepository.deleteByIds(any(),any())).thenReturn(Boolean.TRUE);
+        Boolean isSuccess = customizedCaseTemplateApiRepository.deleteByIds(Lists.newArrayList(MOCK_ID));
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the deleteByIds method in the CustomizedCaseTemplateApiRepository")
+    void recover_test() {
+        when(commonDeleteRepository.recover(any(),any())).thenReturn(Boolean.TRUE);
+        Boolean isSuccess = customizedCaseTemplateApiRepository.recover(Lists.newArrayList(MOCK_ID));
+        assertTrue(isSuccess);
+    }
+
 }
