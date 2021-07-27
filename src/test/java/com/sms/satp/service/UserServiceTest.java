@@ -17,8 +17,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.dto.request.UserQueryListRequest;
+import com.sms.satp.dto.UserEntityAuthority;
 import com.sms.satp.dto.request.UserPasswordUpdateRequest;
+import com.sms.satp.dto.request.UserQueryListRequest;
 import com.sms.satp.dto.request.UserRequest;
 import com.sms.satp.dto.response.UserResponse;
 import com.sms.satp.entity.system.UserEntity;
@@ -38,8 +39,7 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -49,12 +49,12 @@ class UserServiceTest {
     private final UserRepository userRepository = mock(UserRepository.class);
     private final WorkspaceRepository workspaceRepository = mock(WorkspaceRepository.class);
     private final UserGroupRepository userGroupRepository = mock(UserGroupRepository.class);
-    private final CommonRepository commonRepository = mock(
-        CommonRepository.class);
+    private final UserGroupService userGroupService = mock(UserGroupService.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final UserMapper userMapper = new UserMapperImpl();
-    private final UserService userService = new UserServiceImpl(
-        userRepository, userGroupRepository, workspaceRepository, commonRepository, userMapper);
+    private final UserService userService = new UserServiceImpl(userRepository, userGroupRepository,
+        userGroupService, workspaceRepository, commonRepository, userMapper, passwordEncoder);
     private final UserEntity user = UserEntity.builder().id(ID).build();
     private final UserRequest userRequest = UserRequest.builder().password("123Wac!@#")
         .id(ID).build();
@@ -67,7 +67,8 @@ class UserServiceTest {
     private final UserPasswordUpdateRequest userPasswordUpdateRequest = UserPasswordUpdateRequest.builder()
         .id(ID).newPassword("123Wac!@#").confirmPassword("123Wac!@#").oldPassword("123Wac!@@#").build();
     private final UserEntity userEntity = UserEntity.builder().id(ID).password("123Wac!@@#").build();
-    private final UserEntity userEntityPasswordEncode = UserEntity.builder().id(ID).password(passwordEncoder.encode("123Wac!@@#")).build();
+    private final UserEntity userEntityPasswordEncode = UserEntity.builder().id(ID)
+        .password(passwordEncoder.encode("123Wac!@@#")).build();
     private static final String ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String GROUP_ID = ObjectId.get().toString();
@@ -207,7 +208,7 @@ class UserServiceTest {
     public void updatePassword_test() {
         when(userRepository.findById(ID)).thenReturn(Optional.of(userEntityPasswordEncode));
         Boolean result = userService.updatePassword(userPasswordUpdateRequest);
-        verify(userRepository,times(1)).save(userEntityPasswordEncode);
+        verify(userRepository, times(1)).save(userEntityPasswordEncode);
         assertThat(result).isTrue();
     }
 
@@ -243,5 +244,43 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.updatePassword(userPasswordUpdateErrorRequest))
             .isInstanceOf(ApiTestPlatformException.class).extracting("message")
             .isEqualTo("The old password is not correct.");
+    }
+
+    @Test
+    @DisplayName("Get user detail by username or email when username or email does not exist")
+    public void getUserDetailsByUsernameOrEmail_non_existent_test() {
+        when(userRepository.findByUsernameOrEmail(USERNAME, USERNAME)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> userService.getUserDetailsByUsernameOrEmail(USERNAME))
+            .isInstanceOf(UsernameNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("Test for getUserDetailsByUsernameOrEmail")
+    public void getUserDetailsByUsernameOrEmail_test() {
+        UserEntity userEntity = UserEntity.builder().id(ID).groupId(GROUP_ID).build();
+        when(userRepository.findByUsernameOrEmail(USERNAME, USERNAME)).thenReturn(Optional.of(userEntity));
+        when(userGroupService.getAuthoritiesByUserGroup(GROUP_ID)).thenReturn(Collections.emptyList());
+        UserEntityAuthority userEntityAuthority = userService.getUserDetailsByUsernameOrEmail(USERNAME);
+        assertThat(userEntityAuthority.getAuthorities()).isEqualTo(Collections.emptyList());
+        assertThat(userEntityAuthority.getUserEntity()).isEqualTo(userEntity);
+    }
+
+    @Test
+    @DisplayName("Get user detail by userId when userId does not exist")
+    public void getUserDetailsByUserId_non_existent_test() {
+        when(userRepository.findById(ID)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> userService.getUserDetailsByUserId(ID))
+            .isInstanceOf(UsernameNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("Test for getUserDetailsByUserId")
+    public void getUserDetailsByUserId_test() {
+        UserEntity userEntity = UserEntity.builder().id(ID).groupId(GROUP_ID).build();
+        when(userRepository.findById(ID)).thenReturn(Optional.of(userEntity));
+        when(userGroupService.getAuthoritiesByUserGroup(GROUP_ID)).thenReturn(Collections.emptyList());
+        UserEntityAuthority userEntityAuthority = userService.getUserDetailsByUserId(ID);
+        assertThat(userEntityAuthority.getAuthorities()).isEqualTo(Collections.emptyList());
+        assertThat(userEntityAuthority.getUserEntity()).isEqualTo(userEntity);
     }
 }

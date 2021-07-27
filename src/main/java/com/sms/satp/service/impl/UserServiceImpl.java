@@ -20,6 +20,7 @@ import static com.sms.satp.utils.Assert.isTrue;
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
+import com.sms.satp.dto.UserEntityAuthority;
 import com.sms.satp.dto.request.UserPasswordUpdateRequest;
 import com.sms.satp.dto.request.UserQueryListRequest;
 import com.sms.satp.dto.request.UserRequest;
@@ -33,6 +34,7 @@ import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.repository.UserRepository;
 import com.sms.satp.repository.WorkspaceRepository;
 import com.sms.satp.security.pojo.CustomUser;
+import com.sms.satp.service.UserGroupService;
 import com.sms.satp.service.UserService;
 import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.SecurityUtil;
@@ -50,7 +52,7 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -60,21 +62,25 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserGroupRepository userGroupRepository;
+    private final UserGroupService userGroupService;
     private final WorkspaceRepository workspaceRepository;
     private final CommonRepository commonRepository;
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
     private static final String GROUP_ID = "groupId";
 
     public UserServiceImpl(UserRepository userRepository,
-        UserGroupRepository userGroupRepository, WorkspaceRepository workspaceRepository,
+        UserGroupRepository userGroupRepository, UserGroupService userGroupService,
+        WorkspaceRepository workspaceRepository,
         CommonRepository commonRepository,
-        UserMapper userMapper) {
+        UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userGroupRepository = userGroupRepository;
+        this.userGroupService = userGroupService;
         this.workspaceRepository = workspaceRepository;
         this.commonRepository = commonRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -217,6 +223,26 @@ public class UserServiceImpl implements UserService {
             log.error("id:{},message:{}", request.getId(), e.getMessage());
             throw e;
         }
+    }
+
+    @Override
+    public UserEntityAuthority getUserDetailsByUsernameOrEmail(String username) {
+        UserEntity userEntity = userRepository.findByUsernameOrEmail(username, username).orElseThrow(() ->
+            new UsernameNotFoundException(String.format("The user %s was not found.", username)));
+        return UserEntityAuthority.builder()
+            .userEntity(userEntity)
+            .authorities(userGroupService.getAuthoritiesByUserGroup(userEntity.getGroupId()))
+            .build();
+    }
+
+    @Override
+    public UserEntityAuthority getUserDetailsByUserId(String id) {
+        UserEntity userEntity = userRepository.findById(id).orElseThrow(() ->
+            new UsernameNotFoundException(String.format("The userId %s was not found.", id)));
+        return UserEntityAuthority.builder()
+            .userEntity(userEntity)
+            .authorities(userGroupService.getAuthoritiesByUserGroup(userEntity.getGroupId()))
+            .build();
     }
 
 }
