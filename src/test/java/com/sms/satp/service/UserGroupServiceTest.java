@@ -8,6 +8,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_USER_GROUP_LIST_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -60,13 +61,13 @@ class UserGroupServiceTest {
     }
 
 
-    /*@Test
+    @Test
     @DisplayName("Test the add method in the UserGroup service")
     public void add_test() {
         when(userGroupMapper.toEntity(userGroupRequest)).thenReturn(userGroup);
         when(userGroupRepository.insert(any(UserGroupEntity.class))).thenReturn(userGroup);
         assertThat(userGroupService.add(userGroupRequest)).isTrue();
-    }*/
+    }
 
     @Test
     @DisplayName("An exception occurred while adding UserGroup")
@@ -111,16 +112,12 @@ class UserGroupServiceTest {
     @Test
     @DisplayName("Test the list method in the UserGroup service")
     public void list_test() {
-        ArrayList<UserGroupEntity> userGroupList = new ArrayList<>();
-        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            userGroupList.add(UserGroupEntity.builder().build());
-        }
         ArrayList<UserGroupResponse> userGroupResponseList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             userGroupResponseList.add(UserGroupResponse.builder().build());
         }
-        when(userGroupRepository.findAllByRemovedIsFalseOrderByCreateDateTimeDesc()).thenReturn(userGroupList);
-        when(userGroupMapper.toDtoList(userGroupList)).thenReturn(userGroupResponseList);
+        when(commonRepository.listLookupUser(anyString(), any(), any(Class.class)))
+            .thenReturn(userGroupResponseList);
         List<UserGroupResponse> result = userGroupService.list();
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
@@ -128,7 +125,7 @@ class UserGroupServiceTest {
     @Test
     @DisplayName("An exception occurred while getting UserGroup list")
     public void list_exception_test() {
-        doThrow(new RuntimeException()).when(userGroupRepository).findAllByRemovedIsFalseOrderByCreateDateTimeDesc();
+        doThrow(new RuntimeException()).when(commonRepository).listLookupUser(anyString(), any(), any(Class.class));
         assertThatThrownBy(userGroupService::list)
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_USER_GROUP_LIST_ERROR.getCode());

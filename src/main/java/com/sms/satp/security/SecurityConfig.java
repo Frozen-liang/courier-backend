@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.satp.security.authentication.AuthenticationFailHandler;
 import com.sms.satp.security.authentication.AuthenticationSuccessHandler;
 import com.sms.satp.security.authentication.RestAccessDeniedHandler;
-import com.sms.satp.security.filter.JwtTokenFilter;
+import com.sms.satp.security.filter.EngineTokenFilter;
+import com.sms.satp.security.filter.UserTokenFilter;
 import com.sms.satp.security.jwt.JwtTokenManager;
 import com.sms.satp.security.point.CustomLoginUrlAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
@@ -13,7 +14,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -39,11 +39,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.jwtTokenManager = jwtTokenManager;
         this.securityProperties = securityProperties;
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
-    }
-
-    @Bean
-    public GrantedAuthorityDefaults grantedAuthorityDefaults() {
-        return new GrantedAuthorityDefaults("");
     }
 
     @Bean
@@ -85,8 +80,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .accessDeniedHandler(accessDeniedHandler)
             .authenticationEntryPoint(authenticationEntryPoint);
         http.headers().cacheControl();
-        JwtTokenFilter jwtTokenFilter = new JwtTokenFilter(jwtTokenManager);
-        http.addFilterBefore(jwtTokenFilter,
-            UsernamePasswordAuthenticationFilter.class);
+        UserTokenFilter userTokenFilter = new UserTokenFilter(jwtTokenManager);
+        EngineTokenFilter engineTokenFilter = new EngineTokenFilter(jwtTokenManager);
+        http.addFilterBefore(userTokenFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(engineTokenFilter, UserTokenFilter.class);
     }
 }

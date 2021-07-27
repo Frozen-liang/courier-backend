@@ -13,7 +13,10 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpHeaders;
 
 @Slf4j
 public final class JwtUtils {
@@ -74,6 +77,14 @@ public final class JwtUtils {
         jwsHeader.put(TOKEN_TYPE, customUser.getTokenType().name());
         jwsHeader.put(TOKEN_USER_ID, customUser.getId());
         return jwsHeader;
+    }
+
+    public static String getToken(HttpServletRequest request) {
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (StringUtils.isNotBlank(header) && header.startsWith("Bearer ")) {
+            return header.split(" ")[1].trim();
+        }
+        return null;
     }
 
 }

@@ -1,9 +1,12 @@
 package com.sms.satp.security.jwt;
 
+import static com.sms.satp.common.enums.RoleType.ENGINE;
 import static com.sms.satp.utils.JwtUtils.TOKEN_TYPE;
 import static com.sms.satp.utils.JwtUtils.TOKEN_USER_ID;
 
+import com.sms.satp.entity.system.SystemRoleEntity;
 import com.sms.satp.entity.system.UserEntity;
+import com.sms.satp.repository.SystemRoleRepository;
 import com.sms.satp.repository.UserRepository;
 import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
@@ -19,11 +22,14 @@ import io.jsonwebtoken.SigningKeyResolver;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import java.time.Duration;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.security.auth.login.AccountNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -32,14 +38,16 @@ public class JwtTokenManager {
 
     private final UserRepository userRepository;
     private final UserGroupService userGroupService;
+    private final SystemRoleRepository roleRepository;
     private final SecurityStrategyFactory securityStrategyFactory;
     private final SigningKeyResolver signingKeyResolver;
 
     public JwtTokenManager(UserRepository userRepository, UserGroupService userGroupService,
-        SecurityStrategyFactory securityStrategyFactory,
+        SystemRoleRepository roleRepository, SecurityStrategyFactory securityStrategyFactory,
         SigningKeyResolver signingKeyResolver) {
         this.userRepository = userRepository;
         this.userGroupService = userGroupService;
+        this.roleRepository = roleRepository;
         this.securityStrategyFactory = securityStrategyFactory;
         this.signingKeyResolver = signingKeyResolver;
     }
@@ -69,9 +77,28 @@ public class JwtTokenManager {
         }
     }
 
+    public Authentication createEngineAuthentication(String token) {
+        try {
+            JwsHeader<?> jwsHeader = JwtUtils.decodeJwt(token, signingKeyResolver);
+            String id = (String) jwsHeader.get(TOKEN_USER_ID);
+            TokenType tokenType = TokenType.valueOf((String) jwsHeader.get(TOKEN_TYPE));
+            List<SimpleGrantedAuthority> roles = roleRepository.findAllByRoleType(ENGINE)
+                .map(SystemRoleEntity::getName).map(SimpleGrantedAuthority::new
+                ).collect(Collectors.toList());
+            return SecurityUtil.newAuthentication(id, "", "engine", roles, tokenType);
+        } catch (Exception exception) {
+            return null;
+        }
+    }
+
     public String getUserId(String token) {
         JwsHeader<?> jwsHeader = JwtUtils.decodeJwt(token, signingKeyResolver);
-        return  (String) jwsHeader.get(TOKEN_USER_ID);
+        return (String) jwsHeader.get(TOKEN_USER_ID);
+    }
+
+    public String getTokenType(String token) {
+        JwsHeader<?> jwsHeader = JwtUtils.decodeJwt(token, signingKeyResolver);
+        return (String) jwsHeader.get(TOKEN_TYPE);
     }
 
     public boolean validate(String token) {

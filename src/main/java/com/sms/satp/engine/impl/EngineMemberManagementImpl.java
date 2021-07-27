@@ -21,12 +21,13 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
-public class EngineMemberManagementImpl implements EngineMemberManagement {
+public class EngineMemberManagementImpl implements EngineMemberManagement, DisposableBean {
 
     private final SecureRandom random = new SecureRandom();
     private final Map<String, EngineMemberEntity> engineMembers = new ConcurrentHashMap<>();
@@ -67,7 +68,7 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     @Override
     public String getAvailableMember() throws ApiTestPlatformException {
-        List<String> availableMembers = engineMemberRepository.findAllByStatus(RUNNING.getCode())
+        List<String> availableMembers = engineMemberRepository.findAllByStatus(RUNNING)
             .map(EngineMemberEntity::getDestination).collect(
                 Collectors.toUnmodifiableList());
         if (CollectionUtils.isEmpty(availableMembers)) {
@@ -118,4 +119,12 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     }
 
 
+    @Override
+    public void destroy() throws Exception {
+        List<EngineMemberEntity> engineMembers = engineMemberRepository.findAllByStatus(RUNNING)
+            .collect(Collectors.toList());
+        engineMembers.forEach(engine -> engine.setStatus(EngineStatus.INVALID));
+        log.info("Destroy engine");
+        engineMemberRepository.saveAll(engineMembers);
+    }
 }

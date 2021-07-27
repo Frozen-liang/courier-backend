@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.sms.satp.entity.system.UserEntity;
+import com.sms.satp.repository.SystemRoleRepository;
 import com.sms.satp.repository.UserRepository;
 import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
@@ -63,8 +64,9 @@ public class JwtTokenManagerTest {
     UserSecurityStrategy userSecurityStrategy = mock(UserSecurityStrategy.class);
     UserRepository userRepository = mock(UserRepository.class);
     UserGroupService userGroupService = mock(UserGroupService.class);
-
-    JwtTokenManager jwtTokenManager = new JwtTokenManager(userRepository, userGroupService, securityStrategyFactory,
+    SystemRoleRepository roleRepository = mock(SystemRoleRepository.class);
+    JwtTokenManager jwtTokenManager = new JwtTokenManager(userRepository, userGroupService, roleRepository,
+        securityStrategyFactory,
         signingKeyResolver);
 
     @Test

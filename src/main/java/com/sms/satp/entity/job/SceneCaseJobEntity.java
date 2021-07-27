@@ -31,6 +31,7 @@ public class SceneCaseJobEntity {
     @JsonIgnore
     private Boolean removed = false;
     private String createUserId;
+    private String workspaceId;
     private String modifyUserId;
     private LocalDateTime createDateTime;
     @LastModifiedDate

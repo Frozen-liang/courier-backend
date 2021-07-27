@@ -26,6 +26,9 @@ public class ApiTestCaseJobEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String workspaceId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String projectId;
+
     @Builder.Default
     @Field("isRemoved")
     private boolean removed = false;

@@ -1,5 +1,6 @@
 package com.sms.satp.repository;
 
+import com.sms.satp.engine.enums.EngineStatus;
 import com.sms.satp.engine.model.EngineMemberEntity;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -11,6 +12,6 @@ public interface EngineMemberRepository extends MongoRepository<EngineMemberEnti
 
     Optional<EngineMemberEntity> findFirstByDestination(String destination);
 
-    Stream<EngineMemberEntity> findAllByStatus(Integer status);
+    Stream<EngineMemberEntity> findAllByStatus(EngineStatus status);
 
 }

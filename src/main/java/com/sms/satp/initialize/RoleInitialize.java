@@ -1,13 +1,11 @@
 package com.sms.satp.initialize;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sms.satp.entity.system.SystemRoleEntity;
 import com.sms.satp.entity.system.SystemVersionEntity;
 import com.sms.satp.repository.SystemRoleRepository;
 import com.sms.satp.repository.SystemVersionRepository;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -61,8 +59,8 @@ public class RoleInitialize implements InitializingBean {
                     systemVersionRepository.save(systemVersion);
                     return;
                 }
-                List<SystemRoleEntity> roles = objectMapper.readValue(classPathResource.getInputStream(), List.class);
-                systemRoleRepository.saveAll(roles);
+                RoleConvert roleConvert = objectMapper.readValue(classPathResource.getInputStream(), RoleConvert.class);
+                systemRoleRepository.saveAll(roleConvert.getRoles());
                 systemVersion.setInitialized(true);
                 systemVersion.setStatus(SUCCESS);
                 systemVersionRepository.save(systemVersion);

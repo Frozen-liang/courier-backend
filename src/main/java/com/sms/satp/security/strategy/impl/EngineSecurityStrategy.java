@@ -10,22 +10,22 @@ import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.time.Duration;
 
-@SecurityStrategy(type = TokenType.USER)
-public class UserSecurityStrategy implements SatpSecurityStrategy {
+@SecurityStrategy(type = TokenType.ENGINE)
+public class EngineSecurityStrategy implements SatpSecurityStrategy {
 
     private final AccessTokenProperties accessTokenProperties;
 
-    public UserSecurityStrategy(AccessTokenProperties accessTokenProperties) {
+    public EngineSecurityStrategy(AccessTokenProperties accessTokenProperties) {
         this.accessTokenProperties = accessTokenProperties;
     }
 
     @Override
     public Key generateSecretKey(JwsHeader<?> jwsHeader) {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessTokenProperties.getUserSecretKey()));
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessTokenProperties.getEngineSecretKey()));
     }
 
     @Override
     public Duration obtainTokenExpirationTime() {
-        return accessTokenProperties.getUserExpire();
+        return accessTokenProperties.getEngineExpire();
     }
 }

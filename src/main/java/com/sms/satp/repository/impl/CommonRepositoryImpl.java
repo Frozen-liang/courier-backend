@@ -1,9 +1,13 @@
 package com.sms.satp.repository.impl;
 
+import static com.sms.satp.common.enums.OperationModule.USER;
 import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonField.CREATE_USER_ID;
 import static com.sms.satp.common.field.CommonField.ID;
 import static com.sms.satp.common.field.CommonField.MODIFY_DATE_TIME;
 import static com.sms.satp.common.field.CommonField.REMOVE;
+import static com.sms.satp.common.field.UserField.NICKNAME;
+import static com.sms.satp.common.field.UserField.USERNAME;
 
 import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.field.Field;
@@ -108,6 +112,21 @@ public class CommonRepositoryImpl implements CommonRepository {
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
         T result = mongoTemplate.aggregate(aggregation, collectionName, responseClass).getUniqueMappedResult();
         return Optional.ofNullable(result);
+    }
+
+    @Override
+    public <T> List<T> listLookupUser(String collectionName, List<Optional<Criteria>> criteriaList,
+        Class<T> responseClass) {
+        List<LookupQueryField> lookupQueryFields = List.of(
+            LookupQueryField.builder().field(USERNAME).build(),
+            LookupQueryField.builder().field(NICKNAME).build()
+        );
+        LookupVo lookupVo = LookupVo.builder()
+            .from(USER)
+            .localField(CREATE_USER_ID)
+            .foreignField(ID).as("user")
+            .queryFields(lookupQueryFields).build();
+        return this.list(collectionName, lookupVo, criteriaList, responseClass);
     }
 
     public <T> List<T> list(QueryVo query, Class<T> responseClass) {

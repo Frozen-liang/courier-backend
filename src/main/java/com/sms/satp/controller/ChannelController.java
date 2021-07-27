@@ -1,5 +1,7 @@
 package com.sms.satp.controller;
 
+import static com.sms.satp.security.TokenType.ENGINE;
+
 import com.sms.satp.common.constant.Constants;
 import com.sms.satp.dto.request.AddSceneCaseJobRequest;
 import com.sms.satp.dto.request.ApiTestCaseJobRunRequest;
@@ -10,19 +12,16 @@ import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.request.EngineRegistrationRequest;
 import com.sms.satp.entity.job.ApiTestCaseJobReport;
 import com.sms.satp.entity.job.SceneCaseJobReport;
-import com.sms.satp.security.TokenType;
 import com.sms.satp.security.jwt.JwtTokenManager;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.ApiTestCaseJobService;
 import com.sms.satp.service.SceneCaseJobService;
-import java.util.List;
-import org.bson.types.ObjectId;
+import java.util.Collections;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,8 +34,6 @@ public class ChannelController {
     private final SceneCaseJobService sceneCaseJobService;
     private final EngineMemberManagement engineMemberManagement;
     private final JwtTokenManager jwtTokenManager;
-    private final CustomUser engine = new CustomUser("engine", "", List.of(new SimpleGrantedAuthority(
-        "Global_Fun_Query_All")), ObjectId.get().toString(), "", TokenType.USER);
 
     public ChannelController(ApiTestCaseJobService apiTestCaseJobService,
         SceneCaseJobService sceneCaseJobService, EngineMemberManagement engineMemberManagement,
@@ -82,7 +79,10 @@ public class ChannelController {
 
     @PostMapping(Constants.SDK_VERSION + "/engine/bind")
     public EngineRegistrationResponse bind(@Validated @RequestBody EngineRegistrationRequest request) {
-        return EngineRegistrationResponse.builder().subscribeAddress(engineMemberManagement.bind(request))
+        String destination = engineMemberManagement.bind(request);
+        CustomUser engine = new CustomUser("engine", "", Collections.emptyList(), destination, "",
+            ENGINE);
+        return EngineRegistrationResponse.builder().subscribeAddress(destination)
             .token(jwtTokenManager.generateAccessToken(engine))
             .build();
     }

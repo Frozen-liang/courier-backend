@@ -135,4 +135,10 @@ public class Role {
     public static final String LOG_QUERY_ALL = "Log" + QUERY_ALL;
     public static final String LOG_QUERY_OWN = "Log" + QUERY_OWN;
 
+
+    // Engine role
+    public static final String GLOBAL_FUN_FIND_ALL = "Global_Fun_Find_All";
+    public static final String PROJECT_FUN_FIND_ALL = "Project_Fun_Find_All";
+    public static final String GLOBAL_FUNCTION_PULL = "Global_Fun_Pull";
+    public static final String PROJECT_FUNCTION_PULL = "Project_Fun_Pull";
 }

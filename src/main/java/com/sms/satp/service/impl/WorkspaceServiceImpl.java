@@ -1,6 +1,5 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.enums.OperationModule.USER;
 import static com.sms.satp.common.enums.OperationModule.WORKSPACE;
 import static com.sms.satp.common.enums.OperationType.ADD;
 import static com.sms.satp.common.enums.OperationType.DELETE;
@@ -12,11 +11,7 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_WORKSPACE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_WORKSPACE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_WORKSPACE_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.THE_WORKSPACE_CANNOT_DELETE_ERROR;
-import static com.sms.satp.common.field.CommonField.CREATE_USER_ID;
-import static com.sms.satp.common.field.CommonField.ID;
 import static com.sms.satp.common.field.CommonField.REMOVE;
-import static com.sms.satp.common.field.UserField.NICKNAME;
-import static com.sms.satp.common.field.UserField.USERNAME;
 import static com.sms.satp.utils.Assert.isFalse;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
@@ -24,8 +19,6 @@ import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.WorkspaceRequest;
 import com.sms.satp.dto.response.WorkspaceResponse;
-import com.sms.satp.entity.mongo.LookupQueryField;
-import com.sms.satp.entity.mongo.LookupVo;
 import com.sms.satp.entity.workspace.WorkspaceEntity;
 import com.sms.satp.mapper.WorkspaceMapper;
 import com.sms.satp.repository.CommonRepository;
@@ -67,17 +60,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public List<WorkspaceResponse> list() {
         try {
             String collectionName = WORKSPACE.getCollectionName();
-            List<LookupQueryField> lookupQueryFields = List.of(
-                LookupQueryField.builder().field(USERNAME).build(),
-                LookupQueryField.builder().field(NICKNAME).build()
-            );
-            LookupVo lookupVo = LookupVo.builder()
-                .from(USER)
-                .localField(CREATE_USER_ID)
-                .foreignField(ID).as("user")
-                .queryFields(lookupQueryFields).build();
             return commonRepository
-                .list(collectionName, lookupVo, List.of(REMOVE.is(Boolean.FALSE)), WorkspaceResponse.class);
+                .listLookupUser(collectionName, List.of(REMOVE.is(Boolean.FALSE)), WorkspaceResponse.class);
         } catch (Exception e) {
             log.error("Failed to get the Workspace list!", e);
             throw new ApiTestPlatformException(GET_WORKSPACE_LIST_ERROR);
@@ -91,7 +75,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         log.info("WorkspaceService-add()-params: [Workspace]={}", workspaceRequest.toString());
         try {
             WorkspaceEntity workspace = workspaceMapper.toEntity(workspaceRequest);
-            workspace.setCreateUsername(SecurityUtil.getCurrentUser().getUsername());
             workspaceRepository.insert(workspace);
         } catch (Exception e) {
             log.error("Failed to add the Workspace!", e);

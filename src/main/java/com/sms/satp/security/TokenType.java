@@ -4,5 +4,6 @@ import lombok.Getter;
 
 @Getter
 public enum TokenType {
-    USER
+    USER,
+    ENGINE
 }

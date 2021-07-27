@@ -16,16 +16,21 @@ import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
+import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.GlobalFunctionRequest;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
+import com.sms.satp.entity.function.FunctionMessage;
 import com.sms.satp.entity.function.GlobalFunctionEntity;
 import com.sms.satp.mapper.GlobalFunctionMapper;
 import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.GlobalFunctionRepository;
 import com.sms.satp.service.GlobalFunctionService;
+import com.sms.satp.service.MessageService;
 import com.sms.satp.utils.ExceptionUtils;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -41,14 +46,16 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     private final GlobalFunctionRepository globalFunctionRepository;
     private final GlobalFunctionMapper globalFunctionMapper;
     private final CommonRepository commonRepository;
+    private final MessageService messageService;
     private static final String FUNCTION_KEY = "functionKey";
 
     public GlobalFunctionServiceImpl(GlobalFunctionRepository globalFunctionRepository,
         GlobalFunctionMapper globalFunctionMapper,
-        CommonRepository commonRepository) {
+        CommonRepository commonRepository, MessageService messageService) {
         this.globalFunctionRepository = globalFunctionRepository;
         this.globalFunctionMapper = globalFunctionMapper;
         this.commonRepository = commonRepository;
+        this.messageService = messageService;
     }
 
     @Override
@@ -85,6 +92,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
         try {
             GlobalFunctionEntity globalFunction = globalFunctionMapper.toEntity(globalFunctionRequest);
             globalFunctionRepository.insert(globalFunction);
+            sendMessageToEngine(List.of(globalFunction.getId()), ADD, globalFunction.getWorkspaceId());
         } catch (Exception e) {
             log.error("Failed to add the GlobalFunction!", e);
             throw new ApiTestPlatformException(ADD_GLOBAL_FUNCTION_ERROR);
@@ -99,10 +107,10 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
         log.info("GlobalFunctionService-edit()-params: [GlobalFunction]={}", globalFunctionRequest.toString());
         try {
             boolean exists = globalFunctionRepository.existsById(globalFunctionRequest.getId());
-
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "GlobalFunction", globalFunctionRequest.getId());
             GlobalFunctionEntity globalFunction = globalFunctionMapper.toEntity(globalFunctionRequest);
             globalFunctionRepository.save(globalFunction);
+            sendMessageToEngine(List.of(globalFunction.getId()), EDIT, globalFunction.getWorkspaceId());
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
             throw apiTestPlatEx;
@@ -119,11 +127,36 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonRepository.deleteByIds(ids, GlobalFunctionEntity.class);
+            String workspaceId = globalFunctionRepository.findById(ids.get(0)).map(GlobalFunctionEntity::getWorkspaceId)
+                .orElse(null);
+            Boolean result = commonRepository.deleteByIds(ids, GlobalFunctionEntity.class);
+            sendMessageToEngine(ids, DELETE, workspaceId);
+            return result;
         } catch (Exception e) {
             log.error("Failed to delete the GlobalFunction!", e);
             throw new ApiTestPlatformException(DELETE_GLOBAL_FUNCTION_BY_ID_ERROR);
         }
+    }
+
+    @Override
+    public Map<String, List<GlobalFunctionResponse>> findAll() {
+        return globalFunctionRepository.findAllByRemovedIsFalse()
+            .collect(Collectors.groupingBy(GlobalFunctionResponse::getWorkspaceId));
+    }
+
+    @Override
+    public List<GlobalFunctionResponse> pullFunction(List<String> ids) {
+        return globalFunctionRepository.findAllByIdIn(ids);
+    }
+
+    private void sendMessageToEngine(List<String> ids, OperationType operationType, String workspaceId) {
+        FunctionMessage functionMessage = FunctionMessage.builder()
+            .ids(ids)
+            .global(true)
+            .operationType(operationType)
+            .key(workspaceId)
+            .build();
+        messageService.enginePullFunctionMessage(functionMessage);
     }
 
 }
