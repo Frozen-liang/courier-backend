@@ -14,6 +14,7 @@ import java.util.List;
 import javax.validation.Valid;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,26 +35,31 @@ public class CaseTemplateController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_CRE_UPD_DEL)")
     public Boolean add(@Valid @RequestBody AddCaseTemplateRequest addCaseTemplateRequest) {
         return caseTemplateService.add(addCaseTemplateRequest);
     }
 
     @PostMapping("/convert")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_CRE_UPD_DEL)")
     public IdResponse convert(@Valid @RequestBody ConvertCaseTemplateRequest convertCaseTemplateRequest) {
         return caseTemplateService.add(convertCaseTemplateRequest);
     }
 
     @DeleteMapping("/delete/{ids}")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_CRE_UPD_DEL)")
     public Boolean deleteByIds(@PathVariable List<String> ids) {
         return caseTemplateService.deleteByIds(ids);
     }
 
     @PutMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_CRE_UPD_DEL)")
     public Boolean edit(@Valid @RequestBody UpdateCaseTemplateRequest updateCaseTemplateRequest) {
         return caseTemplateService.edit(updateCaseTemplateRequest);
     }
 
     @PostMapping("/page/{projectId}")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_QUERY_ALL)")
     public Page<CaseTemplateResponse> page(@RequestBody CaseTemplateSearchRequest searchDto,
         @PathVariable ObjectId projectId) {
         return caseTemplateService.page(searchDto, projectId);
@@ -65,16 +71,19 @@ public class CaseTemplateController {
     }
 
     @PostMapping("/api")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_CRE_UPD_DEL)")
     public Boolean addApi(@Valid @RequestBody AddCaseTemplateApiByIdsRequest request) {
         return caseTemplateService.addApi(request);
     }
 
     @DeleteMapping("/{ids}")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable List<String> ids) {
         return caseTemplateService.delete(ids);
     }
 
     @PutMapping("/recover")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_CRE_UPD_DEL)")
     public Boolean recover(@RequestBody List<String> ids) {
         return caseTemplateService.recover(ids);
     }

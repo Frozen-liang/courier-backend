@@ -14,6 +14,7 @@ import java.util.List;
 import javax.validation.Valid;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,21 +35,25 @@ public class SceneCaseController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_CRE_UPD_DEL)")
     public Boolean add(@Valid @RequestBody AddSceneCaseRequest sceneCaseDto) {
         return sceneCaseService.add(sceneCaseDto);
     }
 
     @DeleteMapping("/delete/{ids}")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_CRE_UPD_DEL)")
     public Boolean deleteByIds(@PathVariable List<String> ids) {
         return sceneCaseService.deleteByIds(ids);
     }
 
     @PutMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_CRE_UPD_DEL)")
     public Boolean edit(@Valid @RequestBody UpdateSceneCaseRequest sceneCaseDto) {
         return sceneCaseService.edit(sceneCaseDto);
     }
 
     @PostMapping("/page/{projectId}")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_QUERY_ALL)")
     public Page<SceneCaseResponse> page(@RequestBody SearchSceneCaseRequest searchDto,
         @PathVariable ObjectId projectId) {
         return sceneCaseService.page(searchDto, projectId);
@@ -60,31 +65,37 @@ public class SceneCaseController {
     }
 
     @PutMapping("/conn/edit")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_CRE_UPD_DEL)")
     public Boolean editConn(@RequestBody UpdateSceneCaseConnRequest updateSceneTemplateRequest) {
         return sceneCaseService.editConn(updateSceneTemplateRequest);
     }
 
     @PostMapping("/api")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_CRE_UPD_DEL)")
     public Boolean addApi(@Valid @RequestBody AddSceneCaseApiByIdsRequest request) {
         return sceneCaseService.addApi(request);
     }
 
     @DeleteMapping("/conn/{sceneCaseApiId}")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_CRE_UPD_DEL)")
     public Boolean deleteConn(@PathVariable String sceneCaseApiId) {
         return sceneCaseService.deleteConn(sceneCaseApiId);
     }
 
     @PostMapping("/template")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_CRE_UPD_DEL)")
     public Boolean addTemplate(@Valid @RequestBody AddCaseTemplateConnRequest addCaseTemplateConnRequest) {
         return sceneCaseService.addTemplate(addCaseTemplateConnRequest);
     }
 
     @DeleteMapping("/{ids}")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable List<String> ids) {
         return sceneCaseService.delete(ids);
     }
 
     @PutMapping("/recover")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_CRE_UPD_DEL)")
     public Boolean recover(@RequestBody List<String> ids) {
         return sceneCaseService.recover(ids);
     }

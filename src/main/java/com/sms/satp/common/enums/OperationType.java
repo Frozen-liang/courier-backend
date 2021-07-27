@@ -26,7 +26,11 @@ public enum OperationType implements EnumCommon {
     // 用户加锁
     LOCK(7),
     // 用户解锁
-    UNLOCK(8);
+    UNLOCK(9),
+    // 登录
+    LOGIN(10),
+    // 登出
+    LOGOUT(11);
 
     private static final Map<Integer, OperationType> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationType::getCode, Function.identity()));

@@ -8,7 +8,7 @@ import com.sms.satp.security.filter.EngineTokenFilter;
 import com.sms.satp.security.filter.UserTokenFilter;
 import com.sms.satp.security.jwt.JwtTokenManager;
 import com.sms.satp.security.point.CustomLoginUrlAuthenticationEntryPoint;
-import org.springframework.context.annotation.Bean;
+import com.sms.satp.service.LogService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -17,7 +17,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsUtils;
@@ -28,32 +27,35 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final ObjectMapper objectMapper;
     private final UserDetailsService userDetailsService;
+    private final LogService logService;
     private final JwtTokenManager jwtTokenManager;
     private final SecurityProperties securityProperties;
+    private final PasswordEncoder passwordEncoder;
 
     public SecurityConfig(
         ObjectMapper objectMapper, UserDetailsService userDetailsService,
-        JwtTokenManager jwtTokenManager, SecurityProperties securityProperties) {
+        LogService logService, JwtTokenManager jwtTokenManager,
+        SecurityProperties securityProperties,
+        PasswordEncoder passwordEncoder) {
         this.objectMapper = objectMapper;
         this.userDetailsService = userDetailsService;
+        this.logService = logService;
         this.jwtTokenManager = jwtTokenManager;
         this.securityProperties = securityProperties;
+        this.passwordEncoder = passwordEncoder;
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        AuthenticationSuccessHandler successHandler = new AuthenticationSuccessHandler(objectMapper, jwtTokenManager);
+        AuthenticationSuccessHandler successHandler = new AuthenticationSuccessHandler(objectMapper, jwtTokenManager,
+            logService);
         AuthenticationFailHandler authenticationFailureHandler = new AuthenticationFailHandler(objectMapper);
         RestAccessDeniedHandler accessDeniedHandler = new RestAccessDeniedHandler(objectMapper);
         CustomLoginUrlAuthenticationEntryPoint authenticationEntryPoint = new CustomLoginUrlAuthenticationEntryPoint(

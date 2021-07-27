@@ -1,7 +1,6 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.request.AddSceneCaseGroupRequest;
-import com.sms.satp.dto.request.UpdateSceneCaseGroupRequest;
+import com.sms.satp.dto.request.SceneCaseGroupRequest;
 import com.sms.satp.dto.response.SceneCaseGroupResponse;
 import com.sms.satp.entity.group.SceneCaseGroupEntity;
 import java.util.List;
@@ -13,9 +12,8 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SceneCaseGroupMapper {
 
-    SceneCaseGroupEntity toSceneCaseGroupByAdd(AddSceneCaseGroupRequest request);
+    SceneCaseGroupEntity toSceneCaseGroupEntity(SceneCaseGroupRequest request);
 
-    SceneCaseGroupEntity toSceneCaseGroupByUpdate(UpdateSceneCaseGroupRequest request);
+    List<SceneCaseGroupResponse> toResponse(List<SceneCaseGroupEntity> sceneCaseGroupEntityList);
 
-    List<SceneCaseGroupResponse> toResponseList(List<SceneCaseGroupEntity> sceneCaseGroups);
 }

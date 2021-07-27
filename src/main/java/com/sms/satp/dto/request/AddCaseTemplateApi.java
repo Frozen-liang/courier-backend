@@ -9,11 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SearchSceneCaseGroupRequest {
-
-    private String projectId;
-
-    private String parentId;
+public class AddCaseTemplateApi {
 
     private String id;
+
+    private Integer order;
+
 }

@@ -5,11 +5,10 @@ import java.util.List;
 
 public interface CustomizedSceneCaseApiRepository {
 
-    int findCurrentOrderBySceneCaseId(String sceneCaseId);
-
     List<SceneCaseApiEntity> findSceneCaseApiByApiIds(List<String> ids);
 
-    List<SceneCaseApiEntity> findSceneCaseApiBySceneCaseIdAndIsExecute(String sceneCaseId, Boolean isExecute);
+    List<SceneCaseApiEntity> findSceneCaseApiBySceneCaseIdAndIsExecuteAndIsRemove(String sceneCaseId,
+        boolean isExecute, boolean isRemove);
 
     Boolean deleteSceneCaseApiConn(List<String> caseTemplateApiId);
 
