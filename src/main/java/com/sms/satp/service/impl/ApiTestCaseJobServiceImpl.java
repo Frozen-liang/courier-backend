@@ -7,6 +7,7 @@ import static com.sms.satp.common.exception.ErrorCode.THE_REQUEST_ADDRESS_IS_ILL
 import static com.sms.satp.utils.Assert.notEmpty;
 import static com.sms.satp.utils.Assert.notNull;
 
+import com.sms.satp.common.enums.JobStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseJobPageRequest;
 import com.sms.satp.dto.request.ApiTestCaseJobRunRequest;
@@ -179,6 +180,18 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
             caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the ApiTest error");
         }
+    }
+
+
+    @Override
+    public void reallocateJob(List<String> engineIds) {
+        List<ApiTestCaseJobEntity> apiTestCaseJobList = apiTestCaseJobRepository
+            .removeByEngineIdInAndJobStatus(engineIds, JobStatus.RUNNING);
+        apiTestCaseJobList.forEach(apiTestCaseJobEntity -> {
+            apiTestCaseJobEntity.setId(null);
+            apiTestCaseJobEntity.setCreateDateTime(LocalDateTime.now());
+            apiTestCaseJobEntity.setJobStatus(null);
+        });
     }
 
     private void checkApiPath(String apiPath) {

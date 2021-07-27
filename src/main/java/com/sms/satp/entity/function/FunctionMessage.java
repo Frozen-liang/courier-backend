@@ -1,7 +1,6 @@
 package com.sms.satp.entity.function;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sms.satp.common.enums.OperationType;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,5 +17,5 @@ public class FunctionMessage {
     @JsonProperty("isGlobal")
     private boolean global;
     private String key;
-    private OperationType operationType;
+    private Integer operationType;
 }

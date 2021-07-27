@@ -26,5 +26,5 @@ public class LookupVo {
     private String as;
     //查询的字段 如全部查询为空就行
     @Default
-    private List<LookupQueryField> queryFields = new ArrayList<>();
+    private List<LookupField> queryFields = new ArrayList<>();
 }

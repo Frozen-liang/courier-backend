@@ -24,11 +24,16 @@ public class EngineRecoveryDetectionTask {
         this.engineMemberRepository = engineMemberRepository;
     }
 
+//    @Scheduled(cron = "* * * * * ?")
+    @Async("engineDetection")
+    public void increaseIndex() {
+        suspiciousEngineManagement.increaseIndex();
+    }
+
     @Scheduled(cron = "* * * * * ?")
     @Async("engineDetection")
     public void detection() {
         Integer currentIndex = suspiciousEngineManagement.getCurrentIndex();
-        suspiciousEngineManagement.increaseIndex();
         List<String> engineIds = suspiciousEngineManagement.get(currentIndex);
         Optional.ofNullable(engineIds).ifPresent(this::updateEngineStatus);
         // TODO publish event
