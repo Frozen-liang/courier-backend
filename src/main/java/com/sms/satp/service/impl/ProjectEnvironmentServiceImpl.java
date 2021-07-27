@@ -11,9 +11,9 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_ENVIRONMENT_E
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_PAGE_ERROR;
-import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
-import static com.sms.satp.common.field.CommonFiled.REMOVE;
+import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonField.PROJECT_ID;
+import static com.sms.satp.common.field.CommonField.REMOVE;
 import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
@@ -25,7 +25,7 @@ import com.sms.satp.dto.response.GlobalEnvironmentResponse;
 import com.sms.satp.dto.response.ProjectEnvironmentResponse;
 import com.sms.satp.entity.env.ProjectEnvironmentEntity;
 import com.sms.satp.mapper.ProjectEnvironmentMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.ProjectEnvironmentRepository;
 import com.sms.satp.service.GlobalEnvironmentService;
 import com.sms.satp.service.ProjectEnvironmentService;
@@ -50,16 +50,16 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
 
     private final ProjectEnvironmentRepository projectEnvironmentRepository;
     private final GlobalEnvironmentService globalEnvironmentService;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
     private final ProjectEnvironmentMapper projectEnvironmentMapper;
 
     public ProjectEnvironmentServiceImpl(ProjectEnvironmentRepository
         projectEnvironmentRepository, GlobalEnvironmentService globalEnvironmentService,
-        CommonDeleteRepository commonDeleteRepository,
+        CommonRepository commonRepository,
         ProjectEnvironmentMapper projectEnvironmentMapper) {
         this.projectEnvironmentRepository = projectEnvironmentRepository;
         this.globalEnvironmentService = globalEnvironmentService;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
         this.projectEnvironmentMapper = projectEnvironmentMapper;
     }
 
@@ -85,13 +85,13 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     @Override
     public List<Object> list(String projectId, String workspaceId) {
         try {
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getFiled());
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
             ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder().projectId(projectId)
                 .build();
             List<Object> result = new ArrayList<>();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(REMOVE.getFiled(), GenericPropertyMatchers.exact())
+                .withMatcher(PROJECT_ID.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(REMOVE.getName(), GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
             Example<ProjectEnvironmentEntity> example = Example.of(projectEnvironment, exampleMatcher);
             List<GlobalEnvironmentResponse> globalEnvironments = globalEnvironmentService.list(workspaceId);
@@ -150,7 +150,7 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, ProjectEnvironmentEntity.class);
+            return commonRepository.deleteByIds(ids, ProjectEnvironmentEntity.class);
         } catch (Exception e) {
             log.error("Failed to delete the projectEnvironment!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_ENVIRONMENT_BY_ID_ERROR);

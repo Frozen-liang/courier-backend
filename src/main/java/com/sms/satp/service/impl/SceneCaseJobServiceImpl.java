@@ -151,6 +151,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                     .apiTestCase(caseList)
                     .createDateTime(LocalDateTime.now())
                     .modifyDateTime(LocalDateTime.now())
+                    .workspaceId(request.getWorkspaceId())
                     .createUserId(currentUser.getId())
                     .modifyUserId(currentUser.getId())
                     .createUserName(currentUser.getUsername())
@@ -165,9 +166,11 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                         .toJobDataCollection(request.getDataCollectionRequest());
                     jobDataCollection.setTestData(jobMapper.toTestDataEntity(testData));
                     SceneCaseJobEntity sceneCaseJob = SceneCaseJobEntity.builder()
+                        .projectId(sceneCase.get().getProjectId())
                         .createDateTime(LocalDateTime.now())
                         .modifyDateTime(LocalDateTime.now())
                         .createUserId(currentUser.getId())
+                        .workspaceId(request.getWorkspaceId())
                         .modifyUserId(currentUser.getId())
                         .createUserName(currentUser.getUsername())
                         .sceneCaseId(request.getSceneCaseId())

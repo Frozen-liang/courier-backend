@@ -1,5 +1,6 @@
 package com.sms.satp.entity.system;
 
+import com.sms.satp.common.enums.RoleType;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +29,7 @@ public class SystemRoleEntity {
     private boolean enable = true;
     @Field("isDefaultRole")
     private boolean defaultRole;
+    private RoleType roleType;
     @CreatedDate
     private LocalDateTime createDateTime;
 }

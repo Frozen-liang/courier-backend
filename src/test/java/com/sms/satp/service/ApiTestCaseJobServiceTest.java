@@ -29,7 +29,10 @@ import com.sms.satp.entity.job.JobCaseApi;
 import com.sms.satp.entity.job.common.JobApiTestCase;
 import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.mapper.JobMapperImpl;
+import com.sms.satp.mapper.MatchParamInfoMapperImpl;
+import com.sms.satp.mapper.ParamInfoMapper;
 import com.sms.satp.mapper.ParamInfoMapperImpl;
+import com.sms.satp.mapper.ResponseResultVerificationMapperImpl;
 import com.sms.satp.repository.ApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.satp.security.TokenType;
@@ -53,7 +56,9 @@ class ApiTestCaseJobServiceTest {
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository = mock(
         CustomizedApiTestCaseJobRepository.class);
     private final ApiTestRequest apiTestRequest = ApiTestRequest.builder().apiPath("3Httt").build();
-    private final JobMapper jobMapper = new JobMapperImpl(new ParamInfoMapperImpl());
+    private final ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
+    private final JobMapper jobMapper = new JobMapperImpl(paramInfoMapper, new MatchParamInfoMapperImpl(),
+        new ResponseResultVerificationMapperImpl(new MatchParamInfoMapperImpl()));
     private final ApiTestCaseJobService apiTestCaseJobService = new ApiTestCaseJobServiceImpl(
         apiTestCaseJobRepository, customizedApiTestCaseJobRepository, caseDispatcherService, projectEnvironmentService
         , apiTestCaseService, jobMapper);

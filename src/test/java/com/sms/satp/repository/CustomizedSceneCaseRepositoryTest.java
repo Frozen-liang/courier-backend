@@ -26,9 +26,9 @@ import static org.wildfly.common.Assert.assertTrue;
 class CustomizedSceneCaseRepositoryTest {
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final CustomizedSceneCaseRepository customizedSceneCaseRepository =
-        new CustomizedSceneCaseRepositoryImpl(mongoTemplate, commonDeleteRepository);
+        new CustomizedSceneCaseRepositoryImpl(mongoTemplate, commonRepository);
 
     private final static String MOCK_ID = "1";
     private final static String NAME = "test";

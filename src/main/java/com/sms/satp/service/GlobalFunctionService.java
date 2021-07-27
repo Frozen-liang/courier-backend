@@ -3,6 +3,7 @@ package com.sms.satp.service;
 import com.sms.satp.dto.request.GlobalFunctionRequest;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
 import java.util.List;
+import java.util.Map;
 
 public interface GlobalFunctionService {
 
@@ -15,4 +16,8 @@ public interface GlobalFunctionService {
     Boolean edit(GlobalFunctionRequest globalFunctionRequest);
 
     Boolean delete(List<String> ids);
+
+    Map<String, List<GlobalFunctionResponse>> findAll();
+
+    List<GlobalFunctionResponse> pullFunction(List<String> ids);
 }

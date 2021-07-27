@@ -181,7 +181,10 @@ public enum ErrorCode {
     DELETE_API_GROUP_BY_ID_ERROR("4073", "Failed to delete the ApiGroup!"),
     EDIT_API_GROUP_ERROR("4074", "Failed to edit the ApiGroup!"),
     // 60001 describes the test exception
-    NOT_SUPPORT_METHOD("60001", "Does not support other HTTP methods.");
+    THE_CASE_NOT_EXIST("60001", "The case must not be empty."),
+    THE_ENV_NOT_EXIST("60002", "The Env not exist"),
+    THE_REQUEST_ADDRESS_IS_ILLEGALITY("60002",
+        "The request address is illegality, please check environment or api path.");
 
     private String code;
     private String message;

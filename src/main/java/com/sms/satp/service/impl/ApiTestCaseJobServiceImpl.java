@@ -1,7 +1,9 @@
 package com.sms.satp.service.impl;
 
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_JOB_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.THE_ENVIRONMENT_NOT_EXITS_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.THE_CASE_NOT_EXIST;
+import static com.sms.satp.common.exception.ErrorCode.THE_ENV_NOT_EXIST;
+import static com.sms.satp.common.exception.ErrorCode.THE_REQUEST_ADDRESS_IS_ILLEGALITY;
 import static com.sms.satp.utils.Assert.notEmpty;
 import static com.sms.satp.utils.Assert.notNull;
 
@@ -90,15 +92,17 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
         try {
             List<String> apiTestCaseIds = apiTestCaseJobRunRequest.getApiTestCaseIds();
             String envId = apiTestCaseJobRunRequest.getEnvId();
-            notEmpty(apiTestCaseIds, "The ApiTestCaseIds must not be empty.");
-            notEmpty(envId, "The EnvId must not be empty.");
+            notEmpty(apiTestCaseIds, THE_CASE_NOT_EXIST);
+            notEmpty(envId, THE_ENV_NOT_EXIST);
             ProjectEnvironmentEntity projectEnvironment = projectEnvironmentService.findOne(envId);
-            notNull(projectEnvironment, THE_ENVIRONMENT_NOT_EXITS_ERROR);
+            notNull(projectEnvironment, THE_ENV_NOT_EXIST);
             JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
             apiTestCaseIds.forEach((apiTestCaseId) -> {
                 jobId.set(null);
                 ApiTestCaseResponse apiTestCaseResponse = apiTestCaseService.findById(apiTestCaseId);
                 ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
+                apiTestCaseJob.setWorkspaceId(apiTestCaseJobRunRequest.getWorkspaceId());
+                apiTestCaseJob.setProjectId(apiTestCaseResponse.getProjectId());
                 apiTestCaseJob.setApiTestCase(
                     JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestCaseResponse)).build());
                 // Multiple job are sent if a data collection exists.
@@ -162,6 +166,8 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             }
             JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
             ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
+            apiTestCaseJob.setWorkspaceId(apiTestRequest.getWorkspaceId());
+            apiTestCaseJob.setProjectId(apiTestRequest.getProjectId());
             apiTestCaseJob.setApiTestCase(
                 JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestRequest)).build());
             apiTestCaseJobRepository.insert(apiTestCaseJob);
@@ -179,7 +185,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
         if (requestProtocol.anyMatch(apiPath::startsWith)) {
             return;
         }
-        throw ExceptionUtils.mpe("The request address is illegality, please check environment or api path.");
+        throw ExceptionUtils.mpe(THE_REQUEST_ADDRESS_IS_ILLEGALITY);
     }
 
     private void errorHandler(String userId, AtomicReference<String> jobId, String message) {

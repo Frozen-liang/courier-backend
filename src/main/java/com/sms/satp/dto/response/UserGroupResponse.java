@@ -17,7 +17,9 @@ public class UserGroupResponse extends BaseResponse {
 
     private String name;
 
-    private String createUsername;
+    private String username;
+
+    private String nickname;
 
     @JsonProperty("isDefaultGroup")
     private boolean defaultGroup;

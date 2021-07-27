@@ -22,6 +22,7 @@ import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.enums.ResponseParamsExtractionType;
 import com.sms.satp.common.enums.ResultType;
 import com.sms.satp.common.enums.ResultVerificationType;
+import com.sms.satp.common.enums.RoleType;
 import com.sms.satp.common.enums.SaveMode;
 import com.sms.satp.engine.enums.EngineStatus;
 import com.sms.satp.security.pojo.CustomUser;
@@ -65,7 +66,7 @@ public class MongoCustomConverterConfiguration {
                 IntegerToProjectTypeConverter.INSTANCE, IntegerToImportStatusConverter.INSTANCE,
                 IntegerToResultVerificationTypeConverter.INSTANCE,
                 IntegerToResponseParamsExtractionTypeConverter.INSTANCE, IntegerToResultTypeConverter.INSTANCE,
-                IntegerToEngineStatusConverter.INSTANCE);
+                IntegerToEngineStatusConverter.INSTANCE, IntegerToRoleTypeConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -304,6 +305,15 @@ public class MongoCustomConverterConfiguration {
 
         public EngineStatus convert(@NonNull Integer code) {
             return EngineStatus.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToRoleTypeConverter implements Converter<Integer, RoleType> {
+        INSTANCE;
+
+        public RoleType convert(@NonNull Integer code) {
+            return RoleType.getType(code);
         }
     }
 

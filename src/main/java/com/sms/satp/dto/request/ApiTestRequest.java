@@ -24,6 +24,7 @@ public class ApiTestRequest {
 
     private String envId;
     private String apiId;
+    private String workspaceId;
     @JsonProperty("isExecute")
     @Default
     private boolean execute = true;

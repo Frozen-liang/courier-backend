@@ -23,14 +23,14 @@ public class JwtTokenFilterTest {
     HttpServletResponse response = mock(HttpServletResponse.class);
     FilterChain chain = mock(FilterChain.class);
 
-    JwtTokenFilter jwtTokenFilter = new JwtTokenFilter(jwtTokenManager);
+    UserTokenFilter userTokenFilter = new UserTokenFilter(jwtTokenManager);
 
     @Test
     @DisplayName("With incorrect authentication header format")
     public void withIncorrectAuthenticationHeaderFormat() throws ServletException, IOException {
         when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn("token");
         doNothing().when(chain).doFilter(request, response);
-        jwtTokenFilter.doFilterInternal(request, response, chain);
+        userTokenFilter.doFilterInternal(request, response, chain);
     }
 
     @Test
@@ -39,7 +39,7 @@ public class JwtTokenFilterTest {
         when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn("Bearer token");
         when(jwtTokenManager.validate("token")).thenReturn(false);
         doNothing().when(chain).doFilter(request, response);
-        jwtTokenFilter.doFilterInternal(request, response, chain);
+        userTokenFilter.doFilterInternal(request, response, chain);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class JwtTokenFilterTest {
         when(jwtTokenManager.validate("token")).thenReturn(true);
         when(jwtTokenManager.createAuthentication("token")).thenReturn(authentication);
         doNothing().when(chain).doFilter(request, response);
-        jwtTokenFilter.doFilterInternal(request, response, chain);
+        userTokenFilter.doFilterInternal(request, response, chain);
     }
 
 }

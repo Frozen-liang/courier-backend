@@ -1,19 +1,8 @@
 package com.sms.satp.service.impl;
 
-import static com.sms.satp.common.enums.OperationModule.CASE_TEMPLATE_API;
-import static com.sms.satp.common.enums.OperationType.ADD;
-import static com.sms.satp.common.enums.OperationType.DELETE;
-import static com.sms.satp.common.enums.OperationType.EDIT;
-import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_API_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.BATCH_EDIT_CASE_TEMPLATE_API_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_API_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_API_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_API_BY_ID_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_API_LIST_BY_CASE_TEMPLATE_ID_ERROR;
-
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
-import com.sms.satp.common.field.SceneFiled;
+import com.sms.satp.common.field.SceneField;
 import com.sms.satp.dto.request.BatchAddCaseTemplateApiRequest;
 import com.sms.satp.dto.request.BatchUpdateCaseTemplateApiRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
@@ -32,6 +21,17 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+
+import static com.sms.satp.common.enums.OperationModule.CASE_TEMPLATE_API;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.DELETE;
+import static com.sms.satp.common.enums.OperationType.EDIT;
+import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.BATCH_EDIT_CASE_TEMPLATE_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_API_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_API_LIST_BY_CASE_TEMPLATE_ID_ERROR;
 
 @Slf4j
 @Service
@@ -121,7 +121,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
         try {
             Example<CaseTemplateApiEntity> example = Example
                 .of(CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             List<CaseTemplateApiEntity> sceneCaseApiList = caseTemplateApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(caseTemplateApiMapper::toCaseTemplateApiDto)
                 .collect(Collectors.toList());
@@ -148,7 +148,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
         try {
             Example<CaseTemplateApiEntity> example = Example
                 .of(CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).removed(removed).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             return caseTemplateApiRepository.findAll(example, sort);
         } catch (Exception e) {
             log.error("Failed to get the CaseTemplateApi list by caseTemplateId!", e);

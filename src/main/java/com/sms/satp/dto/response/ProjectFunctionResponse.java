@@ -1,7 +1,8 @@
 package com.sms.satp.dto.response;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -12,12 +13,10 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class ProjectFunctionResponse extends BaseResponse {
+public class ProjectFunctionResponse extends FunctionResponse {
 
     private String projectId;
-    private String workspaceId;
-    private String functionKey;
-    private String functionName;
-    private List<ParamInfoResponse> functionParams;
-    private String functionCode;
+    @Default
+    @JsonProperty("isGlobal")
+    private boolean global = false;
 }

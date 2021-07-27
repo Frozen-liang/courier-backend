@@ -1,12 +1,12 @@
 package com.sms.satp.repository.impl;
 
-import static com.sms.satp.common.field.CommonFiled.CREATE_DATE_TIME;
-import static com.sms.satp.common.field.CommonFiled.PROJECT_ID;
-import static com.sms.satp.common.field.LogFiled.OPERATION_DESC;
-import static com.sms.satp.common.field.LogFiled.OPERATION_MODULE;
-import static com.sms.satp.common.field.LogFiled.OPERATION_TYPE;
-import static com.sms.satp.common.field.LogFiled.OPERATOR;
-import static com.sms.satp.common.field.LogFiled.OPERATOR_ID;
+import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
+import static com.sms.satp.common.field.CommonField.PROJECT_ID;
+import static com.sms.satp.common.field.LogField.OPERATION_DESC;
+import static com.sms.satp.common.field.LogField.OPERATION_MODULE;
+import static com.sms.satp.common.field.LogField.OPERATION_TYPE;
+import static com.sms.satp.common.field.LogField.OPERATOR;
+import static com.sms.satp.common.field.LogField.OPERATOR_ID;
 
 import com.sms.satp.dto.request.LogPageRequest;
 import com.sms.satp.entity.log.LogEntity;

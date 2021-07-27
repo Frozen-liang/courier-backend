@@ -1,6 +1,6 @@
 package com.sms.satp.common.field;
 
-public enum LogFiled implements Filed {
+public enum LogField implements Field {
 
     OPERATION_TYPE("operationType"),
     OPERATION_MODULE("operationModule"),
@@ -8,13 +8,13 @@ public enum LogFiled implements Filed {
     OPERATOR("operator"),
     OPERATOR_ID("operatorId");
 
-    private final String filed;
+    private final String name;
 
-    LogFiled(String filed) {
-        this.filed = filed;
+    LogField(String name) {
+        this.name = name;
     }
 
-    public String getFiled() {
-        return filed;
+    public String getName() {
+        return name;
     }
 }

@@ -1,6 +1,6 @@
 package com.sms.satp.common.field;
 
-public enum SceneFiled implements Filed {
+public enum SceneField implements Field {
 
     NAME("name"),
     GROUP_ID("groupId"),
@@ -17,14 +17,14 @@ public enum SceneFiled implements Filed {
     API_IS_EXECUTE("apiTestCase.isExecute"),
     CASE_TEMPLATE_API_CONN_LIST("caseTemplateApiConnList");
 
-    private final String filedName;
+    private final String name;
 
-    SceneFiled(String filedName) {
-        this.filedName = filedName;
+    SceneField(String name) {
+        this.name = name;
     }
 
     @Override
-    public String getFiled() {
-        return this.filedName;
+    public String getName() {
+        return this.name;
     }
 }

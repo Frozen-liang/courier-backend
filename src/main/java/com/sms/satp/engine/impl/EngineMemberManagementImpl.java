@@ -67,7 +67,7 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     @Override
     public String getAvailableMember() throws ApiTestPlatformException {
-        List<String> availableMembers = engineMemberRepository.findAllByStatus(RUNNING.getCode())
+        List<String> availableMembers = engineMemberRepository.findAllByStatus(RUNNING)
             .map(EngineMemberEntity::getDestination).collect(
                 Collectors.toUnmodifiableList());
         if (CollectionUtils.isEmpty(availableMembers)) {
@@ -84,6 +84,7 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
             engineMember.setCaseTaskSize(caseRecordRequest.getCaseCount());
             engineMember.setSceneCaseTaskSize(caseRecordRequest.getSceneCaseCount());
             engineMember.setCurrentTaskSize(caseRecordRequest.getCaseCount() + caseRecordRequest.getSceneCaseCount());
+            engineMemberRepository.save(engineMember);
             log.info("The destination {} currentTask {} caseTask {} sceneCaseTask {}.", engineMember.getDestination(),
                 engineMember.getCurrentTaskSize(), engineMember.getCaseTaskSize(), engineMember.getSceneCaseTaskSize());
         });
@@ -115,6 +116,5 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
             log.info("The test engine {} activated.", destination);
         });
     }
-
 
 }

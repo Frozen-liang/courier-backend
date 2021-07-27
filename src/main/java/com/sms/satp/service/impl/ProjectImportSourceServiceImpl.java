@@ -6,7 +6,7 @@ import com.sms.satp.dto.response.ProjectImportSourceResponse;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
 import com.sms.satp.entity.project.ProjectImportSourceEntity;
 import com.sms.satp.mapper.ProjectImportSourceMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.ProjectImportFlowRepository;
 import com.sms.satp.repository.ProjectImportSourceRepository;
 import com.sms.satp.service.ProjectImportSourceService;
@@ -20,17 +20,17 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
     private final ProjectImportSourceMapper projectImportSourceMapper;
     private final ProjectImportSourceRepository projectImportSourceRepository;
     private final ProjectImportFlowRepository projectImportFlowRepository;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
 
 
     public ProjectImportSourceServiceImpl(ProjectImportSourceMapper projectImportSourceMapper,
         ProjectImportSourceRepository projectImportSourceRepository,
         ProjectImportFlowRepository projectImportFlowRepository,
-        CommonDeleteRepository commonDeleteRepository) {
+        CommonRepository commonRepository) {
         this.projectImportSourceMapper = projectImportSourceMapper;
         this.projectImportSourceRepository = projectImportSourceRepository;
         this.projectImportFlowRepository = projectImportFlowRepository;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
 
     @Override
     public Boolean delete(List<String> ids) {
-        return commonDeleteRepository.deleteByIds(ids, ProjectImportSourceEntity.class);
+        return commonRepository.deleteByIds(ids, ProjectImportSourceEntity.class);
     }
 
     @Override

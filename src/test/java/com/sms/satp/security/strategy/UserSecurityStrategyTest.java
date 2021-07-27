@@ -25,7 +25,7 @@ public class UserSecurityStrategyTest {
     @DisplayName("Test user-generateSecretKey")
     void generateSecretKeyTest() {
         String secretKey = Encoders.BASE64.encode(Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded());
-        when(accessTokenProperties.getSecretKey()).thenReturn(secretKey);
+        when(accessTokenProperties.getUserSecretKey()).thenReturn(secretKey);
         JwsHeader<?> jwsHeader = mock(JwsHeader.class);
         Key key = userSecurityStrategy.generateSecretKey(jwsHeader);
         assertThat(key).isEqualTo(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)));
@@ -35,7 +35,7 @@ public class UserSecurityStrategyTest {
     @DisplayName("Test user-obtainTokenExpirationTime")
     void obtainTokenExpirationTimeTest() {
         Duration duration = Duration.ofSeconds(1);
-        when(accessTokenProperties.getExpire()).thenReturn(duration);
+        when(accessTokenProperties.getUserExpire()).thenReturn(duration);
         Duration result = userSecurityStrategy.obtainTokenExpirationTime();
         assertThat(result).isEqualTo(duration);
     }

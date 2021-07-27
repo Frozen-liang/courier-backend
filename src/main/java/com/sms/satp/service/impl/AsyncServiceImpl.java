@@ -86,8 +86,6 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
         String id = importSource.getId();
         // Only one API source is in sync.
         if (Objects.nonNull(id) && projectImportFlowRepository.existsByIdAndImportStatus(id, RUNNING.getCode())) {
-            messageService.projectMessage(projectId, Payload.fail(String.format("The %s is in sync.",
-                importSource.getName())));
             return;
         }
         final ProjectImportFlowEntity projectImportFlowEntity = projectImportFlowRepository.save(

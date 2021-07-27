@@ -21,11 +21,11 @@ public class UserSecurityStrategy implements SatpSecurityStrategy {
 
     @Override
     public Key generateSecretKey(JwsHeader<?> jwsHeader) {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessTokenProperties.getSecretKey()));
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessTokenProperties.getUserSecretKey()));
     }
 
     @Override
     public Duration obtainTokenExpirationTime() {
-        return accessTokenProperties.getExpire();
+        return accessTokenProperties.getUserExpire();
     }
 }

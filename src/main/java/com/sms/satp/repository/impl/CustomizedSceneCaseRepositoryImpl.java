@@ -9,7 +9,7 @@ import com.sms.satp.common.field.SceneFiled;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.entity.scenetest.SceneCaseEntity;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
@@ -32,12 +32,12 @@ import org.springframework.stereotype.Component;
 public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRepository {
 
     private final MongoTemplate mongoTemplate;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
 
     public CustomizedSceneCaseRepositoryImpl(MongoTemplate mongoTemplate,
-        CommonDeleteRepository commonDeleteRepository) {
+        CommonRepository commonRepository) {
         this.mongoTemplate = mongoTemplate;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
     }
 
     @Override
@@ -47,12 +47,12 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
         Query query = new Query();
 
         LookupOperation apiGroupLookupOperation =
-            LookupOperation.newLookup().from("SceneCaseGroup").localField(GROUP_ID.getFiled())
-                .foreignField(ID.getFiled())
+            LookupOperation.newLookup().from("SceneCaseGroup").localField(GROUP_ID.getName())
+                .foreignField(ID.getName())
                 .as("sceneCaseGroup");
         LookupOperation apiTagLookupOperation =
-            LookupOperation.newLookup().from("ApiTag").localField(TAG_ID.getFiled())
-                .foreignField(ID.getFiled())
+            LookupOperation.newLookup().from("ApiTag").localField(TAG_ID.getName())
+                .foreignField(ID.getName())
                 .as("apiTag");
 
         aggregationOperations.add(apiTagLookupOperation);

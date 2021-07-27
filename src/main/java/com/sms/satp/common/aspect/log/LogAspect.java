@@ -1,6 +1,6 @@
 package com.sms.satp.common.aspect.log;
 
-import static com.sms.satp.common.field.CommonFiled.ID;
+import static com.sms.satp.common.field.CommonField.ID;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -90,7 +90,7 @@ public class LogAspect {
             if (Objects.nonNull(value)) {
                 Object queryByIdResult;
                 if (value instanceof Collection) {
-                    Query query = Query.query(Criteria.where(ID.getFiled()).in((Collection) value));
+                    Query query = Query.query(Criteria.where(ID.getName()).in((Collection) value));
                     queryByIdResult = mongoTemplate.find(query, Object.class, operationModule.getCollectionName());
                 } else {
                     if (operationModule == OperationModule.TEST_FILE) {

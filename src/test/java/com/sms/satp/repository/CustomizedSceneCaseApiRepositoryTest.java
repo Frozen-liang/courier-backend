@@ -1,7 +1,6 @@
 package com.sms.satp.repository;
 
 import com.mongodb.client.result.UpdateResult;
-import com.sms.satp.entity.scenetest.CaseTemplateEntity;
 import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
 import com.sms.satp.repository.impl.CustomizedSceneCaseApiRepositoryImpl;
 import java.util.List;
@@ -12,7 +11,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;

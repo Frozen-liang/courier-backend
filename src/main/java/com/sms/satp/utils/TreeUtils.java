@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public abstract class TreeUtils {
 
@@ -12,10 +13,12 @@ public abstract class TreeUtils {
 
     public static List<TreeResponse> createTree(List<? extends TreeResponse> treeResponses) {
         List<TreeResponse> parentList = treeResponses.stream()
-            .filter((e) -> PARENT_DEPTH.equals(e.getDepth()))
+            .filter((tree) -> PARENT_DEPTH.equals(tree.getDepth()))
             .collect(Collectors.toList());
         Map<String, List<TreeResponse>> childMap =
-            treeResponses.stream().filter((e) -> e.getDepth() > PARENT_DEPTH)
+            treeResponses.stream()
+                .filter(
+                    (tree) -> tree.getDepth() > PARENT_DEPTH && !StringUtils.equals(tree.getParentId(), tree.getId()))
                 .collect(Collectors.groupingBy(TreeResponse::getParentId));
         setChild(parentList, childMap);
         return parentList;

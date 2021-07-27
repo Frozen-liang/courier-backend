@@ -20,7 +20,7 @@ import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.ApiType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.common.field.CommonFiled;
+import com.sms.satp.common.field.CommonField;
 import com.sms.satp.dto.request.AddCaseTemplateApiByIdsRequest;
 import com.sms.satp.dto.request.AddCaseTemplateRequest;
 import com.sms.satp.dto.request.AddSceneCaseApi;
@@ -225,8 +225,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             CaseTemplateEntity caseTemplate = CaseTemplateEntity.builder().groupId(groupId).projectId(projectId)
                 .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(CommonFiled.PROJECT_ID.getFiled(), GenericPropertyMatchers.exact())
-                .withMatcher(CommonFiled.GROUP_ID.getFiled(), GenericPropertyMatchers.exact())
+                .withMatcher(CommonField.PROJECT_ID.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(CommonField.GROUP_ID.getName(), GenericPropertyMatchers.exact())
                 .withIgnoreNullValues();
             Example<CaseTemplateEntity> example = Example.of(caseTemplate, exampleMatcher);
             return caseTemplateRepository.findAll(example);
