@@ -67,7 +67,7 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     @Override
     public String getAvailableMember() throws ApiTestPlatformException {
-        List<String> availableMembers = engineMemberRepository.findAllByStatus(RUNNING.getCode())
+        List<String> availableMembers = engineMemberRepository.findAllByStatus(RUNNING)
             .map(EngineMemberEntity::getDestination).collect(
                 Collectors.toUnmodifiableList());
         if (CollectionUtils.isEmpty(availableMembers)) {
@@ -116,6 +116,5 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
             log.info("The test engine {} activated.", destination);
         });
     }
-
 
 }

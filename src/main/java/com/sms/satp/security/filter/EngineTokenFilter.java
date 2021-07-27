@@ -1,23 +1,25 @@
 package com.sms.satp.security.filter;
 
+import static com.sms.satp.security.TokenType.ENGINE;
+
 import com.sms.satp.security.jwt.JwtTokenManager;
+import com.sms.satp.utils.JwtUtils;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-public class JwtTokenFilter extends OncePerRequestFilter {
+public class EngineTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenManager jwtTokenManager;
 
-    public JwtTokenFilter(JwtTokenManager jwtTokenManager) {
+    public EngineTokenFilter(JwtTokenManager jwtTokenManager) {
         this.jwtTokenManager = jwtTokenManager;
     }
 
@@ -26,20 +28,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         @NonNull HttpServletResponse response,
         @NonNull FilterChain chain) throws ServletException, IOException {
         // Get authorization header and validate
-        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.isBlank(header) || !header.startsWith("Bearer ")) {
+        String token = JwtUtils.getToken(request);
+        if (StringUtils.isBlank(token)) {
             chain.doFilter(request, response);
             return;
         }
-        // Get jwt token and validate
-        final String token = header.split(" ")[1].trim();
-        if (!jwtTokenManager.validate(token)) {
+        String tokenType = jwtTokenManager.getTokenType(token);
+        if (!ENGINE.name().equalsIgnoreCase(tokenType) || !jwtTokenManager.validate(token)) {
             chain.doFilter(request, response);
             return;
         }
-        Authentication authentication = jwtTokenManager.createAuthentication(token);
+        Authentication authentication = jwtTokenManager.createEngineAuthentication(token);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(request, response);
-
     }
 }

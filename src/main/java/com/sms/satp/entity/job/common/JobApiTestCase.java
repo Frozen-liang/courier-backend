@@ -27,9 +27,6 @@ public class JobApiTestCase {
 
     private String caseName;
 
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String projectId;
-
     private List<String> tagIds;
 
     private String apiName;

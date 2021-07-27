@@ -44,7 +44,7 @@ public class ConnectChannelInterceptor implements ChannelInterceptor {
                     }
                 }
             }
-            return message;
+            return null;
         }
         return message;
     }

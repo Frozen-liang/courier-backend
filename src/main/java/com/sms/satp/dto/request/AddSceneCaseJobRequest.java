@@ -13,6 +13,8 @@ public class AddSceneCaseJobRequest {
 
     private String sceneCaseId;
 
+    private String workspaceId;
+
     private String caseTemplateId;
 
     private String projectId;

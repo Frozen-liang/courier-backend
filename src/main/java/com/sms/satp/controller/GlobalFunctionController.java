@@ -7,6 +7,7 @@ import com.sms.satp.dto.request.GlobalFunctionRequest;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
 import com.sms.satp.service.GlobalFunctionService;
 import java.util.List;
+import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,10 +35,17 @@ public class GlobalFunctionController {
     }
 
     @GetMapping("/list")
-    // @PreAuthorize("hasRoleOrAdmin(@role.GLOBAL_FUN_QUERY_ALL)")
+    @PreAuthorize("hasRoleOrAdmin(@role.GLOBAL_FUN_QUERY_ALL)")
     public List<GlobalFunctionResponse> list(String workspaceId, String functionKey,
         String functionName) {
         return globalFunctionService.list(workspaceId, functionKey, functionName);
+    }
+
+    @GetMapping("/find-all")
+    @PreAuthorize("hasRole(@role.GLOBAL_FUN_FIND_ALL)")
+    public Map<String, List<GlobalFunctionResponse>> findAll() {
+        // Query all global function. Used for engine.
+        return globalFunctionService.findAll();
     }
 
     @PostMapping
@@ -56,5 +64,11 @@ public class GlobalFunctionController {
     @PreAuthorize("hasRoleOrAdmin(@role.GLOBAL_FUN_DELETE)")
     public Boolean delete(@PathVariable List<String> ids) {
         return globalFunctionService.delete(ids);
+    }
+
+    @GetMapping("/pull/{ids}")
+    @PreAuthorize("hasRole(@role.GLOBAL_FUNCTION_PULL)")
+    public List<GlobalFunctionResponse> pullFunction(@PathVariable("ids") List<String> ids) {
+        return globalFunctionService.pullFunction(ids);
     }
 }

@@ -102,6 +102,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                 ApiTestCaseResponse apiTestCaseResponse = apiTestCaseService.findById(apiTestCaseId);
                 ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
                 apiTestCaseJob.setWorkspaceId(apiTestCaseJobRunRequest.getWorkspaceId());
+                apiTestCaseJob.setProjectId(apiTestCaseResponse.getProjectId());
                 apiTestCaseJob.setApiTestCase(
                     JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestCaseResponse)).build());
                 // Multiple job are sent if a data collection exists.
@@ -165,6 +166,8 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             }
             JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
             ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
+            apiTestCaseJob.setWorkspaceId(apiTestRequest.getWorkspaceId());
+            apiTestCaseJob.setProjectId(apiTestRequest.getProjectId());
             apiTestCaseJob.setApiTestCase(
                 JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestRequest)).build());
             apiTestCaseJobRepository.insert(apiTestCaseJob);

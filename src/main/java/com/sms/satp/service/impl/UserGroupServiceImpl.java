@@ -9,6 +9,7 @@ import static com.sms.satp.common.exception.ErrorCode.DELETE_USER_GROUP_BY_ID_ER
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_USER_GROUP_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_USER_GROUP_LIST_ERROR;
+import static com.sms.satp.common.field.CommonField.REMOVE;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -23,7 +24,6 @@ import com.sms.satp.repository.SystemRoleRepository;
 import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.service.UserGroupService;
 import com.sms.satp.utils.ExceptionUtils;
-import com.sms.satp.utils.SecurityUtil;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -62,7 +62,8 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     public List<UserGroupResponse> list() {
         try {
-            return userGroupMapper.toDtoList(userGroupRepository.findAllByRemovedIsFalseOrderByCreateDateTimeDesc());
+            return commonRepository.listLookupUser(USER_GROUP.getCollectionName(), List.of(REMOVE.is(Boolean.FALSE)),
+                UserGroupResponse.class);
         } catch (Exception e) {
             log.error("Failed to get the UserGroup list!", e);
             throw new ApiTestPlatformException(GET_USER_GROUP_LIST_ERROR);
@@ -76,7 +77,6 @@ public class UserGroupServiceImpl implements UserGroupService {
         log.info("UserGroupService-add()-params: [UserGroup]={}", userGroupRequest.toString());
         try {
             UserGroupEntity userGroup = userGroupMapper.toEntity(userGroupRequest);
-            userGroup.setCreateUsername(SecurityUtil.getCurrentUser().getUsername());
             userGroupRepository.insert(userGroup);
         } catch (Exception e) {
             log.error("Failed to add the UserGroup!", e);

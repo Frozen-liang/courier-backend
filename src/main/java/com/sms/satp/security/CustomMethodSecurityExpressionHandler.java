@@ -18,7 +18,7 @@ public class CustomMethodSecurityExpressionHandler extends DefaultMethodSecurity
         root.setPermissionEvaluator(getPermissionEvaluator());
         root.setTrustResolver(getTrustResolver());
         root.setRoleHierarchy(getRoleHierarchy());
-        root.setDefaultRolePrefix(getDefaultRolePrefix());
+        root.setDefaultRolePrefix("");
         return root;
     }
 }

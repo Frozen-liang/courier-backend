@@ -17,19 +17,25 @@ import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
+import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ProjectFunctionRequest;
+import com.sms.satp.dto.response.FunctionResponse;
 import com.sms.satp.dto.response.GlobalFunctionResponse;
 import com.sms.satp.dto.response.ProjectFunctionResponse;
+import com.sms.satp.entity.function.FunctionMessage;
 import com.sms.satp.entity.function.ProjectFunctionEntity;
 import com.sms.satp.mapper.ProjectFunctionMapper;
 import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.ProjectFunctionRepository;
 import com.sms.satp.service.GlobalFunctionService;
+import com.sms.satp.service.MessageService;
 import com.sms.satp.service.ProjectFunctionService;
 import com.sms.satp.utils.ExceptionUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -45,15 +51,17 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     private final ProjectFunctionRepository projectFunctionRepository;
     private final ProjectFunctionMapper projectFunctionMapper;
     private final GlobalFunctionService globalFunctionService;
+    private final MessageService messageService;
     private final CommonRepository commonRepository;
     private static final String FUNCTION_KEY = "functionKey";
 
     public ProjectFunctionServiceImpl(ProjectFunctionRepository projectFunctionRepository,
         ProjectFunctionMapper projectFunctionMapper, GlobalFunctionService globalFunctionService,
-        CommonRepository commonRepository) {
+        MessageService messageService, CommonRepository commonRepository) {
         this.projectFunctionRepository = projectFunctionRepository;
         this.projectFunctionMapper = projectFunctionMapper;
         this.globalFunctionService = globalFunctionService;
+        this.messageService = messageService;
         this.commonRepository = commonRepository;
     }
 
@@ -64,14 +72,23 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     }
 
     @Override
-    public List<Object> list(String projectId, String workspaceId, String functionKey, String functionName) {
+    public List<FunctionResponse> list(String projectId, String workspaceId, String functionKey, String functionName) {
         try {
-            List<ProjectFunctionResponse> projectFunctionResponses = this.findAll(projectId, functionKey, functionName);
-            ArrayList<Object> list = new ArrayList<>();
+            ProjectFunctionEntity projectFunction = ProjectFunctionEntity.builder()
+                .projectId(projectId).functionKey(functionKey).functionName(functionName).build();
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
+            ExampleMatcher matcher = ExampleMatcher.matching()
+                .withMatcher(PROJECT_ID.getName(), ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher(FUNCTION_KEY, ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher(REMOVE.getName(), ExampleMatcher.GenericPropertyMatchers.exact())
+                .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
+            Example<ProjectFunctionEntity> example = Example.of(projectFunction, matcher);
+            List<ProjectFunctionEntity> projectFunctions = projectFunctionRepository.findAll(example, sort);
+            ArrayList<FunctionResponse> list = new ArrayList<>();
             List<GlobalFunctionResponse> globalFunctionList = globalFunctionService.list(workspaceId, functionKey,
                 functionName);
             list.addAll(globalFunctionList);
-            list.addAll(projectFunctionResponses);
+            list.addAll(projectFunctionMapper.toDtoList(projectFunctions));
             return list;
         } catch (Exception e) {
             log.error("Failed to get the ProjectFunction list!", e);
@@ -88,6 +105,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         try {
             ProjectFunctionEntity projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
             projectFunctionRepository.insert(projectFunction);
+            sendMessageToEngine(List.of(projectFunction.getId()), ADD, projectFunction.getProjectId());
         } catch (Exception e) {
             log.error("Failed to add the ProjectFunction!", e);
             throw new ApiTestPlatformException(ADD_PROJECT_FUNCTION_ERROR);
@@ -105,6 +123,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "ProjectFunction", projectFunctionRequest.getId());
             ProjectFunctionEntity projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
             projectFunctionRepository.save(projectFunction);
+            sendMessageToEngine(List.of(projectFunction.getId()), EDIT, projectFunction.getProjectId());
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
             throw apiTestPlatEx;
@@ -121,7 +140,11 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonRepository.deleteByIds(ids, ProjectFunctionEntity.class);
+            String projectId = projectFunctionRepository.findById(ids.get(0)).map(ProjectFunctionEntity::getProjectId)
+                .orElse(null);
+            Boolean result = commonRepository.deleteByIds(ids, ProjectFunctionEntity.class);
+            sendMessageToEngine(ids, DELETE, projectId);
+            return result;
         } catch (Exception e) {
             log.error("Failed to delete the ProjectFunction!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_FUNCTION_BY_ID_ERROR);
@@ -129,18 +152,24 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     }
 
     @Override
-    public List<ProjectFunctionResponse> findAll(String projectId, String functionKey, String functionName) {
-        ProjectFunctionEntity projectFunction = ProjectFunctionEntity.builder()
-            .projectId(projectId).functionKey(functionKey).functionName(functionName).build();
-        Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
-        ExampleMatcher matcher = ExampleMatcher.matching()
-            .withMatcher(PROJECT_ID.getName(), ExampleMatcher.GenericPropertyMatchers.exact())
-            .withMatcher(FUNCTION_KEY, ExampleMatcher.GenericPropertyMatchers.exact())
-            .withMatcher(REMOVE.getName(), ExampleMatcher.GenericPropertyMatchers.exact())
-            .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
-        Example<ProjectFunctionEntity> example = Example.of(projectFunction, matcher);
-        List<ProjectFunctionEntity> projectFunctionList = projectFunctionRepository.findAll(example, sort);
-        return projectFunctionMapper.toDtoList(projectFunctionList);
+    public Map<String, List<ProjectFunctionResponse>> findAll() {
+        return projectFunctionRepository.findAllByRemovedIsFalse()
+            .collect(Collectors.groupingBy(ProjectFunctionResponse::getProjectId));
+    }
+
+    @Override
+    public List<ProjectFunctionResponse> pullFunction(List<String> ids) {
+        return projectFunctionRepository.findAllByIdIn(ids);
+    }
+
+    private void sendMessageToEngine(List<String> ids, OperationType operationType, String projectId) {
+        FunctionMessage functionMessage = FunctionMessage.builder()
+            .ids(ids)
+            .global(true)
+            .key(projectId)
+            .operationType(operationType)
+            .build();
+        messageService.enginePullFunctionMessage(functionMessage);
     }
 
 }

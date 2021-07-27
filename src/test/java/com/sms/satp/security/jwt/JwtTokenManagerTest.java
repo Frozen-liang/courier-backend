@@ -10,6 +10,8 @@ import static org.mockito.Mockito.when;
 
 import com.sms.satp.dto.UserEntityAuthority;
 import com.sms.satp.entity.system.UserEntity;
+import com.sms.satp.repository.SystemRoleRepository;
+import com.sms.satp.repository.UserRepository;
 import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.security.strategy.SecurityStrategyFactory;
@@ -62,8 +64,9 @@ public class JwtTokenManagerTest {
     SigningKeyResolver signingKeyResolver = mock(SigningKeyResolver.class);
     UserSecurityStrategy userSecurityStrategy = mock(UserSecurityStrategy.class);
     UserService userService = mock(UserService.class);
+    SystemRoleRepository roleRepository = mock(SystemRoleRepository.class);
 
-    JwtTokenManager jwtTokenManager = new JwtTokenManager(userService, securityStrategyFactory, signingKeyResolver);
+    JwtTokenManager jwtTokenManager = new JwtTokenManager(userService, roleRepository, securityStrategyFactory, signingKeyResolver);
 
     @Test
     @DisplayName("Generate token for user successfully")
