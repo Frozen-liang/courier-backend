@@ -8,34 +8,27 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.info.BuildProperties;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 
-//@Component
 @Slf4j
-public class RoleInitialize implements InitializingBean {
+public class RoleInitialize implements ApplicationListener<ApplicationStartedEvent> {
 
     private static final String SUFFIX = "-SystemRole.json";
     private static final String PREFIX = "db/";
     private static final Integer SUCCESS = 1;
     private static final Integer FAIL = 0;
-    private final BuildProperties buildProperties;
-    private final SystemRoleRepository systemRoleRepository;
-    private final SystemVersionRepository systemVersionRepository;
-    private final ObjectMapper objectMapper;
-
-    public RoleInitialize(BuildProperties buildProperties,
-        SystemRoleRepository systemRoleRepository,
-        SystemVersionRepository systemVersionRepository, ObjectMapper objectMapper) {
-        this.buildProperties = buildProperties;
-        this.systemRoleRepository = systemRoleRepository;
-        this.systemVersionRepository = systemVersionRepository;
-        this.objectMapper = objectMapper;
-    }
 
     @Override
-    public void afterPropertiesSet() {
+    public void onApplicationEvent(ApplicationStartedEvent event) {
+        ConfigurableApplicationContext applicationContext = event.getApplicationContext();
+        BuildProperties buildProperties = applicationContext.getBean(BuildProperties.class);
+        SystemRoleRepository systemRoleRepository = applicationContext.getBean(SystemRoleRepository.class);
+        SystemVersionRepository systemVersionRepository = applicationContext.getBean(SystemVersionRepository.class);
+        ObjectMapper objectMapper = applicationContext.getBean(ObjectMapper.class);
         try {
             LocalDateTime buildTime = LocalDateTime.ofInstant(buildProperties.getTime(), ZoneId.systemDefault());
             String version = buildProperties.getVersion();
@@ -69,7 +62,6 @@ public class RoleInitialize implements InitializingBean {
         } catch (Exception e) {
             log.error("Initialize role error.");
         }
-
     }
 
     private boolean checkInitialized(SystemVersionEntity systemVersion, String version) {

@@ -2,20 +2,16 @@ package com.sms.satp.initialize;
 
 import com.sms.satp.entity.system.UserGroupEntity;
 import com.sms.satp.repository.UserGroupRepository;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 
-@Component
-public class DefaultUserGroupInitialize implements InitializingBean {
-
-    private final UserGroupRepository userGroupRepository;
-
-    public DefaultUserGroupInitialize(UserGroupRepository userGroupRepository) {
-        this.userGroupRepository = userGroupRepository;
-    }
+public class DefaultUserGroupInitialize implements ApplicationListener<ApplicationStartedEvent> {
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void onApplicationEvent(ApplicationStartedEvent event) {
+        ConfigurableApplicationContext applicationContext = event.getApplicationContext();
+        UserGroupRepository userGroupRepository = applicationContext.getBean(UserGroupRepository.class);
         boolean exists = userGroupRepository.existsByDefaultGroupIsTrue();
         if (exists) {
             return;
