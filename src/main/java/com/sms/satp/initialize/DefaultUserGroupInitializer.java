@@ -6,7 +6,7 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 
-public class DefaultUserGroupInitialize implements ApplicationListener<ApplicationStartedEvent> {
+public class DefaultUserGroupInitializer implements ApplicationListener<ApplicationStartedEvent> {
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {

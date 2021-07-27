@@ -15,7 +15,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 
 @Slf4j
-public class RoleInitialize implements ApplicationListener<ApplicationStartedEvent> {
+public class RoleInitializer implements ApplicationListener<ApplicationStartedEvent> {
 
     private static final String SUFFIX = "-SystemRole.json";
     private static final String PREFIX = "db/";
