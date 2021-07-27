@@ -1,17 +1,5 @@
 package com.sms.satp.service;
 
-import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.sms.satp.common.enums.JobStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.AddSceneCaseJobRequest;
@@ -37,8 +25,8 @@ import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
+import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
-import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.security.TokenType;
@@ -54,10 +42,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @DisplayName("Test cases for SceneCaseJobServiceTest")
 class SceneCaseJobServiceTest {
 
-    private final SceneCaseApiRepository sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
     private final ProjectEnvironmentService projectEnvironmentService = mock(ProjectEnvironmentService.class);
     private final SceneCaseRepository sceneCaseRepository = mock(SceneCaseRepository.class);
     private final SceneCaseJobRepository sceneCaseJobRepository = mock(SceneCaseJobRepository.class);
@@ -70,7 +70,9 @@ class SceneCaseJobServiceTest {
 
     private final CaseTemplateRepository caseTemplateRepository = mock(CaseTemplateRepository.class);
     private final CaseTemplateApiRepository caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
-    private final SceneCaseJobService sceneCaseJobService = new SceneCaseJobServiceImpl(sceneCaseApiRepository,
+    private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository =
+        mock(CustomizedSceneCaseApiRepository.class);
+    private final SceneCaseJobService sceneCaseJobService = new SceneCaseJobServiceImpl(
         projectEnvironmentService,
         sceneCaseRepository,
         sceneCaseJobRepository,
@@ -79,7 +81,7 @@ class SceneCaseJobServiceTest {
         caseDispatcherService,
         customizedCaseTemplateApiRepository,
         caseTemplateRepository,
-        caseTemplateApiRepository);
+        caseTemplateApiRepository, customizedSceneCaseApiRepository);
 
     private final static String MOCK_ID = "1";
     private final static Integer MOCK_NUM = 1;
@@ -96,7 +98,9 @@ class SceneCaseJobServiceTest {
         Optional<CaseTemplateEntity> sceneCaseApi = Optional.ofNullable(CaseTemplateEntity.builder().build());
         when(caseTemplateRepository.findById(any())).thenReturn(sceneCaseApi);
         List<SceneCaseApiEntity> sceneCaseApiList1 = getSceneCaseApiList();
-        when(sceneCaseApiRepository.findAllBySceneCaseId(any())).thenReturn(sceneCaseApiList1);
+        when(customizedSceneCaseApiRepository.findSceneCaseApiBySceneCaseIdAndIsExecuteAndIsRemove(any(), anyBoolean(),
+            anyBoolean()))
+            .thenReturn(sceneCaseApiList1);
         List<CaseTemplateApiEntity> templateApiList =
             Lists.newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID).order(MOCK_NUM).build());
         when(caseTemplateApiRepository.findAllByCaseTemplateIdOrderByOrder(any())).thenReturn(templateApiList);
@@ -105,9 +109,6 @@ class SceneCaseJobServiceTest {
         JobSceneCaseApi jobSceneCaseApiList =
             JobSceneCaseApi.builder().id(MOCK_ID).order(MOCK_NUM).build();
         when(jobMapper.toJobSceneCaseApiByTemplate(any())).thenReturn(jobSceneCaseApiList);
-        List<CaseTemplateApiEntity> caseTemplateApiList =
-            Lists.newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID).order(MOCK_NUM).build());
-        when(customizedCaseTemplateApiRepository.findByCaseTemplateIds(any())).thenReturn(caseTemplateApiList);
         List<JobSceneCaseApi> caseApiList = Lists
             .newArrayList(JobSceneCaseApi.builder().id(MOCK_ID).order(MOCK_NUM).build());
         when(jobMapper.toJobSceneCaseApiListByTemplate(any())).thenReturn(caseApiList);
@@ -225,7 +226,8 @@ class SceneCaseJobServiceTest {
     @Test
     @DisplayName("Test the get method in the SceneCaseJob service")
     void get_test() {
-        Optional<SceneCaseJobEntity> sceneCaseJob = Optional.ofNullable(SceneCaseJobEntity.builder().id(MOCK_ID).build());
+        Optional<SceneCaseJobEntity> sceneCaseJob = Optional
+            .ofNullable(SceneCaseJobEntity.builder().id(MOCK_ID).build());
         when(sceneCaseJobRepository.findById(any())).thenReturn(sceneCaseJob);
         SceneCaseJobResponse response = SceneCaseJobResponse.builder().id(MOCK_ID).build();
         when(jobMapper.toSceneCaseJobResponse(any())).thenReturn(response);

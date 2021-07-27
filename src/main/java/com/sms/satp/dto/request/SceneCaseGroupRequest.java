@@ -10,10 +10,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-public class ApiGroupRequest {
+@AllArgsConstructor
+@NoArgsConstructor
+public class SceneCaseGroupRequest {
 
     @NotBlank(groups = {UpdateGroup.class}, message = "The id must not be empty.")
     @Null(groups = InsertGroup.class, message = "The id must be null.")
@@ -26,5 +26,4 @@ public class ApiGroupRequest {
     private String name;
 
     private String parentId;
-
 }

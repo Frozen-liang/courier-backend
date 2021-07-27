@@ -1,6 +1,8 @@
 package com.sms.satp.dto.request;
 
 import java.util.List;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,8 +14,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AddCaseTemplateConnRequest {
 
+    @NotNull(message = "The sceneCaseId can not be empty")
     private String sceneCaseId;
 
-    private List<String> caseTemplateIds;
+    @NotEmpty(message = "The entity can not be empty")
+    private List<AddCaseTemplateApi> caseTemplateIds;
 
 }

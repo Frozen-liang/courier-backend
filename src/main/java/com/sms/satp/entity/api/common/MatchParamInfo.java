@@ -1,5 +1,6 @@
 package com.sms.satp.entity.api.common;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.satp.common.enums.MatchType;
 import com.sms.satp.common.enums.ParamType;
 import java.util.List;
@@ -36,16 +37,19 @@ public class MatchParamInfo {
      * 是否校验参数类型.
      */
     @Field("isVerificationParamType")
+    @JsonProperty("isVerificationParamType")
     private boolean verificationParamType;
     /**
      * 是否校验数组内元素.
      */
     @Field("isVerificationArrayElement")
+    @JsonProperty("isVerificationArrayElement")
     private boolean verificationArrayElement;
     /**
      * 是否必含.
      */
     @Field("isRequired")
+    @JsonProperty("isRequired")
     private boolean required;
     /**
      * 对象子属性. JSON/Object/JsonArray.

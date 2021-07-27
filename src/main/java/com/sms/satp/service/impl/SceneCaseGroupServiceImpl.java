@@ -6,32 +6,32 @@ import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.enums.OperationType.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_GROUP_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_GROUP_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_GROUP_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_GROUP_LIST_ERROR;
+import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
+import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.common.field.CommonField;
-import com.sms.satp.common.field.SceneField;
-import com.sms.satp.dto.request.AddSceneCaseGroupRequest;
-import com.sms.satp.dto.request.SearchSceneCaseGroupRequest;
-import com.sms.satp.dto.request.UpdateSceneCaseGroupRequest;
-import com.sms.satp.dto.response.SceneCaseGroupResponse;
+import com.sms.satp.dto.request.SceneCaseGroupRequest;
+import com.sms.satp.dto.response.TreeResponse;
 import com.sms.satp.entity.group.SceneCaseGroupEntity;
 import com.sms.satp.entity.scenetest.SceneCaseEntity;
+import com.sms.satp.infrastructure.id.DefaultIdentifierGenerator;
 import com.sms.satp.mapper.SceneCaseGroupMapper;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.repository.SceneCaseGroupRepository;
 import com.sms.satp.service.SceneCaseGroupService;
 import com.sms.satp.service.SceneCaseService;
+import com.sms.satp.utils.ExceptionUtils;
+import com.sms.satp.utils.TreeUtils;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -42,6 +42,7 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
     private final SceneCaseGroupMapper sceneCaseGroupMapper;
     private final SceneCaseService sceneCaseService;
     private final CustomizedSceneCaseRepository customizedSceneCaseRepository;
+    private final DefaultIdentifierGenerator identifierGenerator = DefaultIdentifierGenerator.getSharedInstance();
 
     public SceneCaseGroupServiceImpl(SceneCaseGroupRepository sceneCaseGroupRepository,
         SceneCaseGroupMapper sceneCaseGroupMapper, SceneCaseService sceneCaseService,
@@ -54,30 +55,51 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
 
     @Override
     @LogRecord(operationType = ADD, operationModule = SCENE_CASE_GROUP, template = "{{#request.name}}")
-    public Boolean add(AddSceneCaseGroupRequest request) {
+    public Boolean add(SceneCaseGroupRequest request) {
         try {
             log.info("SceneCaseGroupService-add()-params: [SceneCaseGroup]={}", request.toString());
-            SceneCaseGroupEntity caseGroup = sceneCaseGroupMapper.toSceneCaseGroupByAdd(request);
-            sceneCaseGroupRepository.insert(caseGroup);
+            SceneCaseGroupEntity sceneCaseGroupEntity = sceneCaseGroupMapper.toSceneCaseGroupEntity(request);
+            String parentId = sceneCaseGroupEntity.getParentId();
+            SceneCaseGroupEntity parentGroup = SceneCaseGroupEntity.builder().depth(0).build();
+            if (StringUtils.isNotBlank(parentId)) {
+                parentGroup = sceneCaseGroupRepository.findById(parentId)
+                    .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "SceneCaseGroup", parentId));
+            }
+            isTrue(parentGroup.getDepth() < Constants.MAX_DEPTH, "The group depth must be less than three.");
+            Long realGroupId = identifierGenerator.nextId();
+            parentGroup.getPath().add(realGroupId);
+            sceneCaseGroupEntity.setDepth(parentGroup.getDepth() + 1);
+            sceneCaseGroupEntity.setRealGroupId(realGroupId);
+            sceneCaseGroupEntity.setPath(parentGroup.getPath());
+            sceneCaseGroupRepository.insert(sceneCaseGroupEntity);
             return Boolean.TRUE;
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseGroup!", e);
-            throw new ApiTestPlatformException(ADD_SCENE_CASE_GROUP_ERROR);
+            throw ExceptionUtils.mpe(ADD_SCENE_CASE_GROUP_ERROR);
         }
     }
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_GROUP, template = "{{#request.name}}")
-    public Boolean edit(UpdateSceneCaseGroupRequest request) {
+    public Boolean edit(SceneCaseGroupRequest request) {
         try {
             log.info("SceneCaseGroupService-edit()-params: [SceneCaseGroup]={}", request.toString());
-            SceneCaseGroupEntity caseGroup = sceneCaseGroupMapper.toSceneCaseGroupByUpdate(request);
-            Optional<SceneCaseGroupEntity> optional = sceneCaseGroupRepository.findById(caseGroup.getId());
-            optional.ifPresent(sceneCaseGroup -> sceneCaseGroupRepository.save(caseGroup));
+            SceneCaseGroupEntity sceneCaseGroupEntity = sceneCaseGroupMapper.toSceneCaseGroupEntity(request);
+            String id = sceneCaseGroupEntity.getId();
+            SceneCaseGroupEntity oldSceneCaseGroup = sceneCaseGroupRepository.findById(id)
+                .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "SceneCaseGroup", id));
+            sceneCaseGroupEntity.setRealGroupId(oldSceneCaseGroup.getRealGroupId());
+            sceneCaseGroupEntity.setPath(oldSceneCaseGroup.getPath());
+            sceneCaseGroupEntity.setDepth(oldSceneCaseGroup.getDepth());
+            sceneCaseGroupEntity.setParentId(oldSceneCaseGroup.getParentId());
+            sceneCaseGroupRepository.save(sceneCaseGroupEntity);
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to edit the SceneCaseGroup!", e);
-            throw new ApiTestPlatformException(EDIT_SCENE_CASE_GROUP_ERROR);
+            throw ExceptionUtils.mpe(EDIT_SCENE_CASE_GROUP_ERROR);
         }
     }
 
@@ -86,39 +108,41 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
         enhance = @Enhance(enable = true))
     public Boolean deleteById(String id) {
         try {
-            Optional<SceneCaseGroupEntity> sceneCaseGroup = sceneCaseGroupRepository.findById(id);
-            sceneCaseGroup.ifPresent(caseGroup -> {
-                sceneCaseGroupRepository.deleteById(caseGroup.getId());
-                List<SceneCaseEntity> sceneCaseEntityList = customizedSceneCaseRepository.getIdsByGroupId(id);
-                List<String> sceneCaseIds = sceneCaseEntityList.stream().map(SceneCaseEntity::getId)
-                    .collect(Collectors.toList());
-                sceneCaseService.delete(sceneCaseIds);
-            });
+            SceneCaseGroupEntity sceneCaseGroupEntity = sceneCaseGroupRepository.findById(id)
+                .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "SceneCaseGroup", id));
+            //Query all sceneCaseGroup contain children groups
+            List<String> ids = sceneCaseGroupRepository
+                .findAllByPathContains(sceneCaseGroupEntity.getRealGroupId()).map(SceneCaseGroupEntity::getId)
+                .collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(ids)) {
+                sceneCaseGroupRepository.deleteAllByIdIn(ids);
+                List<SceneCaseEntity> sceneCaseEntityList = customizedSceneCaseRepository
+                    .getSceneCaseIdsByGroupIds(ids);
+                if (CollectionUtils.isNotEmpty(sceneCaseEntityList)) {
+                    List<String> sceneCaseIds = sceneCaseEntityList.stream().map(SceneCaseEntity::getId)
+                        .collect(Collectors.toList());
+                    sceneCaseService.delete(sceneCaseIds);
+                }
+            }
             return Boolean.TRUE;
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to delete the SceneCaseGroup!", e);
-            throw new ApiTestPlatformException(DELETE_SCENE_CASE_GROUP_ERROR);
+            throw ExceptionUtils.mpe(DELETE_SCENE_CASE_GROUP_ERROR);
         }
     }
 
     @Override
-    public List<SceneCaseGroupResponse> getList(SearchSceneCaseGroupRequest request) {
+    public List<TreeResponse> list(String projectId) {
         try {
-            SceneCaseGroupEntity group =
-                SceneCaseGroupEntity.builder().projectId(request.getProjectId()).parentId(request.getParentId())
-                    .build();
-            ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(CommonField.ID.getName(), GenericPropertyMatchers.exact())
-                .withMatcher(SceneField.NAME.getName(), GenericPropertyMatchers.exact())
-                .withMatcher(CommonField.PROJECT_ID.getName(), GenericPropertyMatchers.exact())
-                .withMatcher(SceneField.PARENT_ID.getName(), GenericPropertyMatchers.exact())
-                .withIgnoreNullValues();
-            Example<SceneCaseGroupEntity> example = Example.of(group, exampleMatcher);
-            List<SceneCaseGroupEntity> sceneCaseGroups = sceneCaseGroupRepository.findAll(example);
-            return sceneCaseGroupMapper.toResponseList(sceneCaseGroups);
+            List<SceneCaseGroupEntity> sceneCaseGroups =
+                sceneCaseGroupRepository.findSceneCaseGroupEntitiesByProjectId(projectId);
+            return TreeUtils.createTree(sceneCaseGroupMapper.toResponse(sceneCaseGroups));
         } catch (Exception e) {
             log.error("Failed to getList the SceneCase page!", e);
-            throw new ApiTestPlatformException(GET_SCENE_CASE_GROUP_LIST_ERROR);
+            throw ExceptionUtils.mpe(GET_SCENE_CASE_GROUP_LIST_ERROR);
         }
     }
 

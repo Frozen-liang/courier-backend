@@ -1,8 +1,8 @@
 package com.sms.satp.mapper;
 
-import com.sms.satp.dto.request.AddCaseTemplateGroupRequest;
-import com.sms.satp.dto.request.UpdateCaseTemplateGroupRequest;
+import com.sms.satp.dto.request.CaseTemplateGroupRequest;
 import com.sms.satp.dto.response.CaseTemplateGroupResponse;
+import com.sms.satp.dto.response.TreeResponse;
 import com.sms.satp.entity.group.CaseTemplateGroupEntity;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -13,9 +13,7 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CaseTemplateGroupMapper {
 
-    CaseTemplateGroupEntity toCaseTemplateGroupByAdd(AddCaseTemplateGroupRequest request);
+    CaseTemplateGroupEntity toCaseTemplateGroupEntity(CaseTemplateGroupRequest request);
 
-    CaseTemplateGroupEntity toCaseTemplateGroupByUpdate(UpdateCaseTemplateGroupRequest request);
-
-    List<CaseTemplateGroupResponse> toResponseList(List<CaseTemplateGroupEntity> caseTemplateGroups);
+    List<CaseTemplateGroupResponse> toResponse(List<CaseTemplateGroupEntity> caseTemplateGroupEntityList);
 }

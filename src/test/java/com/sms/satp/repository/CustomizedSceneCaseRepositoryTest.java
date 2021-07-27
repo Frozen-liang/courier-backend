@@ -1,14 +1,12 @@
 package com.sms.satp.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.response.SceneCaseResponse;
+import com.sms.satp.entity.scenetest.CaseTemplateEntity;
+import com.sms.satp.entity.scenetest.SceneCaseEntity;
 import com.sms.satp.repository.impl.CustomizedSceneCaseRepositoryImpl;
 import java.util.ArrayList;
+import java.util.List;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +15,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Query;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Tests for CustomizedSceneCaseRepositoryTest")
 class CustomizedSceneCaseRepositoryTest {
@@ -55,4 +59,29 @@ class CustomizedSceneCaseRepositoryTest {
         assertThat(page).isNotNull();
     }
 
+    @Test
+    @DisplayName("Test the deleteByIds method in the CustomizedSceneCaseRepository")
+    void deleteByIds_test() {
+        when(commonRepository.deleteByIds(any(),any())).thenReturn(Boolean.TRUE);
+        Boolean isSuccess = customizedSceneCaseRepository.deleteByIds(Lists.newArrayList(MOCK_ID));
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the deleteByIds method in the CustomizedSceneCaseRepository")
+    void recover_test() {
+        when(commonRepository.recover(any(),any())).thenReturn(Boolean.TRUE);
+        Boolean isSuccess = customizedSceneCaseRepository.recover(Lists.newArrayList(MOCK_ID));
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the getSceneCaseIdsByGroupIds method in the CustomizedSceneCaseRepository")
+    void getSceneCaseIdsByGroupIds_test() {
+        when(mongoTemplate.find(any(), any()))
+            .thenReturn(Lists.newArrayList(CaseTemplateEntity.builder().build()));
+        List<SceneCaseEntity> dto =
+            customizedSceneCaseRepository.getSceneCaseIdsByGroupIds(Lists.newArrayList(MOCK_ID));
+        assertThat(dto).isNotEmpty();
+    }
 }

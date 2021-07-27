@@ -8,6 +8,7 @@ import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.service.CaseTemplateApiService;
 import java.util.List;
 import javax.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,21 +29,25 @@ public class CaseTemplateApiController {
     }
 
     @PostMapping(value = "/batch")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_API_CRE_UPD_DEL)")
     public Boolean batchAdd(@Valid @RequestBody BatchAddCaseTemplateApiRequest addCaseTemplateApiRequest) {
         return caseTemplateApiService.batchAdd(addCaseTemplateApiRequest);
     }
 
     @DeleteMapping(value = "/delete/{ids}")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_API_CRE_UPD_DEL)")
     public Boolean deleteByIds(@PathVariable List<String> ids) {
         return caseTemplateApiService.deleteByIds(ids);
     }
 
     @PutMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_API_CRE_UPD_DEL)")
     public Boolean edit(@Valid @RequestBody UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest) {
         return caseTemplateApiService.edit(updateCaseTemplateApiRequest);
     }
 
     @PutMapping("/batch")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_API_CRE_UPD_DEL)")
     public Boolean batchEdit(@Valid @RequestBody BatchUpdateCaseTemplateApiRequest batchUpdateCaseTemplateApiRequest) {
         return caseTemplateApiService.batchEdit(batchUpdateCaseTemplateApiRequest);
     }

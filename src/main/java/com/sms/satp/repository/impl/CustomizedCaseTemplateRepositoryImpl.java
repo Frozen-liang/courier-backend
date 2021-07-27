@@ -1,8 +1,8 @@
 package com.sms.satp.repository.impl;
 
-import static com.sms.satp.common.field.ApiField.GROUP_ID;
-import static com.sms.satp.common.field.ApiField.TAG_ID;
 import static com.sms.satp.common.field.CommonField.ID;
+import static com.sms.satp.common.field.SceneField.GROUP_ID;
+import static com.sms.satp.common.field.SceneField.TAG_ID;
 
 import com.sms.satp.common.field.CommonField;
 import com.sms.satp.common.field.SceneField;
@@ -95,10 +95,10 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
     }
 
     @Override
-    public List<CaseTemplateEntity> getIdsByGroupId(String id) {
+    public List<CaseTemplateEntity> getCaseTemplateIdsByGroupIds(List<String> ids) {
         Query query = new Query();
         query.fields().include(ID.getName());
-        CommonField.GROUP_ID.is(id).ifPresent(query::addCriteria);
+        CommonField.GROUP_ID.in(ids).ifPresent(query::addCriteria);
         return mongoTemplate.find(query, CaseTemplateEntity.class);
     }
 

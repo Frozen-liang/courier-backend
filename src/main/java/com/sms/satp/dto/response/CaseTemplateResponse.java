@@ -18,6 +18,7 @@ public class CaseTemplateResponse extends BaseResponse {
     private String createUserName;
     private String projectId;
     private String groupId;
+    private String dataCollId;
     private String groupName;
     private String testStatus;
     private List<String> tagId;
