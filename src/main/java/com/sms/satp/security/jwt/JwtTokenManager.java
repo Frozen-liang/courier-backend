@@ -1,13 +1,12 @@
 package com.sms.satp.security.jwt;
 
+import static com.sms.satp.common.enums.RoleType.ENGINE;
 import static com.sms.satp.utils.JwtUtils.TOKEN_TYPE;
 import static com.sms.satp.utils.JwtUtils.TOKEN_USER_ID;
 
 import com.sms.satp.dto.UserEntityAuthority;
 import com.sms.satp.entity.system.SystemRoleEntity;
-import com.sms.satp.entity.system.UserEntity;
 import com.sms.satp.repository.SystemRoleRepository;
-import com.sms.satp.repository.UserRepository;
 import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.security.strategy.SatpSecurityStrategy;
