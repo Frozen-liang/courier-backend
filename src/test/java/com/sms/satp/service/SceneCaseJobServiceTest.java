@@ -108,7 +108,6 @@ class SceneCaseJobServiceTest {
         when(jobMapper.toJobSceneCaseApiByTemplate(any())).thenReturn(jobSceneCaseApiList);
         List<CaseTemplateApiEntity> caseTemplateApiList =
             Lists.newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID).order(MOCK_NUM).build());
-        when(customizedCaseTemplateApiRepository.findByCaseTemplateIds(any())).thenReturn(caseTemplateApiList);
         List<JobSceneCaseApi> caseApiList = Lists
             .newArrayList(JobSceneCaseApi.builder().id(MOCK_ID).order(MOCK_NUM).build());
         when(jobMapper.toJobSceneCaseApiListByTemplate(any())).thenReturn(caseApiList);

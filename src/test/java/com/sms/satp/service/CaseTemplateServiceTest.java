@@ -27,7 +27,6 @@ import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
-import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.impl.CaseTemplateServiceImpl;
@@ -50,6 +49,7 @@ import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.RECOVER_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -73,7 +73,6 @@ class CaseTemplateServiceTest {
     private final SceneCaseApiService sceneCaseApiService = mock(SceneCaseApiService.class);
     private final CaseTemplateApiMapper caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
     private final CaseTemplateApiRepository caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
-    private final SceneCaseApiRepository sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
     private final ApiRepository apiRepository = mock(ApiRepository.class);
     private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
     private final ApiTestCaseRepository apiTestCaseRepository = mock(ApiTestCaseRepository.class);
@@ -132,6 +131,19 @@ class CaseTemplateServiceTest {
     }
 
     @Test
+    @DisplayName("Test the add method in the CaseTemplate service throws exception")
+    void add_test_thenThrow_Exception() {
+        CaseTemplateEntity caseTemplate =
+            CaseTemplateEntity.builder().name(MOCK_NAME).projectId(MOCK_PROJECT_ID).groupId(MOCK_GROUP_ID)
+                .createUserId(MOCK_CREATE_USER_ID).build();
+        when(caseTemplateMapper.toCaseTemplateByAddRequest(any())).thenReturn(caseTemplate);
+        when(caseTemplateRepository.insert(any(CaseTemplateEntity.class)))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> caseTemplateService.add(AddCaseTemplateRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
     @DisplayName("Test the addConvert method in the CaseTemplate service")
     void addConvert_test_thenRight() {
         Optional<SceneCaseEntity> sceneCase = Optional.ofNullable(SceneCaseEntity.builder().build());
@@ -164,6 +176,15 @@ class CaseTemplateServiceTest {
     }
 
     @Test
+    @DisplayName("Test the addConvert method in the CaseTemplate service throw exception")
+    void addConvertCase_test_throwException() {
+        when(sceneCaseRepository.findById(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> caseTemplateService
+            .add(ConvertCaseTemplateRequest.builder().sceneCaseId(MOCK_ID).groupId(MOCK_ID).build()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
     @DisplayName("Test the deleteByIds method in the CaseTemplate service")
     void deleteByIds_test() {
         doNothing().when(caseTemplateRepository).deleteById(any());
@@ -178,6 +199,15 @@ class CaseTemplateServiceTest {
     @DisplayName("Test the deleteById method in the CaseTemplate service throws exception")
     void deleteByIds_test_thenThrownException() {
         doThrow(new ApiTestPlatformException(DELETE_CASE_TEMPLATE_ERROR)).when(caseTemplateRepository)
+            .deleteById(any());
+        assertThatThrownBy(() -> caseTemplateService.deleteByIds(Lists.newArrayList(MOCK_ID)))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the deleteById method in the CaseTemplate service throws exception")
+    void deleteByIds_test_then_thrownException() {
+        doThrow(new RuntimeException()).when(caseTemplateRepository)
             .deleteById(any());
         assertThatThrownBy(() -> caseTemplateService.deleteByIds(Lists.newArrayList(MOCK_ID)))
             .isInstanceOf(ApiTestPlatformException.class);
@@ -279,6 +309,14 @@ class CaseTemplateServiceTest {
     }
 
     @Test
+    @DisplayName("Test the getApiList method in the CaseTemplate service thrown exception")
+    void getApiListCaseTemplateIsNull_then_thrownException() {
+        when(caseTemplateRepository.findById(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> caseTemplateService.getApiList(MOCK_ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
     @DisplayName("Test the addApi method in the CaseTemplate service")
     void addApi_thenRight() {
         Optional<CaseTemplateEntity> caseTemplate = Optional.ofNullable(CaseTemplateEntity.builder().build());
@@ -308,6 +346,14 @@ class CaseTemplateServiceTest {
     }
 
     @Test
+    @DisplayName("Test the addApi method in the CaseTemplate service thrown exception")
+    void addApi_thenThrownException() {
+        when(caseTemplateRepository.findById(any())).thenThrow(new RuntimeException());
+        AddCaseTemplateApiByIdsRequest request = getAddRequest();
+        assertThatThrownBy(() -> caseTemplateService.addApi(request)).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
     @DisplayName("Test the delete method in the CaseTemplate service")
     void delete_test() {
         when(customizedCaseTemplateRepository.deleteByIds(any())).thenReturn(Boolean.TRUE);
@@ -317,6 +363,54 @@ class CaseTemplateServiceTest {
         when(customizedCaseTemplateApiRepository.deleteByIds(any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = caseTemplateService.delete(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the delete method in the CaseTemplate service thrown exception")
+    void delete_test_throwApiException() {
+        when(customizedCaseTemplateRepository.deleteByIds(any()))
+            .thenThrow(new ApiTestPlatformException(DELETE_CASE_TEMPLATE_ERROR));
+        assertThatThrownBy(() -> caseTemplateService.delete(Lists.newArrayList(MOCK_ID)))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the delete method in the CaseTemplate service thrown exception")
+    void delete_test_throwException() {
+        when(customizedCaseTemplateRepository.deleteByIds(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> caseTemplateService.delete(Lists.newArrayList(MOCK_ID)))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the recover method in the CaseTemplate service")
+    void recover_test() {
+        when(customizedCaseTemplateRepository.recover(any())).thenReturn(Boolean.TRUE);
+        List<CaseTemplateApiEntity> caseTemplateApiEntityList = Lists.newArrayList(getCaseTemplateApiEntity());
+        when(customizedCaseTemplateApiRepository.findCaseTemplateApiIdsByCaseTemplateIds(any()))
+            .thenReturn(caseTemplateApiEntityList);
+        when(customizedCaseTemplateApiRepository.recover(any())).thenReturn(Boolean.TRUE);
+        Boolean isSuccess = caseTemplateService.recover(Lists.newArrayList(MOCK_ID));
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the recover method in the CaseTemplate service thrown exception")
+    void recover_test_thrownApiException() {
+        when(customizedCaseTemplateRepository.recover(any()))
+            .thenThrow(new ApiTestPlatformException(RECOVER_CASE_TEMPLATE_ERROR));
+        assertThatThrownBy(() -> caseTemplateService.recover(Lists.newArrayList(MOCK_ID)))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the recover method in the CaseTemplate service thrown exception")
+    void recover_test_thrownException() {
+        when(customizedCaseTemplateRepository.recover(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> caseTemplateService.recover(Lists.newArrayList(MOCK_ID)))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
     private CaseTemplateApiEntity getCaseTemplateApiEntity() {

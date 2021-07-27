@@ -28,15 +28,6 @@ class CustomizedSceneCaseApiRepositoryTest {
     private final static String MOCK_ID = "1";
 
     @Test
-    @DisplayName("Test the findMaxOrderBySceneCaseId method in the CustomizedSceneCaseApiRepository")
-    void findMaxOrderBySceneCaseId_test() {
-        SceneCaseApiEntity sceneCaseApi = SceneCaseApiEntity.builder().id(MOCK_ID).order(0).build();
-        when(mongoTemplate.findOne(any(), eq(SceneCaseApiEntity.class))).thenReturn(sceneCaseApi);
-        int result = repository.findCurrentOrderBySceneCaseId(MOCK_ID);
-        assertThat(result).isEqualTo(1);
-    }
-
-    @Test
     @DisplayName("Test the findSceneCaseApiByApiIds method in the CustomizedSceneCaseApiRepository")
     void findSceneCaseApiByApiIds_test() {
         when(mongoTemplate.find(any(), any()))

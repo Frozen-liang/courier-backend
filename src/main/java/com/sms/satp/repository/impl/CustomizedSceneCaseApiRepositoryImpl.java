@@ -30,16 +30,6 @@ public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCase
     }
 
     @Override
-    public int findCurrentOrderBySceneCaseId(String sceneCaseId) {
-        Query query = new Query();
-        SceneFiled.SCENE_CASE_ID.is(sceneCaseId).ifPresent(query::addCriteria);
-        query.with(Sort.by(Direction.DESC, SceneFiled.ORDER.getFiled()));
-        query.limit(1);
-        SceneCaseApiEntity sceneCaseApi = mongoTemplate.findOne(query, SceneCaseApiEntity.class);
-        return Objects.isNull(sceneCaseApi) ? 1 : sceneCaseApi.getOrder() + 1;
-    }
-
-    @Override
     public List<SceneCaseApiEntity> findSceneCaseApiByApiIds(List<String> ids) {
         Query query = new Query();
         SceneFiled.API_ID.in(ids).ifPresent(query::addCriteria);

@@ -26,24 +26,6 @@ class CustomizedCaseTemplateApiRepositoryTest {
     private final static Long COUNT = 1L;
 
     @Test
-    @DisplayName("Test the findByCaseTemplateIds method in the CustomizedCaseTemplateApiRepository")
-    void findByCaseTemplateIds_test() {
-        when(mongoTemplate.find(any(), any()))
-            .thenReturn(Lists.newArrayList(CaseTemplateApiEntity.builder().build()));
-        List<CaseTemplateApiEntity> dto =
-            customizedCaseTemplateApiRepository.findByCaseTemplateIds(Lists.newArrayList(MOCK_ID));
-        assertThat(dto).isNotEmpty();
-    }
-
-    @Test
-    @DisplayName("Test the findByCaseTemplateIds method in the CustomizedCaseTemplateApiRepository")
-    void findByCaseTemplateIds_test_thenNull() {
-        List<CaseTemplateApiEntity> dto =
-            customizedCaseTemplateApiRepository.findByCaseTemplateIds(Lists.newArrayList());
-        assertThat(dto).isEmpty();
-    }
-
-    @Test
     @DisplayName("Test the findByCaseTemplateIdAndIsExecute method in the CustomizedCaseTemplateApiRepository")
     void findByCaseTemplateIdAndIsExecute_test() {
         when(mongoTemplate.find(any(), any()))

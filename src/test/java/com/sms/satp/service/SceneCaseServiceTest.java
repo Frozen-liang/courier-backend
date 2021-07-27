@@ -354,7 +354,6 @@ class SceneCaseServiceTest {
     void addTemplate_thenRight() {
         Optional<SceneCaseEntity> sceneCase = Optional.ofNullable(SceneCaseEntity.builder().build());
         when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
-        when(customizedSceneCaseApiRepository.findCurrentOrderBySceneCaseId(any())).thenReturn(MOCK_PAGE);
         List<CaseTemplateApiEntity> caseTemplateApiList = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
         when(caseTemplateApiService.listByCaseTemplateId(any())).thenReturn(caseTemplateApiList);
         List<CaseTemplateApiConn> caseTemplateApiConnList = Lists

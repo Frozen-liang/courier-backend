@@ -55,6 +55,7 @@ import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.service.CaseTemplateApiService;
 import com.sms.satp.service.SceneCaseApiService;
 import com.sms.satp.service.SceneCaseService;
+import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.SecurityUtil;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +122,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to add the SceneCase!", e);
-            throw new ApiTestPlatformException(ADD_SCENE_CASE_ERROR);
+            throw ExceptionUtils.mpe(ADD_SCENE_CASE_ERROR);
         }
     }
 
@@ -136,9 +137,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 deleteSceneCaseApi(id);
             }
             return Boolean.TRUE;
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to delete the SceneCase!", e);
-            throw new ApiTestPlatformException(DELETE_SCENE_CASE_ERROR);
+            throw ExceptionUtils.mpe(DELETE_SCENE_CASE_ERROR);
         }
     }
 
@@ -152,7 +156,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to edit the SceneCase!", e);
-            throw new ApiTestPlatformException(EDIT_SCENE_CASE_ERROR);
+            throw ExceptionUtils.mpe(EDIT_SCENE_CASE_ERROR);
         }
     }
 
@@ -162,7 +166,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             return customizedSceneCaseRepository.search(searchDto, projectId);
         } catch (Exception e) {
             log.error("Failed to search the SceneCase!", e);
-            throw new ApiTestPlatformException(SEARCH_SCENE_CASE_ERROR);
+            throw ExceptionUtils.mpe(SEARCH_SCENE_CASE_ERROR);
         }
     }
 
@@ -181,9 +185,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 responsesList.add(response);
             }
             return SceneTemplateResponse.builder().sceneCaseDto(dto).sceneCaseApiDtoList(responsesList).build();
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to get the SceneCase conn!", e);
-            throw new ApiTestPlatformException(GET_SCENE_CASE_CONN_ERROR);
+            throw ExceptionUtils.mpe(GET_SCENE_CASE_CONN_ERROR);
         }
     }
 
@@ -215,9 +222,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 sceneCaseApiRepository.saveAll(sceneCaseApiList);
             }
             return Boolean.TRUE;
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to edit the SceneCase conn!", e);
-            throw new ApiTestPlatformException(EDIT_SCENE_CASE_CONN_ERROR);
+            throw ExceptionUtils.mpe(EDIT_SCENE_CASE_CONN_ERROR);
         }
     }
 
@@ -233,7 +243,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             return sceneCaseRepository.findAll(example);
         } catch (Exception e) {
             log.error("Failed to get the SceneCase!", e);
-            throw new ApiTestPlatformException(GET_SCENE_CASE_ERROR);
+            throw ExceptionUtils.mpe(GET_SCENE_CASE_ERROR);
         }
     }
 
@@ -252,9 +262,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 }
             }
             return Boolean.TRUE;
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseApi!", e);
-            throw new ApiTestPlatformException(ADD_SCENE_CASE_API_ERROR);
+            throw ExceptionUtils.mpe(ADD_SCENE_CASE_API_ERROR);
         }
     }
 
@@ -280,9 +293,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 sceneCaseApiRepository.insert(sceneCaseApi);
             }
             return Boolean.TRUE;
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseApi by template!", e);
-            throw new ApiTestPlatformException(ADD_SCENE_CASE_API_ERROR);
+            throw ExceptionUtils.mpe(ADD_SCENE_CASE_API_ERROR);
         }
     }
 
@@ -293,7 +309,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to delete the SceneCase conn!", e);
-            throw new ApiTestPlatformException(DELETE_SCENE_CASE_CONN_ERROR);
+            throw ExceptionUtils.mpe(DELETE_SCENE_CASE_CONN_ERROR);
         }
     }
 
@@ -312,9 +328,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 customizedSceneCaseApiRepository.deleteByIds(sceneCaseApiIds);
             }
             return Boolean.TRUE;
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to delete the SceneCase!", e);
-            throw new ApiTestPlatformException(DELETE_SCENE_CASE_ERROR);
+            throw ExceptionUtils.mpe(DELETE_SCENE_CASE_ERROR);
         }
     }
 
@@ -333,9 +352,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 customizedSceneCaseApiRepository.recover(sceneCaseApiIds);
             }
             return Boolean.TRUE;
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to recover the SceneCase!", e);
-            throw new ApiTestPlatformException(RECOVER_SCENE_CASE_ERROR);
+            throw ExceptionUtils.mpe(RECOVER_SCENE_CASE_ERROR);
         }
     }
 

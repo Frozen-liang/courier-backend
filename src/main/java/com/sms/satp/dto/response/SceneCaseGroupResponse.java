@@ -11,9 +11,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SceneCaseGroupResponse extends BaseResponse {
+public class SceneCaseGroupResponse extends TreeResponse {
 
     private String projectId;
     private String name;
-    private String parentId;
 }

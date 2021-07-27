@@ -1,14 +1,14 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
-import com.sms.satp.dto.request.AddSceneCaseGroupRequest;
-import com.sms.satp.dto.request.SearchSceneCaseGroupRequest;
-import com.sms.satp.dto.request.UpdateSceneCaseGroupRequest;
-import com.sms.satp.dto.response.SceneCaseGroupResponse;
+import com.sms.satp.common.validate.InsertGroup;
+import com.sms.satp.common.validate.UpdateGroup;
+import com.sms.satp.dto.request.SceneCaseGroupRequest;
+import com.sms.satp.dto.response.TreeResponse;
 import com.sms.satp.service.SceneCaseGroupService;
 import java.util.List;
-import javax.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,13 +30,13 @@ public class SceneCaseGroupController {
 
     @PostMapping
     @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_GROUP_CRE_UPD_DEL)")
-    public Boolean add(@Valid @RequestBody AddSceneCaseGroupRequest request) {
+    public Boolean add(@Validated(InsertGroup.class) @RequestBody SceneCaseGroupRequest request) {
         return sceneCaseGroupService.add(request);
     }
 
     @PutMapping
     @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_GROUP_CRE_UPD_DEL)")
-    public Boolean edit(@Valid @RequestBody UpdateSceneCaseGroupRequest request) {
+    public Boolean edit(@Validated(UpdateGroup.class) @RequestBody SceneCaseGroupRequest request) {
         return sceneCaseGroupService.edit(request);
     }
 
@@ -46,10 +46,10 @@ public class SceneCaseGroupController {
         return sceneCaseGroupService.deleteById(id);
     }
 
-    @GetMapping
+    @GetMapping(value = "/list/{projectId}")
     @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_GROUP_QUERY_ALL)")
-    public List<SceneCaseGroupResponse> getList(SearchSceneCaseGroupRequest request) {
-        return sceneCaseGroupService.getList(request);
+    public List<TreeResponse> getList(@PathVariable String projectId) {
+        return sceneCaseGroupService.list(projectId);
     }
 
 }

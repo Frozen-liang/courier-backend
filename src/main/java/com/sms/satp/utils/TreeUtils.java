@@ -1,6 +1,5 @@
 package com.sms.satp.utils;
 
-import com.sms.satp.dto.response.ApiGroupResponse;
 import com.sms.satp.dto.response.TreeResponse;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,7 @@ public abstract class TreeUtils {
 
     private static final Integer PARENT_DEPTH = 1;
 
-    public static List<TreeResponse> createTree(List<ApiGroupResponse> treeResponses) {
+    public static List<TreeResponse> createTree(List<? extends TreeResponse> treeResponses) {
         List<TreeResponse> parentList = treeResponses.stream()
             .filter((e) -> PARENT_DEPTH.equals(e.getDepth()))
             .collect(Collectors.toList());

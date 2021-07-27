@@ -24,6 +24,7 @@ import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.BATCH_EDIT_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_API_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_API_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_API_LIST_BY_CASE_TEMPLATE_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -135,6 +136,27 @@ class CaseTemplateApiServiceTest {
         when(caseTemplateApiRepository.saveAll(any()))
             .thenThrow(new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR));
         assertThatThrownBy(() -> caseTemplateApiService.batchEdit(dto)).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the listResponseByCaseTemplateId method in the CaseTemplateApi service")
+    void listResponseByCaseTemplateId_test() {
+        List<CaseTemplateApiEntity> sceneCaseApiList = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
+        when(caseTemplateApiRepository.findAll(any(Example.class), any(Sort.class))).thenReturn(sceneCaseApiList);
+        CaseTemplateApiResponse caseTemplateApiResponse = CaseTemplateApiResponse.builder().build();
+        when(caseTemplateApiMapper.toCaseTemplateApiDto(any())).thenReturn(caseTemplateApiResponse);
+        List<CaseTemplateApiResponse> response = caseTemplateApiService.listResponseByCaseTemplateId(MOCK_ID);
+        assertThat(response.size()).isEqualTo(MOCK_ORDER_NUMBER);
+    }
+
+    @Test
+    @DisplayName("Test the listResponseByCaseTemplateId method in the CaseTemplateApi service thrown exception")
+    void listResponseByCaseTemplateId_test_thrownException() {
+        List<CaseTemplateApiEntity> sceneCaseApiList = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
+        when(caseTemplateApiRepository.findAll(any(Example.class), any(Sort.class)))
+            .thenThrow(new ApiTestPlatformException(GET_CASE_TEMPLATE_API_LIST_BY_CASE_TEMPLATE_ID_ERROR));
+        assertThatThrownBy(() -> caseTemplateApiService.listResponseByCaseTemplateId(MOCK_ID))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test

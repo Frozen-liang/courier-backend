@@ -5,8 +5,6 @@ import java.util.List;
 
 public interface CustomizedSceneCaseApiRepository {
 
-    int findCurrentOrderBySceneCaseId(String sceneCaseId);
-
     List<SceneCaseApiEntity> findSceneCaseApiByApiIds(List<String> ids);
 
     List<SceneCaseApiEntity> findSceneCaseApiBySceneCaseIdAndIsExecuteAndIsRemove(String sceneCaseId,

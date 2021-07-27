@@ -95,10 +95,10 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
     }
 
     @Override
-    public List<SceneCaseEntity> getIdsByGroupId(String id) {
+    public List<SceneCaseEntity> getSceneCaseIdsByGroupIds(List<String> ids) {
         Query query = new Query();
         query.fields().include(ID.getFiled());
-        CommonFiled.GROUP_ID.is(id).ifPresent(query::addCriteria);
+        CommonFiled.GROUP_ID.in(ids).ifPresent(query::addCriteria);
         return mongoTemplate.find(query, SceneCaseEntity.class);
     }
 
