@@ -1,9 +1,9 @@
 package com.sms.satp.security.jwt;
 
-import static com.sms.satp.common.enums.RoleType.ENGINE;
 import static com.sms.satp.utils.JwtUtils.TOKEN_TYPE;
 import static com.sms.satp.utils.JwtUtils.TOKEN_USER_ID;
 
+import com.sms.satp.dto.UserEntityAuthority;
 import com.sms.satp.entity.system.SystemRoleEntity;
 import com.sms.satp.entity.system.UserEntity;
 import com.sms.satp.repository.SystemRoleRepository;
@@ -12,7 +12,7 @@ import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.security.strategy.SatpSecurityStrategy;
 import com.sms.satp.security.strategy.SecurityStrategyFactory;
-import com.sms.satp.service.UserGroupService;
+import com.sms.satp.service.UserService;
 import com.sms.satp.utils.JwtUtils;
 import com.sms.satp.utils.SecurityUtil;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -36,17 +36,16 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class JwtTokenManager {
 
-    private final UserRepository userRepository;
-    private final UserGroupService userGroupService;
+    private final UserService userService;
     private final SystemRoleRepository roleRepository;
     private final SecurityStrategyFactory securityStrategyFactory;
     private final SigningKeyResolver signingKeyResolver;
 
-    public JwtTokenManager(UserRepository userRepository, UserGroupService userGroupService,
-        SystemRoleRepository roleRepository, SecurityStrategyFactory securityStrategyFactory,
+    public JwtTokenManager(UserService userService,
+        SystemRoleRepository roleRepository,
+        SecurityStrategyFactory securityStrategyFactory,
         SigningKeyResolver signingKeyResolver) {
-        this.userRepository = userRepository;
-        this.userGroupService = userGroupService;
+        this.userService = userService;
         this.roleRepository = roleRepository;
         this.securityStrategyFactory = securityStrategyFactory;
         this.signingKeyResolver = signingKeyResolver;
@@ -65,13 +64,10 @@ public class JwtTokenManager {
             String id = (String) jwsHeader.get(TOKEN_USER_ID);
             TokenType tokenType = TokenType.valueOf((String) jwsHeader.get(TOKEN_TYPE));
 
-            Optional<UserEntity> optional = userRepository.findById(id);
-            if (optional.isPresent()) {
-                UserEntity userEntity = optional.get();
-                return SecurityUtil.newAuthentication(id, userEntity.getEmail(), userEntity.getUsername(),
-                    userGroupService.getAuthoritiesByUserGroup(userEntity.getGroupId()), tokenType);
-            }
-            return null;
+            UserEntityAuthority userEntityAuthority = userService.getUserDetailsByUserId(id);
+            return SecurityUtil.newAuthentication(id, userEntityAuthority.getUserEntity().getEmail(),
+                userEntityAuthority.getUserEntity().getUsername(),
+                userEntityAuthority.getAuthorities(), tokenType);
         } catch (Exception exception) {
             return null;
         }

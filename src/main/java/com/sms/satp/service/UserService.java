@@ -1,5 +1,6 @@
 package com.sms.satp.service;
 
+import com.sms.satp.dto.UserEntityAuthority;
 import com.sms.satp.dto.request.UserPasswordUpdateRequest;
 import com.sms.satp.dto.request.UserQueryListRequest;
 import com.sms.satp.dto.request.UserRequest;
@@ -23,4 +24,8 @@ public interface UserService {
     Boolean unlock(List<String> ids);
 
     Boolean updatePassword(UserPasswordUpdateRequest userPasswordUpdateRequest);
+
+    UserEntityAuthority getUserDetailsByUsernameOrEmail(String username);
+
+    UserEntityAuthority getUserDetailsByUserId(String id);
 }

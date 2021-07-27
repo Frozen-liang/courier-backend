@@ -1,12 +1,9 @@
 package com.sms.satp.security.userdetails;
 
-import com.sms.satp.entity.system.UserEntity;
-import com.sms.satp.repository.UserRepository;
+import com.sms.satp.dto.UserEntityAuthority;
 import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
-import com.sms.satp.service.UserGroupService;
-import java.util.List;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import com.sms.satp.service.UserService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,31 +13,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
-    private final UserGroupService userGroupService;
+    private final UserService userService;
 
-    public CustomUserDetailsService(UserRepository userRepository,
-        UserGroupService userGroupService) {
-        this.userRepository = userRepository;
-        this.userGroupService = userGroupService;
+    public CustomUserDetailsService(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Query user info
-        UserEntity userEntity =
-            userRepository.findByUsernameOrEmail(username, username)
-                .orElseThrow(
-                    () -> new UsernameNotFoundException(String.format("The user %s was not found.", username)));
+        UserEntityAuthority userEntityAuthority = userService.getUserDetailsByUsernameOrEmail(username);
 
-        List<SimpleGrantedAuthority> authorities = userGroupService.getAuthoritiesByUserGroup(userEntity.getGroupId());
+        UserDetails userDetails = User.withUsername(userEntityAuthority.getUserEntity().getUsername())
+            .password(userEntityAuthority.getUserEntity().getPassword())
+            .disabled(userEntityAuthority.getUserEntity().isRemoved()).accountExpired(false)
+            .credentialsExpired(false).accountLocked(false).authorities(userEntityAuthority.getAuthorities()).build();
 
-        // Build UserDetails info of the Security
-        UserDetails userDetails = User.withUsername(userEntity.getUsername())
-            .password(userEntity.getPassword())
-            .disabled(userEntity.isRemoved()).accountExpired(false)
-            .credentialsExpired(false).accountLocked(false).authorities(authorities).build();
-
-        return new CustomUser(userDetails, userEntity.getId(), userEntity.getEmail(), TokenType.USER);
+        return new CustomUser(userDetails, userEntityAuthority.getUserEntity().getId(),
+            userEntityAuthority.getUserEntity().getEmail(), TokenType.USER);
     }
 }

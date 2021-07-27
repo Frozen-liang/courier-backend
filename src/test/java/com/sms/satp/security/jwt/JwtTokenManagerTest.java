@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.dto.UserEntityAuthority;
 import com.sms.satp.entity.system.UserEntity;
 import com.sms.satp.repository.SystemRoleRepository;
 import com.sms.satp.repository.UserRepository;
@@ -15,7 +16,7 @@ import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.security.strategy.SecurityStrategyFactory;
 import com.sms.satp.security.strategy.impl.UserSecurityStrategy;
-import com.sms.satp.service.UserGroupService;
+import com.sms.satp.service.UserService;
 import com.sms.satp.utils.JwtUtils;
 import com.sms.satp.utils.SecurityUtil;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -62,12 +63,10 @@ public class JwtTokenManagerTest {
     SecurityStrategyFactory securityStrategyFactory = mock(SecurityStrategyFactory.class);
     SigningKeyResolver signingKeyResolver = mock(SigningKeyResolver.class);
     UserSecurityStrategy userSecurityStrategy = mock(UserSecurityStrategy.class);
-    UserRepository userRepository = mock(UserRepository.class);
-    UserGroupService userGroupService = mock(UserGroupService.class);
+    UserService userService = mock(UserService.class);
     SystemRoleRepository roleRepository = mock(SystemRoleRepository.class);
-    JwtTokenManager jwtTokenManager = new JwtTokenManager(userRepository, userGroupService, roleRepository,
-        securityStrategyFactory,
-        signingKeyResolver);
+
+    JwtTokenManager jwtTokenManager = new JwtTokenManager(userService, roleRepository, securityStrategyFactory, signingKeyResolver);
 
     @Test
     @DisplayName("Generate token for user successfully")
@@ -108,10 +107,10 @@ public class JwtTokenManagerTest {
         String groupId = "groupId";
         jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
             .thenReturn(jwsHeader);
-        Optional<UserEntity> userEntityOptional =
-            Optional.ofNullable(UserEntity.builder().id(id).username(username).email(email).groupId(groupId).build());
-        when(userRepository.findById(id)).thenReturn(userEntityOptional);
-        when(userGroupService.getAuthoritiesByUserGroup(groupId)).thenReturn(Collections.emptyList());
+        UserEntity userEntity = UserEntity.builder().id(id).username(username).email(email).groupId(groupId).build();
+        UserEntityAuthority userEntityAuthority =
+            UserEntityAuthority.builder().userEntity(userEntity).authorities(Collections.emptyList()).build();
+        when(userService.getUserDetailsByUserId(id)).thenReturn(userEntityAuthority);
         Authentication mockAuthentication = mock(Authentication.class);
         securityUtilMockedStatic.when(() -> SecurityUtil.newAuthentication(id, email, username,
             Collections.emptyList(), TokenType.USER)).thenReturn(mockAuthentication);
@@ -124,7 +123,7 @@ public class JwtTokenManagerTest {
     public void createAuthenticationWhileThrowExceptionTest() {
         jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
             .thenReturn(jwsHeader);
-        when(userRepository.findById(id)).thenThrow(RuntimeException.class);
+//        when(userRepository.findById(id)).thenThrow(RuntimeException.class);
         Authentication authentication = jwtTokenManager.createAuthentication(token);
         assertThat(authentication).isEqualTo(null);
     }
@@ -134,7 +133,6 @@ public class JwtTokenManagerTest {
     public void createAuthenticationFailedTest() {
         jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
             .thenReturn(jwsHeader);
-        when(userRepository.findById(id)).thenReturn(Optional.empty());
         Authentication authentication = jwtTokenManager.createAuthentication(token);
         assertThat(authentication).isEqualTo(null);
     }
