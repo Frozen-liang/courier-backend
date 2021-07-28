@@ -24,8 +24,8 @@ public class AdvancedSetting {
      * 是否自动跟随请求重定向.
      */
     @Default
-    @JsonProperty("isRequestRedirect")
-    @Field(name = "isRequestRedirect")
-    private boolean requestRedirect = true;
+    @JsonProperty("isEnableRedirect")
+    @Field(name = "isEnableRedirect")
+    private boolean enableRedirect = true;
 
 }
