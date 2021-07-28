@@ -21,7 +21,7 @@ import com.sms.satp.dto.request.ApiPageRequest;
 import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.group.ApiGroupEntity;
-import com.sms.satp.entity.mongo.LookupQueryField;
+import com.sms.satp.entity.mongo.LookupField;
 import com.sms.satp.entity.mongo.LookupVo;
 import com.sms.satp.entity.mongo.QueryVo;
 import com.sms.satp.repository.ApiGroupRepository;
@@ -36,8 +36,6 @@ import java.util.stream.Stream;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -60,7 +58,7 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
 
     @Override
     public Optional<ApiResponse> findById(String id) {
-        return commonRepository.findById(id, API.getCollectionName(), getLookupVos(), ApiResponse.class);
+        return commonRepository.findById(id, API.getCollectionName(), getLookupVo(), ApiResponse.class);
     }
 
     @Override
@@ -68,15 +66,15 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         QueryVo queryVo =
             QueryVo.builder().collectionName(API.getCollectionName()).criteriaList(getCriteriaList(apiPageRequest))
                 .build();
-        List<LookupVo> lo = getLookupVos();
-        queryVo.setLookupVos(lo);
+        List<LookupVo> lookupVo = getLookupVo();
+        queryVo.setLookupVo(lookupVo);
         return commonRepository.page(queryVo, apiPageRequest, ApiResponse.class);
     }
 
-    private List<LookupVo> getLookupVos() {
-        List<LookupQueryField> tagField = List.of(LookupQueryField.builder().field(TAG_NAME).build());
-        List<LookupQueryField> groupField =
-            List.of(LookupQueryField.builder().field(GROUP_NAME).alias("groupName").build());
+    private List<LookupVo> getLookupVo() {
+        List<LookupField> tagField = List.of(LookupField.builder().field(TAG_NAME).build());
+        List<LookupField> groupField =
+            List.of(LookupField.builder().field(GROUP_NAME).alias("groupName").build());
         return List.of(LookupVo.builder().from(API_TAG).localField(TAG_ID).foreignField(ID).queryFields(tagField)
                 .as("apiTag").build(),
             LookupVo.builder().from(API_GROUP).localField(GROUP_ID).foreignField(ID).queryFields(groupField)
@@ -104,19 +102,6 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         Update update = Update.update(REMOVE.getName(), Boolean.TRUE);
         update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
         mongoTemplate.updateMulti(query, update, ApiEntity.class);
-    }
-
-    private void createLookUpOperation(List<AggregationOperation> aggregationOperations) {
-        LookupOperation apiTagLookupOperation =
-            LookupOperation.newLookup().from(API_TAG.getCollectionName()).localField(TAG_ID.getName())
-                .foreignField(ID.getName())
-                .as("apiTag");
-        LookupOperation apiGroupLookupOperation =
-            LookupOperation.newLookup().from(API_GROUP.getCollectionName()).localField(GROUP_ID.getName())
-                .foreignField(ID.getName())
-                .as("apiGroup");
-        aggregationOperations.add(apiTagLookupOperation);
-        aggregationOperations.add(apiGroupLookupOperation);
     }
 
     private List<Optional<Criteria>> getCriteriaList(ApiPageRequest apiPageRequest) {

@@ -7,6 +7,7 @@ import com.sms.satp.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.entity.job.ApiTestCaseJobReport;
 import com.sms.satp.security.pojo.CustomUser;
+import java.util.List;
 import org.springframework.data.domain.Page;
 
 public interface ApiTestCaseJobService {
@@ -20,4 +21,6 @@ public interface ApiTestCaseJobService {
     ApiTestCaseJobResponse get(String jobId);
 
     void apiTest(ApiTestRequest apiTestRequest, CustomUser currentUser);
+
+    void reallocateJob(List<String> engineIds);
 }

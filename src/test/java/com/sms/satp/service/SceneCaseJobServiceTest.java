@@ -1,5 +1,18 @@
 package com.sms.satp.service;
 
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.sms.satp.common.enums.JobStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.AddSceneCaseJobRequest;
@@ -32,6 +45,7 @@ import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.impl.SceneCaseJobServiceImpl;
+import com.sms.satp.utils.ExceptionUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -41,19 +55,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @DisplayName("Test cases for SceneCaseJobServiceTest")
 class SceneCaseJobServiceTest {
@@ -85,6 +86,10 @@ class SceneCaseJobServiceTest {
 
     private final static String MOCK_ID = "1";
     private final static Integer MOCK_NUM = 1;
+    private static final String ENGINE_ID = "/engine/13/invoke";
+    private static final List<String> ENGINE_ID_LIST = Collections.singletonList(ENGINE_ID);
+    private final SceneCaseJobEntity sceneCasejobEntity =
+        SceneCaseJobEntity.builder().id(ObjectId.get().toString()).createUserId(ObjectId.get().toString()).build();
     private final CustomUser customUser = new CustomUser("username", "", Collections.emptyList(),
         ObjectId.get().toString(), "", TokenType.USER);
 
@@ -115,10 +120,10 @@ class SceneCaseJobServiceTest {
         JobDataCollection dataCollection1 = JobDataCollection.builder().build();
         when(jobMapper.toJobDataCollection(any())).thenReturn(dataCollection1);
         SceneCaseJobEntity sceneCaseJob = SceneCaseJobEntity.builder().id(MOCK_ID).build();
-        when(sceneCaseJobRepository.insert(any(SceneCaseJobEntity.class))).thenReturn(sceneCaseJob);
+        when(sceneCaseJobRepository.save(any(SceneCaseJobEntity.class))).thenReturn(sceneCaseJob);
         AddSceneCaseJobRequest request = getAddRequest();
         sceneCaseJobService.runJob(request, customUser);
-        verify(sceneCaseJobRepository, times(1)).insert(any(SceneCaseJobEntity.class));
+        verify(sceneCaseJobRepository, times(1)).save(any(SceneCaseJobEntity.class));
     }
 
     @Test
@@ -129,11 +134,11 @@ class SceneCaseJobServiceTest {
         Optional<SceneCaseEntity> sceneCase = Optional.ofNullable(SceneCaseEntity.builder().build());
         when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
         SceneCaseJobEntity sceneCaseJob = SceneCaseJobEntity.builder().id(MOCK_ID).build();
-        when(sceneCaseJobRepository.insert(any(SceneCaseJobEntity.class))).thenReturn(sceneCaseJob);
+        when(sceneCaseJobRepository.save(any(SceneCaseJobEntity.class))).thenReturn(sceneCaseJob);
         AddSceneCaseJobRequest request = getAddRequest();
         request.setDataCollectionRequest(null);
         sceneCaseJobService.runJob(request, customUser);
-        verify(sceneCaseJobRepository, times(1)).insert(any(SceneCaseJobEntity.class));
+        verify(sceneCaseJobRepository, times(1)).save(any(SceneCaseJobEntity.class));
     }
 
     @Test
@@ -239,6 +244,40 @@ class SceneCaseJobServiceTest {
     void get_test_thrownException() {
         when(sceneCaseJobRepository.findOne(any())).thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_JOB_ERROR));
         assertThatThrownBy(() -> sceneCaseJobService.get(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the reallocateJob method in the SceneCaseJob service")
+    public void reallocateJob_test() {
+        when(sceneCaseJobRepository.removeByEngineIdInAndJobStatus(ENGINE_ID_LIST, JobStatus.RUNNING))
+            .thenReturn(Collections.singletonList(sceneCasejobEntity));
+        when(caseDispatcherService.dispatch(any(SceneCaseJobResponse.class))).thenReturn(ENGINE_ID);
+        sceneCaseJobService.reallocateJob(ENGINE_ID_LIST);
+        verify(sceneCaseJobRepository, times(1)).save(any(SceneCaseJobEntity.class));
+    }
+
+    @Test
+    @DisplayName("An apiTestPlatformException occurred while run reallocateJob in SceneCaseJob service")
+    public void reallocateJob_ApiTestPlatformException_test() {
+        when(sceneCaseJobRepository.removeByEngineIdInAndJobStatus(ENGINE_ID_LIST, JobStatus.RUNNING))
+            .thenReturn(Collections.singletonList(sceneCasejobEntity));
+        when(jobMapper.toSceneCaseJobResponse(sceneCasejobEntity)).thenReturn(SceneCaseJobResponse.builder().build());
+        when(caseDispatcherService.dispatch(any(SceneCaseJobResponse.class)))
+            .thenThrow(ExceptionUtils.mpe(""));
+        sceneCaseJobService.reallocateJob(ENGINE_ID_LIST);
+        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("An exception occurred while run reallocateJob in SceneCaseJob service")
+    public void reallocateJob_Exception_test() {
+        when(sceneCaseJobRepository.removeByEngineIdInAndJobStatus(ENGINE_ID_LIST, JobStatus.RUNNING))
+            .thenReturn(List.of(sceneCasejobEntity));
+        when(jobMapper.toSceneCaseJobResponse(sceneCasejobEntity)).thenReturn(SceneCaseJobResponse.builder().build());
+        when(caseDispatcherService.dispatch(any(SceneCaseJobResponse.class)))
+            .thenThrow(new RuntimeException());
+        sceneCaseJobService.reallocateJob(ENGINE_ID_LIST);
+        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
     }
 
     private AddSceneCaseJobRequest getAddRequest() {

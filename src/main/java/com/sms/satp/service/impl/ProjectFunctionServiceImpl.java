@@ -167,7 +167,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
             .ids(ids)
             .global(true)
             .key(projectId)
-            .operationType(operationType)
+            .operationType(operationType.getCode())
             .build();
         messageService.enginePullFunctionMessage(functionMessage);
     }

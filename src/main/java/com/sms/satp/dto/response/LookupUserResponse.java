@@ -6,14 +6,13 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
+@Data
 @EqualsAndHashCode(callSuper = true)
-public class WorkspaceResponse extends LookupUserResponse {
+@SuperBuilder
+public class LookupUserResponse extends BaseResponse {
 
-    private String name;
-
-    private Integer limit;
+    private String createUsername;
+    private String createNickname;
 }
