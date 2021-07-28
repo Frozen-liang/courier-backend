@@ -1,18 +1,19 @@
 package com.sms.satp.mapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.sms.satp.dto.response.FileInfoResponse;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.BsonObjectId;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Tests for FileMapper")
 public class FileMapperTest {
