@@ -38,8 +38,8 @@ import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
-import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
+import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseRepository;
 import com.sms.satp.security.TokenType;
@@ -71,8 +71,8 @@ class SceneCaseJobServiceTest {
 
     private final CaseTemplateRepository caseTemplateRepository = mock(CaseTemplateRepository.class);
     private final CaseTemplateApiRepository caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
-    private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository =
-        mock(CustomizedSceneCaseApiRepository.class);
+    private final SceneCaseApiRepository sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
+
     private final SceneCaseJobService sceneCaseJobService = new SceneCaseJobServiceImpl(
         projectEnvironmentService,
         sceneCaseRepository,
@@ -82,7 +82,7 @@ class SceneCaseJobServiceTest {
         caseDispatcherService,
         customizedCaseTemplateApiRepository,
         caseTemplateRepository,
-        caseTemplateApiRepository, customizedSceneCaseApiRepository);
+        caseTemplateApiRepository, sceneCaseApiRepository);
 
     private final static String MOCK_ID = "1";
     private final static Integer MOCK_NUM = 1;
@@ -103,7 +103,7 @@ class SceneCaseJobServiceTest {
         Optional<CaseTemplateEntity> sceneCaseApi = Optional.ofNullable(CaseTemplateEntity.builder().build());
         when(caseTemplateRepository.findById(any())).thenReturn(sceneCaseApi);
         List<SceneCaseApiEntity> sceneCaseApiList1 = getSceneCaseApiList();
-        when(customizedSceneCaseApiRepository.findSceneCaseApiBySceneCaseIdAndIsRemove(any(), anyBoolean()))
+        when(sceneCaseApiRepository.findSceneCaseApiEntitiesBySceneCaseIdAndRemoved(any(), anyBoolean()))
             .thenReturn(sceneCaseApiList1);
         List<CaseTemplateApiEntity> templateApiList =
             Lists.newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID).order(MOCK_NUM).build());

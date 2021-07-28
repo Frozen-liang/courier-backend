@@ -34,14 +34,6 @@ public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCase
     }
 
     @Override
-    public List<SceneCaseApiEntity> findSceneCaseApiBySceneCaseIdAndIsRemove(String sceneCaseId, boolean isRemove) {
-        Query query = new Query();
-        SceneField.SCENE_CASE_ID.is(sceneCaseId).ifPresent(query::addCriteria);
-        CommonField.REMOVE.is(isRemove).ifPresent(query::addCriteria);
-        return mongoTemplate.find(query, SceneCaseApiEntity.class);
-    }
-
-    @Override
     public Boolean deleteSceneCaseApiConn(List<String> caseTemplateApiId) {
         for (String id : caseTemplateApiId) {
             Query query = new Query();

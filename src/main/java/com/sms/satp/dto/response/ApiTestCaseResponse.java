@@ -1,6 +1,7 @@
 package com.sms.satp.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sms.satp.entity.api.common.AdvancedSetting;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ResponseTimeVerification;
 import java.util.List;
@@ -44,6 +45,7 @@ public class ApiTestCaseResponse extends BaseResponse {
     private ResponseTimeVerification responseTimeVerification;
     @JsonProperty("isExecute")
     private boolean execute;
+    private AdvancedSetting advancedSetting;
     private Integer isSuccess;
     private String testTime;
     private String createUsername;

@@ -39,16 +39,6 @@ class CustomizedSceneCaseApiRepositoryTest {
     }
 
     @Test
-    @DisplayName("Test the findSceneCaseApiBySceneCaseIdAndIsExecute method in the CustomizedSceneCaseApiRepository")
-    void findSceneCaseApiBySceneCaseIdAndIsExecute_test() {
-        when(mongoTemplate.find(any(), any()))
-            .thenReturn(Lists.newArrayList(SceneCaseApiEntity.builder().build()));
-        List<SceneCaseApiEntity> sceneCaseApiList = customizedSceneCaseApiRepository
-            .findSceneCaseApiBySceneCaseIdAndIsRemove(MOCK_ID, Boolean.FALSE);
-        assertThat(sceneCaseApiList).isNotEmpty();
-    }
-
-    @Test
     @DisplayName("Test the deleteSceneCaseApiConn method in the CustomizedSceneCaseApiRepository")
     void deleteSceneCaseApiConn_test() {
         UpdateResult result = UpdateResult.unacknowledged();

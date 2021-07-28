@@ -1,6 +1,7 @@
 package com.sms.satp.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sms.satp.entity.api.common.AdvancedSetting;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,6 +66,8 @@ public class JobApiTestCaseResponse {
     private String modifyUserId;
 
     private String modifyDateTime;
+
+    private AdvancedSetting advancedSetting;
 
     private CaseReportResponse caseReport;
 
