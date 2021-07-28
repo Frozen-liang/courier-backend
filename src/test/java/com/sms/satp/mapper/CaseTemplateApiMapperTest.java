@@ -1,19 +1,18 @@
 package com.sms.satp.mapper;
 
 import com.google.common.collect.Lists;
-import com.sms.satp.common.enums.ApiJsonType;
-import com.sms.satp.common.enums.ApiProtocol;
-import com.sms.satp.common.enums.ApiRequestParamType;
-import com.sms.satp.common.enums.ApiType;
-import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.common.enums.*;
 import com.sms.satp.dto.request.AddCaseTemplateApiRequest;
+import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
 import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.satp.entity.scenetest.CaseTemplateApiEntity;
-import java.util.List;
+import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -21,9 +20,8 @@ import static org.mockito.Mockito.mock;
 @DisplayName("Tests for CaseTemplateApiMapper")
 class CaseTemplateApiMapperTest {
 
-    private ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
-
-    private CaseTemplateApiMapper caseTemplateApiMapper = new CaseTemplateApiMapperImpl(apiTestCaseMapper);
+    private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
+    private final CaseTemplateApiMapper caseTemplateApiMapper = new CaseTemplateApiMapperImpl(apiTestCaseMapper);
     private static final String MOCK_ID = "1";
 
     @Test
@@ -47,7 +45,7 @@ class CaseTemplateApiMapperTest {
     void toCaseTemplateApiListByUpdateRequestList_test() {
         List<UpdateCaseTemplateApiRequest> updateCaseTemplateApiRequestList = Lists.newArrayList(getTemplateDto());
         List<CaseTemplateApiEntity> apiList = caseTemplateApiMapper
-            .toCaseTemplateApiListByUpdateRequestList(updateCaseTemplateApiRequestList);
+                .toCaseTemplateApiListByUpdateRequestList(updateCaseTemplateApiRequestList);
         assertThat(apiList.size()).isEqualTo(updateCaseTemplateApiRequestList.size());
     }
 
@@ -55,40 +53,172 @@ class CaseTemplateApiMapperTest {
     @DisplayName("Test the toCaseTemplateApiListByAddRequestList method in the CaseTemplateApiMapper")
     void toCaseTemplateApiListByAddRequestList_test() {
         List<AddCaseTemplateApiRequest> addCaseTemplateApiRequestList = Lists.newArrayList(
-            AddCaseTemplateApiRequest.builder().build());
+                AddCaseTemplateApiRequest.builder().build());
         List<CaseTemplateApiEntity> caseTemplateApiList =
-            caseTemplateApiMapper.toCaseTemplateApiListByAddRequestList(addCaseTemplateApiRequestList);
+                caseTemplateApiMapper.toCaseTemplateApiListByAddRequestList(addCaseTemplateApiRequestList);
         assertThat(caseTemplateApiList).isNotEmpty();
     }
 
     private CaseTemplateApiEntity getTemplateApi() {
         return CaseTemplateApiEntity.builder()
-            .id(MOCK_ID)
-            .apiType(ApiType.API)
-            .apiTestCase(ApiTestCaseEntity.builder()
-                .apiProtocol(ApiProtocol.HTTPS)
-                .requestMethod(RequestMethod.GET)
-                .apiRequestParamType(ApiRequestParamType.FORM_DATA)
-                .apiResponseJsonType(ApiJsonType.OBJECT)
-                .apiRequestJsonType(ApiJsonType.OBJECT)
-                .apiId(MOCK_ID)
-                .build())
-            .caseTemplateId(MOCK_ID)
-            .build();
+                .id(MOCK_ID)
+                .apiType(ApiType.API)
+                .apiTestCase(ApiTestCaseEntity.builder()
+                        .apiProtocol(ApiProtocol.HTTPS)
+                        .requestMethod(RequestMethod.GET)
+                        .apiRequestParamType(ApiRequestParamType.FORM_DATA)
+                        .apiResponseJsonType(ApiJsonType.OBJECT)
+                        .apiRequestJsonType(ApiJsonType.OBJECT)
+                        .apiId(MOCK_ID)
+                        .build())
+                .caseTemplateId(MOCK_ID)
+                .build();
     }
 
     private UpdateCaseTemplateApiRequest getTemplateDto() {
         return UpdateCaseTemplateApiRequest.builder()
-            .id(MOCK_ID)
-            .caseTemplateId(MOCK_ID)
-            .build();
+                .id(MOCK_ID)
+                .caseTemplateId(MOCK_ID)
+                .build();
     }
 
     private CaseTemplateApiResponse getTemplateApiResponse() {
         return CaseTemplateApiResponse.builder()
-            .id(MOCK_ID)
-            .caseTemplateId(MOCK_ID)
-            .build();
+                .id(MOCK_ID)
+                .caseTemplateId(MOCK_ID)
+                .build();
     }
 
+
+    @Test
+    @DisplayName("Test the updateCaseTemplateApiRequest in toCaseTemplateApiByUpdateRequest is null")
+    void toCaseTemplateApiByUpdateRequest_isNull() {
+        assertThat(caseTemplateApiMapper.toCaseTemplateApiByUpdateRequest(null)).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the caseTemplateApi in toCaseTemplateApiDto is null")
+    void toCaseTemplateApiDto_isNull() {
+        assertThat(caseTemplateApiMapper.toCaseTemplateApiDto(null)).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the updateCaseTemplateApiRequestList in toCaseTemplateApiListByUpdateRequestList is null")
+    void toCaseTemplateApiListByUpdateRequestList_isNull() {
+        assertThat(caseTemplateApiMapper.toCaseTemplateApiListByUpdateRequestList(null)).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the addCaseTemplateApiRequestList in toCaseTemplateApiListByAddRequestList is null")
+    void toCaseTemplateApiListByAddRequestList_isNull() {
+        assertThat(caseTemplateApiMapper.toCaseTemplateApiListByAddRequestList(null)).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the addCaseTemplateApiRequest in toCaseTemplateApi is null")
+    void toCaseTemplateApi_isNull() {
+        assertThat(caseTemplateApiMapper.toCaseTemplateApi(null)).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the toSceneCaseList method in the CaseTemplateApiMapper")
+    void toSceneCaseListTest() {
+        List<CaseTemplateApiEntity> caseTemplateApiEntities = Lists.newArrayList();
+        assertThat(caseTemplateApiMapper.toSceneCaseList(caseTemplateApiEntities)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the toSceneCaseList is Null method in the CaseTemplateApiMapper")
+    void toSceneCaseListTest_isNull() {
+        assertThat(caseTemplateApiMapper.toSceneCaseList(null)).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the toCaseTemplateApiListBySceneCaseApiList method in the CaseTemplateApiMapper")
+    void toCaseTemplateApiListBySceneCaseApiListTest() {
+        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList();
+        assertThat(caseTemplateApiMapper.toCaseTemplateApiListBySceneCaseApiList(sceneCaseApiList)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the toCaseTemplateApiListBySceneCaseApiList is null method in the CaseTemplateApiMapper")
+    void toCaseTemplateApiListBySceneCaseApiListTest_isNull() {
+        assertThat(caseTemplateApiMapper.toCaseTemplateApiListBySceneCaseApiList(null)).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the toCaseTemplateApiBySceneCaseApi method in the CaseTemplateApiMapper")
+    void toCaseTemplateApiBySceneCaseApiTest() {
+        SceneCaseApiEntity sceneCaseApi = SceneCaseApiEntity.builder().build();
+        assertThat(caseTemplateApiMapper.toCaseTemplateApiBySceneCaseApi(sceneCaseApi)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the toCaseTemplateApiBySceneCaseApi method in the CaseTemplateApiMapper")
+    void toCaseTemplateApiBySceneCaseApiTest_isNull() {
+        assertThat(caseTemplateApiMapper.toCaseTemplateApiBySceneCaseApi(null)).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the toCaseTemplateApiDtoList method in the CaseTemplateApiMapper")
+    void toCaseTemplateApiDtoListTest() {
+        List<CaseTemplateApiEntity> caseTemplateApiList = Lists.newArrayList();
+        assertThat(caseTemplateApiMapper.toCaseTemplateApiDtoList(caseTemplateApiList)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the toCaseTemplateApiDtoList is null method in the CaseTemplateApiMapper")
+    void toCaseTemplateApiDtoListTest_isNull() {
+        assertThat(caseTemplateApiMapper.toCaseTemplateApiDtoList(null)).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the apiTestCaseRequestToApiTestCaseEntity is null method in the CaseTemplateApiMapper")
+    void apiTestCaseRequestToApiTestCaseEntityTest() {
+        ApiTestCaseRequest apiTestCaseRequest = ApiTestCaseRequest.builder()
+                .tagIds(Lists.newArrayList())
+                .requestHeaders(Lists.newArrayList())
+                .responseHeaders(Lists.newArrayList())
+                .pathParams(Lists.newArrayList())
+                .restfulParams(Lists.newArrayList())
+                .responseParams(Lists.newArrayList())
+                .responseParams(Lists.newArrayList())
+                .requestParams(Lists.newArrayList())
+                .build();
+        AddCaseTemplateApiRequest request = AddCaseTemplateApiRequest.builder().apiTestCase(apiTestCaseRequest).build();
+        assertThat(caseTemplateApiMapper.toCaseTemplateApi(request)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the apiTestCaseRequestToApiTestCaseEntity is null method in the CaseTemplateApiMapper")
+    void toSceneCaseList_Test() {
+        CaseTemplateApiEntity caseTemplateApiEntity = CaseTemplateApiEntity.builder().build();
+        assertThat(caseTemplateApiMapper.toSceneCaseList(Lists.newArrayList(caseTemplateApiEntity))).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the caseTemplateApiEntityToSceneCaseApiEntity method in the CaseTemplateApiMapper")
+    void toCaseTemplateApiListBySceneCaseApiList_Test() {
+        SceneCaseApiEntity sceneCaseApiEntity=SceneCaseApiEntity.builder().build();
+        assertThat(caseTemplateApiMapper.toCaseTemplateApiListBySceneCaseApiList(Lists.newArrayList(sceneCaseApiEntity))).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the caseTemplateApiEntityToSceneCaseApiEntity method in the CaseTemplateApiMapper")
+    void toCaseTemplateApiDtoList_Test() {
+        CaseTemplateApiEntity caseTemplateApiEntity=CaseTemplateApiEntity.builder().build();
+        assertThat(caseTemplateApiMapper.toCaseTemplateApiDtoList(Lists.newArrayList(caseTemplateApiEntity))).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the apiTestCaseRequestToApiTestCaseEntity is null method in the CaseTemplateApiMapper")
+    void caseTemplateApiEntityToSceneCaseApiEntity_Test() {
+        CaseTemplateApiEntity dto=null;
+        List<CaseTemplateApiEntity> caseTemplateApiList=Lists.newArrayList(dto);
+        assertThat(caseTemplateApiMapper.toSceneCaseList(caseTemplateApiList)).size().isEqualTo(1);
+    }
+
+
+
 }
+
