@@ -29,7 +29,6 @@ import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.repository.CaseTemplateApiRepository;
 import com.sms.satp.repository.CaseTemplateRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateApiRepository;
-import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.repository.CustomizedSceneCaseJobRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseJobRepository;
@@ -145,10 +144,9 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                 throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
             }
             List<JobSceneCaseApi> caseList = getApiCaseList(request);
-            String projectId = sceneCase.isEmpty() ? caseTemplate.get().getProjectId() : sceneCase.get().getProjectId();
             if (Objects.isNull(request.getDataCollectionRequest())) {
                 SceneCaseJobEntity sceneCaseJob = getSceneCaseJobEntity(request, currentUser, jobEnvironment,
-                    caseList, projectId);
+                    caseList);
                 String engineId = caseDispatcherService.dispatch(jobMapper.toSceneCaseJobResponse(sceneCaseJob));
                 sceneCaseJob.setEngineId(engineId);
                 sceneCaseJobRepository.save(sceneCaseJob);
@@ -158,7 +156,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                         .toJobDataCollection(request.getDataCollectionRequest());
                     jobDataCollection.setTestData(jobMapper.toTestDataEntity(testData));
                     SceneCaseJobEntity sceneCaseJob = getSceneCaseJobEntity(request, currentUser, jobEnvironment,
-                        caseList, projectId);
+                        caseList);
                     sceneCaseJob.setDataCollection(jobDataCollection);
                     String engineId = caseDispatcherService.dispatch(jobMapper.toSceneCaseJobResponse(sceneCaseJob));
                     sceneCaseJob.setEngineId(engineId);
@@ -199,13 +197,14 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     }
 
     private SceneCaseJobEntity getSceneCaseJobEntity(AddSceneCaseJobRequest request, CustomUser currentUser,
-        JobEnvironment jobEnvironment, List<JobSceneCaseApi> caseList, String projectId) {
+        JobEnvironment jobEnvironment, List<JobSceneCaseApi> caseList) {
         return SceneCaseJobEntity.builder()
             .id(ObjectId.get().toString())
-            .projectId(projectId)
+            .projectId(request.getProjectId())
             .jobStatus(JobStatus.RUNNING)
             .environment(jobEnvironment)
             .apiTestCase(caseList)
+            .lock(request.isLock())
             .createDateTime(LocalDateTime.now())
             .modifyDateTime(LocalDateTime.now())
             .workspaceId(request.getWorkspaceId())

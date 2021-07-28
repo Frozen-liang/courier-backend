@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,9 @@ public class AddSceneCaseJobRequest {
     private String caseTemplateId;
 
     private String projectId;
+
+    @JsonProperty("isLock")
+    private boolean lock;
 
     private DataCollectionRequest dataCollectionRequest;
 
