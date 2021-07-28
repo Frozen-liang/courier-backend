@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -20,6 +21,11 @@ public class MD5UtilTest {
 
     static {
         digestUtilsMockedStatic = Mockito.mockStatic(DigestUtils.class);
+    }
+
+    @AfterAll
+    public static void close() {
+        digestUtilsMockedStatic.close();
     }
 
     @Test
