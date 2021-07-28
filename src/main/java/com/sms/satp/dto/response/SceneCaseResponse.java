@@ -1,5 +1,6 @@
 package com.sms.satp.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,4 +25,6 @@ public class SceneCaseResponse extends BaseResponse {
     private List<String> tagName;
     private List<String> tagId;
     private Integer priority;
+    @JsonProperty("isLock")
+    private boolean lock;
 }
