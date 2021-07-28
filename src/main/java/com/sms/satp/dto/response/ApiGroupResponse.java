@@ -11,11 +11,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class ApiGroupResponse extends BaseResponse {
+public class ApiGroupResponse extends TreeResponse {
 
     private String projectId;
     private String name;
-    private String parentId;
-    private Integer line;
-    private boolean hasNext;
 }

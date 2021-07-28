@@ -1,5 +1,9 @@
 package com.sms.satp.service.impl;
 
+import static com.sms.satp.common.enums.OperationModule.API_GROUP;
+import static com.sms.satp.common.enums.OperationType.ADD;
+import static com.sms.satp.common.enums.OperationType.EDIT;
+import static com.sms.satp.common.enums.OperationType.REMOVE;
 import static com.sms.satp.common.exception.ErrorCode.ADD_API_GROUP_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_API_GROUP_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_API_GROUP_ERROR;
@@ -7,9 +11,12 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_GROUP_LIST_ERROR;
 import static com.sms.satp.utils.Assert.isTrue;
 
+import com.sms.satp.common.aspect.annotation.Enhance;
+import com.sms.satp.common.aspect.annotation.LogRecord;
+import com.sms.satp.common.constant.Constants;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiGroupRequest;
-import com.sms.satp.dto.response.ApiGroupResponse;
+import com.sms.satp.dto.response.TreeResponse;
 import com.sms.satp.entity.group.ApiGroupEntity;
 import com.sms.satp.infrastructure.id.DefaultIdentifierGenerator;
 import com.sms.satp.mapper.ApiGroupMapper;
@@ -17,6 +24,7 @@ import com.sms.satp.repository.ApiGroupRepository;
 import com.sms.satp.repository.CustomizedApiRepository;
 import com.sms.satp.service.ApiGroupService;
 import com.sms.satp.utils.ExceptionUtils;
+import com.sms.satp.utils.TreeUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +36,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApiGroupServiceImpl implements ApiGroupService {
 
-    private static final int MAX_DEPTH = 3;
     private final ApiGroupRepository apiGroupRepository;
     private final CustomizedApiRepository customizedApiRepository;
     private final ApiGroupMapper apiGroupMapper;
@@ -42,18 +49,11 @@ public class ApiGroupServiceImpl implements ApiGroupService {
     }
 
     @Override
-    public List<ApiGroupResponse> list(String projectId, String groupId) {
+    public List<TreeResponse> list(String projectId) {
         try {
-            List<ApiGroupEntity> apiGroupEntityList;
-            if (StringUtils.isBlank(groupId)) {
-                apiGroupEntityList = apiGroupRepository.findByProjectIdAndDepth(projectId, 1);
-            } else {
-                apiGroupEntityList = apiGroupRepository.findByParentId(groupId);
-            }
-            List<ApiGroupResponse> apiGroupResponses = apiGroupMapper.toResponse(apiGroupEntityList);
-            apiGroupResponses
-                .forEach(response -> response.setHasNext(apiGroupRepository.existsByParentId(response.getId())));
-            return apiGroupResponses;
+            List<ApiGroupEntity> apiGroupEntities = apiGroupRepository
+                .findApiGroupEntitiesByProjectId(projectId);
+            return TreeUtils.createTree(apiGroupMapper.toResponse(apiGroupEntities));
         } catch (Exception e) {
             log.error("Failed to list the ApiGroupService!", e);
             throw new ApiTestPlatformException(GET_API_GROUP_LIST_ERROR);
@@ -61,6 +61,7 @@ public class ApiGroupServiceImpl implements ApiGroupService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = API_GROUP, template = "{{#request.name}}")
     public Boolean add(ApiGroupRequest request) {
         try {
             ApiGroupEntity apiGroupEntity = apiGroupMapper.toEntity(request);
@@ -70,11 +71,10 @@ public class ApiGroupServiceImpl implements ApiGroupService {
                 parentGroup = apiGroupRepository.findById(parentId)
                     .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ApiGroup", parentId));
             }
-            isTrue(parentGroup.getDepth() < MAX_DEPTH, "The group depth must be less than three.");
+            isTrue(parentGroup.getDepth() < Constants.MAX_DEPTH, "The group depth must be less than three.");
             Long realGroupId = identifierGenerator.nextId();
             parentGroup.getPath().add(realGroupId);
-            apiGroupEntity
-                .setDepth(parentGroup.getDepth() + 1);
+            apiGroupEntity.setDepth(parentGroup.getDepth() + 1);
             apiGroupEntity.setRealGroupId(realGroupId);
             apiGroupEntity.setPath(parentGroup.getPath());
             apiGroupRepository.insert(apiGroupEntity);
@@ -89,6 +89,7 @@ public class ApiGroupServiceImpl implements ApiGroupService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = API_GROUP, template = "{{#request.name}}")
     public Boolean edit(ApiGroupRequest request) {
         try {
             ApiGroupEntity apiGroupEntity = apiGroupMapper.toEntity(request);
@@ -111,6 +112,8 @@ public class ApiGroupServiceImpl implements ApiGroupService {
     }
 
     @Override
+    @LogRecord(operationType = REMOVE, operationModule = API_GROUP, template = "{{#result?.name}}",
+        enhance = @Enhance(enable = true))
     public Boolean delete(String id) {
         try {
             ApiGroupEntity apiGroup = apiGroupRepository.findById(id)

@@ -1,18 +1,16 @@
 package com.sms.satp.service;
 
-import com.sms.satp.dto.request.AddCaseTemplateGroupRequest;
-import com.sms.satp.dto.request.SearchCaseTemplateGroupRequest;
-import com.sms.satp.dto.request.UpdateCaseTemplateGroupRequest;
-import com.sms.satp.dto.response.CaseTemplateGroupResponse;
+import com.sms.satp.dto.request.CaseTemplateGroupRequest;
+import com.sms.satp.dto.response.TreeResponse;
 import java.util.List;
 
 public interface CaseTemplateGroupService {
 
-    Boolean add(AddCaseTemplateGroupRequest request);
+    Boolean add(CaseTemplateGroupRequest request);
 
-    Boolean edit(UpdateCaseTemplateGroupRequest request);
+    Boolean edit(CaseTemplateGroupRequest request);
 
     Boolean deleteById(String id);
 
-    List<CaseTemplateGroupResponse> getList(SearchCaseTemplateGroupRequest request);
+    List<TreeResponse> list(String projectId);
 }

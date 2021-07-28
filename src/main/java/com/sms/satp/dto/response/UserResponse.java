@@ -17,6 +17,10 @@ public class UserResponse {
 
     private String username;
 
+    private String nickname;
+
+    private String groupName;
+
     private String groupId;
 
     private String email;

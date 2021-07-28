@@ -1,5 +1,6 @@
 package com.sms.satp.parser.converter;
 
+import com.sms.satp.common.enums.SchemaType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.models.ArrayModel;
 import io.swagger.models.ComposedModel;
@@ -86,6 +87,8 @@ import org.apache.commons.lang3.StringUtils;
 @SuppressFBWarnings
 @Slf4j
 public class SwaggerConverter implements SwaggerParserExtension {
+
+    private static final List<SchemaType> OBJECT_TYPE = List.of(SchemaType.ARRAY, SchemaType.JSON, SchemaType.OBJECT);
 
     @Override
     public SwaggerParseResult readLocation(String url, List<AuthorizationValue> auths, ParseOptions options) {
@@ -1239,6 +1242,40 @@ public class SwaggerConverter implements SwaggerParserExtension {
 
         Schema bodySchema = new Schema();
 
+        if (bodyParams.size() == 1) {
+            BodyParameter sp = (BodyParameter) bodyParams.get(0);
+            Schema schema = convert(sp.getSchema());
+            if (StringUtils.isBlank(schema.getType()) && StringUtils.isNotBlank(schema.get$ref())) {
+                bodySchema = schema;
+            } else if (OBJECT_TYPE.contains(SchemaType.resolve(schema.getType(), schema.getFormat()))) {
+                bodySchema = schema;
+            } else {
+                multipleBodySchema(bodyParams, bodySchema);
+            }
+        } else {
+            multipleBodySchema(bodyParams, bodySchema);
+        }
+
+        List<String> mediaTypes = new ArrayList<>(globalConsumes);
+
+        if (consumes != null && consumes.size() > 0) {
+            mediaTypes.clear();
+            mediaTypes.addAll(consumes);
+        }
+
+        if (mediaTypes.size() == 0) {
+            mediaTypes.add("*/*");
+        }
+
+        Content content = new Content();
+        for (String type : mediaTypes) {
+            content.addMediaType(type, new MediaType().schema(bodySchema));
+        }
+        body.content(content);
+        return body;
+    }
+
+    private void multipleBodySchema(List<io.swagger.models.parameters.Parameter> bodyParams, Schema bodySchema) {
         for (io.swagger.models.parameters.Parameter param : bodyParams) {
             BodyParameter sp = (BodyParameter) param;
 
@@ -1257,23 +1294,6 @@ public class SwaggerConverter implements SwaggerParserExtension {
 
             bodySchema.addProperties(name, schema);
         }
-
-        List<String> mediaTypes = new ArrayList<>(globalConsumes);
-        if (consumes != null && consumes.size() > 0) {
-            mediaTypes.clear();
-            mediaTypes.addAll(consumes);
-        }
-
-        if (mediaTypes.size() == 0) {
-            mediaTypes.add("*/*");
-        }
-
-        Content content = new Content();
-        for (String type : mediaTypes) {
-            content.addMediaType(type, new MediaType().schema(bodySchema));
-        }
-        body.content(content);
-        return body;
     }
 
 

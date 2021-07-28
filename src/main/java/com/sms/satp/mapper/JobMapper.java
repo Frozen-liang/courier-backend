@@ -7,14 +7,18 @@ import com.sms.satp.dto.request.ApiTestRequest;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.ApiTestCaseJobPageResponse;
+import com.sms.satp.dto.response.ApiTestCaseJobReportResponse;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
+import com.sms.satp.dto.response.SceneCaseJobReportResponse;
 import com.sms.satp.dto.response.SceneCaseJobResponse;
 import com.sms.satp.entity.datacollection.TestData;
 import com.sms.satp.entity.env.ProjectEnvironmentEntity;
 import com.sms.satp.entity.job.ApiTestCaseJobEntity;
+import com.sms.satp.entity.job.ApiTestCaseJobReport;
 import com.sms.satp.entity.job.JobSceneCaseApi;
 import com.sms.satp.entity.job.SceneCaseJobEntity;
+import com.sms.satp.entity.job.SceneCaseJobReport;
 import com.sms.satp.entity.job.common.JobApiTestCase;
 import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
@@ -28,7 +32,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-    unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {EnumCommonUtils.class, ParamInfoMapper.class})
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    uses = {EnumCommonUtils.class, ParamInfoMapper.class, MatchParamInfoMapper.class,
+        ResponseResultVerificationMapper.class})
 public interface JobMapper {
 
     JobEnvironment toJobEnvironment(ProjectEnvironmentEntity projectEnvironment);
@@ -61,4 +67,8 @@ public interface JobMapper {
     @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
     @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
     SceneCaseJobResponse toSceneCaseJobResponse(SceneCaseJobEntity sceneCaseJob);
+
+    ApiTestCaseJobReportResponse toApiTestCaseJobReportResponse(ApiTestCaseJobReport caseJobReport);
+
+    SceneCaseJobReportResponse toSceneCaseJobReportResponse(SceneCaseJobReport caseJobReport);
 }

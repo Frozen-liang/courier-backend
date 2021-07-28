@@ -22,6 +22,13 @@ public class ApiTestCaseJobEntity {
 
     @MongoId(FieldType.OBJECT_ID)
     private String id;
+
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String workspaceId;
+
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String projectId;
+
     @Builder.Default
     @Field("isRemoved")
     private boolean removed = false;

@@ -1,6 +1,5 @@
 package com.sms.satp.dto.response;
 
-import com.sms.satp.entity.job.JobSceneCaseApi;
 import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
 import java.util.List;
@@ -17,7 +16,7 @@ public class SceneCaseJobResponse {
 
     private String id;
 
-    private List<JobSceneCaseApi> apiTestCase;
+    private List<JobSceneCaseApiResponse> apiTestCase;
 
     private JobEnvironment environment;
 
@@ -31,9 +30,9 @@ public class SceneCaseJobResponse {
      */
     private String createUserName;
 
-    private Long createUserId;
+    private String createUserId;
 
-    private Long modifyUserId;
+    private String modifyUserId;
 
     private String createDateTime;
 

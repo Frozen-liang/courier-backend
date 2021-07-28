@@ -1,218 +1,240 @@
-[
-  {
-    "name": "Admin",
-    "description": "管理员"
-  },
-  {
-    "name": "User_Create",
-    "description": "用户增加"
-  },
-  {
-    "name": "User_Update",
-    "description": "用户修改"
-  },
-  {
-    "name": "User_Status_Control",
-    "description": "锁定和解锁用户"
-  },
-  {
-    "name": "User_Query_All",
-    "description": "查询所有的用户"
-  },
-  {
-    "name": "User_Group_Create_Update_Delete",
-    "description": "用户分组增加修改删除,删除分组时还需要Api删除权限"
-  },
-  {
-    "name": "User_Group_Query_All",
-    "description": "查询所有的用户分组"
-  },
-  {
-    "name": "Project_Create",
-    "description": "项目增加"
-  },
-  {
-    "name": "Project_Update",
-    "description": "项目修改"
-  },
-  {
-    "name": "Project_Delete",
-    "description": "项目删除"
-  },
-  {
-    "name": "Project_Query_All",
-    "description": "查询所有的项目"
-  },
-  {
-    "name": "Global_Env_Create",
-    "description": "全局环境增加"
-  },
-  {
-    "name": "Global_Env_Update",
-    "description": "全局环境修改"
-  },
-  {
-    "name": "Global_Env_Delete",
-    "description": "全局环境删除"
-  },
-  {
-    "name": "Global_Env_Query_All",
-    "description": "查询所有的全局环境"
-  },
-  {
-    "name": "Global_Fun_Create",
-    "description": "全局函数增加"
-  },
-  {
-    "name": "Global_Fun_Update",
-    "description": "全局函数修改"
-  },
-  {
-    "name": "Global_Fun_Delete",
-    "description": "全局函数删除"
-  },
-  {
-    "name": "Global_Fun_Query_All",
-    "description": "查询所有的全局函数"
-  },
-  {
-    "name": "Project_Env_Create_Update_Delete",
-    "description": "项目环境增加修改删除"
-  },
-  {
-    "name": "Project_Env_Query_All",
-    "description": "查询所有的项目环境"
-  },
-  {
-    "name": "Project_Fun_Create_Update_Delete",
-    "description": "项目函数增加修改删除"
-  },
-  {
-    "name": "Project_Fun_Query_All",
-    "description": "查询所有的项目函数"
-  },
-  {
-    "name": "Api_Create_Update_Delete",
-    "description": "Api增加修改删除"
-  },
-  {
-    "name": "Api_Query_All",
-    "description": "查询所有的Api"
-  },
-  {
-    "name": "Api_Sync",
-    "description": "Api的同步"
-  },
-  {
-    "name": "Api_Import_By_File",
-    "description": "从文件导入Api"
-  },
-  {
-    "name": "Api_Group_Create_Update_Delete",
-    "description": "Api分组增加修改删除"
-  },
-  {
-    "name": "Api_Group_Query_All",
-    "description": "查询所有的Api分组"
-  },
-  {
-    "name": "Tag_Create_Update_Delete",
-    "description": "标签增加修改删除"
-  },
-  {
-    "name": "Tag_Query_All",
-    "description": "查询所有的标签"
-  },
-  {
-    "name": "Tag_Group_Create_Update_Delete",
-    "description": "标签分组增加修改删除"
-  },
-  {
-    "name": "Tag_Group_Query_All",
-    "description": "查询所有的标签分组"
-  },
-  {
-    "name": "Case_Create_Update_Delete",
-    "description": "用例增加修改删除"
-  },
-  {
-    "name": "Case_Query_All",
-    "description": "查询所有的用例"
-  },
-  {
-    "name": "Scene_Case_Create_Update_Delete",
-    "description": "流程用例增加修改删除"
-  },
-  {
-    "name": "Scene_Case_Query_All",
-    "description": "查询所有的流程用例"
-  },
-  {
-    "name": "Data_Collection_Create_Update_Delete",
-    "description": "数据连接增加修改删除"
-  },
-  {
-    "name": "Data_Collection_Query_All",
-    "description": "查询所有的数据连接"
-  },
-  {
-    "name": "Test_File_Create_Update_Delete",
-    "description": "测试文件增加修改删除"
-  },
-  {
-    "name": "Test_File_Query_All",
-    "description": "查询所有的测试文件"
-  },
-  {
-    "name": "Project_Import_Source_Create_Update_Delete",
-    "description": "项目导入资源增加修改删除"
-  },
-  {
-    "name": "Project_Import_Source_Query_All",
-    "description": "查询所有的项目导入资源"
-  },
-  {
-    "name": "Case_Template_Api_Create_Update_Delete",
-    "description": "用例模板Api增加修改删除"
-  },
-  {
-    "name": "Case_Template_Api_Query_All",
-    "description": "查询所有的用例模板Api"
-  },
-  {
-    "name": "Case_Template_Create_Update_Delete",
-    "description": "用例模板增加修改删除"
-  },
-  {
-    "name": "Case_Template_Query_All",
-    "description": "查询所有的用例模板"
-  },
-  {
-    "name": "Case_Template_Group_Create_Update_Delete",
-    "description": "用例模板分组增加修改删除"
-  },
-  {
-    "name": "Case_Template_Group_Query_All",
-    "description": "查询所有的用例模板分组"
-  },
-  {
-    "name": "Scene_Case_Api_Create_Update_Delete",
-    "description": "流程用例Api增加修改删除"
-  },
-  {
-    "name": "Scene_Case_Api_Query_All",
-    "description": "查询所有的流程用例Api"
-  },
-  {
-    "name": "Scene_Case_Group_Create_Update_Delete",
-    "description": "流程用例分组增加修改删除"
-  },
-  {
-    "name": "Scene_Case_Group_Query_All",
-    "description": "查询所有的流程用例分组"
-  },
-  {
-    "name": "Log_Query_All",
-    "description": "查询所有的日志"
-  }
-]
+{
+  "roles": [
+    {
+      "name": "Admin",
+      "description": "管理员"
+    },
+    {
+      "name": "User_Create",
+      "description": "用户增加"
+    },
+    {
+      "name": "User_Update",
+      "description": "用户修改"
+    },
+    {
+      "name": "User_Status_Control",
+      "description": "锁定和解锁用户"
+    },
+    {
+      "name": "User_Query_All",
+      "description": "查询所有的用户"
+    },
+    {
+      "name": "User_Group_Create_Update_Delete",
+      "description": "用户分组增加修改删除,删除分组时需要Api删除权限"
+    },
+    {
+      "name": "User_Group_Query_All",
+      "description": "查询所有的用户分组"
+    },
+    {
+      "name": "Project_Create",
+      "description": "项目增加"
+    },
+    {
+      "name": "Project_Update",
+      "description": "项目修改"
+    },
+    {
+      "name": "Project_Delete",
+      "description": "项目删除"
+    },
+    {
+      "name": "Project_Query_All",
+      "description": "查询所有的项目"
+    },
+    {
+      "name": "Global_Env_Create",
+      "description": "全局环境增加"
+    },
+    {
+      "name": "Global_Env_Update",
+      "description": "全局环境修改"
+    },
+    {
+      "name": "Global_Env_Delete",
+      "description": "全局环境删除"
+    },
+    {
+      "name": "Global_Env_Query_All",
+      "description": "查询所有的全局环境"
+    },
+    {
+      "name": "Global_Fun_Create",
+      "description": "全局函数增加"
+    },
+    {
+      "name": "Global_Fun_Update",
+      "description": "全局函数修改"
+    },
+    {
+      "name": "Global_Fun_Delete",
+      "description": "全局函数删除"
+    },
+    {
+      "name": "Global_Fun_Query_All",
+      "description": "查询所有的全局函数"
+    },
+    {
+      "name": "Project_Env_Create_Update_Delete",
+      "description": "项目环境增加修改删除"
+    },
+    {
+      "name": "Project_Env_Query_All",
+      "description": "查询所有的项目环境"
+    },
+    {
+      "name": "Project_Fun_Create_Update_Delete",
+      "description": "项目函数增加修改删除"
+    },
+    {
+      "name": "Project_Fun_Query_All",
+      "description": "查询所有的项目函数"
+    },
+    {
+      "name": "Api_Create_Update_Delete",
+      "description": "Api增加修改删除"
+    },
+    {
+      "name": "Api_Query_All",
+      "description": "查询所有的Api"
+    },
+    {
+      "name": "Api_Sync",
+      "description": "Api的同步"
+    },
+    {
+      "name": "Api_Import_By_File",
+      "description": "从文件导入Api"
+    },
+    {
+      "name": "Api_Group_Create_Update_Delete",
+      "description": "Api分组增加修改删除"
+    },
+    {
+      "name": "Api_Group_Query_All",
+      "description": "查询所有的Api分组"
+    },
+    {
+      "name": "Tag_Create_Update_Delete",
+      "description": "标签增加修改删除"
+    },
+    {
+      "name": "Tag_Query_All",
+      "description": "查询所有的标签"
+    },
+    {
+      "name": "Tag_Group_Create_Update_Delete",
+      "description": "标签分组增加修改删除"
+    },
+    {
+      "name": "Tag_Group_Query_All",
+      "description": "查询所有的标签分组"
+    },
+    {
+      "name": "Case_Create_Update_Delete",
+      "description": "用例增加修改删除"
+    },
+    {
+      "name": "Case_Query_All",
+      "description": "查询所有的用例"
+    },
+    {
+      "name": "Scene_Case_Create_Update_Delete",
+      "description": "流程用例增加修改删除"
+    },
+    {
+      "name": "Scene_Case_Query_All",
+      "description": "查询所有的流程用例"
+    },
+    {
+      "name": "Data_Collection_Create_Update_Delete",
+      "description": "数据连接增加修改删除"
+    },
+    {
+      "name": "Data_Collection_Query_All",
+      "description": "查询所有的数据连接"
+    },
+    {
+      "name": "Test_File_Create_Update_Delete",
+      "description": "测试文件增加修改删除"
+    },
+    {
+      "name": "Test_File_Query_All",
+      "description": "查询所有的测试文件"
+    },
+    {
+      "name": "Project_Import_Source_Create_Update_Delete",
+      "description": "项目导入资源增加修改删除"
+    },
+    {
+      "name": "Project_Import_Source_Query_All",
+      "description": "查询所有的项目导入资源"
+    },
+    {
+      "name": "Case_Template_Api_Create_Update_Delete",
+      "description": "用例模板Api增加修改删除"
+    },
+    {
+      "name": "Case_Template_Api_Query_All",
+      "description": "查询所有的用例模板Api"
+    },
+    {
+      "name": "Case_Template_Create_Update_Delete",
+      "description": "用例模板增加修改删除"
+    },
+    {
+      "name": "Case_Template_Query_All",
+      "description": "查询所有的用例模板"
+    },
+    {
+      "name": "Case_Template_Group_Create_Update_Delete",
+      "description": "用例模板分组增加修改删除"
+    },
+    {
+      "name": "Case_Template_Group_Query_All",
+      "description": "查询所有的用例模板分组"
+    },
+    {
+      "name": "Scene_Case_Api_Create_Update_Delete",
+      "description": "流程用例Api增加修改删除"
+    },
+    {
+      "name": "Scene_Case_Api_Query_All",
+      "description": "查询所有的流程用例Api"
+    },
+    {
+      "name": "Scene_Case_Group_Create_Update_Delete",
+      "description": "流程用例分组增加修改删除"
+    },
+    {
+      "name": "Scene_Case_Group_Query_All",
+      "description": "查询所有的流程用例分组"
+    },
+    {
+      "name": "Log_Query_All",
+      "description": "查询所有的日志"
+    },
+    {
+      "name": "Global_Fun_Find_All",
+      "description": "引擎查询所有全局函数",
+      "roleType": 1
+    },
+    {
+      "name": "Project_Fun_Find_All",
+      "description": "引擎查询所有项目函数",
+      "roleType": 1
+    },
+    {
+      "name": "Global_Fun_Pull",
+      "description": "引擎查询拉取最新全局函数",
+      "roleType": 1
+    },
+    {
+      "name": "Project_Fun_Pull",
+      "description": "引擎查询拉取最新项目函数",
+      "roleType": 1
+    }
+  ]
+}

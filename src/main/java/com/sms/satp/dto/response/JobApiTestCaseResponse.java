@@ -1,14 +1,11 @@
 package com.sms.satp.dto.response;
 
-import com.sms.satp.entity.api.common.HttpStatusVerification;
-import com.sms.satp.entity.api.common.ResponseTimeVerification;
-import com.sms.satp.entity.job.common.CaseReport;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @AllArgsConstructor
@@ -54,21 +51,21 @@ public class JobApiTestCaseResponse {
 
     private Integer apiRequestJsonType;
 
-    private HttpStatusVerification httpStatusVerification;
+    private HttpStatusVerificationResponse httpStatusVerification;
 
     private ResponseHeadersVerificationResponse responseHeadersVerification;
 
     private ResponseResultVerificationResponse responseResultVerification;
 
-    private ResponseTimeVerification responseTimeVerification;
+    private ResponseTimeVerificationResponse responseTimeVerification;
 
-    @Field("isExecute")
+    @JsonProperty("isExecute")
     private boolean execute;
 
     private String modifyUserId;
 
     private String modifyDateTime;
 
-    private CaseReport caseReport;
+    private CaseReportResponse caseReport;
 
 }

@@ -1,9 +1,9 @@
 package com.sms.satp.entity.job.common;
 
-import com.sms.satp.dto.response.ResponseHeadersVerificationResponse;
-import com.sms.satp.dto.response.ResponseResultVerificationResponse;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ParamInfo;
+import com.sms.satp.entity.api.common.ResponseHeadersVerification;
+import com.sms.satp.entity.api.common.ResponseResultVerification;
 import com.sms.satp.entity.api.common.ResponseTimeVerification;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -26,9 +26,6 @@ public class JobApiTestCase {
     private String apiId;
 
     private String caseName;
-
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String projectId;
 
     private List<String> tagIds;
 
@@ -62,9 +59,9 @@ public class JobApiTestCase {
 
     private HttpStatusVerification httpStatusVerification;
 
-    private ResponseHeadersVerificationResponse responseHeadersVerification;
+    private ResponseHeadersVerification responseHeadersVerification;
 
-    private ResponseResultVerificationResponse responseResultVerification;
+    private ResponseResultVerification responseResultVerification;
 
     private ResponseTimeVerification responseTimeVerification;
 

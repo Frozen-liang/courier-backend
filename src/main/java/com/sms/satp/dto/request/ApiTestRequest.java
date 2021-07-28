@@ -6,13 +6,13 @@ import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
-import com.sms.satp.entity.api.common.ParamInfo;
 import com.sms.satp.entity.api.common.ResponseHeadersVerification;
 import com.sms.satp.entity.api.common.ResponseResultVerification;
 import com.sms.satp.entity.api.common.ResponseTimeVerification;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,8 +24,10 @@ public class ApiTestRequest {
 
     private String envId;
     private String apiId;
+    private String workspaceId;
     @JsonProperty("isExecute")
-    private boolean execute;
+    @Default
+    private boolean execute = true;
     private String projectId;
     private String apiName;
     private String description;
@@ -33,12 +35,12 @@ public class ApiTestRequest {
     private ApiProtocol apiProtocol;
     private RequestMethod requestMethod;
     private ApiRequestParamType apiRequestParamType;
-    private List<ParamInfo> requestHeaders;
-    private List<ParamInfo> responseHeaders;
-    private List<ParamInfo> pathParams;
-    private List<ParamInfo> restfulParams;
-    private List<ParamInfo> requestParams;
-    private List<ParamInfo> responseParams;
+    private List<ParamInfoRequest> requestHeaders;
+    private List<ParamInfoRequest> responseHeaders;
+    private List<ParamInfoRequest> pathParams;
+    private List<ParamInfoRequest> restfulParams;
+    private List<ParamInfoRequest> requestParams;
+    private List<ParamInfoRequest> responseParams;
     private String preInject;
     private String postInject;
     private ApiJsonType apiResponseJsonType;

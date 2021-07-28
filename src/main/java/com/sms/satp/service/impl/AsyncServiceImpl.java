@@ -29,6 +29,7 @@ import com.sms.satp.service.MessageService;
 import com.sms.satp.utils.MD5Util;
 import com.sms.satp.websocket.Payload;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -76,8 +77,8 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
     }
 
     @Override
-    @Async
     @LogRecord(operationType = SYNC, operationModule = API)
+    @Async("importApi")
     public void importApi(ImportSourceVo importSource) {
         String projectId = importSource.getProjectId();
         DocumentType documentType = importSource.getDocumentType();
@@ -85,8 +86,6 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
         String id = importSource.getId();
         // Only one API source is in sync.
         if (Objects.nonNull(id) && projectImportFlowRepository.existsByIdAndImportStatus(id, RUNNING.getCode())) {
-            messageService.projectMessage(projectId, Payload.fail(String.format("The %s is in sync.",
-                importSource.getName())));
             return;
         }
         final ProjectImportFlowEntity projectImportFlowEntity = projectImportFlowRepository.save(
@@ -95,6 +94,7 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
                 .startTime(LocalDateTime.now())
                 .build());
         projectImportFlowRepository.save(projectImportFlowEntity);
+        List<ApiGroupEntity> incrementApiGroup = new ArrayList<>();
         try {
             log.info("The project whose Id is [{}] starts to import API documents.", projectId);
             messageService.projectMessage(projectId,
@@ -107,7 +107,7 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
             Set<ApiGroupEntity> apiGroupEntities = transformer.toApiGroupEntities(definition,
                 (apiGroupEntity -> apiGroupEntity.setProjectId(projectId)));
             // Get all api group.
-            Map<String, String> groupMapping = updateGroupIfNeed(projectId, apiGroupEntities);
+            Map<String, String> groupMapping = updateGroupIfNeed(projectId, apiGroupEntities, incrementApiGroup);
 
             List<ApiEntity> apiEntities = transformer.toApiEntities(definition, apiEntity -> {
                 apiEntity.setProjectId(projectId);
@@ -117,43 +117,38 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
                 apiEntity.setMd5(MD5Util.getMD5(apiEntity));
             });
 
-            List<ApiDocumentChecker> apiDocumentCheckers = documentType.getApiDocumentCheckers();
+            //Check apiEntities, If check not pass,then throw exception.
+            isAllCheckPass(apiEntities, documentType.getApiDocumentCheckers());
 
-            if (isAllCheckPass(projectImportFlowEntity, apiEntities, apiDocumentCheckers)) {
-                Collection<ApiEntity> diffApiEntities = apiEntities;
-                // Get old api by project id and swagger id is not empty.
-                Map<String, ApiEntity> oldApiEntities = apiRepository
-                    .findApiEntitiesByProjectIdAndSwaggerIdNotNull(projectId).stream()
-                    .collect(Collectors.toConcurrentMap(ApiEntity::getSwaggerId, Function.identity()));
+            Collection<ApiEntity> diffApiEntities = apiEntities;
+            // Get old api by project id and swagger id is not empty.
+            Map<String, ApiEntity> oldApiEntities = apiRepository
+                .findApiEntitiesByProjectIdAndSwaggerIdNotNull(projectId).stream()
+                .collect(Collectors.toConcurrentMap(ApiEntity::getSwaggerId, Function.identity()));
 
-                if (MapUtils.isNotEmpty(oldApiEntities)) {
-                    // Create different api entity by save mode.
-                    diffApiEntities = saveMode.getBuildDiffApiEntities().build(apiEntities, oldApiEntities,
-                        applicationContext, importSource.getApiChangeStatus());
-                }
-
-                // Save different api.
-                updateApiEntitiesIfNeed(projectId, diffApiEntities);
-                projectImportFlowEntity.setImportStatus(ImportStatus.SUCCESS);
-                projectImportFlowEntity.setEndTime(LocalDateTime.now());
+            if (MapUtils.isNotEmpty(oldApiEntities)) {
+                // Create different api entity by save mode.
+                diffApiEntities = saveMode.getBuildDiffApiEntities().build(apiEntities, oldApiEntities,
+                    applicationContext, importSource.getApiChangeStatus());
             }
+
+            // Save different api.
+            updateApiEntitiesIfNeed(projectId, diffApiEntities);
+            projectImportFlowEntity.setImportStatus(ImportStatus.SUCCESS);
+            projectImportFlowEntity.setEndTime(LocalDateTime.now());
+
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
-            projectImportFlowEntity.setImportStatus(ImportStatus.FAILED);
-            projectImportFlowEntity.setEndTime(LocalDateTime.now());
-            projectImportFlowEntity.setErrorDetail(e.getMessage());
+            importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, e.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage());
-            projectImportFlowEntity.setImportStatus(ImportStatus.FAILED);
-            projectImportFlowEntity.setEndTime(LocalDateTime.now());
-            projectImportFlowEntity.setErrorDetail("System error.");
+            importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, "System error.");
         }
         projectImportFlowRepository.save(projectImportFlowEntity);
         // Send import message.
         messageService.projectMessage(projectId,
             Payload.ok(projectImportFlowMapper.toProjectImportFlowResponse(projectImportFlowEntity)));
     }
-
 
     private void updateApiEntitiesIfNeed(String projectId, Collection<ApiEntity> diffApiEntities) {
         if (CollectionUtils.isEmpty(diffApiEntities)) {
@@ -172,15 +167,12 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
         }
     }
 
-    private boolean isAllCheckPass(ProjectImportFlowEntity projectImportFlowEntity, List<ApiEntity> apiEntities,
-        List<ApiDocumentChecker> apiDocumentCheckers) {
-        boolean allCheckPass = apiDocumentCheckers.stream()
-            .allMatch(apiDocumentChecker -> apiDocumentChecker
-                .check(apiEntities, projectImportFlowEntity, this.applicationContext));
-        return allCheckPass;
+    private void isAllCheckPass(List<ApiEntity> apiEntities, List<ApiDocumentChecker> apiDocumentCheckers) {
+        apiDocumentCheckers.forEach(apiDocumentChecker -> apiDocumentChecker.check(apiEntities));
     }
 
-    private Map<String, String> updateGroupIfNeed(String projectId, Set<ApiGroupEntity> apiGroupEntities) {
+    private Map<String, String> updateGroupIfNeed(String projectId, Set<ApiGroupEntity> apiGroupEntities,
+        List<ApiGroupEntity> incrementApiGroup) {
         // Get all old group by project id.
         List<ApiGroupEntity> oldGroupEntities =
             apiGroupRepository.findApiGroupEntitiesByProjectId(projectId);
@@ -191,8 +183,10 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
             entity.setRealGroupId(realGroupId);
             entity.setPath(Collections.singletonList(realGroupId));
         });
+
         // Save new api group.
         List<ApiGroupEntity> newApiGroupEntities = apiGroupRepository.saveAll(unsavedGroupEntities);
+        incrementApiGroup.addAll(newApiGroupEntities);
         newApiGroupEntities.addAll(oldGroupEntities);
 
         return newApiGroupEntities.stream()
@@ -203,5 +197,14 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+    }
+
+    private void importApiErrorHandle(ProjectImportFlowEntity projectImportFlowEntity,
+        List<ApiGroupEntity> incrementApiGroup, String errorMessage) {
+        // If import error. delete increment api group.
+        apiGroupRepository.deleteAll(incrementApiGroup);
+        projectImportFlowEntity.setImportStatus(ImportStatus.FAILED);
+        projectImportFlowEntity.setEndTime(LocalDateTime.now());
+        projectImportFlowEntity.setErrorDetail(errorMessage);
     }
 }

@@ -14,8 +14,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST_BY
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.ApiBindingStatus;
-import com.sms.satp.common.exception.ApiTestPlatformException;
-import com.sms.satp.common.field.SceneFiled;
+import com.sms.satp.common.field.SceneField;
 import com.sms.satp.dto.request.BatchAddSceneCaseApiRequest;
 import com.sms.satp.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
@@ -25,6 +24,7 @@ import com.sms.satp.mapper.SceneCaseApiMapper;
 import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.service.SceneCaseApiService;
+import com.sms.satp.utils.ExceptionUtils;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -63,7 +63,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseApi!", e);
-            throw new ApiTestPlatformException(ADD_SCENE_CASE_API_ERROR);
+            throw ExceptionUtils.mpe(ADD_SCENE_CASE_API_ERROR);
         }
     }
 
@@ -78,7 +78,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
             return count > 0;
         } catch (Exception e) {
             log.error("Failed to delete the SceneCaseApi!", e);
-            throw new ApiTestPlatformException(DELETE_SCENE_CASE_API_ERROR);
+            throw ExceptionUtils.mpe(DELETE_SCENE_CASE_API_ERROR);
         }
     }
 
@@ -94,7 +94,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to edit the SceneCaseApi!", e);
-            throw new ApiTestPlatformException(EDIT_SCENE_CASE_API_ERROR);
+            throw ExceptionUtils.mpe(EDIT_SCENE_CASE_API_ERROR);
         }
     }
 
@@ -114,7 +114,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to batch edit the SceneCaseApi!", e);
-            throw new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR);
+            throw ExceptionUtils.mpe(BATCH_EDIT_SCENE_CASE_API_ERROR);
         }
     }
 
@@ -123,12 +123,12 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
                 SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(removed).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(sceneCaseApiMapper::toSceneCaseApiDto).collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);
-            throw new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR);
+            throw ExceptionUtils.mpe(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR);
         }
     }
 
@@ -137,11 +137,11 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
                 SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);
-            throw new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR);
+            throw ExceptionUtils.mpe(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR);
         }
     }
 
@@ -150,11 +150,11 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
                 SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(remove).build());
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneFiled.ORDER.getFiled());
+            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);
-            throw new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR);
+            throw ExceptionUtils.mpe(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR);
         }
     }
 
@@ -165,7 +165,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
             return sceneCaseApi.map(sceneCaseApiMapper::toSceneCaseApiDto).orElse(null);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseApi by id!", e);
-            throw new ApiTestPlatformException(GET_SCENE_CASE_API_BY_ID_ERROR);
+            throw ExceptionUtils.mpe(GET_SCENE_CASE_API_BY_ID_ERROR);
         }
     }
 
@@ -182,7 +182,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to update status the SceneCaseApi!", e);
-            throw new ApiTestPlatformException(ADD_SCENE_CASE_API_ERROR);
+            throw ExceptionUtils.mpe(ADD_SCENE_CASE_API_ERROR);
         }
     }
 

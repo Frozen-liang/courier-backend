@@ -1,16 +1,18 @@
 package com.sms.satp.parser;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.project.ProjectImportFlowEntity;
 import com.sms.satp.parser.impl.OperationIdDuplicateChecker;
 import com.sms.satp.repository.ProjectImportFlowRepository;
+import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.MessageService;
 import com.sms.satp.utils.SecurityUtil;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -31,15 +34,20 @@ public class OperationIdDuplicateCheckerTest {
     private ApplicationContext applicationContext = mock(ApplicationContext.class);
     private ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
     private final MessageService messageService = mock(MessageService.class);
+    private static MockedStatic<SecurityUtil> securityUtilMockedStatic;
 
 
     static {
-        MockedStatic<SecurityUtil> securityUtilMockedStatic = mockStatic(SecurityUtil.class);
+        securityUtilMockedStatic = mockStatic(SecurityUtil.class);
         securityUtilMockedStatic.when(SecurityUtil::getCurrUserId).thenReturn(ObjectId.get().toString());
         securityUtilMockedStatic.when(SecurityUtil::getCurrentUser).thenReturn(new CustomUser("username", "password",
-            Collections.emptyList(), "", "username@qq.com"));
+            Collections.emptyList(), "", "username@qq.com", TokenType.USER));
     }
 
+    @AfterAll
+    public static void close() {
+        securityUtilMockedStatic.close();
+    }
 
     @Test
     public void check_test() {
@@ -48,8 +56,8 @@ public class OperationIdDuplicateCheckerTest {
         when(applicationContext.getBean(MessageService.class)).thenReturn(messageService);
         doNothing().when(messageService).projectMessage(any(), any(Payload.class));
         when(projectImportFlowRepository.save(any(ProjectImportFlowEntity.class))).thenReturn(projectImportFlowEntity);
-        boolean result = operationIdDuplicateChecker.check(getApi(), projectImportFlowEntity, applicationContext);
-        assertThat(result).isFalse();
+        assertThatThrownBy(() -> operationIdDuplicateChecker.check(getApi()))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
     private List<ApiEntity> getApi() {

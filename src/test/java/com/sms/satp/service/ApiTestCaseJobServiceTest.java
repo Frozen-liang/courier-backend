@@ -18,6 +18,7 @@ import com.sms.satp.dto.request.ApiTestRequest;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.request.DataParamRequest;
 import com.sms.satp.dto.request.TestDataRequest;
+import com.sms.satp.dto.response.ApiTestCaseJobReportResponse;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.engine.service.CaseDispatcherService;
@@ -25,13 +26,16 @@ import com.sms.satp.entity.env.ProjectEnvironmentEntity;
 import com.sms.satp.entity.job.ApiTestCaseJobEntity;
 import com.sms.satp.entity.job.ApiTestCaseJobReport;
 import com.sms.satp.entity.job.JobCaseApi;
-import com.sms.satp.entity.job.common.CaseReport;
 import com.sms.satp.entity.job.common.JobApiTestCase;
 import com.sms.satp.mapper.JobMapper;
 import com.sms.satp.mapper.JobMapperImpl;
+import com.sms.satp.mapper.MatchParamInfoMapperImpl;
+import com.sms.satp.mapper.ParamInfoMapper;
 import com.sms.satp.mapper.ParamInfoMapperImpl;
+import com.sms.satp.mapper.ResponseResultVerificationMapperImpl;
 import com.sms.satp.repository.ApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
+import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.impl.ApiTestCaseJobServiceImpl;
 import java.util.Collections;
@@ -52,7 +56,9 @@ class ApiTestCaseJobServiceTest {
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository = mock(
         CustomizedApiTestCaseJobRepository.class);
     private final ApiTestRequest apiTestRequest = ApiTestRequest.builder().apiPath("3Httt").build();
-    private final JobMapper jobMapper = new JobMapperImpl(new ParamInfoMapperImpl());
+    private final ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
+    private final JobMapper jobMapper = new JobMapperImpl(paramInfoMapper, new MatchParamInfoMapperImpl(),
+        new ResponseResultVerificationMapperImpl(new MatchParamInfoMapperImpl()));
     private final ApiTestCaseJobService apiTestCaseJobService = new ApiTestCaseJobServiceImpl(
         apiTestCaseJobRepository, customizedApiTestCaseJobRepository, caseDispatcherService, projectEnvironmentService
         , apiTestCaseService, jobMapper);
@@ -77,7 +83,7 @@ class ApiTestCaseJobServiceTest {
     private final ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder().build();
     private static final String ID = ObjectId.get().toString();
     private final CustomUser customUser =
-        new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "");
+        new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "", TokenType.USER);
 
     @Test
     @DisplayName("Test the findById method in the ApiTestCaseJob service")
@@ -108,7 +114,7 @@ class ApiTestCaseJobServiceTest {
     public void handleJobReport_test() {
         when(apiTestCaseJobRepository.findById(any())).thenReturn(Optional.of(apiTestCaseJob));
         when(apiTestCaseJobRepository.save(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
-        doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(CaseReport.class));
+        doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(ApiTestCaseJobReportResponse.class));
         doNothing().when(caseDispatcherService).dispatch(any(ApiTestCaseJobResponse.class));
         apiTestCaseJobService.handleJobReport(ApiTestCaseJobReport.builder().jobId(ObjectId.get().toString()).build());
         verify(apiTestCaseJobRepository, times(1)).save(any(ApiTestCaseJobEntity.class));
@@ -152,7 +158,7 @@ class ApiTestCaseJobServiceTest {
         when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
         when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest, customUser);
-        doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(CaseReport.class));
+        doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(ApiTestCaseJobReportResponse.class));
         doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
         verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
     }

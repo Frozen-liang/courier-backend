@@ -1,12 +1,18 @@
 package com.sms.satp.engine.impl;
 
+import static com.sms.satp.engine.enums.EngineStatus.PENDING;
+import static com.sms.satp.engine.enums.EngineStatus.RUNNING;
+import static com.sms.satp.engine.enums.EngineStatus.WAITING_FOR_RECONNECTION;
+
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.CaseRecordRequest;
 import com.sms.satp.engine.EngineId;
 import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.enums.EngineStatus;
-import com.sms.satp.engine.model.EngineMember;
+import com.sms.satp.engine.model.EngineMemberEntity;
 import com.sms.satp.engine.request.EngineRegistrationRequest;
+import com.sms.satp.engine.task.SuspiciousEngineManagement;
+import com.sms.satp.repository.EngineMemberRepository;
 import com.sms.satp.utils.ExceptionUtils;
 import java.security.SecureRandom;
 import java.util.List;
@@ -23,15 +29,23 @@ import org.springframework.util.CollectionUtils;
 public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     private final SecureRandom random = new SecureRandom();
-    private final Map<String, EngineMember> engineMembers = new ConcurrentHashMap<>();
+    private final Map<String, EngineMemberEntity> engineMembers = new ConcurrentHashMap<>();
+    private final EngineMemberRepository engineMemberRepository;
+    private final SuspiciousEngineManagement suspiciousEngineManagement;
+
+    public EngineMemberManagementImpl(EngineMemberRepository engineMemberRepository,
+        SuspiciousEngineManagement suspiciousEngineManagement) {
+        this.engineMemberRepository = engineMemberRepository;
+        this.suspiciousEngineManagement = suspiciousEngineManagement;
+    }
 
     @Override
     public String bind(EngineRegistrationRequest request) {
-        EngineMember engineMember =
-            EngineMember.builder().destination(EngineId.generate()).host(request.getHost())
+        EngineMemberEntity engineMember =
+            EngineMemberEntity.builder().destination(EngineId.generate()).host(request.getHost()).status(PENDING)
                 .version(request.getVersion())
                 .build();
-        engineMembers.put(engineMember.getDestination(), engineMember);
+        engineMemberRepository.save(engineMember);
         log.info("The destination {} of the test engine is binding.", engineMember.getDestination());
         return engineMember.getDestination();
     }
@@ -53,10 +67,9 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     @Override
     public String getAvailableMember() throws ApiTestPlatformException {
-        List<String> availableMembers = engineMembers.values().stream()
-            .filter(engineMember -> engineMember.getStatus().equals(EngineStatus.RUNNING))
-            .map(EngineMember::getDestination)
-            .collect(Collectors.toUnmodifiableList());
+        List<String> availableMembers = engineMemberRepository.findAllByStatus(RUNNING)
+            .map(EngineMemberEntity::getDestination).collect(
+                Collectors.toUnmodifiableList());
         if (CollectionUtils.isEmpty(availableMembers)) {
             throw ExceptionUtils.mpe("No engines are available.");
         }
@@ -65,35 +78,43 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     @Override
     public void caseRecord(CaseRecordRequest caseRecordRequest) {
-        engineMembers.computeIfPresent(caseRecordRequest.getDestination(), (key, member) -> {
-            member.setCaseTaskSize(caseRecordRequest.getCaseCount());
-            member.setSceneCaseTaskSize(caseRecordRequest.getSceneCaseCount());
-            member.setCurrentTaskSize(caseRecordRequest.getCaseCount() + caseRecordRequest.getSceneCaseCount());
-            log.info("The destination {} currentTask {} caseTask {} sceneCaseTask {}.", member.getDestination(),
-                member.getCurrentTaskSize(), member.getCaseTaskSize(), member.getSceneCaseTaskSize());
-            return member;
+        Optional<EngineMemberEntity> engineMemberOptional = engineMemberRepository
+            .findFirstByDestination(caseRecordRequest.getDestination());
+        engineMemberOptional.ifPresent(engineMember -> {
+            engineMember.setCaseTaskSize(caseRecordRequest.getCaseCount());
+            engineMember.setSceneCaseTaskSize(caseRecordRequest.getSceneCaseCount());
+            engineMember.setCurrentTaskSize(caseRecordRequest.getCaseCount() + caseRecordRequest.getSceneCaseCount());
+            engineMemberRepository.save(engineMember);
+            log.info("The destination {} currentTask {} caseTask {} sceneCaseTask {}.", engineMember.getDestination(),
+                engineMember.getCurrentTaskSize(), engineMember.getCaseTaskSize(), engineMember.getSceneCaseTaskSize());
         });
     }
 
     @Override
     public void unBind(String sessionId) {
-        Optional<EngineMember> engineMemberOptional = engineMembers.values().stream()
-            .filter(engineMember -> sessionId.equals(engineMember.getSessionId())).findFirst();
-        engineMemberOptional.ifPresent(engineMember -> {
-            engineMembers.remove(engineMember.getDestination());
+        Optional<EngineMemberEntity> engineMemberOptional = engineMemberRepository.findFirstBySessionId(sessionId);
+        engineMemberOptional.ifPresent((engineMember -> {
+            engineMember.setStatus(WAITING_FOR_RECONNECTION);
+            engineMemberRepository.save(engineMember);
+            suspiciousEngineManagement.add(engineMember.getDestination());
             log.info("The destination {} unbind from member of the engine.", engineMember.getDestination());
-        });
+        }));
     }
 
     @Override
-    public void active(EngineMember engineMember) {
-        engineMembers.computeIfPresent(engineMember.getDestination(), (key, oldEngineMember) -> {
-            oldEngineMember.setSessionId(engineMember.getSessionId());
-            oldEngineMember.setStatus(EngineStatus.RUNNING);
-            log.info("The test engine {} activated.", key);
-            return oldEngineMember;
+    public void active(String sessionId, String destination) {
+        Optional<EngineMemberEntity> engineMemberOptional = engineMemberRepository.findFirstByDestination(destination);
+        engineMemberOptional.ifPresent(engineMember -> {
+            if (engineMember.getStatus() == WAITING_FOR_RECONNECTION) {
+                suspiciousEngineManagement.remove(engineMember.getDestination());
+                log.info("The Engine reconnection.destination:{}", engineMember.getDestination());
+            }
+            engineMember.setStatus(RUNNING);
+            engineMember.setDestination(destination);
+            engineMember.setSessionId(sessionId);
+            engineMemberRepository.save(engineMember);
+            log.info("The test engine {} activated.", destination);
         });
     }
-
 
 }

@@ -1,18 +1,19 @@
 package com.sms.satp.dto.response;
 
+import com.sms.satp.entity.api.common.BaseVerification;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseHeadersVerificationResponse {
-
-    private Boolean checkStatus;
+public class ResponseHeadersVerificationResponse extends BaseVerification {
 
     private List<MatchParamInfoResponse> params;
 }

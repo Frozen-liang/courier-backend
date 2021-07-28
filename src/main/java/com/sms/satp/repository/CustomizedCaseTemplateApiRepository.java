@@ -5,11 +5,8 @@ import java.util.List;
 
 public interface CustomizedCaseTemplateApiRepository {
 
-    List<CaseTemplateApiEntity> findByCaseTemplateIds(List<String> caseTemplateIds);
-
-    List<CaseTemplateApiEntity> findByCaseTemplateIdAndIsExecute(String caseTemplateId, Boolean isExecute);
-
-    int findCurrentOrderByCaseTemplateId(String caseTemplateId);
+    List<CaseTemplateApiEntity> findByCaseTemplateIdAndIsExecuteAndIsRemove(String caseTemplateId, boolean isExecute,
+        boolean isRemove);
 
     List<CaseTemplateApiEntity> findCaseTemplateApiIdsByCaseTemplateIds(List<String> ids);
 

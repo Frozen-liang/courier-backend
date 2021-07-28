@@ -2,6 +2,7 @@ package com.sms.satp.service.impl;
 
 import static com.sms.satp.utils.UserDestinationUtil.getProjectDest;
 
+import com.sms.satp.entity.function.FunctionMessage;
 import com.sms.satp.service.MessageService;
 import com.sms.satp.websocket.Payload;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class MessageServiceImpl implements MessageService {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private static final String FUNCTION_DEST = "/engine/function";
 
     public MessageServiceImpl(SimpMessagingTemplate simpMessagingTemplate) {
         this.simpMessagingTemplate = simpMessagingTemplate;
@@ -28,5 +30,12 @@ public class MessageServiceImpl implements MessageService {
     public void userMessage(String userId, Payload<?> payload) {
         log.info("Send user message. userId:{},payload{}", userId, payload);
         simpMessagingTemplate.convertAndSend(getProjectDest(userId), payload);
+    }
+
+    @Override
+    public void enginePullFunctionMessage(FunctionMessage functionMessage) {
+        log.info("Send engine message.functionIds:{},operationType:{}", functionMessage.getIds(),
+            functionMessage.getOperationType());
+        simpMessagingTemplate.convertAndSend(FUNCTION_DEST, Payload.ok(functionMessage));
     }
 }

@@ -1,7 +1,6 @@
 package com.sms.satp.service.impl;
 
 import static com.sms.satp.common.enums.OperationModule.PROJECT;
-import static com.sms.satp.common.enums.OperationType.ADD;
 import static com.sms.satp.common.enums.OperationType.DELETE;
 import static com.sms.satp.common.enums.OperationType.EDIT;
 import static com.sms.satp.common.exception.ErrorCode.ADD_PROJECT_ERROR;
@@ -20,7 +19,7 @@ import com.sms.satp.dto.request.ProjectRequest;
 import com.sms.satp.dto.response.ProjectResponse;
 import com.sms.satp.entity.project.ProjectEntity;
 import com.sms.satp.mapper.ProjectMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.ProjectRepository;
 import com.sms.satp.service.ProjectService;
 import com.sms.satp.utils.ExceptionUtils;
@@ -35,14 +34,14 @@ import org.springframework.stereotype.Service;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
     private final ProjectMapper projectMapper;
 
     public ProjectServiceImpl(ProjectRepository projectRepository,
-        CommonDeleteRepository commonDeleteRepository,
+        CommonRepository commonRepository,
         ProjectMapper projectMapper) {
         this.projectRepository = projectRepository;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
         this.projectMapper = projectMapper;
     }
 
@@ -65,8 +64,8 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = PROJECT, projectId = "id",
-        template = "{{#projectRequest.name}}")
+    /*@LogRecord(operationType = ADD, operationModule = PROJECT, projectId = "id",
+        template = "{{#projectRequest.name}}")*/
     public Boolean add(ProjectRequest projectRequest) {
         log.info("ProjectService-add()-params: [Project]={}", projectRequest.toString());
         try {
@@ -113,7 +112,7 @@ public class ProjectServiceImpl implements ProjectService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, ProjectEntity.class);
+            return commonRepository.deleteByIds(ids, ProjectEntity.class);
         } catch (Exception e) {
             log.error("Failed to delete the Project!", e);
             throw new ApiTestPlatformException(DELETE_PROJECT_BY_ID_ERROR);

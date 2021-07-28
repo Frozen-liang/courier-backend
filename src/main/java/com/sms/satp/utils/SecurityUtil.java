@@ -1,5 +1,6 @@
 package com.sms.satp.utils;
 
+import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -40,16 +41,14 @@ public class SecurityUtil {
     public static boolean isSuperAdmin(Collection<? extends GrantedAuthority> roles) {
 
         return roles.stream()
-            .anyMatch(auth -> auth.getAuthority().equalsIgnoreCase(
-                ADMIN));
+            .anyMatch(auth -> auth.getAuthority().equalsIgnoreCase(ADMIN));
     }
 
     public static boolean isSuperAdmin() {
         Collection<? extends GrantedAuthority> authorities = SecurityContextHolder.getContext().getAuthentication()
             .getAuthorities();
         return authorities.stream()
-            .anyMatch(auth -> auth.getAuthority().equalsIgnoreCase(
-                ADMIN));
+            .anyMatch(auth -> auth.getAuthority().equalsIgnoreCase(ADMIN));
     }
 
     public static CustomUser getCustomUser(Authentication authentication) {
@@ -57,13 +56,11 @@ public class SecurityUtil {
     }
 
     public static Authentication newAuthentication(String userId, String email, String username,
-        Long tokenId, Collection<? extends GrantedAuthority> authorities) {
+        Collection<? extends GrantedAuthority> authorities, TokenType tokenType) {
         CustomUser customUser = new CustomUser(username, "",
             true, true, true, true,
-            authorities, userId, email);
-        return new UsernamePasswordAuthenticationToken(
-            customUser, null,
-            authorities);
+            authorities, userId, email, tokenType);
+        return new UsernamePasswordAuthenticationToken(customUser, null, authorities);
     }
 
 }

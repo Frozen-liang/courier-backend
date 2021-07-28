@@ -8,6 +8,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_USER_GROUP_LIST_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -15,12 +16,15 @@ import static org.mockito.Mockito.when;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.UserGroupRequest;
 import com.sms.satp.dto.response.UserGroupResponse;
+import com.sms.satp.entity.system.SystemRoleEntity;
 import com.sms.satp.entity.system.UserGroupEntity;
 import com.sms.satp.mapper.UserGroupMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
+import com.sms.satp.repository.SystemRoleRepository;
 import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.service.impl.UserGroupServiceImpl;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +36,12 @@ import org.junit.jupiter.api.Test;
 class UserGroupServiceTest {
 
     private final UserGroupRepository userGroupRepository = mock(UserGroupRepository.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(
-        CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(
+        CommonRepository.class);
     private final UserGroupMapper userGroupMapper = mock(UserGroupMapper.class);
+    private final SystemRoleRepository systemRoleRepository = mock(SystemRoleRepository.class);
     private final UserGroupService userGroupService = new UserGroupServiceImpl(
-        userGroupRepository, commonDeleteRepository, userGroupMapper);
+        userGroupRepository, commonRepository, userGroupMapper, systemRoleRepository);
     private final UserGroupEntity userGroup = UserGroupEntity.builder().id(ID).build();
     private final UserGroupResponse userGroupResponse = UserGroupResponse.builder()
         .id(ID).build();
@@ -107,16 +112,12 @@ class UserGroupServiceTest {
     @Test
     @DisplayName("Test the list method in the UserGroup service")
     public void list_test() {
-        ArrayList<UserGroupEntity> userGroupList = new ArrayList<>();
-        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            userGroupList.add(UserGroupEntity.builder().build());
-        }
         ArrayList<UserGroupResponse> userGroupResponseList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             userGroupResponseList.add(UserGroupResponse.builder().build());
         }
-        when(userGroupRepository.findAllByRemovedIsFalseOrderByCreateDateTimeDesc()).thenReturn(userGroupList);
-        when(userGroupMapper.toDtoList(userGroupList)).thenReturn(userGroupResponseList);
+        when(commonRepository.listLookupUser(anyString(), any(), any(Class.class)))
+            .thenReturn(userGroupResponseList);
         List<UserGroupResponse> result = userGroupService.list();
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
@@ -124,7 +125,7 @@ class UserGroupServiceTest {
     @Test
     @DisplayName("An exception occurred while getting UserGroup list")
     public void list_exception_test() {
-        doThrow(new RuntimeException()).when(userGroupRepository).findAllByRemovedIsFalseOrderByCreateDateTimeDesc();
+        doThrow(new RuntimeException()).when(commonRepository).listLookupUser(anyString(), any(), any(Class.class));
         assertThatThrownBy(userGroupService::list)
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_USER_GROUP_LIST_ERROR.getCode());
@@ -134,7 +135,7 @@ class UserGroupServiceTest {
     @DisplayName("Test the delete method in the UserGroup service")
     public void delete_test() {
         List<String> ids = Collections.singletonList(ID);
-        when(commonDeleteRepository.deleteByIds(ids, UserGroupEntity.class)).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(ids, UserGroupEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(userGroupService.delete(Collections.singletonList(ID))).isTrue();
     }
 
@@ -142,11 +143,33 @@ class UserGroupServiceTest {
     @DisplayName("An exception occurred while delete UserGroup")
     public void delete_exception_test() {
         List<String> ids = Collections.singletonList(ID);
-        doThrow(new RuntimeException()).when(commonDeleteRepository)
+        doThrow(new RuntimeException()).when(commonRepository)
             .deleteByIds(ids, UserGroupEntity.class);
         assertThatThrownBy(() -> userGroupService.delete(ids))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_USER_GROUP_BY_ID_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Get the privileges of a user based on his or her group")
+    public void getAuthoritiesByUserGroup_test() {
+        String groupId = "0";
+        String roleName = "role";
+        List<String> roleIds = Arrays.asList("123", "456");
+        UserGroupEntity userGroupEntity = mock(UserGroupEntity.class);
+        when(userGroupRepository.findById(groupId)).thenReturn(Optional.of(userGroupEntity));
+        when(userGroupEntity.getRoleIds()).thenReturn(roleIds);
+        Iterable<SystemRoleEntity> roles = Collections.singletonList(SystemRoleEntity.builder().name(roleName).build());
+        when(systemRoleRepository.findAllById(roleIds)).thenReturn(roles);
+        assertThat(userGroupService.getAuthoritiesByUserGroup(groupId).size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Obtain permissions held by a user group when it does not exist")
+    public void getAuthoritiesByUserGroup_groupNotExist_test() {
+        String groupId = "groupId";
+        when(userGroupRepository.findById(groupId)).thenReturn(Optional.empty());
+        assertThat(userGroupService.getAuthoritiesByUserGroup(groupId)).isEqualTo(Collections.emptyList());
     }
 
 }

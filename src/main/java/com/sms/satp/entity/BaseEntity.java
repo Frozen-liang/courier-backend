@@ -26,8 +26,10 @@ public class BaseEntity {
     @JsonIgnore
     private boolean removed;
     @CreatedBy
+    @Field(targetType = FieldType.OBJECT_ID)
     private String createUserId;
     @LastModifiedBy
+    @Field(targetType = FieldType.OBJECT_ID)
     private String modifyUserId;
     @CreatedDate
     private LocalDateTime createDateTime;

@@ -15,5 +15,6 @@ public interface CustomizedSceneCaseRepository {
 
     Boolean recover(List<String> ids);
 
-    List<SceneCaseEntity> getIdsByGroupId(String id);
+    List<SceneCaseEntity> getSceneCaseIdsByGroupIds(List<String> ids);
+
 }

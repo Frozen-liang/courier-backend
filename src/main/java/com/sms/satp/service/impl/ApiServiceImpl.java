@@ -33,6 +33,7 @@ import com.sms.satp.service.ApiService;
 import com.sms.satp.service.AsyncService;
 import com.sms.satp.service.ProjectImportSourceService;
 import com.sms.satp.utils.ExceptionUtils;
+import com.sms.satp.utils.MD5Util;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.SneakyThrows;
@@ -84,171 +85,9 @@ public class ApiServiceImpl implements ApiService {
         });
         return true;
     }
-    /* private void importApi(ImportSourceVo importSource) {
-        String projectId = importSource.getProjectId();
-        DocumentType documentType = importSource.getDocumentType();
-        DocumentDefinition definition = importSource.getDocumentDefinition();
-        SaveMode saveMode = importSource.getSaveMode();
-        final ProjectImportFlowEntity projectImportFlowEntity = projectImportFlowRepository.save(
-            ProjectImportFlowEntity.builder().projectId(projectId).startTime(LocalDateTime.now())
-                .build());
-        log.info("The project whose Id is [{}] starts to import API documents.", projectId);
-        ApiDocumentTransformer<?> transformer = documentType.getTransformer();
-        Set<ApiGroupEntity> apiGroupEntities = transformer.toApiGroupEntities(definition,
-            (apiGroupEntity -> apiGroupEntity.setProjectId(projectId)));
-        // Get all api group.
-        Map<String, String> groupMapping = updateGroupIfNeed(projectId, apiGroupEntities);
-
-        List<ApiEntity> apiEntities = transformer.toApiEntities(definition, apiEntity -> {
-            apiEntity.setProjectId(projectId);
-            apiEntity.setApiStatus(importSource.getApiPresetStatus());
-            // Replace the group name with the group id.
-            apiEntity.setGroupId(groupMapping.get(apiEntity.getGroupId()));
-            apiEntity.setMd5(MD5Util.getMD5(apiEntity));
-        });
-
-        List<ApiDocumentChecker> apiDocumentCheckers = documentType.getApiDocumentCheckers();
-
-        if (isAllCheckPass(projectImportFlowEntity, apiEntities, apiDocumentCheckers)) {
-            Collection<ApiEntity> diffApiEntities = apiEntities;
-            // Get old api by project id and swagger id is not empty.
-            Map<String, ApiEntity> oldApiEntities = apiRepository
-                .findApiEntitiesByProjectIdAndSwaggerIdNotNull(projectId).stream()
-                .collect(Collectors.toConcurrentMap(ApiEntity::getSwaggerId, Function.identity()));
-
-            if (MapUtils.isNotEmpty(oldApiEntities)) {
-                // Create different api entity by save mode.
-                try {
-                    diffApiEntities = buildDiffApiEntitiesBySaveMode(apiEntities, oldApiEntities, saveMode);
-                } catch (ApiTestPlatformException e) {
-                    log.error(e.getMessage());
-                    projectImportFlowEntity.setImportStatus(ImportStatus.FAILED);
-                    projectImportFlowEntity.setEndTime(LocalDateTime.now());
-                    projectImportFlowRepository.save(projectImportFlowEntity);
-                    return;
-                }
-            }
-
-            // Save different api.
-            updateApiEntitiesIfNeed(projectId, diffApiEntities);
-            projectImportFlowEntity.setImportStatus(ImportStatus.SUCCESS);
-            projectImportFlowEntity.setEndTime(LocalDateTime.now());
-            projectImportFlowRepository.save(projectImportFlowEntity);
-        }
-
-    }
-
-    private Collection<ApiEntity> buildDiffApiEntitiesBySaveMode(List<ApiEntity> newApiEntities,
-        Map<String, ApiEntity> oldApiEntities, SaveMode saveMode) {
-
-        if (saveMode == COVER) {
-            // Delete all old api.
-            apiRepository.deleteAll(oldApiEntities.values());
-            // Publish delete event. Update case status.
-            applicationEventPublisher.publishEvent(new ApiDeleteEvent(this,
-                oldApiEntities.values().parallelStream().map(BaseEntity::getId)
-                    .collect(Collectors.toList())));
-            return newApiEntities;
-        }
-        if (saveMode == REMAIN) {
-            // Get new api.
-            return getNewApiEntities(newApiEntities, oldApiEntities);
-        }
-
-        if (saveMode == INCREMENT) {
-            // Remove invalid api.
-            removeInvalidApi(newApiEntities, oldApiEntities);
-            // Get different api.
-            return compareApiEntities(newApiEntities, oldApiEntities);
-        }
-
-        throw ExceptionUtils.mpe("The save mode must not be null");
-    }
-
-    private Collection<ApiEntity> getNewApiEntities(List<ApiEntity> apiEntities, Map<String, ApiEntity> oldApis) {
-        return apiEntities.parallelStream().filter(apiEntity -> !oldApis.containsKey(apiEntity.getSwaggerId()))
-            .collect(Collectors.toList());
-    }
-
-    private void updateApiEntitiesIfNeed(String projectId, Collection<ApiEntity> diffApiEntities) {
-        if (CollectionUtils.isEmpty(diffApiEntities)) {
-            log.debug("The project whose Id is [{}],Update API documents in total [0].", projectId);
-            return;
-        }
-        List<ApiHistoryEntity> apiHistoryEntities = apiRepository.saveAll(diffApiEntities).stream()
-            .map(apiEntity -> ApiHistoryEntity.builder()
-                .record(apiHistoryMapper.toApiHistoryDetail(apiEntity)).build())
-            .collect(Collectors.toList());
-
-        apiHistoryRepository.insert(apiHistoryEntities);
-        if (log.isDebugEnabled()) {
-            log.debug("The project whose Id is [{}],Update API documents in total [{}].",
-                projectId, diffApiEntities.size());
-        }
-    }
-
-    private Collection<ApiEntity> compareApiEntities(List<ApiEntity> apiEntities,
-        Map<String, ApiEntity> oldApiEntities) {
-        Collection<ApiEntity> diffApiEntities;
-        diffApiEntities = CollectionUtils.subtract(apiEntities, oldApiEntities.values());
-        diffApiEntities.parallelStream()
-            .filter(apiEntity -> oldApiEntities.containsKey(apiEntity.getSwaggerId()))
-            .forEach(apiEntity -> {
-                ApiEntity oldApiEntity = oldApiEntities.get(apiEntity.getSwaggerId());
-                apiEntity.setId(oldApiEntity.getId());
-                apiEntity.setApiStatus(oldApiEntity.getApiStatus());
-                apiEntity.setPreInject(oldApiEntity.getPreInject());
-                apiEntity.setPostInject(oldApiEntity.getPostInject());
-                apiEntity.setTagId(oldApiEntity.getTagId());
-                apiEntity.setCreateUserId(oldApiEntity.getCreateUserId());
-                apiEntity.setCreateDateTime(oldApiEntity.getCreateDateTime());
-            });
-        return diffApiEntities;
-    }
-
-    private void removeInvalidApi(List<ApiEntity> apiEntities, Map<String, ApiEntity> oldApiEntities) {
-        List<String> swaggerIds =
-            apiEntities.stream().map(ApiEntity::getSwaggerId).collect(Collectors.toList());
-        Predicate<String> existSwaggerId = swaggerIds::contains;
-        // Get invalid api.
-        Collection<ApiEntity> invalidApiEntities = oldApiEntities.values().stream()
-            .filter(apiEntity -> existSwaggerId.negate().test(apiEntity.getSwaggerId()))
-            .collect(Collectors.toList());
-        log.info("Remove expired API=[{}]",
-            invalidApiEntities.stream().map(ApiEntity::getApiPath).collect(Collectors.joining(",")));
-        // Delete invalid api.
-        apiRepository.deleteAll(invalidApiEntities);
-        // Publish delete event. Update case status.
-        applicationEventPublisher.publishEvent(new ApiDeleteEvent(this,
-            invalidApiEntities.stream().map(BaseEntity::getId).collect(Collectors.toList())));
-    }
-
-    private boolean isAllCheckPass(ProjectImportFlowEntity projectImportFlowEntity, List<ApiEntity> apiEntities,
-        List<ApiDocumentChecker> apiDocumentCheckers) {
-        boolean allCheckPass = apiDocumentCheckers.stream()
-            .allMatch(apiDocumentChecker -> apiDocumentChecker
-                .check(apiEntities, projectImportFlowEntity, this.applicationContext));
-        return allCheckPass;
-    }
-
-    private Map<String, String> updateGroupIfNeed(String projectId, Set<ApiGroupEntity> apiGroupEntities) {
-        // Get all old group by project id.
-        List<ApiGroupEntity> oldGroupEntities =
-            apiGroupRepository.findApiGroupEntitiesByProjectId(projectId);
-        Collection<ApiGroupEntity> unsavedGroupEntities = CollectionUtils
-            .subtract(apiGroupEntities, oldGroupEntities);
-        // Save new api group.
-        List<ApiGroupEntity> newApiGroupEntities = apiGroupRepository.saveAll(unsavedGroupEntities);
-        newApiGroupEntities.addAll(oldGroupEntities);
-
-        return newApiGroupEntities.stream()
-            .collect(Collectors.toMap(ApiGroupEntity::getName, ApiGroupEntity::getId));
-    }*/
-
 
     @Override
     public ApiResponse findById(String id) {
-
         return customizedApiRepository.findById(id).orElseThrow(() -> ExceptionUtils.mpe(GET_API_BY_ID_ERROR));
     }
 
@@ -268,6 +107,7 @@ public class ApiServiceImpl implements ApiService {
         log.info("ApiService-add()-params: [Api]={}", apiRequestDto.toString());
         try {
             ApiEntity apiEntity = apiMapper.toEntity(apiRequestDto);
+            apiEntity.setMd5(MD5Util.getMD5(apiEntity));
             ApiEntity newApiEntity = apiRepository.insert(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
@@ -288,6 +128,7 @@ public class ApiServiceImpl implements ApiService {
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "Api", apiRequest.getId());
             ApiEntity apiEntity = apiMapper.toEntity(apiRequest);
             ApiEntity newApiEntity = apiRepository.save(apiEntity);
+            newApiEntity.setMd5(MD5Util.getMD5(newApiEntity));
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             apiHistoryRepository.insert(apiHistoryEntity);

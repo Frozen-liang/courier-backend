@@ -19,7 +19,7 @@ import com.sms.satp.dto.request.GlobalEnvironmentRequest;
 import com.sms.satp.dto.response.GlobalEnvironmentResponse;
 import com.sms.satp.entity.env.GlobalEnvironmentEntity;
 import com.sms.satp.mapper.GlobalEnvironmentMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.GlobalEnvironmentRepository;
 import com.sms.satp.service.GlobalEnvironmentService;
 import com.sms.satp.utils.ExceptionUtils;
@@ -33,14 +33,14 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
 
     private final GlobalEnvironmentRepository globalEnvironmentRepository;
     private final GlobalEnvironmentMapper globalEnvironmentMapper;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
 
     public GlobalEnvironmentServiceImpl(GlobalEnvironmentRepository globalEnvironmentRepository,
         GlobalEnvironmentMapper globalEnvironmentMapper,
-        CommonDeleteRepository commonDeleteRepository) {
+        CommonRepository commonRepository) {
         this.globalEnvironmentRepository = globalEnvironmentRepository;
         this.globalEnvironmentMapper = globalEnvironmentMapper;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
     }
 
     @Override
@@ -107,7 +107,7 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, GlobalEnvironmentEntity.class);
+            return commonRepository.deleteByIds(ids, GlobalEnvironmentEntity.class);
         } catch (Exception e) {
             log.error("Failed to delete the GlobalEnvironment!", e);
             throw new ApiTestPlatformException(DELETE_GLOBAL_ENVIRONMENT_ERROR_BY_ID);

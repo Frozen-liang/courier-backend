@@ -9,21 +9,29 @@ import static com.sms.satp.common.exception.ErrorCode.DELETE_USER_GROUP_BY_ID_ER
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_USER_GROUP_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_USER_GROUP_LIST_ERROR;
+import static com.sms.satp.common.field.CommonField.REMOVE;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.UserGroupRequest;
 import com.sms.satp.dto.response.UserGroupResponse;
+import com.sms.satp.entity.system.SystemRoleEntity;
 import com.sms.satp.entity.system.UserGroupEntity;
 import com.sms.satp.mapper.UserGroupMapper;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
+import com.sms.satp.repository.SystemRoleRepository;
 import com.sms.satp.repository.UserGroupRepository;
 import com.sms.satp.service.UserGroupService;
 import com.sms.satp.utils.ExceptionUtils;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,15 +39,16 @@ import org.springframework.stereotype.Service;
 public class UserGroupServiceImpl implements UserGroupService {
 
     private final UserGroupRepository userGroupRepository;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
     private final UserGroupMapper userGroupMapper;
+    private final SystemRoleRepository systemRoleRepository;
 
     public UserGroupServiceImpl(UserGroupRepository userGroupRepository,
-        CommonDeleteRepository commonDeleteRepository,
-        UserGroupMapper userGroupMapper) {
+        CommonRepository commonRepository, UserGroupMapper userGroupMapper, SystemRoleRepository systemRoleRepository) {
         this.userGroupRepository = userGroupRepository;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
         this.userGroupMapper = userGroupMapper;
+        this.systemRoleRepository = systemRoleRepository;
     }
 
     @Override
@@ -53,7 +62,8 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     public List<UserGroupResponse> list() {
         try {
-            return userGroupMapper.toDtoList(userGroupRepository.findAllByRemovedIsFalseOrderByCreateDateTimeDesc());
+            return commonRepository.listLookupUser(USER_GROUP.getCollectionName(), List.of(REMOVE.is(Boolean.FALSE)),
+                UserGroupResponse.class);
         } catch (Exception e) {
             log.error("Failed to get the UserGroup list!", e);
             throw new ApiTestPlatformException(GET_USER_GROUP_LIST_ERROR);
@@ -100,10 +110,26 @@ public class UserGroupServiceImpl implements UserGroupService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return commonDeleteRepository.deleteByIds(ids, UserGroupEntity.class);
+            return commonRepository.deleteByIds(ids, UserGroupEntity.class);
         } catch (Exception e) {
             log.error("Failed to delete the UserGroup!", e);
             throw new ApiTestPlatformException(DELETE_USER_GROUP_BY_ID_ERROR);
+        }
+    }
+
+    @Override
+    public List<SimpleGrantedAuthority> getAuthoritiesByUserGroup(String groupId) {
+        try {
+            UserGroupEntity userGroupEntity = userGroupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException(
+                    String.format("The user group - %s was not found.", groupId)));
+            // Query permissions by group id
+            Iterable<SystemRoleEntity> roles = systemRoleRepository.findAllById(userGroupEntity.getRoleIds());
+            Collection<String> roleNames = CollectionUtils.collect(roles, SystemRoleEntity::getName);
+            return CollectionUtils.isNotEmpty(roleNames) ? roleNames.stream().map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList()) : Collections.emptyList();
+        } catch (Exception exception) {
+            return Collections.emptyList();
         }
     }
 

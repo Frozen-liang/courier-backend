@@ -19,9 +19,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 class CustomizedDataCollectionRepositoryTest {
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
-    private final CommonDeleteRepository commonDeleteRepository = mock(CommonDeleteRepository.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private CustomizedDataCollectionRepository customizedDataCollectionRepository =
-        new CustomizedDataCollectionRepositoryImpl(mongoTemplate, commonDeleteRepository);
+        new CustomizedDataCollectionRepositoryImpl(mongoTemplate, commonRepository);
     private static final String ID = ObjectId.get().toString();
     private static final List<String> ID_LIST = Collections.singletonList(ID);
 
@@ -37,14 +37,14 @@ class CustomizedDataCollectionRepositoryTest {
     @Test
     @DisplayName("Test the deleteById method in the CustomizedDataCollectionRepository")
     public void deleteById_test() {
-        when(commonDeleteRepository.deleteById(ID, DataCollectionEntity.class)).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteById(ID, DataCollectionEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(customizedDataCollectionRepository.deleteById(ID)).isTrue();
     }
 
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedDataCollectionRepository")
     public void deleteByIds() {
-        when(commonDeleteRepository.deleteByIds(ID_LIST, DataCollectionEntity.class)).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(ID_LIST, DataCollectionEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(customizedDataCollectionRepository.deleteByIds(ID_LIST)).isTrue();
     }
 }

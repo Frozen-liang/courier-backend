@@ -8,11 +8,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.dto.response.ApiTestCaseJobReportResponse;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
+import com.sms.satp.dto.response.SceneCaseJobResponse;
 import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.service.impl.CaseDispatcherServiceImpl;
-import com.sms.satp.entity.job.SceneCaseJobEntity;
-import com.sms.satp.entity.job.common.CaseReport;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,10 +27,10 @@ public class CaseDispatcherServiceTest {
     private final CaseDispatcherService caseDispatcherService = new CaseDispatcherServiceImpl(engineMemberManagement,
         simpMessagingTemplate);
     private final ApiTestCaseJobResponse apiTestCaseJobResponse = ApiTestCaseJobResponse.builder().build();
-    private final SceneCaseJobEntity sceneCaseJob = SceneCaseJobEntity.builder().build();
+    private final SceneCaseJobResponse sceneCaseJob = SceneCaseJobResponse.builder().build();
     private static final String USER_ID = ObjectId.get().toString();
     private static final String MESSAGE = "message";
-    private final CaseReport caseReport = CaseReport.builder().build();
+    private final ApiTestCaseJobReportResponse caseReport = ApiTestCaseJobReportResponse.builder().build();
 
     @Test
     @DisplayName("Test the dispatch method in the CaseDispatcherService service")

@@ -1,90 +1,104 @@
 package com.sms.satp.security.jwt;
 
-import com.sms.satp.security.AccessTokenProperties;
+import static com.sms.satp.common.enums.RoleType.ENGINE;
+import static com.sms.satp.utils.JwtUtils.TOKEN_TYPE;
+import static com.sms.satp.utils.JwtUtils.TOKEN_USER_ID;
+
+import com.sms.satp.dto.UserEntityAuthority;
+import com.sms.satp.entity.system.SystemRoleEntity;
+import com.sms.satp.repository.SystemRoleRepository;
+import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
-import io.jsonwebtoken.Claims;
+import com.sms.satp.security.strategy.SatpSecurityStrategy;
+import com.sms.satp.security.strategy.SecurityStrategyFactory;
+import com.sms.satp.service.UserService;
+import com.sms.satp.utils.JwtUtils;
+import com.sms.satp.utils.SecurityUtil;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SigningKeyResolver;
 import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import java.util.Date;
-import javax.crypto.SecretKey;
+import java.time.Duration;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.security.auth.login.AccountNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class JwtTokenManager implements InitializingBean {
+public class JwtTokenManager {
 
-    private static final String JWT_ISSUER = "x-api.com";
-    public static final String API_AUTH = "Api-Auth";
-    public static final String USER_ID = "user_id";
-    public static final String USERNAME = "username";
-    public static final String EMAIL = "email";
-    private final AccessTokenProperties accessTokenProperties;
-    private SecretKey secretKey;
+    private final UserService userService;
+    private final SystemRoleRepository roleRepository;
+    private final SecurityStrategyFactory securityStrategyFactory;
+    private final SigningKeyResolver signingKeyResolver;
 
-    public JwtTokenManager(AccessTokenProperties accessTokenProperties) {
-        this.accessTokenProperties = accessTokenProperties;
+    public JwtTokenManager(UserService userService,
+        SystemRoleRepository roleRepository,
+        SecurityStrategyFactory securityStrategyFactory,
+        SigningKeyResolver signingKeyResolver) {
+        this.userService = userService;
+        this.roleRepository = roleRepository;
+        this.securityStrategyFactory = securityStrategyFactory;
+        this.signingKeyResolver = signingKeyResolver;
     }
 
     public String generateAccessToken(CustomUser user) {
-        return Jwts.builder()
-            .setSubject(API_AUTH)
-            .claim(USER_ID, user.getId())
-            .claim(USERNAME, user.getUsername())
-            .claim(EMAIL, user.getEmail())
-            .setIssuer(JWT_ISSUER)
-            .setIssuedAt(new Date())
-            // 1 week
-            .setExpiration(
-                new Date(System.currentTimeMillis() + accessTokenProperties.getExpire().toMillis()))
-            .signWith(secretKey)
-            .compact();
+        SatpSecurityStrategy satpSecurityStrategy = securityStrategyFactory.fetchSecurityStrategy(user.getTokenType());
+        Duration expirationTime = satpSecurityStrategy.obtainTokenExpirationTime();
+        Optional<String> tokenOptional = JwtUtils.encodeJwt(user, signingKeyResolver, expirationTime);
+        return tokenOptional.orElseThrow(() -> new RuntimeException(new AccountNotFoundException()));
+    }
+
+    public Authentication createAuthentication(String token) {
+        try {
+            JwsHeader<?> jwsHeader = JwtUtils.decodeJwt(token, signingKeyResolver);
+            String id = (String) jwsHeader.get(TOKEN_USER_ID);
+            TokenType tokenType = TokenType.valueOf((String) jwsHeader.get(TOKEN_TYPE));
+
+            UserEntityAuthority userEntityAuthority = userService.getUserDetailsByUserId(id);
+            return SecurityUtil.newAuthentication(id, userEntityAuthority.getUserEntity().getEmail(),
+                userEntityAuthority.getUserEntity().getUsername(),
+                userEntityAuthority.getAuthorities(), tokenType);
+        } catch (Exception exception) {
+            return null;
+        }
+    }
+
+    public Authentication createEngineAuthentication(String token) {
+        try {
+            JwsHeader<?> jwsHeader = JwtUtils.decodeJwt(token, signingKeyResolver);
+            String id = (String) jwsHeader.get(TOKEN_USER_ID);
+            TokenType tokenType = TokenType.valueOf((String) jwsHeader.get(TOKEN_TYPE));
+            List<SimpleGrantedAuthority> roles = roleRepository.findAllByRoleType(ENGINE)
+                .map(SystemRoleEntity::getName).map(SimpleGrantedAuthority::new
+                ).collect(Collectors.toList());
+            return SecurityUtil.newAuthentication(id, "", "engine", roles, tokenType);
+        } catch (Exception exception) {
+            return null;
+        }
     }
 
     public String getUserId(String token) {
-        Claims claims = Jwts.parserBuilder()
-            .setSigningKey(secretKey).build()
-            .parseClaimsJws(token)
-            .getBody();
-
-        return claims.get(USER_ID, String.class);
+        JwsHeader<?> jwsHeader = JwtUtils.decodeJwt(token, signingKeyResolver);
+        return (String) jwsHeader.get(TOKEN_USER_ID);
     }
 
-    public String getUsername(String token) {
-        Claims claims = Jwts.parserBuilder()
-            .setSigningKey(secretKey).build()
-            .parseClaimsJws(token)
-            .getBody();
-        return claims.get(USERNAME, String.class);
-    }
-
-    public String getEmail(String token) {
-        Claims claims = Jwts.parserBuilder()
-            .setSigningKey(secretKey).build()
-            .parseClaimsJws(token)
-            .getBody();
-        return claims.get(EMAIL, String.class);
-    }
-
-    public Date getExpirationDate(String token) {
-        Claims claims = Jwts.parserBuilder()
-            .setSigningKey(secretKey).build()
-            .parseClaimsJws(token)
-            .getBody();
-
-        return claims.getExpiration();
+    public String getTokenType(String token) {
+        JwsHeader<?> jwsHeader = JwtUtils.decodeJwt(token, signingKeyResolver);
+        return (String) jwsHeader.get(TOKEN_TYPE);
     }
 
     public boolean validate(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
-            return true;
+            return Objects.nonNull(JwtUtils.decodeJwt(token, signingKeyResolver));
         } catch (SignatureException ex) {
             log.error("Invalid JWT signature - {}", ex.getMessage());
         } catch (MalformedJwtException ex) {
@@ -97,13 +111,6 @@ public class JwtTokenManager implements InitializingBean {
             log.error("JWT claims string is empty - {}", ex.getMessage());
         }
         return false;
-    }
-
-
-    @Override
-    public void afterPropertiesSet() {
-
-        secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessTokenProperties.getSecretKey()));
     }
 
 }

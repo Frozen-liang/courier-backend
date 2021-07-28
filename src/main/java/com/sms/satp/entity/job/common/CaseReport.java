@@ -1,8 +1,8 @@
 package com.sms.satp.entity.job.common;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.common.enums.ResultType;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,16 +23,17 @@ public class CaseReport {
 
     private String requestUrl;
 
-    private Map<String, String> requestHeader;
+    private Map<String, Object> requestHeader;
 
-    private Map<String, String> responseHeader;
+    private Map<String, Object> responseHeader;
 
     private Object responseData;
 
     private Object requestData;
 
-    @JsonProperty("isSuccess")
-    private boolean isSuccess;
+    private ResultType isSuccess;
+
+    private Integer errCode;
 
     private String failMessage;
 

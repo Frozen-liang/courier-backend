@@ -1,15 +1,15 @@
 package com.sms.satp.repository.impl;
 
-import static com.sms.satp.common.field.ApiFiled.GROUP_ID;
-import static com.sms.satp.common.field.ApiFiled.TAG_ID;
-import static com.sms.satp.common.field.CommonFiled.ID;
+import static com.sms.satp.common.field.CommonField.ID;
+import static com.sms.satp.common.field.SceneField.GROUP_ID;
+import static com.sms.satp.common.field.SceneField.TAG_ID;
 
-import com.sms.satp.common.field.CommonFiled;
-import com.sms.satp.common.field.SceneFiled;
+import com.sms.satp.common.field.CommonField;
+import com.sms.satp.common.field.SceneField;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.entity.scenetest.SceneCaseEntity;
-import com.sms.satp.repository.CommonDeleteRepository;
+import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.utils.PageDtoConverter;
 import java.util.ArrayList;
@@ -32,12 +32,12 @@ import org.springframework.stereotype.Component;
 public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRepository {
 
     private final MongoTemplate mongoTemplate;
-    private final CommonDeleteRepository commonDeleteRepository;
+    private final CommonRepository commonRepository;
 
     public CustomizedSceneCaseRepositoryImpl(MongoTemplate mongoTemplate,
-        CommonDeleteRepository commonDeleteRepository) {
+        CommonRepository commonRepository) {
         this.mongoTemplate = mongoTemplate;
-        this.commonDeleteRepository = commonDeleteRepository;
+        this.commonRepository = commonRepository;
     }
 
     @Override
@@ -47,12 +47,12 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
         Query query = new Query();
 
         LookupOperation apiGroupLookupOperation =
-            LookupOperation.newLookup().from("SceneCaseGroup").localField(GROUP_ID.getFiled())
-                .foreignField(ID.getFiled())
+            LookupOperation.newLookup().from("SceneCaseGroup").localField(GROUP_ID.getName())
+                .foreignField(ID.getName())
                 .as("sceneCaseGroup");
         LookupOperation apiTagLookupOperation =
-            LookupOperation.newLookup().from("ApiTag").localField(TAG_ID.getFiled())
-                .foreignField(ID.getFiled())
+            LookupOperation.newLookup().from("ApiTag").localField(TAG_ID.getName())
+                .foreignField(ID.getName())
                 .as("apiTag");
 
         aggregationOperations.add(apiTagLookupOperation);
@@ -86,38 +86,38 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
 
     @Override
     public Boolean deleteByIds(List<String> ids) {
-        return commonDeleteRepository.deleteByIds(ids, SceneCaseEntity.class);
+        return commonRepository.deleteByIds(ids, SceneCaseEntity.class);
     }
 
     @Override
     public Boolean recover(List<String> ids) {
-        return commonDeleteRepository.recover(ids, SceneCaseEntity.class);
+        return commonRepository.recover(ids, SceneCaseEntity.class);
     }
 
     @Override
-    public List<SceneCaseEntity> getIdsByGroupId(String id) {
+    public List<SceneCaseEntity> getSceneCaseIdsByGroupIds(List<String> ids) {
         Query query = new Query();
-        query.fields().include(ID.getFiled());
-        CommonFiled.GROUP_ID.is(id).ifPresent(query::addCriteria);
+        query.fields().include(ID.getName());
+        CommonField.GROUP_ID.in(ids).ifPresent(query::addCriteria);
         return mongoTemplate.find(query, SceneCaseEntity.class);
     }
 
     private void buildCriteria(SearchSceneCaseRequest searchSceneCaseRequest, Query query,
         ObjectId projectId, ArrayList<AggregationOperation> aggregationOperations) {
-        CommonFiled.PROJECT_ID.is(projectId).ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        CommonFiled.REMOVE.is(searchSceneCaseRequest.isRemoved())
+        CommonField.PROJECT_ID.is(projectId).ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+        CommonField.REMOVE.is(searchSceneCaseRequest.isRemoved())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneFiled.NAME.like(searchSceneCaseRequest.getName())
+        SceneField.NAME.like(searchSceneCaseRequest.getName())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneFiled.GROUP_ID.is(searchSceneCaseRequest.getGroupId())
+        SceneField.GROUP_ID.is(searchSceneCaseRequest.getGroupId())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneFiled.TEST_STATUS.in(searchSceneCaseRequest.getTestStatus())
+        SceneField.TEST_STATUS.in(searchSceneCaseRequest.getTestStatus())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneFiled.TAG_ID.in(searchSceneCaseRequest.getTagId())
+        SceneField.TAG_ID.in(searchSceneCaseRequest.getTagId())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneFiled.PRIORITY.in(searchSceneCaseRequest.getPriority())
+        SceneField.PRIORITY.in(searchSceneCaseRequest.getPriority())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneFiled.CREATE_USER_NAME.in(searchSceneCaseRequest.getCreateUserName())
+        SceneField.CREATE_USER_NAME.in(searchSceneCaseRequest.getCreateUserName())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
     }
 
