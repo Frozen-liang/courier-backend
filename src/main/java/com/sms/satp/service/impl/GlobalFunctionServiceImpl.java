@@ -153,7 +153,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
         FunctionMessage functionMessage = FunctionMessage.builder()
             .ids(ids)
             .global(true)
-            .operationType(operationType)
+            .operationType(operationType.getCode())
             .key(workspaceId)
             .build();
         messageService.enginePullFunctionMessage(functionMessage);

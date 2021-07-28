@@ -1,7 +1,8 @@
-package com.sms.satp.initialize;
+package com.sms.satp.initialize.impl;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,14 +20,12 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 
 @DisplayName("Tests for RoleInitializerTest")
 public class RoleInitializerTest {
 
-    private final ApplicationStartedEvent applicationStartedEvent = mock(ApplicationStartedEvent.class);
     private ConfigurableApplicationContext applicationContext = mock(ConfigurableApplicationContext.class);
     private final SystemVersionRepository systemVersionRepository = mock(SystemVersionRepository.class);
     private final BuildProperties buildProperties = mock(BuildProperties.class);
@@ -36,9 +35,11 @@ public class RoleInitializerTest {
     private final Instant instant = Instant.now();
 
     private final SystemVersionEntity systemVersionEntity = SystemVersionEntity.builder().id(ID)
-        .version(VERSION).name(NAME).group(GROUP).buildTime(LOCAL_DATE_TIME).initialized(true).status(0).createDateTime(LOCAL_DATE_TIME).modifyDateTime(LOCAL_DATE_TIME).build();
-    private final List<SystemRoleEntity> systemRoleEntities = List.of(SystemRoleEntity.builder().id(ID).name(NAME).description(NAME).roleType(
-        RoleType.ENGINE).createDateTime(LOCAL_DATE_TIME).build());
+        .version(VERSION).name(NAME).group(GROUP).buildTime(LOCAL_DATE_TIME).initialized(true).status(0)
+        .createDateTime(LOCAL_DATE_TIME).modifyDateTime(LOCAL_DATE_TIME).build();
+    private final List<SystemRoleEntity> systemRoleEntities = List
+        .of(SystemRoleEntity.builder().id(ID).name(NAME).description(NAME).roleType(
+            RoleType.ENGINE).createDateTime(LOCAL_DATE_TIME).build());
 
     private final RoleConvert roleConvert = new RoleConvert(systemRoleEntities);
     private final RoleInitializer roleInitializer = new RoleInitializer();
@@ -52,7 +53,6 @@ public class RoleInitializerTest {
     @Test
     @DisplayName("Test the onApplicationEvent_test method in the RoleInitializer")
     public void onApplicationEvent_test() throws IOException {
-        when(applicationStartedEvent.getApplicationContext()).thenReturn(applicationContext);
         when(applicationContext.getBean(BuildProperties.class)).thenReturn(buildProperties);
         when(applicationContext.getBean(SystemRoleRepository.class)).thenReturn(systemRoleRepository);
         when(applicationContext.getBean(SystemVersionRepository.class)).thenReturn(systemVersionRepository);
@@ -62,16 +62,15 @@ public class RoleInitializerTest {
         when(buildProperties.getName()).thenReturn(NAME);
         when(buildProperties.getGroup()).thenReturn(GROUP);
         when(systemVersionRepository.findByName(NAME)).thenReturn(systemVersionEntity);
-        when(objectMapper.readValue(any(InputStream.class),any(Class.class))).thenReturn(roleConvert);
-        roleInitializer.onApplicationEvent(applicationStartedEvent);
-        verify(systemRoleRepository).saveAll(systemRoleEntities);
-        verify(systemVersionRepository).save(systemVersionEntity);
+        when(objectMapper.readValue(any(InputStream.class), any(Class.class))).thenReturn(roleConvert);
+        roleInitializer.init(applicationContext);
+        verify(systemRoleRepository, times(1)).saveAll(systemRoleEntities);
+        verify(systemVersionRepository, times(1)).save(systemVersionEntity);
     }
 
     @Test
     @DisplayName("Test the onApplicationEvent_test method in the RoleInitializer")
-    public void onApplicationEvent_path_not_exist_test(){
-        when(applicationStartedEvent.getApplicationContext()).thenReturn(applicationContext);
+    public void onApplicationEvent_path_not_exist_test() {
         when(applicationContext.getBean(BuildProperties.class)).thenReturn(buildProperties);
         when(applicationContext.getBean(SystemRoleRepository.class)).thenReturn(systemRoleRepository);
         when(applicationContext.getBean(SystemVersionRepository.class)).thenReturn(systemVersionRepository);
@@ -80,7 +79,7 @@ public class RoleInitializerTest {
         when(buildProperties.getName()).thenReturn(NAME);
         when(buildProperties.getGroup()).thenReturn(GROUP);
         when(systemVersionRepository.findByName(NAME)).thenReturn(systemVersionEntity);
-        roleInitializer.onApplicationEvent(applicationStartedEvent);
+        roleInitializer.init(applicationContext);
         verify(systemVersionRepository).save(systemVersionEntity);
     }
 }

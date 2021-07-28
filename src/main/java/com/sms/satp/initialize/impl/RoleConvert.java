@@ -1,4 +1,4 @@
-package com.sms.satp.initialize;
+package com.sms.satp.initialize.impl;
 
 import com.sms.satp.entity.system.SystemRoleEntity;
 import java.util.List;

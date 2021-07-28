@@ -2,6 +2,7 @@ package com.sms.satp.service;
 
 import static com.sms.satp.common.enums.OperationType.ADD;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -14,7 +15,6 @@ import com.sms.satp.service.impl.LogServiceImpl;
 import java.util.Collections;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.data.domain.PageImpl;
 
 @DisplayName("Tests for LogService")
@@ -30,16 +30,29 @@ public class LogServiceTest {
     @Test
     @DisplayName("Test the add method in the LogService service")
     public void add_test() {
-        when(logRepository.save(log)).thenReturn(log);
+        when(logRepository.insert(log)).thenReturn(log);
         assertThat(logService.add(log)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test the add method throw exception in the LogService service")
+    public void add_test_throw_exception() {
+        when(logRepository.insert(log)).thenThrow(new RuntimeException());
+        assertThat(logService.add(log)).isFalse();
     }
 
     @Test
     @DisplayName("Test the page method in the LogService service")
     public void page_test() {
-        when(logRepository.save(log)).thenReturn(log);
         when(customizedLogRepository.page(logPageRequest)).thenReturn(new PageImpl<>(Collections.singletonList(log)));
         assertThat(logService.page(logPageRequest)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the page method throw exception in the LogService service")
+    public void page_test_throw_exception() {
+        when(customizedLogRepository.page(logPageRequest)).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> logService.page(logPageRequest)).isInstanceOf(RuntimeException.class);
     }
 
 }

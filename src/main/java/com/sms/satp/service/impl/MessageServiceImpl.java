@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class MessageServiceImpl implements MessageService {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private static final String FUNCTION_DEST = "/engine/function";
+    private static final String FUNCTION_DEST = "/engine/pull/function";
 
     public MessageServiceImpl(SimpMessagingTemplate simpMessagingTemplate) {
         this.simpMessagingTemplate = simpMessagingTemplate;

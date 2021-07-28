@@ -13,7 +13,7 @@ import com.sms.satp.common.field.Field;
 import com.sms.satp.dto.PageDto;
 import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.ApiEntity;
-import com.sms.satp.entity.mongo.LookupQueryField;
+import com.sms.satp.entity.mongo.LookupField;
 import com.sms.satp.entity.mongo.LookupVo;
 import com.sms.satp.entity.mongo.QueryVo;
 import com.sms.satp.repository.impl.CommonRepositoryImpl;
@@ -41,8 +41,8 @@ class CommonRepositoryTest {
 
     private final LookupVo lookupVo = LookupVo.builder().from(OperationModule.API).localField(field).foreignField(field)
         .as(COLLECTION_NAME)
-        .queryFields(List.of(LookupQueryField.builder().field(field).alias(COLLECTION_NAME).build())).build();
-    private final QueryVo queryVo = QueryVo.builder().collectionName(COLLECTION_NAME).lookupVos(List.of(lookupVo)).criteriaList(List.of(Optional.of(criteria)))
+        .queryFields(List.of(LookupField.builder().field(field).alias(COLLECTION_NAME).build())).build();
+    private final QueryVo queryVo = QueryVo.builder().collectionName(COLLECTION_NAME).lookupVo(List.of(lookupVo)).criteriaList(List.of(Optional.of(criteria)))
         .build();
 
     private final CommonRepository commonRepository = new CommonRepositoryImpl(mongoTemplate);

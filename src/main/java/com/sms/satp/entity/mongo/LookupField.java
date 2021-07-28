@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LookupQueryField {
+public class LookupField {
 
     // 数据库的字段
     private Field field;

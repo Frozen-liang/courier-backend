@@ -13,13 +13,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class UserGroupResponse extends BaseResponse {
+public class UserGroupResponse extends LookupUserResponse {
 
     private String name;
-
-    private String username;
-
-    private String nickname;
 
     @JsonProperty("isDefaultGroup")
     private boolean defaultGroup;

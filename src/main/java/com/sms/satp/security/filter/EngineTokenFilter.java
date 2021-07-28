@@ -38,7 +38,7 @@ public class EngineTokenFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
             return;
         }
-        Authentication authentication = jwtTokenManager.createEngineAuthentication(token);
+        Authentication authentication = jwtTokenManager.createAuthentication(token);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(request, response);
     }

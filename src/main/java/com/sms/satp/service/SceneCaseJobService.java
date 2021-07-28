@@ -5,6 +5,7 @@ import com.sms.satp.dto.request.SceneCaseJobRequest;
 import com.sms.satp.dto.response.SceneCaseJobResponse;
 import com.sms.satp.entity.job.SceneCaseJobReport;
 import com.sms.satp.security.pojo.CustomUser;
+import java.util.List;
 import org.springframework.data.domain.Page;
 
 public interface SceneCaseJobService {
@@ -16,5 +17,7 @@ public interface SceneCaseJobService {
     void handleJobReport(SceneCaseJobReport jobReport);
 
     void runJob(AddSceneCaseJobRequest addSceneCaseJobRequest, CustomUser customUser);
+
+    void reallocateJob(List<String> engineIds);
 
 }
