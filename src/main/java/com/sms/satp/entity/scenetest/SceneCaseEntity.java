@@ -3,6 +3,7 @@ package com.sms.satp.entity.scenetest;
 import com.sms.satp.entity.BaseEntity;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -42,7 +43,8 @@ public class SceneCaseEntity extends BaseEntity {
     /**
      * 是否锁定，当前步骤出错或未通过时，依然执行下一个步骤.
      */
+    @Default
     @Field("isLock")
-    private boolean lock;
+    private boolean lock = true;
 
 }

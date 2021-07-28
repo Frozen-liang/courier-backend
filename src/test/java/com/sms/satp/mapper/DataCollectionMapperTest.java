@@ -3,12 +3,18 @@ package com.sms.satp.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.dto.request.DataCollectionRequest;
+import com.sms.satp.dto.request.DataParamRequest;
+import com.sms.satp.dto.request.TestDataRequest;
 import com.sms.satp.dto.response.DataCollectionResponse;
 import com.sms.satp.entity.datacollection.DataCollectionEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.sms.satp.entity.datacollection.DataParam;
+import com.sms.satp.entity.datacollection.TestData;
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +32,8 @@ class DataCollectionMapperTest {
     @DisplayName("Test the method to convert the DataCollection's entity object to a dto object")
     void entity_to_dto() {
         DataCollectionEntity dataCollection = DataCollectionEntity.builder()
-            .collectionName(COLLECTION_NAME)
+                .paramList(Lists.newArrayList())
+                .collectionName(COLLECTION_NAME)
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
             .build();
@@ -51,6 +58,7 @@ class DataCollectionMapperTest {
     @DisplayName("Test the method to convert the DataCollection's dto object to a entity object")
     void dto_to_entity() {
         DataCollectionRequest dataCollectionDto = DataCollectionRequest.builder()
+            .paramList(Lists.newArrayList())
             .collectionName(COLLECTION_NAME)
             .build();
         DataCollectionEntity dataCollection = dataCollectionMapper.toEntity(dataCollectionDto);
@@ -76,6 +84,130 @@ class DataCollectionMapperTest {
     void null_entityList_to_dtoList() {
         List<DataCollectionResponse> dataCollectionDtoList = dataCollectionMapper.toDtoList(null);
         assertThat(dataCollectionDtoList).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the DataCollection's dto object to a entity object")
+    void testDataRequestListToTestDataListTest(){
+        List<TestDataRequest>  list=Lists.newArrayList();
+        DataCollectionRequest request=DataCollectionRequest.builder()
+                .dataList(Lists.newArrayList(list))
+                .build();
+        assertThat(dataCollectionMapper.toEntity(request)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the DataCollection's dto object to a entity object")
+    void testDataRequestToTestDataTest(){
+        TestDataRequest  testDataRequest=TestDataRequest.builder()
+                .dataName("ddd")
+                .data(Lists.newArrayList(DataParamRequest.builder().build()))
+                .build();
+        DataCollectionRequest dataCollectionDto=DataCollectionRequest.builder()
+                .dataList(Lists.newArrayList(testDataRequest))
+                .build();
+        DataCollectionEntity dto = dataCollectionMapper.toEntity(dataCollectionDto);
+        assertThat(dto).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the DataCollection's dto object to a entity object")
+    void testDataRequestToTestDataIsNull_Test(){
+        TestDataRequest  testDataRequest=null;
+        DataCollectionRequest dataCollectionDto=DataCollectionRequest.builder()
+                .dataList(Lists.newArrayList(testDataRequest))
+                .build();
+        DataCollectionEntity dto = dataCollectionMapper.toEntity(dataCollectionDto);
+        assertThat(dto.getDataList()).size().isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the DataCollection's dto object to a entity object")
+    void testDataRequestToTestData_DataParamRequestIsNull_Test(){
+        TestDataRequest  testDataRequest=TestDataRequest.builder()
+                .dataName("ddd")
+                .data(null)
+                .build();
+        DataCollectionRequest dataCollectionDto=DataCollectionRequest.builder()
+                .dataList(Lists.newArrayList(testDataRequest))
+                .build();
+        DataCollectionEntity dto = dataCollectionMapper.toEntity(dataCollectionDto);
+        assertThat(dto.getDataList()).size().isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the DataCollection's dto object to a entity object")
+    void testDataRequestToTestData_DataParamRequestNull_Test(){
+        DataParamRequest request = null;
+        TestDataRequest  testDataRequest=TestDataRequest.builder()
+                .dataName("ddd")
+                .data(Lists.newArrayList(request))
+                .build();
+        DataCollectionRequest dataCollectionDto=DataCollectionRequest.builder()
+                .dataList(Lists.newArrayList(testDataRequest))
+                .build();
+        DataCollectionEntity dto = dataCollectionMapper.toEntity(dataCollectionDto);
+        assertThat(dto.getDataList()).size().isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the DataCollection's dto object to a entity object")
+    void testDataListToTestDataResponseListTest(){
+        List<TestData> list=Lists.newArrayList();
+        DataCollectionEntity dataCollection=DataCollectionEntity.builder()
+                .dataList(list)
+                .build();
+        assertThat(dataCollectionMapper.toDto(dataCollection)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the DataCollection's dto object to a entity object")
+    void testDataToTestDataResponseTest(){
+        TestData testData=TestData.builder()
+                .dataName("123")
+                .data(Lists.newArrayList(DataParam.builder().build()))
+                .build();
+        DataCollectionEntity dataCollection=DataCollectionEntity.builder()
+                .dataList(Lists.newArrayList(testData))
+                .build();
+        assertThat(dataCollectionMapper.toDto(dataCollection)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the DataCollection's dto object to a entity object")
+    void dataParamToDataParamResponse_isNull_Test(){
+        DataParam dataParam=null;
+        TestData testData=TestData.builder()
+                .dataName("null")
+                .data(Lists.newArrayList(dataParam))
+                .build();
+        DataCollectionEntity dataCollection=DataCollectionEntity.builder()
+                .dataList(Lists.newArrayList(testData))
+                .build();
+        assertThat(dataCollectionMapper.toDto(dataCollection).getDataList()).size().isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the DataCollection's dto object to a entity object")
+    void dataParamListToDataParamResponseList_isNull_Test(){
+        TestData testData=TestData.builder()
+                .dataName("null")
+                .data(null)
+                .build();
+        DataCollectionEntity dataCollection=DataCollectionEntity.builder()
+                .dataList(Lists.newArrayList(testData))
+                .build();
+        assertThat(dataCollectionMapper.toDto(dataCollection).getDataList()).size().isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the DataCollection's dto object to a entity object")
+    void testDataToTestDataResponse_isNull_Test(){
+        TestData testData=null;
+        DataCollectionEntity dataCollection=DataCollectionEntity.builder()
+                .dataList(Lists.newArrayList(testData))
+                .build();
+        assertThat(dataCollectionMapper.toDto(dataCollection).getDataList()).size().isEqualTo(1);
     }
 
 }

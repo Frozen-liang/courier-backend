@@ -2,6 +2,7 @@ package com.sms.satp.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.sms.satp.dto.request.ApiTagListRequest;
 import com.sms.satp.dto.request.ApiTagRequest;
 import com.sms.satp.dto.response.ApiTagResponse;
 import com.sms.satp.entity.tag.ApiTagEntity;
@@ -79,4 +80,20 @@ class ApiTagMapperTest {
         assertThat(apiTagDtoList).isNull();
     }
 
+    @Test
+    @DisplayName("Test the method list request ApiTag object")
+    void ApiTagEntity_to_listRequestToApiTag(){
+        ApiTagListRequest apiTagListRequest=ApiTagListRequest.builder()
+                .projectId("1")
+                .tagType(0)
+                .tagName("1")
+                .build();
+        assertThat(apiTagMapper.listRequestToApiTag(apiTagListRequest)).isNotNull();
+
+    }
+    @Test
+    @DisplayName("Test the method list is null request ApiTag object")
+    void null_to_listRequestToApiTag(){
+        assertThat(apiTagMapper.listRequestToApiTag(null)).isNull();
+    }
 }

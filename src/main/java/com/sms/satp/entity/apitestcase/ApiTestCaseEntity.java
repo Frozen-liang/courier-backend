@@ -7,6 +7,7 @@ import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.enums.ResponseParamsExtractionType;
 import com.sms.satp.entity.BaseEntity;
+import com.sms.satp.entity.api.common.AdvancedSetting;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ParamInfo;
 import com.sms.satp.entity.api.common.ResponseHeadersVerification;
@@ -86,6 +87,8 @@ public class ApiTestCaseEntity extends BaseEntity {
 
     @Field(name = "isExecute")
     private boolean execute;
+
+    private AdvancedSetting advancedSetting;
 
     private String createUsername;
 }

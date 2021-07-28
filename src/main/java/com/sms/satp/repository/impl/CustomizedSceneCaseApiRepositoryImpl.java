@@ -8,9 +8,6 @@ import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
 import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import java.util.List;
-import java.util.Objects;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -24,33 +21,15 @@ public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCase
     private final CommonRepository commonRepository;
 
     public CustomizedSceneCaseApiRepositoryImpl(MongoTemplate mongoTemplate,
-        CommonRepository commonRepository) {
+        CommonRepository commonDeleteRepository) {
         this.mongoTemplate = mongoTemplate;
-        this.commonRepository = commonRepository;
-    }
-
-    @Override
-    public int findCurrentOrderBySceneCaseId(String sceneCaseId) {
-        Query query = new Query();
-        SceneField.SCENE_CASE_ID.is(sceneCaseId).ifPresent(query::addCriteria);
-        query.with(Sort.by(Direction.DESC, SceneField.ORDER.getName()));
-        query.limit(1);
-        SceneCaseApiEntity sceneCaseApi = mongoTemplate.findOne(query, SceneCaseApiEntity.class);
-        return Objects.isNull(sceneCaseApi) ? 1 : sceneCaseApi.getOrder() + 1;
+        this.commonRepository = commonDeleteRepository;
     }
 
     @Override
     public List<SceneCaseApiEntity> findSceneCaseApiByApiIds(List<String> ids) {
         Query query = new Query();
         SceneField.API_ID.in(ids).ifPresent(query::addCriteria);
-        return mongoTemplate.find(query, SceneCaseApiEntity.class);
-    }
-
-    @Override
-    public List<SceneCaseApiEntity> findSceneCaseApiBySceneCaseIdAndIsExecute(String sceneCaseId, Boolean isExecute) {
-        Query query = new Query();
-        SceneField.SCENE_CASE_ID.is(sceneCaseId).ifPresent(query::addCriteria);
-        SceneField.API_IS_EXECUTE.is(isExecute).ifPresent(query::addCriteria);
         return mongoTemplate.find(query, SceneCaseApiEntity.class);
     }
 

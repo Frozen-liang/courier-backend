@@ -12,7 +12,7 @@ import static com.sms.satp.common.field.UserField.USERNAME;
 import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.common.field.Field;
 import com.sms.satp.dto.PageDto;
-import com.sms.satp.entity.mongo.LookupQueryField;
+import com.sms.satp.entity.mongo.LookupField;
 import com.sms.satp.entity.mongo.LookupVo;
 import com.sms.satp.entity.mongo.QueryVo;
 import com.sms.satp.repository.CommonRepository;
@@ -117,15 +117,15 @@ public class CommonRepositoryImpl implements CommonRepository {
     @Override
     public <T> List<T> listLookupUser(String collectionName, List<Optional<Criteria>> criteriaList,
         Class<T> responseClass) {
-        List<LookupQueryField> lookupQueryFields = List.of(
-            LookupQueryField.builder().field(USERNAME).build(),
-            LookupQueryField.builder().field(NICKNAME).build()
+        List<LookupField> lookupFields = List.of(
+            LookupField.builder().field(USERNAME).alias("createUsername").build(),
+            LookupField.builder().field(NICKNAME).alias("createNickname").build()
         );
         LookupVo lookupVo = LookupVo.builder()
             .from(USER)
             .localField(CREATE_USER_ID)
             .foreignField(ID).as("user")
-            .queryFields(lookupQueryFields).build();
+            .queryFields(lookupFields).build();
         return this.list(collectionName, lookupVo, criteriaList, responseClass);
     }
 
@@ -133,7 +133,7 @@ public class CommonRepositoryImpl implements CommonRepository {
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         query.getCriteriaList().forEach((criteriaOptional) -> criteriaOptional
             .ifPresent(criteria -> aggregationOperations.add(Aggregation.match(criteria))));
-        ProjectionOperation projectionOperation = addLookupOperation(query.getLookupVos(), responseClass,
+        ProjectionOperation projectionOperation = addLookupOperation(query.getLookupVo(), responseClass,
             aggregationOperations);
         aggregationOperations.add(Aggregation.sort(Direction.DESC, CREATE_DATE_TIME.getName()));
         aggregationOperations.add(projectionOperation);
@@ -145,7 +145,7 @@ public class CommonRepositoryImpl implements CommonRepository {
     public <T> List<T> list(String collectionName, LookupVo lookupVo, List<Optional<Criteria>> criteriaList,
         Class<T> responseClass) {
         QueryVo queryVo =
-            QueryVo.builder().collectionName(collectionName).lookupVos(List.of(lookupVo)).criteriaList(criteriaList)
+            QueryVo.builder().collectionName(collectionName).lookupVo(List.of(lookupVo)).criteriaList(criteriaList)
                 .build();
         return this.list(queryVo, responseClass);
     }
@@ -157,7 +157,7 @@ public class CommonRepositoryImpl implements CommonRepository {
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         Sort sort = PageDtoConverter.createSort(pageRequest);
 
-        final ProjectionOperation projectionOperation = addLookupOperation(queryVo.getLookupVos(), responseClass,
+        final ProjectionOperation projectionOperation = addLookupOperation(queryVo.getLookupVo(), responseClass,
             aggregationOperations);
 
         Query query = new Query();
@@ -197,7 +197,7 @@ public class CommonRepositoryImpl implements CommonRepository {
                     .foreignField(lookupVo.getForeignField().getName())
                     .as(lookupVo.getAs());
             aggregationOperations.add(lookupOperation);
-            for (LookupQueryField queryField : lookupVo.getQueryFields()) {
+            for (LookupField queryField : lookupVo.getQueryFields()) {
                 projectionOperation = projectionOperation
                     .and(lookupVo.getAs() + "." + queryField.getField().getName())
                     .as(StringUtils.defaultString(queryField.getAlias(), queryField.getField().getName()));

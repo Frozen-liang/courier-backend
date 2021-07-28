@@ -1,5 +1,6 @@
 package com.sms.satp.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
 import java.util.List;
@@ -15,6 +16,13 @@ import lombok.NoArgsConstructor;
 public class SceneCaseJobResponse {
 
     private String id;
+
+    private String workspaceId;
+
+    private String projectId;
+
+    @JsonProperty("isLock")
+    private boolean lock;
 
     private List<JobSceneCaseApiResponse> apiTestCase;
 

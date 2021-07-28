@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,9 @@ public class AddCaseTemplateRequest {
     @NotNull(message = "The projectId can not be empty")
     private String projectId;
     private String groupId;
+    private String dataCollId;
     private String testStatus;
     private List<String> tagId;
+    @JsonProperty("isLock")
+    private boolean lock;
 }

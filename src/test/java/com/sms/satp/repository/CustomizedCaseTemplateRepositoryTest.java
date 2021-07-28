@@ -1,14 +1,11 @@
 package com.sms.satp.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.response.CaseTemplateResponse;
+import com.sms.satp.entity.scenetest.CaseTemplateEntity;
 import com.sms.satp.repository.impl.CustomizedCaseTemplateRepositoryImpl;
 import java.util.ArrayList;
+import java.util.List;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +14,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Query;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Tests for CustomizedCaseTemplateRepositoryTest")
 class CustomizedCaseTemplateRepositoryTest {
@@ -55,4 +58,29 @@ class CustomizedCaseTemplateRepositoryTest {
         assertThat(page).isNotNull();
     }
 
+    @Test
+    @DisplayName("Test the deleteByIds method in the CustomizedCaseTemplateRepository")
+    void deleteByIds_test() {
+        when(commonRepository.deleteByIds(any(),any())).thenReturn(Boolean.TRUE);
+        Boolean isSuccess = customizedCaseTemplateRepository.deleteByIds(Lists.newArrayList(MOCK_ID));
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the deleteByIds method in the CustomizedCaseTemplateRepository")
+    void recover_test() {
+        when(commonRepository.recover(any(),any())).thenReturn(Boolean.TRUE);
+        Boolean isSuccess = customizedCaseTemplateRepository.recover(Lists.newArrayList(MOCK_ID));
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the getCaseTemplateIdsByGroupIds method in the CustomizedCaseTemplateRepository")
+    void getCaseTemplateIdsByGroupIds_test() {
+        when(mongoTemplate.find(any(), any()))
+            .thenReturn(Lists.newArrayList(CaseTemplateEntity.builder().build()));
+        List<CaseTemplateEntity> dto =
+            customizedCaseTemplateRepository.getCaseTemplateIdsByGroupIds(Lists.newArrayList(MOCK_ID));
+        assertThat(dto).isNotEmpty();
+    }
 }

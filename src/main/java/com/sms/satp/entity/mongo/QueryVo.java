@@ -20,7 +20,7 @@ public class QueryVo  {
     private String collectionName;
 
     // 关联的表
-    private List<LookupVo> lookupVos;
+    private List<LookupVo> lookupVo;
 
     // 查询条件
     @Default

@@ -1,20 +1,20 @@
 package com.sms.satp.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sms.satp.entity.api.common.BaseVerification;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Builder
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseResultVerificationResponse {
-
-    @JsonProperty("isCheckStatus")
-    private boolean checkStatus;
+public class ResponseResultVerificationResponse extends BaseVerification {
 
     private Integer resultVerificationType;
 

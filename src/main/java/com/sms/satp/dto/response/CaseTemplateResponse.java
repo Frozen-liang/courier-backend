@@ -1,5 +1,6 @@
 package com.sms.satp.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,8 +19,11 @@ public class CaseTemplateResponse extends BaseResponse {
     private String createUserName;
     private String projectId;
     private String groupId;
+    private String dataCollId;
     private String groupName;
     private String testStatus;
     private List<String> tagId;
     private List<String> tagName;
+    @JsonProperty("isLock")
+    private boolean lock;
 }

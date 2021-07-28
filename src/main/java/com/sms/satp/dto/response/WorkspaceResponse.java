@@ -11,13 +11,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class WorkspaceResponse extends BaseResponse {
+public class WorkspaceResponse extends LookupUserResponse {
 
     private String name;
-
-    private String username;
-
-    private String nickname;
 
     private Integer limit;
 }

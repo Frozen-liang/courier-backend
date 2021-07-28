@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -22,4 +23,6 @@ public class AddSceneCaseRequest {
     private String groupId;
     private List<String> tagId;
     private int priority;
+    @JsonProperty("isLock")
+    private boolean lock;
 }
