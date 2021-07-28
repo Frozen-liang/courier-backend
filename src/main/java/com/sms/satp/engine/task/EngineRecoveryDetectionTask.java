@@ -5,6 +5,7 @@ import static com.sms.satp.engine.enums.EngineStatus.INVALID;
 import com.sms.satp.engine.model.EngineMemberEntity;
 import com.sms.satp.repository.EngineMemberRepository;
 import com.sms.satp.service.ApiTestCaseJobService;
+import com.sms.satp.service.SceneCaseJobService;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -19,12 +20,15 @@ public class EngineRecoveryDetectionTask {
     private final SuspiciousEngineManagement suspiciousEngineManagement;
     private final EngineMemberRepository engineMemberRepository;
     private final ApiTestCaseJobService apiTestCaseJobService;
+    private final SceneCaseJobService sceneCaseJobService;
 
     public EngineRecoveryDetectionTask(SuspiciousEngineManagement suspiciousEngineManagement,
-        EngineMemberRepository engineMemberRepository, ApiTestCaseJobService apiTestCaseJobService) {
+        EngineMemberRepository engineMemberRepository, ApiTestCaseJobService apiTestCaseJobService,
+        SceneCaseJobService sceneCaseJobService) {
         this.suspiciousEngineManagement = suspiciousEngineManagement;
         this.engineMemberRepository = engineMemberRepository;
         this.apiTestCaseJobService = apiTestCaseJobService;
+        this.sceneCaseJobService = sceneCaseJobService;
     }
 
     @Scheduled(cron = "* * * * * ?")
@@ -34,19 +38,20 @@ public class EngineRecoveryDetectionTask {
 
     @Scheduled(cron = "* * * * * ?")
     @Async("engineDetection")
-    public void detection() {
+    public void engineDetection() {
         Integer currentIndex = suspiciousEngineManagement.getCurrentIndex();
         List<String> engineIds = suspiciousEngineManagement.get(currentIndex);
         Optional.ofNullable(engineIds).ifPresent((engineId) -> {
             updateEngineStatus(engineIds);
             // Reallocate api test job to engine.
             apiTestCaseJobService.reallocateJob(engineIds);
-            // TODO  Reallocate scene  job to engine.
+            // Reallocate scene job to engine.
+            sceneCaseJobService.reallocateJob(engineIds);
         });
     }
 
     private void updateEngineStatus(List<String> engineIds) {
-        Iterable<EngineMemberEntity> engineMemberEntities = engineMemberRepository.findAllById(engineIds);
+        List<EngineMemberEntity> engineMemberEntities = engineMemberRepository.findAllByDestinationIn(engineIds);
         engineMemberEntities.forEach(entity -> entity.setStatus(INVALID));
         engineMemberRepository.saveAll(engineMemberEntities);
     }

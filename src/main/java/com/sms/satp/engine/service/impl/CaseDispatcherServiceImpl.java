@@ -28,17 +28,19 @@ public class CaseDispatcherServiceImpl implements CaseDispatcherService {
     }
 
     @Override
-    public void dispatch(ApiTestCaseJobResponse caseJob) {
+    public String dispatch(ApiTestCaseJobResponse caseJob) {
         String destination = engineMemberManagement.getAvailableMember();
         log.info("Send ApiTestCaseJob. destination {}", destination);
         simpMessagingTemplate.convertAndSend(destination, caseJob);
+        return destination;
     }
 
     @Override
-    public void dispatch(SceneCaseJobResponse caseJob) {
+    public String dispatch(SceneCaseJobResponse caseJob) {
         String destination = engineMemberManagement.getAvailableMember();
         log.info("Run case job. destination {}", destination);
         simpMessagingTemplate.convertAndSend(destination, caseJob);
+        return destination;
     }
 
     @Override

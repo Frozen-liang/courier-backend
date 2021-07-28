@@ -5,13 +5,15 @@ import static com.sms.satp.utils.JwtUtils.TOKEN_USER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.sms.satp.common.enums.RoleType;
 import com.sms.satp.dto.UserEntityAuthority;
+import com.sms.satp.entity.system.SystemRoleEntity;
 import com.sms.satp.entity.system.UserEntity;
 import com.sms.satp.repository.SystemRoleRepository;
-import com.sms.satp.repository.UserRepository;
 import com.sms.satp.security.TokenType;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.security.strategy.SecurityStrategyFactory;
@@ -29,6 +31,7 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,6 +45,7 @@ public class JwtTokenManagerTest {
     private static String token = "token";
     private static String id = "id";
     private static String userTokenType = "USER";
+    private static String engineTokenType = "ENGINE";
     private static JwsHeader<?> jwsHeader;
     private static MockedStatic<JwtUtils> jwtUtilsMockedStatic;
     private static MockedStatic<SecurityUtil> securityUtilMockedStatic;
@@ -66,7 +70,8 @@ public class JwtTokenManagerTest {
     UserService userService = mock(UserService.class);
     SystemRoleRepository roleRepository = mock(SystemRoleRepository.class);
 
-    JwtTokenManager jwtTokenManager = new JwtTokenManager(userService, roleRepository, securityStrategyFactory, signingKeyResolver);
+    JwtTokenManager jwtTokenManager = new JwtTokenManager(userService, roleRepository, securityStrategyFactory,
+        signingKeyResolver);
 
     @Test
     @DisplayName("Generate token for user successfully")
@@ -107,6 +112,7 @@ public class JwtTokenManagerTest {
         String groupId = "groupId";
         jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
             .thenReturn(jwsHeader);
+        when(jwsHeader.get(TOKEN_TYPE)).thenReturn(userTokenType);
         UserEntity userEntity = UserEntity.builder().id(id).username(username).email(email).groupId(groupId).build();
         UserEntityAuthority userEntityAuthority =
             UserEntityAuthority.builder().userEntity(userEntity).authorities(Collections.emptyList()).build();
@@ -114,6 +120,22 @@ public class JwtTokenManagerTest {
         Authentication mockAuthentication = mock(Authentication.class);
         securityUtilMockedStatic.when(() -> SecurityUtil.newAuthentication(id, email, username,
             Collections.emptyList(), TokenType.USER)).thenReturn(mockAuthentication);
+        Authentication authentication = jwtTokenManager.createAuthentication(token);
+        assertThat(authentication).isEqualTo(mockAuthentication);
+    }
+
+    @Test
+    @DisplayName("Parsing out identity information based on token")
+    public void createEngineAuthenticationTest() {
+        Stream<SystemRoleEntity> roles = Stream.of(SystemRoleEntity.builder().name("Admin").build());
+        jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
+            .thenReturn(jwsHeader);
+        when(jwsHeader.get(TOKEN_TYPE)).thenReturn(engineTokenType);
+        when(roleRepository.findAllByRoleType(RoleType.ENGINE))
+            .thenReturn(roles);
+        Authentication mockAuthentication = mock(Authentication.class);
+        securityUtilMockedStatic.when(() -> SecurityUtil.newAuthentication(anyString(), anyString(), anyString(),
+            any(), any())).thenReturn(mockAuthentication);
         Authentication authentication = jwtTokenManager.createAuthentication(token);
         assertThat(authentication).isEqualTo(mockAuthentication);
     }
@@ -143,6 +165,15 @@ public class JwtTokenManagerTest {
         jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
             .thenReturn(jwsHeader);
         assertThat(jwtTokenManager.getUserId(token)).isEqualTo(id);
+    }
+
+    @Test
+    @DisplayName("Parsing out tokenType id based on token")
+    public void getTokenTypeTest() {
+        jwtUtilsMockedStatic.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
+            .thenReturn(jwsHeader);
+        when(jwsHeader.get(TOKEN_TYPE)).thenReturn(engineTokenType);
+        assertThat(jwtTokenManager.getTokenType(token)).isEqualTo(engineTokenType);
     }
 
     @Test

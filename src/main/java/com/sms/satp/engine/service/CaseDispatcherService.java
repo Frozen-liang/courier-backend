@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 @Service
 public interface CaseDispatcherService {
 
-    void dispatch(ApiTestCaseJobResponse caseJob);
+    String dispatch(ApiTestCaseJobResponse caseJob);
 
-    void dispatch(SceneCaseJobResponse caseJob);
+    String dispatch(SceneCaseJobResponse caseJob);
 
     void sendJobReport(String userId, ApiTestCaseJobReportResponse caseReport);
 

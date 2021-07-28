@@ -16,6 +16,10 @@ public class SceneCaseJobResponse {
 
     private String id;
 
+    private String workspaceId;
+
+    private String projectId;
+
     private List<JobSceneCaseApiResponse> apiTestCase;
 
     private JobEnvironment environment;

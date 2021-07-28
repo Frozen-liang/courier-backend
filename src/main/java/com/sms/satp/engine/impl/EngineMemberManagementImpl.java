@@ -8,7 +8,6 @@ import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.CaseRecordRequest;
 import com.sms.satp.engine.EngineId;
 import com.sms.satp.engine.EngineMemberManagement;
-import com.sms.satp.engine.enums.EngineStatus;
 import com.sms.satp.engine.model.EngineMemberEntity;
 import com.sms.satp.engine.request.EngineRegistrationRequest;
 import com.sms.satp.engine.task.SuspiciousEngineManagement;
@@ -16,9 +15,7 @@ import com.sms.satp.repository.EngineMemberRepository;
 import com.sms.satp.utils.ExceptionUtils;
 import java.security.SecureRandom;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +26,6 @@ import org.springframework.util.CollectionUtils;
 public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     private final SecureRandom random = new SecureRandom();
-    private final Map<String, EngineMemberEntity> engineMembers = new ConcurrentHashMap<>();
     private final EngineMemberRepository engineMemberRepository;
     private final SuspiciousEngineManagement suspiciousEngineManagement;
 
@@ -50,20 +46,6 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
         return engineMember.getDestination();
     }
 
-    @Override
-    public void updateMemberStatus(String destination, EngineStatus status) {
-        log.info("The status of the test engine {} was ready to update.", destination);
-        engineMembers.computeIfPresent(destination,
-            (key, oldMember) -> {
-                log.info("The status of the test engine {} has changed from {} to {}.", oldMember.getDestination(),
-                    oldMember.getStatus(),
-                    status);
-                oldMember.setStatus(status);
-                return oldMember;
-            }
-        );
-
-    }
 
     @Override
     public String getAvailableMember() throws ApiTestPlatformException {

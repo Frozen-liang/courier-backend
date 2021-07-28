@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.sms.satp.dto.response.ApiTestCaseJobReportResponse;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
+import com.sms.satp.dto.response.SceneCaseJobReportResponse;
 import com.sms.satp.dto.response.SceneCaseJobResponse;
 import com.sms.satp.engine.EngineMemberManagement;
 import com.sms.satp.engine.service.impl.CaseDispatcherServiceImpl;
@@ -31,6 +32,7 @@ public class CaseDispatcherServiceTest {
     private static final String USER_ID = ObjectId.get().toString();
     private static final String MESSAGE = "message";
     private final ApiTestCaseJobReportResponse caseReport = ApiTestCaseJobReportResponse.builder().build();
+    private final SceneCaseJobReportResponse sceneCaseJobReportResponse = SceneCaseJobReportResponse.builder().build();
 
     @Test
     @DisplayName("Test the dispatch method in the CaseDispatcherService service")
@@ -54,6 +56,14 @@ public class CaseDispatcherServiceTest {
     @DisplayName("Test the sendJobReport method in the CaseDispatcherService service")
     public void sendJobReport_test() {
         caseDispatcherService.sendJobReport(USER_ID, caseReport);
+        doNothing().when(simpMessagingTemplate).convertAndSend(anyString(), any(Object.class));
+        verify(simpMessagingTemplate, times(1)).convertAndSend(anyString(), any(Object.class));
+    }
+
+    @Test
+    @DisplayName("Test the sendJobReport method in the CaseDispatcherService service")
+    public void sendSceneJobReport_test() {
+        caseDispatcherService.sendJobReport(USER_ID, sceneCaseJobReportResponse);
         doNothing().when(simpMessagingTemplate).convertAndSend(anyString(), any(Object.class));
         verify(simpMessagingTemplate, times(1)).convertAndSend(anyString(), any(Object.class));
     }

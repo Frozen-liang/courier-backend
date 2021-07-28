@@ -18,6 +18,8 @@ public class ApiTestCaseJobResponse extends BaseResponse {
 
     private String workspaceId;
 
+    private String projectId;
+
     private JobEnvironmentResponse environment;
 
     private JobDataCollection dataCollection;

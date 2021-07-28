@@ -40,7 +40,6 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -90,7 +89,6 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
     @Override
     public void runJob(ApiTestCaseJobRunRequest apiTestCaseJobRunRequest, CustomUser currentUser) {
         DataCollectionRequest dataCollectionRequest = apiTestCaseJobRunRequest.getDataCollectionRequest();
-        String jobId = null;
         try {
             List<String> apiTestCaseIds = apiTestCaseJobRunRequest.getApiTestCaseIds();
             String envId = apiTestCaseJobRunRequest.getEnvId();
@@ -100,7 +98,6 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             notNull(projectEnvironment, THE_ENV_NOT_EXIST);
             JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
             for (String apiTestCaseId : apiTestCaseIds) {
-                jobId = null;
                 ApiTestCaseResponse apiTestCaseResponse = apiTestCaseService.findById(apiTestCaseId);
                 ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
                 apiTestCaseJob.setWorkspaceId(apiTestCaseJobRunRequest.getWorkspaceId());
@@ -114,37 +111,30 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                     for (TestDataRequest dataList : dataCollectionRequest.getDataList()) {
                         String id = ObjectId.get().toString();
                         apiTestCaseJob.setId(id);
-                        jobId = id;
                         jobDataCollection.setTestData(jobMapper.toTestDataEntity(dataList));
                         apiTestCaseJob.setDataCollection(jobDataCollection);
-                        apiTestCaseJobRepository.insert(apiTestCaseJob);
-                        caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
+                        String engineId = caseDispatcherService
+                            .dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
+                        apiTestCaseJob.setEngineId(engineId);
+                        apiTestCaseJobRepository.save(apiTestCaseJob);
                     }
                 } else {
-                    apiTestCaseJobRepository.insert(apiTestCaseJob);
-                    jobId = apiTestCaseJob.getId();
-                    caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
+                    apiTestCaseJob.setId(ObjectId.get().toString());
+                    String engineId = caseDispatcherService
+                        .dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
+                    apiTestCaseJob.setEngineId(engineId);
+                    apiTestCaseJobRepository.save(apiTestCaseJob);
                 }
             }
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error("Execute the ApiTestCase error. errorMessage:{}", apiTestPlatEx.getMessage());
-            errorHandler(currentUser.getId(), jobId, apiTestPlatEx.getMessage());
+            caseDispatcherService.sendErrorMessage(currentUser.getId(), apiTestPlatEx.getMessage());
         } catch (Exception e) {
             log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
-            errorHandler(currentUser.getId(), jobId, "Execute the ApiTestCase error");
+            caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the ApiTestCase error.");
         }
     }
 
-    private ApiTestCaseJobEntity createApiTestCaseJob(JobEnvironment jobEnvironment,
-        CustomUser currentUser) {
-        return ApiTestCaseJobEntity.builder()
-            .createDateTime(LocalDateTime.now())
-            .modifyUserId(currentUser.getId())
-            .createUserId(currentUser.getId())
-            .createUserName(currentUser.getUsername())
-            .environment(jobEnvironment)
-            .build();
-    }
 
     @Override
     public Page<ApiTestCaseJobPageResponse> page(ApiTestCaseJobPageRequest pageRequest) {
@@ -159,7 +149,6 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
 
     @Override
     public void apiTest(ApiTestRequest apiTestRequest, CustomUser currentUser) {
-        String jobId = null;
         try {
             ProjectEnvironmentEntity projectEnvironment = projectEnvironmentService.findOne(apiTestRequest.getEnvId());
             String apiPath = apiTestRequest.getApiPath();
@@ -169,26 +158,26 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             }
             JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
             ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
+            apiTestCaseJob.setId(ObjectId.get().toString());
             apiTestCaseJob.setWorkspaceId(apiTestRequest.getWorkspaceId());
             apiTestCaseJob.setProjectId(apiTestRequest.getProjectId());
             apiTestCaseJob.setApiTestCase(
                 JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestRequest)).build());
-            apiTestCaseJobRepository.insert(apiTestCaseJob);
-            jobId = apiTestCaseJob.getId();
-            caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
+            String engineId = caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
+            apiTestCaseJob.setEngineId(engineId);
+            apiTestCaseJobRepository.save(apiTestCaseJob);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
-            errorHandler(currentUser.getId(), jobId, apiTestPlatEx.getMessage());
+            caseDispatcherService.sendErrorMessage(currentUser.getId(), apiTestPlatEx.getMessage());
         } catch (Exception e) {
             log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
-            errorHandler(currentUser.getId(), jobId, "Execute the ApiTestCase error");
+            caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the ApiTestCase error.");
         }
     }
 
 
     @Override
     public void reallocateJob(List<String> engineIds) {
-        String jobId = null;
         String userId = null;
         List<ApiTestCaseJobEntity> apiTestCaseJobList = apiTestCaseJobRepository
             .removeByEngineIdInAndJobStatus(engineIds, JobStatus.RUNNING);
@@ -197,21 +186,34 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                 return;
             }
             for (ApiTestCaseJobEntity apiTestCaseJobEntity : apiTestCaseJobList) {
-                apiTestCaseJobEntity.setId(null);
+                apiTestCaseJobEntity.setId(ObjectId.get().toString());
                 apiTestCaseJobEntity.setCreateDateTime(LocalDateTime.now());
                 apiTestCaseJobEntity.setJobStatus(null);
-                apiTestCaseJobRepository.save(apiTestCaseJobEntity);
-                jobId = apiTestCaseJobEntity.getId();
                 userId = apiTestCaseJobEntity.getCreateUserId();
-                caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJobEntity));
+                String engineId = caseDispatcherService
+                    .dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJobEntity));
+                apiTestCaseJobEntity.setEngineId(engineId);
+                apiTestCaseJobRepository.save(apiTestCaseJobEntity);
             }
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
-            errorHandler(userId, jobId, apiTestPlatEx.getMessage());
+            caseDispatcherService.sendErrorMessage(userId, apiTestPlatEx.getMessage());
         } catch (Exception e) {
             log.error("Reallocate job  errorMessage:{}", e.getMessage());
-            errorHandler(userId, jobId, "Execute the ApiTestCase error");
+            caseDispatcherService.sendErrorMessage(userId, "Execute the ApiTestCase error.");
         }
+    }
+
+    private ApiTestCaseJobEntity createApiTestCaseJob(JobEnvironment jobEnvironment,
+        CustomUser currentUser) {
+        return ApiTestCaseJobEntity.builder()
+            .createDateTime(LocalDateTime.now())
+            .modifyUserId(currentUser.getId())
+            .createUserId(currentUser.getId())
+            .jobStatus(JobStatus.RUNNING)
+            .createUserName(currentUser.getUsername())
+            .environment(jobEnvironment)
+            .build();
     }
 
     private void checkApiPath(String apiPath) {
@@ -219,12 +221,5 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             return;
         }
         throw ExceptionUtils.mpe(THE_REQUEST_ADDRESS_IS_ILLEGALITY);
-    }
-
-    private void errorHandler(String userId, String jobId, String message) {
-        caseDispatcherService.sendErrorMessage(userId, message);
-        if (StringUtils.isNotBlank(jobId)) {
-            apiTestCaseJobRepository.deleteById(jobId);
-        }
     }
 }

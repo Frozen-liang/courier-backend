@@ -27,6 +27,7 @@ public class SceneCaseJobEntity {
 
     @MongoId(FieldType.OBJECT_ID)
     private String id;
+    private String engineId;
     @Builder.Default
     @JsonIgnore
     private Boolean removed = false;

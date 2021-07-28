@@ -62,28 +62,37 @@ public class JwtTokenManager {
             JwsHeader<?> jwsHeader = JwtUtils.decodeJwt(token, signingKeyResolver);
             String id = (String) jwsHeader.get(TOKEN_USER_ID);
             TokenType tokenType = TokenType.valueOf((String) jwsHeader.get(TOKEN_TYPE));
-
-            UserEntityAuthority userEntityAuthority = userService.getUserDetailsByUserId(id);
-            return SecurityUtil.newAuthentication(id, userEntityAuthority.getUserEntity().getEmail(),
-                userEntityAuthority.getUserEntity().getUsername(),
-                userEntityAuthority.getAuthorities(), tokenType);
+            Authentication authentication;
+            switch (tokenType) {
+                case USER:
+                    authentication = createUserAuthentication(id, tokenType);
+                    break;
+                case ENGINE:
+                    authentication = createEngineAuthentication(id, tokenType);
+                    break;
+                default:
+                    authentication = null;
+            }
+            return authentication;
         } catch (Exception exception) {
             return null;
         }
     }
 
-    public Authentication createEngineAuthentication(String token) {
-        try {
-            JwsHeader<?> jwsHeader = JwtUtils.decodeJwt(token, signingKeyResolver);
-            String id = (String) jwsHeader.get(TOKEN_USER_ID);
-            TokenType tokenType = TokenType.valueOf((String) jwsHeader.get(TOKEN_TYPE));
-            List<SimpleGrantedAuthority> roles = roleRepository.findAllByRoleType(ENGINE)
-                .map(SystemRoleEntity::getName).map(SimpleGrantedAuthority::new
-                ).collect(Collectors.toList());
-            return SecurityUtil.newAuthentication(id, "", "engine", roles, tokenType);
-        } catch (Exception exception) {
-            return null;
-        }
+    private Authentication createUserAuthentication(String id, TokenType tokenType) {
+        UserEntityAuthority userEntityAuthority = userService.getUserDetailsByUserId(id);
+        return SecurityUtil.newAuthentication(id, userEntityAuthority.getUserEntity().getEmail(),
+            userEntityAuthority.getUserEntity().getUsername(),
+            userEntityAuthority.getAuthorities(), tokenType);
+
+    }
+
+    private Authentication createEngineAuthentication(String id, TokenType tokenType) {
+        List<SimpleGrantedAuthority> roles = roleRepository.findAllByRoleType(ENGINE)
+            .map(SystemRoleEntity::getName).map(SimpleGrantedAuthority::new
+            ).collect(Collectors.toList());
+        return SecurityUtil.newAuthentication(id, "", "engine", roles, tokenType);
+
     }
 
     public String getUserId(String token) {
