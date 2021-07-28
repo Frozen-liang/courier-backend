@@ -7,9 +7,6 @@ public interface CustomizedSceneCaseApiRepository {
 
     List<SceneCaseApiEntity> findSceneCaseApiByApiIds(List<String> ids);
 
-    List<SceneCaseApiEntity> findSceneCaseApiBySceneCaseIdAndIsExecuteAndIsRemove(String sceneCaseId,
-        boolean isExecute, boolean isRemove);
-
     Boolean deleteSceneCaseApiConn(List<String> caseTemplateApiId);
 
     List<SceneCaseApiEntity> findSceneCaseApiIdsBySceneCaseIds(List<String> ids);

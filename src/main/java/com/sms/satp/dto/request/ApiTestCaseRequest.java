@@ -8,6 +8,7 @@ import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.enums.ResponseParamsExtractionType;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
+import com.sms.satp.entity.api.common.AdvancedSetting;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ResponseHeadersVerification;
 import com.sms.satp.entity.api.common.ResponseResultVerification;
@@ -65,4 +66,5 @@ public class ApiTestCaseRequest {
     @Default
     @JsonProperty("isExecute")
     private boolean execute = true;
+    private AdvancedSetting advancedSetting;
 }

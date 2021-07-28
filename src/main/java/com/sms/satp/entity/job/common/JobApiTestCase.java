@@ -1,5 +1,6 @@
 package com.sms.satp.entity.job.common;
 
+import com.sms.satp.entity.api.common.AdvancedSetting;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ParamInfo;
 import com.sms.satp.entity.api.common.ResponseHeadersVerification;
@@ -73,5 +74,9 @@ public class JobApiTestCase {
     private String modifyDateTime;
 
     private CaseReport caseReport;
+
+    private long delayTime;
+
+    private AdvancedSetting advancedSetting;
 
 }

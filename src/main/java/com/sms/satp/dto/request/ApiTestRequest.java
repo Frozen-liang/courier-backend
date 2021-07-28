@@ -5,6 +5,7 @@ import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.entity.api.common.AdvancedSetting;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ResponseHeadersVerification;
 import com.sms.satp.entity.api.common.ResponseResultVerification;
@@ -49,4 +50,5 @@ public class ApiTestRequest {
     private ResponseHeadersVerification responseHeadersVerification;
     private ResponseResultVerification responseResultVerification;
     private ResponseTimeVerification responseTimeVerification;
+    private AdvancedSetting advancedSetting;
 }

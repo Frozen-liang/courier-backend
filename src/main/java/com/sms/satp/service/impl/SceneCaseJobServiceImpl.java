@@ -65,7 +65,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
     private final CaseTemplateRepository caseTemplateRepository;
     private final CaseTemplateApiRepository caseTemplateApiRepository;
-    private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository;
+    private final SceneCaseApiRepository sceneCaseApiRepository;
 
     public SceneCaseJobServiceImpl(
         ProjectEnvironmentService projectEnvironmentService,
@@ -77,7 +77,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository,
         CaseTemplateRepository caseTemplateRepository,
         CaseTemplateApiRepository caseTemplateApiRepository,
-        CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository) {
+        SceneCaseApiRepository sceneCaseApiRepository) {
         this.projectEnvironmentService = projectEnvironmentService;
         this.sceneCaseRepository = sceneCaseRepository;
         this.sceneCaseJobRepository = sceneCaseJobRepository;
@@ -87,7 +87,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
         this.caseTemplateRepository = caseTemplateRepository;
         this.caseTemplateApiRepository = caseTemplateApiRepository;
-        this.customizedSceneCaseApiRepository = customizedSceneCaseApiRepository;
+        this.sceneCaseApiRepository = sceneCaseApiRepository;
     }
 
     @Override
@@ -196,9 +196,8 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     private List<JobSceneCaseApi> getApiCaseList(AddSceneCaseJobRequest request) {
         List<JobSceneCaseApi> caseList = Lists.newArrayList();
         if (StringUtils.isNotBlank(request.getSceneCaseId())) {
-            List<SceneCaseApiEntity> sceneCaseApiList = customizedSceneCaseApiRepository
-                .findSceneCaseApiBySceneCaseIdAndIsExecuteAndIsRemove(request.getSceneCaseId(), Boolean.TRUE,
-                    Boolean.FALSE);
+            List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiRepository
+                .findSceneCaseApiEntitiesBySceneCaseIdAndRemoved(request.getSceneCaseId(), Boolean.FALSE);
             Integer index = 0;
             for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
                 if (Objects.isNull(sceneCaseApi.getCaseTemplateId())
