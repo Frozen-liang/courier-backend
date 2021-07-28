@@ -27,7 +27,7 @@ public class BuildInfoEnvironmentPostProcessor implements EnvironmentPostProcess
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         if (BUILD_INFO_LOCATION.exists()) {
-            Properties properties = loadFrom(BUILD_INFO_LOCATION);
+            Properties properties = loadFrom();
             OriginTrackedMapPropertySource originTrackedMapPropertySource = new OriginTrackedMapPropertySource(
                 BUILD_INFO_SOURCE_NAME, properties);
             environment.getPropertySources().addLast(originTrackedMapPropertySource);
@@ -39,8 +39,8 @@ public class BuildInfoEnvironmentPostProcessor implements EnvironmentPostProcess
         return ORDER;
     }
 
-    protected Properties loadFrom(Resource location) throws IOException {
-        Properties source = loadSource(location);
+    protected Properties loadFrom() throws IOException {
+        Properties source = loadSource();
         Properties target = new Properties();
         for (String key : source.stringPropertyNames()) {
             if (key.startsWith(BUILD_KEY)) {
@@ -50,7 +50,8 @@ public class BuildInfoEnvironmentPostProcessor implements EnvironmentPostProcess
         return target;
     }
 
-    private Properties loadSource(Resource location) throws IOException {
-        return PropertiesLoaderUtils.loadProperties(new EncodedResource(location, StandardCharsets.UTF_8));
+    private Properties loadSource() throws IOException {
+        return PropertiesLoaderUtils.loadProperties(new EncodedResource(
+            BuildInfoEnvironmentPostProcessor.BUILD_INFO_LOCATION, StandardCharsets.UTF_8));
     }
 }
