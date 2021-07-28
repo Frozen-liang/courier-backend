@@ -3,4 +3,7 @@ org.springframework.context.ApplicationListener=\
 com.sms.satp.initialize.DestroyRunningEngine,\
 com.sms.satp.initialize.RoleInitializer,\
 com.sms.satp.initialize.DefaultUserGroupInitializer
+# Environment Post Processor
+org.springframework.boot.env.EnvironmentPostProcessor=\
+  com.sms.satp.infrastructure.env.BuildInfoEnvironmentPostProcessor
 
