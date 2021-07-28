@@ -1,5 +1,11 @@
 package com.sms.satp.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
+
 import com.mongodb.client.result.UpdateResult;
 import com.sms.satp.entity.scenetest.CaseTemplateEntity;
 import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
@@ -9,12 +15,6 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Tests for CustomizedSceneCaseApiRepositoryTest")
 class CustomizedSceneCaseApiRepositoryTest {
@@ -44,7 +44,7 @@ class CustomizedSceneCaseApiRepositoryTest {
         when(mongoTemplate.find(any(), any()))
             .thenReturn(Lists.newArrayList(SceneCaseApiEntity.builder().build()));
         List<SceneCaseApiEntity> sceneCaseApiList = customizedSceneCaseApiRepository
-            .findSceneCaseApiBySceneCaseIdAndIsExecuteAndIsRemove(MOCK_ID, Boolean.TRUE, Boolean.FALSE);
+            .findSceneCaseApiBySceneCaseIdAndIsRemove(MOCK_ID, Boolean.FALSE);
         assertThat(sceneCaseApiList).isNotEmpty();
     }
 

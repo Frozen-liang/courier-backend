@@ -103,8 +103,7 @@ class SceneCaseJobServiceTest {
         Optional<CaseTemplateEntity> sceneCaseApi = Optional.ofNullable(CaseTemplateEntity.builder().build());
         when(caseTemplateRepository.findById(any())).thenReturn(sceneCaseApi);
         List<SceneCaseApiEntity> sceneCaseApiList1 = getSceneCaseApiList();
-        when(customizedSceneCaseApiRepository.findSceneCaseApiBySceneCaseIdAndIsExecuteAndIsRemove(any(), anyBoolean(),
-            anyBoolean()))
+        when(customizedSceneCaseApiRepository.findSceneCaseApiBySceneCaseIdAndIsRemove(any(), anyBoolean()))
             .thenReturn(sceneCaseApiList1);
         List<CaseTemplateApiEntity> templateApiList =
             Lists.newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID).order(MOCK_NUM).build());
