@@ -19,9 +19,9 @@ public class BuildInfoEnvironmentPostProcessor implements EnvironmentPostProcess
 
     public static final String X_API_BUILD = "xapi.build.";
     public static final String BUILD_KEY = "build.";
-    public final int ORDER = ConfigDataEnvironmentPostProcessor.ORDER + 10;
+    public static final int ORDER = ConfigDataEnvironmentPostProcessor.ORDER + 10;
     private static final String BUILD_INFO_SOURCE_NAME = "xApiEnvironment";
-    private final Resource BUILD_INFO_LOCATION = new ClassPathResource("META-INF/build-info.properties");
+    private static final Resource BUILD_INFO_LOCATION = new ClassPathResource("META-INF/build-info.properties");
 
     @SneakyThrows
     @Override
