@@ -30,7 +30,7 @@ public class SpelUtilsTest {
         assertThat(SpelUtils.getValue(evaluationContext, "test", Class.class)).isNull();
     }
 
-    @Test
+   /* @Test
     @DisplayName("Test the getValue method in the SpelUtil")
     public void getValue_test() {
     }
@@ -49,5 +49,5 @@ public class SpelUtilsTest {
     @DisplayName("Test the addVariable_test method in the SpelUtil")
     public void addVariable_test() {
 
-    }
+    }*/
 }

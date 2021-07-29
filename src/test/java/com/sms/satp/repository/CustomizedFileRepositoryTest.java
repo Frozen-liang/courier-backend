@@ -35,12 +35,12 @@ class CustomizedFileRepositoryTest {
 
     private final GridFsTemplate gridFsTemplate = mock(GridFsTemplate.class);
     private final GridFSFile gridFSFile = mock(GridFSFile.class);
-    MultipartFile multipartFile = mock(MultipartFile.class);
+    private final MultipartFile multipartFile = mock(MultipartFile.class);
     private final CustomizedFileRepository customizedFileRepository = new CustomizedFileRepositoryImpl(gridFsTemplate);
     private static final int TOTAL_ELEMENTS = 20;
     private final ObjectId projectId = ObjectId.get();
     private static final String ID = ObjectId.get().toString();
-    TestFileRequest testFileRequest = TestFileRequest.builder().id(ObjectId.get()).testFile(multipartFile)
+    private final TestFileRequest testFileRequest = TestFileRequest.builder().id(ObjectId.get()).testFile(multipartFile)
         .projectId(projectId).build();
 
     @Test
