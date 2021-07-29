@@ -2,7 +2,6 @@ package com.sms.satp.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -18,28 +17,36 @@ public class MD5UtilTest {
 
     private static final String TEST = "test";
     private static final MockedStatic<DigestUtils> digestUtilsMockedStatic;
+    private static final MockedStatic<JsonUtils> JSON_UTILS_MOCKED_STATIC;
 
     static {
         digestUtilsMockedStatic = Mockito.mockStatic(DigestUtils.class);
+        JSON_UTILS_MOCKED_STATIC = Mockito.mockStatic(JsonUtils.class);
     }
 
     @AfterAll
     public static void close() {
         digestUtilsMockedStatic.close();
+        JSON_UTILS_MOCKED_STATIC.close();
     }
 
     @Test
     @DisplayName("Test the encodeJwt method in the MD5Util")
     public void getMD5_test() throws IOException {
-        String json = JsonUtils.serializeObject(TEST);
-        String result = DigestUtils.md5DigestAsHex(json.getBytes(StandardCharsets.UTF_8));
+        String json = "JSON";
+        String result = "RESULT";
+        JSON_UTILS_MOCKED_STATIC.when(() -> JsonUtils.serializeObject(TEST)).thenReturn(json);
+        digestUtilsMockedStatic.when(() -> DigestUtils.md5DigestAsHex(json.getBytes(StandardCharsets.UTF_8)))
+            .thenReturn(result);
         assertThat(MD5Util.getMD5(TEST)).isEqualTo(result);
     }
 
     @Test
     @DisplayName("An exception occurred while getMD5 MD5Util")
     public void getMD5_exception_test() throws IOException {
-        digestUtilsMockedStatic.when(() -> DigestUtils.md5DigestAsHex(any(byte[].class)))
+        String json = "JSON";
+        JSON_UTILS_MOCKED_STATIC.when(() -> JsonUtils.serializeObject(TEST)).thenReturn(json);
+        digestUtilsMockedStatic.when(() -> DigestUtils.md5DigestAsHex(json.getBytes(StandardCharsets.UTF_8)))
             .thenThrow(new RuntimeException());
         assertThatThrownBy(() -> MD5Util.getMD5(TEST)).isInstanceOf(RuntimeException.class);
     }

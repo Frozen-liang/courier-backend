@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.sms.satp.common.aspect.annotation.LogRecord;
-import java.lang.reflect.Method;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,6 @@ public class SpelUtilsTest {
 
     private final EvaluationContext evaluationContext = mock(EvaluationContext.class);
     private final LogRecord logRecord = mock(LogRecord.class);
-    private final Method method = mock(Method.class);
     private static final String ID = ObjectId.get().toString();
 
     @Test
