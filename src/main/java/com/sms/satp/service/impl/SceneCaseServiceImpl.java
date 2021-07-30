@@ -17,6 +17,8 @@ import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.RECOVER_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.THE_API_ENTITY_NOT_EXITS_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.THE_API_TEST_CASE_NOT_EXITS_ERROR;
 
 import com.google.common.collect.Lists;
 import com.sms.satp.common.aspect.annotation.Enhance;
@@ -198,11 +200,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     public Boolean editConn(UpdateSceneCaseConnRequest updateSceneTemplateRequest) {
         log.info("SceneCaseService-editConn()-params: [SceneTemplateDto]={}", updateSceneTemplateRequest.toString());
         try {
-            Optional<SceneCaseEntity> sceneCase = sceneCaseRepository
-                .findById(updateSceneTemplateRequest.getSceneCaseId());
-            if (sceneCase.isEmpty()) {
-                throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
-            }
+            sceneCaseRepository.findById(updateSceneTemplateRequest.getSceneCaseId())
+                .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_BY_ID_ERROR));
             if (CollectionUtils.isNotEmpty(updateSceneTemplateRequest.getUpdateSceneCaseApiRequests())) {
                 List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList();
                 for (UpdateSceneCaseApiConnRequest request :
@@ -250,16 +249,11 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     @Override
     public Boolean addApi(AddSceneCaseApiByIdsRequest request) {
         try {
-            Optional<SceneCaseEntity> sceneCase = sceneCaseRepository.findById(request.getSceneCaseId());
-            if (sceneCase.isEmpty()) {
-                throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
-            }
-            for (AddSceneCaseApi addSceneCaseApi : request.getSceneCaseApis()) {
-                if (BooleanUtils.isTrue(addSceneCaseApi.getIsCase())) {
-                    addSceneCaseApiByTestCase(sceneCase.get(), addSceneCaseApi);
-                } else {
-                    addSceneCaseApiByApi(sceneCase.get(), addSceneCaseApi);
-                }
+            SceneCaseEntity sceneCase =
+                sceneCaseRepository.findById(request.getSceneCaseId())
+                    .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_BY_ID_ERROR));
+            for (AddSceneCaseApi addSceneCaseApiRequest : request.getSceneCaseApis()) {
+                addSceneCaseApi(sceneCase, addSceneCaseApiRequest);
             }
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
@@ -274,11 +268,9 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     @Override
     public Boolean addTemplate(AddCaseTemplateConnRequest addCaseTemplateConnRequest) {
         try {
-            Optional<SceneCaseEntity> sceneCase = sceneCaseRepository
-                .findById(addCaseTemplateConnRequest.getSceneCaseId());
-            if (sceneCase.isEmpty()) {
-                throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
-            }
+            SceneCaseEntity sceneCase =
+                sceneCaseRepository.findById(addCaseTemplateConnRequest.getSceneCaseId())
+                    .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_BY_ID_ERROR));
             for (AddCaseTemplateApi addCaseTemplateApi : addCaseTemplateConnRequest.getCaseTemplateIds()) {
                 List<CaseTemplateApiEntity> caseTemplateApiList =
                     caseTemplateApiService.listByCaseTemplateId(addCaseTemplateApi.getId());
@@ -286,7 +278,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                     .sceneCaseId(addCaseTemplateConnRequest.getSceneCaseId())
                     .caseTemplateId(addCaseTemplateApi.getId())
                     .apiType(ApiType.API)
-                    .projectId(sceneCase.get().getProjectId())
+                    .projectId(sceneCase.getProjectId())
                     .order(addCaseTemplateApi.getOrder())
                     .caseTemplateApiConnList(sceneCaseMapper.toCaseTemplateApiConnList(caseTemplateApiList))
                     .build();
@@ -369,38 +361,27 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         }
     }
 
-    private void addSceneCaseApiByApi(SceneCaseEntity sceneCase, AddSceneCaseApi addSceneCaseApi) {
-        Optional<ApiEntity> apiEntity = apiRepository.findById(addSceneCaseApi.getId());
-        if (apiEntity.isPresent()) {
-            ApiTestCaseEntity apiTestCase = apiTestCaseMapper.toEntityByApiEntity(apiEntity.get());
-            apiTestCase.setExecute(Boolean.TRUE);
-            SceneCaseApiEntity sceneCaseApi =
-                SceneCaseApiEntity.builder()
-                    .apiTestCase(apiTestCase)
-                    .sceneCaseId(sceneCase.getId())
-                    .order(addSceneCaseApi.getOrder())
-                    .projectId(sceneCase.getProjectId())
-                    .apiType(ApiType.API)
-                    .build();
-            sceneCaseApiRepository.insert(sceneCaseApi);
+    private void addSceneCaseApi(SceneCaseEntity sceneCase, AddSceneCaseApi addSceneCaseApi) {
+        ApiTestCaseEntity apiTestCase;
+        if (BooleanUtils.isTrue(addSceneCaseApi.getIsCase())) {
+            apiTestCase =
+                apiTestCaseRepository.findById(addSceneCaseApi.getId())
+                    .orElseThrow(() -> ExceptionUtils.mpe(THE_API_TEST_CASE_NOT_EXITS_ERROR));
+        } else {
+            ApiEntity apiEntity = apiRepository.findById(addSceneCaseApi.getId())
+                .orElseThrow(() -> ExceptionUtils.mpe(THE_API_ENTITY_NOT_EXITS_ERROR));
+            apiTestCase = apiTestCaseMapper.toEntityByApiEntity(apiEntity);
         }
-    }
-
-    private void addSceneCaseApiByTestCase(SceneCaseEntity sceneCase, AddSceneCaseApi addSceneCaseApi) {
-        Optional<ApiTestCaseEntity> apiTestCase = apiTestCaseRepository.findById(addSceneCaseApi.getId());
-        if (apiTestCase.isPresent()) {
-            ApiTestCaseEntity testCase = apiTestCase.get();
-            testCase.setExecute(Boolean.TRUE);
-            SceneCaseApiEntity sceneCaseApi =
-                SceneCaseApiEntity.builder()
-                    .apiTestCase(testCase)
-                    .sceneCaseId(sceneCase.getId())
-                    .order(addSceneCaseApi.getOrder())
-                    .projectId(sceneCase.getProjectId())
-                    .apiType(ApiType.API)
-                    .build();
-            sceneCaseApiRepository.insert(sceneCaseApi);
-        }
+        apiTestCase.setExecute(Boolean.TRUE);
+        SceneCaseApiEntity sceneCaseApi =
+            SceneCaseApiEntity.builder()
+                .apiTestCase(apiTestCase)
+                .sceneCaseId(sceneCase.getId())
+                .order(addSceneCaseApi.getOrder())
+                .projectId(sceneCase.getProjectId())
+                .apiType(ApiType.API)
+                .build();
+        sceneCaseApiRepository.insert(sceneCaseApi);
     }
 
     private void resetSceneCaseApiConn(SceneCaseApiConnResponse response,
@@ -408,10 +389,11 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         List<CaseTemplateApiEntity> caseTemplateApiList =
             caseTemplateApiService.listByCaseTemplateId(sceneCaseApi.getCaseTemplateId());
         if (CollectionUtils.isNotEmpty(caseTemplateApiList)) {
-            Map<String, Boolean> isExecute =
+            Map<String, Boolean> isExecuteMap =
                 sceneCaseApi.getCaseTemplateApiConnList().stream().collect(
                     Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::isExecute));
-            caseTemplateApiList.forEach(api -> api.getApiTestCase().setExecute(isExecute.get(api.getId())));
+            caseTemplateApiList.forEach(api -> api.getApiTestCase().setExecute(
+                isExecuteMap.getOrDefault(api.getId(), Boolean.TRUE)));
             response.setCaseTemplateApiList(caseTemplateApiMapper.toCaseTemplateApiDtoList(caseTemplateApiList));
         }
     }

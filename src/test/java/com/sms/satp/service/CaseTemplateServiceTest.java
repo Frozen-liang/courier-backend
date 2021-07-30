@@ -92,22 +92,22 @@ class CaseTemplateServiceTest {
     private final static Integer MOCK_PAGE = 1;
     private final static Integer MOCK_SIZE = 1;
     private final static long MOCK_TOTAL = 1L;
-    private static MockedStatic<SecurityUtil> securityUtilMockedStatic;
+    private static final MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
 
     static {
-        securityUtilMockedStatic = Mockito.mockStatic(SecurityUtil.class);
+        SECURITY_UTIL_MOCKED_STATIC = Mockito.mockStatic(SecurityUtil.class);
     }
 
     @AfterAll
     public static void close() {
-        securityUtilMockedStatic.close();
+        SECURITY_UTIL_MOCKED_STATIC.close();
     }
 
     @Test
     @DisplayName("Test the add method in the CaseTemplate service")
     void add_test() {
         CustomUser customUser = mock(CustomUser.class);
-        securityUtilMockedStatic.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
         CaseTemplateEntity caseTemplate =
             CaseTemplateEntity.builder().name(MOCK_NAME).projectId(MOCK_PROJECT_ID).groupId(MOCK_GROUP_ID)
                 .createUserId(MOCK_CREATE_USER_ID).build();

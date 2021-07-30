@@ -83,4 +83,12 @@ class CustomizedCaseTemplateRepositoryTest {
             customizedCaseTemplateRepository.getCaseTemplateIdsByGroupIds(Lists.newArrayList(MOCK_ID));
         assertThat(dto).isNotEmpty();
     }
+
+    @Test
+    @DisplayName("Test the deleteGroupIdByIds method in the CustomizedCaseTemplateRepository")
+    void deleteGroupIdByIds_test() {
+        when(commonRepository.deleteFieldByIds(any(),any(),any())).thenReturn(Boolean.TRUE);
+        assertTrue(customizedCaseTemplateRepository.deleteGroupIdByIds(Lists.newArrayList(MOCK_ID)));
+    }
+
 }

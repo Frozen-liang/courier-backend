@@ -13,6 +13,7 @@ public enum CommonField implements Field {
     MODIFY_DATE_TIME("modifyDateTime"),
     REMOVE("isRemoved"),
     CREATE_USER_ID("createUserId"),
+    MODIFY_USER_ID("modifyUserId"),
     GROUP_ID("groupId");
 
     private final String name;

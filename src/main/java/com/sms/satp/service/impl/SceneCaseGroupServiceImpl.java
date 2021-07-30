@@ -11,6 +11,7 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_GROUP_ERRO
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_GROUP_LIST_ERROR;
 import static com.sms.satp.utils.Assert.isTrue;
 
+import com.google.common.collect.Lists;
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.constant.Constants;
@@ -28,6 +29,7 @@ import com.sms.satp.service.SceneCaseService;
 import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.TreeUtils;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -111,9 +113,12 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
             SceneCaseGroupEntity sceneCaseGroupEntity = sceneCaseGroupRepository.findById(id)
                 .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "SceneCaseGroup", id));
             //Query all sceneCaseGroup contain children groups
-            List<String> ids = sceneCaseGroupRepository
-                .findAllByPathContains(sceneCaseGroupEntity.getRealGroupId()).map(SceneCaseGroupEntity::getId)
-                .collect(Collectors.toList());
+            List<String> ids = Lists.newArrayList();
+            if (Objects.nonNull(sceneCaseGroupEntity.getRealGroupId())) {
+                ids = sceneCaseGroupRepository
+                    .findAllByPathContains(sceneCaseGroupEntity.getRealGroupId()).map(SceneCaseGroupEntity::getId)
+                    .collect(Collectors.toList());
+            }
             if (CollectionUtils.isNotEmpty(ids)) {
                 sceneCaseGroupRepository.deleteAllByIdIn(ids);
                 List<SceneCaseEntity> sceneCaseEntityList = customizedSceneCaseRepository
@@ -122,6 +127,7 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
                     List<String> sceneCaseIds = sceneCaseEntityList.stream().map(SceneCaseEntity::getId)
                         .collect(Collectors.toList());
                     sceneCaseService.delete(sceneCaseIds);
+                    customizedSceneCaseRepository.deleteGroupIdByIds(sceneCaseIds);
                 }
             }
             return Boolean.TRUE;

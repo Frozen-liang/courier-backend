@@ -102,6 +102,11 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
         return mongoTemplate.find(query, CaseTemplateEntity.class);
     }
 
+    @Override
+    public Boolean deleteGroupIdByIds(List<String> ids) {
+        return commonRepository.deleteFieldByIds(ids, CommonField.GROUP_ID.getName(), CaseTemplateEntity.class);
+    }
+
     private void buildCriteria(CaseTemplateSearchRequest searchRequest, Query query,
         ObjectId projectId, ArrayList<AggregationOperation> aggregationOperations) {
         CommonField.PROJECT_ID.is(projectId).ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
@@ -114,6 +119,8 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
         SceneField.NAME.like(searchRequest.getName())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         SceneField.GROUP_ID.is(searchRequest.getGroupId())
+            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+        SceneField.PRIORITY.in(searchRequest.getPriority())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
         SceneField.CREATE_USER_NAME.in(searchRequest.getCreateUserName())
             .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));

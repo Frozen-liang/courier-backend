@@ -84,4 +84,11 @@ class CustomizedSceneCaseRepositoryTest {
             customizedSceneCaseRepository.getSceneCaseIdsByGroupIds(Lists.newArrayList(MOCK_ID));
         assertThat(dto).isNotEmpty();
     }
+
+    @Test
+    @DisplayName("Test the deleteGroupIdByIds method in the CustomizedSceneCaseRepository")
+    void deleteGroupIdByIds_test() {
+        when(commonRepository.deleteFieldByIds(any(),any(),any())).thenReturn(Boolean.TRUE);
+        assertTrue(customizedSceneCaseRepository.deleteGroupIdByIds(Lists.newArrayList(MOCK_ID)));
+    }
 }

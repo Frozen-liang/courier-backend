@@ -31,4 +31,8 @@ public interface CommonRepository {
         Class<T> responseClass);
 
     <T> Page<T> page(QueryVo queryVo, PageDto pageRequest, Class<T> responseClass);
+
+    Boolean deleteFieldById(String id, String fieldName, Class<?> entityClass);
+
+    Boolean deleteFieldByIds(List<String> ids, String fieldName, Class<?> entityClass);
 }

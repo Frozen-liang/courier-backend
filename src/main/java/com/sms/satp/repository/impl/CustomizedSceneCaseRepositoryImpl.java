@@ -102,6 +102,11 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
         return mongoTemplate.find(query, SceneCaseEntity.class);
     }
 
+    @Override
+    public Boolean deleteGroupIdByIds(List<String> ids) {
+        return commonRepository.deleteFieldByIds(ids, CommonField.GROUP_ID.getName(), SceneCaseEntity.class);
+    }
+
     private void buildCriteria(SearchSceneCaseRequest searchSceneCaseRequest, Query query,
         ObjectId projectId, ArrayList<AggregationOperation> aggregationOperations) {
         CommonField.PROJECT_ID.is(projectId).ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));

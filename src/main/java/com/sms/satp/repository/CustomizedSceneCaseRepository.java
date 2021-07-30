@@ -17,4 +17,5 @@ public interface CustomizedSceneCaseRepository {
 
     List<SceneCaseEntity> getSceneCaseIdsByGroupIds(List<String> ids);
 
+    Boolean deleteGroupIdByIds(List<String> ids);
 }

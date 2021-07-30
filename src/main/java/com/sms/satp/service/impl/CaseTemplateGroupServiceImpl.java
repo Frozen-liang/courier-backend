@@ -11,6 +11,7 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_GROUP_LIST_ERROR;
 import static com.sms.satp.utils.Assert.isTrue;
 
+import com.google.common.collect.Lists;
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.constant.Constants;
@@ -28,6 +29,7 @@ import com.sms.satp.service.CaseTemplateService;
 import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.TreeUtils;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -111,9 +113,12 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
             CaseTemplateGroupEntity caseTemplateGroup = caseTemplateGroupRepository.findById(id)
                 .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "CaseTemplateGroup", id));
             //Query all CaseTemplateGroup contain children groups
-            List<String> ids = caseTemplateGroupRepository
-                .findAllByPathContains(caseTemplateGroup.getRealGroupId()).map(CaseTemplateGroupEntity::getId)
-                .collect(Collectors.toList());
+            List<String> ids = Lists.newArrayList();
+            if (Objects.nonNull(caseTemplateGroup.getRealGroupId())) {
+                ids = caseTemplateGroupRepository
+                    .findAllByPathContains(caseTemplateGroup.getRealGroupId()).map(CaseTemplateGroupEntity::getId)
+                    .collect(Collectors.toList());
+            }
             if (CollectionUtils.isNotEmpty(ids)) {
                 caseTemplateGroupRepository.deleteAllByIdIn(ids);
                 List<CaseTemplateEntity> caseTemplateEntityList = customizedCaseTemplateRepository
@@ -122,6 +127,7 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
                     List<String> caseTemplateIds = caseTemplateEntityList.stream().map(CaseTemplateEntity::getId)
                         .collect(Collectors.toList());
                     caseTemplateService.delete(caseTemplateIds);
+                    customizedCaseTemplateRepository.deleteGroupIdByIds(caseTemplateIds);
                 }
             }
             return Boolean.TRUE;
