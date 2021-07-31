@@ -1,5 +1,6 @@
 package com.sms.satp.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,9 @@ public class SceneCaseApiConnResponse extends BaseResponse {
     private String shell;
 
     private Integer order;
+
+    @JsonProperty("isLock")
+    private boolean lock;
 
     private ApiTestCaseResponse apiTestCase;
 

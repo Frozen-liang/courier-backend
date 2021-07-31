@@ -35,7 +35,7 @@ public class ApiTestCaseRequest {
     private String caseName;
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiId can not be empty.")
     private String apiId;
-    private List<String> tagIds;
+    private List<String> tagId;
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId can not be empty.")
     private String projectId;
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiName can not be empty.")
@@ -61,7 +61,6 @@ public class ApiTestCaseRequest {
     private ResponseHeadersVerification responseHeadersVerification;
     private ResponseResultVerification responseResultVerification;
     private ResponseTimeVerification responseTimeVerification;
-    private String createUserName;
     private String dataCollId;
     @Default
     @JsonProperty("isExecute")

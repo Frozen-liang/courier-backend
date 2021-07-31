@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiType;
 import javax.validation.constraints.NotNull;
@@ -26,6 +27,12 @@ public class UpdateSceneCaseApiRequest {
     private String shell;
 
     private Integer order;
+
+    /**
+     * 是否强制执行该步骤，即使其他步骤出错时.
+     */
+    @JsonProperty("isLock")
+    private boolean lock;
 
     /**
      * API绑定状态.

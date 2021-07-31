@@ -11,12 +11,16 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
@@ -49,11 +53,9 @@ class CustomizedCaseTemplateRepositoryTest {
         request.setRemoved(Boolean.FALSE);
         request.setPageNumber(1);
         request.setPageSize(1);
-        when(mongoTemplate.count(any(Query.class), any(Class.class))).thenReturn(COUNT);
-        AggregationResults aggregationResults = mock(AggregationResults.class);
-        when(mongoTemplate.aggregate(any(), any(Class.class), any(Class.class)))
-            .thenReturn(aggregationResults);
-        when(aggregationResults.getMappedResults()).thenReturn(apiDtoList);
+        Page<CaseTemplateResponse> responses = mock(Page.class);
+        when(responses.getContent()).thenReturn(apiDtoList);
+        when(commonRepository.page(any(),any(),eq(CaseTemplateResponse.class))).thenReturn(responses);
         Page<CaseTemplateResponse> page = customizedCaseTemplateRepository.page(request, new ObjectId());
         assertThat(page).isNotNull();
     }

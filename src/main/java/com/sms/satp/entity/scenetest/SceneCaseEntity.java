@@ -3,7 +3,6 @@ package com.sms.satp.entity.scenetest;
 import com.sms.satp.entity.BaseEntity;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder.Default;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -24,8 +23,6 @@ public class SceneCaseEntity extends BaseEntity {
 
     private String name;
 
-    private String createUserName;
-
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
@@ -41,10 +38,9 @@ public class SceneCaseEntity extends BaseEntity {
     private Integer priority;
 
     /**
-     * 是否锁定，当前步骤出错或未通过时，依然执行下一个步骤.
+     *出错时，是否执行下一个步骤.
      */
-    @Default
-    @Field("isLock")
-    private boolean lock = true;
+    @Field("isNext")
+    private boolean next;
 
 }

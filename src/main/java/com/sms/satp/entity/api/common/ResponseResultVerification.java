@@ -2,6 +2,7 @@ package com.sms.satp.entity.api.common;
 
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ResultVerificationType;
+import com.sms.satp.common.enums.VerificationElementType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import lombok.Data;
@@ -21,6 +22,8 @@ public class ResponseResultVerification extends BaseVerification {
     private ResultVerificationType resultVerificationType;
 
     private ApiJsonType apiResponseJsonType;
+
+    private VerificationElementType verificationElementType;
 
     private List<MatchParamInfo> params;
 }

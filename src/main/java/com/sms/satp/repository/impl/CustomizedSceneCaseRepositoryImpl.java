@@ -1,29 +1,35 @@
 package com.sms.satp.repository.impl;
 
+import static com.sms.satp.common.field.ApiTag.GROUP_NAME;
+import static com.sms.satp.common.field.ApiTag.TAG_NAME;
+import static com.sms.satp.common.field.CommonField.CREATE_USER_ID;
 import static com.sms.satp.common.field.CommonField.ID;
+import static com.sms.satp.common.field.CommonField.PROJECT_ID;
+import static com.sms.satp.common.field.CommonField.REMOVE;
+import static com.sms.satp.common.field.CommonField.USERNAME;
+import static com.sms.satp.common.field.SceneField.CREATE_USER_NAME;
 import static com.sms.satp.common.field.SceneField.GROUP_ID;
+import static com.sms.satp.common.field.SceneField.NAME;
+import static com.sms.satp.common.field.SceneField.PRIORITY;
 import static com.sms.satp.common.field.SceneField.TAG_ID;
+import static com.sms.satp.common.field.SceneField.TEST_STATUS;
 
+import com.google.common.collect.Lists;
+import com.sms.satp.common.enums.OperationModule;
 import com.sms.satp.common.field.CommonField;
-import com.sms.satp.common.field.SceneField;
 import com.sms.satp.dto.request.SearchSceneCaseRequest;
 import com.sms.satp.dto.response.SceneCaseResponse;
+import com.sms.satp.entity.mongo.LookupField;
+import com.sms.satp.entity.mongo.LookupVo;
+import com.sms.satp.entity.mongo.QueryVo;
 import com.sms.satp.entity.scenetest.SceneCaseEntity;
 import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
-import com.sms.satp.utils.PageDtoConverter;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.LookupOperation;
-import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -42,46 +48,13 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
 
     @Override
     public Page<SceneCaseResponse> search(SearchSceneCaseRequest searchSceneCaseRequest, ObjectId projectId) {
-        PageDtoConverter.frontMapping(searchSceneCaseRequest);
-        ArrayList<AggregationOperation> aggregationOperations = new ArrayList<>();
-        Query query = new Query();
-
-        LookupOperation apiGroupLookupOperation =
-            LookupOperation.newLookup().from("SceneCaseGroup").localField(GROUP_ID.getName())
-                .foreignField(ID.getName())
-                .as("sceneCaseGroup");
-        LookupOperation apiTagLookupOperation =
-            LookupOperation.newLookup().from("ApiTag").localField(TAG_ID.getName())
-                .foreignField(ID.getName())
-                .as("apiTag");
-
-        aggregationOperations.add(apiTagLookupOperation);
-        aggregationOperations.add(apiGroupLookupOperation);
-
-        buildCriteria(searchSceneCaseRequest, query, projectId, aggregationOperations);
-
-        Sort sort = PageDtoConverter.createSort(searchSceneCaseRequest);
-        aggregationOperations.add(Aggregation.sort(sort));
-
-        int skipRecord = searchSceneCaseRequest.getPageNumber() * searchSceneCaseRequest.getPageSize();
-        aggregationOperations.add(Aggregation.limit(searchSceneCaseRequest.getPageSize()));
-        aggregationOperations.add(Aggregation.skip(Long.valueOf(skipRecord)));
-
-        ProjectionOperation projectionOperation = Aggregation.project(SceneCaseResponse.class);
-        projectionOperation = projectionOperation.and("sceneCaseGroup.name").as("groupName");
-        projectionOperation = projectionOperation.and("apiTag.tagName").as("tagName");
-        aggregationOperations.add(projectionOperation);
-
-        Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
-        long count = mongoTemplate.count(query, SceneCaseEntity.class);
-        if (count == 0L || skipRecord >= count) {
-            return Page.empty();
-        }
-        List<SceneCaseResponse> records = mongoTemplate
-            .aggregate(aggregation, SceneCaseEntity.class, SceneCaseResponse.class)
-            .getMappedResults();
-        return new PageImpl<SceneCaseResponse>(records,
-            PageRequest.of(searchSceneCaseRequest.getPageNumber(), searchSceneCaseRequest.getPageSize(), sort), count);
+        List<LookupVo> lookupVoList = getLookupVoList();
+        QueryVo queryVo = QueryVo.builder()
+            .collectionName("SceneCase")
+            .lookupVo(lookupVoList)
+            .criteriaList(buildCriteria(searchSceneCaseRequest, projectId))
+            .build();
+        return commonRepository.page(queryVo, searchSceneCaseRequest, SceneCaseResponse.class);
     }
 
     @Override
@@ -107,28 +80,43 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
         return commonRepository.deleteFieldByIds(ids, CommonField.GROUP_ID.getName(), SceneCaseEntity.class);
     }
 
-    private void buildCriteria(SearchSceneCaseRequest searchSceneCaseRequest, Query query,
-        ObjectId projectId, ArrayList<AggregationOperation> aggregationOperations) {
-        CommonField.PROJECT_ID.is(projectId).ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        CommonField.REMOVE.is(searchSceneCaseRequest.isRemoved())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneField.NAME.like(searchSceneCaseRequest.getName())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneField.GROUP_ID.is(searchSceneCaseRequest.getGroupId())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneField.TEST_STATUS.in(searchSceneCaseRequest.getTestStatus())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneField.TAG_ID.in(searchSceneCaseRequest.getTagId())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneField.PRIORITY.in(searchSceneCaseRequest.getPriority())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneField.CREATE_USER_NAME.in(searchSceneCaseRequest.getCreateUserName())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+    private List<LookupVo> getLookupVoList() {
+        return Lists.newArrayList(
+            LookupVo.builder()
+                .from(OperationModule.SCENE_CASE_GROUP)
+                .localField(GROUP_ID)
+                .foreignField(ID)
+                .as("sceneCaseGroup")
+                .queryFields(Lists.newArrayList(LookupField.builder().field(GROUP_NAME).alias("groupName").build()))
+                .build(),
+            LookupVo.builder()
+                .from(OperationModule.API_TAG)
+                .localField(TAG_ID)
+                .foreignField(ID)
+                .as("apiTag")
+                .queryFields(Lists.newArrayList(LookupField.builder().field(TAG_NAME).build()))
+                .build(),
+            LookupVo.builder()
+                .from(OperationModule.USER)
+                .localField(CREATE_USER_ID)
+                .foreignField(ID)
+                .as("user")
+                .queryFields(Lists.newArrayList(LookupField.builder().field(USERNAME).alias("createUsername").build()))
+                .build()
+        );
     }
 
-    private void addCriteria(Criteria criteria, Query query, List<AggregationOperation> aggregationOperations) {
-        query.addCriteria(criteria);
-        aggregationOperations.add(Aggregation.match(criteria));
+    private List<Optional<Criteria>> buildCriteria(SearchSceneCaseRequest searchSceneCaseRequest, ObjectId projectId) {
+        return Lists.newArrayList(
+            PROJECT_ID.is(projectId),
+            REMOVE.is(searchSceneCaseRequest.isRemoved()),
+            NAME.like(searchSceneCaseRequest.getName()),
+            GROUP_ID.is(searchSceneCaseRequest.getGroupId()),
+            TEST_STATUS.in(searchSceneCaseRequest.getTestStatus()),
+            TAG_ID.in(searchSceneCaseRequest.getTagId()),
+            PRIORITY.in(searchSceneCaseRequest.getPriority()),
+            CREATE_USER_NAME.in(searchSceneCaseRequest.getCreateUserName())
+        );
     }
 
 }

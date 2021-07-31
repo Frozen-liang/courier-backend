@@ -1,29 +1,35 @@
 package com.sms.satp.repository.impl;
 
+import static com.sms.satp.common.field.ApiTag.GROUP_NAME;
+import static com.sms.satp.common.field.ApiTag.TAG_NAME;
+import static com.sms.satp.common.field.CommonField.CREATE_USER_ID;
 import static com.sms.satp.common.field.CommonField.ID;
+import static com.sms.satp.common.field.CommonField.PROJECT_ID;
+import static com.sms.satp.common.field.CommonField.REMOVE;
+import static com.sms.satp.common.field.CommonField.USERNAME;
+import static com.sms.satp.common.field.SceneField.CREATE_USER_NAME;
 import static com.sms.satp.common.field.SceneField.GROUP_ID;
+import static com.sms.satp.common.field.SceneField.NAME;
+import static com.sms.satp.common.field.SceneField.PRIORITY;
 import static com.sms.satp.common.field.SceneField.TAG_ID;
+import static com.sms.satp.common.field.SceneField.TEST_STATUS;
 
+import com.google.common.collect.Lists;
+import com.sms.satp.common.enums.OperationModule;
 import com.sms.satp.common.field.CommonField;
-import com.sms.satp.common.field.SceneField;
 import com.sms.satp.dto.request.CaseTemplateSearchRequest;
 import com.sms.satp.dto.response.CaseTemplateResponse;
+import com.sms.satp.entity.mongo.LookupField;
+import com.sms.satp.entity.mongo.LookupVo;
+import com.sms.satp.entity.mongo.QueryVo;
 import com.sms.satp.entity.scenetest.CaseTemplateEntity;
 import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.repository.CustomizedCaseTemplateRepository;
-import com.sms.satp.utils.PageDtoConverter;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.LookupOperation;
-import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -41,47 +47,14 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
     }
 
     @Override
-    public Page<CaseTemplateResponse> page(CaseTemplateSearchRequest searchDto, ObjectId projectId) {
-        PageDtoConverter.frontMapping(searchDto);
-        ArrayList<AggregationOperation> aggregationOperations = new ArrayList<>();
-        Query query = new Query();
-
-        LookupOperation apiTagLookupOperation =
-            LookupOperation.newLookup().from("ApiTag").localField(TAG_ID.getName())
-                .foreignField(ID.getName())
-                .as("apiTag");
-        LookupOperation apiGroupLookupOperation =
-            LookupOperation.newLookup().from("CaseTemplateGroup").localField(GROUP_ID.getName())
-                .foreignField(ID.getName())
-                .as("caseTemplateGroup");
-
-        aggregationOperations.add(apiTagLookupOperation);
-        aggregationOperations.add(apiGroupLookupOperation);
-
-        buildCriteria(searchDto, query, projectId, aggregationOperations);
-
-        int skipRecord = searchDto.getPageNumber() * searchDto.getPageSize();
-        aggregationOperations.add(Aggregation.skip(Long.valueOf(skipRecord)));
-        aggregationOperations.add(Aggregation.limit(searchDto.getPageSize()));
-
-        Sort sort = PageDtoConverter.createSort(searchDto);
-        aggregationOperations.add(Aggregation.sort(sort));
-
-        ProjectionOperation projectionOperation = Aggregation.project(CaseTemplateResponse.class);
-        projectionOperation = projectionOperation.and("apiTag.tagName").as("tagName");
-        projectionOperation = projectionOperation.and("caseTemplateGroup.name").as("groupName");
-        aggregationOperations.add(projectionOperation);
-
-        Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
-        long count = mongoTemplate.count(query, CaseTemplateEntity.class);
-        if (count == 0L || skipRecord >= count) {
-            return Page.empty();
-        }
-        List<CaseTemplateResponse> records = mongoTemplate
-            .aggregate(aggregation, CaseTemplateEntity.class, CaseTemplateResponse.class)
-            .getMappedResults();
-        return new PageImpl<CaseTemplateResponse>(records,
-            PageRequest.of(searchDto.getPageNumber(), searchDto.getPageSize(), sort), count);
+    public Page<CaseTemplateResponse> page(CaseTemplateSearchRequest searchRequest, ObjectId projectId) {
+        List<LookupVo> lookupVoList = getLookupVoList();
+        QueryVo queryVo = QueryVo.builder()
+            .collectionName("CaseTemplate")
+            .lookupVo(lookupVoList)
+            .criteriaList(buildCriteria(searchRequest, projectId))
+            .build();
+        return commonRepository.page(queryVo, searchRequest, CaseTemplateResponse.class);
     }
 
     @Override
@@ -107,28 +80,43 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
         return commonRepository.deleteFieldByIds(ids, CommonField.GROUP_ID.getName(), CaseTemplateEntity.class);
     }
 
-    private void buildCriteria(CaseTemplateSearchRequest searchRequest, Query query,
-        ObjectId projectId, ArrayList<AggregationOperation> aggregationOperations) {
-        CommonField.PROJECT_ID.is(projectId).ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        CommonField.REMOVE.is(searchRequest.isRemoved())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneField.TEST_STATUS.in(searchRequest.getTestStatus())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneField.TAG_ID.in(searchRequest.getTagId())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneField.NAME.like(searchRequest.getName())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneField.GROUP_ID.is(searchRequest.getGroupId())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneField.PRIORITY.in(searchRequest.getPriority())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
-        SceneField.CREATE_USER_NAME.in(searchRequest.getCreateUserName())
-            .ifPresent(criteria -> addCriteria(criteria, query, aggregationOperations));
+    private List<LookupVo> getLookupVoList() {
+        return Lists.newArrayList(
+            LookupVo.builder()
+                .from(OperationModule.CASE_TEMPLATE_GROUP)
+                .localField(GROUP_ID)
+                .foreignField(ID)
+                .as("caseTemplateGroup")
+                .queryFields(Lists.newArrayList(LookupField.builder().field(GROUP_NAME).alias("groupName").build()))
+                .build(),
+            LookupVo.builder()
+                .from(OperationModule.API_TAG)
+                .localField(TAG_ID)
+                .foreignField(ID)
+                .as("apiTag")
+                .queryFields(Lists.newArrayList(LookupField.builder().field(TAG_NAME).build()))
+                .build(),
+            LookupVo.builder()
+                .from(OperationModule.USER)
+                .localField(CREATE_USER_ID)
+                .foreignField(ID)
+                .as("user")
+                .queryFields(Lists.newArrayList(LookupField.builder().field(USERNAME).alias("createUsername").build()))
+                .build()
+        );
     }
 
-    private void addCriteria(Criteria criteria, Query query, List<AggregationOperation> aggregationOperations) {
-        query.addCriteria(criteria);
-        aggregationOperations.add(Aggregation.match(criteria));
+    private List<Optional<Criteria>> buildCriteria(CaseTemplateSearchRequest searchRequest, ObjectId projectId) {
+        return Lists.newArrayList(
+            PROJECT_ID.is(projectId),
+            REMOVE.is(searchRequest.isRemoved()),
+            NAME.like(searchRequest.getName()),
+            GROUP_ID.is(searchRequest.getGroupId()),
+            TEST_STATUS.in(searchRequest.getTestStatus()),
+            TAG_ID.in(searchRequest.getTagId()),
+            PRIORITY.in(searchRequest.getPriority()),
+            CREATE_USER_NAME.in(searchRequest.getCreateUserName())
+        );
     }
 
 }

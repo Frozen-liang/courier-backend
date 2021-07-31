@@ -14,7 +14,8 @@ public enum CommonField implements Field {
     REMOVE("isRemoved"),
     CREATE_USER_ID("createUserId"),
     MODIFY_USER_ID("modifyUserId"),
-    GROUP_ID("groupId");
+    GROUP_ID("groupId"),
+    USERNAME("username");
 
     private final String name;
 

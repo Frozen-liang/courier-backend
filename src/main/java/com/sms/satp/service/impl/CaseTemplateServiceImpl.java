@@ -52,10 +52,8 @@ import com.sms.satp.service.CaseTemplateApiService;
 import com.sms.satp.service.CaseTemplateService;
 import com.sms.satp.service.SceneCaseApiService;
 import com.sms.satp.utils.ExceptionUtils;
-import com.sms.satp.utils.SecurityUtil;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -113,7 +111,6 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         try {
             CaseTemplateEntity sceneCaseTemplate = caseTemplateMapper
                 .toCaseTemplateByAddRequest(addCaseTemplateRequest);
-            sceneCaseTemplate.setCreateUserName(SecurityUtil.getCurrentUser().getUsername());
             caseTemplateRepository.insert(sceneCaseTemplate);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {

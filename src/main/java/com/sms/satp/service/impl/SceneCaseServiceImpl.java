@@ -119,7 +119,6 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         log.info("SceneCaseService-add()-params: [SceneCase]={}", addSceneCaseRequest.toString());
         try {
             SceneCaseEntity sceneCase = sceneCaseMapper.toAddSceneCase(addSceneCaseRequest);
-            sceneCase.setCreateUserName(SecurityUtil.getCurrentUser().getUsername());
             sceneCaseRepository.insert(sceneCase);
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -209,6 +208,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                     Optional<SceneCaseApiEntity> sceneCaseApi = sceneCaseApiRepository.findById(request.getId());
                     sceneCaseApi.ifPresent(api -> {
                         api.setOrder(request.getOrder());
+                        api.setLock(request.isLock());
                         if (Objects.isNull(api.getCaseTemplateId())) {
                             api.getApiTestCase().setExecute(request.getApiTestCase().isExecute());
                         } else {
@@ -388,14 +388,12 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         SceneCaseApiEntity sceneCaseApi) {
         List<CaseTemplateApiEntity> caseTemplateApiList =
             caseTemplateApiService.listByCaseTemplateId(sceneCaseApi.getCaseTemplateId());
-        if (CollectionUtils.isNotEmpty(caseTemplateApiList)) {
-            Map<String, Boolean> isExecuteMap =
-                sceneCaseApi.getCaseTemplateApiConnList().stream().collect(
-                    Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::isExecute));
-            caseTemplateApiList.forEach(api -> api.getApiTestCase().setExecute(
-                isExecuteMap.getOrDefault(api.getId(), Boolean.TRUE)));
-            response.setCaseTemplateApiList(caseTemplateApiMapper.toCaseTemplateApiDtoList(caseTemplateApiList));
-        }
+        Map<String, Boolean> isExecuteMap =
+            sceneCaseApi.getCaseTemplateApiConnList().stream().collect(
+                Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::isExecute));
+        caseTemplateApiList.forEach(api -> api.getApiTestCase().setExecute(
+            isExecuteMap.getOrDefault(api.getId(), Boolean.TRUE)));
+        response.setCaseTemplateApiList(caseTemplateApiMapper.toCaseTemplateApiDtoList(caseTemplateApiList));
     }
 
 }
