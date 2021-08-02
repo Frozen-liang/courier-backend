@@ -181,6 +181,7 @@ public enum ErrorCode {
     DELETE_API_GROUP_BY_ID_ERROR("4173", "Failed to delete the ApiGroup!"),
     EDIT_API_GROUP_ERROR("4174", "Failed to edit the ApiGroup!"),
     THE_FUNCTION_KEY_EXIST_ERROR("4175", "The function key %s exist in %s"),
+    THE_API_ENTITY_NOT_EXITS_ERROR("4176", "The Api entity no exist!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),

@@ -81,8 +81,8 @@ public class FileController {
     @PreAuthorize("hasRoleOrAdmin(@role.DATA_COLLECTION_CRE_UPD_DEL)")
     public void downloadDataCollectionTemplate(HttpServletResponse response) {
         ClassPathResource classPathResource = new ClassPathResource("template/data-collection.csv");
-        String filename = classPathResource.getFilename();
         response.setContentType(Media.APPLICATION_OCTET_STREAM.getType());
+        response.setCharacterEncoding("UTF-8");
         response.setHeader("Content-Disposition",
             "attachment;filename=" + URLEncoder
                 .encode(FILENAME, StandardCharsets.UTF_8));
