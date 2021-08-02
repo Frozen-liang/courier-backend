@@ -182,7 +182,6 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                 userId = sceneCaseJobEntity.getCreateUserId();
                 sceneCaseJobEntity.setId(ObjectId.get().toString());
                 sceneCaseJobEntity.setCreateDateTime(LocalDateTime.now());
-                sceneCaseJobEntity.setJobStatus(null);
                 String engineId = caseDispatcherService.dispatch(jobMapper.toSceneCaseJobResponse(sceneCaseJobEntity));
                 sceneCaseJobEntity.setEngineId(engineId);
                 sceneCaseJobRepository.save(sceneCaseJobEntity);

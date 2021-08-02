@@ -16,7 +16,6 @@ import org.springframework.expression.EvaluationException;
 import org.springframework.expression.Expression;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 @Slf4j
 public class SpelUtils {
@@ -112,22 +111,6 @@ public class SpelUtils {
         } catch (Exception e) {
             log.error("EvaluationContext set variable error.");
         }
-    }
-
-    public static EvaluationContext getContext(Object[] arguments, Method signatureMethod) {
-        StandardEvaluationContext context = new StandardEvaluationContext();
-        try {
-            String[] parameterNames = parameterNameDiscoverer.getParameterNames(signatureMethod);
-            if (parameterNames == null || parameterNames.length == 0) {
-                return context;
-            }
-            for (int i = 0; i < arguments.length; i++) {
-                context.setVariable(parameterNames[i], arguments[i]);
-            }
-        } catch (Exception e) {
-            log.error("Get EvaluationContext error.");
-        }
-        return context;
     }
 
     private static String createObjectExpression(String prefixName, String name) {

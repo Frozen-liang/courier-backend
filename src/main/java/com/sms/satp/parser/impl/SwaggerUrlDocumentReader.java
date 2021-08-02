@@ -1,5 +1,7 @@
 package com.sms.satp.parser.impl;
 
+import static com.sms.satp.common.exception.ErrorCode.PARSE_SWAGGER_URL_ERROR;
+
 import com.sms.satp.parser.DocumentReader;
 import com.sms.satp.parser.common.DocumentDefinition;
 import com.sms.satp.utils.ExceptionUtils;
@@ -26,7 +28,7 @@ public class SwaggerUrlDocumentReader implements DocumentReader {
                     PARSE_OPTIONS).getOpenAPI();
         } catch (Exception e) {
             log.error("Parse the swagger url error. message:{}", e.getMessage());
-            throw ExceptionUtils.mpe("Parse the swagger url error, Please check the url.");
+            throw ExceptionUtils.mpe(PARSE_SWAGGER_URL_ERROR);
         }
         return DocumentDefinition.builder().document(openApi).build();
     }

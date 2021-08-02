@@ -3,6 +3,7 @@ package com.sms.satp.service.impl;
 import static com.sms.satp.common.enums.ImportStatus.RUNNING;
 import static com.sms.satp.common.enums.OperationModule.API;
 import static com.sms.satp.common.enums.OperationType.SYNC;
+import static com.sms.satp.common.exception.ErrorCode.SYSTEM_ERROR;
 
 import com.sms.satp.common.aspect.annotation.LogRecord;
 import com.sms.satp.common.enums.DocumentType;
@@ -139,10 +140,11 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
 
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
-            importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, e.getMessage());
+            importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, e.getCode(), e.getMessage());
         } catch (Exception e) {
             log.error(e.getMessage());
-            importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, "System error.");
+            importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, SYSTEM_ERROR.getCode(),
+                SYSTEM_ERROR.getMessage());
         }
         projectImportFlowRepository.save(projectImportFlowEntity);
         // Send import message.
@@ -200,11 +202,12 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
     }
 
     private void importApiErrorHandle(ProjectImportFlowEntity projectImportFlowEntity,
-        List<ApiGroupEntity> incrementApiGroup, String errorMessage) {
+        List<ApiGroupEntity> incrementApiGroup, String errorCode, String errorMessage) {
         // If import error. delete increment api group.
         apiGroupRepository.deleteAll(incrementApiGroup);
         projectImportFlowEntity.setImportStatus(ImportStatus.FAILED);
         projectImportFlowEntity.setEndTime(LocalDateTime.now());
+        projectImportFlowEntity.setErrorCode(errorCode);
         projectImportFlowEntity.setErrorDetail(errorMessage);
     }
 }

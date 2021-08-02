@@ -155,28 +155,14 @@ class WorkspaceServiceTest {
     @Test
     @DisplayName("Test the findByUserId method in the Workspace service")
     public void findByUserId_test() {
-        ArrayList<WorkspaceEntity> workspaceList = new ArrayList<>();
-        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            workspaceList.add(WorkspaceEntity.builder().build());
-        }
         ArrayList<WorkspaceResponse> workspaceResponseList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             workspaceResponseList.add(WorkspaceResponse.builder().build());
         }
-        when(workspaceRepository.findAllByRemovedIsFalseAndUserIdsContainsOrderByCreateDateTimeDesc(any()))
-            .thenReturn(workspaceList);
-        when(workspaceMapper.toDtoList(workspaceList)).thenReturn(workspaceResponseList);
+        when(commonRepository.listLookupUser(anyString(), any(), any(Class.class)))
+            .thenReturn(workspaceResponseList);
         List<WorkspaceResponse> result = workspaceService.findByUserId();
         assertThat(result).hasSize(TOTAL_ELEMENTS);
-    }
-
-    @Test
-    @DisplayName("An exception occurred while getting Workspace list")
-    public void findByUserId_exception_test() {
-        doThrow(new RuntimeException()).when(workspaceRepository)
-            .findAllByRemovedIsFalseAndUserIdsContainsOrderByCreateDateTimeDesc(any());
-        assertThatThrownBy(workspaceService::findByUserId)
-            .isInstanceOf(RuntimeException.class);
     }
 
     @Test

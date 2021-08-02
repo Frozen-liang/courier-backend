@@ -40,7 +40,7 @@ class ApiGroupServiceTest {
         .name(PROJECT_NAME).parentId(null).build();
     private final ApiGroupEntity apiGroupEntityExistParent = ApiGroupEntity.builder().id(ID).projectId(ID)
         .name(PROJECT_NAME).parentId(ID).build();
-    private final ApiGroupEntity apiGroupEntity = ApiGroupEntity.builder().id(ID).projectId(ID)
+    private final ApiGroupEntity apiGroupEntity = ApiGroupEntity.builder().id(ID).realGroupId(1L).projectId(ID)
         .name(PROJECT_NAME).parentId(ID).build();
     private final ApiGroupEntity parentGroup = ApiGroupEntity.builder().projectId(ID).build();
     private final ApiGroupService apiGroupService = new ApiGroupServiceImpl(apiGroupRepository, customizedApiRepository,
@@ -146,12 +146,12 @@ class ApiGroupServiceTest {
     @DisplayName("Test the delete method in the ApiGroup service")
     public void delete_success_test() {
         when(apiGroupRepository.findById(ID)).thenReturn(Optional.of(apiGroupEntity));
-        when(apiGroupRepository.findAllByPathContains(apiGroupEntityExistParent.getRealGroupId()))
+        when(apiGroupRepository.findAllByPathContains(apiGroupEntity.getRealGroupId()))
             .thenReturn(Stream.of(ApiGroupEntity.builder().id(ID).build(),
                 ApiGroupEntity.builder().id(ID).build()));
-        Boolean result = apiGroupService.delete(ID);
         doNothing().when(apiGroupRepository).deleteAllByIdIn(any());
         doNothing().when(customizedApiRepository).deleteByGroupIds(any());
+        Boolean result = apiGroupService.delete(ID);
         assertThat(result).isTrue();
     }
 
@@ -160,9 +160,17 @@ class ApiGroupServiceTest {
     public void delete_fail_test() {
         when(apiGroupRepository.findById(ID)).thenReturn(Optional.of(apiGroupEntity));
         when(apiGroupRepository.findAllByPathContains(apiGroupEntityExistParent.getRealGroupId()))
-            .thenReturn(Stream.of());
+            .thenReturn(Stream.empty());
         assertThat(apiGroupService.delete(ID)).isFalse();
+    }
 
+    @Test
+    @DisplayName("Test the delete method in the ApiGroup service")
+    public void delete_test_when_realGroupId_isNull() {
+        when(apiGroupRepository.findById(ID)).thenReturn(Optional.of(ApiGroupEntity.builder().build()));
+        doNothing().when(apiGroupRepository).deleteAllByIdIn(any());
+        doNothing().when(customizedApiRepository).deleteByGroupIds(any());
+        assertThat(apiGroupService.delete(ID)).isTrue();
     }
 
     @Test

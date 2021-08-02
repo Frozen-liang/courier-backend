@@ -19,4 +19,5 @@ public class SceneCaseJobReport {
     private List<CaseReport> caseReportList;
     private String message;
     private Integer totalTimeCost;
+    private Integer paramsTotalTimeCost;
 }

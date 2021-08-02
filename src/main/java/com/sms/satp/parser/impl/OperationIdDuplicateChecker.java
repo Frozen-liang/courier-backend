@@ -1,5 +1,7 @@
 package com.sms.satp.parser.impl;
 
+import static com.sms.satp.common.exception.ErrorCode.THE_OPERATION_ID_NOT_UNIQUE_ERROR;
+
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.parser.ApiDocumentChecker;
@@ -27,7 +29,7 @@ public class OperationIdDuplicateChecker implements ApiDocumentChecker {
                 String errorDetail = String.format("OperationId [%s] is repeated in [%s].", key, apiPaths);
                 errorMessageBuilder.append(errorDetail).append("\n");
             }
-            throw ExceptionUtils.mpe(errorMessageBuilder.toString());
+            throw ExceptionUtils.mpe(THE_OPERATION_ID_NOT_UNIQUE_ERROR, errorMessageBuilder.toString());
         }
     }
 }

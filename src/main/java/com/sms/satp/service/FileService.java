@@ -10,7 +10,7 @@ public interface FileService {
 
     List<FileInfoResponse> list(ObjectId projectId);
 
-    Boolean insertTestFile(TestFileRequest testFileRequest);
+    String insertTestFile(TestFileRequest testFileRequest);
 
     Boolean updateTestFile(TestFileRequest testFileRequest);
 

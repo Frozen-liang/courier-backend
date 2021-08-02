@@ -33,6 +33,7 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
     private static final String CASE_REPORT = "apiTestCase.jobApiTestCase.caseReport";
     private static final String CREATE_USER_NAME = "createUserName";
     private static final String MESSAGE = "message";
+    private static final List<JobStatus> JOB_STATUSES = List.of(JobStatus.SUCCESS, JobStatus.FAIL);
 
     public CustomizedApiTestCaseJobRepositoryImpl(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
@@ -51,6 +52,7 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
         API_TEST_CASE_ID.is(apiTestCaseJobPageRequest.getApiTestCaseId()).ifPresent(query::addCriteria);
         CREATE_USER_ID.in(apiTestCaseJobPageRequest.getUserIds()).ifPresent(query::addCriteria);
         JOB_API_ID.is((apiTestCaseJobPageRequest.getApiId())).ifPresent(query::addCriteria);
+        JOB_STATUS.in(JOB_STATUSES).ifPresent(query::addCriteria);
         long count = mongoTemplate.count(query, ApiTestCaseJobEntity.class);
         if (count <= 0) {
             return new PageImpl<>(Collections.emptyList());

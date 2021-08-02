@@ -20,7 +20,15 @@ public interface Field {
     }
 
     default Optional<Criteria> is(String value) {
-        return StringUtils.isNotEmpty(value) ? Optional.of(Criteria.where(getName()).is(value)) : Optional.empty();
+        return StringUtils.isNotBlank(value) ? Optional.of(Criteria.where(getName()).is(value)) : Optional.empty();
+    }
+
+    default Optional<Criteria> ne(Object value) {
+        return Objects.nonNull(value) ? Optional.of(Criteria.where(getName()).ne(value)) : Optional.empty();
+    }
+
+    default Optional<Criteria> ne(String value) {
+        return StringUtils.isNotBlank(value) ? Optional.of(Criteria.where(getName()).ne(value)) : Optional.empty();
     }
 
     default Optional<Criteria> in(Collection<?> values) {
