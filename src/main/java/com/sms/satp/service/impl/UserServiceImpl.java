@@ -152,7 +152,8 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean checkPassword(String password) {
-        Pattern pattern = Pattern.compile("^(?=.*\\d)(?=.*?[_\\-@&=])(?=.*[a-z])(?=.*[A-Z]).{8,25}$");
+        Pattern pattern = Pattern
+            .compile("^(?=.*\\d)(?=.*?[_\\-@&=!#$%^*<.>~`?'\"/;:'(){}\\[\\]])(?=.*[a-z])(?=.*[A-Z]).{8,40}$");
         return pattern.matcher(password).matches();
     }
 
@@ -164,9 +165,12 @@ public class UserServiceImpl implements UserService {
             UserEntity oldUser = userRepository.findById(userRequest.getId())
                 .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "User", userRequest.getId()));
             UserEntity user = userMapper.toEntity(userRequest);
-            isFalse(userRepository.existsByUsername(userRequest.getUsername()), "The username exists.");
-            isFalse(userRepository.existsByEmail(userRequest.getEmail()), "The email exists.");
+            isFalse(!oldUser.getUsername().equals(userRequest.getUsername())
+                && userRepository.existsByUsername(userRequest.getUsername()), "The username exists.");
+            isFalse(!oldUser.getEmail().equals(userRequest.getEmail())
+                && userRepository.existsByEmail(userRequest.getEmail()), "The email exists.");
             user.setPassword(oldUser.getPassword());
+            user.setRemoved(oldUser.isRemoved());
             userRepository.save(user);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());

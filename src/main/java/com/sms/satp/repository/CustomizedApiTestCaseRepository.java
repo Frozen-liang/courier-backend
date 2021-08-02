@@ -1,7 +1,9 @@
 package com.sms.satp.repository;
 
 import com.sms.satp.common.enums.ApiBindingStatus;
+import com.sms.satp.dto.response.ApiTestCaseResponse;
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface CustomizedApiTestCaseRepository {
 
@@ -12,4 +14,6 @@ public interface CustomizedApiTestCaseRepository {
     Boolean deleteByIds(List<String> ids);
 
     Boolean recover(List<String> ids);
+
+    List<ApiTestCaseResponse> listByJoin(String apiId, String projectId, boolean removed);
 }

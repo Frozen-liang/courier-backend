@@ -10,10 +10,11 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_LIST_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.THE_FUNCTION_KEY_EXIST_ERROR;
 import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonField.PROJECT_ID;
 import static com.sms.satp.common.field.CommonField.REMOVE;
-import static com.sms.satp.utils.Assert.isTrue;
+import static com.sms.satp.utils.Assert.isFalse;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
 import com.sms.satp.common.aspect.annotation.LogRecord;
@@ -104,8 +105,15 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         log.info("ProjectFunctionService-add()-params: [ProjectFunction]={}", projectFunctionRequest.toString());
         try {
             ProjectFunctionEntity projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
+            String functionKey = projectFunction.getFunctionKey();
+            boolean exists = projectFunctionRepository
+                .existsByFunctionKeyAndProjectIdAndRemovedIsFalse(functionKey, projectFunction.getProjectId());
+            isFalse(exists, THE_FUNCTION_KEY_EXIST_ERROR, functionKey, "ProjectFunction");
             projectFunctionRepository.insert(projectFunction);
             sendMessageToEngine(List.of(projectFunction.getId()), ADD, projectFunction.getProjectId());
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to add the ProjectFunction!", e);
             throw new ApiTestPlatformException(ADD_PROJECT_FUNCTION_ERROR);
@@ -119,9 +127,16 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     public Boolean edit(ProjectFunctionRequest projectFunctionRequest) {
         log.info("ProjectFunctionService-edit()-params: [ProjectFunction]={}", projectFunctionRequest.toString());
         try {
-            boolean exists = projectFunctionRepository.existsById(projectFunctionRequest.getId());
-            isTrue(exists, EDIT_NOT_EXIST_ERROR, "ProjectFunction", projectFunctionRequest.getId());
+            ProjectFunctionEntity oldProjectFunction = projectFunctionRepository
+                .findById(projectFunctionRequest.getId())
+                .orElseThrow(
+                    () -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ProjectFunction", projectFunctionRequest.getId()));
             ProjectFunctionEntity projectFunction = projectFunctionMapper.toEntity(projectFunctionRequest);
+            String functionKey = projectFunction.getFunctionKey();
+            isFalse(!oldProjectFunction.getFunctionKey().equals(functionKey)
+                    && projectFunctionRepository
+                    .existsByFunctionKeyAndProjectIdAndRemovedIsFalse(functionKey, projectFunction.getProjectId()),
+                THE_FUNCTION_KEY_EXIST_ERROR, functionKey, "ProjectFunction");
             projectFunctionRepository.save(projectFunction);
             sendMessageToEngine(List.of(projectFunction.getId()), EDIT, projectFunction.getProjectId());
         } catch (ApiTestPlatformException apiTestPlatEx) {

@@ -13,10 +13,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SceneCaseResponse extends BaseResponse {
+public class SceneCaseResponse extends LookupUserResponse {
 
     private String name;
-    private String createUserName;
     private String projectId;
     private String dataCollId;
     private String groupName;
@@ -25,6 +24,6 @@ public class SceneCaseResponse extends BaseResponse {
     private List<String> tagName;
     private List<String> tagId;
     private Integer priority;
-    @JsonProperty("isLock")
-    private boolean lock;
+    @JsonProperty("isNext")
+    private boolean next;
 }

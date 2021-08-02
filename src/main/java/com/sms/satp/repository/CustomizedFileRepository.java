@@ -11,7 +11,7 @@ public interface CustomizedFileRepository {
 
     List<GridFSFile> list(ObjectId projectId);
 
-    Boolean insertTestFile(TestFileRequest testFileRequest) throws IOException;
+    String insertTestFile(TestFileRequest testFileRequest) throws IOException;
 
     Boolean updateTestFile(TestFileRequest testFileRequest) throws IOException;
 

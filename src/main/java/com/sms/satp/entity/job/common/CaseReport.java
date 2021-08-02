@@ -37,6 +37,10 @@ public class CaseReport {
 
     private String failMessage;
 
-    private Long timeCost;
+    //The time it takes to run.
+    private Integer timeCost;
+
+    // The time it takes to prepare parameters.
+    private Integer paramsTimeCost;
 
 }

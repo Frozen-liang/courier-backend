@@ -48,8 +48,8 @@ public class FileServiceTest {
     @Test
     @DisplayName("Test the insertTestFile method in the file service")
     public void insertTestFile_test() throws IOException {
-        when(customizedFileRepository.insertTestFile(testFileRequest)).thenReturn(Boolean.TRUE);
-        assertThat(fileService.insertTestFile(testFileRequest)).isTrue();
+        when(customizedFileRepository.insertTestFile(testFileRequest)).thenReturn(ObjectId.get().toString());
+        assertThat(fileService.insertTestFile(testFileRequest)).isNotNull();
     }
 
     @Test

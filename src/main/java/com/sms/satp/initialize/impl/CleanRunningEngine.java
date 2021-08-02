@@ -22,7 +22,7 @@ public class CleanRunningEngine implements DataInitializer {
         List<EngineMemberEntity> engineMembers = engineMemberRepository.findAllByStatus(RUNNING)
             .collect(Collectors.toList());
         engineMembers.forEach(engine -> engine.setStatus(EngineStatus.INVALID));
-        log.debug("Cleaning running engine");
+        log.debug("Clean running engine");
         engineMemberRepository.saveAll(engineMembers);
     }
 

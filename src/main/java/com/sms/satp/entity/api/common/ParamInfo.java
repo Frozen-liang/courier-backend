@@ -39,11 +39,6 @@ public class ParamInfo {
     @Default
     private boolean required = false;
     /**
-     * 是否传输.
-     */
-    @Field("isTransport")
-    private boolean transport;
-    /**
      * 对象子属性. JSON/Object/JsonArray.
      */
     @ToString.Exclude

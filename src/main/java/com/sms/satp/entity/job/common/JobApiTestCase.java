@@ -28,7 +28,7 @@ public class JobApiTestCase {
 
     private String caseName;
 
-    private List<String> tagIds;
+    private List<String> tagId;
 
     private String apiName;
 

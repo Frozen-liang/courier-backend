@@ -11,4 +11,6 @@ public interface GlobalFunctionRepository extends MongoRepository<GlobalFunction
     Stream<GlobalFunctionResponse> findAllByRemovedIsFalse();
 
     List<GlobalFunctionResponse> findAllByIdIn(List<String> ids);
+
+    boolean existsByFunctionKeyAndWorkspaceIdAndRemovedIsFalse(String functionName, String workspaceId);
 }

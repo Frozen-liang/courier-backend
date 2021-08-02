@@ -44,13 +44,13 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
     }
 
     @Override
-    public Boolean insertTestFile(TestFileRequest testFileRequest) throws IOException {
+    public String insertTestFile(TestFileRequest testFileRequest) throws IOException {
         MultipartFile testFile = testFileRequest.getTestFile();
         Document document = new Document();
         document.put(PROJECT_ID.getName(), testFileRequest.getProjectId());
-        gridFsTemplate
+        ObjectId id = gridFsTemplate
             .store(testFile.getInputStream(), testFile.getOriginalFilename(), testFile.getContentType(), document);
-        return true;
+        return id.toString();
     }
 
     @Override

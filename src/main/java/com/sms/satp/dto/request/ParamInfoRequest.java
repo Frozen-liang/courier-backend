@@ -49,12 +49,6 @@ public class ParamInfoRequest {
     @JsonProperty("isRequired")
     private boolean required;
     /**
-     * 是否传输.
-     */
-    @Field("isTransport")
-    @JsonProperty("isTransport")
-    private boolean transport;
-    /**
      * 对象子属性. JSON/Object/JsonArray.
      */
     @Builder.Default

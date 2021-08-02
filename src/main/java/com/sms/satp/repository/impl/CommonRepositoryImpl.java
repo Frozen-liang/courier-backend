@@ -5,6 +5,7 @@ import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
 import static com.sms.satp.common.field.CommonField.CREATE_USER_ID;
 import static com.sms.satp.common.field.CommonField.ID;
 import static com.sms.satp.common.field.CommonField.MODIFY_DATE_TIME;
+import static com.sms.satp.common.field.CommonField.MODIFY_USER_ID;
 import static com.sms.satp.common.field.CommonField.REMOVE;
 import static com.sms.satp.common.field.UserField.NICKNAME;
 import static com.sms.satp.common.field.UserField.USERNAME;
@@ -17,6 +18,7 @@ import com.sms.satp.entity.mongo.LookupVo;
 import com.sms.satp.entity.mongo.QueryVo;
 import com.sms.satp.repository.CommonRepository;
 import com.sms.satp.utils.PageDtoConverter;
+import com.sms.satp.utils.SecurityUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,7 @@ public class CommonRepositoryImpl implements CommonRepository {
         Query query = new Query(Criteria.where(ID.getName()).is(id));
         Update update = Update.update(REMOVE.getName(), Boolean.TRUE);
         update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
+        update.set(MODIFY_USER_ID.getName(), SecurityUtil.getCurrUserId());
         UpdateResult updateResult = mongoTemplate.updateFirst(query, update, entityClass);
         return updateResult.getModifiedCount() == MODIFY_COUNT;
     }
@@ -63,6 +66,7 @@ public class CommonRepositoryImpl implements CommonRepository {
         Query query = new Query(Criteria.where(ID.getName()).in(ids));
         Update update = Update.update(REMOVE.getName(), Boolean.TRUE);
         update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
+        update.set(MODIFY_USER_ID.getName(), SecurityUtil.getCurrUserId());
         UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
         return updateResult.getModifiedCount() > 0;
     }
@@ -73,6 +77,7 @@ public class CommonRepositoryImpl implements CommonRepository {
         filed.in(tagIds).ifPresent(query::addCriteria);
         Update update = new Update();
         update.pullAll(filed.getName(), tagIds.toArray());
+        update.set(MODIFY_USER_ID.getName(), SecurityUtil.getCurrUserId());
         UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
         return updateResult.getModifiedCount() > 0;
     }
@@ -85,6 +90,7 @@ public class CommonRepositoryImpl implements CommonRepository {
         Query query = new Query(Criteria.where(ID.getName()).in(ids));
         Update update = Update.update(REMOVE.getName(), Boolean.FALSE);
         update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
+        update.set(MODIFY_USER_ID.getName(), SecurityUtil.getCurrUserId());
         UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
         return updateResult.getModifiedCount() > 0;
     }
@@ -181,6 +187,28 @@ public class CommonRepositoryImpl implements CommonRepository {
 
         return new PageImpl<T>(records,
             PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort), count);
+    }
+
+    @Override
+    public Boolean deleteFieldById(String id, String fieldName, Class<?> entityClass) {
+        Query query = new Query(Criteria.where(ID.getName()).is(id));
+        Update update = new Update();
+        update.unset(fieldName);
+        update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
+        update.set(MODIFY_USER_ID.getName(), SecurityUtil.getCurrUserId());
+        UpdateResult updateResult = mongoTemplate.updateFirst(query, update, entityClass);
+        return updateResult.getModifiedCount() == MODIFY_COUNT;
+    }
+
+    @Override
+    public Boolean deleteFieldByIds(List<String> ids, String fieldName, Class<?> entityClass) {
+        Query query = new Query(Criteria.where(ID.getName()).in(ids));
+        Update update = new Update();
+        update.unset(fieldName);
+        update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
+        update.set(MODIFY_USER_ID.getName(), SecurityUtil.getCurrUserId());
+        UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
+        return updateResult.getModifiedCount() > 0;
     }
 
     private <T> ProjectionOperation getProjectionOperation(Class<T> responseClass) {
