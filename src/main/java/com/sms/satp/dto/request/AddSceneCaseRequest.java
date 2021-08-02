@@ -21,8 +21,9 @@ public class AddSceneCaseRequest {
     private String dataCollId;
     @NotNull(message = "The groupId can not be empty")
     private String groupId;
+    private String testStatus;
     private List<String> tagId;
-    private int priority;
-    @JsonProperty("isLock")
-    private boolean lock;
+    private Integer priority;
+    @JsonProperty("isNext")
+    private boolean next;
 }

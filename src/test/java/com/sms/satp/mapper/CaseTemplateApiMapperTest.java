@@ -176,7 +176,7 @@ class CaseTemplateApiMapperTest {
     @DisplayName("Test the apiTestCaseRequestToApiTestCaseEntity is null method in the CaseTemplateApiMapper")
     void apiTestCaseRequestToApiTestCaseEntityTest() {
         ApiTestCaseRequest apiTestCaseRequest = ApiTestCaseRequest.builder()
-                .tagIds(Lists.newArrayList())
+                .tagId(Lists.newArrayList())
                 .requestHeaders(Lists.newArrayList())
                 .responseHeaders(Lists.newArrayList())
                 .pathParams(Lists.newArrayList())

@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,12 +16,15 @@ public class UpdateCaseTemplateRequest {
 
     @NotNull(message = "The id can not be empty")
     private String id;
+    @NotNull(message = "The name can not be empty")
     private String name;
-    private String createUserName;
     @NotNull(message = "The projectId can not be empty")
     private String projectId;
     private String groupId;
     private String dataCollId;
     private String testStatus;
     private List<String> tagId;
+    private Integer priority;
+    @JsonProperty("isNext")
+    private boolean next;
 }

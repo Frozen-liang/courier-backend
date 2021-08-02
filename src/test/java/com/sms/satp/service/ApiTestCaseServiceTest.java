@@ -1,21 +1,5 @@
 package com.sms.satp.service;
 
-import static com.sms.satp.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.DELETE_API_TEST_CASE_BY_ID_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_BY_ID_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_LIST_ERROR;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
@@ -34,18 +18,32 @@ import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseRepository;
 import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.impl.ApiTestCaseServiceImpl;
-import com.sms.satp.utils.SecurityUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+
+import static com.sms.satp.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_API_TEST_CASE_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_BY_ID_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_LIST_ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @DisplayName("Tests for ApiTestCaseService")
 class ApiTestCaseServiceTest {
@@ -73,16 +71,6 @@ class ApiTestCaseServiceTest {
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String API_ID = ObjectId.get().toString();
     private static final String PROJECT_ID = ObjectId.get().toString();
-    private static MockedStatic<SecurityUtil> securityUtilMockedStatic;
-
-    static {
-        securityUtilMockedStatic = Mockito.mockStatic(SecurityUtil.class);
-    }
-
-    @AfterAll
-    public static void close() {
-        securityUtilMockedStatic.close();
-    }
 
     @Test
     @DisplayName("Test the findById method in the ApiTestCase service")
@@ -106,7 +94,6 @@ class ApiTestCaseServiceTest {
     @DisplayName("Test the add method in the ApiTestCase service")
     public void add_test() {
         CustomUser customUser = mock(CustomUser.class);
-        securityUtilMockedStatic.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
         when(apiTestCaseMapper.toEntity(apiTestCaseRequest)).thenReturn(apiTestCase);
         when(apiTestCaseRepository.insert(any(ApiTestCaseEntity.class))).thenReturn(apiTestCase);
         assertThat(apiTestCaseService.add(apiTestCaseRequest)).isTrue();
@@ -155,16 +142,12 @@ class ApiTestCaseServiceTest {
     @Test
     @DisplayName("Test the list method in the ApiTestCase service")
     public void list_test() {
-        ArrayList<ApiTestCaseEntity> apiTestCaseList = new ArrayList<>();
-        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            apiTestCaseList.add(ApiTestCaseEntity.builder().build());
-        }
         ArrayList<ApiTestCaseResponse> apiTestCaseResponseList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             apiTestCaseResponseList.add(ApiTestCaseResponse.builder().build());
         }
-        when(apiTestCaseRepository.findAll(any(), any(Sort.class))).thenReturn(apiTestCaseList);
-        when(apiTestCaseMapper.toDtoList(apiTestCaseList)).thenReturn(apiTestCaseResponseList);
+        when(customizedApiTestCaseRepository.listByJoin(any(), any(), anyBoolean()))
+            .thenReturn(apiTestCaseResponseList);
         when(customizedApiTestCaseJobRepository.findRecentlyCaseReportByCaseId(any()))
             .thenReturn(ApiTestCaseJobEntity.builder().build());
         List<ApiTestCaseResponse> result = apiTestCaseService.list(API_ID, PROJECT_ID, REMOVED);
@@ -174,7 +157,7 @@ class ApiTestCaseServiceTest {
     @Test
     @DisplayName("An exception occurred while getting ApiTestCase list")
     public void list_exception_test() {
-        doThrow(new RuntimeException()).when(apiTestCaseRepository).findAll(any(), any(Sort.class));
+        doThrow(new RuntimeException()).when(customizedApiTestCaseRepository).listByJoin(any(), any(), anyBoolean());
         assertThatThrownBy(() -> apiTestCaseService.list(API_ID, PROJECT_ID, REMOVED))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_TEST_CASE_LIST_ERROR.getCode());

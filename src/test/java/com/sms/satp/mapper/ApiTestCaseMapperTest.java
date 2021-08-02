@@ -93,7 +93,7 @@ class ApiTestCaseMapperTest {
     @DisplayName("[NotNull Input Parameter]Test the method for converting an ApiTestCase entity list object to a dto list object")
     void Notnull_entityList_to_dtoList(){
         ApiTestCaseRequest apiTestCaseRequest= ApiTestCaseRequest.builder()
-                .tagIds(Lists.newArrayList())
+                .tagId(Lists.newArrayList())
                 .requestHeaders(Lists.newArrayList())
                 .responseHeaders(Lists.newArrayList())
                 .pathParams(Lists.newArrayList())

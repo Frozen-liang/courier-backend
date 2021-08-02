@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ApiType;
 import javax.crypto.Mac;
@@ -25,6 +26,9 @@ public class AddCaseTemplateApiRequest {
     private String shell;
 
     private Integer order;
+
+    @JsonProperty("isLock")
+    private boolean lock;
 
     /**
      * API绑定状态.

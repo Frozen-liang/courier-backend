@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.satp.dto.response.CaseTemplateApiResponse;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,9 @@ public class UpdateSceneCaseApiConnRequest {
     private String caseTemplateId;
 
     private Integer order;
+
+    @JsonProperty("isLock")
+    private boolean lock;
 
     private ApiTestCaseRequest apiTestCase;
 

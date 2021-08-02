@@ -20,5 +20,8 @@ public interface ResponseResultVerificationMapper {
     @Mapping(target = "apiResponseJsonType",
         expression = "java(com.sms.satp.common.enums.ApiJsonType.getType(responseResultVerification"
             + ".getApiResponseJsonType()))")
+    @Mapping(target = "verificationElementType",
+        expression = "java(com.sms.satp.common.enums.VerificationElementType.getType(responseResultVerification"
+            + ".getVerificationElementType()))")
     ResponseResultVerification toEntity(ResponseResultVerificationResponse responseResultVerification);
 }
