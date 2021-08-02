@@ -18,6 +18,7 @@ import com.sms.satp.common.enums.OperationModule;
 import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.common.enums.ParamType;
 import com.sms.satp.common.enums.ProjectType;
+import com.sms.satp.common.enums.RawType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.enums.ResponseParamsExtractionType;
 import com.sms.satp.common.enums.ResultType;
@@ -68,7 +69,7 @@ public class MongoCustomConverterConfiguration {
                 IntegerToResultVerificationTypeConverter.INSTANCE,
                 IntegerToResponseParamsExtractionTypeConverter.INSTANCE, IntegerToResultTypeConverter.INSTANCE,
                 IntegerToEngineStatusConverter.INSTANCE, IntegerToRoleTypeConverter.INSTANCE,
-                IntegerToVerificationElementTypeConverter.INSTANCE);
+                IntegerToVerificationElementTypeConverter.INSTANCE, IntegerToRawTypeConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -327,5 +328,15 @@ public class MongoCustomConverterConfiguration {
             return VerificationElementType.getType(code);
         }
     }
+
+    @ReadingConverter
+    enum IntegerToRawTypeConverter implements Converter<Integer, RawType> {
+        INSTANCE;
+
+        public RawType convert(@NonNull Integer code) {
+            return RawType.getType(code);
+        }
+    }
+
 }
 
