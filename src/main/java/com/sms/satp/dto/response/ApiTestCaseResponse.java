@@ -19,28 +19,10 @@ import lombok.experimental.SuperBuilder;
 public class ApiTestCaseResponse extends LookupUserResponse {
 
     private String caseName;
-    private String apiId;
     private String projectId;
-    private String apiName;
     private List<String> tagName;
     private List<String> tagId;
-    private String description;
-    private String apiPath;
-    private Integer apiProtocol;
-    private Integer status;
-    private Integer requestMethod;
-    private Integer apiRequestParamType;
-    private List<ParamInfoResponse> requestHeaders;
-    private List<ParamInfoResponse> responseHeaders;
-    private List<ParamInfoResponse> pathParams;
-    private List<ParamInfoResponse> restfulParams;
-    private List<ParamInfoResponse> requestParams;
-    private List<ParamInfoResponse> responseParams;
     private Integer responseParamsExtractionType;
-    private String preInject;
-    private String postInject;
-    private Integer apiResponseJsonType;
-    private Integer apiRequestJsonType;
     private HttpStatusVerification httpStatusVerification;
     private ResponseHeadersVerificationResponse responseHeadersVerification;
     private ResponseResultVerificationResponse responseResultVerification;
@@ -52,4 +34,5 @@ public class ApiTestCaseResponse extends LookupUserResponse {
     private Integer isSuccess;
     private String testTime;
     private String jobId;
+    private ApiEntityResponse apiEntity;
 }

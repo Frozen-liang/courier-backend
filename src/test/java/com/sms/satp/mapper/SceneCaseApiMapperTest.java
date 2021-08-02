@@ -9,6 +9,7 @@ import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.dto.request.AddSceneCaseApiRequest;
 import com.sms.satp.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.satp.dto.response.SceneCaseApiResponse;
+import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
 import java.util.List;
@@ -38,10 +39,14 @@ class SceneCaseApiMapperTest {
     void toSceneCaseApiDto_test() {
         SceneCaseApiEntity sceneCaseApi = SceneCaseApiEntity.builder().id(MOCK_ID).sceneCaseId(MOCK_ID)
             .apiType(ApiType.API)
-            .apiTestCase(ApiTestCaseEntity.builder().apiProtocol(ApiProtocol.HTTPS).requestMethod(RequestMethod.GET)
-                .apiRequestParamType(ApiRequestParamType.FORM_DATA)
-                .apiResponseJsonType(ApiJsonType.OBJECT)
-                .apiRequestJsonType(ApiJsonType.OBJECT)
+            .apiTestCase(ApiTestCaseEntity.builder()
+                .apiEntity(ApiEntity.builder()
+                    .apiProtocol(ApiProtocol.HTTPS)
+                    .requestMethod(RequestMethod.GET)
+                    .apiRequestParamType(ApiRequestParamType.FORM_DATA)
+                    .apiResponseJsonType(ApiJsonType.OBJECT)
+                    .apiRequestJsonType(ApiJsonType.OBJECT)
+                    .build())
                 .build())
             .build();
         SceneCaseApiResponse dto = sceneCaseApiMapper.toSceneCaseApiDto(sceneCaseApi);
