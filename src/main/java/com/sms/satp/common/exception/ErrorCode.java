@@ -175,17 +175,24 @@ public enum ErrorCode {
     EDIT_USER_GROUP_ERROR("4167", "Failed to edit the UserGroup!"),
     IMPORT_DATA_COLLECTION_ERROR("4168", "Failed to import the DataCollection!"),
     UNLOCK_USER_BY_ID_ERROR("4169", "Failed to unlock the User!"),
-    RECOVER_SCENE_CASE_ERROR("4070", "Failed to recover the SceneCase!"),
-    RECOVER_CASE_TEMPLATE_ERROR("4071", "Failed to recover the CaseTemplate!"),
-    ADD_API_GROUP_ERROR("4072", "Failed to add the ApiGroup!"),
-    DELETE_API_GROUP_BY_ID_ERROR("4073", "Failed to delete the ApiGroup!"),
-    EDIT_API_GROUP_ERROR("4074", "Failed to edit the ApiGroup!"),
-    // 60001 describes the test exception
-    THE_CASE_NOT_EXIST("60001", "The case must not be empty."),
-    THE_ENV_NOT_EXIST("60002", "The Env not exist"),
-    THE_REQUEST_ADDRESS_IS_ILLEGALITY("60002",
-        "The request address is illegality, please check environment or api path.");
+    RECOVER_SCENE_CASE_ERROR("4170", "Failed to recover the SceneCase!"),
+    RECOVER_CASE_TEMPLATE_ERROR("4171", "Failed to recover the CaseTemplate!"),
+    ADD_API_GROUP_ERROR("4172", "Failed to add the ApiGroup!"),
+    DELETE_API_GROUP_BY_ID_ERROR("4173", "Failed to delete the ApiGroup!"),
+    EDIT_API_GROUP_ERROR("4174", "Failed to edit the ApiGroup!"),
+    THE_FUNCTION_KEY_EXIST_ERROR("4175", "The function key %s exist in %s"),
 
+    // 60001 - 61000 describes api import exception
+    PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),
+    PARSE_SWAGGER_URL_ERROR("61002", "Parse the swagger url error, Please check the url."),
+    THE_OPERATION_ID_NOT_UNIQUE_ERROR("61020", "%s"),
+
+
+    // 61001  describes the test exception
+    THE_CASE_NOT_EXIST("61001", "The case must not be empty."),
+    THE_ENV_NOT_EXIST("61002", "The Env not exist"),
+    THE_REQUEST_ADDRESS_IS_ILLEGALITY("61003",
+        "The request address is illegality, please check environment or api path.");
     private String code;
     private String message;
 

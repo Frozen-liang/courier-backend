@@ -46,7 +46,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @LogRecord(operationType = ADD, operationModule = TEST_FILE,
         template = "{{#testFileRequest.testFile.originalFilename}}")
-    public Boolean insertTestFile(TestFileRequest testFileRequest) {
+    public String insertTestFile(TestFileRequest testFileRequest) {
         try {
             return customizedFileRepository.insertTestFile(testFileRequest);
         } catch (Exception e) {

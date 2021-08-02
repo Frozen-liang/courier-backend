@@ -12,6 +12,7 @@ import static com.sms.satp.common.exception.ErrorCode.GET_WORKSPACE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_WORKSPACE_LIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.THE_WORKSPACE_CANNOT_DELETE_ERROR;
 import static com.sms.satp.common.field.CommonField.REMOVE;
+import static com.sms.satp.common.field.WorkspaceField.USER_IDS;
 import static com.sms.satp.utils.Assert.isFalse;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
@@ -29,6 +30,7 @@ import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.SecurityUtil;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -122,9 +124,10 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public List<WorkspaceResponse> findByUserId() {
-        return workspaceMapper
-            .toDtoList(workspaceRepository
-                .findAllByRemovedIsFalseAndUserIdsContainsOrderByCreateDateTimeDesc(SecurityUtil.getCurrUserId()));
+        return commonRepository.listLookupUser(WORKSPACE.getCollectionName(),
+            List.of(REMOVE.is(Boolean.FALSE), USER_IDS.is(new ObjectId(SecurityUtil.getCurrUserId()))),
+            WorkspaceResponse.class
+        );
     }
 
 }

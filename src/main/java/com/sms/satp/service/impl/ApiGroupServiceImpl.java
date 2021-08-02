@@ -26,6 +26,7 @@ import com.sms.satp.service.ApiGroupService;
 import com.sms.satp.utils.ExceptionUtils;
 import com.sms.satp.utils.TreeUtils;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -118,10 +119,15 @@ public class ApiGroupServiceImpl implements ApiGroupService {
         try {
             ApiGroupEntity apiGroup = apiGroupRepository.findById(id)
                 .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ApiGroup", id));
-            //Query all apiGroup contain children groups
-            List<String> ids = apiGroupRepository
-                .findAllByPathContains(apiGroup.getRealGroupId()).map(ApiGroupEntity::getId)
-                .collect(Collectors.toList());
+            List<String> ids;
+            if (Objects.nonNull(apiGroup.getRealGroupId())) {
+                //Query all apiGroup contain children groups
+                ids = apiGroupRepository
+                    .findAllByPathContains(apiGroup.getRealGroupId()).map(ApiGroupEntity::getId)
+                    .collect(Collectors.toList());
+            } else {
+                ids = List.of(id);
+            }
             if (CollectionUtils.isNotEmpty(ids)) {
                 apiGroupRepository.deleteAllByIdIn(ids);
                 customizedApiRepository.deleteByGroupIds(ids);

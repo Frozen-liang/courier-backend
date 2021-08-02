@@ -1,6 +1,7 @@
 package com.sms.satp.controller;
 
 import com.sms.satp.common.constant.Constants;
+import com.sms.satp.common.enums.Media;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
 import com.sms.satp.dto.request.TestFileRequest;
@@ -18,6 +19,8 @@ import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -35,6 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class FileController {
 
     private final FileService fileService;
+    private static final String FILENAME = "数据集导入模板.csv";
 
     public FileController(FileService fileService) {
         this.fileService = fileService;
@@ -50,7 +54,7 @@ public class FileController {
     @PostMapping("/upload")
     @ResponseBody
     @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
-    public Boolean insertTestFile(@Validated(InsertGroup.class) TestFileRequest testFileRequest) {
+    public String insertTestFile(@Validated(InsertGroup.class) TestFileRequest testFileRequest) {
         return fileService.insertTestFile(testFileRequest);
     }
 
@@ -73,6 +77,19 @@ public class FileController {
         writeStream(response, gridFsResource);
     }
 
+    @GetMapping(value = "/download/data-collection-template")
+    @PreAuthorize("hasRoleOrAdmin(@role.DATA_COLLECTION_CRE_UPD_DEL)")
+    public void downloadDataCollectionTemplate(HttpServletResponse response) {
+        ClassPathResource classPathResource = new ClassPathResource("template/data-collection.csv");
+        String filename = classPathResource.getFilename();
+        response.setContentType(Media.APPLICATION_OCTET_STREAM.getType());
+        response.setHeader("Content-Disposition",
+            "attachment;filename=" + URLEncoder
+                .encode(FILENAME, StandardCharsets.UTF_8));
+        writeStream(response, classPathResource);
+    }
+
+
     @GetMapping(value = "/stream/{id}")
     public void getOutputStream(@PathVariable("id") String id, HttpServletResponse response) {
         GridFsResource gridFsResource = fileService.downloadTestFile(id);
@@ -88,12 +105,12 @@ public class FileController {
     }
 
     @SneakyThrows(IOException.class)
-    private void writeStream(HttpServletResponse response, GridFsResource gridFsResource) {
+    private void writeStream(HttpServletResponse response, Resource resource) {
         ServletOutputStream os = null;
         InputStream is = null;
         try {
             os = response.getOutputStream();
-            is = gridFsResource.getInputStream();
+            is = resource.getInputStream();
             IOUtils.copy(is, os);
             os.flush();
         } finally {

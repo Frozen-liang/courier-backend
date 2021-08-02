@@ -19,6 +19,7 @@ public class RoleResponse {
     private String id;
     private String name;
     private String description;
+    private Integer roleType;
     private Boolean enable;
     @JsonProperty("isExist")
     private boolean exist;

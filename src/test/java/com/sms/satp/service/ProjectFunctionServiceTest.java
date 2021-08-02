@@ -6,6 +6,7 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_PROJECT_FUNCTION_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_PROJECT_FUNCTION_LIST_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.THE_FUNCTION_KEY_EXIST_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,11 +47,12 @@ class ProjectFunctionServiceTest {
     private final MessageService messageService = mock(MessageService.class);
     private final ProjectFunctionService projectFunctionService = new ProjectFunctionServiceImpl(
         projectFunctionRepository, projectFunctionMapper, globalFunctionService, messageService, commonRepository);
-    private final ProjectFunctionEntity projectFunction = ProjectFunctionEntity.builder().id(ID).build();
+    private final ProjectFunctionEntity projectFunction =
+        ProjectFunctionEntity.builder().functionKey("name").id(ID).build();
     private final ProjectFunctionResponse projectFunctionResponse = ProjectFunctionResponse
         .builder().id(ID).build();
     private final ProjectFunctionRequest projectFunctionRequest = ProjectFunctionRequest
-        .builder().id(ID).build();
+        .builder().id(ID).functionKey("updateName").build();
     private static final String ID = ObjectId.get().toString();
     private static final List<String> ID_LIST = Collections.singletonList(ID);
     private static final Integer TOTAL_ELEMENTS = 10;
@@ -82,9 +84,24 @@ class ProjectFunctionServiceTest {
     public void add_test() {
         doNothing().when(messageService).enginePullFunctionMessage(any());
         when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
+        when(projectFunctionRepository.existsByFunctionKeyAndProjectIdAndRemovedIsFalse(any(), any()))
+            .thenReturn(false);
         when(projectFunctionRepository.insert(any(ProjectFunctionEntity.class))).thenReturn(projectFunction);
-        projectFunctionService.add(projectFunctionRequest);
+        Boolean result = projectFunctionService.add(projectFunctionRequest);
         verify(projectFunctionRepository, times(1)).insert(any(ProjectFunctionEntity.class));
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("An api test platform exception occurred while adding ProjectFunction")
+    public void add_ApiTestPlatformException_test() {
+        doNothing().when(messageService).enginePullFunctionMessage(any());
+        when(projectFunctionMapper.toEntity(any())).thenReturn(ProjectFunctionEntity.builder().build());
+        when(projectFunctionRepository.existsByFunctionKeyAndProjectIdAndRemovedIsFalse(any(), any()))
+            .thenReturn(true);
+        assertThatThrownBy(() -> projectFunctionService.add(projectFunctionRequest))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(THE_FUNCTION_KEY_EXIST_ERROR.getCode());
     }
 
     @Test
@@ -103,7 +120,9 @@ class ProjectFunctionServiceTest {
     public void edit_test() {
         doNothing().when(messageService).enginePullFunctionMessage(any());
         when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
-        when(projectFunctionRepository.existsById(any())).thenReturn(Boolean.TRUE);
+        when(projectFunctionRepository.findById(any())).thenReturn(Optional.of(projectFunction));
+        when(projectFunctionRepository.existsByFunctionKeyAndProjectIdAndRemovedIsFalse(any(), any()))
+            .thenReturn(false);
         when(projectFunctionRepository.save(any(ProjectFunctionEntity.class))).thenReturn(projectFunction);
         assertThat(projectFunctionService.edit(projectFunctionRequest)).isTrue();
     }
@@ -113,7 +132,9 @@ class ProjectFunctionServiceTest {
     public void edit_exception_test() {
         doNothing().when(messageService).enginePullFunctionMessage(any());
         when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
-        when(projectFunctionRepository.existsById(any())).thenReturn(Boolean.TRUE);
+        when(projectFunctionRepository.findById(any())).thenReturn(Optional.of(projectFunction));
+        when(projectFunctionRepository.existsByFunctionKeyAndProjectIdAndRemovedIsFalse(any(), any()))
+            .thenReturn(false);
         doThrow(new RuntimeException()).when(projectFunctionRepository).save(any(ProjectFunctionEntity.class));
         assertThatThrownBy(() -> projectFunctionService.edit(projectFunctionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -125,7 +146,7 @@ class ProjectFunctionServiceTest {
     public void edit_not_exist_exception_test() {
         doNothing().when(messageService).enginePullFunctionMessage(any());
         when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
-        when(projectFunctionRepository.existsById(any())).thenReturn(Boolean.FALSE);
+        when(projectFunctionRepository.findById(any())).thenReturn(Optional.empty());
         assertThatThrownBy(() -> projectFunctionService.edit(projectFunctionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_NOT_EXIST_ERROR.getCode());

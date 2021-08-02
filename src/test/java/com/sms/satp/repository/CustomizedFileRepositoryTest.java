@@ -11,11 +11,13 @@ import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.sms.satp.dto.request.TestFileRequest;
 import com.sms.satp.repository.impl.CustomizedFileRepositoryImpl;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.bson.BsonObjectId;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,7 +58,7 @@ class CustomizedFileRepositoryTest {
         when(testFile.getOriginalFilename()).thenReturn("test.txt");
         when(testFile.getContentType()).thenReturn("application/octet-stream");
         when(gridFsTemplate.store(any(), anyString(), anyString(), any())).thenReturn(ObjectId.get());
-        assertThat(customizedFileRepository.insertTestFile(testFileRequest)).isTrue();
+        assertThat(customizedFileRepository.insertTestFile(testFileRequest)).isNotNull();
     }
 
     @Test
@@ -67,11 +69,12 @@ class CustomizedFileRepositoryTest {
         testFileRequest.setTestFile(testFile);
         GridFSFile gridFSFile = createGridFsFile();
         when(gridFsTemplate.findOne(any())).thenReturn(gridFSFile);
-        when(testFile.getInputStream()).thenReturn(null);
+        byte[] bytes = {1, 2, 4, 3};
+        when(testFile.getInputStream()).thenReturn(new ByteArrayInputStream(bytes));
         when(testFile.getOriginalFilename()).thenReturn("test.txt");
         when(testFile.getContentType()).thenReturn("application/octet-stream");
         when(gridFsTemplate.store(any())).thenReturn(ObjectId.get());
-        assertThat(customizedFileRepository.insertTestFile(testFileRequest)).isTrue();
+        assertThat(customizedFileRepository.updateTestFile(testFileRequest)).isNotNull();
     }
 
     @Test
@@ -99,7 +102,10 @@ class CustomizedFileRepositoryTest {
     }
 
     private GridFSFile createGridFsFile() {
-        return new GridFSFile(new BsonObjectId(), "test.txt", 1000L, 1000, new Date(), null);
+        Document metadata = new Document();
+        metadata.put("projectId", ObjectId.get());
+        metadata.put("uploadUser", "zhangsan");
+        return new GridFSFile(new BsonObjectId(), "test.txt", 1000L, 1000, new Date(), metadata);
     }
 
 }

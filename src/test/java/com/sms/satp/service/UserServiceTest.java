@@ -55,9 +55,10 @@ class UserServiceTest {
     private final UserMapper userMapper = new UserMapperImpl();
     private final UserService userService = new UserServiceImpl(userRepository, userGroupRepository,
         userGroupService, workspaceRepository, commonRepository, userMapper, passwordEncoder);
-    private final UserEntity user = UserEntity.builder().id(ID).build();
-    private final UserRequest userRequest = UserRequest.builder().password("123Wac!@#")
-        .id(ID).build();
+    private final UserEntity user = UserEntity.builder().username("username")
+        .email("1236@test.com").password("123Wsetcsc!@#").id(ID).build();
+    private final UserRequest userRequest = UserRequest.builder().username("username")
+        .email("123@test.com").password("123Wac!@#").id(ID).build();
     private final UserPasswordUpdateRequest userPasswordUpdateSameRequest = UserPasswordUpdateRequest.builder()
         .newPassword("123Wac!@#").confirmPassword("123Wac!@@#").build();
     private final UserPasswordUpdateRequest userPasswordUpdateFormatRequest = UserPasswordUpdateRequest.builder()
@@ -114,6 +115,8 @@ class UserServiceTest {
     @DisplayName("Test the edit method in the User service")
     public void edit_test() {
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(userRepository.existsByEmail(any())).thenReturn(false);
+        when(userRepository.existsByUsername(any())).thenReturn(false);
         when(userRepository.save(any(UserEntity.class))).thenReturn(user);
         assertThat(userService.edit(userRequest)).isTrue();
     }

@@ -27,6 +27,7 @@ public class ProjectImportFlowEntity {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private ImportStatus importStatus;
+    private String errorCode;
     private String errorDetail;
     @LastModifiedDate
     private LocalDateTime createDateTime;

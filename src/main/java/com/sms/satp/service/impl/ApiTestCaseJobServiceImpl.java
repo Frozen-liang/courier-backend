@@ -188,7 +188,6 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             for (ApiTestCaseJobEntity apiTestCaseJobEntity : apiTestCaseJobList) {
                 apiTestCaseJobEntity.setId(ObjectId.get().toString());
                 apiTestCaseJobEntity.setCreateDateTime(LocalDateTime.now());
-                apiTestCaseJobEntity.setJobStatus(null);
                 userId = apiTestCaseJobEntity.getCreateUserId();
                 String engineId = caseDispatcherService
                     .dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJobEntity));

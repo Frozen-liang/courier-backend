@@ -12,4 +12,6 @@ public interface ProjectFunctionRepository extends MongoRepository<ProjectFuncti
 
     List<ProjectFunctionResponse> findAllByIdIn(List<String> ids);
 
+    boolean existsByFunctionKeyAndProjectIdAndRemovedIsFalse(String functionName, String projectId);
+
 }

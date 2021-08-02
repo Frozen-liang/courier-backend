@@ -1,15 +1,14 @@
 package com.sms.satp.mapper;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.sms.satp.dto.response.ApiGroupResponse;
 import com.sms.satp.entity.group.ApiGroupEntity;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Tests for ApiGroupMapperTest")
 public class ApiGroupMapperTest {
