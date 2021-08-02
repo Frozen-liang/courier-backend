@@ -12,10 +12,6 @@ import static com.sms.satp.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_BY_ID_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_API_TEST_CASE_LIST_ERROR;
-import static com.sms.satp.common.field.CommonField.API_ID;
-import static com.sms.satp.common.field.CommonField.CREATE_DATE_TIME;
-import static com.sms.satp.common.field.CommonField.PROJECT_ID;
-import static com.sms.satp.common.field.CommonField.REMOVE;
 import static com.sms.satp.utils.Assert.isTrue;
 
 import com.sms.satp.common.aspect.annotation.Enhance;
@@ -35,15 +31,9 @@ import com.sms.satp.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.satp.repository.CustomizedApiTestCaseRepository;
 import com.sms.satp.service.ApiTestCaseService;
 import com.sms.satp.utils.ExceptionUtils;
-import com.sms.satp.utils.SecurityUtil;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -76,18 +66,9 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     @Override
     public List<ApiTestCaseResponse> list(String apiId, String projectId, boolean removed) {
         try {
-            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
-            ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder().apiId(apiId).removed(removed)
-                .projectId(projectId).build();
-            ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(PROJECT_ID.getName(), GenericPropertyMatchers.exact())
-                .withMatcher(API_ID.getName(), GenericPropertyMatchers.exact())
-                .withMatcher(REMOVE.getName(), GenericPropertyMatchers.exact())
-                .withIgnorePaths("isExecute")
-                .withIgnoreNullValues();
-            Example<ApiTestCaseEntity> example = Example.of(apiTestCase, exampleMatcher);
-            List<ApiTestCaseResponse> apiTestCaseResponses = apiTestCaseMapper
-                .toDtoList(apiTestCaseRepository.findAll(example, sort));
+            List<ApiTestCaseResponse> apiTestCaseResponses = customizedApiTestCaseRepository.listByJoin(apiId,
+                projectId, removed);
+
             apiTestCaseResponses.forEach(response -> {
                 ApiTestCaseJobEntity apiTestCaseJob = customizedApiTestCaseJobRepository
                     .findRecentlyCaseReportByCaseId(response.getId());
@@ -115,7 +96,6 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         log.info("ApiTestCaseService-add()-params: [ApiTestCase]={}", apiTestCaseRequest.toString());
         try {
             ApiTestCaseEntity apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
-            apiTestCase.setCreateUsername(SecurityUtil.getCurrentUser().getUsername());
             apiTestCaseRepository.insert(apiTestCase);
         } catch (Exception e) {
             log.error("Failed to add the ApiTestCase!", e);

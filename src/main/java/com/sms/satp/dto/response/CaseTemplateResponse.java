@@ -13,17 +13,17 @@ import lombok.experimental.SuperBuilder;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaseTemplateResponse extends BaseResponse {
+public class CaseTemplateResponse extends LookupUserResponse {
 
     private String name;
-    private String createUserName;
     private String projectId;
     private String groupId;
     private String dataCollId;
     private String groupName;
     private String testStatus;
+    private Integer priority;
     private List<String> tagId;
     private List<String> tagName;
-    @JsonProperty("isLock")
-    private boolean lock;
+    @JsonProperty("isNext")
+    private boolean next;
 }

@@ -16,12 +16,14 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class ApiTestCaseResponse extends BaseResponse {
+public class ApiTestCaseResponse extends LookupUserResponse {
 
     private String caseName;
     private String apiId;
     private String projectId;
     private String apiName;
+    private List<String> tagName;
+    private List<String> tagId;
     private String description;
     private String apiPath;
     private Integer apiProtocol;
@@ -43,11 +45,11 @@ public class ApiTestCaseResponse extends BaseResponse {
     private ResponseHeadersVerificationResponse responseHeadersVerification;
     private ResponseResultVerificationResponse responseResultVerification;
     private ResponseTimeVerification responseTimeVerification;
+    private String dataCollId;
     @JsonProperty("isExecute")
     private boolean execute;
     private AdvancedSetting advancedSetting;
     private Integer isSuccess;
     private String testTime;
-    private String createUsername;
     private String jobId;
 }

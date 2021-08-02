@@ -193,6 +193,7 @@ public enum ErrorCode {
     THE_ENV_NOT_EXIST("61002", "The Env not exist"),
     THE_REQUEST_ADDRESS_IS_ILLEGALITY("61003",
         "The request address is illegality, please check environment or api path.");
+
     private String code;
     private String message;
 

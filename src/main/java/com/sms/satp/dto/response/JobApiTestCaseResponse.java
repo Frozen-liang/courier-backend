@@ -22,7 +22,7 @@ public class JobApiTestCaseResponse {
 
     private String projectId;
 
-    private List<String> tagIds;
+    private List<String> tagId;
 
     private String apiName;
 

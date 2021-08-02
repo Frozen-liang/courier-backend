@@ -24,6 +24,7 @@ import com.sms.satp.common.enums.ResultType;
 import com.sms.satp.common.enums.ResultVerificationType;
 import com.sms.satp.common.enums.RoleType;
 import com.sms.satp.common.enums.SaveMode;
+import com.sms.satp.common.enums.VerificationElementType;
 import com.sms.satp.engine.enums.EngineStatus;
 import com.sms.satp.security.pojo.CustomUser;
 import java.util.List;
@@ -66,7 +67,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToProjectTypeConverter.INSTANCE, IntegerToImportStatusConverter.INSTANCE,
                 IntegerToResultVerificationTypeConverter.INSTANCE,
                 IntegerToResponseParamsExtractionTypeConverter.INSTANCE, IntegerToResultTypeConverter.INSTANCE,
-                IntegerToEngineStatusConverter.INSTANCE, IntegerToRoleTypeConverter.INSTANCE);
+                IntegerToEngineStatusConverter.INSTANCE, IntegerToRoleTypeConverter.INSTANCE,
+                IntegerToVerificationElementTypeConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -317,6 +319,13 @@ public class MongoCustomConverterConfiguration {
         }
     }
 
+    @ReadingConverter
+    enum IntegerToVerificationElementTypeConverter implements Converter<Integer, VerificationElementType> {
+        INSTANCE;
 
+        public VerificationElementType convert(@NonNull Integer code) {
+            return VerificationElementType.getType(code);
+        }
+    }
 }
 

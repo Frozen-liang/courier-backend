@@ -38,6 +38,12 @@ public class SceneCaseApiEntity extends BaseEntity {
 
     private Integer order;
 
+    /**
+     * 是否强制执行该步骤，即使其他步骤出错时.
+     */
+    @Field("isLock")
+    private boolean lock;
+
     private ApiTestCaseEntity apiTestCase;
 
     private List<CaseTemplateApiConn> caseTemplateApiConnList;

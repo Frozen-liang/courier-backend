@@ -18,8 +18,8 @@ import com.sms.satp.dto.response.SceneCaseResponse;
 import com.sms.satp.dto.response.SceneTemplateResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
-import com.sms.satp.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.satp.entity.scenetest.CaseTemplateApiConn;
+import com.sms.satp.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
 import com.sms.satp.entity.scenetest.SceneCaseEntity;
 import com.sms.satp.mapper.ApiTestCaseMapper;
@@ -32,18 +32,13 @@ import com.sms.satp.repository.CustomizedSceneCaseApiRepository;
 import com.sms.satp.repository.CustomizedSceneCaseRepository;
 import com.sms.satp.repository.SceneCaseApiRepository;
 import com.sms.satp.repository.SceneCaseRepository;
-import com.sms.satp.security.pojo.CustomUser;
 import com.sms.satp.service.impl.SceneCaseServiceImpl;
-import com.sms.satp.utils.SecurityUtil;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -53,7 +48,6 @@ import org.springframework.data.domain.Pageable;
 import static com.sms.satp.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_CONN_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
 import static com.sms.satp.common.exception.ErrorCode.RECOVER_SCENE_CASE_ERROR;
@@ -93,16 +87,6 @@ class SceneCaseServiceTest {
     private final static Integer MOCK_PAGE = 1;
     private final static Integer MOCK_SIZE = 1;
     private final static long MOCK_TOTAL = 1L;
-    private static MockedStatic<SecurityUtil> securityUtilMockedStatic;
-
-    static {
-        securityUtilMockedStatic = Mockito.mockStatic(SecurityUtil.class);
-    }
-
-    @AfterAll
-    public static void close() {
-        securityUtilMockedStatic.close();
-    }
 
     @BeforeEach
     void setBean() {
@@ -127,8 +111,6 @@ class SceneCaseServiceTest {
     @Test
     @DisplayName("Test the add method in the SceneCase service")
     void add_test() {
-        CustomUser customUser = mock(CustomUser.class);
-        securityUtilMockedStatic.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
         SceneCaseEntity sceneCase =
             SceneCaseEntity.builder().name(MOCK_NAME).projectId(MOCK_PROJECT_ID).groupId(MOCK_GROUP_ID)
                 .createUserId(MOCK_CREATE_USER_ID).build();

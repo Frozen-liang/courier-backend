@@ -16,4 +16,6 @@ public interface CustomizedCaseTemplateRepository {
     Boolean recover(List<String> ids);
 
     List<CaseTemplateEntity> getCaseTemplateIdsByGroupIds(List<String> ids);
+
+    Boolean deleteGroupIdByIds(List<String> ids);
 }

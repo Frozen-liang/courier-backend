@@ -44,7 +44,8 @@ public class ApiTestCaseEntity extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String dataCollId;
 
-    private List<String> tagIds;
+    @Field(targetType = FieldType.OBJECT_ID)
+    private List<String> tagId;
 
     private ApiBindingStatus status;
 
@@ -90,5 +91,4 @@ public class ApiTestCaseEntity extends BaseEntity {
 
     private AdvancedSetting advancedSetting;
 
-    private String createUsername;
 }

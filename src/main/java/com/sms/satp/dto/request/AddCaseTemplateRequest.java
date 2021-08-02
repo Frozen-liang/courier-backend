@@ -16,13 +16,14 @@ public class AddCaseTemplateRequest {
 
     @NotNull(message = "The name can not be empty")
     private String name;
-    private String createUserName;
     @NotNull(message = "The projectId can not be empty")
     private String projectId;
+    @NotNull(message = "The groupId can not be empty")
     private String groupId;
     private String dataCollId;
     private String testStatus;
     private List<String> tagId;
-    @JsonProperty("isLock")
-    private boolean lock;
+    private Integer priority;
+    @JsonProperty("isNext")
+    private boolean next;
 }
