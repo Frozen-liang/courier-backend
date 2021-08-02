@@ -1,5 +1,21 @@
 package com.sms.satp.service;
 
+import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.RECOVER_CASE_TEMPLATE_ERROR;
+import static com.sms.satp.common.exception.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
+
 import com.google.common.collect.Lists;
 import com.sms.satp.common.exception.ApiTestPlatformException;
 import com.sms.satp.dto.request.AddCaseTemplateApiByIdsRequest;
@@ -45,22 +61,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import static com.sms.satp.common.exception.ErrorCode.ADD_CASE_TEMPLATE_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.GET_CASE_TEMPLATE_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.RECOVER_CASE_TEMPLATE_ERROR;
-import static com.sms.satp.common.exception.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.wildfly.common.Assert.assertTrue;
-
 @DisplayName("Test cases for CaseTemplateServiceTest")
 class CaseTemplateServiceTest {
 
@@ -92,22 +92,22 @@ class CaseTemplateServiceTest {
     private final static Integer MOCK_PAGE = 1;
     private final static Integer MOCK_SIZE = 1;
     private final static long MOCK_TOTAL = 1L;
-    private static MockedStatic<SecurityUtil> securityUtilMockedStatic;
+    private final static MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
 
     static {
-        securityUtilMockedStatic = Mockito.mockStatic(SecurityUtil.class);
+        SECURITY_UTIL_MOCKED_STATIC = Mockito.mockStatic(SecurityUtil.class);
     }
 
     @AfterAll
     public static void close() {
-        securityUtilMockedStatic.close();
+        SECURITY_UTIL_MOCKED_STATIC.close();
     }
 
     @Test
     @DisplayName("Test the add method in the CaseTemplate service")
     void add_test() {
         CustomUser customUser = mock(CustomUser.class);
-        securityUtilMockedStatic.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
         CaseTemplateEntity caseTemplate =
             CaseTemplateEntity.builder().name(MOCK_NAME).projectId(MOCK_PROJECT_ID).groupId(MOCK_GROUP_ID)
                 .createUserId(MOCK_CREATE_USER_ID).build();

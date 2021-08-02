@@ -34,19 +34,19 @@ public class OperationIdDuplicateCheckerTest {
     private ApplicationContext applicationContext = mock(ApplicationContext.class);
     private ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
     private final MessageService messageService = mock(MessageService.class);
-    private static MockedStatic<SecurityUtil> securityUtilMockedStatic;
+    private final static MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
 
 
     static {
-        securityUtilMockedStatic = mockStatic(SecurityUtil.class);
-        securityUtilMockedStatic.when(SecurityUtil::getCurrUserId).thenReturn(ObjectId.get().toString());
-        securityUtilMockedStatic.when(SecurityUtil::getCurrentUser).thenReturn(new CustomUser("username", "password",
+        SECURITY_UTIL_MOCKED_STATIC = mockStatic(SecurityUtil.class);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrUserId).thenReturn(ObjectId.get().toString());
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(new CustomUser("username", "password",
             Collections.emptyList(), "", "username@qq.com", TokenType.USER));
     }
 
     @AfterAll
     public static void close() {
-        securityUtilMockedStatic.close();
+        SECURITY_UTIL_MOCKED_STATIC.close();
     }
 
     @Test

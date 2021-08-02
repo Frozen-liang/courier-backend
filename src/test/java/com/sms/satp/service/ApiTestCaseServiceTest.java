@@ -73,15 +73,15 @@ class ApiTestCaseServiceTest {
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final String API_ID = ObjectId.get().toString();
     private static final String PROJECT_ID = ObjectId.get().toString();
-    private static MockedStatic<SecurityUtil> securityUtilMockedStatic;
+    private static final MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
 
     static {
-        securityUtilMockedStatic = Mockito.mockStatic(SecurityUtil.class);
+        SECURITY_UTIL_MOCKED_STATIC = Mockito.mockStatic(SecurityUtil.class);
     }
 
     @AfterAll
     public static void close() {
-        securityUtilMockedStatic.close();
+        SECURITY_UTIL_MOCKED_STATIC.close();
     }
 
     @Test
@@ -106,7 +106,7 @@ class ApiTestCaseServiceTest {
     @DisplayName("Test the add method in the ApiTestCase service")
     public void add_test() {
         CustomUser customUser = mock(CustomUser.class);
-        securityUtilMockedStatic.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
         when(apiTestCaseMapper.toEntity(apiTestCaseRequest)).thenReturn(apiTestCase);
         when(apiTestCaseRepository.insert(any(ApiTestCaseEntity.class))).thenReturn(apiTestCase);
         assertThat(apiTestCaseService.add(apiTestCaseRequest)).isTrue();
