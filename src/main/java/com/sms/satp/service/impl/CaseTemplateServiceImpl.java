@@ -323,7 +323,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
 
     private void addCaseTemplateApi(CaseTemplateEntity caseTemplate, AddSceneCaseApi addSceneCaseApi) {
         ApiTestCaseEntity apiTestCase;
-        if (BooleanUtils.isTrue(addSceneCaseApi.getIsCase())) {
+        if (BooleanUtils.isTrue(addSceneCaseApi.isCase())) {
             apiTestCase =
                 apiTestCaseRepository.findById(addSceneCaseApi.getId())
                     .orElseThrow(() -> ExceptionUtils.mpe(THE_API_TEST_CASE_NOT_EXITS_ERROR));

@@ -1,5 +1,6 @@
 package com.sms.satp.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +15,8 @@ public class AddSceneCaseApi {
     private String id;
 
     private Integer order;
-    
-    private Boolean isCase;
+
+    @JsonProperty("isCase")
+    private boolean isCase;
 
 }
