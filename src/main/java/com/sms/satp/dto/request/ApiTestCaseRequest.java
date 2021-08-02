@@ -1,10 +1,7 @@
 package com.sms.satp.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sms.satp.common.enums.ApiJsonType;
-import com.sms.satp.common.enums.ApiProtocol;
-import com.sms.satp.common.enums.ApiRequestParamType;
-import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.common.enums.ResponseParamsExtractionType;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
@@ -33,37 +30,19 @@ public class ApiTestCaseRequest {
     private String id;
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The caseName can not be empty.")
     private String caseName;
-    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiId can not be empty.")
-    private String apiId;
+    private String dataCollId;
     private List<String> tagId;
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId can not be empty.")
     private String projectId;
-    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiName can not be empty.")
-    private String apiName;
-    private String description;
-    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiPath can not be empty.")
-    private String apiPath;
-    private ApiProtocol apiProtocol;
-    private RequestMethod requestMethod;
-    private ApiRequestParamType apiRequestParamType;
-    private List<ParamInfoRequest> requestHeaders;
-    private List<ParamInfoRequest> responseHeaders;
-    private List<ParamInfoRequest> pathParams;
-    private List<ParamInfoRequest> restfulParams;
-    private List<ParamInfoRequest> requestParams;
-    private List<ParamInfoRequest> responseParams;
+    private ApiBindingStatus status;
     private ResponseParamsExtractionType responseParamsExtractionType;
-    private String preInject;
-    private String postInject;
-    private ApiJsonType apiResponseJsonType;
-    private ApiJsonType apiRequestJsonType;
     private HttpStatusVerification httpStatusVerification;
     private ResponseHeadersVerification responseHeadersVerification;
     private ResponseResultVerification responseResultVerification;
     private ResponseTimeVerification responseTimeVerification;
-    private String dataCollId;
     @Default
     @JsonProperty("isExecute")
     private boolean execute = true;
     private AdvancedSetting advancedSetting;
+    private ApiEntityRequest apiEntity;
 }

@@ -5,15 +5,17 @@ import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SceneCaseJobResponse {
+public class SceneCaseJobResponse extends BaseResponse {
 
     private String id;
 
@@ -38,11 +40,4 @@ public class SceneCaseJobResponse {
      */
     private String createUserName;
 
-    private String createUserId;
-
-    private String modifyUserId;
-
-    private String createDateTime;
-
-    private String modifyDateTime;
 }

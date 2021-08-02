@@ -8,7 +8,9 @@ import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.RequestMethod;
+import com.sms.satp.dto.request.ApiEntityRequest;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
+import com.sms.satp.dto.response.ApiEntityResponse;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
@@ -31,9 +33,14 @@ class ApiTestCaseMapperTest {
     private ApiTestCaseMapper apiTestCaseMapper = new ApiTestCaseMapperImpl(responseResultVerificationMapper,
         responseHeadersVerificationMapper, paramInfoMapper);
     private ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder()
-        .caseName(CASE_NAME).apiProtocol(ApiProtocol.HTTP).createDateTime(CREATE_TIME).modifyDateTime(MODIFY_TIME)
-        .apiRequestJsonType(ApiJsonType.OBJECT).apiResponseJsonType(ApiJsonType.ARRAY).requestMethod(RequestMethod.GET)
-        .apiRequestParamType(ApiRequestParamType.JSON).build();
+        .caseName(CASE_NAME).apiEntity(ApiEntity.builder()
+            .apiRequestJsonType(ApiJsonType.OBJECT)
+            .apiResponseJsonType(ApiJsonType.ARRAY)
+            .requestMethod(RequestMethod.GET)
+            .apiRequestParamType(ApiRequestParamType.JSON)
+            .apiProtocol(ApiProtocol.HTTP).build())
+        .createDateTime(CREATE_TIME).modifyDateTime(MODIFY_TIME)
+        .build();
     private static final Integer SIZE = 10;
     private static final String CASE_NAME = "apiTestCase";
     private static final LocalDateTime CREATE_TIME = LocalDateTime.now();
@@ -44,7 +51,7 @@ class ApiTestCaseMapperTest {
     void entity_to_dto() {
         ApiTestCaseResponse apiTestCaseResponse = apiTestCaseMapper.toDto(apiTestCase);
         assertThat(apiTestCaseResponse.getCaseName()).isEqualTo(CASE_NAME);
-        assertThat(apiTestCaseResponse.getApiProtocol()).isEqualTo(ApiProtocol.HTTP.getCode());
+        assertThat(apiTestCaseResponse.getApiEntity().getApiProtocol()).isEqualTo(ApiProtocol.HTTP.getCode());
     }
 
     @Test
@@ -89,43 +96,49 @@ class ApiTestCaseMapperTest {
         List<ApiTestCaseResponse> apiTestCaseDtoList = apiTestCaseMapper.toDtoList(null);
         assertThat(apiTestCaseDtoList).isNull();
     }
+
     @Test
     @DisplayName("[NotNull Input Parameter]Test the method for converting an ApiTestCase entity list object to a dto list object")
-    void Notnull_entityList_to_dtoList(){
-        ApiTestCaseRequest apiTestCaseRequest= ApiTestCaseRequest.builder()
-                .tagId(Lists.newArrayList())
+    void Notnull_entityList_to_dtoList() {
+        ApiTestCaseRequest apiTestCaseRequest = ApiTestCaseRequest.builder()
+            .tagId(Lists.newArrayList())
+            .apiEntity(ApiEntityRequest.builder()
                 .requestHeaders(Lists.newArrayList())
                 .responseHeaders(Lists.newArrayList())
                 .pathParams(Lists.newArrayList())
                 .restfulParams(Lists.newArrayList())
                 .requestParams(Lists.newArrayList())
                 .responseParams(Lists.newArrayList())
-                .build();
+                .build())
+            .build();
         ApiTestCaseEntity dto = apiTestCaseMapper.toEntity(apiTestCaseRequest);
         assertThat(dto).isNotNull();
     }
+
     @Test
     @DisplayName("test the method an ApiTestCaseEntity to EntityByApiEntity")
-    void ApiTestCaseEntity_toEntityByApiEntity(){
-        ApiEntity apiEntity=ApiEntity.builder().build();
+    void ApiTestCaseEntity_toEntityByApiEntity() {
+        ApiEntity apiEntity = ApiEntity.builder().build();
         assertThat(apiTestCaseMapper.toEntityByApiEntity(apiEntity)).isNotNull();
     }
+
     @Test
     @DisplayName("[Null Input Parameter]test the method an ApiTestCaseEntity to EntityByApiEntity")
-    void Null_ApiTestCaseEntity_toEntityByApiEntity(){
+    void Null_ApiTestCaseEntity_toEntityByApiEntity() {
         assertThat(apiTestCaseMapper.toEntityByApiEntity(null)).isNull();
     }
+
     @Test
     @DisplayName("[Null Input Parameter]test the method an ApiTestCaseEntity to EntityByApiEntity")
-    void NotNull_ApiTestCaseEntity_toEntityByApiEntity(){
-        ApiEntity apiEntity= ApiEntity.builder()
-                .requestHeaders(Lists.newArrayList())
-                .responseHeaders(Lists.newArrayList())
-                .pathParams(Lists.newArrayList())
-                .restfulParams(Lists.newArrayList())
-                .requestParams(Lists.newArrayList())
-                .responseParams(Lists.newArrayList())
-                .build();
+    void NotNull_ApiTestCaseEntity_toEntityByApiEntity() {
+        ApiEntity apiEntity = ApiEntity.builder()
+            .requestHeaders(Lists.newArrayList())
+            .responseHeaders(Lists.newArrayList())
+            .pathParams(Lists.newArrayList())
+            .restfulParams(Lists.newArrayList())
+            .requestParams(Lists.newArrayList())
+            .responseParams(Lists.newArrayList())
+            .build();
         assertThat(apiTestCaseMapper.toEntityByApiEntity(apiEntity)).isNotNull();
     }
 

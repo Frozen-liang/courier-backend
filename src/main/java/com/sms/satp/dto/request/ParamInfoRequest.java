@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -48,6 +49,13 @@ public class ParamInfoRequest {
     @Field("isRequired")
     @JsonProperty("isRequired")
     private boolean required;
+    /**
+     * 是否提取.
+     */
+    @Field("isExtract")
+    @JsonProperty("isExtract")
+    @Default
+    private boolean extract = true;
     /**
      * 对象子属性. JSON/Object/JsonArray.
      */

@@ -23,6 +23,23 @@ public interface ApiTestCaseMapper {
 
     ApiTestCaseEntity toEntity(ApiTestCaseRequest apiTestCaseRequest);
 
-    @Mapping(target = "apiId", source = "id")
+    @Mapping(target = "apiEntity.id", source = "id")
+    @Mapping(target = "apiEntity.apiName", source = "apiName")
+    @Mapping(target = "apiEntity.apiPath", source = "apiPath")
+    @Mapping(target = "apiEntity.apiProtocol", source = "apiProtocol")
+    @Mapping(target = "apiEntity.requestMethod", source = "requestMethod")
+    @Mapping(target = "apiEntity.apiRequestParamType", source = "apiRequestParamType")
+    @Mapping(target = "apiEntity.apiResponseParamType", source = "apiResponseParamType")
+    @Mapping(target = "apiEntity.requestHeaders", source = "requestHeaders")
+    @Mapping(target = "apiEntity.responseHeaders", source = "responseHeaders")
+    @Mapping(target = "apiEntity.pathParams", source = "pathParams")
+    @Mapping(target = "apiEntity.restfulParams", source = "restfulParams")
+    @Mapping(target = "apiEntity.requestParams", source = "requestParams")
+    @Mapping(target = "apiEntity.responseParams", source = "responseParams")
+    @Mapping(target = "apiEntity.apiStatus", source = "apiStatus")
+    @Mapping(target = "apiEntity.preInject", source = "preInject")
+    @Mapping(target = "apiEntity.postInject", source = "postInject")
+    @Mapping(target = "apiEntity.apiResponseJsonType", source = "apiResponseJsonType")
+    @Mapping(target = "apiEntity.apiRequestJsonType", source = "apiRequestJsonType")
     ApiTestCaseEntity toEntityByApiEntity(ApiEntity apiEntity);
 }

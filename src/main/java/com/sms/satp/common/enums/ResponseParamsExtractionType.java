@@ -12,7 +12,7 @@ public enum ResponseParamsExtractionType implements EnumCommon {
     JSON(0),
     RAW(1);
 
-    private Integer code;
+    private final int code;
 
     private static final Map<Integer, ResponseParamsExtractionType> MAPPINGS =
         Arrays.stream(values()).collect(Collectors.toMap(ResponseParamsExtractionType::getCode, Function.identity()));

@@ -39,6 +39,12 @@ public class ParamInfo {
     @Default
     private boolean required = false;
     /**
+     * 是否提取.
+     */
+    @Field("isExtract")
+    @Default
+    private boolean extract = true;
+    /**
      * 对象子属性. JSON/Object/JsonArray.
      */
     @ToString.Exclude

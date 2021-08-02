@@ -64,8 +64,6 @@ public interface JobMapper {
     @Mapping(target = "jobApiTestCase", source = "apiTestCase")
     JobSceneCaseApi toJobSceneCaseApiByTemplate(CaseTemplateApiEntity caseTemplateApiList);
 
-    @Mapping(target = "createDateTime", source = "createDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
-    @Mapping(target = "modifyDateTime", source = "modifyDateTime", dateFormat = TimePatternConstant.DEFAULT_PATTERN)
     SceneCaseJobResponse toSceneCaseJobResponse(SceneCaseJobEntity sceneCaseJob);
 
     ApiTestCaseJobReportResponse toApiTestCaseJobReportResponse(ApiTestCaseJobReport caseJobReport);

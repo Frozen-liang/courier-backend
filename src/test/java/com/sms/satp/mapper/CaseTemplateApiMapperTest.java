@@ -3,9 +3,11 @@ package com.sms.satp.mapper;
 import com.google.common.collect.Lists;
 import com.sms.satp.common.enums.*;
 import com.sms.satp.dto.request.AddCaseTemplateApiRequest;
+import com.sms.satp.dto.request.ApiEntityRequest;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
 import com.sms.satp.dto.response.CaseTemplateApiResponse;
+import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.satp.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
@@ -64,12 +66,13 @@ class CaseTemplateApiMapperTest {
                 .id(MOCK_ID)
                 .apiType(ApiType.API)
                 .apiTestCase(ApiTestCaseEntity.builder()
-                        .apiProtocol(ApiProtocol.HTTPS)
-                        .requestMethod(RequestMethod.GET)
-                        .apiRequestParamType(ApiRequestParamType.FORM_DATA)
-                        .apiResponseJsonType(ApiJsonType.OBJECT)
-                        .apiRequestJsonType(ApiJsonType.OBJECT)
-                        .apiId(MOCK_ID)
+                    .apiEntity(ApiEntity.builder()
+                            .apiProtocol(ApiProtocol.HTTPS)
+                            .requestMethod(RequestMethod.GET)
+                            .apiRequestParamType(ApiRequestParamType.FORM_DATA)
+                            .apiResponseJsonType(ApiJsonType.OBJECT)
+                            .apiRequestJsonType(ApiJsonType.OBJECT)
+                            .id(MOCK_ID).build())
                         .build())
                 .caseTemplateId(MOCK_ID)
                 .build();
@@ -177,6 +180,7 @@ class CaseTemplateApiMapperTest {
     void apiTestCaseRequestToApiTestCaseEntityTest() {
         ApiTestCaseRequest apiTestCaseRequest = ApiTestCaseRequest.builder()
                 .tagId(Lists.newArrayList())
+            .apiEntity(ApiEntityRequest.builder()
                 .requestHeaders(Lists.newArrayList())
                 .responseHeaders(Lists.newArrayList())
                 .pathParams(Lists.newArrayList())
@@ -184,6 +188,7 @@ class CaseTemplateApiMapperTest {
                 .responseParams(Lists.newArrayList())
                 .responseParams(Lists.newArrayList())
                 .requestParams(Lists.newArrayList())
+                .build())
                 .build();
         AddCaseTemplateApiRequest request = AddCaseTemplateApiRequest.builder().apiTestCase(apiTestCaseRequest).build();
         assertThat(caseTemplateApiMapper.toCaseTemplateApi(request)).isNotNull();
