@@ -5,6 +5,7 @@ import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
+import com.sms.satp.common.enums.RawType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.entity.BaseEntity;
 import com.sms.satp.entity.api.common.ParamInfo;
@@ -62,6 +63,10 @@ public class ApiEntity extends BaseEntity {
 
     private ApiRequestParamType apiRequestParamType;
 
+    private String requestRaw;
+
+    private RawType requestRawType;
+
     private List<ParamInfo> requestHeaders;
 
     private List<ParamInfo> responseHeaders;
@@ -92,5 +97,9 @@ public class ApiEntity extends BaseEntity {
 
     @JsonIgnore
     private ApiRequestParamType apiResponseParamType;
+
+    private String responseRaw;
+
+    private RawType responseRawType;
 
 }

@@ -50,16 +50,16 @@ class WorkspaceServiceTest {
         .id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
-    private static MockedStatic<SecurityUtil> securityUtilMockedStatic;
+    private static final MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
 
     static {
-        securityUtilMockedStatic = mockStatic(SecurityUtil.class);
-        securityUtilMockedStatic.when(SecurityUtil::getCurrUserId).thenReturn(ObjectId.get().toString());
+        SECURITY_UTIL_MOCKED_STATIC = mockStatic(SecurityUtil.class);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrUserId).thenReturn(ObjectId.get().toString());
     }
 
     @AfterAll
     public static void close() {
-        securityUtilMockedStatic.close();
+        SECURITY_UTIL_MOCKED_STATIC.close();
     }
 
 
