@@ -3,6 +3,7 @@ package com.sms.satp.dto.request;
 import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
+import com.sms.satp.common.enums.RawType;
 import com.sms.satp.common.enums.RequestMethod;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,8 @@ public class ApiEntityRequest {
     private RequestMethod requestMethod;
     private ApiRequestParamType apiRequestParamType;
     private ApiRequestParamType apiResponseParamType;
+    private String requestRaw;
+    private RawType requestRawType;
     private List<ParamInfoRequest> requestHeaders;
     private List<ParamInfoRequest> responseHeaders;
     private List<ParamInfoRequest> pathParams;
@@ -37,4 +40,6 @@ public class ApiEntityRequest {
     private String postInject;
     private ApiJsonType apiResponseJsonType;
     private ApiJsonType apiRequestJsonType;
+    private String responseRaw;
+    private RawType responseRawType;
 }

@@ -1,5 +1,6 @@
 package com.sms.satp.dto.response;
 
+import com.sms.satp.common.enums.RawType;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,8 @@ public class ApiEntityResponse {
     private Integer requestMethod;
     private Integer apiRequestParamType;
     private Integer apiResponseParamType;
+    private String requestRaw;
+    private Integer requestRawType;
     private List<ParamInfoResponse> requestHeaders;
     private List<ParamInfoResponse> responseHeaders;
     private List<ParamInfoResponse> pathParams;
@@ -33,4 +36,6 @@ public class ApiEntityResponse {
     private String postInject;
     private Integer apiResponseJsonType;
     private Integer apiRequestJsonType;
+    private String responseRaw;
+    private Integer responseRawType;
 }
