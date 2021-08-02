@@ -11,13 +11,12 @@ import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.sms.satp.dto.request.TestFileRequest;
 import com.sms.satp.repository.impl.CustomizedFileRepositoryImpl;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.bson.BsonObjectId;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,12 +68,11 @@ class CustomizedFileRepositoryTest {
         testFileRequest.setTestFile(testFile);
         GridFSFile gridFSFile = createGridFsFile();
         when(gridFsTemplate.findOne(any())).thenReturn(gridFSFile);
-        byte[] bytes = {1, 2, 4, 3};
-        when(testFile.getInputStream()).thenReturn(new ByteArrayInputStream(bytes));
+        when(testFile.getInputStream()).thenReturn(InputStream.nullInputStream());
         when(testFile.getOriginalFilename()).thenReturn("test.txt");
         when(testFile.getContentType()).thenReturn("application/octet-stream");
         when(gridFsTemplate.store(any())).thenReturn(ObjectId.get());
-        assertThat(customizedFileRepository.updateTestFile(testFileRequest)).isNotNull();
+        assertThat(customizedFileRepository.updateTestFile(testFileRequest)).isTrue();
     }
 
     @Test
@@ -99,6 +97,13 @@ class CustomizedFileRepositoryTest {
     public void downloadTestFile_test_return_null() {
         when(gridFsTemplate.findOne(any())).thenReturn(null);
         assertThat(customizedFileRepository.downloadTestFile(ID)).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the downloadTestFile method in the CustomizedFileRepository")
+    public void findById_test() {
+        when(gridFsTemplate.findOne(any())).thenReturn(createGridFsFile());
+        assertThat(customizedFileRepository.findById(ID)).isNotNull();
     }
 
     private GridFSFile createGridFsFile() {
