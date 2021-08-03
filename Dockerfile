@@ -26,6 +26,6 @@ COPY --from=builder application/snapshot-dependencies/ ./
 COPY --from=builder application/application/ ./
 COPY ./build/application.properties ./
 # security patch - remove apt from container
-EXPOSE 5556
+EXPOSE 8011
 ENTRYPOINT ["sh","-c","java $JAVA_OPTS -Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom org.springframework.boot.loader.JarLauncher"]
 
