@@ -79,7 +79,7 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
 
     @Override
     @LogRecord(operationType = SYNC, operationModule = API)
-    @Async("importApi")
+    @Async
     public void importApi(ImportSourceVo importSource) {
         String projectId = importSource.getProjectId();
         DocumentType documentType = importSource.getDocumentType();

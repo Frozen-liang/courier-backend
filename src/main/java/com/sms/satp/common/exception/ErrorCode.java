@@ -182,6 +182,11 @@ public enum ErrorCode {
     EDIT_API_GROUP_ERROR("4174", "Failed to edit the ApiGroup!"),
     THE_FUNCTION_KEY_EXIST_ERROR("4175", "The function key %s exist in %s"),
     THE_API_ENTITY_NOT_EXITS_ERROR("4176", "The Api entity no exist!"),
+    ADD_SCHEDULE_ERROR("4177", "Failed to add the Schedule!"),
+    GET_SCHEDULE_LIST_ERROR("4178", "Failed to get the Schedule list!"),
+    GET_SCHEDULE_BY_ID_ERROR("4179", "The Schedule not exist!"),
+    DELETE_SCHEDULE_BY_ID_ERROR("4180", "Failed to delete the Schedule!"),
+    EDIT_SCHEDULE_ERROR("4181", "Failed to edit the Schedule!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),

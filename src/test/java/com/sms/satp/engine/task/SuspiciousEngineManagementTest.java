@@ -16,7 +16,7 @@ public class SuspiciousEngineManagementTest {
     @DisplayName("Test for increaseIndex in SuspiciousEngineManagement")
     public void increaseIndex_test() {
         Integer integer = suspiciousEngineManagement.increaseIndex();
-        assertThat(integer).isEqualTo(1);
+        assertThat(integer).isEqualTo(0);
     }
 
     @Test

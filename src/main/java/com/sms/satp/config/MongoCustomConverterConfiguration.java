@@ -7,6 +7,8 @@ import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
 import com.sms.satp.common.enums.ApiTagType;
 import com.sms.satp.common.enums.ApiType;
+import com.sms.satp.common.enums.CaseFilter;
+import com.sms.satp.common.enums.CycleType;
 import com.sms.satp.common.enums.DocumentType;
 import com.sms.satp.common.enums.DocumentUrlType;
 import com.sms.satp.common.enums.EnumCommon;
@@ -14,6 +16,7 @@ import com.sms.satp.common.enums.GroupImportType;
 import com.sms.satp.common.enums.ImportStatus;
 import com.sms.satp.common.enums.JobStatus;
 import com.sms.satp.common.enums.MatchType;
+import com.sms.satp.common.enums.NoticeType;
 import com.sms.satp.common.enums.OperationModule;
 import com.sms.satp.common.enums.OperationType;
 import com.sms.satp.common.enums.ParamType;
@@ -25,6 +28,7 @@ import com.sms.satp.common.enums.ResultType;
 import com.sms.satp.common.enums.ResultVerificationType;
 import com.sms.satp.common.enums.RoleType;
 import com.sms.satp.common.enums.SaveMode;
+import com.sms.satp.common.enums.ScheduleStatusType;
 import com.sms.satp.common.enums.VerificationElementType;
 import com.sms.satp.engine.enums.EngineStatus;
 import com.sms.satp.security.pojo.CustomUser;
@@ -69,7 +73,9 @@ public class MongoCustomConverterConfiguration {
                 IntegerToResultVerificationTypeConverter.INSTANCE,
                 IntegerToResponseParamsExtractionTypeConverter.INSTANCE, IntegerToResultTypeConverter.INSTANCE,
                 IntegerToEngineStatusConverter.INSTANCE, IntegerToRoleTypeConverter.INSTANCE,
-                IntegerToVerificationElementTypeConverter.INSTANCE, IntegerToRawTypeConverter.INSTANCE);
+                IntegerToVerificationElementTypeConverter.INSTANCE, IntegerToRawTypeConverter.INSTANCE,
+                IntegerToScheduleStatusTypeConverter.INSTANCE, IntegerToCycleTypeConverter.INSTANCE,
+                IntegerToNoticeTypeConverter.INSTANCE, IntegerToCaseFilterConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -335,6 +341,42 @@ public class MongoCustomConverterConfiguration {
 
         public RawType convert(@NonNull Integer code) {
             return RawType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToScheduleStatusTypeConverter implements Converter<Integer, ScheduleStatusType> {
+        INSTANCE;
+
+        public ScheduleStatusType convert(@NonNull Integer code) {
+            return ScheduleStatusType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToCycleTypeConverter implements Converter<Integer, CycleType> {
+        INSTANCE;
+
+        public CycleType convert(@NonNull Integer code) {
+            return CycleType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToNoticeTypeConverter implements Converter<Integer, NoticeType> {
+        INSTANCE;
+
+        public NoticeType convert(@NonNull Integer code) {
+            return NoticeType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToCaseFilterConverter implements Converter<Integer, CaseFilter> {
+        INSTANCE;
+
+        public CaseFilter convert(@NonNull Integer code) {
+            return CaseFilter.getType(code);
         }
     }
 

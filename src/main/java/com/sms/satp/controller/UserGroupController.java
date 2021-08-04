@@ -1,6 +1,6 @@
 package com.sms.satp.controller;
 
-import static com.sms.satp.common.constant.Constants.USER_GROUP;
+import static com.sms.satp.common.constant.Constants.USER_GROUP_PATH;
 
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(USER_GROUP)
+@RequestMapping(USER_GROUP_PATH)
 public class UserGroupController {
 
     private final UserGroupService userGroupService;
