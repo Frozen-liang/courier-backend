@@ -1,9 +1,9 @@
-package com.sms.satp.mapper;
+package com.sms.courier.mapper;
 
-import com.sms.satp.dto.request.ScheduleRequest;
-import com.sms.satp.dto.response.ScheduleResponse;
-import com.sms.satp.entity.schedule.ScheduleEntity;
-import com.sms.satp.utils.EnumCommonUtils;
+import com.sms.courier.dto.request.ScheduleRequest;
+import com.sms.courier.dto.response.ScheduleResponse;
+import com.sms.courier.entity.schedule.ScheduleEntity;
+import com.sms.courier.utils.EnumCommonUtils;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;

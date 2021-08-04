@@ -1,13 +1,13 @@
-package com.sms.satp.dto.response;
+package com.sms.courier.dto.response;
 
 
-import static com.sms.satp.common.constant.TimePatternConstant.DEFAULT_PATTERN;
+import static com.sms.courier.common.constant.TimePatternConstant.DEFAULT_PATTERN;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sms.satp.common.enums.CycleType;
-import com.sms.satp.common.enums.NoticeType;
-import com.sms.satp.entity.schedule.CaseCondition;
+import com.sms.courier.common.enums.CycleType;
+import com.sms.courier.common.enums.NoticeType;
+import com.sms.courier.entity.schedule.CaseCondition;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;

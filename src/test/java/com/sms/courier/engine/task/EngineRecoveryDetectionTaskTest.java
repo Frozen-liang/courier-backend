@@ -47,5 +47,5 @@ public class EngineRecoveryDetectionTaskTest {
         engineRecoveryDetectionTask.engineDetection();
         verify(apiTestCaseJobService, times(1)).reallocateJob(engineIds);
         verify(sceneCaseJobService, times(1)).reallocateJob(engineIds);
-    }
+    }*/
 }

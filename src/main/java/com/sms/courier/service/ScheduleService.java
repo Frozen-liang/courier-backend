@@ -1,8 +1,8 @@
-package com.sms.satp.service;
+package com.sms.courier.service;
 
-import com.sms.satp.dto.request.ScheduleListRequest;
-import com.sms.satp.dto.request.ScheduleRequest;
-import com.sms.satp.dto.response.ScheduleResponse;
+import com.sms.courier.dto.request.ScheduleListRequest;
+import com.sms.courier.dto.request.ScheduleRequest;
+import com.sms.courier.dto.response.ScheduleResponse;
 import java.util.List;
 import org.springframework.stereotype.Service;
 

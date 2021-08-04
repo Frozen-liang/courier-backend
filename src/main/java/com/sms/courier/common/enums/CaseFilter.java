@@ -1,4 +1,4 @@
-package com.sms.satp.common.enums;
+package com.sms.courier.common.enums;
 
 import java.util.Arrays;
 import java.util.Map;

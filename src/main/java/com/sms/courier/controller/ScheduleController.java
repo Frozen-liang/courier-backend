@@ -1,13 +1,13 @@
-package com.sms.satp.controller;
+package com.sms.courier.controller;
 
-import static com.sms.satp.common.constant.Constants.SCHEDULE_PATH;
+import static com.sms.courier.common.constant.Constants.SCHEDULE_PATH;
 
-import com.sms.satp.common.validate.InsertGroup;
-import com.sms.satp.common.validate.UpdateGroup;
-import com.sms.satp.dto.request.ScheduleListRequest;
-import com.sms.satp.dto.request.ScheduleRequest;
-import com.sms.satp.dto.response.ScheduleResponse;
-import com.sms.satp.service.ScheduleService;
+import com.sms.courier.common.validate.InsertGroup;
+import com.sms.courier.common.validate.UpdateGroup;
+import com.sms.courier.dto.request.ScheduleListRequest;
+import com.sms.courier.dto.request.ScheduleRequest;
+import com.sms.courier.dto.response.ScheduleResponse;
+import com.sms.courier.service.ScheduleService;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;

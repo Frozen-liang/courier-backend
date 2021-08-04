@@ -1,12 +1,12 @@
-package com.sms.satp.entity.schedule;
+package com.sms.courier.entity.schedule;
 
 
-import com.sms.satp.common.enums.CaseFilter;
-import com.sms.satp.common.enums.CycleType;
-import com.sms.satp.common.enums.NoticeType;
-import com.sms.satp.common.enums.ScheduleStatusType;
-import com.sms.satp.common.enums.TaskStatus;
-import com.sms.satp.entity.BaseEntity;
+import com.sms.courier.common.enums.CaseFilter;
+import com.sms.courier.common.enums.CycleType;
+import com.sms.courier.common.enums.NoticeType;
+import com.sms.courier.common.enums.ScheduleStatusType;
+import com.sms.courier.common.enums.TaskStatus;
+import com.sms.courier.entity.BaseEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Data;

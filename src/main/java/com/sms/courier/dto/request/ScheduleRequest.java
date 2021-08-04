@@ -1,10 +1,10 @@
-package com.sms.satp.dto.request;
+package com.sms.courier.dto.request;
 
 
-import com.sms.satp.common.enums.CycleType;
-import com.sms.satp.common.enums.NoticeType;
-import com.sms.satp.common.validate.InsertGroup;
-import com.sms.satp.common.validate.UpdateGroup;
+import com.sms.courier.common.enums.CycleType;
+import com.sms.courier.common.enums.NoticeType;
+import com.sms.courier.common.validate.InsertGroup;
+import com.sms.courier.common.validate.UpdateGroup;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-package com.sms.satp.entity.schedule;
+package com.sms.courier.entity.schedule;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

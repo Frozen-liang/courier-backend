@@ -1,4 +1,4 @@
-package com.sms.satp.common.listener.event;
+package com.sms.courier.common.listener.event;
 
 import java.io.Serializable;
 import java.util.List;

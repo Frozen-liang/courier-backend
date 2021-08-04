@@ -1,10 +1,10 @@
-package com.sms.satp.mapper;
+package com.sms.courier.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sms.satp.dto.request.ScheduleRequest;
-import com.sms.satp.dto.response.ScheduleResponse;
-import com.sms.satp.entity.schedule.ScheduleEntity;
+import com.sms.courier.dto.request.ScheduleRequest;
+import com.sms.courier.dto.response.ScheduleResponse;
+import com.sms.courier.entity.schedule.ScheduleEntity;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

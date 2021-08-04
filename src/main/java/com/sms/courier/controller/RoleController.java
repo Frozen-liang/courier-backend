@@ -1,6 +1,6 @@
 package com.sms.courier.controller;
 
-import static com.sms.courier.common.constant.Constants.ROLE;
+import static com.sms.courier.common.constant.Constants.ROLE_PATH;
 
 import com.sms.courier.dto.response.RoleResponse;
 import com.sms.courier.service.RoleService;

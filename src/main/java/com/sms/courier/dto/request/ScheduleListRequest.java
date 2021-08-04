@@ -1,4 +1,4 @@
-package com.sms.satp.dto.request;
+package com.sms.courier.dto.request;
 
 
 import lombok.AllArgsConstructor;
