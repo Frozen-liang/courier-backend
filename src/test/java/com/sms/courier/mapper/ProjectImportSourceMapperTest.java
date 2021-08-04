@@ -1,20 +1,19 @@
-package com.sms.satp.mapper;
+package com.sms.courier.mapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import com.sms.satp.common.enums.ApiStatus;
-import com.sms.satp.common.enums.DocumentUrlType;
-import com.sms.satp.common.enums.ParamType;
-import com.sms.satp.common.enums.SaveMode;
-import com.sms.satp.dto.request.ProjectImportSourceRequest;
-import com.sms.satp.dto.response.ProjectImportSourceResponse;
-import com.sms.satp.entity.api.common.ParamInfo;
-
-import com.sms.satp.entity.project.ProjectImportSourceEntity;
+import com.sms.courier.common.enums.ApiStatus;
+import com.sms.courier.common.enums.DocumentUrlType;
+import com.sms.courier.common.enums.ParamType;
+import com.sms.courier.common.enums.SaveMode;
+import com.sms.courier.dto.request.ProjectImportSourceRequest;
+import com.sms.courier.dto.response.ProjectImportSourceResponse;
+import com.sms.courier.entity.api.common.ParamInfo;
+import com.sms.courier.entity.project.ProjectImportSourceEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Tests for ProjectImportSourceMapper")
 public class ProjectImportSourceMapperTest {

@@ -1,24 +1,16 @@
 package com.sms.satp.mapper;
 
-import static org.assertj.core.api.Assertions.as;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import com.sms.satp.common.enums.ImportStatus;
-import com.sms.satp.common.enums.ParamType;
-import com.sms.satp.dto.request.ParamInfoRequest;
-import com.sms.satp.dto.response.ParamInfoResponse;
-import com.sms.satp.dto.response.ProjectImportFlowResponse;
-import com.sms.satp.entity.api.common.ParamInfo;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.sms.satp.entity.project.ProjectImportFlowEntity;
-import org.apache.commons.lang3.StringUtils;
-import org.assertj.core.util.Lists;
+import com.sms.courier.common.enums.ImportStatus;
+import com.sms.courier.dto.response.ProjectImportFlowResponse;
+import com.sms.courier.entity.project.ProjectImportFlowEntity;
+import com.sms.courier.mapper.ProjectImportFlowMapper;
+import com.sms.courier.mapper.ProjectImportFlowMapperImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.time.LocalDateTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Tests for ProjectImportFlowMapper")
 public class ProjectImportFlowMapperTest {

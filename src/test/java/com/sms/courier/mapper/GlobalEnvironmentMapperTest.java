@@ -3,6 +3,7 @@ package com.sms.courier.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.courier.dto.request.GlobalEnvironmentRequest;
+import com.sms.courier.dto.request.ParamInfoRequest;
 import com.sms.courier.dto.response.GlobalEnvironmentResponse;
 import com.sms.courier.entity.env.GlobalEnvironmentEntity;
 import java.time.LocalDateTime;

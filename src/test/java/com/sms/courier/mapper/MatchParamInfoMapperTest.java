@@ -1,19 +1,19 @@
-package com.sms.satp.mapper;
+package com.sms.courier.mapper;
 
-import static com.sms.satp.common.enums.OperationModule.PROJECT;
-import static com.sms.satp.common.enums.OperationType.ADD;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import com.sms.satp.common.enums.MatchType;
-import com.sms.satp.common.enums.ParamType;
-import com.sms.satp.dto.response.MatchParamInfoResponse;
-import com.sms.satp.entity.api.common.MatchParamInfo;
-import com.sms.satp.entity.log.LogEntity;
+import com.sms.courier.common.enums.MatchType;
+import com.sms.courier.common.enums.ParamType;
+import com.sms.courier.dto.response.MatchParamInfoResponse;
+import com.sms.courier.entity.api.common.MatchParamInfo;
+import com.sms.courier.entity.log.LogEntity;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static com.sms.courier.common.enums.OperationModule.PROJECT;
+import static com.sms.courier.common.enums.OperationType.ADD;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Tests for MatchParamInfoMapperTest")
 public class MatchParamInfoMapperTest {
