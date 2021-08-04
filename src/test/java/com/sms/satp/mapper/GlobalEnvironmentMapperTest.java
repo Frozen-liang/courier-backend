@@ -3,12 +3,14 @@ package com.sms.satp.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.satp.dto.request.GlobalEnvironmentRequest;
+import com.sms.satp.dto.request.ParamInfoRequest;
 import com.sms.satp.dto.response.GlobalEnvironmentResponse;
 import com.sms.satp.entity.env.GlobalEnvironmentEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -29,6 +31,7 @@ class GlobalEnvironmentMapperTest {
             .envName(EVN_NAME)
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
+            .headers(Lists.newArrayList())
             .build();
         GlobalEnvironmentResponse globalEnvironmentDto = globalEnvironmentMapper.toDto(globalEnvironment);
         assertThat(globalEnvironmentDto.getEnvName()).isEqualTo(EVN_NAME);
@@ -76,5 +79,29 @@ class GlobalEnvironmentMapperTest {
         List<GlobalEnvironmentResponse> globalEnvironmentDtoList = globalEnvironmentMapper.toDtoList(null);
         assertThat(globalEnvironmentDtoList).isNull();
     }
+
+    @Test
+    @DisplayName("[Null Input Parameter]Test the method for converting an GlobalEnvironment entity list object to a dto list object")
+    void paramInfoRequestListToHeaderInfoList_Test(){
+        List<ParamInfoRequest> list=Lists.newArrayList(ParamInfoRequest.builder().build());
+        GlobalEnvironmentRequest globalEnvironmentDto=GlobalEnvironmentRequest.builder()
+                .headers(list)
+                .build();
+        GlobalEnvironmentEntity dto=globalEnvironmentMapper.toEntity(globalEnvironmentDto);
+        assertThat(dto).isNotNull();
+    }
+
+    @Test
+    @DisplayName("[Null Input Parameter]Test the method for converting an GlobalEnvironment entity list object to a dto list object")
+    void paramInfoRequestToHeaderInfo_IsNull_Test(){
+        ParamInfoRequest paramInfoRequest=null;
+        List<ParamInfoRequest> list=Lists.newArrayList(paramInfoRequest);
+        GlobalEnvironmentRequest globalEnvironmentDto=GlobalEnvironmentRequest.builder()
+                .headers(list)
+                .build();
+        GlobalEnvironmentEntity dto=globalEnvironmentMapper.toEntity(globalEnvironmentDto);
+        assertThat(dto).isNotNull();
+    }
+
 
 }
