@@ -125,7 +125,7 @@ class SceneCaseApiMapperTest {
     void apiTestCaseRequestToApiTestCaseEntity_test() {
         AddSceneCaseApiRequest addSceneCaseApiRequest = AddSceneCaseApiRequest.builder()
                 .apiTestCase(ApiTestCaseRequest.builder()
-                        .apiEntity(ApiEntityRequest.builder()
+                        .apiEntity(ApiRequest.builder()
                                 .requestHeaders(Lists.newArrayList(ParamInfoRequest.builder()
                                         .paramType(ParamType.INT)
                                         .build()))
@@ -142,7 +142,7 @@ class SceneCaseApiMapperTest {
         ParamInfoRequest paramInfoRequest = null;
         AddSceneCaseApiRequest addSceneCaseApiRequest = AddSceneCaseApiRequest.builder()
                 .apiTestCase(ApiTestCaseRequest.builder()
-                        .apiEntity(ApiEntityRequest.builder()
+                        .apiEntity(ApiRequest.builder()
                                 .requestHeaders(Lists.newArrayList(paramInfoRequest))
                                 .tagId(Lists.newArrayList())
                                 .build())
