@@ -1,6 +1,6 @@
 package com.sms.satp.entity.job.common;
 
-import com.sms.satp.dto.response.ApiEntityResponse;
+import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.entity.api.common.AdvancedSetting;
 import com.sms.satp.entity.api.common.HttpStatusVerification;
 import com.sms.satp.entity.api.common.ResponseHeadersVerification;
@@ -51,7 +51,7 @@ public class JobApiTestCase {
 
     private AdvancedSetting advancedSetting;
 
-    private ApiEntityResponse apiEntity;
+    private ApiResponse apiEntity;
 
     private CaseReport caseReport;
 

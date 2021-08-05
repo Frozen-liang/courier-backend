@@ -34,6 +34,7 @@ import com.sms.satp.utils.ExceptionUtils;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -64,7 +65,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     }
 
     @Override
-    public List<ApiTestCaseResponse> list(String apiId, String projectId, boolean removed) {
+    public List<ApiTestCaseResponse> list(ObjectId apiId, ObjectId projectId, boolean removed) {
         try {
             List<ApiTestCaseResponse> apiTestCaseResponses = customizedApiTestCaseRepository.listByJoin(apiId,
                 projectId, removed);

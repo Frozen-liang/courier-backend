@@ -8,9 +8,8 @@ import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.RequestMethod;
-import com.sms.satp.dto.request.ApiEntityRequest;
+import com.sms.satp.dto.request.ApiRequest;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
-import com.sms.satp.dto.response.ApiEntityResponse;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
@@ -102,7 +101,7 @@ class ApiTestCaseMapperTest {
     void Notnull_entityList_to_dtoList() {
         ApiTestCaseRequest apiTestCaseRequest = ApiTestCaseRequest.builder()
             .tagId(Lists.newArrayList())
-            .apiEntity(ApiEntityRequest.builder()
+            .apiEntity(ApiRequest.builder()
                 .requestHeaders(Lists.newArrayList())
                 .responseHeaders(Lists.newArrayList())
                 .pathParams(Lists.newArrayList())

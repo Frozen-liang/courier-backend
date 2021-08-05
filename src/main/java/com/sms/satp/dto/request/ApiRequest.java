@@ -5,6 +5,7 @@ import com.sms.satp.common.enums.ApiJsonType;
 import com.sms.satp.common.enums.ApiProtocol;
 import com.sms.satp.common.enums.ApiRequestParamType;
 import com.sms.satp.common.enums.ApiStatus;
+import com.sms.satp.common.enums.RawType;
 import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.common.validate.InsertGroup;
 import com.sms.satp.common.validate.UpdateGroup;
@@ -51,6 +52,9 @@ public class ApiRequest {
 
     private ApiRequestParamType apiRequestParamType;
 
+    private String requestRaw;
+
+    private RawType requestRawType;
     @Valid
     private List<ParamInfoRequest> requestHeaders;
     @Valid
@@ -78,4 +82,10 @@ public class ApiRequest {
 
     //@NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiRequestJsonType must not be null.")
     private ApiJsonType apiRequestJsonType;
+
+    private ApiRequestParamType apiResponseParamType;
+
+    private String responseRaw;
+
+    private RawType responseRawType;
 }

@@ -1,11 +1,9 @@
 package com.sms.satp.mapper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.sms.satp.common.enums.JobStatus;
 import com.sms.satp.dto.request.DataCollectionRequest;
 import com.sms.satp.dto.request.TestDataRequest;
-import com.sms.satp.dto.response.ApiEntityResponse;
+import com.sms.satp.dto.response.ApiResponse;
 import com.sms.satp.dto.response.ApiTestCaseJobResponse;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import com.sms.satp.entity.datacollection.TestData;
@@ -18,6 +16,8 @@ import com.sms.satp.entity.job.common.JobDataCollection;
 import com.sms.satp.entity.job.common.JobEnvironment;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Tests for JobMapper")
 class JobMapperTest {
@@ -39,7 +39,7 @@ class JobMapperTest {
     @DisplayName("Test the method to convert the apiTestCaseResponse object to a jobApiTestCase object")
     void apiTestCaseResponse_to_jobApiTestCase() {
         ApiTestCaseResponse apiTestCaseResponse =
-            ApiTestCaseResponse.builder().apiEntity(ApiEntityResponse.builder().apiName(NAME).build()).build();
+            ApiTestCaseResponse.builder().apiEntity(ApiResponse.builder().apiName(NAME).build()).build();
         JobApiTestCase jobApiTestCase = jobMapper.toJobApiTestCase(apiTestCaseResponse);
         assertThat(jobApiTestCase.getApiEntity().getApiName()).isEqualTo(NAME);
     }

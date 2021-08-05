@@ -69,8 +69,8 @@ class ApiTestCaseServiceTest {
     private static final boolean REMOVED = Boolean.FALSE;
     private static final String ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
-    private static final String API_ID = ObjectId.get().toString();
-    private static final String PROJECT_ID = ObjectId.get().toString();
+    private static final ObjectId API_ID = ObjectId.get();
+    private static final ObjectId PROJECT_ID = ObjectId.get();
 
     @Test
     @DisplayName("Test the findById method in the ApiTestCase service")

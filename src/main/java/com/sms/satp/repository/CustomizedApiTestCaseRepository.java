@@ -3,6 +3,7 @@ package com.sms.satp.repository;
 import com.sms.satp.common.enums.ApiBindingStatus;
 import com.sms.satp.dto.response.ApiTestCaseResponse;
 import java.util.List;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 
 public interface CustomizedApiTestCaseRepository {
@@ -15,5 +16,5 @@ public interface CustomizedApiTestCaseRepository {
 
     Boolean recover(List<String> ids);
 
-    List<ApiTestCaseResponse> listByJoin(String apiId, String projectId, boolean removed);
+    List<ApiTestCaseResponse> listByJoin(ObjectId apiId, ObjectId projectId, boolean removed);
 }

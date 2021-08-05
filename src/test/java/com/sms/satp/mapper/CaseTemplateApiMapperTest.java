@@ -1,9 +1,13 @@
 package com.sms.satp.mapper;
 
 import com.google.common.collect.Lists;
-import com.sms.satp.common.enums.*;
+import com.sms.satp.common.enums.ApiJsonType;
+import com.sms.satp.common.enums.ApiProtocol;
+import com.sms.satp.common.enums.ApiRequestParamType;
+import com.sms.satp.common.enums.ApiType;
+import com.sms.satp.common.enums.RequestMethod;
 import com.sms.satp.dto.request.AddCaseTemplateApiRequest;
-import com.sms.satp.dto.request.ApiEntityRequest;
+import com.sms.satp.dto.request.ApiRequest;
 import com.sms.satp.dto.request.ApiTestCaseRequest;
 import com.sms.satp.dto.request.UpdateCaseTemplateApiRequest;
 import com.sms.satp.dto.response.CaseTemplateApiResponse;
@@ -11,10 +15,9 @@ import com.sms.satp.entity.api.ApiEntity;
 import com.sms.satp.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.satp.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.satp.entity.scenetest.SceneCaseApiEntity;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -180,7 +183,7 @@ class CaseTemplateApiMapperTest {
     void apiTestCaseRequestToApiTestCaseEntityTest() {
         ApiTestCaseRequest apiTestCaseRequest = ApiTestCaseRequest.builder()
                 .tagId(Lists.newArrayList())
-            .apiEntity(ApiEntityRequest.builder()
+            .apiEntity(ApiRequest.builder()
                 .requestHeaders(Lists.newArrayList())
                 .responseHeaders(Lists.newArrayList())
                 .pathParams(Lists.newArrayList())
