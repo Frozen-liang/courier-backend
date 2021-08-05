@@ -91,6 +91,6 @@ task_deploy:
   before_script:
     - echo "Running deploy docker image"
   script:
-    - ssh API-DEV /home/ec2-user/satp/starter.sh ${IMAGE} ${IMAGE_TAG}
+    - ssh API-DEV /home/ec2-user/courier/starter.sh ${IMAGE} ${IMAGE_TAG}
 
 

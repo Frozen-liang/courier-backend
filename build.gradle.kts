@@ -10,9 +10,9 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 
 
-group = "com.starlight.api.platform"
+group = "com.sms.courier"
 version = "1.0.0-SNAPSHOT"
-description = "sms-satp"
+description = "courier-backend"
 
 
 
@@ -149,7 +149,7 @@ tasks.spotbugsMain {
 
 tasks.jacocoTestReport {
     classDirectories.setFrom(sourceSets.main.get().output.asFileTree.matching {
-        exclude("com/sms/satp/security/SecurityConfig.class", "com/sms/satp/utils/**", "com/sms/satp/engine/**", "com/sms/satp/parser/converter/**.class", "com/sms/satp/common/**", "**/entity/**/**.class", "**/SatpApplication.class", "com/sms/satp/infrastructure/**", "com/sms/satp/websocket/**.class", "com/sms/satp/config/**.class", "com/sms/satp/controller/**")
+        exclude("com/sms/courier/security/SecurityConfig.class", "com/sms/courier/utils/**", "com/sms/courier/engine/**", "com/sms/courier/parser/converter/**.class", "com/sms/courier/common/**", "**/entity/**/**.class", "**/courierApplication.class", "com/sms/courier/infrastructure/**", "com/sms/courier/websocket/**.class", "com/sms/courier/config/**.class", "com/sms/courier/controller/**")
     })
     dependsOn(tasks.test)
     reports {
