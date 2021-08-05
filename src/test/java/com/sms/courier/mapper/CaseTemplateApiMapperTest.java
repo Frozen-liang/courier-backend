@@ -7,7 +7,7 @@ import com.sms.courier.common.enums.ApiRequestParamType;
 import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.enums.RequestMethod;
 import com.sms.courier.dto.request.AddCaseTemplateApiRequest;
-import com.sms.courier.dto.request.ApiEntityRequest;
+import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.request.UpdateCaseTemplateApiRequest;
 import com.sms.courier.dto.response.CaseTemplateApiResponse;
@@ -15,6 +15,7 @@ import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

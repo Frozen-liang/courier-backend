@@ -5,6 +5,7 @@ import com.sms.courier.common.enums.ApiJsonType;
 import com.sms.courier.common.enums.ApiProtocol;
 import com.sms.courier.common.enums.ApiRequestParamType;
 import com.sms.courier.common.enums.ApiStatus;
+import com.sms.courier.common.enums.RawType;
 import com.sms.courier.common.enums.RequestMethod;
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;

@@ -1,6 +1,6 @@
 package com.sms.courier.entity.job.common;
 
-import com.sms.courier.dto.response.ApiEntityResponse;
+import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.common.AdvancedSetting;
 import com.sms.courier.entity.api.common.HttpStatusVerification;
 import com.sms.courier.entity.api.common.ResponseHeadersVerification;
