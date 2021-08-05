@@ -23,6 +23,7 @@ public interface ApiTestCaseMapper {
 
     ApiTestCaseEntity toEntity(ApiTestCaseRequest apiTestCaseRequest);
 
+    @Mapping(target = "caseName", source = "apiName")
     @Mapping(target = "apiEntity.id", source = "id")
     @Mapping(target = "apiEntity.apiName", source = "apiName")
     @Mapping(target = "apiEntity.apiPath", source = "apiPath")

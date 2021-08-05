@@ -5,6 +5,7 @@ import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import java.util.List;
+import org.bson.types.ObjectId;
 
 public interface ApiTestCaseService {
 
@@ -12,7 +13,7 @@ public interface ApiTestCaseService {
 
     ApiTestCaseEntity findOne(String id);
 
-    List<ApiTestCaseResponse> list(String apiId, String projectId, boolean removed);
+    List<ApiTestCaseResponse> list(ObjectId apiId, ObjectId projectId, boolean removed);
 
     Boolean add(ApiTestCaseRequest apiTestCaseRequest);
 
