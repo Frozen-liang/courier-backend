@@ -4,11 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.courier.dto.request.ProjectEnvironmentRequest;
 import com.sms.courier.dto.response.ProjectEnvironmentResponse;
+import com.sms.courier.entity.api.common.HeaderInfo;
+import com.sms.courier.entity.env.GlobalEnvironmentEntity;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -77,4 +80,46 @@ class ProjectEnvironmentMapperTest {
         assertThat(projectEnvironmentDtoList).isNull();
     }
 
+    @Test
+    @DisplayName("[Null Input Parameter]Test the method for converting an ProjectEnvironment entity list object to a dto list object")
+    void toEntityByGlobalTest(){
+        GlobalEnvironmentEntity globalEnvironment = GlobalEnvironmentEntity.builder()
+                .modifyDateTime(MODIFY_TIME)
+                .createDateTime(CREATE_TIME)
+                .envVariable(Lists.newArrayList())
+                .urlParams(Lists.newArrayList())
+                .requestParams(Lists.newArrayList())
+                .build();
+        ProjectEnvironmentEntity dto = projectEnvironmentMapper.toEntityByGlobal(globalEnvironment);
+        assertThat(dto).isNotNull();
+    }
+
+    @Test
+    @DisplayName("[Null Input Parameter]Test the method for converting an ProjectEnvironment entity list object to a dto list object")
+    void toEntityByGlobal_IsNull_Test(){
+        ProjectEnvironmentEntity dto = projectEnvironmentMapper.toEntityByGlobal(null);
+        assertThat(dto).isNull();
+    }
+
+    @Test
+    @DisplayName("[Null Input Parameter]Test the method for converting an ProjectEnvironment entity list object to a dto list object")
+    void headerInfoToParamInfo_Test(){
+        HeaderInfo headerInfo = HeaderInfo.builder().build();
+        GlobalEnvironmentEntity globalEnvironment = GlobalEnvironmentEntity.builder()
+                .headers(Lists.newArrayList(headerInfo))
+                .build();
+        ProjectEnvironmentEntity dto = projectEnvironmentMapper.toEntityByGlobal(globalEnvironment);
+        assertThat(dto).isNotNull();
+    }
+
+    @Test
+    @DisplayName("[Null Input Parameter]Test the method for converting an ProjectEnvironment entity list object to a dto list object")
+    void headerInfoToParamInfo_IsNull_Test(){
+        HeaderInfo headerInfo = null;
+        GlobalEnvironmentEntity globalEnvironment = GlobalEnvironmentEntity.builder()
+                .headers(Lists.newArrayList(headerInfo))
+                .build();
+        ProjectEnvironmentEntity dto = projectEnvironmentMapper.toEntityByGlobal(globalEnvironment);
+        assertThat(dto).isNotNull();
+    }
 }
