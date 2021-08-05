@@ -14,7 +14,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -33,7 +32,6 @@ public class ScheduleEntity extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
-    @Indexed(unique = true)
     private String name;
 
     private String description;

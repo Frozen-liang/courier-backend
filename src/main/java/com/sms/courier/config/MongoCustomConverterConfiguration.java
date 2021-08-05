@@ -29,6 +29,7 @@ import com.sms.courier.common.enums.ResultVerificationType;
 import com.sms.courier.common.enums.RoleType;
 import com.sms.courier.common.enums.SaveMode;
 import com.sms.courier.common.enums.ScheduleStatusType;
+import com.sms.courier.common.enums.TaskStatus;
 import com.sms.courier.common.enums.VerificationElementType;
 import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.security.pojo.CustomUser;
@@ -75,7 +76,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToEngineStatusConverter.INSTANCE, IntegerToRoleTypeConverter.INSTANCE,
                 IntegerToVerificationElementTypeConverter.INSTANCE, IntegerToRawTypeConverter.INSTANCE,
                 IntegerToScheduleStatusTypeConverter.INSTANCE, IntegerToCycleTypeConverter.INSTANCE,
-                IntegerToNoticeTypeConverter.INSTANCE, IntegerToCaseFilterConverter.INSTANCE);
+                IntegerToNoticeTypeConverter.INSTANCE, IntegerToCaseFilterConverter.INSTANCE,
+                IntegerToTaskStatusConverter.INSTANCE);
         return new MongoCustomConversions(converters);
     }
 
@@ -377,6 +379,15 @@ public class MongoCustomConverterConfiguration {
 
         public CaseFilter convert(@NonNull Integer code) {
             return CaseFilter.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToTaskStatusConverter implements Converter<Integer, TaskStatus> {
+        INSTANCE;
+
+        public TaskStatus convert(@NonNull Integer code) {
+            return TaskStatus.getType(code);
         }
     }
 

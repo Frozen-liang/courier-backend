@@ -27,7 +27,7 @@ public enum RawType implements EnumCommon {
         return this.code;
     }
 
-    public static RawType getType(int code) {
+    public static RawType getType(Integer code) {
         return mappings.get(code);
     }
 }

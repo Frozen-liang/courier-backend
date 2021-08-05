@@ -325,6 +325,18 @@
       "roleType": 0
     },
     {
+      "id": "610a0bf495e1c9094c0a709c",
+      "name": "Schedule_Query_All",
+      "description": "查询所有的定时任务",
+      "roleType": 0
+    },
+    {
+      "id": "610a0bf495e1c9094c0a709d",
+      "name": "Schedule_Create_Update_Delete",
+      "description": "定时任务增加修改删除",
+      "roleType": 0
+    },
+    {
       "id": "610126d056617f032835a987",
       "name": "Global_Fun_Find_All",
       "description": "引擎查询所有全局函数",

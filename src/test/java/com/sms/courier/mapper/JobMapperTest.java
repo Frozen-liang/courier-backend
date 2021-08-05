@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.dto.request.DataCollectionRequest;
 import com.sms.courier.dto.request.TestDataRequest;
-import com.sms.courier.dto.response.ApiEntityResponse;
 import com.sms.courier.dto.response.ApiTestCaseJobResponse;
-import com.sms.courier.dto.response.ApiTestCaseResponse;
+import com.sms.courier.entity.api.ApiEntity;
+import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.datacollection.TestData;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
@@ -38,10 +38,10 @@ class JobMapperTest {
     @Test
     @DisplayName("Test the method to convert the apiTestCaseResponse object to a jobApiTestCase object")
     void apiTestCaseResponse_to_jobApiTestCase() {
-        ApiTestCaseResponse apiTestCaseResponse =
-            ApiTestCaseResponse.builder().apiEntity(ApiEntityResponse.builder().apiName(NAME).build()).build();
+        ApiTestCaseEntity apiTestCaseResponse =
+            ApiTestCaseEntity.builder().apiEntity(ApiEntity.builder().apiName(NAME).build()).build();
         JobApiTestCase jobApiTestCase = jobMapper.toJobApiTestCase(apiTestCaseResponse);
-        assertThat(jobApiTestCase.getApiEntity().getApiName()).isEqualTo(NAME);
+        assertThat(jobApiTestCase.getJobApi().getApiName()).isEqualTo(NAME);
     }
 
     @Test

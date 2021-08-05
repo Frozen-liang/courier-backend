@@ -16,8 +16,8 @@ import com.sms.courier.dto.request.DataCollectionRequest;
 import com.sms.courier.dto.request.TestDataRequest;
 import com.sms.courier.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.courier.dto.response.ApiTestCaseJobResponse;
-import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.engine.service.CaseDispatcherService;
+import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobReport;
@@ -98,12 +98,12 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             notNull(projectEnvironment, THE_ENV_NOT_EXIST);
             JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
             for (String apiTestCaseId : apiTestCaseIds) {
-                ApiTestCaseResponse apiTestCaseResponse = apiTestCaseService.findById(apiTestCaseId);
+                ApiTestCaseEntity apiTestCase = apiTestCaseService.findOne(apiTestCaseId);
                 ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
                 apiTestCaseJob.setWorkspaceId(apiTestCaseJobRunRequest.getWorkspaceId());
-                apiTestCaseJob.setProjectId(apiTestCaseResponse.getProjectId());
+                apiTestCaseJob.setProjectId(apiTestCase.getProjectId());
                 apiTestCaseJob.setApiTestCase(
-                    JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestCaseResponse)).build());
+                    JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestCase)).build());
                 // Multiple job are sent if a data collection exists.
                 if (Objects.nonNull(dataCollectionRequest) && CollectionUtils
                     .isNotEmpty(dataCollectionRequest.getDataList())) {

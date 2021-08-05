@@ -4,13 +4,17 @@ import static com.sms.courier.common.enums.OperationModule.SCHEDULE;
 import static com.sms.courier.common.enums.ScheduleStatusType.CREATE;
 import static com.sms.courier.common.enums.ScheduleStatusType.UPDATE;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCHEDULE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DELETE_SCHEDULE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCHEDULE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_LIST_ERROR;
 import static com.sms.courier.common.field.CommonField.REMOVE;
+import static com.sms.courier.common.field.ScheduleField.SCHEDULE_STATUS;
 
+import com.sms.courier.common.enums.ScheduleStatusType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.request.ScheduleListRequest;
 import com.sms.courier.dto.request.ScheduleRequest;
 import com.sms.courier.dto.response.ScheduleResponse;
@@ -20,7 +24,9 @@ import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.ScheduleRepository;
 import com.sms.courier.service.ScheduleService;
 import com.sms.courier.utils.ExceptionUtils;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -92,7 +98,15 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public Boolean delete(String id) {
-        return true;
+        try {
+            Map<Field, Object> updateFields = new HashMap<>();
+            updateFields.put(REMOVE, true);
+            updateFields.put(SCHEDULE_STATUS, ScheduleStatusType.DELETE);
+            return commonRepository.updateFieldById(id, updateFields, ScheduleEntity.class);
+        } catch (Exception e) {
+            log.error("Failed to delete Schedule. message:{}", e.getMessage());
+            throw ExceptionUtils.mpe(DELETE_SCHEDULE_BY_ID_ERROR);
+        }
     }
 
     private boolean checkScheduleTime(ScheduleEntity oldSchedule, ScheduleEntity newSchedule) {
