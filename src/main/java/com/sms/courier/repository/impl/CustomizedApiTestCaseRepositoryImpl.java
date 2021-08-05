@@ -23,6 +23,7 @@ import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -69,7 +70,7 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
     }
 
     @Override
-    public List<ApiTestCaseResponse> listByJoin(String apiId, String projectId, boolean removed) {
+    public List<ApiTestCaseResponse> listByJoin(ObjectId apiId, ObjectId projectId, boolean removed) {
         List<LookupVo> lookupVoList = getLookupVoList();
         QueryVo queryVo = QueryVo.builder()
             .collectionName("ApiTestCase")
@@ -98,7 +99,7 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
         );
     }
 
-    private List<Optional<Criteria>> buildCriteria(String apiId, String projectId, boolean removed) {
+    private List<Optional<Criteria>> buildCriteria(ObjectId apiId, ObjectId projectId, boolean removed) {
         return Lists.newArrayList(
             PROJECT_ID.is(projectId),
             REMOVE.is(removed),
