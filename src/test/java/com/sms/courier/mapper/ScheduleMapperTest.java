@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Tests for ScheduleMapper")
 class ScheduleMapperTest {
 
-    private ScheduleMapper scheduleMapper = new ScheduleMapperImpl();
+    private final ScheduleMapper scheduleMapper = new ScheduleMapperImpl();
     private static final String NAME = "schedule";
     private static final LocalDateTime CREATE_TIME = LocalDateTime.now();
     private static final LocalDateTime MODIFY_TIME = LocalDateTime.now();

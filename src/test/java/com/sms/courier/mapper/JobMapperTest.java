@@ -1,15 +1,17 @@
 package com.sms.courier.mapper;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.common.collect.Lists;
 import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.dto.request.ApiTestRequest;
 import com.sms.courier.dto.request.DataCollectionRequest;
 import com.sms.courier.dto.request.DataParamRequest;
 import com.sms.courier.dto.request.TestDataRequest;
+import com.sms.courier.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.courier.dto.response.ApiTestCaseJobResponse;
-import com.sms.courier.entity.api.ApiEntity;
-import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
-import com.sms.courier.dto.response.*;
+import com.sms.courier.dto.response.SceneCaseJobReportResponse;
+import com.sms.courier.dto.response.SceneCaseJobResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.api.common.HttpStatusVerification;
 import com.sms.courier.entity.api.common.MatchParamInfo;
@@ -19,22 +21,23 @@ import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.datacollection.TestData;
 import com.sms.courier.entity.env.EnvironmentAuth;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
-import com.sms.courier.entity.job.*;
+import com.sms.courier.entity.job.ApiTestCaseJobEntity;
+import com.sms.courier.entity.job.JobCaseApi;
+import com.sms.courier.entity.job.JobSceneCaseApi;
+import com.sms.courier.entity.job.SceneCaseJobEntity;
+import com.sms.courier.entity.job.SceneCaseJobReport;
 import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.JobDataCollection;
 import com.sms.courier.entity.job.common.JobEnvironment;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Tests for JobMapper")
 class JobMapperTest {
@@ -63,33 +66,7 @@ class JobMapperTest {
         assertThat(jobEnvironment.getEnvName()).isEqualTo(NAME);
     }
 
-    @Test
-    @DisplayName("Test the method to convert the apiTestCaseResponse object to a jobApiTestCase object")
-    void apiTestCaseResponse_to_jobApiTestCase() {
-        ApiTestCaseEntity apiTestCaseResponse =
-            ApiTestCaseEntity.builder().apiEntity(ApiEntity.builder().apiName(NAME).build()).build();
-        List<MatchParamInfoResponse> list = Lists.newArrayList();
-        ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
-                .modifyDateTime(MODIFY_TIME)
-                .responseHeadersVerification(ResponseHeadersVerificationResponse.builder()
-                        .params(list)
-                        .build())
-                .apiEntity(ApiResponse.builder()
-                        .apiName(NAME)
-                        .requestHeaders(Lists.newArrayList(ParamInfoResponse.builder().paramType(0).build()))
-                        .build())
-                .build();
-        JobApiTestCase jobApiTestCase = jobMapper.toJobApiTestCase(apiTestCaseResponse);
-        assertThat(jobApiTestCase.getJobApi().getApiName()).isEqualTo(NAME);
-    }
 
-    @Test
-    @DisplayName("Test the method to convert the apiTestCaseResponse object to a jobApiTestCase object")
-    void toJobApiTestCase_isNull_Test(){
-        ApiTestCaseResponse apiTestCaseResponse =null;
-        JobApiTestCase jobApiTestCase = jobMapper.toJobApiTestCase(apiTestCaseResponse);
-        assertThat(jobApiTestCase).isNull();
-    }
 
     @Test
     @DisplayName("Test the method to convert the apiTestCaseResponse object to a jobApiTestCase object")
@@ -134,7 +111,6 @@ class JobMapperTest {
         ApiTestCaseJobEntity apiTestCaseJob = ApiTestCaseJobEntity.builder().message(message)
             .apiTestCase(JobCaseApi.builder().jobApiTestCase(
                 JobApiTestCase.builder()
-                        .tagId(Lists.newArrayList())
                         .caseReport(CaseReport.builder()
                                 .requestUrl(requestUrl).build()).build())
                 .build()).build();
@@ -242,7 +218,7 @@ class JobMapperTest {
     @Test
     @DisplayName("Test the method to convert the apiTestCaseJob object to a apiTestCaseJobPageResponse object")
     void toSceneCaseJobReportResponse_Test(){
-        SceneCaseJobReport caseJobReport=SceneCaseJobReport.builder().build();
+        SceneCaseJobReport caseJobReport= SceneCaseJobReport.builder().build();
         SceneCaseJobReportResponse dot=jobMapper.toSceneCaseJobReportResponse(caseJobReport);
         assertThat(dot).isNotNull();
     }
@@ -278,31 +254,6 @@ class JobMapperTest {
                 .data(Lists.newArrayList(dataParamRequest))
                 .build();
         TestData dto = jobMapper.toTestDataEntity(testDataRequest);
-        assertThat(dto).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Test the method to convert the apiTestCaseJob object to a apiTestCaseJobPageResponse object")
-    void matchParamInfoResponseListToMatchParamInfoList_IsNull_Test(){
-        List<MatchParamInfoResponse> list = null;
-        ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
-                .responseHeadersVerification(new ResponseHeadersVerificationResponse(list))
-                .build();
-        JobApiTestCase dto = jobMapper.toJobApiTestCase(apiTestCaseResponse);
-        assertThat(dto).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Test the method to convert the apiTestCaseJob object to a apiTestCaseJobPageResponse object")
-    void matchParamInfoResponseListToMatchParamInfoList_Test(){
-        List<MatchParamInfoResponse> list = Lists.newArrayList(MatchParamInfoResponse.builder()
-                .matchType(0)
-                .paramType(0)
-                .build());
-        ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
-                .responseHeadersVerification(new ResponseHeadersVerificationResponse(list))
-                .build();
-        JobApiTestCase dto = jobMapper.toJobApiTestCase(apiTestCaseResponse);
         assertThat(dto).isNotNull();
     }
 

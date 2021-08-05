@@ -28,7 +28,7 @@ public class JobApiTestCaseResponse {
     @JsonProperty("isExecute")
     private boolean execute;
     private AdvancedSetting advancedSetting;
-    private ApiEntityResponse jobApi;
+    private JobApiResponse jobApi;
     private CaseReportResponse caseReport;
 
 }
