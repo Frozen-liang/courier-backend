@@ -2,6 +2,7 @@ package com.sms.courier.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.Lists;
 import com.sms.courier.dto.request.WorkspaceRequest;
 import com.sms.courier.dto.response.WorkspaceResponse;
 import com.sms.courier.entity.workspace.WorkspaceEntity;
@@ -51,9 +52,29 @@ class WorkspaceMapperTest {
     void dto_to_entity() {
         WorkspaceRequest workspaceRequest = WorkspaceRequest.builder()
             .name(NAME)
+            .userIds(Lists.newArrayList("IDS"))
             .build();
         WorkspaceEntity workspace = workspaceMapper.toEntity(workspaceRequest);
         assertThat(workspace.getName()).isEqualTo(NAME);
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the Workspace's entity object to a dto object")
+    void entity_IsNull_to_dto() {
+        WorkspaceResponse dto = workspaceMapper.toDto(null);
+        assertThat(dto).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the Workspace's entity object to a dto object")
+    void toDtoList_IsNull_to_dto() {
+        assertThat(workspaceMapper.toDtoList(null)).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the Workspace's entity object to a dto object")
+    void toEntity_IsNull_to_dto() {
+        assertThat(workspaceMapper.toEntity(null)).isNull();
     }
 
 }
