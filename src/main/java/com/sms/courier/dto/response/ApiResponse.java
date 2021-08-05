@@ -36,6 +36,9 @@ public class ApiResponse extends BaseResponse {
 
     private Integer apiRequestParamType;
 
+    private String requestRaw;
+
+    private Integer requestRawType;
 
     private List<ParamInfoResponse> requestHeaders;
     private List<ParamInfoResponse> responseHeaders;
@@ -55,6 +58,12 @@ public class ApiResponse extends BaseResponse {
     private Integer apiResponseJsonType;
 
     private Integer apiRequestJsonType;
+
+    private Integer apiResponseParamType;
+
+    private String responseRaw;
+
+    private Integer responseRawType;
 
     private String createUser;
 }

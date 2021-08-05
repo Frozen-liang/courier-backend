@@ -44,5 +44,5 @@ public class ApiTestCaseRequest {
     @JsonProperty("isExecute")
     private boolean execute = true;
     private AdvancedSetting advancedSetting;
-    private ApiEntityRequest apiEntity;
+    private ApiRequest apiEntity;
 }

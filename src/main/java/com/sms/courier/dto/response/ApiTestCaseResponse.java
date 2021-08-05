@@ -34,5 +34,5 @@ public class ApiTestCaseResponse extends LookupUserResponse {
     private Integer isSuccess;
     private String testTime;
     private String jobId;
-    private ApiEntityResponse apiEntity;
+    private ApiResponse apiEntity;
 }

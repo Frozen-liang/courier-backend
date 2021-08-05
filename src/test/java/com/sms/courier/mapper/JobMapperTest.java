@@ -69,7 +69,7 @@ class JobMapperTest {
                 .responseHeadersVerification(ResponseHeadersVerificationResponse.builder()
                         .params(list)
                         .build())
-                .apiEntity(ApiEntityResponse.builder()
+                .apiEntity(ApiResponse.builder()
                         .apiName(NAME)
                         .requestHeaders(Lists.newArrayList(ParamInfoResponse.builder().paramType(0).build()))
                         .build())
