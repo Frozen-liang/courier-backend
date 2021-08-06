@@ -2,6 +2,7 @@ package com.sms.courier.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.Lists;
 import com.sms.courier.dto.request.UserGroupRequest;
 import com.sms.courier.dto.response.UserGroupResponse;
 import com.sms.courier.entity.system.UserGroupEntity;
@@ -29,7 +30,8 @@ class UserGroupMapperTest {
             .name(NAME)
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
-            .build();
+                .roleIds(Lists.newArrayList())
+                .build();
         UserGroupResponse userGroupResponse = userGroupMapper.toDto(userGroup);
         assertThat(userGroupResponse.getName()).isEqualTo(NAME);
     }
@@ -50,7 +52,8 @@ class UserGroupMapperTest {
     @DisplayName("Test the method to convert the UserGroup's dto object to a entity object")
     void dto_to_entity() {
         UserGroupRequest userGroupRequest = UserGroupRequest.builder()
-            .name(NAME)
+                .roleIds(Lists.newArrayList())
+                .name(NAME)
             .build();
         UserGroupEntity userGroup = userGroupMapper.toEntity(userGroupRequest);
         assertThat(userGroup.getName()).isEqualTo(NAME);
