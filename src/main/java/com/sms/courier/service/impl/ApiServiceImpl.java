@@ -94,11 +94,11 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     @LogRecord(operationType = OperationType.ADD, operationModule = OperationModule.API,
-        template = "{{#apiRequestDto.apiName}}")
-    public Boolean add(ApiRequest apiRequestDto) {
-        log.info("ApiService-add()-params: [Api]={}", apiRequestDto.toString());
+        template = "{{#apiRequest.apiName}}")
+    public Boolean add(ApiRequest apiRequest) {
+        log.info("ApiService-add()-params: [Api]={}", apiRequest.toString());
         try {
-            ApiEntity apiEntity = apiMapper.toEntity(apiRequestDto);
+            ApiEntity apiEntity = apiMapper.toEntity(apiRequest);
             apiEntity.setMd5(MD5Util.getMD5(apiEntity));
             ApiEntity newApiEntity = apiRepository.insert(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
@@ -113,7 +113,7 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     @LogRecord(operationType = OperationType.EDIT, operationModule = OperationModule.API,
-        template = "{{#apiRequestDto.apiName}}")
+        template = "{{#apiRequest.apiName}}")
     public Boolean edit(ApiRequest apiRequest) {
         log.info("ApiService-edit()-params: [Api]={}", apiRequest.toString());
         try {

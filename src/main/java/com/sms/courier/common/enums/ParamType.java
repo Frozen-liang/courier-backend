@@ -6,17 +6,19 @@ import java.util.Map;
 public enum ParamType implements EnumCommon {
     STRING(0), FILE(1),
 
-    JSON(2), INT(3),
+    JSON(2), /*INT(3),*/
 
-    FLOAT(4), DOUBLE(5),
+    /*FLOAT(4), DOUBLE(5),*/
 
     DATE(6), DATETIME(7),
 
-    BOOLEAN(8), BYTE(9), SHORT(10),
+    BOOLEAN(8), BYTE(9),
 
-    LONG(11), ARRAY(12),
+    /*SHORT(10), LONG(11), */
 
-    OBJECT(13), NUMBER(14);
+    ARRAY(12), OBJECT(13),
+
+    NUMBER(14);
 
     private static final Map<Integer, ParamType> mappings = new HashMap<>(16);
 
@@ -37,7 +39,7 @@ public enum ParamType implements EnumCommon {
         return this.code;
     }
 
-    public static ParamType getType(int code) {
+    public static ParamType getType(Integer code) {
         return mappings.get(code);
     }
 }

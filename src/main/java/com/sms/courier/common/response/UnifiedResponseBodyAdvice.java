@@ -12,7 +12,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-@RestControllerAdvice("com.sms.satp.controller")
+@RestControllerAdvice("com.sms.courier.controller")
 public class UnifiedResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
     @Override

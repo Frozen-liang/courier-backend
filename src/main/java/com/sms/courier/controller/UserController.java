@@ -1,6 +1,6 @@
 package com.sms.courier.controller;
 
-import static com.sms.courier.common.constant.Constants.USER;
+import static com.sms.courier.common.constant.Constants.USER_PATH;
 
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(USER)
+@RequestMapping(USER_PATH)
 public class UserController {
 
     private final UserService userService;

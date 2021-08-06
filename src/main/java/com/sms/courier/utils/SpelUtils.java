@@ -1,10 +1,14 @@
 package com.sms.courier.utils;
 
+import static com.sms.courier.common.enums.OperationType.DELETE;
+import static com.sms.courier.common.enums.OperationType.REMOVE;
+
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.enums.OperationType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +30,7 @@ public class SpelUtils {
     private static final SpelExpressionParser spelExpressionParser = new SpelExpressionParser();
     private static final LocalVariableTableParameterNameDiscoverer parameterNameDiscoverer =
         new LocalVariableTableParameterNameDiscoverer();
+    private static final List<OperationType> OPERATION_TYPES = List.of(DELETE, REMOVE);
 
     private SpelUtils() {
     }
@@ -52,9 +57,7 @@ public class SpelUtils {
             Expression expression;
             String value = null;
             String exp;
-
-            if (logRecord.operationType() == OperationType.DELETE
-                || logRecord.operationType() == OperationType.REMOVE) {
+            if (OPERATION_TYPES.contains(logRecord.operationType())) {
                 if (!logRecord.enhance().enable()) {
                     return null;
                 }

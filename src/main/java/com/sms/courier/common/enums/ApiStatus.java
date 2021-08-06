@@ -31,7 +31,7 @@ public enum ApiStatus implements EnumCommon {
         return code;
     }
 
-    public static ApiStatus getType(int code) {
+    public static ApiStatus getType(Integer code) {
         return mappings.get(code);
     }
 }

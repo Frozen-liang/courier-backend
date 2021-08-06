@@ -37,7 +37,7 @@ public class RoleInitializer implements DataInitializer {
             log.debug("version:{},name:{},group:{},buildTime:{}", version, name, group, buildTime);
             Objects.requireNonNull(name);
             Objects.requireNonNull(version);
-            SystemVersionEntity systemVersion = systemVersionRepository.findByName(name);
+            SystemVersionEntity systemVersion = systemVersionRepository.findByVersion(version);
             if (checkInitialized(systemVersion, version)) {
                 String path = String.join("", PREFIX, version, SUFFIX);
                 final ClassPathResource classPathResource = new ClassPathResource(path);
@@ -60,7 +60,7 @@ public class RoleInitializer implements DataInitializer {
                 log.debug("Initialize role success");
             }
         } catch (Exception e) {
-            log.error("Initialize role error. errorMessage:{}", e.getMessage());
+            log.error("Initialize role error. message:{}", e.getMessage());
         }
     }
 

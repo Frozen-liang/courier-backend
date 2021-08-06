@@ -38,9 +38,11 @@ public class Constants {
     public static final String API_GROUP_PATH = SDK_VERSION + "/api-group";
     public static final String FILE_PATH = SDK_VERSION + "/file";
     public static final String WORKSPACE_PATH = SDK_VERSION + "/workspace";
-    public static final String USER = SDK_VERSION + "/system/user";
-    public static final String USER_GROUP = SDK_VERSION + "/system/user-group";
-    public static final String ROLE = SDK_VERSION + "/system/role";
+    public static final String USER_PATH = SDK_VERSION + "/system/user";
+    public static final String USER_GROUP_PATH = SDK_VERSION + "/system/user-group";
+    public static final String ROLE_PATH = SDK_VERSION + "/system/role";
+    public static final String SCHEDULE_PATH = SDK_VERSION + "/schedule";
+
     public static final int MAX_DEPTH = 3;
 
 }

@@ -1,12 +1,9 @@
 package com.sms.courier.dto.request;
 
-import com.sms.courier.common.enums.ApiStatus;
-import com.sms.courier.common.enums.GroupImportType;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
@@ -31,14 +28,7 @@ public class ApiImportRequest {
     /**
      * 新API文件状态预设.
      */
-    @Default
-    private Integer apiPresetStatus = ApiStatus.PUBLISH.getCode();
-    /**
-     * 变更API状态设置.
-     */
-    @Default
-    private Integer apiChangeStatus = ApiStatus.PUBLISH.getCode();
+    private Integer apiPresetStatus;
 
-    @Default
-    private Integer groupImportType = GroupImportType.EVERY_ONCE.getCode();
+    private Integer apiChangeStatus;
 }

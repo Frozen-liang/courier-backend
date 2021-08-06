@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.sms.courier.common.aspect.annotation.LogRecord;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Encoders;
+import io.jsonwebtoken.security.Keys;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,27 +28,7 @@ public class SpelUtilsTest {
     @Test
     @DisplayName("Test the getValue method in the SpelUtil")
     public void getValue_exception_null_test() {
+        System.out.println(Encoders.BASE64.encode(Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded()));
         assertThat(SpelUtils.getValue(evaluationContext, "test", Class.class)).isNull();
     }
-
-   /* @Test
-    @DisplayName("Test the getValue method in the SpelUtil")
-    public void getValue_test() {
-    }
-
-    @Test
-    @DisplayName("Test the getProjectId_test method in the SpelUtil")
-    public void getProjectId_null_test() {
-    }
-
-    @Test
-    @DisplayName("Test the getProjectId_test method in the SpelUtil")
-    public void getProjectId_test() {
-    }
-
-    @Test
-    @DisplayName("Test the addVariable_test method in the SpelUtil")
-    public void addVariable_test() {
-
-    }*/
 }

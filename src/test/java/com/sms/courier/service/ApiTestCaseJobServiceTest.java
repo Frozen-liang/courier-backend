@@ -22,8 +22,8 @@ import com.sms.courier.dto.request.DataParamRequest;
 import com.sms.courier.dto.request.TestDataRequest;
 import com.sms.courier.dto.response.ApiTestCaseJobReportResponse;
 import com.sms.courier.dto.response.ApiTestCaseJobResponse;
-import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.engine.service.CaseDispatcherService;
+import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobReport;
@@ -81,7 +81,7 @@ class ApiTestCaseJobServiceTest {
         ApiTestCaseJobRunRequest.builder().apiTestCaseIds(Collections.singletonList(ObjectId.get().toString()))
             .envId(ObjectId.get().toString())
             .build();
-    private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder().id(ID).build();
+    private final ApiTestCaseEntity apiTestCaseEntity = ApiTestCaseEntity.builder().id(ID).build();
     private final ProjectEnvironmentEntity projectEnvironment = ProjectEnvironmentEntity.builder().build();
     private static final String ID = ObjectId.get().toString();
     private static final String ENGINE_ID = "/engine/13/invoke";
@@ -127,7 +127,7 @@ class ApiTestCaseJobServiceTest {
     @Test
     @DisplayName("Test the runJob method in the ApiTestCaseJob service")
     public void runJob_test() {
-        when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
+        when(apiTestCaseService.findOne(any())).thenReturn(apiTestCaseEntity);
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         when(apiTestCaseJobRepository.insert(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
         when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);
@@ -138,7 +138,7 @@ class ApiTestCaseJobServiceTest {
     @Test
     @DisplayName("Test the runJob method in the ApiTestCaseJob service")
     public void runJob2_test() {
-        when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
+        when(apiTestCaseService.findOne(any())).thenReturn(apiTestCaseEntity);
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         when(apiTestCaseJobRepository.insert(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
         when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);
@@ -149,7 +149,7 @@ class ApiTestCaseJobServiceTest {
     @Test
     @DisplayName("An exception occurred while execute ApiTestCaseJob")
     public void environment_not_exist_exception_test() {
-        when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
+        when(apiTestCaseService.findOne(any())).thenReturn(apiTestCaseEntity);
         when(projectEnvironmentService.findOne(any())).thenReturn(null);
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest, customUser);
         doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
@@ -159,7 +159,7 @@ class ApiTestCaseJobServiceTest {
     @Test
     @DisplayName("An exception occurred while execute ApiTestCaseJob")
     public void execute_exception_test() {
-        when(apiTestCaseService.findById(any())).thenReturn(apiTestCaseResponse);
+        when(apiTestCaseService.findOne(any())).thenReturn(apiTestCaseEntity);
         when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest, customUser);
         doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(ApiTestCaseJobReportResponse.class));

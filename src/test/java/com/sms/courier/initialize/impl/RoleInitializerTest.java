@@ -61,7 +61,7 @@ public class RoleInitializerTest {
         when(buildProperties.getVersion()).thenReturn(VERSION);
         when(buildProperties.getName()).thenReturn(NAME);
         when(buildProperties.getGroup()).thenReturn(GROUP);
-        when(systemVersionRepository.findByName(NAME)).thenReturn(systemVersionEntity);
+        when(systemVersionRepository.findByVersion(VERSION)).thenReturn(systemVersionEntity);
         when(objectMapper.readValue(any(InputStream.class), any(Class.class))).thenReturn(roleConvert);
         roleInitializer.init(applicationContext);
         verify(systemRoleRepository, times(1)).saveAll(systemRoleEntities);
@@ -78,7 +78,7 @@ public class RoleInitializerTest {
         when(buildProperties.getVersion()).thenReturn("v1");
         when(buildProperties.getName()).thenReturn(NAME);
         when(buildProperties.getGroup()).thenReturn(GROUP);
-        when(systemVersionRepository.findByName(NAME)).thenReturn(systemVersionEntity);
+        when(systemVersionRepository.findByVersion("v1")).thenReturn(systemVersionEntity);
         roleInitializer.init(applicationContext);
         verify(systemVersionRepository).save(systemVersionEntity);
     }

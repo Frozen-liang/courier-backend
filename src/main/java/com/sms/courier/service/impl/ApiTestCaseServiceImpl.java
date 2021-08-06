@@ -65,6 +65,12 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     }
 
     @Override
+    public ApiTestCaseEntity findOne(String id) {
+        return apiTestCaseRepository.findById(id)
+            .orElseThrow(() -> ExceptionUtils.mpe("The apiTestCase not exist. id=%s", id));
+    }
+
+    @Override
     public List<ApiTestCaseResponse> list(ObjectId apiId, ObjectId projectId, boolean removed) {
         try {
             List<ApiTestCaseResponse> apiTestCaseResponses = customizedApiTestCaseRepository.listByJoin(apiId,

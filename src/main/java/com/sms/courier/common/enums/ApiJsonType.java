@@ -34,7 +34,7 @@ public enum ApiJsonType implements EnumCommon {
         return paramType;
     }
 
-    public static ApiJsonType getType(int code) {
+    public static ApiJsonType getType(Integer code) {
         return MAPPINGS.get(code);
     }
 
