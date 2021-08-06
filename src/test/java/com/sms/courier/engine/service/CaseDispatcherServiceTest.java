@@ -31,24 +31,27 @@ public class CaseDispatcherServiceTest {
     private final SceneCaseJobResponse sceneCaseJob = SceneCaseJobResponse.builder().build();
     private static final String USER_ID = ObjectId.get().toString();
     private static final String MESSAGE = "message";
+    private static final String DESTINATION = "engine/123/invoke";
     private final ApiTestCaseJobReportResponse caseReport = ApiTestCaseJobReportResponse.builder().build();
     private final SceneCaseJobReportResponse sceneCaseJobReportResponse = SceneCaseJobReportResponse.builder().build();
 
     @Test
     @DisplayName("Test the dispatch method in the CaseDispatcherService service")
     public void dispatch_test() {
-        when(engineMemberManagement.getAvailableMember()).thenReturn("1");
+        when(engineMemberManagement.getAvailableMember()).thenReturn(DESTINATION);
         doNothing().when(simpMessagingTemplate).convertAndSend(anyString(), any(Object.class));
         caseDispatcherService.dispatch(apiTestCaseJobResponse);
+        doNothing().when(engineMemberManagement).countTaskRecord(DESTINATION, 1);
         verify(simpMessagingTemplate, times(1)).convertAndSend(anyString(), any(Object.class));
     }
 
     @Test
     @DisplayName("Test the dispatch method in the CaseDispatcherService service")
     public void dispatch2_test() {
-        when(engineMemberManagement.getAvailableMember()).thenReturn("1");
+        when(engineMemberManagement.getAvailableMember()).thenReturn(DESTINATION);
         doNothing().when(simpMessagingTemplate).convertAndSend(anyString(), any(Object.class));
         caseDispatcherService.dispatch(sceneCaseJob);
+        doNothing().when(engineMemberManagement).countTaskRecord(DESTINATION, 1);
         verify(simpMessagingTemplate, times(1)).convertAndSend(anyString(), any(Object.class));
     }
 
