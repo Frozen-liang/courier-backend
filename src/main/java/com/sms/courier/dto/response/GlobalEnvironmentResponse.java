@@ -1,7 +1,6 @@
 package com.sms.courier.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sms.courier.entity.api.common.HeaderInfo;
 import com.sms.courier.entity.env.EnvironmentAuth;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -27,7 +26,7 @@ public class GlobalEnvironmentResponse extends BaseResponse {
     private String afterInject;
     private String globalBeforeProcess;
     private String globalAfterProcess;
-    private List<HeaderInfo> headers;
+    private List<ParamInfoResponse> headers;
     private List<ParamInfoResponse> envVariable;
     private List<ParamInfoResponse> urlParams;
     private List<ParamInfoResponse> requestParams;
