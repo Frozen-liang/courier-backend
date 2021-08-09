@@ -133,7 +133,7 @@ class SceneCaseApiMapperTest {
                 .apiTestCase(ApiTestCaseRequest.builder()
                         .apiEntity(ApiRequest.builder()
                                 .requestHeaders(Lists.newArrayList(ParamInfoRequest.builder()
-                                        .paramType(ParamType.NUMBER)
+                                        .paramType(ParamType.NUMBER.getCode())
                                         .build()))
                                 .build())
                         .tagId(Lists.newArrayList("tagId"))
