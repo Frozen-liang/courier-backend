@@ -33,6 +33,7 @@ public class EngineMemberManagementTest {
         new EngineMemberManagementImpl(engineMemberRepository, suspiciousEngineManagement);
     private final EngineMemberEntity engineMember = EngineMemberEntity.builder().destination(EngineId.generate()).id(
         ObjectId.get().toString()).status(EngineStatus.RUNNING).build();
+    private static final String DESTINATION = EngineId.generate();
 
     @Test
     @DisplayName("Test for bind in EngineMemberManagement")
@@ -74,7 +75,7 @@ public class EngineMemberManagementTest {
     @DisplayName("Test for active in EngineMemberManagement")
     public void active_test() {
         when(engineMemberRepository.findFirstByDestination(anyString())).thenReturn(Optional.of(engineMember));
-        engineMemberManagement.active("sessionId", "destination");
+        engineMemberManagement.active("sessionId", DESTINATION);
         verify(engineMemberRepository, times(1)).save(engineMember);
     }
 
@@ -84,7 +85,7 @@ public class EngineMemberManagementTest {
         engineMember.setStatus(EngineStatus.WAITING_FOR_RECONNECTION);
         doNothing().when(suspiciousEngineManagement).remove(anyString());
         when(engineMemberRepository.findFirstByDestination(anyString())).thenReturn(Optional.of(engineMember));
-        engineMemberManagement.active("sessionId", "destination");
+        engineMemberManagement.active("sessionId", DESTINATION);
         verify(suspiciousEngineManagement, times(1)).remove(anyString());
         verify(engineMemberRepository, times(1)).save(engineMember);
     }
@@ -98,6 +99,15 @@ public class EngineMemberManagementTest {
         doNothing().when(suspiciousEngineManagement).add(engineMember.getDestination());
         verify(engineMemberRepository, times(1)).save(engineMember);
         verify(suspiciousEngineManagement, times(1)).add(engineMember.getDestination());
+    }
+
+    @Test
+    @DisplayName("Test for taskCountRecord in EngineMemberManagement")
+    public void taskCountRecord_test() {
+        when(engineMemberRepository.findFirstByDestination(anyString())).thenReturn(Optional.of(engineMember));
+        when(engineMemberRepository.save(engineMember)).thenReturn(engineMember);
+        engineMemberManagement.countTaskRecord(DESTINATION, 1);
+        verify(engineMemberRepository, times(1)).save(engineMember);
     }
 
 }

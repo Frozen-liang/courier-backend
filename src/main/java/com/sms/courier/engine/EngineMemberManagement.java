@@ -15,4 +15,6 @@ public interface EngineMemberManagement {
     String getAvailableMember() throws ApiTestPlatformException;
 
     void caseRecord(CaseRecordRequest caseRecordRequest);
+
+    void countTaskRecord(String destination, Integer size);
 }

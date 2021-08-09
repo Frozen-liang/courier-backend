@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -36,7 +37,7 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     public String bind(EngineRegistrationRequest request) {
         EngineMemberEntity engineMember =
             EngineMemberEntity.builder().destination(EngineId.generate()).host(request.getHost()).status(
-                    EngineStatus.PENDING)
+                EngineStatus.PENDING)
                 .version(request.getVersion())
                 .build();
         engineMemberRepository.save(engineMember);
@@ -61,13 +62,22 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
         Optional<EngineMemberEntity> engineMemberOptional = engineMemberRepository
             .findFirstByDestination(caseRecordRequest.getDestination());
         engineMemberOptional.ifPresent(engineMember -> {
-            engineMember.setCaseTaskSize(caseRecordRequest.getCaseCount());
-            engineMember.setSceneCaseTaskSize(caseRecordRequest.getSceneCaseCount());
-            engineMember.setCurrentTaskSize(caseRecordRequest.getCaseCount() + caseRecordRequest.getSceneCaseCount());
+            engineMember.setCaseTask(caseRecordRequest.getCaseCount());
+            engineMember.setSceneCaseTask(caseRecordRequest.getSceneCaseCount());
             engineMemberRepository.save(engineMember);
-            log.info("The destination {} currentTask {} caseTask {} sceneCaseTask {}.", engineMember.getDestination(),
-                engineMember.getCurrentTaskSize(), engineMember.getCaseTaskSize(), engineMember.getSceneCaseTaskSize());
+            log.info("The destination {}  caseTask {} sceneCaseTask {}.", engineMember.getDestination(),
+                engineMember.getCaseTask(), engineMember.getSceneCaseTask());
         });
+    }
+
+    @Override
+    public void countTaskRecord(String destination, Integer size) {
+        Optional<EngineMemberEntity> engineMemberOptional = engineMemberRepository.findFirstByDestination(destination);
+        engineMemberOptional.ifPresent((engineMember -> {
+            engineMember.setTaskCount(engineMember.getTaskCount() + size);
+            engineMemberRepository.save(engineMember);
+            log.info("The engine {} taskCount {}", destination, engineMember.getTaskCount());
+        }));
     }
 
     @Override
@@ -83,6 +93,9 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     @Override
     public void active(String sessionId, String destination) {
+        if (StringUtils.isBlank(destination) || !destination.startsWith("/engine")) {
+            return;
+        }
         Optional<EngineMemberEntity> engineMemberOptional = engineMemberRepository.findFirstByDestination(destination);
         engineMemberOptional.ifPresent(engineMember -> {
             if (engineMember.getStatus() == EngineStatus.WAITING_FOR_RECONNECTION) {

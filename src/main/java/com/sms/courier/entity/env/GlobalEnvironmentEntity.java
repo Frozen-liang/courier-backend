@@ -2,7 +2,6 @@ package com.sms.courier.entity.env;
 
 import com.sms.courier.common.enums.ApiRequestParamType;
 import com.sms.courier.entity.BaseEntity;
-import com.sms.courier.entity.api.common.HeaderInfo;
 import com.sms.courier.entity.api.common.ParamInfo;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -34,7 +33,7 @@ public class GlobalEnvironmentEntity extends BaseEntity {
     private String afterInject;
     private String globalBeforeProcess;
     private String globalAfterProcess;
-    private List<HeaderInfo> headers;
+    private List<ParamInfo> headers;
     private List<ParamInfo> envVariable;
     private List<ParamInfo> urlParams;
     private ApiRequestParamType requestParamType;
