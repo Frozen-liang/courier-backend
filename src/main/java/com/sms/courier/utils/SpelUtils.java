@@ -65,6 +65,7 @@ public class SpelUtils {
         return null;
     }
 
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     private static String getProjectIdByParams(EvaluationContext context, LogRecord logRecord, Method method,
         Object[] args) {
         String exp;
