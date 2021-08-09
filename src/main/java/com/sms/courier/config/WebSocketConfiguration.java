@@ -2,6 +2,7 @@ package com.sms.courier.config;
 
 import com.sms.courier.common.interceptors.ConnectChannelInterceptor;
 import com.sms.courier.common.interceptors.DataCompressionChannelInterceptor;
+import com.sms.courier.websocket.WebsocketProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -16,18 +17,21 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 @Slf4j
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
 
+    private final WebsocketProperties websocketProperties;
     private final ConnectChannelInterceptor connectChannelInterceptor;
     private final DataCompressionChannelInterceptor dataCompressionChannelInterceptor;
 
-    public WebSocketConfiguration(ConnectChannelInterceptor connectChannelInterceptor,
+    public WebSocketConfiguration(WebsocketProperties websocketProperties,
+        ConnectChannelInterceptor connectChannelInterceptor,
         DataCompressionChannelInterceptor dataCompressionChannelInterceptor) {
+        this.websocketProperties = websocketProperties;
         this.connectChannelInterceptor = connectChannelInterceptor;
         this.dataCompressionChannelInterceptor = dataCompressionChannelInterceptor;
     }
 
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
-        registry.setMessageSizeLimit(65536 * 10);
+        registry.setMessageSizeLimit(websocketProperties.getMessageSizeLimit());
     }
 
     @Override
@@ -42,11 +46,10 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-
-        registry.addEndpoint("/user").setAllowedOriginPatterns("*")
+        registry.addEndpoint("/user").setAllowedOriginPatterns(websocketProperties.getUserAllowedOriginPatterns())
             .withSockJS();
 
-        registry.addEndpoint("/engine").setAllowedOriginPatterns("*")
+        registry.addEndpoint("/engine").setAllowedOriginPatterns(websocketProperties.getEngineAllowedOriginPatterns())
             .withSockJS();
     }
 

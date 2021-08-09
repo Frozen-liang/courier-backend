@@ -89,23 +89,25 @@ public class LogAspect {
             Object value = context.lookupVariable(enhance.primaryKey());
             if (Objects.nonNull(value)) {
                 Object queryByIdResult;
-                if (value instanceof Collection) {
-                    Query query = Query.query(Criteria.where(ID.getName()).in((Collection) value));
-                    queryByIdResult = mongoTemplate.find(query, Object.class, operationModule.getCollectionName());
-                } else {
-                    if (operationModule == OperationModule.TEST_FILE) {
-                        queryByIdResult = fileService.findById((String) value);
-                    } else {
-                        queryByIdResult = mongoTemplate
-                            .findById(value, Object.class, operationModule.getCollectionName());
-                    }
-                }
+                queryByIdResult = getQueryResult(operationModule, value);
                 context.setVariable(enhance.queryResultKey(), queryByIdResult);
             } else {
                 log.error("The method:{} parameterNames not exist the primaryKey:{}.",
                     method, enhance.primaryKey());
             }
         }
+    }
+
+    private Object getQueryResult(OperationModule operationModule, Object value) {
+        if (value instanceof Collection) {
+            Query query = Query.query(Criteria.where(ID.getName()).in((Collection) value));
+            return mongoTemplate.find(query, Object.class, operationModule.getCollectionName());
+        }
+        if (operationModule == OperationModule.TEST_FILE) {
+            return fileService.findById((String) value);
+        }
+        return mongoTemplate.findById(value, Object.class, operationModule.getCollectionName());
+
     }
 
 }

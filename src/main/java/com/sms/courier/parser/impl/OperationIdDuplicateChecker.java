@@ -22,14 +22,19 @@ public class OperationIdDuplicateChecker implements ApiDocumentChecker {
             .filter(entry -> entry.getValue().size() > 1)
             .collect(Collectors.toConcurrentMap(Entry::getKey, Entry::getValue));
         if (checkResult.size() > 0) {
-            StringBuilder errorMessageBuilder = new StringBuilder();
-            for (Entry<String, List<ApiEntity>> entry : checkResult.entrySet()) {
-                String key = entry.getKey();
-                String apiPaths = entry.getValue().stream().map(ApiEntity::getApiPath).collect(Collectors.joining(","));
-                String errorDetail = String.format("OperationId [%s] is repeated in [%s].", key, apiPaths);
-                errorMessageBuilder.append(errorDetail).append("\n");
-            }
-            throw ExceptionUtils.mpe(THE_OPERATION_ID_NOT_UNIQUE_ERROR, errorMessageBuilder.toString());
+            String errorMsg = checkResult.entrySet().stream().map(this::buildErrorMessage)
+                .collect(Collectors.joining("\n"));
+            throw ExceptionUtils.mpe(THE_OPERATION_ID_NOT_UNIQUE_ERROR, errorMsg);
         }
     }
+
+    private String buildErrorMessage(Entry<String, List<ApiEntity>> entry) {
+
+        String key = entry.getKey();
+        String apiPaths = entry.getValue().stream().map(ApiEntity::getApiPath).collect(Collectors.joining(","));
+        return String.format("OperationId [%s] is repeated in [%s].", key, apiPaths);
+
+    }
+
+
 }

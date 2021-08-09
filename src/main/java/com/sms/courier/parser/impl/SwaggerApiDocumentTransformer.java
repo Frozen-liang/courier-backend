@@ -156,13 +156,16 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
         // Build response body.
         apiResponse
             .flatMap(response -> Objects.nonNull(response.getContent())
-                ? response.getContent().values().stream().findFirst() : Optional.empty()).stream()
+                ? response.getContent().entrySet().stream().findFirst() : Optional.empty()).stream()
+            // set api response param type.
+            .peek(entry -> apiEntityBuilder
+                .apiResponseParamType(Media.resolve(entry.getKey()).getApiRequestParamType()))
+            .map(Entry::getValue)
             .peek(mediaType -> ifRequestOrResponseEqualArray(mediaType, apiEntityBuilder::apiResponseJsonType))
             .findFirst()
             .map(MediaType::getSchema)
             .map(schema -> toParams(Optional.empty(), schema, components, 0))
             .ifPresent(apiEntityBuilder::responseParams);
-
         // Build response header
         apiResponse.map(ApiResponse::getHeaders)
             .ifPresent(headers -> buildResponseHeaders(headers, apiEntityBuilder::responseHeaders));

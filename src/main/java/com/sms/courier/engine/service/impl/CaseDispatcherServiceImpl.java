@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CaseDispatcherServiceImpl implements CaseDispatcherService {
 
+    private static final int TASK_SIZE = 1;
     private final EngineMemberManagement engineMemberManagement;
     private final SimpMessagingTemplate simpMessagingTemplate;
 
@@ -32,6 +33,7 @@ public class CaseDispatcherServiceImpl implements CaseDispatcherService {
         String destination = engineMemberManagement.getAvailableMember();
         log.info("Send ApiTestCaseJob. destination {}", destination);
         simpMessagingTemplate.convertAndSend(destination, caseJob);
+        engineMemberManagement.countTaskRecord(destination, TASK_SIZE);
         return destination;
     }
 
@@ -40,6 +42,7 @@ public class CaseDispatcherServiceImpl implements CaseDispatcherService {
         String destination = engineMemberManagement.getAvailableMember();
         log.info("Run case job. destination {}", destination);
         simpMessagingTemplate.convertAndSend(destination, caseJob);
+        engineMemberManagement.countTaskRecord(destination, TASK_SIZE);
         return destination;
     }
 

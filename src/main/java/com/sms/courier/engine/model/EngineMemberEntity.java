@@ -31,11 +31,11 @@ public class EngineMemberEntity extends BaseEntity {
     @Default
     private Integer taskSizeLimit = -1;
     @Default
-    private Integer currentTaskSize = 0;
+    private Integer caseTask = 0;
     @Default
-    private Integer caseTaskSize = 0;
+    private Integer sceneCaseTask = 0;
     @Default
-    private Integer sceneCaseTaskSize = 0;
+    private Integer taskCount = 0;
     @Default
     private EngineStatus status = EngineStatus.PENDING;
 }
