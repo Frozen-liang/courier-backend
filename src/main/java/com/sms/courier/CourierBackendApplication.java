@@ -12,10 +12,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAspectJAutoProxy
 @EnableAsync
 @EnableScheduling
-public class SatpApplication {
+public class CourierBackendApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SatpApplication.class, args);
+        SpringApplication.run(CourierBackendApplication.class, args);
     }
 
 }
