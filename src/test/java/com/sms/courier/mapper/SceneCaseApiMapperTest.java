@@ -1,24 +1,28 @@
 package com.sms.courier.mapper;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+
 import com.google.common.collect.Lists;
-import com.sms.courier.common.enums.*;
-import com.sms.courier.dto.request.*;
+import com.sms.courier.common.enums.ApiJsonType;
+import com.sms.courier.common.enums.ApiProtocol;
+import com.sms.courier.common.enums.ApiRequestParamType;
+import com.sms.courier.common.enums.ApiType;
+import com.sms.courier.common.enums.ParamType;
+import com.sms.courier.common.enums.RequestMethod;
+import com.sms.courier.dto.request.AddSceneCaseApiRequest;
+import com.sms.courier.dto.request.ApiRequest;
+import com.sms.courier.dto.request.ApiTestCaseRequest;
+import com.sms.courier.dto.request.ParamInfoRequest;
+import com.sms.courier.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.courier.dto.response.SceneCaseApiConnResponse;
 import com.sms.courier.dto.response.SceneCaseApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
-
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.as;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
-import static org.assertj.core.api.InstanceOfAssertFactories.list;
-import static org.mockito.Mockito.mock;
 
 @DisplayName("Tests for SceneCaseApiMapper")
 class SceneCaseApiMapperTest {
@@ -127,7 +131,7 @@ class SceneCaseApiMapperTest {
                 .apiTestCase(ApiTestCaseRequest.builder()
                         .apiEntity(ApiRequest.builder()
                                 .requestHeaders(Lists.newArrayList(ParamInfoRequest.builder()
-                                        .paramType(ParamType.INT)
+                                        .paramType(ParamType.NUMBER)
                                         .build()))
                                 .build())
                         .tagId(Lists.newArrayList("tagId"))
