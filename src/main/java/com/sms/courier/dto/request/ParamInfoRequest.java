@@ -1,7 +1,6 @@
 package com.sms.courier.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sms.courier.common.enums.ParamType;
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
 import java.util.ArrayList;
@@ -41,7 +40,7 @@ public class ParamInfoRequest {
      * @link ParamType
      */
 
-    private ParamType paramType;
+    private Integer paramType;
 
     /**
      * 是否必填.

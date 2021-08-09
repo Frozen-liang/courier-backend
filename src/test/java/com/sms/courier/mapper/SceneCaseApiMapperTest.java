@@ -23,8 +23,10 @@ import static org.mockito.Mockito.mock;
 @DisplayName("Tests for SceneCaseApiMapper")
 class SceneCaseApiMapperTest {
 
-    private ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
-    private SceneCaseApiMapper sceneCaseApiMapper = new SceneCaseApiMapperImpl(apiTestCaseMapper);
+    private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
+    private final ParamInfoMapper paramInfoMapper = mock(ParamInfoMapper.class);
+    private final SceneCaseApiMapper sceneCaseApiMapper = new SceneCaseApiMapperImpl(apiTestCaseMapper,
+        paramInfoMapper);
     private static final String MOCK_ID = "1";
 
     @Test
@@ -39,17 +41,17 @@ class SceneCaseApiMapperTest {
     @DisplayName("Test the toSceneCaseApiDto method in the SceneCaseApiMapper")
     void toSceneCaseApiDto_test() {
         SceneCaseApiEntity sceneCaseApi = SceneCaseApiEntity.builder().id(MOCK_ID).sceneCaseId(MOCK_ID)
-                .apiType(ApiType.API)
-                .apiTestCase(ApiTestCaseEntity.builder()
-                        .apiEntity(ApiEntity.builder()
-                                .apiProtocol(ApiProtocol.HTTPS)
-                                .requestMethod(RequestMethod.GET)
-                                .apiRequestParamType(ApiRequestParamType.FORM_DATA)
-                                .apiResponseJsonType(ApiJsonType.OBJECT)
-                                .apiRequestJsonType(ApiJsonType.OBJECT)
-                                .build())
-                        .build())
-                .build();
+            .apiType(ApiType.API)
+            .apiTestCase(ApiTestCaseEntity.builder()
+                .apiEntity(ApiEntity.builder()
+                    .apiProtocol(ApiProtocol.HTTPS)
+                    .requestMethod(RequestMethod.GET)
+                    .apiRequestParamType(ApiRequestParamType.FORM_DATA)
+                    .apiResponseJsonType(ApiJsonType.OBJECT)
+                    .apiRequestJsonType(ApiJsonType.OBJECT)
+                    .build())
+                .build())
+            .build();
         SceneCaseApiResponse dto = sceneCaseApiMapper.toSceneCaseApiDto(sceneCaseApi);
         assertThat(dto.getId()).isEqualTo(MOCK_ID);
     }
@@ -58,7 +60,7 @@ class SceneCaseApiMapperTest {
     @DisplayName("Test the toSceneCaseApiList method in the SceneCaseApiMapper")
     void toSceneCaseApiList_test() {
         List<UpdateSceneCaseApiRequest> sceneCaseApiList =
-                Lists.newArrayList(UpdateSceneCaseApiRequest.builder().id(MOCK_ID).build());
+            Lists.newArrayList(UpdateSceneCaseApiRequest.builder().id(MOCK_ID).build());
         List<SceneCaseApiEntity> apiList = sceneCaseApiMapper.toSceneCaseApiList(sceneCaseApiList);
         assertThat(apiList.size()).isEqualTo(sceneCaseApiList.size());
     }
@@ -67,9 +69,9 @@ class SceneCaseApiMapperTest {
     @DisplayName("Test the toSceneCaseApiListByAddRequest method in the SceneCaseApiMapper")
     void toSceneCaseApiListByAddRequest_test() {
         List<AddSceneCaseApiRequest> addSceneCaseApiRequestList =
-                Lists.newArrayList(AddSceneCaseApiRequest.builder().build());
+            Lists.newArrayList(AddSceneCaseApiRequest.builder().build());
         List<SceneCaseApiEntity> sceneCaseApiList =
-                sceneCaseApiMapper.toSceneCaseApiListByAddRequest(addSceneCaseApiRequestList);
+            sceneCaseApiMapper.toSceneCaseApiListByAddRequest(addSceneCaseApiRequestList);
         assertThat(sceneCaseApiList).isNotEmpty();
     }
 
@@ -124,15 +126,15 @@ class SceneCaseApiMapperTest {
     @DisplayName("Test the apiTestCaseRequestToApiTestCaseEntity test method in the SceneCaseApiMapper")
     void apiTestCaseRequestToApiTestCaseEntity_test() {
         AddSceneCaseApiRequest addSceneCaseApiRequest = AddSceneCaseApiRequest.builder()
-                .apiTestCase(ApiTestCaseRequest.builder()
-                        .apiEntity(ApiRequest.builder()
-                                .requestHeaders(Lists.newArrayList(ParamInfoRequest.builder()
-                                        .paramType(ParamType.INT)
-                                        .build()))
-                                .build())
-                        .tagId(Lists.newArrayList("tagId"))
-                        .build())
-                .build();
+            .apiTestCase(ApiTestCaseRequest.builder()
+                .apiEntity(ApiRequest.builder()
+                    .requestHeaders(Lists.newArrayList(ParamInfoRequest.builder()
+                        .paramType(ParamType.NUMBER.ordinal())
+                        .build()))
+                    .build())
+                .tagId(Lists.newArrayList("tagId"))
+                .build())
+            .build();
         assertThat(sceneCaseApiMapper.toSceneCaseApi(addSceneCaseApiRequest)).isNotNull();
     }
 
@@ -141,13 +143,13 @@ class SceneCaseApiMapperTest {
     void paramInfoRequestToParamInfo_IsNull_test() {
         ParamInfoRequest paramInfoRequest = null;
         AddSceneCaseApiRequest addSceneCaseApiRequest = AddSceneCaseApiRequest.builder()
-                .apiTestCase(ApiTestCaseRequest.builder()
-                        .apiEntity(ApiRequest.builder()
-                                .requestHeaders(Lists.newArrayList(paramInfoRequest))
-                                .tagId(Lists.newArrayList())
-                                .build())
-                        .build())
-                .build();
+            .apiTestCase(ApiTestCaseRequest.builder()
+                .apiEntity(ApiRequest.builder()
+                    .requestHeaders(Lists.newArrayList(paramInfoRequest))
+                    .tagId(Lists.newArrayList())
+                    .build())
+                .build())
+            .build();
         assertThat(sceneCaseApiMapper.toSceneCaseApi(addSceneCaseApiRequest)).isNotNull();
     }
 
@@ -155,10 +157,10 @@ class SceneCaseApiMapperTest {
     @DisplayName("Test the apiTestCaseRequestToApiTestCaseEntity test method in the SceneCaseApiMapper")
     void apiTestCaseRequestToApiTestCaseEntity_Null_test() {
         AddSceneCaseApiRequest addSceneCaseApiRequest = AddSceneCaseApiRequest.builder()
-                .apiTestCase(ApiTestCaseRequest.builder()
-                        .apiEntity(null)
-                        .build())
-                .build();
+            .apiTestCase(ApiTestCaseRequest.builder()
+                .apiEntity(null)
+                .build())
+            .build();
         assertThat(sceneCaseApiMapper.toSceneCaseApi(addSceneCaseApiRequest)).isNotNull();
     }
 

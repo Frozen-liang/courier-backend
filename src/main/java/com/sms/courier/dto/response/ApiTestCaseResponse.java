@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @AllArgsConstructor
@@ -28,6 +29,7 @@ public class ApiTestCaseResponse extends LookupUserResponse {
     private ResponseResultVerificationResponse responseResultVerification;
     private ResponseTimeVerification responseTimeVerification;
     private String dataCollId;
+    @Field("isExecute")
     @JsonProperty("isExecute")
     private boolean execute;
     private AdvancedSetting advancedSetting;

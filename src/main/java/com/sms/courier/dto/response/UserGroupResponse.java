@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @NoArgsConstructor
@@ -17,6 +18,7 @@ public class UserGroupResponse extends LookupUserResponse {
 
     private String name;
 
+    @Field("isDefaultGroup")
     @JsonProperty("isDefaultGroup")
     private boolean defaultGroup;
 
