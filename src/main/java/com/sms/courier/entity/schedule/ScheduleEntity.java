@@ -9,6 +9,7 @@ import com.sms.courier.common.enums.TaskStatus;
 import com.sms.courier.entity.BaseEntity;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -44,9 +45,9 @@ public class ScheduleEntity extends BaseEntity {
 
     private CycleType cycle;
 
-    private List<String> time;
+    private Set<String> time;
 
-    private List<Integer> week;
+    private Set<Integer> week;
 
     private CaseFilter caseFilter;
 

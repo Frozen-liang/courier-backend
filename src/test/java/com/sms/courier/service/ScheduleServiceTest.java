@@ -26,8 +26,8 @@ import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.ScheduleRepository;
 import com.sms.courier.service.impl.ScheduleServiceImpl;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class ScheduleServiceTest {
         scheduleMapper);
     private static final String ID = ObjectId.get().toString();
     private final ScheduleEntity schedule =
-        ScheduleEntity.builder().id(ID).cycle(CycleType.DAY).time(List.of("11:40")).build();
+        ScheduleEntity.builder().id(ID).cycle(CycleType.DAY).time(Set.of("11:40")).build();
     private final ScheduleRequest scheduleRequest = ScheduleRequest.builder().cycle(CycleType.DAY).id(ID).build();
 
     @Test
