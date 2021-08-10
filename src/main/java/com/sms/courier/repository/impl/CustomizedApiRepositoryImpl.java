@@ -3,6 +3,7 @@ package com.sms.courier.repository.impl;
 import static com.sms.courier.common.enums.OperationModule.API;
 import static com.sms.courier.common.enums.OperationModule.API_GROUP;
 import static com.sms.courier.common.enums.OperationModule.API_TAG;
+import static com.sms.courier.common.enums.OperationModule.API_TEST_CASE;
 import static com.sms.courier.common.field.ApiField.API_NAME;
 import static com.sms.courier.common.field.ApiField.API_PATH;
 import static com.sms.courier.common.field.ApiField.API_PROTOCOL;
@@ -12,6 +13,7 @@ import static com.sms.courier.common.field.ApiField.REQUEST_METHOD;
 import static com.sms.courier.common.field.ApiField.TAG_ID;
 import static com.sms.courier.common.field.ApiTag.GROUP_NAME;
 import static com.sms.courier.common.field.ApiTag.TAG_NAME;
+import static com.sms.courier.common.field.ApiTestCaseField.CASE_API_ID;
 import static com.sms.courier.common.field.CommonField.ID;
 import static com.sms.courier.common.field.CommonField.MODIFY_DATE_TIME;
 import static com.sms.courier.common.field.CommonField.PROJECT_ID;
@@ -21,6 +23,7 @@ import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
+import com.sms.courier.entity.mongo.GroupResultVo;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
@@ -30,12 +33,16 @@ import com.sms.courier.repository.CustomizedApiRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.GroupOperation;
+import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -68,7 +75,25 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
                 .build();
         List<LookupVo> lookupVo = getLookupVo();
         queryVo.setLookupVo(lookupVo);
-        return commonRepository.page(queryVo, apiPageRequest, ApiResponse.class);
+        Page<ApiResponse> page = commonRepository.page(queryVo, apiPageRequest, ApiResponse.class);
+        queryApiTestCase(page.getContent());
+        return page;
+    }
+
+    private void queryApiTestCase(List<ApiResponse> apiResponses) {
+        if (apiResponses.isEmpty()) {
+            return;
+        }
+        List<ObjectId> ids = apiResponses.stream().map(ApiResponse::getId).map(ObjectId::new)
+            .collect(Collectors.toList());
+        GroupOperation groupBy = Aggregation.group(CASE_API_ID.getName()).count().as("count");
+        MatchOperation match = Aggregation.match(Criteria.where(CASE_API_ID.getName()).in(ids));
+        List<GroupResultVo> results = mongoTemplate
+            .aggregate(Aggregation.newAggregation(match, groupBy), API_TEST_CASE.getCollectionName(),
+                GroupResultVo.class).getMappedResults();
+        Map<String, Integer> map = results.stream()
+            .collect(Collectors.toUnmodifiableMap(GroupResultVo::getId, GroupResultVo::getCount));
+        apiResponses.forEach(apiResponse -> apiResponse.setCaseCount(map.getOrDefault(apiResponse.getId(), 0)));
     }
 
     private List<LookupVo> getLookupVo() {
