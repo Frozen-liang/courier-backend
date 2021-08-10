@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @ToString(callSuper = true)
@@ -25,6 +26,7 @@ public class ScheduleListResponse extends LookupUserResponse {
 
     private String description;
 
+    @Field("isLoop")
     @JsonProperty("isLoop")
     private boolean loop;
 

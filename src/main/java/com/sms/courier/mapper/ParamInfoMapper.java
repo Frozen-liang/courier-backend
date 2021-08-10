@@ -14,6 +14,8 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = EnumCommonUtils.class)
 public interface ParamInfoMapper {
 
+    @Mapping(target = "paramType", expression = "java(com.sms.courier.common.enums.ParamType"
+        + ".getType(paramInfoRequest.getParamType()))")
     ParamInfo toEntity(ParamInfoRequest paramInfoRequest);
 
     @Mapping(target = "paramType", expression = "java(com.sms.courier.common.enums.ParamType"
