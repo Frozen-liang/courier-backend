@@ -41,12 +41,16 @@ import com.sms.courier.security.TokenType;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.impl.ApiTestCaseJobServiceImpl;
 import com.sms.courier.utils.ExceptionUtils;
+import com.sms.courier.utils.SecurityUtil;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.data.domain.PageImpl;
 
 @DisplayName("Tests for ApiTestCaseJobService")
@@ -88,6 +92,16 @@ class ApiTestCaseJobServiceTest {
     private static final List<String> ENGINE_ID_LIST = Collections.singletonList(ENGINE_ID);
     private final CustomUser customUser =
         new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "", TokenType.USER);
+    private static final MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
+
+    static {
+        SECURITY_UTIL_MOCKED_STATIC = Mockito.mockStatic(SecurityUtil.class);
+    }
+
+    @AfterAll
+    public static void close() {
+        SECURITY_UTIL_MOCKED_STATIC.close();
+    }
 
     @Test
     @DisplayName("Test the findById method in the ApiTestCaseJob service")
@@ -120,6 +134,7 @@ class ApiTestCaseJobServiceTest {
         when(apiTestCaseJobRepository.save(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
         doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(ApiTestCaseJobReportResponse.class));
         when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);
+        doNothing().when(apiTestCaseService).insertTestResult(anyString(), any());
         apiTestCaseJobService.handleJobReport(ApiTestCaseJobReport.builder().jobId(ObjectId.get().toString()).build());
         verify(apiTestCaseJobRepository, times(1)).save(any(ApiTestCaseJobEntity.class));
     }
@@ -238,5 +253,15 @@ class ApiTestCaseJobServiceTest {
             .thenThrow(new RuntimeException());
         apiTestCaseJobService.reallocateJob(ENGINE_ID_LIST);
         verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("Test the apiTest method in the ApiTestCaseJob service")
+    public void buildJob_test() {
+        when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
+        apiTestCaseJobService.apiTest(apiTestRequest, customUser);
+        ApiTestCaseJobResponse apiTestCaseJobResponse = apiTestCaseJobService.buildJob(apiTestRequest);
+        assertThat(apiTestCaseJobResponse).isNotNull();
     }
 }
