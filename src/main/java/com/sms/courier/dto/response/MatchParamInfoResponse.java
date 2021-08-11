@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Builder
 @Data
@@ -42,10 +43,10 @@ public class MatchParamInfoResponse {
     @JsonProperty("isVerificationArrayElement")
     private boolean verificationArrayElement;
     /**
-     * 是否必含.
+     * 是否校验.
      */
-    @JsonProperty("isRequired")
-    private boolean required;
+    @JsonProperty("isVerify")
+    private boolean verify;
     /**
      * 对象子属性. JSON/Object/JsonArray.
      */

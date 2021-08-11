@@ -46,11 +46,11 @@ public class MatchParamInfo {
     @JsonProperty("isVerificationArrayElement")
     private boolean verificationArrayElement;
     /**
-     * 是否必含.
+     * 是否校验.
      */
-    @Field("isRequired")
-    @JsonProperty("isRequired")
-    private boolean required;
+    @Field("isVerify")
+    @JsonProperty("isVerify")
+    private boolean verify;
     /**
      * 对象子属性. JSON/Object/JsonArray.
      */
