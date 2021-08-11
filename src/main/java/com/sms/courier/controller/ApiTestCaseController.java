@@ -77,4 +77,9 @@ public class ApiTestCaseController {
     public Boolean recover(@RequestBody List<String> ids) {
         return apiTestCaseService.recover(ids);
     }
+
+    @GetMapping("/count/pid/{projectId}")
+    public Long count(@PathVariable String projectId) {
+        return apiTestCaseService.count(projectId);
+    }
 }

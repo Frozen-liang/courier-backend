@@ -91,4 +91,9 @@ public class ApiController {
         return apiService.recover(ids);
     }
 
+    @GetMapping("/count/pid/{projectId}")
+    public Long count(@PathVariable String projectId) {
+        return apiService.count(projectId);
+    }
+
 }

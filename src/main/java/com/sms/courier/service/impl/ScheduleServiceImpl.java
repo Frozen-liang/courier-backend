@@ -27,8 +27,8 @@ import com.sms.courier.utils.ExceptionUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -113,9 +113,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (oldSchedule.getCycle() != newSchedule.getCycle()) {
             return true;
         }
-        if (!CollectionUtils.isEqualCollection(oldSchedule.getTime(), newSchedule.getTime())) {
+        if (!Objects.equals(oldSchedule.getTime(), newSchedule.getTime())) {
             return true;
         }
-        return !CollectionUtils.isEqualCollection(oldSchedule.getWeek(), newSchedule.getWeek());
+        return !Objects.equals(oldSchedule.getWeek(), newSchedule.getWeek());
     }
 }

@@ -28,4 +28,6 @@ public interface ApiTestCaseService {
     Boolean deleteAll();
 
     Boolean recover(List<String> ids);
+
+    Long count(String projectId);
 }
