@@ -33,8 +33,6 @@ public class ApiTestCaseResponse extends LookupUserResponse {
     @JsonProperty("isExecute")
     private boolean execute;
     private AdvancedSetting advancedSetting;
-    private Integer isSuccess;
-    private String testTime;
-    private String jobId;
     private ApiResponse apiEntity;
+    private TestResultResponse lastTestResult;
 }

@@ -1,5 +1,6 @@
 package com.sms.courier.mapper;
 
+import com.sms.courier.dto.request.ResponseHeadersVerificationRequest;
 import com.sms.courier.dto.response.ResponseHeadersVerificationResponse;
 import com.sms.courier.entity.api.common.ResponseHeadersVerification;
 import org.mapstruct.InjectionStrategy;
@@ -11,4 +12,6 @@ import org.mapstruct.ReportingPolicy;
 public interface ResponseHeadersVerificationMapper {
 
     ResponseHeadersVerificationResponse toDto(ResponseHeadersVerification responseHeadersVerification);
+
+    ResponseHeadersVerification toResponseHeadersVerification(ResponseHeadersVerificationRequest request);
 }

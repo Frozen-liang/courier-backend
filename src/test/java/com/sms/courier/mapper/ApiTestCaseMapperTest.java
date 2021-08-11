@@ -1,5 +1,8 @@
 package com.sms.courier.mapper;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+
 import com.sms.courier.common.enums.ApiJsonType;
 import com.sms.courier.common.enums.ApiProtocol;
 import com.sms.courier.common.enums.ApiRequestParamType;
@@ -17,9 +20,6 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-
 @DisplayName("Tests for ApiTestCaseMapper")
 class ApiTestCaseMapperTest {
 
@@ -28,6 +28,7 @@ class ApiTestCaseMapperTest {
     private ResponseHeadersVerificationMapper responseHeadersVerificationMapper =
         mock(ResponseHeadersVerificationMapper.class);
     private ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
+    private MatchParamInfoMapper matchParamInfoMapper = new MatchParamInfoMapperImpl();
     private ApiTestCaseMapper apiTestCaseMapper = new ApiTestCaseMapperImpl(responseResultVerificationMapper,
         responseHeadersVerificationMapper, paramInfoMapper);
     private ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder()

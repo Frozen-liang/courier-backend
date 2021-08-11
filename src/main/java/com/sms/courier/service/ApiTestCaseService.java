@@ -4,6 +4,7 @@ import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
+import com.sms.courier.entity.apitestcase.TestResult;
 import java.util.List;
 import org.bson.types.ObjectId;
 
@@ -30,4 +31,6 @@ public interface ApiTestCaseService {
     Boolean recover(List<String> ids);
 
     Long count(String projectId);
+
+    void insertTestResult(String id, TestResult testResult);
 }

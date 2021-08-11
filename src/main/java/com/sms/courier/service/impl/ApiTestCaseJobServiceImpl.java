@@ -8,6 +8,7 @@ import static com.sms.courier.utils.Assert.notEmpty;
 import static com.sms.courier.utils.Assert.notNull;
 
 import com.sms.courier.common.enums.JobStatus;
+import com.sms.courier.common.enums.ResultType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.ApiTestCaseJobPageRequest;
 import com.sms.courier.dto.request.ApiTestCaseJobRunRequest;
@@ -18,6 +19,7 @@ import com.sms.courier.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.courier.dto.response.ApiTestCaseJobResponse;
 import com.sms.courier.engine.service.CaseDispatcherService;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
+import com.sms.courier.entity.apitestcase.TestResult;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobReport;
@@ -34,6 +36,7 @@ import com.sms.courier.service.ApiTestCaseJobService;
 import com.sms.courier.service.ApiTestCaseService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.utils.ExceptionUtils;
+import com.sms.courier.utils.SecurityUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -83,6 +86,16 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             caseDispatcherService
                 .sendJobReport(job.getCreateUserId(), jobMapper.toApiTestCaseJobReportResponse(apiTestCaseJobReport));
             apiTestCaseJobRepository.save(job);
+            caseReport = Objects
+                .requireNonNullElse(caseReport, CaseReport.builder().errCode(apiTestCaseJobReport.getErrCode())
+                    .failMessage(apiTestCaseJobReport.getMessage()).isSuccess(
+                        ResultType.FAIL).build());
+            TestResult testResult = jobMapper.toTestResult(caseReport);
+            testResult.setJobId(job.getId());
+            testResult.setTestUsername(job.getCreateUserName());
+            testResult.setTestTime(job.getCreateDateTime());
+            // Sava test result in api test case.
+            apiTestCaseService.insertTestResult(job.getApiTestCase().getJobApiTestCase().getId(), testResult);
         });
     }
 
@@ -150,19 +163,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
     @Override
     public void apiTest(ApiTestRequest apiTestRequest, CustomUser currentUser) {
         try {
-            ProjectEnvironmentEntity projectEnvironment = projectEnvironmentService.findOne(apiTestRequest.getEnvId());
-            String apiPath = apiTestRequest.getApiPath();
-
-            if (Objects.isNull(projectEnvironment)) {
-                checkApiPath(apiPath);
-            }
-            JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
-            ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
-            apiTestCaseJob.setId(ObjectId.get().toString());
-            apiTestCaseJob.setWorkspaceId(apiTestRequest.getWorkspaceId());
-            apiTestCaseJob.setProjectId(apiTestRequest.getProjectId());
-            apiTestCaseJob.setApiTestCase(
-                JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestRequest)).build());
+            ApiTestCaseJobEntity apiTestCaseJob = getApiTestCaseJobEntity(apiTestRequest, currentUser);
             String engineId = caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
             apiTestCaseJob.setEngineId(engineId);
             apiTestCaseJobRepository.save(apiTestCaseJob);
@@ -174,7 +175,6 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the ApiTestCase error.");
         }
     }
-
 
     @Override
     public void reallocateJob(List<String> engineIds) {
@@ -201,6 +201,28 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             log.error("Reallocate job  errorMessage:{}", e.getMessage());
             caseDispatcherService.sendErrorMessage(userId, "Execute the ApiTestCase error.");
         }
+    }
+
+    @Override
+    public ApiTestCaseJobResponse buildJob(ApiTestRequest request) {
+        ApiTestCaseJobEntity apiTestCaseJobEntity = getApiTestCaseJobEntity(request, SecurityUtil.getCurrentUser());
+        return jobMapper.toApiTestCaseJobResponse(apiTestCaseJobEntity);
+    }
+
+    private ApiTestCaseJobEntity getApiTestCaseJobEntity(ApiTestRequest apiTestRequest, CustomUser currentUser) {
+        ProjectEnvironmentEntity projectEnvironment = projectEnvironmentService.findOne(apiTestRequest.getEnvId());
+        String apiPath = apiTestRequest.getApiPath();
+        if (Objects.isNull(projectEnvironment)) {
+            checkApiPath(apiPath);
+        }
+        JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
+        ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnvironment, currentUser);
+        apiTestCaseJob.setId(ObjectId.get().toString());
+        apiTestCaseJob.setWorkspaceId(apiTestRequest.getWorkspaceId());
+        apiTestCaseJob.setProjectId(apiTestRequest.getProjectId());
+        apiTestCaseJob.setApiTestCase(
+            JobCaseApi.builder().jobApiTestCase(jobMapper.toJobApiTestCase(apiTestRequest)).build());
+        return apiTestCaseJob;
     }
 
     private ApiTestCaseJobEntity createApiTestCaseJob(JobEnvironment jobEnvironment,

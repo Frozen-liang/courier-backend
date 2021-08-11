@@ -200,8 +200,8 @@ public enum ErrorCode {
     THE_REQUEST_ADDRESS_IS_ILLEGALITY("61003",
         "The request address is illegality, please check environment or api path.");
 
-    private String code;
-    private String message;
+    private final String code;
+    private final String message;
 
     ErrorCode(String code, String message) {
         this.code = code;
