@@ -59,4 +59,5 @@ public class ApiTestCaseEntity extends BaseEntity {
 
     private ApiEntity apiEntity;
 
+    private TestResult lastTestResult;
 }

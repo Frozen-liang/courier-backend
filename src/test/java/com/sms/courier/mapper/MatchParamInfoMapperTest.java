@@ -100,12 +100,6 @@ public class MatchParamInfoMapperTest {
         assertThat(dto.getChildParam()).isNotNull();
     }
 
-    @Test
-    @DisplayName("Test the method to convert the ParamInfo's dto object to a entity object")
-    void toEntity_IsNull_Test() {
-        MatchParamInfo dto = matchParamInfoMapper.toEntity(null);
-        assertThat(dto).isNull();
-    }
 
 
 }

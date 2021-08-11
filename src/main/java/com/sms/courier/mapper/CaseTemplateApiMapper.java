@@ -14,7 +14,8 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
     unmappedTargetPolicy = ReportingPolicy.IGNORE,
-    uses = {ApiTestCaseMapper.class, EnumCommonUtils.class, ParamInfoMapper.class})
+    uses = {ApiTestCaseMapper.class, EnumCommonUtils.class, ParamInfoMapper.class,
+        ResponseHeadersVerificationMapper.class, ResponseResultVerificationMapper.class})
 public interface CaseTemplateApiMapper {
 
     CaseTemplateApiEntity toCaseTemplateApiByUpdateRequest(UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest);

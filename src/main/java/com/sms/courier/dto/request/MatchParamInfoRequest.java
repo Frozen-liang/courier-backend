@@ -1,20 +1,19 @@
-package com.sms.courier.dto.response;
+package com.sms.courier.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.ArrayList;
+import com.sms.courier.common.enums.MatchType;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MatchParamInfoResponse {
+public class MatchParamInfoRequest {
 
     /**
      * 字段名.
@@ -27,7 +26,7 @@ public class MatchParamInfoResponse {
     /**
      * 校验类型.
      */
-    private Integer matchType;
+    private MatchType matchType;
     /**
      * 字段类型.
      */
@@ -35,25 +34,24 @@ public class MatchParamInfoResponse {
     /**
      * 是否校验参数类型.
      */
+
     @JsonProperty("isVerificationParamType")
-    @Field("isVerificationParamType")
     private boolean verificationParamType;
     /**
      * 是否校验数组内元素.
      */
+
     @JsonProperty("isVerificationArrayElement")
-    @Field("isVerificationArrayElement")
     private boolean verificationArrayElement;
     /**
      * 是否必含.
      */
+
     @JsonProperty("isRequired")
-    @Field("isRequired")
     private boolean required;
     /**
      * 对象子属性. JSON/Object/JsonArray.
      */
-    @Builder.Default
     @ToString.Exclude
-    private List<MatchParamInfoResponse> childParam = new ArrayList<>();
+    private List<MatchParamInfoRequest> childParam;
 }

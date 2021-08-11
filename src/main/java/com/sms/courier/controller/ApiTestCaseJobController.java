@@ -3,12 +3,15 @@ package com.sms.courier.controller;
 import static com.sms.courier.common.constant.Constants.API_TEST_CASE_JOB_PATH;
 
 import com.sms.courier.dto.request.ApiTestCaseJobPageRequest;
+import com.sms.courier.dto.request.ApiTestRequest;
 import com.sms.courier.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.courier.dto.response.ApiTestCaseJobResponse;
 import com.sms.courier.service.ApiTestCaseJobService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,6 +28,11 @@ public class ApiTestCaseJobController {
     @GetMapping("/page")
     public Page<ApiTestCaseJobPageResponse> page(ApiTestCaseJobPageRequest pageRequest) {
         return apiTestCaseJobService.page(pageRequest);
+    }
+
+    @PostMapping("/buildJob")
+    public ApiTestCaseJobResponse buildJob(@RequestBody ApiTestRequest request) {
+        return apiTestCaseJobService.buildJob(request);
     }
 
     @GetMapping("/{jobId}")
