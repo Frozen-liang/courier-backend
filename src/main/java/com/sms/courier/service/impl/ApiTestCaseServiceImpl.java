@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -174,6 +175,11 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean recover(List<String> ids) {
         return customizedApiTestCaseRepository.recover(ids);
+    }
+
+    @Override
+    public Long count(String projectId) {
+        return apiTestCaseRepository.count(Example.of(ApiTestCaseEntity.builder().projectId(projectId).build()));
     }
 
 }

@@ -30,4 +30,6 @@ public interface ApiService {
     Boolean deleteAll();
 
     Boolean recover(List<String> ids);
+
+    Long count(String projectId);
 }

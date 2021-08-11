@@ -176,6 +176,7 @@ public class CommonRepositoryImpl implements CommonRepository {
         int skipRecord = pageRequest.getPageNumber() * pageRequest.getPageSize();
         aggregationOperations.add(Aggregation.skip(Long.valueOf(skipRecord)));
         aggregationOperations.add(Aggregation.limit(pageRequest.getPageSize()));
+
         aggregationOperations.add(projectionOperation);
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
 
