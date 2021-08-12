@@ -40,6 +40,8 @@ public class ApiTestCaseEntity extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
+    private Integer priority;
+
     private ApiBindingStatus status;
 
     private ResponseParamsExtractionType responseParamsExtractionType;

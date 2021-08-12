@@ -34,21 +34,18 @@ public class MatchParamInfoRequest {
     /**
      * 是否校验参数类型.
      */
-
     @JsonProperty("isVerificationParamType")
     private boolean verificationParamType;
     /**
      * 是否校验数组内元素.
      */
-
     @JsonProperty("isVerificationArrayElement")
     private boolean verificationArrayElement;
     /**
-     * 是否必含.
+     * 是否校验.
      */
-
-    @JsonProperty("isRequired")
-    private boolean required;
+    @JsonProperty("isVerify")
+    private boolean verify;
     /**
      * 对象子属性. JSON/Object/JsonArray.
      */
