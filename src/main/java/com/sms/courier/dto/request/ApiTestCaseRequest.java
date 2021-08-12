@@ -32,6 +32,7 @@ public class ApiTestCaseRequest {
     private List<String> tagId;
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId can not be empty.")
     private String projectId;
+    private Integer priority;
     private ApiBindingStatus status;
     private ResponseParamsExtractionType responseParamsExtractionType;
     private HttpStatusVerification httpStatusVerification;

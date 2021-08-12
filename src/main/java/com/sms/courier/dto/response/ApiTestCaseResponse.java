@@ -21,6 +21,7 @@ public class ApiTestCaseResponse extends LookupUserResponse {
 
     private String caseName;
     private String projectId;
+    private Integer priority;
     private List<String> tagName;
     private List<String> tagId;
     private Integer responseParamsExtractionType;

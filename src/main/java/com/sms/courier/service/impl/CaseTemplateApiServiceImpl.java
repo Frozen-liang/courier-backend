@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -120,7 +121,8 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     public List<CaseTemplateApiResponse> listResponseByCaseTemplateId(String caseTemplateId) {
         try {
             Example<CaseTemplateApiEntity> example = Example
-                .of(CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).build());
+                .of(CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).build(),
+                    ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName()));
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             List<CaseTemplateApiEntity> sceneCaseApiList = caseTemplateApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(caseTemplateApiMapper::toCaseTemplateApiDto)
@@ -135,7 +137,8 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     public List<CaseTemplateApiEntity> listByCaseTemplateId(String caseTemplateId) {
         try {
             Example<CaseTemplateApiEntity> example = Example.of(
-                CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).build());
+                CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).build(),
+                ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName()));
             return caseTemplateApiRepository.findAll(example);
         } catch (Exception e) {
             log.error("Failed to get the CaseTemplateApi list by caseTemplateId!", e);
@@ -147,7 +150,8 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     public List<CaseTemplateApiEntity> getApiByCaseTemplateId(String caseTemplateId, boolean removed) {
         try {
             Example<CaseTemplateApiEntity> example = Example
-                .of(CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).removed(removed).build());
+                .of(CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).removed(removed).build(),
+                    ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName()));
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             return caseTemplateApiRepository.findAll(example, sort);
         } catch (Exception e) {
