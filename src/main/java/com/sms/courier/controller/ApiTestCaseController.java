@@ -7,6 +7,7 @@ import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.service.ApiTestCaseService;
 import java.util.List;
+import org.bson.types.ObjectId;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -47,7 +49,8 @@ public class ApiTestCaseController {
 
     @GetMapping("/list")
     @PreAuthorize("hasRoleOrAdmin(@role.CASE_QUERY_ALL)")
-    public List<ApiTestCaseResponse> list(String apiId, String projectId, boolean removed) {
+    public List<ApiTestCaseResponse> list(@RequestParam("apiId") ObjectId apiId,
+        @RequestParam("projectId") ObjectId projectId, boolean removed) {
         return apiTestCaseService.list(apiId, projectId, removed);
     }
 
@@ -73,5 +76,10 @@ public class ApiTestCaseController {
     @PreAuthorize("hasRoleOrAdmin(@role.CASE_CRE_UPD_DEL)")
     public Boolean recover(@RequestBody List<String> ids) {
         return apiTestCaseService.recover(ids);
+    }
+
+    @GetMapping("/count/pid/{projectId}")
+    public Long count(@PathVariable String projectId) {
+        return apiTestCaseService.count(projectId);
     }
 }

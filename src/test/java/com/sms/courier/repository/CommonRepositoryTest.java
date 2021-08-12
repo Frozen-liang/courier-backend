@@ -1,5 +1,12 @@
 package com.sms.courier.repository;
 
+import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.mongodb.client.result.UpdateResult;
 import com.sms.courier.common.enums.OperationModule;
 import com.sms.courier.common.field.ApiField;
@@ -13,7 +20,9 @@ import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.repository.impl.CommonRepositoryImpl;
 import com.sms.courier.utils.SecurityUtil;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterAll;
@@ -27,12 +36,6 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.UpdateDefinition;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @DisplayName("Tests for CommonRepositoryTest")
 class CommonRepositoryTest {
@@ -166,7 +169,7 @@ class CommonRepositoryTest {
     }
 
     @Test
-    @DisplayName("Test the deleteByIds method in the CommonRepository")
+    @DisplayName("Test the deleteFieldById method in the CommonRepository")
     void delete_field_by_ids_test() {
         SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrUserId).thenReturn(ID);
         when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
@@ -175,11 +178,22 @@ class CommonRepositoryTest {
     }
 
     @Test
-    @DisplayName("Test the deleteById method in the CommonRepository")
+    @DisplayName("Test the deleteFieldById method in the CommonRepository")
     void delete_field_by_id_test() {
         SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrUserId).thenReturn(ID);
         when(mongoTemplate.updateFirst(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
             UpdateResult.acknowledged(1, 1L, null));
         assertThat(commonRepository.deleteFieldById(ID, COLLECTION_NAME, ApiEntity.class)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test the deleteById method in the CommonRepository")
+    void update_field_by_id_test() {
+        Map<Field, Object> updateFields = new HashMap<>();
+        updateFields.put(CREATE_USER_ID, ID);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrUserId).thenReturn(ID);
+        when(mongoTemplate.updateFirst(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
+            UpdateResult.acknowledged(1, 1L, null));
+        assertThat(commonRepository.updateFieldById(ID, updateFields, ApiEntity.class)).isTrue();
     }
 }

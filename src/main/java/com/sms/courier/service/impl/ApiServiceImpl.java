@@ -29,6 +29,7 @@ import java.util.List;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -94,11 +95,11 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     @LogRecord(operationType = OperationType.ADD, operationModule = OperationModule.API,
-        template = "{{#apiRequestDto.apiName}}")
-    public Boolean add(ApiRequest apiRequestDto) {
-        log.info("ApiService-add()-params: [Api]={}", apiRequestDto.toString());
+        template = "{{#apiRequest.apiName}}")
+    public Boolean add(ApiRequest apiRequest) {
+        log.info("ApiService-add()-params: [Api]={}", apiRequest.toString());
         try {
-            ApiEntity apiEntity = apiMapper.toEntity(apiRequestDto);
+            ApiEntity apiEntity = apiMapper.toEntity(apiRequest);
             apiEntity.setMd5(MD5Util.getMD5(apiEntity));
             ApiEntity newApiEntity = apiRepository.insert(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
@@ -113,7 +114,7 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     @LogRecord(operationType = OperationType.EDIT, operationModule = OperationModule.API,
-        template = "{{#apiRequestDto.apiName}}")
+        template = "{{#apiRequest.apiName}}")
     public Boolean edit(ApiRequest apiRequest) {
         log.info("ApiService-edit()-params: [Api]={}", apiRequest.toString());
         try {
@@ -169,6 +170,11 @@ public class ApiServiceImpl implements ApiService {
         template = "{{#result?.![#this.apiName]}}", enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean recover(List<String> ids) {
         return customizedApiRepository.recover(ids);
+    }
+
+    @Override
+    public Long count(String projectId) {
+        return apiRepository.count(Example.of(ApiEntity.builder().projectId(projectId).build()));
     }
 
 }

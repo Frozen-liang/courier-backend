@@ -15,6 +15,7 @@ public class ApiTestCaseJobReport {
 
     private String jobId;
     private JobStatus jobStatus;
+    private String errCode;
     private Integer totalTimeCost;
     private Integer paramsTotalTimeCost;
     private CaseReport caseReport;

@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -122,7 +123,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     public List<SceneCaseApiResponse> listBySceneCaseId(String sceneCaseId, boolean removed) {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
-                SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(removed).build());
+                SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(removed).build(),
+                ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName()));
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(sceneCaseApiMapper::toSceneCaseApiDto).collect(Collectors.toList());
@@ -136,7 +138,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     public List<SceneCaseApiEntity> listBySceneCaseId(String sceneCaseId) {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
-                SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).build());
+                SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).build(),
+                ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName()));
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {
@@ -149,7 +152,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     public List<SceneCaseApiEntity> getApiBySceneCaseId(String sceneCaseId, boolean remove) {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
-                SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(remove).build());
+                SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(remove).build(),
+                ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName()));
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {

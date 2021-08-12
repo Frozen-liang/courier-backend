@@ -1,10 +1,6 @@
 package com.sms.courier.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sms.courier.common.enums.ApiJsonType;
-import com.sms.courier.common.enums.ApiProtocol;
-import com.sms.courier.common.enums.ApiRequestParamType;
-import com.sms.courier.common.enums.RequestMethod;
 import com.sms.courier.entity.api.common.AdvancedSetting;
 import com.sms.courier.entity.api.common.HttpStatusVerification;
 import com.sms.courier.entity.api.common.ResponseHeadersVerification;
@@ -33,9 +29,11 @@ public class ApiTestRequest {
     private String apiName;
     private String description;
     private String apiPath;
-    private ApiProtocol apiProtocol;
-    private RequestMethod requestMethod;
-    private ApiRequestParamType apiRequestParamType;
+    private Integer apiProtocol;
+    private Integer requestMethod;
+    private Integer apiRequestParamType;
+    private String requestRaw;
+    private Integer requestRawType;
     private List<ParamInfoRequest> requestHeaders;
     private List<ParamInfoRequest> responseHeaders;
     private List<ParamInfoRequest> pathParams;
@@ -44,11 +42,14 @@ public class ApiTestRequest {
     private List<ParamInfoRequest> responseParams;
     private String preInject;
     private String postInject;
-    private ApiJsonType apiResponseJsonType;
-    private ApiJsonType apiRequestJsonType;
+    private Integer apiResponseJsonType;
+    private Integer apiRequestJsonType;
     private HttpStatusVerification httpStatusVerification;
     private ResponseHeadersVerification responseHeadersVerification;
     private ResponseResultVerification responseResultVerification;
     private ResponseTimeVerification responseTimeVerification;
     private AdvancedSetting advancedSetting;
+    private Integer apiResponseParamType;
+    private String responseRaw;
+    private Integer responseRawType;
 }

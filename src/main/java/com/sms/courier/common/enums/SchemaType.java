@@ -10,14 +10,14 @@ import org.springframework.lang.Nullable;
 public enum SchemaType {
 
     STRING("string", ParamType.STRING),
-    INT("integer", ParamType.INT),
-    LONG("long", ParamType.LONG),
+    INT("integer", ParamType.NUMBER),
+    LONG("long", ParamType.NUMBER),
     OBJECT("object", ParamType.OBJECT),
-    DOUBLE("double", ParamType.DOUBLE),
+    DOUBLE("double", ParamType.NUMBER),
     BOOLEAN("boolean", ParamType.BOOLEAN),
     DATE("date", ParamType.DATE),
     DATETIME("datetime", ParamType.DATETIME),
-    FLOAT("float", ParamType.FLOAT),
+    FLOAT("float", ParamType.NUMBER),
     JSON("json", ParamType.JSON),
     NUMBER("number", ParamType.NUMBER),
     FILE("file", ParamType.FILE),

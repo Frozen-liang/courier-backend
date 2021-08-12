@@ -33,19 +33,24 @@ public class ConnectChannelInterceptor implements ChannelInterceptor {
             .getAccessor(message, StompHeaderAccessor.class);
         if (Objects.nonNull(accessor) && CONNECT.equals(accessor.getCommand())) {
             List<String> nativeHeader = accessor.getNativeHeader(AUTHORIZATION);
-            if (CollectionUtils.isNotEmpty(nativeHeader)) {
-                String header = nativeHeader.get(0);
-                if (StringUtils.isNotBlank(header) || header.startsWith("Bearer ")) {
-                    String token = header.split(" ")[1].trim();
-                    if (jwtTokenManager.validate(token)) {
-                        Authentication authentication = jwtTokenManager.createAuthentication(token);
-                        accessor.setUser(authentication);
-                        return message;
-                    }
-                }
+            String token = getToken(nativeHeader);
+            if (StringUtils.isNotBlank(token) && jwtTokenManager.validate(token)) {
+                Authentication authentication = jwtTokenManager.createAuthentication(token);
+                accessor.setUser(authentication);
+                return message;
             }
             return null;
         }
         return message;
+    }
+
+    private String getToken(List<String> nativeHeader) {
+        if (CollectionUtils.isNotEmpty(nativeHeader)) {
+            String header = nativeHeader.get(0);
+            if (StringUtils.isNotBlank(header) || header.startsWith("Bearer ")) {
+                return header.split(" ")[1].trim();
+            }
+        }
+        return null;
     }
 }

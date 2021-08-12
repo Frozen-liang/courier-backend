@@ -8,6 +8,7 @@ import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -32,4 +33,6 @@ public class SystemRoleEntity {
     private RoleType roleType;
     @CreatedDate
     private LocalDateTime createDateTime;
+    @LastModifiedDate
+    private LocalDateTime modifyDataTime;
 }

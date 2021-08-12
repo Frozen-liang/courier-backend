@@ -22,8 +22,10 @@ import com.sms.courier.utils.SecurityUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -174,6 +176,7 @@ public class CommonRepositoryImpl implements CommonRepository {
         int skipRecord = pageRequest.getPageNumber() * pageRequest.getPageSize();
         aggregationOperations.add(Aggregation.skip(Long.valueOf(skipRecord)));
         aggregationOperations.add(Aggregation.limit(pageRequest.getPageSize()));
+
         aggregationOperations.add(projectionOperation);
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
 
@@ -208,6 +211,22 @@ public class CommonRepositoryImpl implements CommonRepository {
         update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
         update.set(MODIFY_USER_ID.getName(), SecurityUtil.getCurrUserId());
         UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
+        return updateResult.getModifiedCount() > 0;
+    }
+
+    @Override
+    public Boolean updateFieldById(String id, Map<Field, Object> updateFields, Class<?> entityClass) {
+        if (MapUtils.isEmpty(updateFields)) {
+            return false;
+        }
+        Update update = new Update();
+        updateFields.forEach((key, value) -> {
+            update.set(key.getName(), value);
+        });
+        update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
+        update.set(MODIFY_USER_ID.getName(), SecurityUtil.getCurrUserId());
+        Query query = new Query(Criteria.where(ID.getName()).is(id));
+        UpdateResult updateResult = mongoTemplate.updateFirst(query, update, entityClass);
         return updateResult.getModifiedCount() > 0;
     }
 

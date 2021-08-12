@@ -1,5 +1,22 @@
 package com.sms.courier.service;
 
+import static com.sms.courier.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DELETE_API_TEST_CASE_BY_ID_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_BY_ID_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_LIST_ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
@@ -26,23 +43,6 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static com.sms.courier.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.DELETE_API_TEST_CASE_BY_ID_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_BY_ID_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_LIST_ERROR;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @DisplayName("Tests for ApiTestCaseService")
 class ApiTestCaseServiceTest {
 
@@ -67,8 +67,8 @@ class ApiTestCaseServiceTest {
     private static final boolean REMOVED = Boolean.FALSE;
     private static final String ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
-    private static final String API_ID = ObjectId.get().toString();
-    private static final String PROJECT_ID = ObjectId.get().toString();
+    private static final ObjectId API_ID = ObjectId.get();
+    private static final ObjectId PROJECT_ID = ObjectId.get();
 
     @Test
     @DisplayName("Test the findById method in the ApiTestCase service")
@@ -78,6 +78,15 @@ class ApiTestCaseServiceTest {
         ApiTestCaseResponse result1 = apiTestCaseService.findById(ID);
         assertThat(result1).isNotNull();
         assertThat(result1.getId()).isEqualTo(ID);
+    }
+
+    @Test
+    @DisplayName("Test the findOne method in the ApiTestCase service")
+    public void findOne_test() {
+        when(apiTestCaseRepository.findById(ID)).thenReturn(Optional.of(apiTestCase));
+        ApiTestCaseEntity result = apiTestCaseService.findOne(ID);
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(ID);
     }
 
     @Test

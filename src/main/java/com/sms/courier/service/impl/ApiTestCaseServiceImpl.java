@@ -20,10 +20,9 @@ import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
-import com.sms.courier.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
-import com.sms.courier.entity.job.ApiTestCaseJobEntity;
+import com.sms.courier.entity.apitestcase.TestResult;
 import com.sms.courier.mapper.ApiTestCaseMapper;
 import com.sms.courier.mapper.JobMapper;
 import com.sms.courier.repository.ApiTestCaseRepository;
@@ -32,8 +31,11 @@ import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.service.ApiTestCaseService;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.List;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -64,30 +66,20 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     }
 
     @Override
-    public List<ApiTestCaseResponse> list(String apiId, String projectId, boolean removed) {
-        try {
-            List<ApiTestCaseResponse> apiTestCaseResponses = customizedApiTestCaseRepository.listByJoin(apiId,
-                projectId, removed);
+    public ApiTestCaseEntity findOne(String id) {
+        return apiTestCaseRepository.findById(id)
+            .orElseThrow(() -> ExceptionUtils.mpe("The apiTestCase not exist. id=%s", id));
+    }
 
-            apiTestCaseResponses.forEach(response -> {
-                ApiTestCaseJobEntity apiTestCaseJob = customizedApiTestCaseJobRepository
-                    .findRecentlyCaseReportByCaseId(response.getId());
-                ApiTestCaseJobPageResponse jobResponse = jobMapper
-                    .toApiTestCaseJobPageResponse(apiTestCaseJob);
-                response.setTestTime(jobResponse.getTestDateTime());
-                response.setJobId(apiTestCaseJob.getId());
-                response
-                    .setIsSuccess(
-                        Objects.nonNull(jobResponse.getTestReport()) ? jobResponse.getTestReport().getIsSuccess()
-                            : null);
-            });
-            return apiTestCaseResponses;
+    @Override
+    public List<ApiTestCaseResponse> list(ObjectId apiId, ObjectId projectId, boolean removed) {
+        try {
+            return customizedApiTestCaseRepository.listByJoin(apiId, projectId, removed);
         } catch (Exception e) {
             log.error("Failed to get the ApiTestCase list!", e);
             throw new ApiTestPlatformException(GET_API_TEST_CASE_LIST_ERROR);
         }
     }
-
 
     @Override
     @LogRecord(operationType = ADD, operationModule = API_TEST_CASE,
@@ -113,6 +105,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
             boolean exists = apiTestCaseRepository.existsById(apiTestCaseRequest.getId());
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "ApiTestCase", apiTestCaseRequest.getId());
             ApiTestCaseEntity apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
+            apiTestCase.setLastTestResult(null);
             apiTestCaseRepository.save(apiTestCase);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
@@ -167,6 +160,25 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean recover(List<String> ids) {
         return customizedApiTestCaseRepository.recover(ids);
+    }
+
+    @Override
+    public Long count(String projectId) {
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching().withIgnorePaths("isExecute");
+        return apiTestCaseRepository
+            .count(Example.of(ApiTestCaseEntity.builder().projectId(projectId).build(), exampleMatcher));
+    }
+
+    @Override
+    public void insertTestResult(String id, TestResult testResult) {
+        if (StringUtils.isBlank(id)) {
+            return;
+        }
+        apiTestCaseRepository.findById(id).ifPresent(apiTestCaseEntity -> {
+            log.info("Insert last test result.{}", testResult);
+            apiTestCaseEntity.setLastTestResult(testResult);
+            apiTestCaseRepository.save(apiTestCaseEntity);
+        });
     }
 
 }

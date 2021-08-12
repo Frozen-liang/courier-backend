@@ -23,4 +23,6 @@ public interface ApiTestCaseJobService {
     void apiTest(ApiTestRequest apiTestRequest, CustomUser currentUser);
 
     void reallocateJob(List<String> engineIds);
+
+    ApiTestCaseJobResponse buildJob(ApiTestRequest request);
 }

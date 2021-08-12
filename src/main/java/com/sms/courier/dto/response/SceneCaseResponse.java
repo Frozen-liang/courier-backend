@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -24,6 +25,7 @@ public class SceneCaseResponse extends LookupUserResponse {
     private List<String> tagName;
     private List<String> tagId;
     private Integer priority;
+    @Field("isNext")
     @JsonProperty("isNext")
     private boolean next;
 }

@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +23,7 @@ public class BaseResponse {
     private LocalDateTime modifyDateTime;
     private String createUserId;
     private String modifyUserId;
+    @Field("isRemoved")
     @JsonProperty("isRemoved")
-    private boolean isRemoved;
+    private boolean removed;
 }

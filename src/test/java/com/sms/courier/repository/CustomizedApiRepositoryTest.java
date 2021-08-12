@@ -12,6 +12,7 @@ import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
+import com.sms.courier.entity.mongo.GroupResultVo;
 import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.repository.impl.CustomizedApiRepositoryImpl;
 import java.util.Arrays;
@@ -25,6 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 
 @DisplayName("Tests for CustomizedApiRepositoryTest")
 class CustomizedApiRepositoryTest {
@@ -49,11 +52,15 @@ class CustomizedApiRepositoryTest {
     @DisplayName("Test the page method in the CustomizedApiRepository")
     public void page_test() {
         when(commonRepository.page(any(QueryVo.class), any(), any()))
-            .thenReturn(new PageImpl<>(List.of(ApiResponse.builder().build())));
+            .thenReturn(new PageImpl<>(List.of(ApiResponse.builder().id(ID).build())));
         when(apiGroupRepository.findById(any()))
             .thenReturn(Optional.of(ApiGroupEntity.builder().realGroupId(1L).build()));
         when(apiGroupRepository.findAllByPathContains(any()))
             .thenReturn(Stream.of(ApiGroupEntity.builder().id(ID).build()));
+        AggregationResults aggregationResults = mock(AggregationResults.class);
+        when(mongoTemplate.aggregate(any(Aggregation.class), anyString(), any())).thenReturn(aggregationResults);
+        when(aggregationResults.getMappedResults())
+            .thenReturn(List.of(GroupResultVo.builder().id(ID).count(1).build()));
         ApiPageRequest apiPageRequest = new ApiPageRequest();
         apiPageRequest.setApiProtocol(Arrays.asList(1, 2));
         apiPageRequest.setApiStatus(Arrays.asList(1, 2));
@@ -79,13 +86,13 @@ class CustomizedApiRepositoryTest {
         when(commonRepository.deleteByIds(ID_LIST, ApiEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(customizedApiRepository.deleteByIds(ID_LIST)).isTrue();
     }
+
     @Test
     @DisplayName("Test the recover method in the CustomizedApiRepository")
     public void recover_test() {
         when(commonRepository.recover(ID_LIST, ApiEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(customizedApiRepository.recover(ID_LIST)).isTrue();
     }
-
 
 
     @Test

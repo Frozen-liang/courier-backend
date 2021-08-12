@@ -28,7 +28,7 @@ public enum ApiRequestParamType implements EnumCommon {
         return this.code;
     }
 
-    public static ApiRequestParamType getType(int code) {
+    public static ApiRequestParamType getType(Integer code) {
         return mappings.get(code);
     }
 }

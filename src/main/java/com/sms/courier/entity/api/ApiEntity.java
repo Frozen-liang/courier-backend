@@ -95,7 +95,6 @@ public class ApiEntity extends BaseEntity {
 
     private ApiJsonType apiRequestJsonType;
 
-    @JsonIgnore
     private ApiRequestParamType apiResponseParamType;
 
     private String responseRaw;

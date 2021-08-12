@@ -17,7 +17,7 @@ public class SuspiciousEngineManagementImpl implements SuspiciousEngineManagemen
 
     @Override
     public Integer increaseIndex() {
-        return currentIndex.updateAndGet(currentIndex -> (currentIndex + 1) % 60);
+        return currentIndex.getAndUpdate(currentIndex -> (currentIndex + 1) % 60);
     }
 
     public Integer getCurrentIndex() {
@@ -43,7 +43,7 @@ public class SuspiciousEngineManagementImpl implements SuspiciousEngineManagemen
     public void remove(String engineId) {
         engineIndexMapping.compute(engineId, (key, value) -> {
             if (Objects.nonNull(value)) {
-                suspiciousEngineQueue.remove(value);
+                suspiciousEngineQueue.get(value).remove(engineId);
             }
 
             // equals remove operation.

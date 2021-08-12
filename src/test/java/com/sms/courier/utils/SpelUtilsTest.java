@@ -22,30 +22,4 @@ public class SpelUtilsTest {
         assertThat(SpelUtils.getValue(evaluationContext, null, Class.class)).isNull();
     }
 
-    @Test
-    @DisplayName("Test the getValue method in the SpelUtil")
-    public void getValue_exception_null_test() {
-        assertThat(SpelUtils.getValue(evaluationContext, "test", Class.class)).isNull();
-    }
-
-   /* @Test
-    @DisplayName("Test the getValue method in the SpelUtil")
-    public void getValue_test() {
-    }
-
-    @Test
-    @DisplayName("Test the getProjectId_test method in the SpelUtil")
-    public void getProjectId_null_test() {
-    }
-
-    @Test
-    @DisplayName("Test the getProjectId_test method in the SpelUtil")
-    public void getProjectId_test() {
-    }
-
-    @Test
-    @DisplayName("Test the addVariable_test method in the SpelUtil")
-    public void addVariable_test() {
-
-    }*/
 }

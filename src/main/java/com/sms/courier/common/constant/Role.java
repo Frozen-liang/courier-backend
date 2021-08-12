@@ -135,6 +135,11 @@ public class Role {
     public static final String LOG_QUERY_ALL = "Log" + QUERY_ALL;
     public static final String LOG_QUERY_OWN = "Log" + QUERY_OWN;
 
+    // Schedule
+    public static final String SCHEDULE_CRE_UPD_DEL = "Schedule" + CRE_UPD_DEL;
+    public static final String SCHEDULE_QUERY_ALL = "Schedule" + QUERY_ALL;
+    public static final String SCHEDULE_QUERY_OWN = "Schedule" + QUERY_OWN;
+
 
     // Engine role
     public static final String GLOBAL_FUN_FIND_ALL = "Global_Fun_Find_All";

@@ -1,12 +1,12 @@
 package com.sms.courier.entity.job.common;
 
-import com.sms.courier.dto.response.ApiEntityResponse;
+import com.sms.courier.common.enums.ApiBindingStatus;
+import com.sms.courier.common.enums.ResponseParamsExtractionType;
 import com.sms.courier.entity.api.common.AdvancedSetting;
 import com.sms.courier.entity.api.common.HttpStatusVerification;
 import com.sms.courier.entity.api.common.ResponseHeadersVerification;
 import com.sms.courier.entity.api.common.ResponseResultVerification;
 import com.sms.courier.entity.api.common.ResponseTimeVerification;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,15 +28,9 @@ public class JobApiTestCase {
     @Field(targetType = FieldType.OBJECT_ID)
     private String dataCollId;
 
-    @Field(targetType = FieldType.OBJECT_ID)
-    private List<String> tagId;
+    private ApiBindingStatus status;
 
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String projectId;
-
-    private Integer status;
-
-    private Integer responseParamsExtractionType;
+    private ResponseParamsExtractionType responseParamsExtractionType;
 
     private HttpStatusVerification httpStatusVerification;
 
@@ -51,7 +45,7 @@ public class JobApiTestCase {
 
     private AdvancedSetting advancedSetting;
 
-    private ApiEntityResponse apiEntity;
+    private JobApi jobApi;
 
     private CaseReport caseReport;
 

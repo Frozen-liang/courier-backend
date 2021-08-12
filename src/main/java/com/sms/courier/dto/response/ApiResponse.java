@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class ApiResponse extends BaseResponse {
+public class ApiResponse extends LookupUserResponse {
 
     private String projectId;
 
@@ -36,6 +36,9 @@ public class ApiResponse extends BaseResponse {
 
     private Integer apiRequestParamType;
 
+    private String requestRaw;
+
+    private Integer requestRawType;
 
     private List<ParamInfoResponse> requestHeaders;
     private List<ParamInfoResponse> responseHeaders;
@@ -56,5 +59,11 @@ public class ApiResponse extends BaseResponse {
 
     private Integer apiRequestJsonType;
 
-    private String createUser;
+    private Integer apiResponseParamType;
+
+    private String responseRaw;
+
+    private Integer responseRawType;
+
+    private int caseCount;
 }

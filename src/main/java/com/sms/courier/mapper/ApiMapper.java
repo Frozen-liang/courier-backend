@@ -37,9 +37,8 @@ public interface ApiMapper {
             "java(DocumentFileType.getType(Objects"
                 + ".requireNonNull(Objects.requireNonNull(request).getDocumentFileType())).getDocumentType())")
     @Mapping(target = "saveMode", expression = "java(SaveMode.getType(request.getSaveMode()))")
-    @Mapping(target = "apiPresetStatus", expression = "java(ApiStatus.getType(request.getSaveMode()))")
-    @Mapping(target = "apiChangeStatus", expression = "java(ApiStatus.getType(request.getSaveMode()))")
-    @Mapping(target = "groupImportType", expression = "java(GroupImportType.getType(request.getSaveMode()))")
+    @Mapping(target = "apiPresetStatus", expression = "java(ApiStatus.getType(request.getApiPresetStatus()))")
+    @Mapping(target = "apiChangeStatus", expression = "java(ApiStatus.getType(request.getApiChangeStatus()))")
     ImportSourceVo toImportSource(ApiImportRequest request, String source);
 
     @Mapping(target = "documentType",

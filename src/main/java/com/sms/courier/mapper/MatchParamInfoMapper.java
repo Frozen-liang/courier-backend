@@ -1,8 +1,10 @@
 package com.sms.courier.mapper;
 
+import com.sms.courier.dto.request.MatchParamInfoRequest;
 import com.sms.courier.dto.response.MatchParamInfoResponse;
 import com.sms.courier.entity.api.common.MatchParamInfo;
 import com.sms.courier.utils.EnumCommonUtils;
+import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -19,4 +21,10 @@ public interface MatchParamInfoMapper {
     @Mapping(target = "paramType",
         expression = "java(com.sms.courier.common.enums.ParamType.getType(matchParamInfo.getParamType()))")
     MatchParamInfo toEntity(MatchParamInfoResponse matchParamInfo);
+
+    @Mapping(target = "paramType",
+        expression = "java(com.sms.courier.common.enums.ParamType.getType(request.getParamType()))")
+    MatchParamInfo toEntity(MatchParamInfoRequest request);
+
+    List<MatchParamInfo> toEntityList(List<MatchParamInfoRequest> request);
 }

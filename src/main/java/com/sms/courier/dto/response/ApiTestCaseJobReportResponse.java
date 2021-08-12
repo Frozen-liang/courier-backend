@@ -13,7 +13,7 @@ public class ApiTestCaseJobReportResponse {
 
     private String jobId;
     private Integer jobStatus;
-    private Integer errCode;
+    private String errCode;
     private CaseReportResponse caseReport;
     private String message;
     private Integer totalTimeCost;

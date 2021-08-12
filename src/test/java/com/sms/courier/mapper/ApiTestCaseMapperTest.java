@@ -3,12 +3,11 @@ package com.sms.courier.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-
 import com.sms.courier.common.enums.ApiJsonType;
 import com.sms.courier.common.enums.ApiProtocol;
 import com.sms.courier.common.enums.ApiRequestParamType;
 import com.sms.courier.common.enums.RequestMethod;
-import com.sms.courier.dto.request.ApiEntityRequest;
+import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.api.ApiEntity;
@@ -29,6 +28,7 @@ class ApiTestCaseMapperTest {
     private ResponseHeadersVerificationMapper responseHeadersVerificationMapper =
         mock(ResponseHeadersVerificationMapper.class);
     private ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
+    private MatchParamInfoMapper matchParamInfoMapper = new MatchParamInfoMapperImpl();
     private ApiTestCaseMapper apiTestCaseMapper = new ApiTestCaseMapperImpl(responseResultVerificationMapper,
         responseHeadersVerificationMapper, paramInfoMapper);
     private ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder()
@@ -101,7 +101,7 @@ class ApiTestCaseMapperTest {
     void Notnull_entityList_to_dtoList() {
         ApiTestCaseRequest apiTestCaseRequest = ApiTestCaseRequest.builder()
             .tagId(Lists.newArrayList())
-            .apiEntity(ApiEntityRequest.builder()
+            .apiEntity(ApiRequest.builder()
                 .requestHeaders(Lists.newArrayList())
                 .responseHeaders(Lists.newArrayList())
                 .pathParams(Lists.newArrayList())

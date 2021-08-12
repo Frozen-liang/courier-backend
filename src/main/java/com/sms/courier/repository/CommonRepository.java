@@ -5,6 +5,7 @@ import com.sms.courier.dto.PageDto;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -35,4 +36,6 @@ public interface CommonRepository {
     Boolean deleteFieldById(String id, String fieldName, Class<?> entityClass);
 
     Boolean deleteFieldByIds(List<String> ids, String fieldName, Class<?> entityClass);
+
+    Boolean updateFieldById(String id, Map<Field, Object> updateFields, Class<?> entityClass);
 }

@@ -13,7 +13,10 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-    unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {EnumCommonUtils.class, ApiTestCaseMapper.class})
+    unmappedTargetPolicy = ReportingPolicy.IGNORE,
+    uses = {EnumCommonUtils.class, ApiTestCaseMapper.class, ResponseHeadersVerificationMapper.class,
+        ResponseResultVerificationMapper.class,
+        ParamInfoMapper.class})
 public interface SceneCaseApiMapper {
 
     SceneCaseApiEntity toSceneCaseApiByUpdateRequest(UpdateSceneCaseApiRequest updateSceneCaseApiRequest);

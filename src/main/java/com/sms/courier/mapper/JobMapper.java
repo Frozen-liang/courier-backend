@@ -8,9 +8,10 @@ import com.sms.courier.dto.request.TestDataRequest;
 import com.sms.courier.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.courier.dto.response.ApiTestCaseJobReportResponse;
 import com.sms.courier.dto.response.ApiTestCaseJobResponse;
-import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.dto.response.SceneCaseJobReportResponse;
 import com.sms.courier.dto.response.SceneCaseJobResponse;
+import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
+import com.sms.courier.entity.apitestcase.TestResult;
 import com.sms.courier.entity.datacollection.TestData;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
@@ -18,6 +19,7 @@ import com.sms.courier.entity.job.ApiTestCaseJobReport;
 import com.sms.courier.entity.job.JobSceneCaseApi;
 import com.sms.courier.entity.job.SceneCaseJobEntity;
 import com.sms.courier.entity.job.SceneCaseJobReport;
+import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.JobDataCollection;
 import com.sms.courier.entity.job.common.JobEnvironment;
@@ -38,8 +40,42 @@ public interface JobMapper {
 
     JobEnvironment toJobEnvironment(ProjectEnvironmentEntity projectEnvironment);
 
-    JobApiTestCase toJobApiTestCase(ApiTestCaseResponse apiTestCaseResponse);
+    @Mapping(target = "jobApi", source = "apiEntity")
+    JobApiTestCase toJobApiTestCase(ApiTestCaseEntity apiTestCaseEntity);
 
+    @Mapping(target = "jobApi.id", source = "apiId")
+    @Mapping(target = "jobApi.projectId", source = "projectId")
+    @Mapping(target = "jobApi.apiName", source = "apiName")
+    @Mapping(target = "jobApi.description", source = "description")
+    @Mapping(target = "jobApi.apiPath", source = "apiPath")
+    @Mapping(target = "jobApi.apiProtocol",
+        expression = "java(com.sms.courier.common.enums.ApiProtocol.getType(apiTestRequest.getApiProtocol()))")
+    @Mapping(target = "jobApi.requestMethod",
+        expression = "java(com.sms.courier.common.enums.RequestMethod.getType(apiTestRequest.getRequestMethod()))")
+    @Mapping(target = "jobApi.apiRequestParamType",
+        expression =
+            "java(com.sms.courier.common.enums.ApiRequestParamType.getType(apiTestRequest.getApiRequestParamType()))")
+    @Mapping(target = "jobApi.apiResponseParamType",
+        expression =
+            "java(com.sms.courier.common.enums.ApiRequestParamType.getType(apiTestRequest.getApiResponseParamType()))")
+    @Mapping(target = "jobApi.requestRaw", source = "requestRaw")
+    @Mapping(target = "jobApi.requestRawType",
+        expression = "java(com.sms.courier.common.enums.RawType.getType(apiTestRequest.getRequestRawType()))")
+    @Mapping(target = "jobApi.requestHeaders", source = "requestHeaders")
+    @Mapping(target = "jobApi.responseHeaders", source = "responseHeaders")
+    @Mapping(target = "jobApi.pathParams", source = "pathParams")
+    @Mapping(target = "jobApi.restfulParams", source = "restfulParams")
+    @Mapping(target = "jobApi.requestParams", source = "requestParams")
+    @Mapping(target = "jobApi.responseParams", source = "responseParams")
+    @Mapping(target = "jobApi.preInject", source = "preInject")
+    @Mapping(target = "jobApi.postInject", source = "postInject")
+    @Mapping(target = "jobApi.apiResponseJsonType",
+        expression = "java(com.sms.courier.common.enums.ApiJsonType.getType(apiTestRequest.getApiResponseParamType()))")
+    @Mapping(target = "jobApi.apiRequestJsonType",
+        expression = "java(com.sms.courier.common.enums.ApiJsonType.getType(apiTestRequest.getApiRequestJsonType()))")
+    @Mapping(target = "jobApi.responseRaw", source = "responseRaw")
+    @Mapping(target = "jobApi.responseRawType",
+        expression = "java(com.sms.courier.common.enums.RawType.getType(apiTestRequest.getRequestRawType()))")
     JobApiTestCase toJobApiTestCase(ApiTestRequest apiTestRequest);
 
     JobDataCollection toJobDataCollection(DataCollectionRequest dataCollectionRequest);
@@ -68,4 +104,6 @@ public interface JobMapper {
     ApiTestCaseJobReportResponse toApiTestCaseJobReportResponse(ApiTestCaseJobReport caseJobReport);
 
     SceneCaseJobReportResponse toSceneCaseJobReportResponse(SceneCaseJobReport caseJobReport);
+
+    TestResult toTestResult(CaseReport caseReport);
 }

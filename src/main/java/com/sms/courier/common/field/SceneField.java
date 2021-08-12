@@ -15,7 +15,8 @@ public enum SceneField implements Field {
     ORDER("order"),
     API_ID("apiTestCase.apiId"),
     API_IS_EXECUTE("apiTestCase.isExecute"),
-    CASE_TEMPLATE_API_CONN_LIST("caseTemplateApiConnList");
+    CASE_TEMPLATE_API_CONN_LIST("caseTemplateApiConnList"),
+    IS_LOCK("isLock");
 
     private final String name;
 

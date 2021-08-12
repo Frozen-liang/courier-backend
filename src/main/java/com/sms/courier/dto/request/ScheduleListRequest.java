@@ -1,4 +1,5 @@
-package com.sms.courier.entity.criteria;
+package com.sms.courier.dto.request;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,14 +7,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InterfaceCriteria {
+@Builder
+public class ScheduleListRequest {
 
     private String projectId;
+
     private String groupId;
-    private String title;
-    private String tag;
-    private String path;
+
+    private String name;
 }
