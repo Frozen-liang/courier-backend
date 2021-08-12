@@ -17,6 +17,7 @@ import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.engine.model.EngineMemberEntity;
 import com.sms.courier.engine.request.EngineRegistrationRequest;
 import com.sms.courier.engine.task.SuspiciousEngineManagement;
+import com.sms.courier.mapper.EngineMapper;
 import com.sms.courier.repository.EngineMemberRepository;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -29,8 +30,9 @@ public class EngineMemberManagementTest {
 
     private final EngineMemberRepository engineMemberRepository = mock(EngineMemberRepository.class);
     private final SuspiciousEngineManagement suspiciousEngineManagement = mock(SuspiciousEngineManagement.class);
+    private final EngineMapper engineMapper = mock(EngineMapper.class);
     private final EngineMemberManagement engineMemberManagement =
-        new EngineMemberManagementImpl(engineMemberRepository, suspiciousEngineManagement);
+        new EngineMemberManagementImpl(engineMemberRepository, suspiciousEngineManagement, engineMapper);
     private final EngineMemberEntity engineMember = EngineMemberEntity.builder().destination(EngineId.generate()).id(
         ObjectId.get().toString()).status(EngineStatus.RUNNING).build();
     private static final String DESTINATION = EngineId.generate();

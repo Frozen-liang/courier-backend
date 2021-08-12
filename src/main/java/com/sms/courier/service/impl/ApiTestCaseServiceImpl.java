@@ -107,9 +107,9 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
             ApiTestCaseEntity apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
             apiTestCase.setLastTestResult(null);
             apiTestCaseRepository.save(apiTestCase);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the ApiTestCase!", e);
             throw new ApiTestPlatformException(EDIT_API_TEST_CASE_ERROR);

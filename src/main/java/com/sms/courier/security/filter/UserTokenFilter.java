@@ -33,6 +33,7 @@ public class UserTokenFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
             return;
         }
+        //TODO 先验证token 不合法直接返回401
         String tokenType = jwtTokenManager.getTokenType(token);
         if (!USER.name().equalsIgnoreCase(tokenType) || !jwtTokenManager.validate(token)) {
             chain.doFilter(request, response);

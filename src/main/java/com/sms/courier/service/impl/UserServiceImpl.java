@@ -163,9 +163,9 @@ public class UserServiceImpl implements UserService {
             user.setPassword(oldUser.getPassword());
             user.setRemoved(oldUser.isRemoved());
             userRepository.save(user);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (DuplicateKeyException e) {
             log.error("The email:{} exist!", userRequest.getEmail());
             throw ExceptionUtils.mpe("The email:%s exist!", userRequest.getEmail());

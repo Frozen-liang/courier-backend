@@ -13,6 +13,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -70,6 +71,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             return new ResponseEntity<>(
                 Response.error(Integer.toString(status.value()), "Failed to convert argument"),
                 status);
+        }
+        if (ex instanceof MissingServletRequestParameterException) {
+            String parameterName = ((MissingServletRequestParameterException) ex).getParameterName();
+            return new ResponseEntity<>(Response.error(Integer.toString(Objects.requireNonNull(status).value()),
+                String.format("The %s must not be empty.", parameterName)), status);
         }
         log.error("[Application=API Testing Platform][Exception Level=INTERNAL_SERVER_ERROR]:", ex);
         return new ResponseEntity<>(

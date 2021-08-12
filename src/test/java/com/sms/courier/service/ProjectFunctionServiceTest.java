@@ -20,10 +20,12 @@ import static org.mockito.Mockito.when;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.ProjectFunctionRequest;
 import com.sms.courier.dto.response.FunctionResponse;
+import com.sms.courier.dto.response.LoadFunctionResponse;
 import com.sms.courier.dto.response.ProjectFunctionResponse;
 import com.sms.courier.entity.function.ProjectFunctionEntity;
 import com.sms.courier.mapper.ProjectFunctionMapper;
 import com.sms.courier.repository.CommonRepository;
+import com.sms.courier.repository.CustomizedFunctionRepository;
 import com.sms.courier.repository.ProjectFunctionRepository;
 import com.sms.courier.service.impl.ProjectFunctionServiceImpl;
 import java.util.ArrayList;
@@ -45,8 +47,10 @@ class ProjectFunctionServiceTest {
     private final GlobalFunctionService globalFunctionService = mock(GlobalFunctionService.class);
     private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final MessageService messageService = mock(MessageService.class);
+    private final CustomizedFunctionRepository customizedFunctionRepository = mock(CustomizedFunctionRepository.class);
     private final ProjectFunctionService projectFunctionService = new ProjectFunctionServiceImpl(
-        projectFunctionRepository, projectFunctionMapper, globalFunctionService, messageService, commonRepository);
+        projectFunctionRepository, projectFunctionMapper, globalFunctionService, messageService, commonRepository,
+        customizedFunctionRepository);
     private final ProjectFunctionEntity projectFunction =
         ProjectFunctionEntity.builder().functionKey("name").id(ID).build();
     private final ProjectFunctionResponse projectFunctionResponse = ProjectFunctionResponse
@@ -216,6 +220,17 @@ class ProjectFunctionServiceTest {
         when(projectFunctionRepository.findAllByIdIn(List.of(ID))).thenReturn(projectFunctionResponses);
         List<ProjectFunctionResponse> result = projectFunctionService.pullFunction(List.of(ID));
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test for loadFunction in GlobalFunction service")
+    public void loadFunction_test() {
+        when(customizedFunctionRepository.loadFunction(null, WORKSPACE_ID, LoadFunctionResponse.class))
+            .thenReturn(List.of(new LoadFunctionResponse()));
+        when(customizedFunctionRepository.loadFunction(PROJECT_ID, null, LoadFunctionResponse.class))
+            .thenReturn(List.of(new LoadFunctionResponse()));
+        List<LoadFunctionResponse> result = projectFunctionService.loadFunction(WORKSPACE_ID, PROJECT_ID);
+        assertThat(result).isNotEmpty().hasSize(2);
     }
 
 }

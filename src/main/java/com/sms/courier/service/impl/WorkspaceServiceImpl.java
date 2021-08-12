@@ -96,9 +96,9 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             }
             WorkspaceEntity workspace = workspaceMapper.toEntity(workspaceRequest);
             workspaceRepository.save(workspace);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the Workspace!", e);
             throw new ApiTestPlatformException(EDIT_WORKSPACE_ERROR);
@@ -113,9 +113,9 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         try {
             isFalse(projectService.existsByWorkspaceId(id), THE_WORKSPACE_CANNOT_DELETE_ERROR);
             return commonRepository.deleteById(id, WorkspaceEntity.class);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to delete the Workspace!", e);
             throw new ApiTestPlatformException(DELETE_WORKSPACE_BY_ID_ERROR);

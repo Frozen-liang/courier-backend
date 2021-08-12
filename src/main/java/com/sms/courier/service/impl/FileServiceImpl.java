@@ -61,9 +61,9 @@ public class FileServiceImpl implements FileService {
     public Boolean updateTestFile(TestFileRequest testFileRequest) {
         try {
             return customizedFileRepository.updateTestFile(testFileRequest);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to edit the TestFile");
             throw ExceptionUtils.mpe(EDIT_TEST_FILE_ERROR);
@@ -89,9 +89,9 @@ public class FileServiceImpl implements FileService {
             GridFsResource gridFsResource = customizedFileRepository.downloadTestFile(id);
             notNull(gridFsResource, THE_TEST_FILE_NOT_EXIST_ERROR, id);
             return gridFsResource;
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to download the TestFile by id:{}", id);
             throw ExceptionUtils.mpe(DOWNLOAD_TEST_FILE_ERROR);

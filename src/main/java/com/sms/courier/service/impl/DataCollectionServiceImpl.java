@@ -121,9 +121,9 @@ public class DataCollectionServiceImpl implements DataCollectionService {
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "DataCollection", dataCollectionRequest.getId());
             DataCollectionEntity dataCollection = dataCollectionMapper.toEntity(dataCollectionRequest);
             dataCollectionRepository.save(dataCollection);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the DataCollection!", e);
             throw new ApiTestPlatformException(EDIT_DATA_COLLECTION_ERROR);

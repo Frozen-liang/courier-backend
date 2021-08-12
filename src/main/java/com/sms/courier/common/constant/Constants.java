@@ -34,6 +34,7 @@ public class Constants {
     public static final String USER_GROUP_PATH = SDK_VERSION + "/system/user-group";
     public static final String ROLE_PATH = SDK_VERSION + "/system/role";
     public static final String SCHEDULE_PATH = SDK_VERSION + "/schedule";
+    public static final String ENGINE_PATH = SDK_VERSION + "/engine";
 
     public static final int MAX_DEPTH = 3;
 
