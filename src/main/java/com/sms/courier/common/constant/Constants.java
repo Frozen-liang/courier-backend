@@ -42,5 +42,6 @@ public class Constants {
     public static final String USER_GROUP = SDK_VERSION + "/system/user-group";
     public static final String ROLE = SDK_VERSION + "/system/role";
     public static final int MAX_DEPTH = 3;
+    public static final String HTTP_DEFAULT_STATUS_CODE = "200";
 
 }

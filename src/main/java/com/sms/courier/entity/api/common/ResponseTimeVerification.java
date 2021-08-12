@@ -15,5 +15,5 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class ResponseTimeVerification extends BaseVerification {
 
-    private Integer timeoutLimit;
+    private long timeoutLimit;
 }
