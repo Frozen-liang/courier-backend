@@ -18,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class UserTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenManager jwtTokenManager;
+    private static final String TOKEN_TYPE = USER.name();
 
     public UserTokenFilter(JwtTokenManager jwtTokenManager) {
         this.jwtTokenManager = jwtTokenManager;
@@ -33,9 +34,7 @@ public class UserTokenFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
             return;
         }
-        //TODO 先验证token 不合法直接返回401
-        String tokenType = jwtTokenManager.getTokenType(token);
-        if (!USER.name().equalsIgnoreCase(tokenType) || !jwtTokenManager.validate(token)) {
+        if (!jwtTokenManager.validate(token) || !TOKEN_TYPE.equalsIgnoreCase(jwtTokenManager.getTokenType(token))) {
             chain.doFilter(request, response);
             return;
         }

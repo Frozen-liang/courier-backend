@@ -224,7 +224,7 @@ class GlobalFunctionServiceTest {
     @Test
     @DisplayName("Test for loadFunction in GlobalFunction service")
     public void loadFunction_test() {
-        when(customizedFunctionRepository.loadFunction(null, WORKSPACE_ID, LoadFunctionResponse.class))
+        when(customizedFunctionRepository.loadFunction(null, WORKSPACE_ID, GlobalFunctionEntity.class))
             .thenReturn(List.of(new LoadFunctionResponse()));
         List<LoadFunctionResponse> result = globalFunctionService.loadFunction(WORKSPACE_ID);
         assertThat(result).isNotEmpty();

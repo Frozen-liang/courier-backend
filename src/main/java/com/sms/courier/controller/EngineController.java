@@ -35,6 +35,7 @@ public class EngineController {
     public List<EngineResponse> getRunningEngine() {
         return engineMemberManagement.getRunningEngine();
     }
+
     @PostMapping("/bind")
     public EngineRegistrationResponse bind(@Validated @RequestBody EngineRegistrationRequest request) {
         String destination = engineMemberManagement.bind(request);

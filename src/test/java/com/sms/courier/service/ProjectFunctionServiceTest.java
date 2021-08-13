@@ -22,6 +22,7 @@ import com.sms.courier.dto.request.ProjectFunctionRequest;
 import com.sms.courier.dto.response.FunctionResponse;
 import com.sms.courier.dto.response.LoadFunctionResponse;
 import com.sms.courier.dto.response.ProjectFunctionResponse;
+import com.sms.courier.entity.function.GlobalFunctionEntity;
 import com.sms.courier.entity.function.ProjectFunctionEntity;
 import com.sms.courier.mapper.ProjectFunctionMapper;
 import com.sms.courier.repository.CommonRepository;
@@ -225,9 +226,9 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("Test for loadFunction in GlobalFunction service")
     public void loadFunction_test() {
-        when(customizedFunctionRepository.loadFunction(null, WORKSPACE_ID, LoadFunctionResponse.class))
+        when(customizedFunctionRepository.loadFunction(null, WORKSPACE_ID, GlobalFunctionEntity.class))
             .thenReturn(List.of(new LoadFunctionResponse()));
-        when(customizedFunctionRepository.loadFunction(PROJECT_ID, null, LoadFunctionResponse.class))
+        when(customizedFunctionRepository.loadFunction(PROJECT_ID, null, ProjectFunctionEntity.class))
             .thenReturn(List.of(new LoadFunctionResponse()));
         List<LoadFunctionResponse> result = projectFunctionService.loadFunction(WORKSPACE_ID, PROJECT_ID);
         assertThat(result).isNotEmpty().hasSize(2);
