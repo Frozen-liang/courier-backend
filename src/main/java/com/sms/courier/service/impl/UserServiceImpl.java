@@ -98,7 +98,6 @@ public class UserServiceImpl implements UserService {
             List<String> userIds = Optional.ofNullable(request.getWorkspaceId())
                 .map(workspaceRepository::findById)
                 .map(Optional::get)
-
                 .map(WorkspaceEntity::getUserIds)
                 .orElse(Collections.emptyList());
             List<String> groupIds = userResponseList.stream().map(UserResponse::getGroupId)
