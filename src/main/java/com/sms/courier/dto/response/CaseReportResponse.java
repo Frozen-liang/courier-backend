@@ -37,4 +37,6 @@ public class CaseReportResponse {
 
     private Long timeCost;
 
+    private Integer paramsTimeCost;
+
 }

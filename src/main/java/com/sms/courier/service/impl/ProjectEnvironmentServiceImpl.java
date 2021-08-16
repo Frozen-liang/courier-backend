@@ -134,9 +134,9 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
             ProjectEnvironmentEntity projectEnvironment = projectEnvironmentMapper
                 .toEntity(projectEnvironmentRequest);
             projectEnvironmentRepository.save(projectEnvironment);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to edit the projectEnvironment!", e);
             throw new ApiTestPlatformException(EDIT_PROJECT_ENVIRONMENT_ERROR);

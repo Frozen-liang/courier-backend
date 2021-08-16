@@ -18,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class EngineTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenManager jwtTokenManager;
+    private static final String TOKEN_TYPE = ENGINE.name();
 
     public EngineTokenFilter(JwtTokenManager jwtTokenManager) {
         this.jwtTokenManager = jwtTokenManager;
@@ -33,8 +34,8 @@ public class EngineTokenFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
             return;
         }
-        String tokenType = jwtTokenManager.getTokenType(token);
-        if (!ENGINE.name().equalsIgnoreCase(tokenType) || !jwtTokenManager.validate(token)) {
+
+        if (!jwtTokenManager.validate(token) || !TOKEN_TYPE.equalsIgnoreCase(jwtTokenManager.getTokenType(token))) {
             chain.doFilter(request, response);
             return;
         }

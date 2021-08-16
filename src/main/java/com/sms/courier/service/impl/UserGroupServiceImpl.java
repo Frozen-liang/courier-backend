@@ -95,9 +95,9 @@ public class UserGroupServiceImpl implements UserGroupService {
             UserGroupEntity userGroup = userGroupMapper.toEntity(userGroupRequest);
             userGroup.setDefaultGroup(oldUserGroup.isDefaultGroup());
             userGroupRepository.save(userGroup);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the UserGroup!", e);
             throw new ApiTestPlatformException(EDIT_USER_GROUP_ERROR);

@@ -163,9 +163,9 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                     sceneCaseJobRepository.save(sceneCaseJob);
                 }
             }
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error("Execute the SceneCaseJob error. errorMessage:{}", apiTestPlatEx.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUser.getId(), apiTestPlatEx.getMessage());
+        } catch (ApiTestPlatformException courierException) {
+            log.error("Execute the SceneCaseJob error. errorMessage:{}", courierException.getMessage());
+            caseDispatcherService.sendErrorMessage(currentUser.getId(), courierException.getMessage());
         } catch (Exception e) {
             log.error("Execute the SceneCaseJob error. errorMessage:{}", e.getMessage());
             caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the SceneCaseJob error.");
@@ -186,9 +186,9 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                 sceneCaseJobEntity.setEngineId(engineId);
                 sceneCaseJobRepository.save(sceneCaseJobEntity);
             }
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error("Reallocate SceneCaseJob error. errorMessage:{}", apiTestPlatEx.getMessage());
-            caseDispatcherService.sendErrorMessage(userId, apiTestPlatEx.getMessage());
+        } catch (ApiTestPlatformException courierException) {
+            log.error("Reallocate SceneCaseJob error. errorMessage:{}", courierException.getMessage());
+            caseDispatcherService.sendErrorMessage(userId, courierException.getMessage());
         } catch (Exception e) {
             log.error("Reallocate SceneCaseJob error. errorMessage:{}", e.getMessage());
             caseDispatcherService.sendErrorMessage(userId, "Execute the SceneCaseJob error.");

@@ -2,6 +2,7 @@ package com.sms.courier.service;
 
 import com.sms.courier.dto.request.GlobalFunctionRequest;
 import com.sms.courier.dto.response.GlobalFunctionResponse;
+import com.sms.courier.dto.response.LoadFunctionResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -20,4 +21,6 @@ public interface GlobalFunctionService {
     Map<String, List<GlobalFunctionResponse>> findAll();
 
     List<GlobalFunctionResponse> pullFunction(List<String> ids);
+
+    List<LoadFunctionResponse> loadFunction(String workspaceId);
 }

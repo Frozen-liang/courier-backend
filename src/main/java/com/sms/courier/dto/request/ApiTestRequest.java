@@ -1,11 +1,6 @@
 package com.sms.courier.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sms.courier.entity.api.common.AdvancedSetting;
-import com.sms.courier.entity.api.common.HttpStatusVerification;
-import com.sms.courier.entity.api.common.ResponseHeadersVerification;
-import com.sms.courier.entity.api.common.ResponseResultVerification;
-import com.sms.courier.entity.api.common.ResponseTimeVerification;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,11 +39,6 @@ public class ApiTestRequest {
     private String postInject;
     private Integer apiResponseJsonType;
     private Integer apiRequestJsonType;
-    private HttpStatusVerification httpStatusVerification;
-    private ResponseHeadersVerification responseHeadersVerification;
-    private ResponseResultVerification responseResultVerification;
-    private ResponseTimeVerification responseTimeVerification;
-    private AdvancedSetting advancedSetting;
     private Integer apiResponseParamType;
     private String responseRaw;
     private Integer responseRawType;
