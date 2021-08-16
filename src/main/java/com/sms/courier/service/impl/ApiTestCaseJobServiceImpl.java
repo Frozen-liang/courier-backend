@@ -152,7 +152,6 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
     public ApiTestCaseJobResponse buildJob(ApiTestRequest request) {
         try {
             ApiTestCaseJobEntity apiTestCaseJobEntity = getApiTestCaseJobEntity(request, SecurityUtil.getCurrentUser());
-            apiTestCaseJobRepository.save(apiTestCaseJobEntity);
             return jobMapper.toApiTestCaseJobResponse(apiTestCaseJobEntity);
         } catch (ApiTestPlatformException courierException) {
             log.error("Build the case job error. message:{}", courierException.getMessage());

@@ -273,9 +273,7 @@ class ApiTestCaseJobServiceTest {
     @Test
     @DisplayName("An runtime exception occurred while running buildJob")
     public void buildJob_runtime_exception_test() {
-        when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
-        when(apiTestCaseService.findOne(any())).thenReturn(apiTestCaseEntity);
-        when(apiTestCaseJobRepository.save(any())).thenThrow(new RuntimeException());
+        when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
         SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
         assertThatThrownBy(() -> apiTestCaseJobService.buildJob(apiTestRequest)).extracting("code")
             .isEqualTo(BUILD_CASE_JOB_ERROR.getCode());

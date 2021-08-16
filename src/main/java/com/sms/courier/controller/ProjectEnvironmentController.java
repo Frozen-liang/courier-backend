@@ -72,5 +72,4 @@ public class ProjectEnvironmentController {
     public Boolean delete(@PathVariable List<String> ids) {
         return projectEnvironmentService.delete(ids);
     }
-
 }
