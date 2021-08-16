@@ -46,6 +46,7 @@ import com.sms.courier.security.TokenType;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.impl.SceneCaseJobServiceImpl;
 import com.sms.courier.utils.ExceptionUtils;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -91,7 +92,7 @@ class SceneCaseJobServiceTest {
     private final SceneCaseJobEntity sceneCasejobEntity =
         SceneCaseJobEntity.builder().id(ObjectId.get().toString()).createUserId(ObjectId.get().toString()).build();
     private final CustomUser customUser = new CustomUser("username", "", Collections.emptyList(),
-        ObjectId.get().toString(), "", TokenType.USER);
+        ObjectId.get().toString(), "", TokenType.USER, LocalDate.now());
 
     @Test
     @DisplayName("Test the runJob method in the SceneCaseJob service")

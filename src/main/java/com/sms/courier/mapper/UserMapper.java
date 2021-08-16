@@ -2,9 +2,11 @@ package com.sms.courier.mapper;
 
 import com.sms.courier.dto.request.UserQueryListRequest;
 import com.sms.courier.dto.request.UserRequest;
+import com.sms.courier.dto.response.UserProfileResponse;
 import com.sms.courier.dto.response.UserResponse;
 import com.sms.courier.entity.system.UserEntity;
 import com.sms.courier.security.pojo.CustomUser;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.mapstruct.InjectionStrategy;
@@ -28,5 +30,13 @@ public interface UserMapper {
     @Mapping(target = "roles",
         expression = "java(customUser.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect"
             + "(Collectors.toList()))")
-    UserResponse toUserResponse(CustomUser customUser);
+    @Mapping(target = "expired", expression = "java(isExpired(customUser.getExpiredDate()))")
+    UserProfileResponse toUserResponse(CustomUser customUser);
+
+    default boolean isExpired(LocalDate expiredDate) {
+        if (expiredDate == null) {
+            return true;
+        }
+        return expiredDate.isAfter(LocalDate.now());
+    }
 }

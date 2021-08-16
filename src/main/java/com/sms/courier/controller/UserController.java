@@ -7,6 +7,7 @@ import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.request.UserPasswordUpdateRequest;
 import com.sms.courier.dto.request.UserQueryListRequest;
 import com.sms.courier.dto.request.UserRequest;
+import com.sms.courier.dto.response.UserProfileResponse;
 import com.sms.courier.dto.response.UserResponse;
 import com.sms.courier.service.UserService;
 import java.util.List;
@@ -32,7 +33,7 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public UserResponse userProfile() {
+    public UserProfileResponse userProfile() {
         return userService.userProfile();
     }
 

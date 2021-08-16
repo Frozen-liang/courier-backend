@@ -2,6 +2,7 @@ package com.sms.courier.utils;
 
 import com.sms.courier.security.TokenType;
 import com.sms.courier.security.pojo.CustomUser;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.function.Consumer;
 import javax.security.auth.login.AccountNotFoundException;
@@ -56,10 +57,10 @@ public class SecurityUtil {
     }
 
     public static Authentication newAuthentication(String userId, String email, String username,
-        Collection<? extends GrantedAuthority> authorities, TokenType tokenType) {
+        Collection<? extends GrantedAuthority> authorities, TokenType tokenType, LocalDate expiredDate) {
         CustomUser customUser = new CustomUser(username, "",
             true, true, true, true,
-            authorities, userId, email, tokenType);
+            authorities, userId, email, tokenType, expiredDate);
         return new UsernamePasswordAuthenticationToken(customUser, null, authorities);
     }
 

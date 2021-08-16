@@ -11,6 +11,7 @@ import com.sms.courier.dto.UserEntityAuthority;
 import com.sms.courier.dto.request.UserPasswordUpdateRequest;
 import com.sms.courier.dto.request.UserQueryListRequest;
 import com.sms.courier.dto.request.UserRequest;
+import com.sms.courier.dto.response.UserProfileResponse;
 import com.sms.courier.dto.response.UserResponse;
 import com.sms.courier.entity.system.UserEntity;
 import com.sms.courier.entity.system.UserGroupEntity;
@@ -26,6 +27,7 @@ import com.sms.courier.service.UserService;
 import com.sms.courier.utils.Assert;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +74,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse userProfile() {
+    public UserProfileResponse userProfile() {
         CustomUser currentUser = SecurityUtil.getCurrentUser();
         return userMapper.toUserResponse(currentUser);
     }
@@ -212,6 +214,7 @@ public class UserServiceImpl implements UserService {
             Assert.isTrue(passwordEncoder.matches(request.getOldPassword(), userEntity.getPassword()),
                 "The old password is not correct.");
             userEntity.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userEntity.setExpiredDate(LocalDate.now().plusMonths(3));
             userRepository.save(userEntity);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {

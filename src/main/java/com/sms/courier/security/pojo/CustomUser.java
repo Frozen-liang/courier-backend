@@ -1,6 +1,7 @@
 package com.sms.courier.security.pojo;
 
 import com.sms.courier.security.TokenType;
+import java.time.LocalDate;
 import java.util.Collection;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,25 +20,30 @@ public class CustomUser extends User {
     private String email;
     private String nickname;
     private TokenType tokenType;
+    private LocalDate expiredDate;
 
     public CustomUser(String username, String password,
-        Collection<? extends GrantedAuthority> authorities, String id, String email, TokenType tokenType) {
+        Collection<? extends GrantedAuthority> authorities, String id, String email, TokenType tokenType,
+        LocalDate expiredDate) {
         super(username, password, authorities);
         this.id = id;
         this.email = email;
+        this.expiredDate = expiredDate;
         this.tokenType = tokenType;
     }
 
     public CustomUser(String username, String password, boolean enabled, boolean accountNonExpired,
         boolean credentialsNonExpired, boolean accountNonLocked,
-        Collection<? extends GrantedAuthority> authorities, String id, String email, TokenType tokenType) {
+        Collection<? extends GrantedAuthority> authorities, String id, String email, TokenType tokenType,
+        LocalDate expiredDate) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
         this.id = id;
         this.email = email;
         this.tokenType = tokenType;
+        this.expiredDate = expiredDate;
     }
 
-    public CustomUser(UserDetails user, String id, String email, TokenType tokenType) {
+    public CustomUser(UserDetails user, String id, String email, TokenType tokenType, LocalDate expiredDate) {
         super(user.getUsername(), user.getPassword(), user.isEnabled(), user.isAccountNonExpired(),
             user.isCredentialsNonExpired(),
             user.isAccountNonLocked(),
@@ -45,5 +51,6 @@ public class CustomUser extends User {
         this.id = id;
         this.email = email;
         this.tokenType = tokenType;
+        this.expiredDate = expiredDate;
     }
 }

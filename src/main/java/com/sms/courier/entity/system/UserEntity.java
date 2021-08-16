@@ -1,6 +1,7 @@
 package com.sms.courier.entity.system;
 
 import com.sms.courier.entity.BaseEntity;
+import java.time.LocalDate;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @Document(collection = "User")
 public class UserEntity extends BaseEntity {
 
+    @Indexed(unique = true)
     private String username;
     private String nickname;
     @HashIndexed
@@ -30,4 +32,6 @@ public class UserEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
+
+    private LocalDate expiredDate;
 }

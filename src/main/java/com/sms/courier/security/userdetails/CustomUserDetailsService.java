@@ -29,6 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             .credentialsExpired(false).accountLocked(false).authorities(userEntityAuthority.getAuthorities()).build();
 
         return new CustomUser(userDetails, userEntityAuthority.getUserEntity().getId(),
-            userEntityAuthority.getUserEntity().getEmail(), TokenType.USER);
+            userEntityAuthority.getUserEntity().getEmail(), TokenType.USER, userEntityAuthority.getUserEntity()
+            .getExpiredDate());
     }
 }

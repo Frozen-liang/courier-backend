@@ -6,13 +6,13 @@ import static org.mockito.Mockito.when;
 
 import com.sms.courier.dto.request.UserQueryListRequest;
 import com.sms.courier.dto.request.UserRequest;
+import com.sms.courier.dto.response.UserProfileResponse;
 import com.sms.courier.dto.response.UserResponse;
 import com.sms.courier.entity.system.UserEntity;
+import com.sms.courier.security.pojo.CustomUser;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.sms.courier.security.pojo.CustomUser;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
@@ -78,7 +78,7 @@ class UserMapperTest {
 
     @Test
     @DisplayName("[Null Input Parameter]Test the method to convert the User's entity object to a dto object")
-    void toEntity_IsNull_Test(){
+    void toEntity_IsNull_Test() {
         UserRequest userRequest = null;
         UserEntity dto = userMapper.toEntity(userRequest);
         assertThat(dto).isNull();
@@ -86,7 +86,7 @@ class UserMapperTest {
 
     @Test
     @DisplayName("[Null Input Parameter]Test the method to convert the User's entity object to a dto object")
-    void toEntity_to_IsNull_Test(){
+    void toEntity_to_IsNull_Test() {
         UserQueryListRequest userRequest = null;
         UserEntity dto = userMapper.toEntity(userRequest);
         assertThat(dto).isNull();
@@ -94,17 +94,17 @@ class UserMapperTest {
 
     @Test
     @DisplayName("Test the method to convert the User's entity object to a dto object")
-    void toUserResponse_Test(){
+    void toUserResponse_Test() {
         CustomUser customUser = mock(CustomUser.class);
         when(customUser.getAuthorities()).thenReturn(Lists.newArrayList());
-        UserResponse dto = userMapper.toUserResponse(customUser);
+        UserProfileResponse dto = userMapper.toUserResponse(customUser);
         assertThat(dto).isNotNull();
     }
 
     @Test
     @DisplayName("Test the method to convert the User's entity object to a dto object")
-    void toUserResponse_IsNull_Test(){
-        UserResponse dto = userMapper.toUserResponse(null);
+    void toUserResponse_IsNull_Test() {
+        UserProfileResponse dto = userMapper.toUserResponse(null);
         assertThat(dto).isNull();
     }
 

@@ -21,6 +21,7 @@ import io.jsonwebtoken.SigningKeyResolver;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -83,7 +84,7 @@ public class JwtTokenManager {
         UserEntityAuthority userEntityAuthority = userService.getUserDetailsByUserId(id);
         return SecurityUtil.newAuthentication(id, userEntityAuthority.getUserEntity().getEmail(),
             userEntityAuthority.getUserEntity().getUsername(),
-            userEntityAuthority.getAuthorities(), tokenType);
+            userEntityAuthority.getAuthorities(), tokenType, userEntityAuthority.getUserEntity().getExpiredDate());
 
     }
 
@@ -91,7 +92,7 @@ public class JwtTokenManager {
         List<SimpleGrantedAuthority> roles = roleRepository.findAllByRoleType(ENGINE)
             .map(SystemRoleEntity::getName).map(SimpleGrantedAuthority::new
             ).collect(Collectors.toList());
-        return SecurityUtil.newAuthentication(id, "", "engine", roles, tokenType);
+        return SecurityUtil.newAuthentication(id, "", "engine", roles, tokenType, LocalDate.now());
 
     }
 
