@@ -7,6 +7,12 @@
       "roleType": 0
     },
     {
+      "id": "6119ca625ae8c73b0c824e7c",
+      "name": "Workspace_Query_Own",
+      "description": "查询已分配的工作空间",
+      "roleType": 0
+    },
+    {
       "id": "610126d056617f032835a952",
       "name": "User_Create",
       "description": "用户增加",
