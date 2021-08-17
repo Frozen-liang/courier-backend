@@ -36,6 +36,7 @@ public class Constants {
     public static final String SCHEDULE_PATH = SDK_VERSION + "/schedule";
     public static final String ENGINE_PATH = SDK_VERSION + "/engine";
     public static final String USER_ENV_PATH = SDK_VERSION + "/user-env";
+    public static final String API_HISTORY_PATH = SDK_VERSION + "/api-history";
 
     public static final int MAX_DEPTH = 3;
 

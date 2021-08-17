@@ -2,6 +2,7 @@ package com.sms.courier.entity.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sms.courier.common.enums.ApiJsonType;
+import com.sms.courier.common.enums.ApiNodeType;
 import com.sms.courier.common.enums.ApiProtocol;
 import com.sms.courier.common.enums.ApiRequestParamType;
 import com.sms.courier.common.enums.ApiStatus;
@@ -86,7 +87,6 @@ public class ApiEntity extends BaseEntity {
 
     private String swaggerId;
 
-
     @JsonIgnore
     @Include
     private String md5;
@@ -101,4 +101,11 @@ public class ApiEntity extends BaseEntity {
 
     private RawType responseRawType;
 
+    private String apiManagerId;
+
+    private String richText;
+
+    private String markdown;
+
+    private ApiNodeType apiNodeType;
 }

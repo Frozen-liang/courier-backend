@@ -102,4 +102,5 @@ public class ApiController {
     public Boolean batchUpdateByIds(@RequestBody BatchUpdateByIdRequest<Object> batchUpdateRequest) {
         return apiService.batchUpdateByIds(batchUpdateRequest);
     }
+
 }
