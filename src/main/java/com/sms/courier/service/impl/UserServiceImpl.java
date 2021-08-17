@@ -1,5 +1,7 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.field.CommonField.GROUP_ID;
+
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.enums.OperationModule;
@@ -8,6 +10,8 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.common.field.CommonField;
 import com.sms.courier.dto.UserEntityAuthority;
+import com.sms.courier.dto.request.BatchUpdateByIdRequest;
+import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.request.UserPasswordUpdateRequest;
 import com.sms.courier.dto.request.UserQueryListRequest;
 import com.sms.courier.dto.request.UserRequest;
@@ -36,6 +40,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -57,7 +62,6 @@ public class UserServiceImpl implements UserService {
     private final CommonRepository commonRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private static final String GROUP_ID = "groupId";
 
     public UserServiceImpl(UserRepository userRepository,
         UserGroupRepository userGroupRepository, UserGroupService userGroupService,
@@ -91,7 +95,7 @@ public class UserServiceImpl implements UserService {
             Sort sort = Sort.by(Direction.DESC, CommonField.CREATE_DATE_TIME.getName());
             UserEntity userEntity = userMapper.toEntity(request);
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(GROUP_ID, ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher(GROUP_ID.getName(), ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING)
                 .withIgnorePaths(CommonField.REMOVE.getName())
                 .withIgnoreNullValues();
@@ -241,6 +245,20 @@ public class UserServiceImpl implements UserService {
             .userEntity(userEntity)
             .authorities(userGroupService.getAuthoritiesByUserGroup(userEntity.getGroupId()))
             .build();
+    }
+
+    @Override
+    public Boolean batchUpdateByIds(BatchUpdateByIdRequest<ObjectId> batchUpdateRequest) {
+        UpdateRequest<ObjectId> updateRequest = batchUpdateRequest.getUpdateRequest();
+        List<String> ids = batchUpdateRequest.getIds();
+        try {
+            return commonRepository.updateFieldByIds(batchUpdateRequest.getIds(), updateRequest, UserEntity.class);
+        } catch (Exception e) {
+            log.error("Batch update {} error. ids:{} key:{} value:{}",
+                ids, "User", updateRequest.getKey(), updateRequest.getValue());
+            throw ExceptionUtils
+                .mpe(ErrorCode.BATCH_UPDATE_ERROR, ids, "User", updateRequest.getKey(), updateRequest.getValue());
+        }
     }
 
 }

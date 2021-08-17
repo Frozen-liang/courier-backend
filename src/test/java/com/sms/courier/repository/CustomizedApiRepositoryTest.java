@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.courier.dto.request.ApiPageRequest;
+import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
@@ -102,5 +103,13 @@ class CustomizedApiRepositoryTest {
         when(mongoTemplate.updateMulti(any(), any(), any(Class.class))).thenReturn(null);
         customizedApiRepository.deleteByGroupIds(ID_LIST);
         verify(mongoTemplate, times(1)).updateMulti(any(), any(), any(Class.class));
+    }
+
+    @Test
+    @DisplayName("Test for batchUpdateByIds in CustomizedApiRepository")
+    public void batchUpdateByIds_test() {
+        when(commonRepository.updateFieldByIds(any(), any(UpdateRequest.class), any())).thenReturn(true);
+        Boolean result = customizedApiRepository.updateFieldByIds(List.of(ID), new UpdateRequest<>());
+        assertThat(result).isTrue();
     }
 }

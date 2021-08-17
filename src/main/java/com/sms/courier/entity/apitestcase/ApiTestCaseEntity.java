@@ -11,6 +11,7 @@ import com.sms.courier.entity.api.common.ResponseResultVerification;
 import com.sms.courier.entity.api.common.ResponseTimeVerification;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -55,7 +56,8 @@ public class ApiTestCaseEntity extends BaseEntity {
     private ResponseTimeVerification responseTimeVerification;
 
     @Field(name = "isExecute")
-    private boolean execute;
+    @Default
+    private boolean execute = true;
 
     private AdvancedSetting advancedSetting;
 

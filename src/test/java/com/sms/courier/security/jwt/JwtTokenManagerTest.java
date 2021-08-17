@@ -83,7 +83,7 @@ public class JwtTokenManagerTest {
         when(userSecurityStrategy.obtainTokenExpirationTime()).thenReturn(duration);
         CustomUser customUser = new CustomUser("username", "password",
             Arrays.asList(new SimpleGrantedAuthority("role1"), new SimpleGrantedAuthority("role2")),
-            "id", "name", TokenType.USER,EXPIRED_DATE);
+            "id", "name", TokenType.USER, EXPIRED_DATE);
         String token = "123";
         JWT_UTILS_MOCKED_STATIC.when(() -> JwtUtils.encodeJwt(any(CustomUser.class),
             any(SigningKeyResolver.class), any(Duration.class))).thenReturn(Optional.of(token));
@@ -99,7 +99,7 @@ public class JwtTokenManagerTest {
         when(userSecurityStrategy.obtainTokenExpirationTime()).thenReturn(duration);
         CustomUser customUser = new CustomUser("username", "password",
             Arrays.asList(new SimpleGrantedAuthority("role1"), new SimpleGrantedAuthority("role2")),
-            "id", "name", TokenType.USER,EXPIRED_DATE);
+            "id", "name", TokenType.USER, EXPIRED_DATE);
         JWT_UTILS_MOCKED_STATIC.when(() -> JwtUtils.encodeJwt(any(CustomUser.class),
             any(SigningKeyResolver.class), any(Duration.class))).thenReturn(Optional.empty());
         assertThatThrownBy(() -> jwtTokenManager.generateAccessToken(customUser))
@@ -115,13 +115,15 @@ public class JwtTokenManagerTest {
         JWT_UTILS_MOCKED_STATIC.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
             .thenReturn(jwsHeader);
         when(jwsHeader.get(TOKEN_TYPE)).thenReturn(userTokenType);
-        UserEntity userEntity = UserEntity.builder().id(id).username(username).email(email).groupId(groupId).build();
+        UserEntity userEntity =
+            UserEntity.builder().id(id).username(username).email(email).groupId(groupId).expiredDate(EXPIRED_DATE)
+                .build();
         UserEntityAuthority userEntityAuthority =
             UserEntityAuthority.builder().userEntity(userEntity).authorities(Collections.emptyList()).build();
         when(userService.getUserDetailsByUserId(id)).thenReturn(userEntityAuthority);
         Authentication mockAuthentication = mock(Authentication.class);
         SECURITY_UTIL_MOCKED_STATIC.when(() -> SecurityUtil.newAuthentication(id, email, username,
-            Collections.emptyList(), TokenType.USER,EXPIRED_DATE)).thenReturn(mockAuthentication);
+            Collections.emptyList(), TokenType.USER, EXPIRED_DATE)).thenReturn(mockAuthentication);
         Authentication authentication = jwtTokenManager.createAuthentication(token);
         assertThat(authentication).isEqualTo(mockAuthentication);
     }
@@ -137,7 +139,7 @@ public class JwtTokenManagerTest {
             .thenReturn(roles);
         Authentication mockAuthentication = mock(Authentication.class);
         SECURITY_UTIL_MOCKED_STATIC.when(() -> SecurityUtil.newAuthentication(anyString(), anyString(), anyString(),
-            any(), any(),any())).thenReturn(mockAuthentication);
+            any(), any(), any())).thenReturn(mockAuthentication);
         Authentication authentication = jwtTokenManager.createAuthentication(token);
         assertThat(authentication).isEqualTo(mockAuthentication);
     }

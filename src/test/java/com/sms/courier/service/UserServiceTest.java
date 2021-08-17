@@ -1,6 +1,7 @@
 package com.sms.courier.service;
 
 import static com.sms.courier.common.exception.ErrorCode.ADD_USER_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.BATCH_UPDATE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_USER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_USER_BY_ID_ERROR;
@@ -18,6 +19,8 @@ import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.UserEntityAuthority;
+import com.sms.courier.dto.request.BatchUpdateByIdRequest;
+import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.request.UserPasswordUpdateRequest;
 import com.sms.courier.dto.request.UserQueryListRequest;
 import com.sms.courier.dto.request.UserRequest;
@@ -77,6 +80,8 @@ class UserServiceTest {
     private static final String USERNAME = "test";
     private final UserQueryListRequest request =
         UserQueryListRequest.builder().username(USERNAME).groupId(GROUP_ID).workspaceId(WORKSPACE_ID).build();
+    private final BatchUpdateByIdRequest<ObjectId> batchUpdateRequest = new BatchUpdateByIdRequest<>(List.of(ID),
+        new UpdateRequest<>());
 
     @Test
     @DisplayName("Test the findById method in the User service")
@@ -285,5 +290,22 @@ class UserServiceTest {
         UserEntityAuthority userEntityAuthority = userService.getUserDetailsByUserId(ID);
         assertThat(userEntityAuthority.getAuthorities()).isEqualTo(Collections.emptyList());
         assertThat(userEntityAuthority.getUserEntity()).isEqualTo(userEntity);
+    }
+
+    @Test
+    @DisplayName("Test for batchUpdateByIds in UserService")
+    public void batchUpdateByIds_test() {
+        when(commonRepository.updateFieldByIds(any(), any(UpdateRequest.class), any())).thenReturn(true);
+        Boolean result = userService.batchUpdateByIds(batchUpdateRequest);
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while test batchUpdateByIds in UserService.")
+    public void batchUpdateByIds_exception_test() {
+        when(commonRepository.updateFieldByIds(any(), any(UpdateRequest.class), any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> userService.batchUpdateByIds(batchUpdateRequest))
+            .isInstanceOf(ApiTestPlatformException.class).extracting("code").isEqualTo(BATCH_UPDATE_ERROR.getCode());
     }
 }

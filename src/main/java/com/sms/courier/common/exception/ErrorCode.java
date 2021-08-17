@@ -188,6 +188,7 @@ public enum ErrorCode {
     DELETE_SCHEDULE_BY_ID_ERROR("4180", "Failed to delete the Schedule!"),
     EDIT_SCHEDULE_ERROR("4181", "Failed to edit the Schedule!"),
     BUILD_CASE_JOB_ERROR("4182", "Failed to build the case job!"),
+    BATCH_UPDATE_ERROR("4183", "Batch update %s error. ids:%s key:%s value:%s!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),

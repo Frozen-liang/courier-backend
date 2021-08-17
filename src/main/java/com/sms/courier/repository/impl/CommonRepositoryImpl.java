@@ -13,6 +13,7 @@ import static com.sms.courier.common.field.UserField.USERNAME;
 import com.mongodb.client.result.UpdateResult;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.PageDto;
+import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -205,29 +207,36 @@ public class CommonRepositoryImpl implements CommonRepository {
 
     @Override
     public Boolean deleteFieldByIds(List<String> ids, String fieldName, Class<?> entityClass) {
-        Query query = new Query(Criteria.where(ID.getName()).in(ids));
         Update update = new Update();
         update.unset(fieldName);
-        update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
-        update.set(MODIFY_USER_ID.getName(), SecurityUtil.getCurrUserId());
-        UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
-        return updateResult.getModifiedCount() > 0;
+        return updateMulti(ids, update, entityClass);
     }
 
     @Override
     public Boolean updateFieldById(String id, Map<Field, Object> updateFields, Class<?> entityClass) {
-        if (MapUtils.isEmpty(updateFields)) {
+        return this.updateFieldByIds(List.of(id), updateFields, entityClass);
+    }
+
+    @Override
+    public Boolean updateFieldByIds(List<String> ids, Map<Field, Object> updateFields, Class<?> entityClass) {
+        if (MapUtils.isEmpty(updateFields) || Objects.isNull(entityClass)) {
             return false;
         }
         Update update = new Update();
         updateFields.forEach((key, value) -> {
             update.set(key.getName(), value);
         });
-        update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
-        update.set(MODIFY_USER_ID.getName(), SecurityUtil.getCurrUserId());
-        Query query = new Query(Criteria.where(ID.getName()).is(id));
-        UpdateResult updateResult = mongoTemplate.updateFirst(query, update, entityClass);
-        return updateResult.getModifiedCount() > 0;
+        return updateMulti(ids, update, entityClass);
+    }
+
+    @Override
+    public Boolean updateFieldByIds(List<String> ids, UpdateRequest<?> updateRequest, Class<?> entityClass) {
+        if (Objects.isNull(updateRequest) || Objects.isNull(entityClass)) {
+            return false;
+        }
+        Update update = new Update();
+        update.set(updateRequest.getKey(), updateRequest.getValue());
+        return updateMulti(ids, update, entityClass);
     }
 
     private <T> ProjectionOperation getProjectionOperation(Class<T> responseClass) {
@@ -256,6 +265,14 @@ public class CommonRepositoryImpl implements CommonRepository {
     private void addCriteria(Criteria criteria, Query query, List<AggregationOperation> aggregationOperations) {
         query.addCriteria(criteria);
         aggregationOperations.add(Aggregation.match(criteria));
+    }
+
+    private Boolean updateMulti(List<String> ids, Update update, Class<?> entityClass) {
+        update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
+        update.set(MODIFY_USER_ID.getName(), SecurityUtil.getCurrUserId());
+        Query query = new Query(Criteria.where(ID.getName()).in(ids));
+        UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
+        return updateResult.getModifiedCount() > 0;
     }
 
 }
