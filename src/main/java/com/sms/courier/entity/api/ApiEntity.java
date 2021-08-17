@@ -9,6 +9,7 @@ import com.sms.courier.common.enums.RawType;
 import com.sms.courier.common.enums.RequestMethod;
 import com.sms.courier.entity.BaseEntity;
 import com.sms.courier.entity.api.common.ParamInfo;
+import com.sms.courier.entity.structure.StructureEntity;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import lombok.Data;
@@ -20,6 +21,7 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.HashIndexed;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -76,7 +78,20 @@ public class ApiEntity extends BaseEntity {
     private List<ParamInfo> restfulParams;
 
     private List<ParamInfo> requestParams;
+
     private List<ParamInfo> responseParams;
+
+    /**
+     * 自定义结构 用于struct
+     */
+    private List<ParamInfo> customRequestStructs;
+    private List<ParamInfo> customResponseStructs;
+
+    @DBRef
+    private StructureEntity requestStructureRef;
+    @DBRef
+    private StructureEntity responseStructureRef;
+
     @JsonIgnore
     private ApiStatus apiStatus;
     @JsonIgnore
