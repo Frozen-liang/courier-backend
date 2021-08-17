@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
 import java.time.Duration;
 import org.springframework.boot.convert.ApplicationConversionService;
+import org.springframework.core.convert.TypeDescriptor;
 
 public class DurationToStringSerializer extends JsonSerializer<Duration> {
 
@@ -14,7 +15,9 @@ public class DurationToStringSerializer extends JsonSerializer<Duration> {
     public void serialize(Duration duration, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
         throws IOException {
         jsonGenerator.writeString(
-            String.valueOf(ApplicationConversionService.getSharedInstance().convert(duration, Long.class)));
+            String.valueOf(ApplicationConversionService.getSharedInstance().convert(duration,
+                TypeDescriptor.valueOf(duration.getClass()), TypeDescriptor.valueOf(Long.class))));
 
     }
+
 }

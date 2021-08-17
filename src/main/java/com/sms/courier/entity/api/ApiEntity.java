@@ -82,7 +82,7 @@ public class ApiEntity extends BaseEntity {
     private List<ParamInfo> responseParams;
 
     /**
-     * 自定义结构 用于struct
+     * 自定义结构 用于struct.
      */
     private List<ParamInfo> customRequestStructs;
     private List<ParamInfo> customResponseStructs;
