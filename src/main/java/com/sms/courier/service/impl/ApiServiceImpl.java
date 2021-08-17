@@ -126,9 +126,9 @@ public class ApiServiceImpl implements ApiService {
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             apiHistoryRepository.insert(apiHistoryEntity);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
             throw new ApiTestPlatformException(ErrorCode.EDIT_API_ERROR);

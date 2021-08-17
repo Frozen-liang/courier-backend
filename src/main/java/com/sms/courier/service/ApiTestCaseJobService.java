@@ -25,4 +25,8 @@ public interface ApiTestCaseJobService {
     void reallocateJob(List<String> engineIds);
 
     ApiTestCaseJobResponse buildJob(ApiTestRequest request);
+
+    List<ApiTestCaseJobResponse> buildJob(ApiTestCaseJobRunRequest apiTestCaseJobRunRequest);
+
+    Boolean insertJobReport(ApiTestCaseJobReport jobReport);
 }

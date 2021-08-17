@@ -68,9 +68,9 @@ public class ApiTagGroupServiceImpl implements ApiTagGroupService {
             isFalse(exists, THE_API_TAG_GROUP_NAME_EXIST_ERROR, apiTagGroupRequest.getName());
             ApiTagGroupEntity apiTagGroup = apiTagGroupMapper.toEntity(apiTagGroupRequest);
             apiTagGroupRepository.insert(apiTagGroup);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the ApiTagGroup!", e);
             throw new ApiTestPlatformException(ADD_API_TAG_GROUP_ERROR);
@@ -90,9 +90,9 @@ public class ApiTagGroupServiceImpl implements ApiTagGroupService {
             isFalse(exists, THE_API_TAG_GROUP_NAME_EXIST_ERROR, apiTagGroupRequest.getName());
             ApiTagGroupEntity apiTagGroup = apiTagGroupMapper.toEntity(apiTagGroupRequest);
             apiTagGroupRepository.save(apiTagGroup);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the ApiTagGroup!", e);
             throw new ApiTestPlatformException(EDIT_API_TAG_GROUP_ERROR);

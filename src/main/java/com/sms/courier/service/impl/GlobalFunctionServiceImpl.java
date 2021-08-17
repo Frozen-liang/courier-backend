@@ -21,10 +21,12 @@ import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.GlobalFunctionRequest;
 import com.sms.courier.dto.response.GlobalFunctionResponse;
+import com.sms.courier.dto.response.LoadFunctionResponse;
 import com.sms.courier.entity.function.FunctionMessage;
 import com.sms.courier.entity.function.GlobalFunctionEntity;
 import com.sms.courier.mapper.GlobalFunctionMapper;
 import com.sms.courier.repository.CommonRepository;
+import com.sms.courier.repository.CustomizedFunctionRepository;
 import com.sms.courier.repository.GlobalFunctionRepository;
 import com.sms.courier.service.GlobalFunctionService;
 import com.sms.courier.service.MessageService;
@@ -47,15 +49,19 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     private final GlobalFunctionRepository globalFunctionRepository;
     private final GlobalFunctionMapper globalFunctionMapper;
     private final CommonRepository commonRepository;
+    private final CustomizedFunctionRepository customizedFunctionRepository;
     private final MessageService messageService;
     private static final String FUNCTION_KEY = "functionKey";
 
     public GlobalFunctionServiceImpl(GlobalFunctionRepository globalFunctionRepository,
         GlobalFunctionMapper globalFunctionMapper,
-        CommonRepository commonRepository, MessageService messageService) {
+        CommonRepository commonRepository,
+        CustomizedFunctionRepository customizedFunctionRepository,
+        MessageService messageService) {
         this.globalFunctionRepository = globalFunctionRepository;
         this.globalFunctionMapper = globalFunctionMapper;
         this.commonRepository = commonRepository;
+        this.customizedFunctionRepository = customizedFunctionRepository;
         this.messageService = messageService;
     }
 
@@ -125,9 +131,9 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
                 THE_FUNCTION_KEY_EXIST_ERROR, functionKey, "GlobalFunction");
             globalFunctionRepository.save(globalFunction);
             sendMessageToEngine(List.of(globalFunction.getId()), EDIT, globalFunction.getWorkspaceId());
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the GlobalFunction!", e);
             throw new ApiTestPlatformException(EDIT_GLOBAL_FUNCTION_ERROR);
@@ -161,6 +167,11 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     @Override
     public List<GlobalFunctionResponse> pullFunction(List<String> ids) {
         return globalFunctionRepository.findAllByIdIn(ids);
+    }
+
+    @Override
+    public List<LoadFunctionResponse> loadFunction(String workspaceId) {
+        return customizedFunctionRepository.loadFunction(null, workspaceId, GlobalFunctionEntity.class);
     }
 
     private void sendMessageToEngine(List<String> ids, OperationType operationType, String workspaceId) {

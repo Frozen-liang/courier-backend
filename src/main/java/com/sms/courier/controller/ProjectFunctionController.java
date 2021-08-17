@@ -5,6 +5,7 @@ import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.request.ProjectFunctionRequest;
 import com.sms.courier.dto.response.FunctionResponse;
+import com.sms.courier.dto.response.LoadFunctionResponse;
 import com.sms.courier.dto.response.ProjectFunctionResponse;
 import com.sms.courier.service.ProjectFunctionService;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -73,5 +75,10 @@ public class ProjectFunctionController {
     @PreAuthorize("hasRole(@role.PROJECT_FUNCTION_PULL)")
     public List<ProjectFunctionResponse> pullFunction(@PathVariable("ids") List<String> ids) {
         return projectFunctionService.pullFunction(ids);
+    }
+
+    @GetMapping("/load")
+    public List<LoadFunctionResponse> loadFunction(@RequestParam String workspaceId, @RequestParam String projectId) {
+        return projectFunctionService.loadFunction(workspaceId, projectId);
     }
 }

@@ -31,11 +31,21 @@ import com.sms.courier.common.enums.SaveMode;
 import com.sms.courier.common.enums.ScheduleStatusType;
 import com.sms.courier.common.enums.TaskStatus;
 import com.sms.courier.common.enums.VerificationElementType;
+import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.security.pojo.CustomUser;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.mongo.MongoClientSettingsBuilderCustomizer;
+import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -43,8 +53,13 @@ import org.springframework.data.convert.ReadingConverter;
 import org.springframework.data.convert.WritingConverter;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.convert.DbRefResolver;
+import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
+import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
@@ -56,6 +71,30 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class MongoCustomConverterConfiguration {
 
     private static final String BUCKET = "TestFile";
+
+    @Value("${mongodb.max-connection-idle-time:60000}")
+    private long maxConnectionIdleTime;
+
+    @Bean
+    public MappingMongoConverter mappingMongoConverter(MongoDatabaseFactory factory, MongoMappingContext context,
+        BeanFactory beanFactory) {
+        DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
+        MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, context);
+        try {
+
+            mappingConverter.setCustomConversions(beanFactory.getBean(MongoCustomConversions.class));
+        } catch (NoSuchBeanDefinitionException ignore) {
+            throw new ApiTestPlatformException(ErrorCode.SYSTEM_ERROR);
+        }
+        mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
+        return mappingConverter;
+    }
+
+    @Bean
+    public MongoClientSettingsBuilderCustomizer mappingMongoClientSetting() {
+        return clientSettingsBuilder -> clientSettingsBuilder.applyToConnectionPoolSettings(
+            builder -> builder.maxConnectionIdleTime(maxConnectionIdleTime, TimeUnit.MILLISECONDS));
+    }
 
     @Bean
     MongoCustomConversions mongoCustomConversions() {
@@ -77,7 +116,9 @@ public class MongoCustomConverterConfiguration {
                 IntegerToVerificationElementTypeConverter.INSTANCE, IntegerToRawTypeConverter.INSTANCE,
                 IntegerToScheduleStatusTypeConverter.INSTANCE, IntegerToCycleTypeConverter.INSTANCE,
                 IntegerToNoticeTypeConverter.INSTANCE, IntegerToCaseFilterConverter.INSTANCE,
-                IntegerToTaskStatusConverter.INSTANCE);
+                IntegerToTaskStatusConverter.INSTANCE, DurationToLongConverter.INSTANCE,
+                LongToDurationConverter.INSTANCE);
+
         return new MongoCustomConversions(converters);
     }
 
@@ -105,6 +146,26 @@ public class MongoCustomConverterConfiguration {
 
         public Integer convert(EnumCommon enumCommon) {
             return enumCommon.getCode();
+        }
+    }
+
+    @WritingConverter
+    enum DurationToLongConverter implements Converter<Duration, Long> {
+        INSTANCE;
+
+        public Long convert(@NotNull Duration duration) {
+            return
+                ApplicationConversionService.getSharedInstance().convert(duration, Long.class);
+        }
+    }
+
+    @ReadingConverter
+    enum LongToDurationConverter implements Converter<Long, Duration> {
+        INSTANCE;
+
+        public Duration convert(@NotNull Long millisecond) {
+            return
+                ApplicationConversionService.getSharedInstance().convert(millisecond, Duration.class);
         }
     }
 

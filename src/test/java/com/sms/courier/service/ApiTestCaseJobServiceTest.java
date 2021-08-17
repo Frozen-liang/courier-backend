@@ -1,6 +1,8 @@
 package com.sms.courier.service;
 
+import static com.sms.courier.common.exception.ErrorCode.BUILD_CASE_JOB_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_JOB_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.THE_ENV_NOT_EXIST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -62,7 +64,8 @@ class ApiTestCaseJobServiceTest {
     private final ApiTestCaseService apiTestCaseService = mock(ApiTestCaseService.class);
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository = mock(
         CustomizedApiTestCaseJobRepository.class);
-    private final ApiTestRequest apiTestRequest = ApiTestRequest.builder().apiPath("3Httt").build();
+    private final ApiTestRequest apiTestRequest =
+        ApiTestRequest.builder().envId(ObjectId.get().toString()).apiPath("3Httt").build();
     private final ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
     private final JobMapper jobMapper = new JobMapperImpl(paramInfoMapper, new MatchParamInfoMapperImpl(),
         new ResponseResultVerificationMapperImpl(new MatchParamInfoMapperImpl()));
@@ -184,20 +187,10 @@ class ApiTestCaseJobServiceTest {
 
     @Test
     @DisplayName("Test the apiTest method in the ApiTestCaseJob service")
-    public void apiTest1_test() {
-        ApiTestRequest apiTestRequestPath = ApiTestRequest.builder().apiPath("Http://").build();
-        when(projectEnvironmentService.findOne(any())).thenReturn(null);
-        when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);
-        when(apiTestCaseJobRepository.save(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
-        apiTestCaseJobService.apiTest(apiTestRequestPath, customUser);
-        verify(apiTestCaseJobRepository, times(1)).save(any(ApiTestCaseJobEntity.class));
-    }
-
-    @Test
-    @DisplayName("Test the apiTest method in the ApiTestCaseJob service")
     public void apiTest2_test() {
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);
+        when(apiTestCaseService.findOne(any())).thenReturn(apiTestCaseEntity);
         apiTestCaseJobService.apiTest(apiTestRequest, customUser);
         when(apiTestCaseJobRepository.save(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
         verify(apiTestCaseJobRepository, times(1)).save(any(ApiTestCaseJobEntity.class));
@@ -256,12 +249,77 @@ class ApiTestCaseJobServiceTest {
     }
 
     @Test
-    @DisplayName("Test the apiTest method in the ApiTestCaseJob service")
+    @DisplayName("Test the buildJob method in the ApiTestCaseJob service")
     public void buildJob_test() {
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
+        when(apiTestCaseService.findOne(any())).thenReturn(apiTestCaseEntity);
+        when(apiTestCaseJobRepository.save(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
         SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
-        apiTestCaseJobService.apiTest(apiTestRequest, customUser);
         ApiTestCaseJobResponse apiTestCaseJobResponse = apiTestCaseJobService.buildJob(apiTestRequest);
         assertThat(apiTestCaseJobResponse).isNotNull();
+    }
+
+    @Test
+    @DisplayName("An custom courier exception occurred while running buildJob")
+    public void buildJob_custom_courier_exception_test() {
+        when(projectEnvironmentService.findOne(any())).thenReturn(null);
+        when(apiTestCaseService.findOne(any())).thenReturn(apiTestCaseEntity);
+        when(apiTestCaseJobRepository.save(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
+        assertThatThrownBy(() -> apiTestCaseJobService.buildJob(apiTestRequest)).extracting("code")
+            .isEqualTo(THE_ENV_NOT_EXIST.getCode());
+    }
+
+    @Test
+    @DisplayName("An runtime exception occurred while running buildJob")
+    public void buildJob_runtime_exception_test() {
+        when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
+        assertThatThrownBy(() -> apiTestCaseJobService.buildJob(apiTestRequest)).extracting("code")
+            .isEqualTo(BUILD_CASE_JOB_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the buildJobs method in the ApiTestCaseJob service")
+    public void buildJobs_test() {
+        when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
+        when(apiTestCaseService.findOne(any())).thenReturn(apiTestCaseEntity);
+        when(apiTestCaseJobRepository.save(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
+        List<ApiTestCaseJobResponse> apiTestCaseJobResponses = apiTestCaseJobService.buildJob(apiTestCaseJobRunRequest);
+        assertThat(apiTestCaseJobResponses).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("An custom courier exception occurred while running buildJobs")
+    public void buildJobs_custom_courier_exception_test() {
+        when(projectEnvironmentService.findOne(any())).thenReturn(null);
+        when(apiTestCaseService.findOne(any())).thenReturn(apiTestCaseEntity);
+        when(apiTestCaseJobRepository.save(any())).thenReturn(apiTestCaseEntity);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
+        assertThatThrownBy(() -> apiTestCaseJobService.buildJob(apiTestCaseJobRunRequest)).extracting("code")
+            .isEqualTo(THE_ENV_NOT_EXIST.getCode());
+    }
+
+    @Test
+    @DisplayName("An runtime exception occurred while running buildJobs")
+    public void buildJobs_runtime_exception_test() {
+        when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
+        when(apiTestCaseJobRepository.save(any())).thenThrow(new RuntimeException());
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
+        assertThatThrownBy(() -> apiTestCaseJobService.buildJob(apiTestCaseJobRunRequest2)).extracting("code")
+            .isEqualTo(BUILD_CASE_JOB_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the insertJobReport method in the ApiTestCaseJob service")
+    public void insertJobReport_test() {
+        when(apiTestCaseJobRepository.findById(any())).thenReturn(Optional.of(apiTestCaseJob));
+        when(apiTestCaseJobRepository.save(any(ApiTestCaseJobEntity.class))).thenReturn(apiTestCaseJob);
+        doNothing().when(apiTestCaseService).insertTestResult(anyString(), any());
+        Boolean result = apiTestCaseJobService
+            .insertJobReport(ApiTestCaseJobReport.builder().jobId(ObjectId.get().toString()).build());
+        verify(apiTestCaseJobRepository, times(1)).save(any(ApiTestCaseJobEntity.class));
+        assertThat(result).isTrue();
     }
 }

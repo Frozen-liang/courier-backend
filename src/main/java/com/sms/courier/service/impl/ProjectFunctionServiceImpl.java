@@ -23,11 +23,14 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.ProjectFunctionRequest;
 import com.sms.courier.dto.response.FunctionResponse;
 import com.sms.courier.dto.response.GlobalFunctionResponse;
+import com.sms.courier.dto.response.LoadFunctionResponse;
 import com.sms.courier.dto.response.ProjectFunctionResponse;
 import com.sms.courier.entity.function.FunctionMessage;
+import com.sms.courier.entity.function.GlobalFunctionEntity;
 import com.sms.courier.entity.function.ProjectFunctionEntity;
 import com.sms.courier.mapper.ProjectFunctionMapper;
 import com.sms.courier.repository.CommonRepository;
+import com.sms.courier.repository.CustomizedFunctionRepository;
 import com.sms.courier.repository.ProjectFunctionRepository;
 import com.sms.courier.service.GlobalFunctionService;
 import com.sms.courier.service.MessageService;
@@ -54,16 +57,19 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     private final GlobalFunctionService globalFunctionService;
     private final MessageService messageService;
     private final CommonRepository commonRepository;
+    private final CustomizedFunctionRepository customizedFunctionRepository;
     private static final String FUNCTION_KEY = "functionKey";
 
     public ProjectFunctionServiceImpl(ProjectFunctionRepository projectFunctionRepository,
         ProjectFunctionMapper projectFunctionMapper, GlobalFunctionService globalFunctionService,
-        MessageService messageService, CommonRepository commonRepository) {
+        MessageService messageService, CommonRepository commonRepository,
+        CustomizedFunctionRepository customizedFunctionRepository) {
         this.projectFunctionRepository = projectFunctionRepository;
         this.projectFunctionMapper = projectFunctionMapper;
         this.globalFunctionService = globalFunctionService;
         this.messageService = messageService;
         this.commonRepository = commonRepository;
+        this.customizedFunctionRepository = customizedFunctionRepository;
     }
 
     @Override
@@ -139,9 +145,9 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
                 THE_FUNCTION_KEY_EXIST_ERROR, functionKey, "ProjectFunction");
             projectFunctionRepository.save(projectFunction);
             sendMessageToEngine(List.of(projectFunction.getId()), EDIT, projectFunction.getProjectId());
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the ProjectFunction!", e);
             throw new ApiTestPlatformException(EDIT_PROJECT_FUNCTION_ERROR);
@@ -177,10 +183,20 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         return projectFunctionRepository.findAllByIdIn(ids);
     }
 
+    @Override
+    public List<LoadFunctionResponse> loadFunction(String workspaceId, String projectId) {
+        List<LoadFunctionResponse> loadFunctionResponses = customizedFunctionRepository
+            .loadFunction(null, workspaceId, GlobalFunctionEntity.class);
+        List<LoadFunctionResponse> results = new ArrayList<>(loadFunctionResponses);
+        results.addAll(customizedFunctionRepository
+            .loadFunction(projectId, null, ProjectFunctionEntity.class));
+        return results;
+    }
+
     private void sendMessageToEngine(List<String> ids, OperationType operationType, String projectId) {
         FunctionMessage functionMessage = FunctionMessage.builder()
             .ids(ids)
-            .global(true)
+            .global(false)
             .key(projectId)
             .operationType(operationType.getCode())
             .build();

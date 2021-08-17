@@ -108,9 +108,9 @@ public class ApiTagServiceImpl implements ApiTagService {
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "ApiTag", apiTagRequest.getId());
             ApiTagEntity apiTag = apiTagMapper.toEntity(apiTagRequest);
             apiTagRepository.save(apiTag);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to edit the ApiTag!", e);
             throw ExceptionUtils.mpe(EDIT_API_TAG_ERROR);

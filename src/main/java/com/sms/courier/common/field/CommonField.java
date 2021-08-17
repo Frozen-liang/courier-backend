@@ -8,6 +8,7 @@ public enum CommonField implements Field {
 
     ID("_id"),
     PROJECT_ID("projectId"),
+    WORKSPACE_ID("workspaceId"),
     API_ID("apiEntity._id"),
     CREATE_DATE_TIME("createDateTime"),
     MODIFY_DATE_TIME("modifyDateTime"),

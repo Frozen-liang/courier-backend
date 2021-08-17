@@ -98,7 +98,6 @@ public class UserServiceImpl implements UserService {
             List<String> userIds = Optional.ofNullable(request.getWorkspaceId())
                 .map(workspaceRepository::findById)
                 .map(Optional::get)
-
                 .map(WorkspaceEntity::getUserIds)
                 .orElse(Collections.emptyList());
             List<String> groupIds = userResponseList.stream().map(UserResponse::getGroupId)
@@ -163,9 +162,9 @@ public class UserServiceImpl implements UserService {
             user.setPassword(oldUser.getPassword());
             user.setRemoved(oldUser.isRemoved());
             userRepository.save(user);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (DuplicateKeyException e) {
             log.error("The email:{} exist!", userRequest.getEmail());
             throw ExceptionUtils.mpe("The email:%s exist!", userRequest.getEmail());

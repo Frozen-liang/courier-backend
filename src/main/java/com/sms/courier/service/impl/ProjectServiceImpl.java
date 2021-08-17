@@ -77,9 +77,9 @@ public class ProjectServiceImpl implements ProjectService {
                 return Boolean.TRUE;
             }
             throw ExceptionUtils.mpe(THE_PROJECT_EXIST_ERROR, project.getName(), project.getVersion());
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the Project!", e);
             throw new ApiTestPlatformException(ADD_PROJECT_ERROR);
@@ -96,9 +96,9 @@ public class ProjectServiceImpl implements ProjectService {
             isTrue(exists, EDIT_NOT_EXIST_ERROR, "Project", projectRequest.getId());
             ProjectEntity project = projectMapper.toEntity(projectRequest);
             projectRepository.save(project);
-        } catch (ApiTestPlatformException apiTestPlatEx) {
-            log.error(apiTestPlatEx.getMessage());
-            throw apiTestPlatEx;
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the Project!", e);
             throw new ApiTestPlatformException(EDIT_PROJECT_ERROR);

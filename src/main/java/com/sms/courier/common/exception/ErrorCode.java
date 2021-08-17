@@ -187,6 +187,7 @@ public enum ErrorCode {
     GET_SCHEDULE_BY_ID_ERROR("4179", "The Schedule not exist!"),
     DELETE_SCHEDULE_BY_ID_ERROR("4180", "Failed to delete the Schedule!"),
     EDIT_SCHEDULE_ERROR("4181", "Failed to edit the Schedule!"),
+    BUILD_CASE_JOB_ERROR("4182", "Failed to build the case job!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),
@@ -196,9 +197,7 @@ public enum ErrorCode {
 
     // 61001  describes the test exception
     THE_CASE_NOT_EXIST("61001", "The case must not be empty."),
-    THE_ENV_NOT_EXIST("61002", "The Env not exist"),
-    THE_REQUEST_ADDRESS_IS_ILLEGALITY("61003",
-        "The request address is illegality, please check environment or api path.");
+    THE_ENV_NOT_EXIST("61002", "The Env not exist");
 
     private final String code;
     private final String message;
