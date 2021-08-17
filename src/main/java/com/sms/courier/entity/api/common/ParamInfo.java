@@ -49,4 +49,9 @@ public class ParamInfo {
      */
     @ToString.Exclude
     private List<ParamInfo> childParam;
+
+    /**
+     * 在数据结构中是唯一的
+     */
+    private String paramId;
 }
