@@ -7,6 +7,7 @@ import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.request.ApiImportRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
+import com.sms.courier.dto.request.BatchUpdateByIdRequest;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.service.ApiService;
 import java.util.List;
@@ -96,4 +97,9 @@ public class ApiController {
         return apiService.count(projectId);
     }
 
+    @PutMapping("/batch/updateByIds")
+    @PreAuthorize("hasRoleOrAdmin(@role.API_CRE_UPD_DEL)")
+    public Boolean batchUpdateByIds(@RequestBody BatchUpdateByIdRequest<Object> batchUpdateRequest) {
+        return apiService.batchUpdateByIds(batchUpdateRequest);
+    }
 }

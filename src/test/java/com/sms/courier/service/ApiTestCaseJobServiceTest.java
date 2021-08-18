@@ -44,6 +44,7 @@ import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.impl.ApiTestCaseJobServiceImpl;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -94,7 +95,8 @@ class ApiTestCaseJobServiceTest {
     private static final String ENGINE_ID = "/engine/13/invoke";
     private static final List<String> ENGINE_ID_LIST = Collections.singletonList(ENGINE_ID);
     private final CustomUser customUser =
-        new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "", TokenType.USER);
+        new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "", TokenType.USER,
+            LocalDate.now());
     private static final MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
 
     static {

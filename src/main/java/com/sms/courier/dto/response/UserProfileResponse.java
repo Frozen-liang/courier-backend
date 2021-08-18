@@ -11,12 +11,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StructureRefResponse   {
+public class UserProfileResponse {
 
-    @JsonProperty("isGlobal")
-    private boolean global;
+    private String id;
 
-    private List<ParamInfoResponse> struct;
+    private String username;
 
-    private Integer structType;
+    private String nickname;
+
+    private String email;
+
+    private List<String> roles;
+
+    @JsonProperty("isExpired")
+    private boolean expired;
+
 }

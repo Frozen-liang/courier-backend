@@ -53,7 +53,7 @@ public class ApiGroupServiceImpl implements ApiGroupService {
     public List<TreeResponse> list(String projectId) {
         try {
             List<ApiGroupEntity> apiGroupEntities = apiGroupRepository
-                .findApiGroupEntitiesByProjectId(projectId);
+                .findApiGroupEntitiesByProjectIdOrderByCreateDateTimeDesc(projectId);
             return TreeUtils.createTree(apiGroupMapper.toResponse(apiGroupEntities));
         } catch (Exception e) {
             log.error("Failed to list the ApiGroupService!", e);

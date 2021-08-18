@@ -40,8 +40,8 @@ public class DataStructureRequest {
     @Size(min = 1, message = "The struct must not bu empty.", groups = {UpdateGroup.class, InsertGroup.class})
     private List<ParamInfoRequest> struct;
 
-    @NotNull(message = "The dataType must not be empty.", groups = {UpdateGroup.class, InsertGroup.class})
-    private ApiRequestParamType dataType;
+    @NotNull(message = "The structType must not be empty.", groups = {UpdateGroup.class, InsertGroup.class})
+    private ApiRequestParamType structType;
 
     private String description;
 }

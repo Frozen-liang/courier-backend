@@ -71,4 +71,6 @@ public class ParamInfoRequest {
      * 自定义结构 用于struct
      */
     private IdRequest structureRef;
+
+    private Long paramId;
 }

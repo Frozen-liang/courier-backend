@@ -1,6 +1,7 @@
 package com.sms.courier.service;
 
 import static com.sms.courier.common.exception.ErrorCode.ADD_API_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.BATCH_UPDATE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_API_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_API_BY_ID_ERROR;
@@ -18,6 +19,8 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.ApiImportRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
+import com.sms.courier.dto.request.BatchUpdateByIdRequest;
+import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.api.ApiHistoryEntity;
@@ -57,6 +60,8 @@ class ApiServiceTest {
     private final ApiResponse apiResponseDto = ApiResponse.builder().id(ID).build();
     private final ApiRequest apiRequestDto = ApiRequest.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
+    private final BatchUpdateByIdRequest<Object> batchUpdateRequest = new BatchUpdateByIdRequest<>(List.of(ID),
+        new UpdateRequest<>());
 
     @Test
     @DisplayName("Test the findById method in the Api service")
@@ -186,5 +191,22 @@ class ApiServiceTest {
                 List.of(ProjectImportSourceEntity.builder().documentType(DocumentUrlType.SWAGGER_FILE).build()));
         doNothing().when(asyncService).importApi(any());
         assertThat(apiService.syncApiByProImpSourceIds(proImpSourceIds)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test for batchUpdateByIds in ApiService")
+    public void batchUpdateByIds_test() {
+        when(customizedApiRepository.updateFieldByIds(any(), any())).thenReturn(true);
+        Boolean result = apiService.batchUpdateByIds(batchUpdateRequest);
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while test batchUpdateByIds in ApiService.")
+    public void batchUpdateByIds_exception_test() {
+        when(customizedApiRepository.updateFieldByIds(any(), any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> apiService.batchUpdateByIds(batchUpdateRequest))
+            .isInstanceOf(ApiTestPlatformException.class).extracting("code").isEqualTo(BATCH_UPDATE_ERROR.getCode());
     }
 }

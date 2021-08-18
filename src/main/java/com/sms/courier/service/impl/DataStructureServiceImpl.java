@@ -90,6 +90,9 @@ public class DataStructureServiceImpl implements DataStructureService {
         } catch (ApiTestPlatformException courierException) {
             log.error(courierException.getMessage());
             throw courierException;
+        } catch (DuplicateKeyException e) {
+            log.error("Failed to add the DataStructure!", e);
+            throw ExceptionUtils.mpe(THE_NAME_EXISTS_ERROR, dataStructureRequest.getName());
         } catch (Exception e) {
             log.error("Failed to add the DataStructure!", e);
             throw new ApiTestPlatformException(EDIT_DATA_STRUCTURE_ERROR);

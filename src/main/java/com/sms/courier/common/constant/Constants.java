@@ -39,5 +39,6 @@ public class Constants {
     public static final String DATA_STRUCTURE_PATE = SDK_VERSION + "/data-structure";
 
     public static final int MAX_DEPTH = 3;
+    public static final String HTTP_DEFAULT_STATUS_CODE = "200";
 
 }

@@ -22,13 +22,13 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @NoArgsConstructor
 @SuperBuilder
 @Document(collection = "DataStructure")
-@CompoundIndex(def = "{'refId':1,'name':1}",unique = true)
+@CompoundIndex(def = "{'refId':1,'name':1}", unique = true)
 public class StructureEntity extends BaseEntity {
 
     private String name;
 
     /**
-     * 这里既有可能是projectId 也有可能是spaceId, 需要看是否是全局isGlobal字段来进行区分
+     * 这里既有可能是projectId 也有可能是spaceId, 需要看是否是全局isGlobal字段来进行区分.
      */
     @Field(targetType = FieldType.OBJECT_ID)
     private String refId;
@@ -37,9 +37,9 @@ public class StructureEntity extends BaseEntity {
 
     private List<ParamInfo> struct;
 
-    private ApiRequestParamType jsonType;
+    private ApiRequestParamType structType;
 
     private String description;
 
-
+    private List<String> refStructIds;
 }

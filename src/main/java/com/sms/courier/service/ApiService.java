@@ -3,6 +3,7 @@ package com.sms.courier.service;
 import com.sms.courier.dto.request.ApiImportRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
+import com.sms.courier.dto.request.BatchUpdateByIdRequest;
 import com.sms.courier.dto.response.ApiResponse;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -32,4 +33,6 @@ public interface ApiService {
     Boolean recover(List<String> ids);
 
     Long count(String projectId);
+
+    Boolean batchUpdateByIds(BatchUpdateByIdRequest<Object> batchUpdateRequest);
 }

@@ -188,6 +188,7 @@ public enum ErrorCode {
     DELETE_SCHEDULE_BY_ID_ERROR("4180", "Failed to delete the Schedule!"),
     EDIT_SCHEDULE_ERROR("4181", "Failed to edit the Schedule!"),
     BUILD_CASE_JOB_ERROR("4182", "Failed to build the case job!"),
+    BATCH_UPDATE_ERROR("4183", "Batch update %s error. ids:%s key:%s value:%s!"),
     ADD_DATA_STRUCTURE_ERROR("4184", "Failed to add the DataStructure!"),
     GET_DATA_STRUCTURE_LIST_ERROR("4185", "Failed to get the DataStructure list!"),
     GET_DATA_STRUCTURE_BY_ID_ERROR("4186", "The DataStructure not exist!"),

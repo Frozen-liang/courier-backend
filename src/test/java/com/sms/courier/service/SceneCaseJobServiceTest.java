@@ -46,6 +46,7 @@ import com.sms.courier.security.TokenType;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.impl.SceneCaseJobServiceImpl;
 import com.sms.courier.utils.ExceptionUtils;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -91,7 +92,7 @@ class SceneCaseJobServiceTest {
     private final SceneCaseJobEntity sceneCasejobEntity =
         SceneCaseJobEntity.builder().id(ObjectId.get().toString()).createUserId(ObjectId.get().toString()).build();
     private final CustomUser customUser = new CustomUser("username", "", Collections.emptyList(),
-        ObjectId.get().toString(), "", TokenType.USER);
+        ObjectId.get().toString(), "", TokenType.USER, LocalDate.now());
 
     @Test
     @DisplayName("Test the runJob method in the SceneCaseJob service")
@@ -103,7 +104,7 @@ class SceneCaseJobServiceTest {
         Optional<CaseTemplateEntity> sceneCaseApi = Optional.ofNullable(CaseTemplateEntity.builder().build());
         when(caseTemplateRepository.findById(any())).thenReturn(sceneCaseApi);
         List<SceneCaseApiEntity> sceneCaseApiList1 = getSceneCaseApiList();
-        when(sceneCaseApiRepository.findSceneCaseApiEntitiesBySceneCaseIdAndRemoved(any(), anyBoolean()))
+        when(sceneCaseApiRepository.findSceneCaseApiEntitiesBySceneCaseIdAndRemovedOrderByOrder(any(), anyBoolean()))
             .thenReturn(sceneCaseApiList1);
         List<CaseTemplateApiEntity> templateApiList =
             Lists.newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID).order(MOCK_NUM).build());

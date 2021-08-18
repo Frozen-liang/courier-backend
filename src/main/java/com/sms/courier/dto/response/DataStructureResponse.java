@@ -25,7 +25,7 @@ public class DataStructureResponse extends BaseResponse {
 
     private List<ParamInfoResponse> struct;
 
-    private Integer dataType;
+    private Integer structType;
 
     private String description;
 }
