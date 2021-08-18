@@ -1,6 +1,7 @@
 package com.sms.courier.entity.api.common;
 
 import com.sms.courier.common.enums.ParamType;
+import com.sms.courier.entity.structure.StructureEntity;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 @Builder
@@ -50,8 +52,21 @@ public class ParamInfo {
     @ToString.Exclude
     private List<ParamInfo> childParam;
 
+    @ToString.Exclude
+    private List<ParamInfo> customStructs;
+
+    // 是否引用数据结构
+    @Field("isRef")
+    private boolean ref;
+
     /**
-     * 在数据结构中是唯一的
+     * 自定义结构 用于struct
      */
-    private String paramId;
+    @DBRef
+    private StructureEntity structureRef;
+
+    /**
+     * 在数据结构中是唯一的.
+     */
+    private Long paramId;
 }

@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -20,7 +21,8 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @ToString(callSuper = true)
 @NoArgsConstructor
 @SuperBuilder
-@Document(collection = "ApiStructure")
+@Document(collection = "DataStructure")
+@CompoundIndex(def = "{'refId':1,'name':1}",unique = true)
 public class StructureEntity extends BaseEntity {
 
     private String name;

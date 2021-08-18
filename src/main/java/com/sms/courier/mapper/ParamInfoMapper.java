@@ -18,10 +18,6 @@ public interface ParamInfoMapper {
         + ".getType(paramInfoRequest.getParamType()))")
     ParamInfo toEntity(ParamInfoRequest paramInfoRequest);
 
-    @Mapping(target = "paramType", expression = "java(com.sms.courier.common.enums.ParamType"
-        + ".getType(paramInfoResponse.getParamType()))")
-    ParamInfo toEntityByResponse(ParamInfoResponse paramInfoResponse);
-
     List<ParamInfo> toEntityList(List<ParamInfoRequest> paramInfoDtoList);
 
     ParamInfoResponse toDto(ParamInfo paramInfo);
