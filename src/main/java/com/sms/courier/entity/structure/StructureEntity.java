@@ -26,7 +26,7 @@ public class StructureEntity extends BaseEntity {
     private String name;
 
     /**
-     * 这里既有可能是projectId 也有可能是spaceId, 需要看是否是全局isGlobal字段来进行区分
+     * 这里既有可能是projectId 也有可能是spaceId, 需要看是否是全局isGlobal字段来进行区分.
      */
     @Field(targetType = FieldType.OBJECT_ID)
     private String refId;

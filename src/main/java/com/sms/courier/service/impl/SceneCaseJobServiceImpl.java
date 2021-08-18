@@ -240,7 +240,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         List<JobSceneCaseApi> caseList = Lists.newArrayList();
         if (StringUtils.isNotBlank(request.getSceneCaseId())) {
             List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiRepository
-                .findSceneCaseApiEntitiesBySceneCaseIdAndRemoved(request.getSceneCaseId(), Boolean.FALSE);
+                .findSceneCaseApiEntitiesBySceneCaseIdAndRemovedOrderByOrder(request.getSceneCaseId(), Boolean.FALSE);
             Integer index = 0;
             for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
                 if (Objects.isNull(sceneCaseApi.getCaseTemplateId())

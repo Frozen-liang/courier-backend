@@ -1,19 +1,5 @@
 package com.sms.courier.service;
 
-import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.wildfly.common.Assert.assertTrue;
-
 import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.AddSceneCaseJobRequest;
@@ -48,6 +34,7 @@ import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.impl.SceneCaseJobServiceImpl;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +47,20 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Test cases for SceneCaseJobServiceTest")
 class SceneCaseJobServiceTest {
@@ -96,7 +97,7 @@ class SceneCaseJobServiceTest {
     private final SceneCaseJobEntity sceneCasejobEntity =
         SceneCaseJobEntity.builder().id(ObjectId.get().toString()).createUserId(ObjectId.get().toString()).build();
     private final CustomUser customUser = new CustomUser("username", "", Collections.emptyList(),
-        ObjectId.get().toString(), "", TokenType.USER);
+        ObjectId.get().toString(), "", TokenType.USER, LocalDate.now());
 
     private final static MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
 
@@ -119,7 +120,7 @@ class SceneCaseJobServiceTest {
         Optional<CaseTemplateEntity> sceneCaseApi = Optional.ofNullable(CaseTemplateEntity.builder().build());
         when(caseTemplateRepository.findById(any())).thenReturn(sceneCaseApi);
         List<SceneCaseApiEntity> sceneCaseApiList1 = getSceneCaseApiList();
-        when(sceneCaseApiRepository.findSceneCaseApiEntitiesBySceneCaseIdAndRemoved(any(), anyBoolean()))
+        when(sceneCaseApiRepository.findSceneCaseApiEntitiesBySceneCaseIdAndRemovedOrderByOrder(any(), anyBoolean()))
             .thenReturn(sceneCaseApiList1);
         List<CaseTemplateApiEntity> templateApiList =
             Lists.newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID).order(MOCK_NUM).build());

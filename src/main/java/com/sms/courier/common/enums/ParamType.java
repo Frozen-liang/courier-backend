@@ -6,15 +6,15 @@ import java.util.Map;
 public enum ParamType implements EnumCommon {
     STRING(0), FILE(1),
 
-    JSON(2), /*INT(3),*/
+    JSON(2), INT(3),
 
-    /*FLOAT(4), DOUBLE(5),*/
+    FLOAT(4), DOUBLE(5),
 
     DATE(6), DATETIME(7),
 
     BOOLEAN(8), BYTE(9),
 
-    /*SHORT(10), LONG(11), */
+    SHORT(10), LONG(11),
 
     ARRAY(12), OBJECT(13),
 

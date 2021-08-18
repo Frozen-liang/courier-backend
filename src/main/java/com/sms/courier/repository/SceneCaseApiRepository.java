@@ -8,7 +8,7 @@ public interface SceneCaseApiRepository extends MongoRepository<SceneCaseApiEnti
 
     Long deleteAllByIdIsIn(List<String> ids);
 
-    List<SceneCaseApiEntity> findSceneCaseApiEntitiesBySceneCaseIdAndRemoved(String sceneCaseId,
+    List<SceneCaseApiEntity> findSceneCaseApiEntitiesBySceneCaseIdAndRemovedOrderByOrder(String sceneCaseId,
         boolean removed);
 
 }

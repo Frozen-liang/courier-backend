@@ -2,6 +2,7 @@ package com.sms.courier.repository;
 
 import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.PageDto;
+import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
 import java.util.List;
@@ -38,4 +39,8 @@ public interface CommonRepository {
     Boolean deleteFieldByIds(List<String> ids, String fieldName, Class<?> entityClass);
 
     Boolean updateFieldById(String id, Map<Field, Object> updateFields, Class<?> entityClass);
+
+    Boolean updateFieldByIds(List<String> ids, Map<Field, Object> updateFields, Class<?> entityClass);
+
+    Boolean updateFieldByIds(List<String> ids, UpdateRequest<?> updateRequest, Class<?> entityClass);
 }

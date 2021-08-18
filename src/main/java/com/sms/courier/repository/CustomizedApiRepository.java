@@ -1,6 +1,7 @@
 package com.sms.courier.repository;
 
 import com.sms.courier.dto.request.ApiPageRequest;
+import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.response.ApiResponse;
 import java.util.List;
 import java.util.Optional;
@@ -19,4 +20,6 @@ public interface CustomizedApiRepository {
     Boolean recover(List<String> ids);
 
     void deleteByGroupIds(List<String> groupIds);
+
+    Boolean updateFieldByIds(List<String> ids, UpdateRequest<Object> updateRequest);
 }

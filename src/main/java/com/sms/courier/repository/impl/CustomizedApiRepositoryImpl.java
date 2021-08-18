@@ -20,6 +20,7 @@ import static com.sms.courier.common.field.CommonField.PROJECT_ID;
 import static com.sms.courier.common.field.CommonField.REMOVE;
 
 import com.sms.courier.dto.request.ApiPageRequest;
+import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
@@ -61,7 +62,6 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         this.commonRepository = commonRepository;
         this.apiGroupRepository = apiGroupRepository;
     }
-
 
     @Override
     public Optional<ApiResponse> findById(String id) {
@@ -127,6 +127,11 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         Update update = Update.update(REMOVE.getName(), Boolean.TRUE);
         update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
         mongoTemplate.updateMulti(query, update, ApiEntity.class);
+    }
+
+    @Override
+    public Boolean updateFieldByIds(List<String> ids, UpdateRequest<Object> updateRequest) {
+        return commonRepository.updateFieldByIds(ids, updateRequest, ApiEntity.class);
     }
 
     private List<Optional<Criteria>> getCriteriaList(ApiPageRequest apiPageRequest) {
