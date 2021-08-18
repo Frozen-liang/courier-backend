@@ -38,5 +38,6 @@ public class Constants {
     public static final String USER_ENV_PATH = SDK_VERSION + "/user-env";
 
     public static final int MAX_DEPTH = 3;
+    public static final String HTTP_DEFAULT_STATUS_CODE = "200";
 
 }

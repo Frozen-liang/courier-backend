@@ -19,7 +19,10 @@ import static com.sms.courier.common.exception.ErrorCode.THE_API_TEST_CASE_NOT_E
 import com.google.common.collect.Lists;
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
+import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.enums.ApiType;
+import com.sms.courier.common.enums.ResponseParamsExtractionType;
+import com.sms.courier.common.enums.ResultVerificationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.field.CommonField;
 import com.sms.courier.dto.request.AddCaseTemplateApiByIdsRequest;
@@ -33,6 +36,8 @@ import com.sms.courier.dto.response.CaseTemplateDetailResponse;
 import com.sms.courier.dto.response.CaseTemplateResponse;
 import com.sms.courier.dto.response.IdResponse;
 import com.sms.courier.entity.api.ApiEntity;
+import com.sms.courier.entity.api.common.HttpStatusVerification;
+import com.sms.courier.entity.api.common.ResponseResultVerification;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
@@ -327,10 +332,12 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             apiTestCase =
                 apiTestCaseRepository.findById(addSceneCaseApi.getId())
                     .orElseThrow(() -> ExceptionUtils.mpe(THE_API_TEST_CASE_NOT_EXITS_ERROR));
+            resetApiTestCaseByCase(apiTestCase);
         } else {
             ApiEntity apiEntity = apiRepository.findById(addSceneCaseApi.getId())
                 .orElseThrow(() -> ExceptionUtils.mpe(THE_API_ENTITY_NOT_EXITS_ERROR));
             apiTestCase = apiTestCaseMapper.toEntityByApiEntity(apiEntity);
+            resetApiTestCaseByApi(apiTestCase, apiEntity);
         }
         apiTestCase.setExecute(Boolean.TRUE);
         CaseTemplateApiEntity caseTemplateApi =
@@ -354,4 +361,17 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         }
     }
 
+    private void resetApiTestCaseByApi(ApiTestCaseEntity apiTestCase, ApiEntity apiEntity) {
+        apiTestCase.setExecute(Boolean.TRUE);
+        apiTestCase.setResponseParamsExtractionType(ResponseParamsExtractionType.JSON);
+        apiTestCase.setHttpStatusVerification(HttpStatusVerification.builder().statusCode(
+            Constants.HTTP_DEFAULT_STATUS_CODE).build());
+        apiTestCase.setResponseResultVerification(ResponseResultVerification.builder().resultVerificationType(
+            ResultVerificationType.JSON).apiResponseJsonType(apiEntity.getApiResponseJsonType()).build());
+    }
+
+    private void resetApiTestCaseByCase(ApiTestCaseEntity apiTestCase) {
+        apiTestCase.setExecute(Boolean.TRUE);
+        apiTestCase.setResponseParamsExtractionType(ResponseParamsExtractionType.JSON);
+    }
 }
