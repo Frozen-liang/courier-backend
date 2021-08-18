@@ -20,4 +20,7 @@ public interface SceneCaseJobService {
 
     void reallocateJob(List<String> engineIds);
 
+    List<SceneCaseJobResponse> buildJob(AddSceneCaseJobRequest sceneCaseJobRequest);
+
+    Boolean editReport(SceneCaseJobReport sceneCaseJobReport);
 }

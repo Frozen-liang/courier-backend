@@ -106,4 +106,6 @@ public interface JobMapper {
     SceneCaseJobReportResponse toSceneCaseJobReportResponse(SceneCaseJobReport caseJobReport);
 
     TestResult toTestResult(CaseReport caseReport);
+
+    List<SceneCaseJobResponse> toSceneCaseJobResponseList(List<SceneCaseJobEntity> jobEntityList);
 }

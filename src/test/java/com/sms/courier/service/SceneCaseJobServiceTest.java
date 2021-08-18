@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
 
 import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
@@ -46,13 +47,17 @@ import com.sms.courier.security.TokenType;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.impl.SceneCaseJobServiceImpl;
 import com.sms.courier.utils.ExceptionUtils;
+import com.sms.courier.utils.SecurityUtil;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -92,6 +97,17 @@ class SceneCaseJobServiceTest {
         SceneCaseJobEntity.builder().id(ObjectId.get().toString()).createUserId(ObjectId.get().toString()).build();
     private final CustomUser customUser = new CustomUser("username", "", Collections.emptyList(),
         ObjectId.get().toString(), "", TokenType.USER);
+
+    private final static MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
+
+    static {
+        SECURITY_UTIL_MOCKED_STATIC = Mockito.mockStatic(SecurityUtil.class);
+    }
+
+    @AfterAll
+    public static void close() {
+        SECURITY_UTIL_MOCKED_STATIC.close();
+    }
 
     @Test
     @DisplayName("Test the runJob method in the SceneCaseJob service")
@@ -198,14 +214,6 @@ class SceneCaseJobServiceTest {
         verify(sceneCaseJobRepository, times(1)).save(any());
     }
 
-    private SceneCaseJobReport getReport() {
-        return SceneCaseJobReport.builder()
-            .jobId(MOCK_ID)
-            .jobStatus(JobStatus.SUCCESS)
-            .caseReportList(Lists.newArrayList(CaseReport.builder().caseId(MOCK_ID).build()))
-            .build();
-    }
-
     @Test
     @DisplayName("Test the page method in the SceneCaseJob service")
     void page_test() {
@@ -280,6 +288,40 @@ class SceneCaseJobServiceTest {
         verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
     }
 
+    @Test
+    @DisplayName("An exception occurred while build job in SceneCaseJob service")
+    public void buildJob_test() {
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(customUser);
+        ProjectEnvironmentEntity environment = ProjectEnvironmentEntity.builder().build();
+        when(projectEnvironmentService.findOne(any())).thenReturn(environment);
+        Optional<SceneCaseEntity> sceneCase = Optional.ofNullable(SceneCaseEntity.builder().build());
+        when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
+        SceneCaseJobEntity sceneCaseJob = SceneCaseJobEntity.builder().id(MOCK_ID).build();
+        when(sceneCaseJobRepository.save(any(SceneCaseJobEntity.class))).thenReturn(sceneCaseJob);
+        AddSceneCaseJobRequest request = getAddRequest();
+        request.setDataCollectionRequest(null);
+        List<SceneCaseJobResponse> responses = sceneCaseJobService.buildJob(request);
+        assertThat(responses).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Test the editReport method in the SceneCaseJob service")
+    void editReport_test() {
+        Optional<SceneCaseJobEntity> sceneCaseJob =
+            Optional.ofNullable(
+                SceneCaseJobEntity.builder()
+                    .apiTestCase(Lists.newArrayList(JobSceneCaseApi.builder().id(MOCK_ID)
+                        .jobApiTestCase(JobApiTestCase
+                            .builder().id(MOCK_ID).build()).build()))
+                    .id(MOCK_ID).build());
+        when(sceneCaseJobRepository.findById(any())).thenReturn(sceneCaseJob);
+        doNothing().when(caseDispatcherService).sendErrorMessage(any(), any());
+        when(sceneCaseJobRepository.save(any())).thenReturn(SceneCaseJobEntity.builder().id(MOCK_ID).build());
+        SceneCaseJobReport sceneCaseJobReport = getReport();
+        Boolean isSuccess = sceneCaseJobService.editReport(sceneCaseJobReport);
+        assertTrue(isSuccess);
+    }
+
     private AddSceneCaseJobRequest getAddRequest() {
         return AddSceneCaseJobRequest.builder()
             .sceneCaseId(MOCK_ID)
@@ -303,5 +345,13 @@ class SceneCaseJobServiceTest {
                 .order(MOCK_NUM)
                 .apiTestCase(ApiTestCaseEntity.builder().id(MOCK_ID).execute(Boolean.TRUE).build())
                 .build());
+    }
+
+    private SceneCaseJobReport getReport() {
+        return SceneCaseJobReport.builder()
+            .jobId(MOCK_ID)
+            .jobStatus(JobStatus.SUCCESS)
+            .caseReportList(Lists.newArrayList(CaseReport.builder().caseId(MOCK_ID).build()))
+            .build();
     }
 }
