@@ -9,6 +9,8 @@ import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.request.ApiImportRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
+import com.sms.courier.dto.request.BatchUpdateByIdRequest;
+import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.api.ApiHistoryEntity;
@@ -175,6 +177,20 @@ public class ApiServiceImpl implements ApiService {
     @Override
     public Long count(String projectId) {
         return apiRepository.count(Example.of(ApiEntity.builder().projectId(projectId).build()));
+    }
+
+    @Override
+    public Boolean batchUpdateByIds(BatchUpdateByIdRequest<Object> batchUpdateRequest) {
+        UpdateRequest<Object> updateRequest = batchUpdateRequest.getUpdateRequest();
+        List<String> ids = batchUpdateRequest.getIds();
+        try {
+            return customizedApiRepository.updateFieldByIds(batchUpdateRequest.getIds(), updateRequest);
+        } catch (Exception e) {
+            log.error("Batch update {} error. ids:{} key:{} value:{} message:{}",
+                ids, "Api", updateRequest.getKey(), updateRequest.getValue(), e.getMessage());
+            throw ExceptionUtils
+                .mpe(ErrorCode.BATCH_UPDATE_ERROR, ids, "Api", updateRequest.getKey(), updateRequest.getValue());
+        }
     }
 
 }

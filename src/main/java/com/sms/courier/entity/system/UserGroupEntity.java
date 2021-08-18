@@ -20,8 +20,6 @@ public class UserGroupEntity extends BaseEntity {
 
     private String name;
 
-    private String createUsername;
-
     private List<String> roleIds;
 
     @Field(name = "isDefaultGroup")

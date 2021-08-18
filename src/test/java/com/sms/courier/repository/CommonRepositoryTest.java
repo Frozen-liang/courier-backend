@@ -12,6 +12,7 @@ import com.sms.courier.common.enums.OperationModule;
 import com.sms.courier.common.field.ApiField;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.PageDto;
+import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.mongo.LookupField;
@@ -187,13 +188,35 @@ class CommonRepositoryTest {
     }
 
     @Test
-    @DisplayName("Test the deleteById method in the CommonRepository")
+    @DisplayName("Test the updateFieldById method in the CommonRepository")
     void update_field_by_id_test() {
         Map<Field, Object> updateFields = new HashMap<>();
         updateFields.put(CREATE_USER_ID, ID);
         SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrUserId).thenReturn(ID);
-        when(mongoTemplate.updateFirst(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
+        when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
             UpdateResult.acknowledged(1, 1L, null));
         assertThat(commonRepository.updateFieldById(ID, updateFields, ApiEntity.class)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test the updateFieldByIds method in the CommonRepository")
+    void update_field_by_ids_test() {
+        Map<Field, Object> updateFields = new HashMap<>();
+        updateFields.put(CREATE_USER_ID, ID);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrUserId).thenReturn(ID);
+        when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
+            UpdateResult.acknowledged(1, 1L, null));
+        assertThat(commonRepository.updateFieldByIds(List.of(ID), updateFields, ApiEntity.class)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test the updateFieldByIds method in the CommonRepository")
+    void update_field_by_ids2_test() {
+        UpdateRequest<String> updateRequest = new UpdateRequest<>();
+        updateRequest.setKey("age");
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrUserId).thenReturn(ID);
+        when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
+            UpdateResult.acknowledged(1, 1L, null));
+        assertThat(commonRepository.updateFieldByIds(List.of(ID), updateRequest, ApiEntity.class)).isTrue();
     }
 }
