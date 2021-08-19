@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -31,6 +32,7 @@ public class StructureEntity extends BaseEntity {
      * 这里既有可能是projectId 也有可能是spaceId, 需要看是否是全局isGlobal字段来进行区分.
      */
     @Field(targetType = FieldType.OBJECT_ID)
+    @Indexed
     private String refId;
 
     private boolean global;
@@ -41,5 +43,6 @@ public class StructureEntity extends BaseEntity {
 
     private String description;
 
+    @Indexed
     private List<String> refStructIds;
 }

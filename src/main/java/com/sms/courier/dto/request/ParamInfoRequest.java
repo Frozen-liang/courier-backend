@@ -68,9 +68,9 @@ public class ParamInfoRequest {
     private boolean ref;
 
     /**
-     * 自定义结构 用于struct
+     * 自定义结构 用于struct.
      */
     private IdRequest structureRef;
 
-    private Long paramId;
+    private String paramId;
 }

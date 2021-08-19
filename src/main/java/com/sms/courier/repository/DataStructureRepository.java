@@ -8,4 +8,5 @@ public interface DataStructureRepository extends MongoRepository<StructureEntity
 
     Boolean deleteByIdIn(List<String> ids);
 
+    boolean existsByRefStructIds(String id);
 }

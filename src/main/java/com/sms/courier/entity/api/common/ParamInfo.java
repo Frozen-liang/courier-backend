@@ -60,7 +60,7 @@ public class ParamInfo {
     private boolean ref;
 
     /**
-     * 自定义结构 用于struct
+     * 自定义结构 用于struct.
      */
     @DBRef
     private StructureEntity structureRef;
@@ -68,5 +68,5 @@ public class ParamInfo {
     /**
      * 在数据结构中是唯一的.
      */
-    private Long paramId;
+    private String paramId;
 }

@@ -5,7 +5,9 @@ import static com.sms.courier.common.constant.Constants.DATA_STRUCTURE_PATE;
 
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
+import com.sms.courier.dto.request.DataStructureListRequest;
 import com.sms.courier.dto.request.DataStructureRequest;
+import com.sms.courier.dto.response.DataStructureListResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
 import com.sms.courier.service.DataStructureService;
 import java.util.List;
@@ -44,9 +46,14 @@ public class DataStructureController {
         return dataStructureService.edit(dataStructureRequest);
     }
 
-    @GetMapping("/list")
-    public List<DataStructureResponse> list() {
-        return dataStructureService.list();
+    @PostMapping("/list")
+    public List<DataStructureListResponse> list(@RequestBody DataStructureListRequest request) {
+        return dataStructureService.getDataStructureList(request);
+    }
+
+    @PostMapping("/data/list")
+    public List<DataStructureResponse> dataList(@RequestBody DataStructureListRequest request) {
+        return dataStructureService.getDataStructureDataList(request);
     }
 
     @DeleteMapping("/{ids}")

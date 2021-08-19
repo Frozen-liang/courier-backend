@@ -28,7 +28,7 @@ public class DataStructureRequest {
     private String name;
 
     /**
-     * 这里既有可能是projectId 也有可能是spaceId, 需要看是否是全局isGlobal字段来进行区分
+     * 这里既有可能是projectId 也有可能是spaceId, 需要看是否是全局isGlobal字段来进行区分.
      */
     @NotBlank(message = "The refId must not be empty.", groups = {UpdateGroup.class, InsertGroup.class})
     private String refId;
@@ -44,4 +44,6 @@ public class DataStructureRequest {
     private ApiRequestParamType structType;
 
     private String description;
+
+    private List<String> refStructIds;
 }

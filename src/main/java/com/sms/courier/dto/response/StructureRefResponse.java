@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class StructureRefResponse   {
+public class StructureRefResponse {
+
+    private String id;
 
     @JsonProperty("isGlobal")
     private boolean global;

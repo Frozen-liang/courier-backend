@@ -63,9 +63,9 @@ public class ParamInfoResponse {
     private boolean ref;
 
     /**
-     * 自定义结构 用于struct
+     * 自定义结构 用于struct.
      */
     private StructureRefResponse structureRef;
 
-    private Long paramId;
+    private String paramId;
 }
