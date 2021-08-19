@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.courier.dto.request.DataStructureRequest;
 import com.sms.courier.dto.response.DataStructureListResponse;
+import com.sms.courier.dto.response.DataStructureReferenceResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
 import com.sms.courier.entity.structure.StructureEntity;
 import java.time.LocalDateTime;
@@ -84,4 +85,18 @@ class DataStructureMapperTest {
         assertThat(dataStructure.getName()).isEqualTo(NAME);
     }
 
+
+    @Test
+    @DisplayName("Test the method for converting an DataStructure entity list object to a reference response list "
+        + "object")
+    void toReferenceResponse_test() {
+        List<StructureEntity> dataStructures = new ArrayList<>();
+        for (int i = 0; i < SIZE; i++) {
+            dataStructures.add(StructureEntity.builder().name(NAME).build());
+        }
+        List<DataStructureReferenceResponse> referenceResponses = dataStructureMapper
+            .toReferenceResponse(dataStructures);
+        assertThat(referenceResponses).hasSize(SIZE);
+        assertThat(referenceResponses).allMatch(result -> StringUtils.equals(result.getName(), NAME));
+    }
 }

@@ -8,6 +8,7 @@ import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.request.DataStructureListRequest;
 import com.sms.courier.dto.request.DataStructureRequest;
 import com.sms.courier.dto.response.DataStructureListResponse;
+import com.sms.courier.dto.response.DataStructureReferenceResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
 import com.sms.courier.service.DataStructureService;
 import java.util.List;
@@ -59,5 +60,10 @@ public class DataStructureController {
     @DeleteMapping("/{ids}")
     public Boolean delete(@PathVariable List<String> ids) {
         return dataStructureService.delete(ids);
+    }
+
+    @GetMapping("/getReference/{id}")
+    public List<DataStructureReferenceResponse> getReference(@PathVariable String id) {
+        return dataStructureService.getReference(id);
     }
 }

@@ -22,6 +22,7 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.DataStructureListRequest;
 import com.sms.courier.dto.request.DataStructureRequest;
 import com.sms.courier.dto.response.DataStructureListResponse;
+import com.sms.courier.dto.response.DataStructureReferenceResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
 import com.sms.courier.entity.api.common.ParamInfo;
 import com.sms.courier.entity.structure.StructureEntity;
@@ -146,6 +147,14 @@ public class DataStructureServiceImpl implements DataStructureService {
             log.error("Failed to get the DataStructure data list!", e);
             throw new ApiTestPlatformException(GET_DATA_STRUCTURE_DATA_LIST_ERROR);
         }
+    }
+
+    @Override
+    public List<DataStructureReferenceResponse> getReference(String id) {
+        Query query = new Query();
+        REF_STRUCT_IDS.is(id).ifPresent(query::addCriteria);
+        query.fields().include(ID.getName(), NAME.getName());
+        return dataStructureMapper.toReferenceResponse(commonRepository.list(query, StructureEntity.class));
     }
 
     private void setParamId(List<ParamInfo> struct) {

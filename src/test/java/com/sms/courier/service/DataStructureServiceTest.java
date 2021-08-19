@@ -19,6 +19,7 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.DataStructureListRequest;
 import com.sms.courier.dto.request.DataStructureRequest;
 import com.sms.courier.dto.response.DataStructureListResponse;
+import com.sms.courier.dto.response.DataStructureReferenceResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
 import com.sms.courier.entity.structure.StructureEntity;
 import com.sms.courier.mapper.DataStructureMapper;
@@ -43,12 +44,12 @@ import org.springframework.data.mongodb.core.query.Query;
 class DataStructureServiceTest {
 
     private final DataStructureRepository dataStructureRepository = mock(DataStructureRepository.class);
-    private final CommonRepository commonDeleteRepository = mock(
+    private final CommonRepository commonRepository = mock(
         CommonRepository.class);
     private final ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
     private final DataStructureMapper dataStructureMapper = new DataStructureMapperImpl(paramInfoMapper);
     private final DataStructureService dataStructureService = new DataStructureServiceImpl(
-        dataStructureRepository, commonDeleteRepository, dataStructureMapper);
+        dataStructureRepository, commonRepository, dataStructureMapper);
     private final StructureEntity dataStructure = StructureEntity.builder().id(ID).build();
     private final DataStructureResponse dataStructureResponse = DataStructureResponse.builder()
         .id(ID).build();
@@ -148,7 +149,7 @@ class DataStructureServiceTest {
             dataStructureList.add(StructureEntity.builder().build());
         }
         when(dataStructureRepository.existsByRefStructIds(any())).thenReturn(false);
-        when(commonDeleteRepository.list(any(Query.class), any())).thenReturn(dataStructureList);
+        when(commonRepository.list(any(Query.class), any())).thenReturn(dataStructureList);
         List<DataStructureListResponse> result = dataStructureService
             .getDataStructureList(dataStructureListRequest);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
@@ -157,7 +158,7 @@ class DataStructureServiceTest {
     @Test
     @DisplayName("An exception occurred while getting DataStructure list")
     public void getDataStructureList_exception_test() {
-        doThrow(new RuntimeException()).when(commonDeleteRepository).list(any(Query.class), any());
+        doThrow(new RuntimeException()).when(commonRepository).list(any(Query.class), any());
         assertThatThrownBy(() -> dataStructureService.getDataStructureList(DataStructureListRequest.builder().build()))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_DATA_STRUCTURE_LIST_ERROR.getCode());
@@ -172,7 +173,7 @@ class DataStructureServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             dataStructureList.add(StructureEntity.builder().build());
         }
-        when(commonDeleteRepository.list(any(Query.class), any())).thenReturn(dataStructureList);
+        when(commonRepository.list(any(Query.class), any())).thenReturn(dataStructureList);
         List<DataStructureResponse> result = dataStructureService.getDataStructureDataList(dataStructureListRequest);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
@@ -180,7 +181,7 @@ class DataStructureServiceTest {
     @Test
     @DisplayName("An exception occurred while getting DataStructure data list")
     public void getDataStructureDataList_exception_test() {
-        doThrow(new RuntimeException()).when(commonDeleteRepository).list(any(Query.class), any());
+        doThrow(new RuntimeException()).when(commonRepository).list(any(Query.class), any());
         assertThatThrownBy(
             () -> dataStructureService.getDataStructureDataList(DataStructureListRequest.builder().build()))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -204,6 +205,18 @@ class DataStructureServiceTest {
         assertThatThrownBy(() -> dataStructureService.delete(ids))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_DATA_STRUCTURE_BY_ID_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the getReference method in the DataStructure service")
+    public void getReference_test() {
+        List<Object> dataStructureList = new ArrayList<>();
+        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
+            dataStructureList.add(StructureEntity.builder().build());
+        }
+        when(commonRepository.list(any(Query.class), any())).thenReturn(dataStructureList);
+        List<DataStructureReferenceResponse> result = dataStructureService.getReference(ID);
+        assertThat(result).hasSize(10);
     }
 
 }

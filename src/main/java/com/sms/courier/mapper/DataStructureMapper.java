@@ -2,6 +2,7 @@ package com.sms.courier.mapper;
 
 import com.sms.courier.dto.request.DataStructureRequest;
 import com.sms.courier.dto.response.DataStructureListResponse;
+import com.sms.courier.dto.response.DataStructureReferenceResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
 import com.sms.courier.entity.structure.StructureEntity;
 import com.sms.courier.utils.EnumCommonUtils;
@@ -23,4 +24,6 @@ public interface DataStructureMapper {
     List<DataStructureListResponse> toListResponses(List<StructureEntity> dataStructureList);
 
     StructureEntity toEntity(DataStructureRequest dataStructureRequest);
+
+    List<DataStructureReferenceResponse> toReferenceResponse(List<StructureEntity> dataStructureList);
 }
