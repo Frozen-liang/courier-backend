@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 public interface CommonRepository {
 
@@ -31,6 +32,8 @@ public interface CommonRepository {
 
     <T> List<T> list(String collectionName, LookupVo lookupVo, List<Optional<Criteria>> criteriaList,
         Class<T> responseClass);
+
+    <T> List<T> list(Query query, Class<T> entityClass);
 
     <T> Page<T> page(QueryVo queryVo, PageDto pageRequest, Class<T> responseClass);
 

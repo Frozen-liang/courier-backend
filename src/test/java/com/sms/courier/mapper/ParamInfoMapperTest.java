@@ -1,6 +1,5 @@
 package com.sms.courier.mapper;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.courier.common.enums.ParamType;
@@ -76,27 +75,5 @@ public class ParamInfoMapperTest {
         List<ParamInfoResponse> paramInfoDtoList = paramInfoMapper.toDtoList(null);
         assertThat(paramInfoDtoList).isNull();
     }
-
-    @Test
-    @DisplayName("[Null Input Parameter]Test the method to convert the ParamInfo's dto object to a entity object")
-    void toEntityByResponse_IsNull_Test(){
-        ParamInfo dto=paramInfoMapper.toEntityByResponse(null);
-        assertThat(dto).isNull();
-    }
-
-    @Test
-    @DisplayName("[Null Input Parameter]Test the method to convert the ParamInfo's dto object to a entity object")
-    void paramInfoResponseListToParamInfoList_Test(){
-        List<ParamInfoResponse> list = Lists.newArrayList(ParamInfoResponse.builder()
-                .paramType(0)
-                .build());
-        ParamInfoResponse paramInfoResponse = ParamInfoResponse.builder()
-                .childParam(list)
-                .paramType(0)
-                .build();
-        ParamInfo dto = paramInfoMapper.toEntityByResponse(paramInfoResponse);
-        assertThat(dto).isNotNull();
-    }
-
 
 }

@@ -53,4 +53,19 @@ public class ParamInfoResponse {
      */
     @ToString.Exclude
     private List<ParamInfoResponse> childParam;
+
+    @ToString.Exclude
+    private List<ParamInfoResponse> customStructs;
+
+    // 是否引用数据结构
+    @JsonProperty("isRef")
+    @Field("isRef")
+    private boolean ref;
+
+    /**
+     * 自定义结构 用于struct.
+     */
+    private StructureRefResponse structureRef;
+
+    private String paramId;
 }

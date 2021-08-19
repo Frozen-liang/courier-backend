@@ -189,6 +189,13 @@ public enum ErrorCode {
     EDIT_SCHEDULE_ERROR("4181", "Failed to edit the Schedule!"),
     BUILD_CASE_JOB_ERROR("4182", "Failed to build the case job!"),
     BATCH_UPDATE_ERROR("4183", "Batch update %s error. ids:%s key:%s value:%s!"),
+    ADD_DATA_STRUCTURE_ERROR("4184", "Failed to add the DataStructure!"),
+    GET_DATA_STRUCTURE_LIST_ERROR("4185", "Failed to get the DataStructure list!"),
+    GET_DATA_STRUCTURE_BY_ID_ERROR("4186", "The DataStructure not exist!"),
+    DELETE_DATA_STRUCTURE_BY_ID_ERROR("4187", "Failed to delete the DataStructure!"),
+    EDIT_DATA_STRUCTURE_ERROR("4188", "Failed to edit the DataStructure!"),
+    THE_NAME_EXISTS_ERROR("4189", "The name of the %s already exists!"),
+    GET_DATA_STRUCTURE_DATA_LIST_ERROR("4190", "Failed to get the DataStructure data list!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),
