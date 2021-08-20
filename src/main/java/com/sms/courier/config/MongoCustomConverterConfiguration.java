@@ -35,14 +35,17 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.security.pojo.CustomUser;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.mongo.MongoClientSettingsBuilderCustomizer;
+import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -113,7 +116,9 @@ public class MongoCustomConverterConfiguration {
                 IntegerToVerificationElementTypeConverter.INSTANCE, IntegerToRawTypeConverter.INSTANCE,
                 IntegerToScheduleStatusTypeConverter.INSTANCE, IntegerToCycleTypeConverter.INSTANCE,
                 IntegerToNoticeTypeConverter.INSTANCE, IntegerToCaseFilterConverter.INSTANCE,
-                IntegerToTaskStatusConverter.INSTANCE);
+                IntegerToTaskStatusConverter.INSTANCE, DurationToLongConverter.INSTANCE,
+                LongToDurationConverter.INSTANCE);
+
         return new MongoCustomConversions(converters);
     }
 
@@ -141,6 +146,26 @@ public class MongoCustomConverterConfiguration {
 
         public Integer convert(EnumCommon enumCommon) {
             return enumCommon.getCode();
+        }
+    }
+
+    @WritingConverter
+    enum DurationToLongConverter implements Converter<Duration, Long> {
+        INSTANCE;
+
+        public Long convert(@NotNull Duration duration) {
+            return
+                ApplicationConversionService.getSharedInstance().convert(duration, Long.class);
+        }
+    }
+
+    @ReadingConverter
+    enum LongToDurationConverter implements Converter<Long, Duration> {
+        INSTANCE;
+
+        public Duration convert(@NotNull Long millisecond) {
+            return
+                ApplicationConversionService.getSharedInstance().convert(millisecond, Duration.class);
         }
     }
 

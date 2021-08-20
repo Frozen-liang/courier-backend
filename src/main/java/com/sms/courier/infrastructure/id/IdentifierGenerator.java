@@ -31,8 +31,8 @@ public interface IdentifierGenerator {
      * @param entity 实体.
      * @return id
      */
-    Number nextId(Object entity);
+    Long nextId(Object entity);
 
-    Number nextId();
+    Long nextId();
 
 }

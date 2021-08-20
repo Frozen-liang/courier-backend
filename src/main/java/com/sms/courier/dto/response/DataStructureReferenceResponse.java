@@ -1,6 +1,5 @@
 package com.sms.courier.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,9 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseTimeVerificationResponse {
+public class DataStructureReferenceResponse {
 
-    @JsonProperty("isCheckStatus")
-    private boolean checkStatus;
-    private Integer timeoutLimit;
+    private String id;
+    private String name;
 }

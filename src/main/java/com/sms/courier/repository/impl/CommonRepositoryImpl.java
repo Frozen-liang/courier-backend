@@ -34,6 +34,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -158,6 +159,14 @@ public class CommonRepositoryImpl implements CommonRepository {
             QueryVo.builder().collectionName(collectionName).lookupVo(List.of(lookupVo)).criteriaList(criteriaList)
                 .build();
         return this.list(queryVo, responseClass);
+    }
+
+    @Override
+    public <T> List<T> list(Query query, Class<T> entityClass) {
+        if (!query.isSorted()) {
+            query.with(Sort.by(Order.desc(MODIFY_DATE_TIME.getName())));
+        }
+        return mongoTemplate.find(query, entityClass);
     }
 
     @Override

@@ -77,7 +77,9 @@ public class ApiEntity extends BaseEntity {
     private List<ParamInfo> restfulParams;
 
     private List<ParamInfo> requestParams;
+
     private List<ParamInfo> responseParams;
+
     @JsonIgnore
     private ApiStatus apiStatus;
     @JsonIgnore
