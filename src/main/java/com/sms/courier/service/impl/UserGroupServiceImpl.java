@@ -9,7 +9,9 @@ import static com.sms.courier.common.exception.ErrorCode.DELETE_USER_GROUP_BY_ID
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_USER_GROUP_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_USER_GROUP_LIST_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.THE_NAME_EXISTS_ERROR;
 import static com.sms.courier.common.field.CommonField.REMOVE;
+import static com.sms.courier.utils.Assert.isFalse;
 
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
@@ -75,9 +78,14 @@ public class UserGroupServiceImpl implements UserGroupService {
     @LogRecord(operationType = ADD, operationModule = USER_GROUP, template = "{{#userGroupRequest.name}}")
     public Boolean add(UserGroupRequest userGroupRequest) {
         log.info("UserGroupService-add()-params: [UserGroup]={}", userGroupRequest.toString());
+        String name = userGroupRequest.getName();
         try {
             UserGroupEntity userGroup = userGroupMapper.toEntity(userGroupRequest);
+            isFalse(userGroupRepository.existsByName(name), THE_NAME_EXISTS_ERROR, name);
             userGroupRepository.insert(userGroup);
+        } catch (ApiTestPlatformException courierException) {
+            log.error(courierException.getMessage());
+            throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the UserGroup!", e);
             throw new ApiTestPlatformException(ADD_USER_GROUP_ERROR);
@@ -98,6 +106,9 @@ public class UserGroupServiceImpl implements UserGroupService {
         } catch (ApiTestPlatformException courierException) {
             log.error(courierException.getMessage());
             throw courierException;
+        } catch (DuplicateKeyException e) {
+            log.error("The name {} exists.", userGroupRequest.getName());
+            throw ExceptionUtils.mpe(THE_NAME_EXISTS_ERROR, userGroupRequest.getName());
         } catch (Exception e) {
             log.error("Failed to add the UserGroup!", e);
             throw new ApiTestPlatformException(EDIT_USER_GROUP_ERROR);
