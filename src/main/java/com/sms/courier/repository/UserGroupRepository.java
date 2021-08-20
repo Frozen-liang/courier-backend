@@ -12,4 +12,6 @@ public interface UserGroupRepository extends MongoRepository<UserGroupEntity, St
     boolean existsByDefaultGroupIsTrue();
 
     Stream<UserGroupEntity> findAllByIdIn(List<String> ids);
+
+    boolean existsByName(String name);
 }

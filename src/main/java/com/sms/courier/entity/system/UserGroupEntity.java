@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -18,6 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "UserGroup")
 public class UserGroupEntity extends BaseEntity {
 
+    @Indexed(unique = true)
     private String name;
 
     private List<String> roleIds;
