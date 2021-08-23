@@ -14,4 +14,6 @@ public interface UserGroupRepository extends MongoRepository<UserGroupEntity, St
     Stream<UserGroupEntity> findAllByIdIn(List<String> ids);
 
     boolean existsByName(String name);
+
+    boolean deleteByIdIn(List<String> ids);
 }

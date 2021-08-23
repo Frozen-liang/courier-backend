@@ -10,6 +10,7 @@ import com.sms.courier.entity.BaseEntity;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -66,5 +67,9 @@ public class ScheduleEntity extends BaseEntity {
 
     @Field("isDisplayError")
     private boolean displayError;
+
+    @Field("isOpen")
+    @Default
+    private boolean open = true;
 
 }

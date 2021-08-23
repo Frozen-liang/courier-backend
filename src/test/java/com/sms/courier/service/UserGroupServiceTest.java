@@ -33,6 +33,7 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.mongodb.core.query.Query;
 
 @DisplayName("Tests for UserGroupService")
 class UserGroupServiceTest {
@@ -160,7 +161,8 @@ class UserGroupServiceTest {
     @DisplayName("Test the delete method in the UserGroup service")
     public void delete_test() {
         List<String> ids = Collections.singletonList(ID);
-        when(commonRepository.deleteByIds(ids, UserGroupEntity.class)).thenReturn(Boolean.TRUE);
+        when(commonRepository.updateField(any(Query.class), any(), any())).thenReturn(Boolean.TRUE);
+        when(userGroupRepository.deleteByIdIn(ids)).thenReturn(Boolean.TRUE);
         assertThat(userGroupService.delete(Collections.singletonList(ID))).isTrue();
     }
 
@@ -168,8 +170,9 @@ class UserGroupServiceTest {
     @DisplayName("An exception occurred while delete UserGroup")
     public void delete_exception_test() {
         List<String> ids = Collections.singletonList(ID);
-        doThrow(new RuntimeException()).when(commonRepository)
-            .deleteByIds(ids, UserGroupEntity.class);
+        when(commonRepository.updateField(any(Query.class), any(), any())).thenReturn(Boolean.TRUE);
+        doThrow(new RuntimeException()).when(userGroupRepository)
+            .deleteByIdIn(ids);
         assertThatThrownBy(() -> userGroupService.delete(ids))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_USER_GROUP_BY_ID_ERROR.getCode());

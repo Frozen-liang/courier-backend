@@ -19,7 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "UserGroup")
 public class UserGroupEntity extends BaseEntity {
 
-    @Indexed(unique = true)
+    @Indexed(unique = true, background = true)
     private String name;
 
     private List<String> roleIds;
