@@ -119,6 +119,9 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             }
             job.setJobStatus(jobReport.getJobStatus());
             job.setMessage(jobReport.getMessage());
+            job.setParamsTotalTimeCost(jobReport.getParamsTotalTimeCost());
+            job.setTotalTimeCost(jobReport.getTotalTimeCost());
+            job.setInfoList(job.getInfoList());
             caseDispatcherService
                 .sendJobReport(job.getCreateUserId(), jobMapper.toSceneCaseJobReportResponse(jobReport));
             sceneCaseJobRepository.save(job);

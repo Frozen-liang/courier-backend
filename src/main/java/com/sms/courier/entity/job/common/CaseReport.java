@@ -3,6 +3,7 @@ package com.sms.courier.entity.job.common;
 
 import com.sms.courier.common.enums.RequestMethod;
 import com.sms.courier.common.enums.ResultType;
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,5 +43,7 @@ public class CaseReport {
 
     // The time it takes to prepare parameters.
     private Integer paramsTimeCost;
+
+    private List<String> infoList;
 
 }

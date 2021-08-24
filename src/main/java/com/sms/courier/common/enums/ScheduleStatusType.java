@@ -5,7 +5,7 @@ import java.util.Map;
 
 public enum ScheduleStatusType implements EnumCommon {
 
-    CREATE(0), UPDATE(1), DELETE(2);
+    CREATE(0), UPDATE(1), DELETE(2), COMPLETE(3);
 
     private static final Map<Integer, ScheduleStatusType> mappings = new HashMap<>(16);
 

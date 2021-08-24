@@ -24,21 +24,25 @@ public class AdminInitializer implements DataInitializer {
 
     @Override
     public void init(ApplicationContext applicationContext) {
-        UserRepository userRepository = applicationContext.getBean(UserRepository.class);
-        UserGroupRepository userGroupRepository = applicationContext.getBean(UserGroupRepository.class);
-        if (!userGroupRepository.existsById(GROUP_ID)) {
-            log.debug("Initialize group Admin.");
-            UserGroupEntity userGroup = UserGroupEntity.builder().id(GROUP_ID).name(ADMIN)
-                .roleIds(List.of(ADMIN_ROLE_ID))
-                .createDateTime(LocalDateTime.now())
-                .build();
-            userGroupRepository.save(userGroup);
-        }
-        if (!userRepository.existsById(USER_ID)) {
-            log.debug("Initialize user Admin .");
-            UserEntity user = UserEntity.builder().id(USER_ID).nickname(ADMIN).email(EMAIL).username(ADMIN)
-                .groupId(GROUP_ID).password(PASSWORD).createDateTime(LocalDateTime.now()).build();
-            userRepository.save(user);
+        try {
+            UserRepository userRepository = applicationContext.getBean(UserRepository.class);
+            UserGroupRepository userGroupRepository = applicationContext.getBean(UserGroupRepository.class);
+            if (!userGroupRepository.existsById(GROUP_ID)) {
+                log.debug("Initialize group Admin.");
+                UserGroupEntity userGroup = UserGroupEntity.builder().id(GROUP_ID).name(ADMIN)
+                    .roleIds(List.of(ADMIN_ROLE_ID))
+                    .createDateTime(LocalDateTime.now())
+                    .build();
+                userGroupRepository.save(userGroup);
+            }
+            if (!userRepository.existsById(USER_ID)) {
+                log.debug("Initialize user Admin .");
+                UserEntity user = UserEntity.builder().id(USER_ID).nickname(ADMIN).email(EMAIL).username(ADMIN)
+                    .groupId(GROUP_ID).password(PASSWORD).createDateTime(LocalDateTime.now()).build();
+                userRepository.save(user);
+            }
+        } catch (Exception e) {
+            log.error("Initialize Admin error!", e);
         }
 
     }

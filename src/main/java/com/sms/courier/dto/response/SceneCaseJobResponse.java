@@ -40,4 +40,10 @@ public class SceneCaseJobResponse extends BaseResponse {
      */
     private String createUserName;
 
+    private Integer totalTimeCost;
+
+    private Integer paramsTotalTimeCost;
+
+    private List<String> infoList;
+
 }

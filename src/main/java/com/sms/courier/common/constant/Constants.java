@@ -37,6 +37,7 @@ public class Constants {
     public static final String ENGINE_PATH = SDK_VERSION + "/engine";
     public static final String USER_ENV_PATH = SDK_VERSION + "/user-env";
     public static final String DATA_STRUCTURE_PATE = SDK_VERSION + "/data-structure";
+    public static final String API_HISTORY_PATH = SDK_VERSION + "/api-history";
 
     public static final int MAX_DEPTH = 3;
     public static final String HTTP_DEFAULT_STATUS_CODE = "200";

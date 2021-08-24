@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.UpdateDefinition;
 
 public interface CommonRepository {
 
@@ -46,4 +47,6 @@ public interface CommonRepository {
     Boolean updateFieldByIds(List<String> ids, Map<Field, Object> updateFields, Class<?> entityClass);
 
     Boolean updateFieldByIds(List<String> ids, UpdateRequest<?> updateRequest, Class<?> entityClass);
+
+    Boolean updateField(Query query, UpdateDefinition update, Class<?> entityClass);
 }
