@@ -1,6 +1,7 @@
 package com.sms.courier.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sms.courier.common.enums.ApiEncodingType;
 import com.sms.courier.common.enums.ApiJsonType;
 import com.sms.courier.common.enums.ApiProtocol;
 import com.sms.courier.common.enums.ApiRequestParamType;
@@ -88,4 +89,6 @@ public class ApiRequest {
     private String responseRaw;
 
     private RawType responseRawType;
+
+    private ApiEncodingType apiEncodingType;
 }

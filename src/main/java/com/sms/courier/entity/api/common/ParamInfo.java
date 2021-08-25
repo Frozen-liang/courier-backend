@@ -69,4 +69,14 @@ public class ParamInfo {
      * 在数据结构中是唯一的.
      */
     private String paramId;
+
+    /**
+     * mock 参数生成规则.
+     */
+    private String mockRule;
+
+    /**
+     * mock api xml 属性.
+     */
+    private String attribute;
 }
