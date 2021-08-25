@@ -66,4 +66,6 @@ public class ApiResponse extends LookupUserResponse {
     private Integer responseRawType;
 
     private int caseCount;
+
+    private Integer apiEncodingType;
 }

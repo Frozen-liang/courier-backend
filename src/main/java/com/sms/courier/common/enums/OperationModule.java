@@ -29,7 +29,8 @@ public enum OperationModule implements EnumCommon {
     WORKSPACE(18, "Workspace"),
     USER(19, "User"),
     USER_GROUP(20, "UserGroup"),
-    SCHEDULE(21, "UserGroup");
+    SCHEDULE(21, "UserGroup"),
+    MOCK_API(22, "MockApi");
 
     private static final Map<Integer, OperationModule> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationModule::getCode, Function.identity()));
