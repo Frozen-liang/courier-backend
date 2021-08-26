@@ -8,15 +8,18 @@ import com.sms.courier.utils.StringToDurationSerializer;
 import java.time.Duration;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MockApiResponse {
+public class MockApiResponse extends LookupUserResponse {
 
     private String projectId;
 
@@ -73,8 +76,8 @@ public class MockApiResponse {
     @JsonDeserialize(using = StringToDurationSerializer.class)
     private Duration delayTime;
 
+    @Field("isEnable")
     @JsonProperty(value = "isEnable")
     private boolean enable;
 
-    private ApiResponse apiEntity;
 }

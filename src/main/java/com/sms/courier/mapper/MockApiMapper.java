@@ -1,6 +1,7 @@
 package com.sms.courier.mapper;
 
 import com.sms.courier.dto.request.MockApiRequest;
+import com.sms.courier.dto.response.MockApiResponse;
 import com.sms.courier.entity.mock.MockApiEntity;
 import com.sms.courier.utils.EnumCommonUtils;
 import org.mapstruct.InjectionStrategy;
@@ -13,4 +14,6 @@ import org.mapstruct.ReportingPolicy;
 public interface MockApiMapper {
 
     MockApiEntity toEntity(MockApiRequest mockApiRequest);
+
+    MockApiResponse toResponse(MockApiEntity mockApiEntity);
 }
