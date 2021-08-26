@@ -41,6 +41,17 @@ public class CustomizedMockApiRepositoryImpl implements CustomizedMockApiReposit
         return commonRepository.page(queryVo, pageRequest, MockApiResponse.class);
     }
 
+    @Override
+    public List<MockApiResponse> list(ObjectId apiId, Boolean isEnable) {
+        List<LookupVo> lookupVoList = getLookupVoList();
+        QueryVo queryVo = QueryVo.builder()
+            .collectionName("MockApi")
+            .lookupVo(lookupVoList)
+            .criteriaList(buildListCriteria(isEnable, apiId))
+            .build();
+        return commonRepository.list(queryVo, MockApiResponse.class);
+    }
+
     private List<LookupVo> getLookupVoList() {
         return Lists.newArrayList(
             LookupVo.builder()
@@ -52,10 +63,17 @@ public class CustomizedMockApiRepositoryImpl implements CustomizedMockApiReposit
                 .build());
     }
 
-    private List<Optional<Criteria>> buildCriteria(MockApiPageRequest request, ObjectId apiId) {
+    private List<Optional<Criteria>> buildCriteria(MockApiPageRequest pageRequest, ObjectId apiId) {
         return Lists.newArrayList(
             MockField.API_ID.is(apiId),
-            MockField.IS_ENABLE.is(request.getIsEnable())
+            MockField.IS_ENABLE.is(pageRequest.getIsEnable())
+        );
+    }
+
+    private List<Optional<Criteria>> buildListCriteria(Boolean isEnable, ObjectId apiId) {
+        return Lists.newArrayList(
+            MockField.API_ID.is(apiId),
+            MockField.IS_ENABLE.is(isEnable)
         );
     }
 

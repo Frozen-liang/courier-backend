@@ -198,6 +198,7 @@ public enum ErrorCode {
     GET_DATA_STRUCTURE_DATA_LIST_ERROR("4190", "Failed to get the DataStructure data list!"),
     ADD_MOCK_API_ERROR("4191", "Failed to add the MockApi!"),
     GET_MOCK_API_PAGE_ERROR("4192", "Failed to get the MockApi page!"),
+    GET_MOCK_API_LIST_ERROR("4193", "Failed to get the MockApi list!"),
 
 
     // 60001 - 61000 describes api import exception

@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PageMockApiResponse {
+public class MockApiResponsePage {
 
     private ApiResponse apiResponse;
 

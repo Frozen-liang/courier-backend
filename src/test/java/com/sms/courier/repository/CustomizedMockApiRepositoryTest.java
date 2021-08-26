@@ -2,7 +2,9 @@ package com.sms.courier.repository;
 
 import com.sms.courier.dto.request.MockApiPageRequest;
 import com.sms.courier.dto.response.MockApiResponse;
+import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.repository.impl.CustomizedMockApiRepositoryImpl;
+import java.util.List;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +35,15 @@ public class CustomizedMockApiRepositoryTest {
         Page<MockApiResponse> responses = customizedMockApiRepository.page(MOCK_OBJECT_ID, MockApiPageRequest.builder()
             .isEnable(Boolean.TRUE).build());
         assertThat(responses.getContent()).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Test the list method in the MockApi service")
+    void list_test() {
+        List<MockApiResponse> mockApiResponseList = Lists.newArrayList(MockApiResponse.builder().build());
+        when(commonRepository.list(any(QueryVo.class),eq(MockApiResponse.class))).thenReturn(mockApiResponseList);
+        List<MockApiResponse> responses = customizedMockApiRepository.list(MOCK_OBJECT_ID, Boolean.TRUE);
+        assertThat(responses).isNotEmpty();
     }
 
 }

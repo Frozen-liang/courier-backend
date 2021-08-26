@@ -4,7 +4,8 @@ import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.dto.request.MockApiPageRequest;
 import com.sms.courier.dto.request.MockApiRequest;
-import com.sms.courier.dto.response.PageMockApiResponse;
+import com.sms.courier.dto.response.MockApiResponseList;
+import com.sms.courier.dto.response.MockApiResponsePage;
 import com.sms.courier.service.MockApiService;
 import org.bson.types.ObjectId;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,8 +34,13 @@ public class MockApiController {
     }
 
     @GetMapping("/page/{apiId}")
-    public PageMockApiResponse page(@PathVariable ObjectId apiId, MockApiPageRequest pageRequest) {
+    public MockApiResponsePage page(@PathVariable ObjectId apiId, MockApiPageRequest pageRequest) {
         return mockApiService.page(apiId, pageRequest);
+    }
+
+    @GetMapping("/{apiId}")
+    public MockApiResponseList list(@PathVariable ObjectId apiId, Boolean isEnable) {
+        return mockApiService.list(apiId, isEnable);
     }
 
 }

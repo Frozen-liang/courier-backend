@@ -5,7 +5,8 @@ import com.sms.courier.dto.request.MockApiPageRequest;
 import com.sms.courier.dto.request.MockApiRequest;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.dto.response.MockApiResponse;
-import com.sms.courier.dto.response.PageMockApiResponse;
+import com.sms.courier.dto.response.MockApiResponseList;
+import com.sms.courier.dto.response.MockApiResponsePage;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.mock.MockApiEntity;
 import com.sms.courier.mapper.ApiMapper;
@@ -14,6 +15,8 @@ import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.CustomizedMockApiRepository;
 import com.sms.courier.repository.MockApiRepository;
 import com.sms.courier.service.impl.MockApiServiceImpl;
+import java.util.List;
+import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,7 +69,7 @@ public class MockApiServiceTest {
         Page<MockApiResponse> mockApiResponsePage = mock(Page.class);
         when(customizedMockApiRepository.page(any(),any())).thenReturn(mockApiResponsePage);
         when(apiMapper.toDto(any())).thenReturn(ApiResponse.builder().build());
-        PageMockApiResponse response = mockApiService.page(MOCK_OBJECT_ID, MockApiPageRequest.builder().build());
+        MockApiResponsePage response = mockApiService.page(MOCK_OBJECT_ID, MockApiPageRequest.builder().build());
         assertThat(response).isNotNull();
     }
 
@@ -74,7 +77,7 @@ public class MockApiServiceTest {
     @DisplayName("Test the page method in the MockApi service return null")
     void page_apiEntityIsNull_test() {
         when(apiRepository.findApiEntityByIdAndRemoved(any(),anyBoolean())).thenReturn(null);
-        PageMockApiResponse response = mockApiService.page(MOCK_OBJECT_ID, MockApiPageRequest.builder().build());
+        MockApiResponsePage response = mockApiService.page(MOCK_OBJECT_ID, MockApiPageRequest.builder().build());
         assertThat(response).isNull();
     }
 
@@ -83,6 +86,34 @@ public class MockApiServiceTest {
     void page_test_thenException() {
         when(apiRepository.findApiEntityByIdAndRemoved(any(),anyBoolean())).thenThrow(new RuntimeException());
         assertThatThrownBy(()->mockApiService.page(MOCK_OBJECT_ID, MockApiPageRequest.builder().build())).isInstanceOf(
+            ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the list method in the MockApi service")
+    void list_test() {
+        ApiEntity apiEntity = ApiEntity.builder().build();
+        when(apiRepository.findApiEntityByIdAndRemoved(any(),anyBoolean())).thenReturn(apiEntity);
+        List<MockApiResponse> mockApiResponseList = Lists.newArrayList(MockApiResponse.builder().build());
+        when(customizedMockApiRepository.list(any(),any())).thenReturn(mockApiResponseList);
+        when(apiMapper.toDto(any())).thenReturn(ApiResponse.builder().build());
+        MockApiResponseList response = mockApiService.list(MOCK_OBJECT_ID, Boolean.TRUE);
+        assertThat(response).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Test the list method in the MockApi service return null")
+    void list_apiEntityIsNull_test() {
+        when(apiRepository.findApiEntityByIdAndRemoved(any(),anyBoolean())).thenReturn(null);
+        MockApiResponseList response = mockApiService.list(MOCK_OBJECT_ID, Boolean.TRUE);
+        assertThat(response).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the list method in the MockApi service then Exception")
+    void list_test_thenException() {
+        when(apiRepository.findApiEntityByIdAndRemoved(any(),anyBoolean())).thenThrow(new RuntimeException());
+        assertThatThrownBy(()->mockApiService.list(MOCK_OBJECT_ID, Boolean.TRUE)).isInstanceOf(
             ApiTestPlatformException.class);
     }
 
