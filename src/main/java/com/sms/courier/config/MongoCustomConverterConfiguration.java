@@ -17,6 +17,7 @@ import com.sms.courier.common.enums.GroupImportType;
 import com.sms.courier.common.enums.ImportStatus;
 import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.enums.MatchType;
+import com.sms.courier.common.enums.MockApiJsonLocateType;
 import com.sms.courier.common.enums.MockApiResponseParamType;
 import com.sms.courier.common.enums.NoticeType;
 import com.sms.courier.common.enums.OperationModule;
@@ -120,7 +121,7 @@ public class MongoCustomConverterConfiguration {
                 IntegerToNoticeTypeConverter.INSTANCE, IntegerToCaseFilterConverter.INSTANCE,
                 IntegerToTaskStatusConverter.INSTANCE, DurationToLongConverter.INSTANCE,
                 LongToDurationConverter.INSTANCE, IntegerToMockApiResponseParamTypeConverter.INSTANCE,
-                IntegerToApiEncodingTypeConverter.INSTANCE);
+                IntegerToApiEncodingTypeConverter.INSTANCE, IntegerToMockApiJsonLocateTypeConverter.INSTANCE);
 
         return new MongoCustomConversions(converters);
     }
@@ -473,5 +474,13 @@ public class MongoCustomConverterConfiguration {
         }
     }
 
+    @ReadingConverter
+    enum IntegerToMockApiJsonLocateTypeConverter implements Converter<Integer, MockApiJsonLocateType> {
+        INSTANCE;
+
+        public MockApiJsonLocateType convert(@NonNull Integer code) {
+            return MockApiJsonLocateType.getType(code);
+        }
+    }
 }
 

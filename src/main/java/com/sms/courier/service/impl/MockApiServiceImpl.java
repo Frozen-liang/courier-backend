@@ -2,10 +2,15 @@ package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.OperationModule.MOCK_API;
 import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.EDIT;
+import static com.sms.courier.common.enums.OperationType.REMOVE;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DELETE_MOCK_API_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.EDIT_MOCK_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_MOCK_API_LIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_MOCK_API_PAGE_ERROR;
 
+import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.dto.request.MockApiPageRequest;
 import com.sms.courier.dto.request.MockApiRequest;
@@ -56,7 +61,7 @@ public class MockApiServiceImpl implements MockApiService {
         try {
             MockApiEntity mockApiEntity = mockApiMapper.toEntity(request);
             mockApiRepository.insert(mockApiEntity);
-            return true;
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to add the MockApi!", e);
             throw ExceptionUtils.mpe(ADD_SCENE_CASE_ERROR);
@@ -97,5 +102,33 @@ public class MockApiServiceImpl implements MockApiService {
         }
     }
 
+    @Override
+    @LogRecord(operationType = EDIT, operationModule = MOCK_API, template = "{{#request.mockName}}")
+    public Boolean edit(MockApiRequest request) {
+        log.info("MockApiService-edit()-params: [MockApiRequest]={}", request.toString());
+        try {
+            MockApiEntity entity = mockApiMapper.toEntity(request);
+            mockApiRepository.save(entity);
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to edit the MockApi!", e);
+            throw ExceptionUtils.mpe(EDIT_MOCK_API_ERROR);
+        }
+    }
+
+    @Override
+    @LogRecord(operationType = REMOVE, operationModule = MOCK_API,
+        template = "{{#result?.![#this.mockName]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
+    public Boolean deleteByIds(List<String> ids) {
+        log.info("MockApiService-delete()-params: [MockApiId]={}", ids);
+        try {
+            mockApiRepository.deleteAllByIdIsIn(ids);
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to delete the MockApi!", e);
+            throw ExceptionUtils.mpe(DELETE_MOCK_API_ERROR);
+        }
+    }
 
 }

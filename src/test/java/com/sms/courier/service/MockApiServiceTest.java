@@ -65,9 +65,9 @@ public class MockApiServiceTest {
     @DisplayName("Test the page method in the MockApi service")
     void page_test() {
         ApiEntity apiEntity = ApiEntity.builder().build();
-        when(apiRepository.findApiEntityByIdAndRemoved(any(),anyBoolean())).thenReturn(apiEntity);
+        when(apiRepository.findApiEntityByIdAndRemoved(any(), anyBoolean())).thenReturn(apiEntity);
         Page<MockApiResponse> mockApiResponsePage = mock(Page.class);
-        when(customizedMockApiRepository.page(any(),any())).thenReturn(mockApiResponsePage);
+        when(customizedMockApiRepository.page(any(), any())).thenReturn(mockApiResponsePage);
         when(apiMapper.toDto(any())).thenReturn(ApiResponse.builder().build());
         MockApiResponsePage response = mockApiService.page(MOCK_OBJECT_ID, MockApiPageRequest.builder().build());
         assertThat(response).isNotNull();
@@ -76,7 +76,7 @@ public class MockApiServiceTest {
     @Test
     @DisplayName("Test the page method in the MockApi service return null")
     void page_apiEntityIsNull_test() {
-        when(apiRepository.findApiEntityByIdAndRemoved(any(),anyBoolean())).thenReturn(null);
+        when(apiRepository.findApiEntityByIdAndRemoved(any(), anyBoolean())).thenReturn(null);
         MockApiResponsePage response = mockApiService.page(MOCK_OBJECT_ID, MockApiPageRequest.builder().build());
         assertThat(response).isNull();
     }
@@ -84,18 +84,19 @@ public class MockApiServiceTest {
     @Test
     @DisplayName("Test the page method in the MockApi service then Exception")
     void page_test_thenException() {
-        when(apiRepository.findApiEntityByIdAndRemoved(any(),anyBoolean())).thenThrow(new RuntimeException());
-        assertThatThrownBy(()->mockApiService.page(MOCK_OBJECT_ID, MockApiPageRequest.builder().build())).isInstanceOf(
-            ApiTestPlatformException.class);
+        when(apiRepository.findApiEntityByIdAndRemoved(any(), anyBoolean())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> mockApiService.page(MOCK_OBJECT_ID, MockApiPageRequest.builder().build()))
+            .isInstanceOf(
+                ApiTestPlatformException.class);
     }
 
     @Test
     @DisplayName("Test the list method in the MockApi service")
     void list_test() {
         ApiEntity apiEntity = ApiEntity.builder().build();
-        when(apiRepository.findApiEntityByIdAndRemoved(any(),anyBoolean())).thenReturn(apiEntity);
+        when(apiRepository.findApiEntityByIdAndRemoved(any(), anyBoolean())).thenReturn(apiEntity);
         List<MockApiResponse> mockApiResponseList = Lists.newArrayList(MockApiResponse.builder().build());
-        when(customizedMockApiRepository.list(any(),any())).thenReturn(mockApiResponseList);
+        when(customizedMockApiRepository.list(any(), any())).thenReturn(mockApiResponseList);
         when(apiMapper.toDto(any())).thenReturn(ApiResponse.builder().build());
         MockApiResponseList response = mockApiService.list(MOCK_OBJECT_ID, Boolean.TRUE);
         assertThat(response).isNotNull();
@@ -104,7 +105,7 @@ public class MockApiServiceTest {
     @Test
     @DisplayName("Test the list method in the MockApi service return null")
     void list_apiEntityIsNull_test() {
-        when(apiRepository.findApiEntityByIdAndRemoved(any(),anyBoolean())).thenReturn(null);
+        when(apiRepository.findApiEntityByIdAndRemoved(any(), anyBoolean())).thenReturn(null);
         MockApiResponseList response = mockApiService.list(MOCK_OBJECT_ID, Boolean.TRUE);
         assertThat(response).isNull();
     }
@@ -112,9 +113,45 @@ public class MockApiServiceTest {
     @Test
     @DisplayName("Test the list method in the MockApi service then Exception")
     void list_test_thenException() {
-        when(apiRepository.findApiEntityByIdAndRemoved(any(),anyBoolean())).thenThrow(new RuntimeException());
-        assertThatThrownBy(()->mockApiService.list(MOCK_OBJECT_ID, Boolean.TRUE)).isInstanceOf(
+        when(apiRepository.findApiEntityByIdAndRemoved(any(), anyBoolean())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> mockApiService.list(MOCK_OBJECT_ID, Boolean.TRUE)).isInstanceOf(
             ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the edit method in the MockApi service")
+    void edit_test() {
+        MockApiEntity entity = MockApiEntity.builder().build();
+        when(mockApiMapper.toEntity(any())).thenReturn(entity);
+        when(mockApiRepository.save(any())).thenReturn(entity);
+        Boolean isSuccess = mockApiService.edit(MockApiRequest.builder().id(MOCK_ID).build());
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the edit method in the MockApi service then exception")
+    void edit_test_thenException() {
+        MockApiEntity entity = MockApiEntity.builder().build();
+        when(mockApiMapper.toEntity(any())).thenReturn(entity);
+        when(mockApiRepository.save(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> mockApiService.edit(MockApiRequest.builder().id(MOCK_ID).build()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the deleteByIds method in the MockApi service")
+    void deleteByIds_test() {
+        when(mockApiRepository.deleteAllByIdIsIn(any())).thenReturn(1L);
+        Boolean isSuccess = mockApiService.deleteByIds(Lists.newArrayList(MOCK_ID));
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the deleteByIds method in the MockApi service then exception")
+    void deleteByIds_test_thenException() {
+        when(mockApiRepository.deleteAllByIdIsIn(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> mockApiService.deleteByIds(Lists.newArrayList(MOCK_ID)))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
 }
