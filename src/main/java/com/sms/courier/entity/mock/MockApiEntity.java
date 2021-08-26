@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sms.courier.common.enums.ApiJsonType;
 import com.sms.courier.common.enums.ApiRequestParamType;
+import com.sms.courier.common.enums.MockApiJsonLocateType;
 import com.sms.courier.common.enums.MockApiResponseParamType;
 import com.sms.courier.common.enums.RawType;
 import com.sms.courier.entity.BaseEntity;
@@ -72,6 +73,8 @@ public class MockApiEntity extends BaseEntity {
     private ApiJsonType apiResponseJsonType;
 
     private ApiJsonType apiRequestJsonType;
+
+    private MockApiJsonLocateType jsonLocateType;
 
     /**
      * xml 声明.

@@ -62,6 +62,8 @@ public class MockApiResponse extends LookupUserResponse {
 
     private Integer apiRequestJsonType;
 
+    private Integer jsonLocateType;
+
     /**
      * xml 声明.
      */

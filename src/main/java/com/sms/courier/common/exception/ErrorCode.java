@@ -199,6 +199,8 @@ public enum ErrorCode {
     ADD_MOCK_API_ERROR("4191", "Failed to add the MockApi!"),
     GET_MOCK_API_PAGE_ERROR("4192", "Failed to get the MockApi page!"),
     GET_MOCK_API_LIST_ERROR("4193", "Failed to get the MockApi list!"),
+    EDIT_MOCK_API_ERROR("4194", "Failed to edit the MockApi!"),
+    DELETE_MOCK_API_ERROR("4195", "Failed to delete the MockApi!"),
 
 
     // 60001 - 61000 describes api import exception
