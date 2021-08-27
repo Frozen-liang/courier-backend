@@ -20,6 +20,7 @@ Courier is a one-stop open source continuous api test platform, covering Test tr
 * MongoDB: All the main data of Courier are stored in Mongodb.
 * Chrome Plugin: Browser plug-in to test the local interface.
 * Docker Engine: Provide a running environment for the engine.
+* Mocker: No code simulation test for API.
 
 ### Component Relationship
 ![](doc/img/courier.png)
