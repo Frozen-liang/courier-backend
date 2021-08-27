@@ -1,6 +1,7 @@
 package com.sms.courier.entity.api;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sms.courier.common.enums.ApiEncodingType;
 import com.sms.courier.common.enums.ApiJsonType;
 import com.sms.courier.common.enums.ApiNodeType;
 import com.sms.courier.common.enums.ApiProtocol;
@@ -111,4 +112,6 @@ public class ApiEntity extends BaseEntity {
     private String markdown;
 
     private ApiNodeType apiNodeType;
+
+    private ApiEncodingType apiEncodingType;
 }

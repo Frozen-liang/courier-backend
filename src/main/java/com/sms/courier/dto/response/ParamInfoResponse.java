@@ -68,4 +68,6 @@ public class ParamInfoResponse {
     private StructureRefResponse structureRef;
 
     private String paramId;
+
+    private String mockRule;
 }

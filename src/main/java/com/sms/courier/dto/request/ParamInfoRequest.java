@@ -73,4 +73,6 @@ public class ParamInfoRequest {
     private IdRequest structureRef;
 
     private String paramId;
+
+    private String mockRule;
 }

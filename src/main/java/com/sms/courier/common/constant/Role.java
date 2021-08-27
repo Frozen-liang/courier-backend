@@ -146,4 +146,10 @@ public class Role {
     public static final String PROJECT_FUN_FIND_ALL = "Project_Fun_Find_All";
     public static final String GLOBAL_FUNCTION_PULL = "Global_Fun_Pull";
     public static final String PROJECT_FUNCTION_PULL = "Project_Fun_Pull";
+
+    // MOCK API
+    public static final String MOCK_API_GRE_UPD_DEL = "Mock_Api" + CRE_UPD_DEL;
+    public static final String MOCK_API_QUERY_ALL = "Mock_Api" + QUERY_ALL;
+    public static final String MOCK_API_QUERY_OWN = "Mock_Api" + QUERY_OWN;
+
 }
