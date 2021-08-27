@@ -11,6 +11,7 @@ import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.BatchUpdateByIdRequest;
 import com.sms.courier.dto.request.UpdateRequest;
+import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.api.ApiHistoryEntity;
@@ -86,7 +87,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Page<ApiResponse> page(ApiPageRequest apiPageRequest) {
+    public Page<ApiPageResponse> page(ApiPageRequest apiPageRequest) {
         try {
             return customizedApiRepository.page(apiPageRequest);
         } catch (Exception e) {

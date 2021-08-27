@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class ApiResponse extends LookupUserResponse {
+public class ApiPageResponse extends LookupUserResponse {
 
     private String projectId;
 
@@ -26,52 +26,37 @@ public class ApiResponse extends LookupUserResponse {
 
     private String apiName;
 
-    private String description;
-
     private String apiPath;
 
     private Integer apiProtocol;
 
     private Integer requestMethod;
 
+    private Integer apiStatus;
+
+    private String swaggerId;
+
+    private String apiManagerId;
+
+    private String apiManager;
+
+    private int caseCount;
+
+
     private Integer apiRequestParamType;
-
     private String requestRaw;
-
     private Integer requestRawType;
-
     private List<ParamInfoResponse> requestHeaders;
     private List<ParamInfoResponse> responseHeaders;
     private List<ParamInfoResponse> pathParams;
     private List<ParamInfoResponse> restfulParams;
     private List<ParamInfoResponse> requestParams;
     private List<ParamInfoResponse> responseParams;
-
-    private Integer apiStatus;
-
     private String preInject;
-
     private String postInject;
-
-    private String swaggerId;
-
     private Integer apiResponseJsonType;
-
     private Integer apiRequestJsonType;
-
     private Integer apiResponseParamType;
-
     private String responseRaw;
-
     private Integer responseRawType;
-
-    private String richText;
-
-    private String markdown;
-
-    private Integer apiNodeType;
-
-    private String apiManagerId;
-
-    private String apiManager;
 }

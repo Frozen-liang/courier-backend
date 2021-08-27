@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.UpdateRequest;
+import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
@@ -70,7 +71,7 @@ class CustomizedApiRepositoryTest {
         apiPageRequest.setRequestMethod(Arrays.asList(1, 2));
         apiPageRequest.setApiProtocol(Arrays.asList(1, 2));
         apiPageRequest.setTagId(Arrays.asList(new ObjectId(), new ObjectId()));
-        Page<ApiResponse> page = customizedApiRepository.page(apiPageRequest);
+        Page<ApiPageResponse> page = customizedApiRepository.page(apiPageRequest);
         assertThat(page).isNotNull();
     }
 

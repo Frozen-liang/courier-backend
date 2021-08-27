@@ -5,22 +5,30 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.sms.courier.dto.request.TestFileRequest;
 import com.sms.courier.repository.impl.CustomizedFileRepositoryImpl;
+import com.sms.courier.security.TokenType;
+import com.sms.courier.security.pojo.CustomUser;
+import com.sms.courier.utils.SecurityUtil;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import org.bson.BsonObjectId;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +41,21 @@ class CustomizedFileRepositoryTest {
     private static final int TOTAL_ELEMENTS = 20;
     private final ObjectId projectId = ObjectId.get();
     private static final String ID = ObjectId.get().toString();
+
+    private final static MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
+
+
+    static {
+        SECURITY_UTIL_MOCKED_STATIC = mockStatic(SecurityUtil.class);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrUserId).thenReturn(ObjectId.get().toString());
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(new CustomUser("username", "password",
+            Collections.emptyList(), "", "username@qq.com", TokenType.USER, LocalDate.now()));
+    }
+
+    @AfterAll
+    public static void close() {
+        SECURITY_UTIL_MOCKED_STATIC.close();
+    }
 
     @Test
     @DisplayName("Test the list method in the CustomizedFileRepository")

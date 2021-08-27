@@ -103,6 +103,7 @@ public class ApiEntity extends BaseEntity {
 
     private RawType responseRawType;
 
+    @Field(targetType = FieldType.OBJECT_ID)
     private String apiManagerId;
 
     private String richText;

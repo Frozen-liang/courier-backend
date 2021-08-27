@@ -64,5 +64,7 @@ public class ApiTestCaseJobEntity {
 
     private Integer paramsTotalTimeCost;
 
+    private Integer delayTimeTotalTimeCost;
+
     private List<String> infoList;
 }

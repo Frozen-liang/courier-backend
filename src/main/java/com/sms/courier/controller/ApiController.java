@@ -8,6 +8,7 @@ import com.sms.courier.dto.request.ApiImportRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.BatchUpdateByIdRequest;
+import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.service.ApiService;
 import java.util.List;
@@ -52,7 +53,7 @@ public class ApiController {
 
     @PostMapping("/page")
     @PreAuthorize("hasRoleOrAdmin(@role.API_QUERY_ALL)")
-    public Page<ApiResponse> page(@RequestBody @Validated ApiPageRequest apiPageRequest) {
+    public Page<ApiPageResponse> page(@RequestBody @Validated ApiPageRequest apiPageRequest) {
         return apiService.page(apiPageRequest);
     }
 
