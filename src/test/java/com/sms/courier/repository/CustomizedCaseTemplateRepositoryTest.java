@@ -6,6 +6,7 @@ import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.repository.impl.CustomizedCaseTemplateRepositoryImpl;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
@@ -88,4 +89,13 @@ class CustomizedCaseTemplateRepositoryTest {
         assertTrue(customizedCaseTemplateRepository.deleteGroupIdByIds(Lists.newArrayList(MOCK_ID)));
     }
 
+    @Test
+    @DisplayName("Test the findById method in the CustomizedCaseTemplateRepository")
+    void findById_test() {
+        Optional<CaseTemplateResponse> optional = Optional.ofNullable(CaseTemplateResponse.builder().build());
+        when(commonRepository.findById(any(), any(), any(List.class), eq(CaseTemplateResponse.class)))
+            .thenReturn(optional);
+        Optional<CaseTemplateResponse> response = customizedCaseTemplateRepository.findById(MOCK_ID);
+        assertThat(response).isNotEmpty();
+    }
 }
