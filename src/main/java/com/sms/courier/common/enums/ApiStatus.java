@@ -11,7 +11,11 @@ public enum ApiStatus implements EnumCommon {
     DOCKING(3),
     TESTING(4),
     PUBLISH(5),
-    DEPRECATED(6);
+    DEPRECATED(6),
+    EXCEPTION(7),
+    MAINTAIN(8),
+    DONE(9);
+
 
     private final int code;
     private static final Map<Integer, ApiStatus> mappings = new HashMap<>(16);
