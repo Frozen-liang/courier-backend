@@ -36,6 +36,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.mongodb.core.query.UpdateDefinition;
 
 @DisplayName("Tests for CommonRepositoryTest")
@@ -218,5 +219,13 @@ class CommonRepositoryTest {
         when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
             UpdateResult.acknowledged(1, 1L, null));
         assertThat(commonRepository.updateFieldByIds(List.of(ID), updateRequest, ApiEntity.class)).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test the updateField method in the CommonRepository")
+    void updateField_test() {
+        when(mongoTemplate.updateMulti(any(Query.class), any(UpdateDefinition.class), any(Class.class))).thenReturn(
+            UpdateResult.acknowledged(1, 1L, null));
+        assertThat(commonRepository.updateField(new Query(), new Update(), ApiEntity.class)).isTrue();
     }
 }

@@ -21,6 +21,7 @@ import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.BatchUpdateByIdRequest;
 import com.sms.courier.dto.request.UpdateRequest;
+import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.api.ApiHistoryEntity;
@@ -124,7 +125,7 @@ class ApiServiceTest {
     public void page_test() {
         ApiPageRequest apiPageRequest = new ApiPageRequest();
         when(customizedApiRepository.page(apiPageRequest)).thenReturn(Page.empty());
-        Page<ApiResponse> page = apiService.page(apiPageRequest);
+        Page<ApiPageResponse> page = apiService.page(apiPageRequest);
         assertThat(page).isNotNull();
     }
 

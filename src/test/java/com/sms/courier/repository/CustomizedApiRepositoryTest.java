@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.UpdateRequest;
+import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
@@ -53,7 +54,7 @@ class CustomizedApiRepositoryTest {
     @DisplayName("Test the page method in the CustomizedApiRepository")
     public void page_test() {
         when(commonRepository.page(any(QueryVo.class), any(), any()))
-            .thenReturn(new PageImpl<>(List.of(ApiResponse.builder().id(ID).build())));
+            .thenReturn(new PageImpl<>(List.of(ApiPageResponse.builder().id(ID).build())));
         when(apiGroupRepository.findById(any()))
             .thenReturn(Optional.of(ApiGroupEntity.builder().realGroupId(1L).build()));
         when(apiGroupRepository.findAllByPathContains(any()))
@@ -70,7 +71,7 @@ class CustomizedApiRepositoryTest {
         apiPageRequest.setRequestMethod(Arrays.asList(1, 2));
         apiPageRequest.setApiProtocol(Arrays.asList(1, 2));
         apiPageRequest.setTagId(Arrays.asList(new ObjectId(), new ObjectId()));
-        Page<ApiResponse> page = customizedApiRepository.page(apiPageRequest);
+        Page<ApiPageResponse> page = customizedApiRepository.page(apiPageRequest);
         assertThat(page).isNotNull();
     }
 

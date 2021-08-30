@@ -196,6 +196,14 @@ public enum ErrorCode {
     EDIT_DATA_STRUCTURE_ERROR("4188", "Failed to edit the DataStructure!"),
     THE_NAME_EXISTS_ERROR("4189", "The name of the %s already exists!"),
     GET_DATA_STRUCTURE_DATA_LIST_ERROR("4190", "Failed to get the DataStructure data list!"),
+    ADD_MOCK_API_ERROR("4191", "Failed to add the MockApi!"),
+    GET_MOCK_API_PAGE_ERROR("4192", "Failed to get the MockApi page!"),
+    GET_MOCK_API_LIST_ERROR("4193", "Failed to get the MockApi list!"),
+    EDIT_MOCK_API_ERROR("4194", "Failed to edit the MockApi!"),
+    DELETE_MOCK_API_ERROR("4195", "Failed to delete the MockApi!"),
+    EDIT_MOCK_SETTING_API_ERROR("4196", "Failed to edit the Mock Setting!"),
+    QUERY_MOCK_SETTING_API_ERROR("4197", "Failed to query the Mock Setting!"),
+
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),

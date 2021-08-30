@@ -4,6 +4,7 @@ import com.sms.courier.dto.request.ApiImportRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.BatchUpdateByIdRequest;
+import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -18,7 +19,7 @@ public interface ApiService {
 
     ApiResponse findById(String id);
 
-    Page<ApiResponse> page(ApiPageRequest apiPageRequest);
+    Page<ApiPageResponse> page(ApiPageRequest apiPageRequest);
 
     Boolean add(ApiRequest apiRequestDto);
 

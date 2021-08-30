@@ -1,7 +1,9 @@
 package com.sms.courier.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sms.courier.common.enums.ApiEncodingType;
 import com.sms.courier.common.enums.ApiJsonType;
+import com.sms.courier.common.enums.ApiNodeType;
 import com.sms.courier.common.enums.ApiProtocol;
 import com.sms.courier.common.enums.ApiRequestParamType;
 import com.sms.courier.common.enums.ApiStatus;
@@ -35,6 +37,8 @@ public class ApiRequest {
     private String groupId;
 
     private List<String> tagId;
+
+    private String apiManagerId;
 
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiName must not be null.")
     private String apiName;
@@ -88,4 +92,12 @@ public class ApiRequest {
     private String responseRaw;
 
     private RawType responseRawType;
+
+    private String richText;
+
+    private String markdown;
+
+    private ApiNodeType apiNodeType;
+
+    private ApiEncodingType apiEncodingType;
 }

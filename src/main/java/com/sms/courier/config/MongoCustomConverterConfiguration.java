@@ -1,6 +1,7 @@
 package com.sms.courier.config;
 
 import com.sms.courier.common.enums.ApiBindingStatus;
+import com.sms.courier.common.enums.ApiEncodingType;
 import com.sms.courier.common.enums.ApiJsonType;
 import com.sms.courier.common.enums.ApiProtocol;
 import com.sms.courier.common.enums.ApiRequestParamType;
@@ -16,6 +17,8 @@ import com.sms.courier.common.enums.GroupImportType;
 import com.sms.courier.common.enums.ImportStatus;
 import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.enums.MatchType;
+import com.sms.courier.common.enums.MockApiJsonLocateType;
+import com.sms.courier.common.enums.MockApiResponseParamType;
 import com.sms.courier.common.enums.NoticeType;
 import com.sms.courier.common.enums.OperationModule;
 import com.sms.courier.common.enums.OperationType;
@@ -117,7 +120,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToScheduleStatusTypeConverter.INSTANCE, IntegerToCycleTypeConverter.INSTANCE,
                 IntegerToNoticeTypeConverter.INSTANCE, IntegerToCaseFilterConverter.INSTANCE,
                 IntegerToTaskStatusConverter.INSTANCE, DurationToLongConverter.INSTANCE,
-                LongToDurationConverter.INSTANCE);
+                LongToDurationConverter.INSTANCE, IntegerToMockApiResponseParamTypeConverter.INSTANCE,
+                IntegerToApiEncodingTypeConverter.INSTANCE, IntegerToMockApiJsonLocateTypeConverter.INSTANCE);
 
         return new MongoCustomConversions(converters);
     }
@@ -452,5 +456,31 @@ public class MongoCustomConverterConfiguration {
         }
     }
 
+    @ReadingConverter
+    enum IntegerToMockApiResponseParamTypeConverter implements Converter<Integer, MockApiResponseParamType> {
+        INSTANCE;
+
+        public MockApiResponseParamType convert(@NonNull Integer code) {
+            return MockApiResponseParamType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToApiEncodingTypeConverter implements Converter<Integer, ApiEncodingType> {
+        INSTANCE;
+
+        public ApiEncodingType convert(@NonNull Integer code) {
+            return ApiEncodingType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToMockApiJsonLocateTypeConverter implements Converter<Integer, MockApiJsonLocateType> {
+        INSTANCE;
+
+        public MockApiJsonLocateType convert(@NonNull Integer code) {
+            return MockApiJsonLocateType.getType(code);
+        }
+    }
 }
 

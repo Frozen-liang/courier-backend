@@ -65,5 +65,17 @@ public class ApiResponse extends LookupUserResponse {
 
     private Integer responseRawType;
 
+    private String richText;
+
+    private String markdown;
+
+    private Integer apiNodeType;
+
+    private String apiManagerId;
+
+    private String apiManager;
+
     private int caseCount;
+
+    private Integer apiEncodingType;
 }

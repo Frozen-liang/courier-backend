@@ -30,6 +30,8 @@ public class ApiPageRequest extends PageDto {
 
     private List<ObjectId> tagId;
 
+    private List<ObjectId> apiManagerId;
+
     private List<Integer> apiProtocol;
 
     private List<Integer> requestMethod;
