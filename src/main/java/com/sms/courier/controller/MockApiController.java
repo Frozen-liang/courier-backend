@@ -49,6 +49,12 @@ public class MockApiController {
         return mockApiService.list(apiId, isEnable);
     }
 
+    @GetMapping("/mock/list/{apiId}")
+    @PreAuthorize("hasRoleOrAdmin(@role.MOCK_API_MOCK_QUERY_ALL)")
+    public MockApiResponseList mockList(@PathVariable ObjectId apiId, Boolean isEnable) {
+        return mockApiService.list(apiId, isEnable);
+    }
+
     @PutMapping
     @PreAuthorize("hasRoleOrAdmin(@role.MOCK_API_GRE_UPD_DEL)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody MockApiRequest request) {

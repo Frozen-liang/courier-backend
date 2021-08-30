@@ -10,7 +10,9 @@ public enum RoleType implements EnumCommon {
 
     USER(0),
 
-    ENGINE(1);
+    ENGINE(1),
+
+    MOCK(2);
 
     private static final Map<Integer, RoleType> MAPPINGS = Arrays.stream(values()).sequential().collect(
         Collectors.toMap(RoleType::getCode, Function.identity()));

@@ -1,6 +1,7 @@
 package com.sms.courier.security.jwt;
 
 import static com.sms.courier.common.enums.RoleType.ENGINE;
+import static com.sms.courier.common.enums.RoleType.MOCK;
 import static com.sms.courier.utils.JwtUtils.TOKEN_TYPE;
 import static com.sms.courier.utils.JwtUtils.TOKEN_USER_ID;
 
@@ -71,6 +72,9 @@ public class JwtTokenManager {
                 case ENGINE:
                     authentication = createEngineAuthentication(id, tokenType);
                     break;
+                case MOCK:
+                    authentication = createMockAuthentication(id, tokenType);
+                    break;
                 default:
                     authentication = null;
             }
@@ -93,6 +97,14 @@ public class JwtTokenManager {
             .map(SystemRoleEntity::getName).map(SimpleGrantedAuthority::new
             ).collect(Collectors.toList());
         return SecurityUtil.newAuthentication(id, "", "engine", roles, tokenType, LocalDate.now());
+
+    }
+
+    private Authentication createMockAuthentication(String id, TokenType tokenType) {
+        List<SimpleGrantedAuthority> roles = roleRepository.findAllByRoleType(MOCK)
+            .map(SystemRoleEntity::getName).map(SimpleGrantedAuthority::new
+            ).collect(Collectors.toList());
+        return SecurityUtil.newAuthentication(id, "", "mock", roles, tokenType, LocalDate.now());
 
     }
 
