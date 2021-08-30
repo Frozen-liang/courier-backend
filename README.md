@@ -2,9 +2,9 @@
 ![pipeline status](https://gitlab.smsassist.com/smsdevops/smsdevopsplatform/sms-satp/badges/develop/pipeline.svg)
 ![coverage report](https://gitlab.smsassist.com/smsdevops/smsdevopsplatform/sms-satp/badges/develop/coverage.svg?job=task_test)
 
-Courier is a one-stop open source continuous api test platform, covering Test tracking, Scene test, Interface testing, Api design, Teamwork and other functions, effectively supporting the development and test team to make full use of cloud elasticity to highly scalable automation test, accelerate High quality software delivery.
+Courier is a one-stop open source continuous api test platform, covering Test tracking, Interface testing, Teamwork and other functions, effectively supporting the development and test team to make full use of cloud elasticity to highly scalable automation test, accelerate High quality software delivery.
 
-
+![](doc/img/couriers-intro.png)
 
 
 ## Architecture
