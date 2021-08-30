@@ -4,6 +4,8 @@ import static com.sms.courier.common.enums.OperationModule.API;
 import static com.sms.courier.common.enums.OperationModule.API_GROUP;
 import static com.sms.courier.common.enums.OperationModule.API_TAG;
 import static com.sms.courier.common.enums.OperationModule.API_TEST_CASE;
+import static com.sms.courier.common.enums.OperationModule.USER;
+import static com.sms.courier.common.field.ApiField.API_MANAGER_ID;
 import static com.sms.courier.common.field.ApiField.API_NAME;
 import static com.sms.courier.common.field.ApiField.API_PATH;
 import static com.sms.courier.common.field.ApiField.API_PROTOCOL;
@@ -14,13 +16,17 @@ import static com.sms.courier.common.field.ApiField.TAG_ID;
 import static com.sms.courier.common.field.ApiTag.GROUP_NAME;
 import static com.sms.courier.common.field.ApiTag.TAG_NAME;
 import static com.sms.courier.common.field.ApiTestCaseField.CASE_API_ID;
+import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
 import static com.sms.courier.common.field.CommonField.ID;
 import static com.sms.courier.common.field.CommonField.MODIFY_DATE_TIME;
 import static com.sms.courier.common.field.CommonField.PROJECT_ID;
 import static com.sms.courier.common.field.CommonField.REMOVE;
+import static com.sms.courier.common.field.UserField.NICKNAME;
+import static com.sms.courier.common.field.UserField.USERNAME;
 
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.UpdateRequest;
+import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
@@ -69,22 +75,22 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
     }
 
     @Override
-    public Page<ApiResponse> page(ApiPageRequest apiPageRequest) {
+    public Page<ApiPageResponse> page(ApiPageRequest apiPageRequest) {
         QueryVo queryVo =
             QueryVo.builder().collectionName(API.getCollectionName()).criteriaList(getCriteriaList(apiPageRequest))
                 .build();
-        List<LookupVo> lookupVo = getLookupVo();
+        List<LookupVo> lookupVo = pageLookup();
         queryVo.setLookupVo(lookupVo);
-        Page<ApiResponse> page = commonRepository.page(queryVo, apiPageRequest, ApiResponse.class);
+        Page<ApiPageResponse> page = commonRepository.page(queryVo, apiPageRequest, ApiPageResponse.class);
         queryApiTestCase(page.getContent());
         return page;
     }
 
-    private void queryApiTestCase(List<ApiResponse> apiResponses) {
+    private void queryApiTestCase(List<ApiPageResponse> apiResponses) {
         if (apiResponses.isEmpty()) {
             return;
         }
-        List<ObjectId> ids = apiResponses.stream().map(ApiResponse::getId).map(ObjectId::new)
+        List<ObjectId> ids = apiResponses.stream().map(ApiPageResponse::getId).map(ObjectId::new)
             .collect(Collectors.toList());
         GroupOperation groupBy = Aggregation.group(CASE_API_ID.getName()).count().as("count");
         MatchOperation match = Aggregation.match(Criteria.where(CASE_API_ID.getName()).in(ids));
@@ -96,14 +102,31 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         apiResponses.forEach(apiResponse -> apiResponse.setCaseCount(map.getOrDefault(apiResponse.getId(), 0)));
     }
 
-    private List<LookupVo> getLookupVo() {
+    private List<LookupVo> pageLookup() {
+        List<LookupField> createUserField = List.of(
+            LookupField.builder().field(USERNAME).alias("createUsername").build(),
+            LookupField.builder().field(NICKNAME).alias("createNickname").build()
+        );
+        List<LookupField> managerUserField = List.of(
+            LookupField.builder().field(USERNAME).alias("apiManager").build()
+        );
         List<LookupField> tagField = List.of(LookupField.builder().field(TAG_NAME).build());
-        List<LookupField> groupField =
-            List.of(LookupField.builder().field(GROUP_NAME).alias("groupName").build());
         return List.of(LookupVo.builder().from(API_TAG).localField(TAG_ID).foreignField(ID).queryFields(tagField)
                 .as("apiTag").build(),
-            LookupVo.builder().from(API_GROUP).localField(GROUP_ID).foreignField(ID).queryFields(groupField)
-                .as("apiGroup").build());
+            LookupVo.builder().from(USER).localField(CREATE_USER_ID).foreignField(ID).as("createUser")
+                .queryFields(createUserField).build(),
+            LookupVo.builder().from(USER).localField(API_MANAGER_ID).foreignField(ID).as("manager")
+                .queryFields(managerUserField).build()
+        );
+    }
+
+    private List<LookupVo> getLookupVo() {
+        List<LookupField> groupField =
+            List.of(LookupField.builder().field(GROUP_NAME).alias("groupName").build());
+        List<LookupVo> pageLookup = new ArrayList<>(pageLookup());
+        pageLookup.add(LookupVo.builder().from(API_GROUP).localField(GROUP_ID).foreignField(ID).queryFields(groupField)
+            .as("apiGroup").build());
+        return pageLookup;
     }
 
     @Override
@@ -145,6 +168,7 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         criteriaList.add(GROUP_ID.in(getApiGroupId(apiPageRequest.getGroupId())));
         criteriaList.add(REQUEST_METHOD.in(apiPageRequest.getRequestMethod()));
         criteriaList.add(TAG_ID.in(apiPageRequest.getTagId()));
+        criteriaList.add(API_MANAGER_ID.in(apiPageRequest.getApiManagerId()));
         return criteriaList;
     }
 

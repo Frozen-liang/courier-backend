@@ -5,10 +5,10 @@ import com.sms.courier.dto.request.BatchUpdateByIdRequest;
 import com.sms.courier.dto.request.UserPasswordUpdateRequest;
 import com.sms.courier.dto.request.UserQueryListRequest;
 import com.sms.courier.dto.request.UserRequest;
+import com.sms.courier.dto.response.UserInfoResponse;
 import com.sms.courier.dto.response.UserProfileResponse;
 import com.sms.courier.dto.response.UserResponse;
 import java.util.List;
-import org.bson.types.ObjectId;
 
 public interface UserService {
 
@@ -32,5 +32,7 @@ public interface UserService {
 
     UserEntityAuthority getUserDetailsByUserId(String id);
 
-    Boolean batchUpdateByIds(BatchUpdateByIdRequest<ObjectId> batchUpdateRequest);
+    Boolean batchUpdateByIds(BatchUpdateByIdRequest<Object> batchUpdateRequest);
+
+    List<UserInfoResponse> getByWorkspaceId(String workspaceId);
 }

@@ -196,6 +196,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
         job.setTotalTimeCost(jobReport.getTotalTimeCost());
         job.setParamsTotalTimeCost(jobReport.getParamsTotalTimeCost());
         job.setInfoList(jobReport.getInfoList());
+        job.setDelayTimeTotalTimeCost(jobReport.getDelayTimeTotalTimeCost());
         apiTestCaseJobRepository.save(job);
         caseReport = Objects
             .requireNonNullElse(caseReport, CaseReport.builder().errCode(jobReport.getErrCode())

@@ -44,6 +44,8 @@ public class CaseReport {
     // The time it takes to prepare parameters.
     private Integer paramsTimeCost;
 
+    private Integer delayTime;
+
     private List<String> infoList;
 
 }

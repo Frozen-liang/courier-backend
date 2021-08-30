@@ -19,6 +19,7 @@ public class ApiTestCaseJobReport {
     private String errCode;
     private Integer totalTimeCost;
     private Integer paramsTotalTimeCost;
+    private Integer delayTimeTotalTimeCost;
     private CaseReport caseReport;
     private List<String> infoList;
     private String message;

@@ -8,11 +8,11 @@ import com.sms.courier.dto.request.BatchUpdateByIdRequest;
 import com.sms.courier.dto.request.UserPasswordUpdateRequest;
 import com.sms.courier.dto.request.UserQueryListRequest;
 import com.sms.courier.dto.request.UserRequest;
+import com.sms.courier.dto.response.UserInfoResponse;
 import com.sms.courier.dto.response.UserProfileResponse;
 import com.sms.courier.dto.response.UserResponse;
 import com.sms.courier.service.UserService;
 import java.util.List;
-import org.bson.types.ObjectId;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -81,8 +81,12 @@ public class UserController {
 
     @PutMapping("/batch/updateByIds")
     @PreAuthorize("hasRoleOrAdmin(@role.USER_UPDATE)")
-    public Boolean batchUpdateByIds(@RequestBody BatchUpdateByIdRequest<ObjectId> batchUpdateRequest) {
+    public Boolean batchUpdateByIds(@RequestBody BatchUpdateByIdRequest<Object> batchUpdateRequest) {
         return userService.batchUpdateByIds(batchUpdateRequest);
     }
 
+    @GetMapping("/workspaceId/{workspaceId}")
+    public List<UserInfoResponse> getByWorkspaceId(@PathVariable String workspaceId) {
+        return userService.getByWorkspaceId(workspaceId);
+    }
 }
