@@ -54,7 +54,7 @@ class CustomizedApiRepositoryTest {
     @DisplayName("Test the page method in the CustomizedApiRepository")
     public void page_test() {
         when(commonRepository.page(any(QueryVo.class), any(), any()))
-            .thenReturn(new PageImpl<>(List.of(ApiResponse.builder().id(ID).build())));
+            .thenReturn(new PageImpl<>(List.of(ApiPageResponse.builder().id(ID).build())));
         when(apiGroupRepository.findById(any()))
             .thenReturn(Optional.of(ApiGroupEntity.builder().realGroupId(1L).build()));
         when(apiGroupRepository.findAllByPathContains(any()))
