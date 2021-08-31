@@ -23,8 +23,8 @@ public class SceneCaseJobResponse extends BaseResponse {
 
     private String projectId;
 
-    @JsonProperty("isLock")
-    private boolean lock;
+    @JsonProperty("isNext")
+    private boolean next;
 
     private List<JobSceneCaseApiResponse> apiTestCase;
 
