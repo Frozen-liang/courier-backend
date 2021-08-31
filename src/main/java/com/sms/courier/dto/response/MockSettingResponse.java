@@ -14,4 +14,6 @@ import lombok.experimental.SuperBuilder;
 public class MockSettingResponse extends BaseResponse {
 
     private String mockUrl;
+
+    private String mockToken;
 }
