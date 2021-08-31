@@ -229,7 +229,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             .jobStatus(JobStatus.RUNNING)
             .environment(jobEnvironment)
             .apiTestCase(caseList)
-            .lock(request.isLock())
+            .next(request.isNext())
             .createDateTime(LocalDateTime.now())
             .modifyDateTime(LocalDateTime.now())
             .workspaceId(request.getWorkspaceId())
