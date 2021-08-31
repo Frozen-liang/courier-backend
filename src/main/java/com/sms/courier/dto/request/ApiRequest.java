@@ -100,8 +100,4 @@ public class ApiRequest {
     private ApiNodeType apiNodeType;
 
     private ApiEncodingType apiEncodingType;
-
-    private Integer caseCount;
-
-    private Integer sceneCaseCount;
 }

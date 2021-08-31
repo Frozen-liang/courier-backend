@@ -37,8 +37,10 @@ class CustomizedApiRepositoryTest {
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
     private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final ApiGroupRepository apiGroupRepository = mock(ApiGroupRepository.class);
+    private final ApiTagRepository apiTagRepository = mock(ApiTagRepository.class);
+    private final UserRepository userRepository = mock(UserRepository.class);
     private final CustomizedApiRepository customizedApiRepository = new CustomizedApiRepositoryImpl(mongoTemplate,
-        commonRepository, apiGroupRepository);
+        commonRepository, apiGroupRepository, apiTagRepository, userRepository);
     private static final String ID = ObjectId.get().toString();
     private static final List<String> ID_LIST = Collections.singletonList(ID);
 
@@ -55,6 +57,8 @@ class CustomizedApiRepositoryTest {
     public void page_test() {
         when(commonRepository.page(any(QueryVo.class), any(), any()))
             .thenReturn(new PageImpl<>(List.of(ApiPageResponse.builder().id(ID).build())));
+        when(apiTagRepository.findAllByIdIn(any())).thenReturn(Stream.empty());
+        when(userRepository.findByIdIn(any())).thenReturn(Collections.emptyList());
         when(apiGroupRepository.findById(any()))
             .thenReturn(Optional.of(ApiGroupEntity.builder().realGroupId(1L).build()));
         when(apiGroupRepository.findAllByPathContains(any()))

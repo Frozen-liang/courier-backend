@@ -89,7 +89,7 @@ public class ApiServiceImpl implements ApiService {
     @Override
     public Page<ApiPageResponse> page(ApiPageRequest apiPageRequest) {
         try {
-            return customizedApiRepository.page(apiPageRequest);
+             return customizedApiRepository.page(apiPageRequest);
         } catch (Exception e) {
             log.error("Failed to get the Api page!", e);
             throw new ApiTestPlatformException(ErrorCode.GET_API_PAGE_ERROR);

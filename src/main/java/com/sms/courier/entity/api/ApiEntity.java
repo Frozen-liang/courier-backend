@@ -105,6 +105,7 @@ public class ApiEntity extends BaseEntity {
     private RawType responseRawType;
 
     @Field(targetType = FieldType.OBJECT_ID)
+    @JsonIgnore
     private String apiManagerId;
 
     private String richText;
@@ -115,7 +116,9 @@ public class ApiEntity extends BaseEntity {
 
     private ApiEncodingType apiEncodingType;
 
+    @JsonIgnore
     private Integer caseCount;
 
+    @JsonIgnore
     private Integer sceneCaseCount;
 }

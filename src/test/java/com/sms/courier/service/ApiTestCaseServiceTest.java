@@ -19,8 +19,10 @@ import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
+import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
@@ -50,11 +52,12 @@ class ApiTestCaseServiceTest {
         CustomizedApiTestCaseJobRepository.class);
     private final ApiTestCaseService apiTestCaseService = new ApiTestCaseServiceImpl(
         apiTestCaseRepository, customizedApiTestCaseRepository, apiTestCaseMapper, applicationEventPublisher);
-    private final ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder().id(ID).build();
+    private final ApiTestCaseEntity apiTestCase =
+        ApiTestCaseEntity.builder().id(ID).apiEntity(ApiEntity.builder().id(ID).build()).build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
         .id(ID).build();
     private final ApiTestCaseRequest apiTestCaseRequest = ApiTestCaseRequest.builder()
-        .id(ID).build();
+        .id(ID).apiEntity(ApiRequest.builder().id(ID).build()).build();
     private static final boolean REMOVED = Boolean.FALSE;
     private static final String ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
