@@ -179,8 +179,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     @Override
     public SceneTemplateResponse getConn(String id) {
         try {
-            Optional<SceneCaseEntity> optional = sceneCaseRepository.findById(id);
-            SceneCaseResponse dto = sceneCaseMapper.toDto(optional.orElse(null));
+            SceneCaseResponse dto = customizedSceneCaseRepository.findById(id).orElse(null);
             List<SceneCaseApiConnResponse> responsesList = Lists.newArrayList();
             List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiService.listBySceneCaseId(id);
             for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {

@@ -240,10 +240,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     @Override
     public CaseTemplateDetailResponse getApiList(String caseTemplateId) {
         try {
-            CaseTemplateEntity caseTemplate =
-                caseTemplateRepository.findById(caseTemplateId)
-                    .orElseThrow(() -> ExceptionUtils.mpe(GET_CASE_TEMPLATE_ERROR));
-            CaseTemplateResponse caseTemplateResponse = caseTemplateMapper.toDto(caseTemplate);
+            CaseTemplateResponse caseTemplateResponse =
+                customizedCaseTemplateRepository.findById(caseTemplateId).orElse(null);
             List<CaseTemplateApiResponse> caseTemplateApiResponseList =
                 caseTemplateApiService.listResponseByCaseTemplateId(caseTemplateId);
             return CaseTemplateDetailResponse.builder().caseTemplateResponse(caseTemplateResponse)
