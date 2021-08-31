@@ -14,6 +14,7 @@ import com.sms.courier.utils.DurationToStringSerializer;
 import com.sms.courier.utils.StringToDurationSerializer;
 import java.time.Duration;
 import java.util.List;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -90,7 +91,8 @@ public class MockApiEntity extends BaseEntity {
     @JsonDeserialize(using = StringToDurationSerializer.class)
     private Duration delayTime;
 
+    @Default
     @Field(value = "isEnable")
-    private boolean enable;
+    private boolean enable = true;
 
 }
