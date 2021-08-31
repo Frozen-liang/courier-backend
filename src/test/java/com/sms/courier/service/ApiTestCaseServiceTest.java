@@ -24,12 +24,6 @@ import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
-import com.sms.courier.mapper.JobMapper;
-import com.sms.courier.mapper.JobMapperImpl;
-import com.sms.courier.mapper.MatchParamInfoMapperImpl;
-import com.sms.courier.mapper.ParamInfoMapper;
-import com.sms.courier.mapper.ParamInfoMapperImpl;
-import com.sms.courier.mapper.ResponseResultVerificationMapperImpl;
 import com.sms.courier.repository.ApiTestCaseRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseRepository;
@@ -42,6 +36,7 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 
 @DisplayName("Tests for ApiTestCaseService")
 class ApiTestCaseServiceTest {
@@ -50,15 +45,11 @@ class ApiTestCaseServiceTest {
     private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository = mock(
         CustomizedApiTestCaseRepository.class);
     private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
-    private final ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
-    private final JobMapper jobMapper = new JobMapperImpl(paramInfoMapper, new MatchParamInfoMapperImpl(),
-        new ResponseResultVerificationMapperImpl(new MatchParamInfoMapperImpl()));
-
+    private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository = mock(
         CustomizedApiTestCaseJobRepository.class);
     private final ApiTestCaseService apiTestCaseService = new ApiTestCaseServiceImpl(
-        apiTestCaseRepository, customizedApiTestCaseRepository, customizedApiTestCaseJobRepository, apiTestCaseMapper,
-        jobMapper);
+        apiTestCaseRepository, customizedApiTestCaseRepository, apiTestCaseMapper, applicationEventPublisher);
     private final ApiTestCaseEntity apiTestCase = ApiTestCaseEntity.builder().id(ID).build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
         .id(ID).build();
@@ -103,6 +94,7 @@ class ApiTestCaseServiceTest {
         CustomUser customUser = mock(CustomUser.class);
         when(apiTestCaseMapper.toEntity(apiTestCaseRequest)).thenReturn(apiTestCase);
         when(apiTestCaseRepository.insert(any(ApiTestCaseEntity.class))).thenReturn(apiTestCase);
+        doNothing().when(applicationEventPublisher).publishEvent(any());
         assertThat(apiTestCaseService.add(apiTestCaseRequest)).isTrue();
     }
 

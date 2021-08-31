@@ -149,6 +149,7 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         Query query = new Query(Criteria.where(GROUP_ID.getName()).in(groupIds));
         Update update = Update.update(REMOVE.getName(), Boolean.TRUE);
         update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
+        update.unset(GROUP_ID.getName());
         mongoTemplate.updateMulti(query, update, ApiEntity.class);
     }
 

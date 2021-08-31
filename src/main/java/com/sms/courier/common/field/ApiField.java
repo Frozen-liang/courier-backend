@@ -9,7 +9,9 @@ public enum ApiField implements Field {
     API_PATH("apiPath"),
     REQUEST_METHOD("requestMethod"),
     API_MANAGER_ID("apiManagerId"),
-    API_STATUS("apiStatus");
+    API_STATUS("apiStatus"),
+    CASE_COUNT("caseCount"),
+    SCENE_CASE_COUNT("sceneCaseCount");
 
     private final String name;
 

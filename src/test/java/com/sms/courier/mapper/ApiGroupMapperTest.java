@@ -2,10 +2,16 @@ package com.sms.courier.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.courier.dto.response.ApiGroupResponse;
 import com.sms.courier.entity.group.ApiGroupEntity;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
+import java.util.Map;
+import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,10 +25,23 @@ public class ApiGroupMapperTest {
 
     @Test
     void apiList_to_apiDtoList() {
+        File file = new File("D:\\IdeaProjects\\sms-satp\\src\\test\\resources\\config\\test.json");
+        Map<String, String> map = new LinkedHashMap<>();
+        for (int i = 0; i < 4000; i++) {
+            map.put("key" + i, "");
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String json = objectMapper.writeValueAsString(map);
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            IOUtils.write(json,fileOutputStream, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }/*
         List<ApiGroupEntity> apis = getEntity();
         List<ApiGroupResponse> apiDtoList = apiGroupMapper.toResponse(apis);
         assertThat(apiDtoList).hasSize(SIZE);
-        assertThat(apiDtoList).allMatch(result -> StringUtils.equals(result.getName(), API_NAME));
+        assertThat(apiDtoList).allMatch(result -> StringUtils.equals(result.getName(), API_NAME));*/
     }
 
     @Test
