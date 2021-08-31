@@ -226,8 +226,8 @@ class SceneCaseServiceTest {
     @Test
     @DisplayName("Test the getConn method in the SceneCase service")
     void getConn_test() {
-        Optional<SceneCaseEntity> optional = Optional.ofNullable(SceneCaseEntity.builder().build());
-        when(sceneCaseRepository.findById(any())).thenReturn(optional);
+        Optional<SceneCaseResponse> optional = Optional.ofNullable(SceneCaseResponse.builder().build());
+        when(customizedSceneCaseRepository.findById(any())).thenReturn(optional);
         SceneCaseResponse sceneCaseDto = SceneCaseResponse.builder().build();
         when(sceneCaseMapper.toDto(any())).thenReturn(sceneCaseDto);
         List<SceneCaseApiEntity> sceneCaseApiDtoList =
@@ -254,14 +254,15 @@ class SceneCaseServiceTest {
     @Test
     @DisplayName("Test the getConn method in the SceneCase service thrown exception")
     void getConn_test_thrownException() {
-        when(sceneCaseRepository.findById(any())).thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_CONN_ERROR));
+        when(customizedSceneCaseRepository.findById(any()))
+            .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_CONN_ERROR));
         assertThatThrownBy(() -> sceneCaseService.getConn(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test
     @DisplayName("Test the getConn method in the SceneCase service thrown exception")
     void getConn_test_thrown_Exception() {
-        when(sceneCaseRepository.findById(any())).thenThrow(new RuntimeException());
+        when(customizedSceneCaseRepository.findById(any())).thenThrow(new RuntimeException());
         assertThatThrownBy(() -> sceneCaseService.getConn(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
     }
 

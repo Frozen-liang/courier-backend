@@ -80,6 +80,12 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
         return commonRepository.deleteFieldByIds(ids, CommonField.GROUP_ID.getName(), SceneCaseEntity.class);
     }
 
+    @Override
+    public Optional<SceneCaseResponse> findById(String id) {
+        List<LookupVo> lookupVoList = getLookupVoList();
+        return commonRepository.findById(id, "SceneCase", lookupVoList, SceneCaseResponse.class);
+    }
+
     private List<LookupVo> getLookupVoList() {
         return Lists.newArrayList(
             LookupVo.builder()

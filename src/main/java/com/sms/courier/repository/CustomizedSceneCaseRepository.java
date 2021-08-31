@@ -4,6 +4,7 @@ import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.response.SceneCaseResponse;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import java.util.List;
+import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 
@@ -18,4 +19,6 @@ public interface CustomizedSceneCaseRepository {
     List<SceneCaseEntity> getSceneCaseIdsByGroupIds(List<String> ids);
 
     Boolean deleteGroupIdByIds(List<String> ids);
+
+    Optional<SceneCaseResponse> findById(String id);
 }
