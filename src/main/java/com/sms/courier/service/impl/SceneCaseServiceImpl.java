@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.constant.Constants;
+import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.enums.ResponseParamsExtractionType;
 import com.sms.courier.common.enums.ResultVerificationType;
@@ -371,13 +372,14 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             apiTestCase =
                 apiTestCaseRepository.findById(addSceneCaseApi.getId())
                     .orElseThrow(() -> ExceptionUtils.mpe(THE_API_TEST_CASE_NOT_EXITS_ERROR));
-            apiTestCase.setResponseParamsExtractionType(ResponseParamsExtractionType.JSON);
         } else {
             ApiEntity apiEntity = apiRepository.findById(addSceneCaseApi.getId())
                 .orElseThrow(() -> ExceptionUtils.mpe(THE_API_ENTITY_NOT_EXITS_ERROR));
             apiTestCase = apiTestCaseMapper.toEntityByApiEntity(apiEntity);
             resetApiTestCaseByApi(apiTestCase, apiEntity);
         }
+        apiTestCase.setResponseParamsExtractionType(ResponseParamsExtractionType.JSON);
+        apiTestCase.setStatus(ApiBindingStatus.BINDING);
         SceneCaseApiEntity sceneCaseApi =
             SceneCaseApiEntity.builder()
                 .apiTestCase(apiTestCase)
@@ -390,7 +392,6 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     private void resetApiTestCaseByApi(ApiTestCaseEntity apiTestCase, ApiEntity apiEntity) {
-        apiTestCase.setResponseParamsExtractionType(ResponseParamsExtractionType.JSON);
         apiTestCase.setHttpStatusVerification(HttpStatusVerification.builder().statusCode(
             Constants.HTTP_DEFAULT_STATUS_CODE).build());
         apiTestCase.setResponseResultVerification(ResponseResultVerification.builder().resultVerificationType(
