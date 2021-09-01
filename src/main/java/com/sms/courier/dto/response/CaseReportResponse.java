@@ -1,6 +1,7 @@
 package com.sms.courier.dto.response;
 
 
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,5 +39,7 @@ public class CaseReportResponse {
     private Long timeCost;
 
     private Integer paramsTimeCost;
+
+    private List<String> infoList;
 
 }

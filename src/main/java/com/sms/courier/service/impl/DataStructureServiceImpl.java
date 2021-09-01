@@ -140,6 +140,7 @@ public class DataStructureServiceImpl implements DataStructureService {
             Query query = new Query();
             query.fields().exclude(CREATE_USER_ID.getName());
             ID.ne(request.getId()).ifPresent(query::addCriteria);
+            STRUCT_TYPE.is(request.getStructType()).ifPresent(query::addCriteria);
             REF_ID.in(getIds(request.getProjectId(), request.getWorkspaceId())).ifPresent(query::addCriteria);
             REF_STRUCT_IDS.ne(request.getId()).ifPresent(query::addCriteria);
             return dataStructureMapper.toResponseList(commonRepository.list(query, StructureEntity.class));

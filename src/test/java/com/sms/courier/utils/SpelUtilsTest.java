@@ -8,11 +8,18 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.common.TemplateParserContext;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 @DisplayName("Tests for SpelUtil")
 public class SpelUtilsTest {
 
-    private final EvaluationContext evaluationContext = mock(EvaluationContext.class);
+    private final EvaluationContext evaluationContext = new StandardEvaluationContext();
+    private static final String PREFIX = "{{";
+    private static final String SUFFIX = "}}";
+    private static final TemplateParserContext templateParserContext = new TemplateParserContext(PREFIX, SUFFIX);
+    private static final SpelExpressionParser spelExpressionParser = new SpelExpressionParser();
     private final LogRecord logRecord = mock(LogRecord.class);
     private static final String ID = ObjectId.get().toString();
 

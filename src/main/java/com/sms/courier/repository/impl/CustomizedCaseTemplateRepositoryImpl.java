@@ -80,6 +80,12 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
         return commonRepository.deleteFieldByIds(ids, CommonField.GROUP_ID.getName(), CaseTemplateEntity.class);
     }
 
+    @Override
+    public Optional<CaseTemplateResponse> findById(String id) {
+        List<LookupVo> lookupVoList = getLookupVoList();
+        return commonRepository.findById(id, "CaseTemplate", lookupVoList, CaseTemplateResponse.class);
+    }
+
     private List<LookupVo> getLookupVoList() {
         return Lists.newArrayList(
             LookupVo.builder()

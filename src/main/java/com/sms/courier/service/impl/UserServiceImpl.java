@@ -16,6 +16,7 @@ import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.request.UserPasswordUpdateRequest;
 import com.sms.courier.dto.request.UserQueryListRequest;
 import com.sms.courier.dto.request.UserRequest;
+import com.sms.courier.dto.response.UserInfoResponse;
 import com.sms.courier.dto.response.UserProfileResponse;
 import com.sms.courier.dto.response.UserResponse;
 import com.sms.courier.entity.system.UserEntity;
@@ -41,7 +42,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -168,6 +168,7 @@ public class UserServiceImpl implements UserService {
                 && userRepository.existsByEmail(userRequest.getEmail()), "The email exists.");
             user.setPassword(oldUser.getPassword());
             user.setRemoved(oldUser.isRemoved());
+            user.setExpiredDate(oldUser.getExpiredDate());
             userRepository.save(user);
         } catch (ApiTestPlatformException courierException) {
             log.error(courierException.getMessage());
@@ -249,8 +250,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean batchUpdateByIds(BatchUpdateByIdRequest<ObjectId> batchUpdateRequest) {
-        UpdateRequest<ObjectId> updateRequest = batchUpdateRequest.getUpdateRequest();
+    public Boolean batchUpdateByIds(BatchUpdateByIdRequest<Object> batchUpdateRequest) {
+        UpdateRequest<Object> updateRequest = batchUpdateRequest.getUpdateRequest();
         List<String> ids = batchUpdateRequest.getIds();
         try {
             return commonRepository.updateFieldByIds(batchUpdateRequest.getIds(), updateRequest, UserEntity.class);
@@ -277,6 +278,15 @@ public class UserServiceImpl implements UserService {
             throw new ApiTestPlatformException(ACCOUNT_NOT_EXIST);
         });
         return Boolean.TRUE;
+    }
+
+    @Override
+    public List<UserInfoResponse> getByWorkspaceId(String workspaceId) {
+        Optional<List<String>> optional = workspaceRepository.findById(workspaceId).map(WorkspaceEntity::getUserIds);
+        if (optional.isPresent() && !optional.get().isEmpty()) {
+            return userRepository.findByIdIn(optional.get());
+        }
+        return Collections.emptyList();
     }
 
 }

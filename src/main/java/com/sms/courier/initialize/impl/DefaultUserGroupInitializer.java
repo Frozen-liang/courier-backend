@@ -4,6 +4,7 @@ import com.sms.courier.entity.system.UserGroupEntity;
 import com.sms.courier.initialize.DataInitializer;
 import com.sms.courier.repository.UserGroupRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -13,14 +14,18 @@ public class DefaultUserGroupInitializer implements DataInitializer {
 
     @Override
     public void init(ApplicationContext applicationContext) {
-        UserGroupRepository userGroupRepository = applicationContext.getBean(UserGroupRepository.class);
-        boolean exists = userGroupRepository.existsByDefaultGroupIsTrue();
-        if (exists) {
-            return;
+        try {
+            UserGroupRepository userGroupRepository = applicationContext.getBean(UserGroupRepository.class);
+            boolean exists = userGroupRepository.existsByDefaultGroupIsTrue();
+            if (exists) {
+                return;
+            }
+            UserGroupEntity userGroup = UserGroupEntity.builder().name("默认分组").defaultGroup(true).build();
+            userGroupRepository.save(userGroup);
+            log.debug("Init DefaultUserGroup.");
+        } catch (BeansException e) {
+            log.error("Init DefaultUserGroup error.", e);
         }
-        UserGroupEntity userGroup = UserGroupEntity.builder().name("默认分组").defaultGroup(true).build();
-        userGroupRepository.save(userGroup);
-        log.debug("Init DefaultUserGroup.");
     }
 
     @Override

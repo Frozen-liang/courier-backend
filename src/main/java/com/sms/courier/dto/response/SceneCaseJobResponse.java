@@ -23,8 +23,8 @@ public class SceneCaseJobResponse extends BaseResponse {
 
     private String projectId;
 
-    @JsonProperty("isLock")
-    private boolean lock;
+    @JsonProperty("isNext")
+    private boolean next;
 
     private List<JobSceneCaseApiResponse> apiTestCase;
 
@@ -39,5 +39,13 @@ public class SceneCaseJobResponse extends BaseResponse {
      * 测试人员.
      */
     private String createUserName;
+
+    private Integer totalTimeCost;
+
+    private Integer paramsTotalTimeCost;
+
+    private Integer delayTimeTotalTimeCost;
+
+    private List<String> infoList;
 
 }

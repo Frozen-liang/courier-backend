@@ -37,6 +37,9 @@ public class Constants {
     public static final String ENGINE_PATH = SDK_VERSION + "/engine";
     public static final String USER_ENV_PATH = SDK_VERSION + "/user-env";
     public static final String DATA_STRUCTURE_PATE = SDK_VERSION + "/data-structure";
+    public static final String API_HISTORY_PATH = SDK_VERSION + "/api-history";
+    public static final String MOCK_API_PATH = SDK_VERSION + "/mock-api";
+    public static final String MOCK_SETTING_PATH = SDK_VERSION + "/mock-setting";
     public static final String NOTIFICATION_TEMPLATE_PATH = SDK_VERSION + "/notification-template";
     public static final String EMAIL_SERVICE_PATH = SDK_VERSION + "/email-service";
 

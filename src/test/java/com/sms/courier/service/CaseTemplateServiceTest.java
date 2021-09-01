@@ -273,8 +273,8 @@ class CaseTemplateServiceTest {
     @Test
     @DisplayName("Test the getApiList method in the CaseTemplate service")
     void getApiList_thenRight() {
-        Optional<CaseTemplateEntity> caseTemplate = Optional.ofNullable(CaseTemplateEntity.builder().build());
-        when(caseTemplateRepository.findById(any())).thenReturn(caseTemplate);
+        Optional<CaseTemplateResponse> caseTemplate = Optional.ofNullable(CaseTemplateResponse.builder().build());
+        when(customizedCaseTemplateRepository.findById(any())).thenReturn(caseTemplate);
         List<CaseTemplateApiResponse> caseTemplateApiResponseList =
             Lists.newArrayList(CaseTemplateApiResponse.builder().build());
         when(caseTemplateApiService.listResponseByCaseTemplateId(any())).thenReturn(caseTemplateApiResponseList);
@@ -284,17 +284,8 @@ class CaseTemplateServiceTest {
 
     @Test
     @DisplayName("Test the getApiList method in the CaseTemplate service thrown exception")
-    void getApiListCaseTemplateIsNull_thenThrownException() {
-        Optional<CaseTemplateEntity> caseTemplate = Optional.empty();
-        when(caseTemplateRepository.findById(any())).thenReturn(caseTemplate);
-        assertThatThrownBy(() -> caseTemplateService.getApiList(MOCK_ID))
-            .isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
-    @DisplayName("Test the getApiList method in the CaseTemplate service thrown exception")
     void getApiListCaseTemplateIsNull_then_thrownException() {
-        when(caseTemplateRepository.findById(any())).thenThrow(new RuntimeException());
+        when(customizedCaseTemplateRepository.findById(any())).thenThrow(new RuntimeException());
         assertThatThrownBy(() -> caseTemplateService.getApiList(MOCK_ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }

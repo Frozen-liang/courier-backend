@@ -81,7 +81,7 @@ class UserServiceTest {
     private static final String USERNAME = "test";
     private final UserQueryListRequest request =
         UserQueryListRequest.builder().username(USERNAME).groupId(GROUP_ID).workspaceId(WORKSPACE_ID).build();
-    private final BatchUpdateByIdRequest<ObjectId> batchUpdateRequest = new BatchUpdateByIdRequest<>(List.of(ID),
+    private final BatchUpdateByIdRequest<Object> batchUpdateRequest = new BatchUpdateByIdRequest<>(List.of(ID),
         new UpdateRequest<>());
 
     @Test

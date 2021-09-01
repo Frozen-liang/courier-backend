@@ -9,6 +9,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import com.sms.courier.dto.request.TestFileRequest;
 import com.sms.courier.repository.CustomizedFileRepository;
 import com.sms.courier.utils.ExceptionUtils;
+import com.sms.courier.utils.SecurityUtil;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,6 +49,8 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
         MultipartFile testFile = testFileRequest.getTestFile();
         Document document = new Document();
         document.put(PROJECT_ID.getName(), testFileRequest.getProjectId());
+        document.put("userId", new ObjectId(SecurityUtil.getCurrUserId()));
+        document.put("uploadUser", SecurityUtil.getCurrentUser().getUsername());
         ObjectId id = gridFsTemplate
             .store(testFile.getInputStream(), testFile.getOriginalFilename(), testFile.getContentType(), document);
         return id.toString();
@@ -64,11 +67,14 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
             throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "TestFile", id.toString());
         }
         gridFsTemplate.delete(query);
+        Document document = Objects.requireNonNullElse(gridFsFile.getMetadata(), new Document());
+        document.put("userId", new ObjectId(SecurityUtil.getCurrUserId()));
+        document.put("uploadUser", SecurityUtil.getCurrentUser().getUsername());
         MultipartFile testFile = testFileRequest.getTestFile();
         GridFsUpload<ObjectId> gridFsUpload = GridFsUpload.fromStream(testFile.getInputStream())
             .id(id).contentType(Objects.requireNonNull(testFile.getContentType()))
             .filename(Objects.requireNonNull(testFile.getOriginalFilename()))
-            .metadata(Objects.requireNonNull(gridFsFile.getMetadata())).build();
+            .metadata(document).build();
         gridFsTemplate.store(gridFsUpload);
         return true;
     }

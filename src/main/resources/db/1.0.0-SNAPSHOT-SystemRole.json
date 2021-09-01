@@ -365,6 +365,12 @@
       "name": "Project_Fun_Pull",
       "description": "引擎查询拉取最新项目函数",
       "roleType": 1
+    },
+    {
+      "id": "610126d056617f032835a98b",
+      "name": "Mock_Api_Mock_Query_All",
+      "description": "查询mock api list",
+      "roleType": 2
     }
   ]
 }

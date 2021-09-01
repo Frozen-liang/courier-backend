@@ -5,6 +5,7 @@ import static com.sms.courier.common.exception.ErrorCode.DELETE_USER_GROUP_BY_ID
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_USER_GROUP_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_USER_GROUP_LIST_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.THE_NAME_EXISTS_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,6 +32,8 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.mongodb.core.query.Query;
 
 @DisplayName("Tests for UserGroupService")
 class UserGroupServiceTest {
@@ -64,6 +67,7 @@ class UserGroupServiceTest {
     @Test
     @DisplayName("Test the add method in the UserGroup service")
     public void add_test() {
+        when(userGroupRepository.existsByName(any())).thenReturn(false);
         when(userGroupMapper.toEntity(userGroupRequest)).thenReturn(userGroup);
         when(userGroupRepository.insert(any(UserGroupEntity.class))).thenReturn(userGroup);
         assertThat(userGroupService.add(userGroupRequest)).isTrue();
@@ -73,10 +77,21 @@ class UserGroupServiceTest {
     @DisplayName("An exception occurred while adding UserGroup")
     public void add_exception_test() {
         when(userGroupMapper.toEntity(any())).thenReturn(UserGroupEntity.builder().build());
+        when(userGroupRepository.existsByName(any())).thenReturn(false);
         doThrow(new RuntimeException()).when(userGroupRepository).insert(any(UserGroupEntity.class));
         assertThatThrownBy(() -> userGroupService.add(userGroupRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_USER_GROUP_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An custom exception occurred while adding UserGroup")
+    public void add_custom_exception_test() {
+        when(userGroupMapper.toEntity(any())).thenReturn(UserGroupEntity.builder().build());
+        when(userGroupRepository.existsByName(any())).thenReturn(true);
+        assertThatThrownBy(() -> userGroupService.add(userGroupRequest))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(THE_NAME_EXISTS_ERROR.getCode());
     }
 
     @Test
@@ -110,6 +125,17 @@ class UserGroupServiceTest {
     }
 
     @Test
+    @DisplayName("An DuplicateKeyException occurred while edit UserGroup")
+    public void edit_duplicateKeyException_test() {
+        when(userGroupMapper.toEntity(userGroupRequest)).thenReturn(userGroup);
+        when(userGroupRepository.findById(ID)).thenReturn(Optional.of(userGroup));
+        doThrow(new DuplicateKeyException("")).when(userGroupRepository).save(any(UserGroupEntity.class));
+        assertThatThrownBy(() -> userGroupService.edit(userGroupRequest))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(THE_NAME_EXISTS_ERROR.getCode());
+    }
+
+    @Test
     @DisplayName("Test the list method in the UserGroup service")
     public void list_test() {
         ArrayList<UserGroupResponse> userGroupResponseList = new ArrayList<>();
@@ -135,7 +161,8 @@ class UserGroupServiceTest {
     @DisplayName("Test the delete method in the UserGroup service")
     public void delete_test() {
         List<String> ids = Collections.singletonList(ID);
-        when(commonRepository.deleteByIds(ids, UserGroupEntity.class)).thenReturn(Boolean.TRUE);
+        when(commonRepository.updateField(any(Query.class), any(), any())).thenReturn(Boolean.TRUE);
+        when(userGroupRepository.deleteByIdIn(ids)).thenReturn(Boolean.TRUE);
         assertThat(userGroupService.delete(Collections.singletonList(ID))).isTrue();
     }
 
@@ -143,8 +170,9 @@ class UserGroupServiceTest {
     @DisplayName("An exception occurred while delete UserGroup")
     public void delete_exception_test() {
         List<String> ids = Collections.singletonList(ID);
-        doThrow(new RuntimeException()).when(commonRepository)
-            .deleteByIds(ids, UserGroupEntity.class);
+        when(commonRepository.updateField(any(Query.class), any(), any())).thenReturn(Boolean.TRUE);
+        doThrow(new RuntimeException()).when(userGroupRepository)
+            .deleteByIdIn(ids);
         assertThatThrownBy(() -> userGroupService.delete(ids))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_USER_GROUP_BY_ID_ERROR.getCode());

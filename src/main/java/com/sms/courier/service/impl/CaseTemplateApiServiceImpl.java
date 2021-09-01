@@ -51,7 +51,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
 
     @Override
     @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE_API,
-        template = "{{#addCaseTemplateApiRequest.addCaseTemplateApiRequestList?.![#this.apiTestCase.apiName]}}",
+        template = "{{#addCaseTemplateApiRequest.addCaseTemplateApiRequestList?.![#this.apiTestCase.caseName]}}",
         projectId = "addCaseTemplateApiRequestList[0].projectId")
     public Boolean batchAdd(BatchAddCaseTemplateApiRequest addCaseTemplateApiRequest) {
         log.info("CaseTemplateApiService-batchAdd()-params: [CaseTemplateApi]={}",
@@ -69,7 +69,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
 
     @Override
     @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE_API,
-        template = "{{#result?.![#this.apiTestCase.apiName]}}",
+        template = "{{#result?.![#this.apiTestCase.caseName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("CaseTemplateApiService-deleteById()-params: [id]={}", ids);
@@ -85,7 +85,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API,
-        template = "{{#updateCaseTemplateApiRequest.apiTestCase.apiName}}")
+        template = "{{#updateCaseTemplateApiRequest.apiTestCase.caseName}}")
     public Boolean edit(UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest) {
         log.info("CaseTemplateApiService-edit()-params: [CaseTemplateApi]={}", updateCaseTemplateApiRequest.toString());
         try {
@@ -101,7 +101,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API, template = "{{#updateCaseTemplateApiDto"
-        + ".updateCaseTemplateApiRequestList?.![#this.apiTestCase.apiName]}}",
+        + ".updateCaseTemplateApiRequestList?.![#this.apiTestCase.caseName]}}",
         projectId = "updateCaseTemplateApiRequestList[0].projectId")
     public Boolean batchEdit(BatchUpdateCaseTemplateApiRequest updateCaseTemplateApiDto) {
         log.info("CaseTemplateApiService-batchEdit()-params: [CaseTemplateApi]={}",

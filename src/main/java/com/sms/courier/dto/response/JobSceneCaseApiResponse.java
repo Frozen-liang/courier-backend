@@ -1,5 +1,6 @@
 package com.sms.courier.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,5 +24,9 @@ public class JobSceneCaseApiResponse {
 
     private Integer order;
 
+    @JsonProperty("isLock")
+    private boolean lock;
+
     private JobApiTestCaseResponse jobApiTestCase;
+
 }

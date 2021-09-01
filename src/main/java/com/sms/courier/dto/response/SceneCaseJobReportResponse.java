@@ -17,4 +17,7 @@ public class SceneCaseJobReportResponse {
     private List<CaseReportResponse> caseReportList;
     private String message;
     private Integer totalTimeCost;
+    private Integer paramsTotalTimeCost;
+    private Integer delayTimeTotalTimeCost;
+    private List<String> infoList;
 }

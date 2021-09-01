@@ -7,6 +7,7 @@ import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.repository.impl.CustomizedSceneCaseRepositoryImpl;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +52,7 @@ class CustomizedSceneCaseRepositoryTest {
         request.setPageSize(1);
         Page<SceneCaseResponse> responses = mock(Page.class);
         when(responses.getContent()).thenReturn(apiDtoList);
-        when(commonRepository.page(any(),any(),eq(SceneCaseResponse.class))).thenReturn(responses);
+        when(commonRepository.page(any(), any(), eq(SceneCaseResponse.class))).thenReturn(responses);
         Page<SceneCaseResponse> page = customizedSceneCaseRepository.search(request, new ObjectId());
         assertThat(page).isNotNull();
     }
@@ -59,7 +60,7 @@ class CustomizedSceneCaseRepositoryTest {
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedSceneCaseRepository")
     void deleteByIds_test() {
-        when(commonRepository.deleteByIds(any(),any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(any(), any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = customizedSceneCaseRepository.deleteByIds(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }
@@ -67,7 +68,7 @@ class CustomizedSceneCaseRepositoryTest {
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedSceneCaseRepository")
     void recover_test() {
-        when(commonRepository.recover(any(),any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.recover(any(), any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = customizedSceneCaseRepository.recover(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }
@@ -85,7 +86,18 @@ class CustomizedSceneCaseRepositoryTest {
     @Test
     @DisplayName("Test the deleteGroupIdByIds method in the CustomizedSceneCaseRepository")
     void deleteGroupIdByIds_test() {
-        when(commonRepository.deleteFieldByIds(any(),any(),any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteFieldByIds(any(), any(), any())).thenReturn(Boolean.TRUE);
         assertTrue(customizedSceneCaseRepository.deleteGroupIdByIds(Lists.newArrayList(MOCK_ID)));
     }
+
+    @Test
+    @DisplayName("Test the findById method in the CustomizedSceneCaseRepository")
+    void findById_test() {
+        Optional<SceneCaseResponse> optional = Optional.ofNullable(SceneCaseResponse.builder().build());
+        when(commonRepository.findById(any(), any(), any(List.class), eq(SceneCaseResponse.class)))
+            .thenReturn(optional);
+        Optional<SceneCaseResponse> response = customizedSceneCaseRepository.findById(MOCK_ID);
+        assertThat(response).isNotEmpty();
+    }
+
 }

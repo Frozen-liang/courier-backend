@@ -119,6 +119,10 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             }
             job.setJobStatus(jobReport.getJobStatus());
             job.setMessage(jobReport.getMessage());
+            job.setParamsTotalTimeCost(jobReport.getParamsTotalTimeCost());
+            job.setTotalTimeCost(jobReport.getTotalTimeCost());
+            job.setInfoList(jobReport.getInfoList());
+            job.setDelayTimeTotalTimeCost(jobReport.getDelayTimeTotalTimeCost());
             caseDispatcherService
                 .sendJobReport(job.getCreateUserId(), jobMapper.toSceneCaseJobReportResponse(jobReport));
             sceneCaseJobRepository.save(job);
@@ -225,7 +229,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             .jobStatus(JobStatus.RUNNING)
             .environment(jobEnvironment)
             .apiTestCase(caseList)
-            .lock(request.isLock())
+            .next(request.isNext())
             .createDateTime(LocalDateTime.now())
             .modifyDateTime(LocalDateTime.now())
             .workspaceId(request.getWorkspaceId())

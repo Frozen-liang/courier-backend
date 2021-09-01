@@ -43,6 +43,7 @@ import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.mongodb.core.query.UpdateDefinition;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
@@ -246,6 +247,15 @@ public class CommonRepositoryImpl implements CommonRepository {
         Update update = new Update();
         update.set(updateRequest.getKey(), updateRequest.getValue());
         return updateMulti(ids, update, entityClass);
+    }
+
+    @Override
+    public Boolean updateField(Query query, UpdateDefinition update, Class<?> entityClass) {
+        if (Objects.isNull(query) || Objects.isNull(update) || Objects.isNull(entityClass)) {
+            return false;
+        }
+        UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
+        return updateResult.getModifiedCount() > 0;
     }
 
     private <T> ProjectionOperation getProjectionOperation(Class<T> responseClass) {

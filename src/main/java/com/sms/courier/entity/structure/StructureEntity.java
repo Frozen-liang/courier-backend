@@ -45,4 +45,5 @@ public class StructureEntity extends BaseEntity {
 
     @Indexed
     private List<String> refStructIds;
+
 }
