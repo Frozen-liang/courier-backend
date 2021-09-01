@@ -3,7 +3,6 @@ package com.sms.courier.repository.impl;
 import static com.sms.courier.common.enums.OperationModule.API;
 import static com.sms.courier.common.enums.OperationModule.API_GROUP;
 import static com.sms.courier.common.enums.OperationModule.API_TAG;
-import static com.sms.courier.common.enums.OperationModule.API_TEST_CASE;
 import static com.sms.courier.common.enums.OperationModule.USER;
 import static com.sms.courier.common.field.ApiField.API_MANAGER_ID;
 import static com.sms.courier.common.field.ApiField.API_NAME;
@@ -15,7 +14,6 @@ import static com.sms.courier.common.field.ApiField.REQUEST_METHOD;
 import static com.sms.courier.common.field.ApiField.TAG_ID;
 import static com.sms.courier.common.field.ApiTag.GROUP_NAME;
 import static com.sms.courier.common.field.ApiTag.TAG_NAME;
-import static com.sms.courier.common.field.ApiTestCaseField.CASE_API_ID;
 import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
 import static com.sms.courier.common.field.CommonField.ID;
 import static com.sms.courier.common.field.CommonField.MODIFY_DATE_TIME;
@@ -28,28 +26,34 @@ import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
+import com.sms.courier.dto.response.UserInfoResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
-import com.sms.courier.entity.mongo.GroupResultVo;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
-import com.sms.courier.entity.mongo.QueryVo;
+import com.sms.courier.entity.tag.ApiTagEntity;
 import com.sms.courier.repository.ApiGroupRepository;
+import com.sms.courier.repository.ApiTagRepository;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
+import com.sms.courier.repository.UserRepository;
+import com.sms.courier.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.collections4.CollectionUtils;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.GroupOperation;
-import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -61,12 +65,17 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
     private final MongoTemplate mongoTemplate;
     private final CommonRepository commonRepository;
     private final ApiGroupRepository apiGroupRepository;
+    private final ApiTagRepository apiTagRepository;
+    private final UserRepository userRepository;
 
     public CustomizedApiRepositoryImpl(MongoTemplate mongoTemplate, CommonRepository commonRepository,
-        ApiGroupRepository apiGroupRepository) {
+        ApiGroupRepository apiGroupRepository, ApiTagRepository apiTagRepository,
+        UserRepository userRepository) {
         this.mongoTemplate = mongoTemplate;
         this.commonRepository = commonRepository;
         this.apiGroupRepository = apiGroupRepository;
+        this.apiTagRepository = apiTagRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -76,56 +85,55 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
 
     @Override
     public Page<ApiPageResponse> page(ApiPageRequest apiPageRequest) {
-        QueryVo queryVo =
-            QueryVo.builder().collectionName(API.getCollectionName()).criteriaList(getCriteriaList(apiPageRequest))
-                .build();
-        List<LookupVo> lookupVo = pageLookup();
-        queryVo.setLookupVo(lookupVo);
-        Page<ApiPageResponse> page = commonRepository.page(queryVo, apiPageRequest, ApiPageResponse.class);
-        queryApiTestCase(page.getContent());
-        return page;
-    }
-
-    private void queryApiTestCase(List<ApiPageResponse> apiResponses) {
-        if (apiResponses.isEmpty()) {
-            return;
+        PageDtoConverter.frontMapping(apiPageRequest);
+        Pageable pageable = PageDtoConverter.createPageable(apiPageRequest);
+        Query query = new Query();
+        addCriteria(apiPageRequest, query);
+        long count = mongoTemplate.count(query, ApiEntity.class);
+        if (count == 0) {
+            return Page.empty();
         }
-        List<ObjectId> ids = apiResponses.stream().map(ApiPageResponse::getId).map(ObjectId::new)
-            .collect(Collectors.toList());
-        GroupOperation groupBy = Aggregation.group(CASE_API_ID.getName()).count().as("count");
-        MatchOperation match = Aggregation.match(Criteria.where(CASE_API_ID.getName()).in(ids));
-        List<GroupResultVo> results = mongoTemplate
-            .aggregate(Aggregation.newAggregation(match, groupBy), API_TEST_CASE.getCollectionName(),
-                GroupResultVo.class).getMappedResults();
-        Map<String, Integer> map = results.stream()
-            .collect(Collectors.toUnmodifiableMap(GroupResultVo::getId, GroupResultVo::getCount));
-        apiResponses.forEach(apiResponse -> apiResponse.setCaseCount(map.getOrDefault(apiResponse.getId(), 0)));
+        query.with(pageable);
+        List<ApiPageResponse> records = mongoTemplate.find(query, ApiPageResponse.class, API.getCollectionName());
+        List<String> tagIds = new ArrayList<>();
+        List<String> userIds = new ArrayList<>();
+        records.forEach(api -> {
+            Optional.ofNullable(api.getTagId()).ifPresent(tagIds::addAll);
+            Optional.ofNullable(api.getApiManagerId()).ifPresent(userIds::add);
+        });
+        Map<String, String> tagMap = getTagMap(tagIds);
+        Map<String, String> userMap = getUserMap(userIds);
+        records.forEach((response) -> {
+            response.setApiManager(userMap.get(response.getApiManagerId()));
+            response.setTagName(getTagName(tagMap, response.getTagId()));
+        });
+        return new PageImpl<ApiPageResponse>(records,
+            PageRequest.of(apiPageRequest.getPageNumber(), apiPageRequest.getPageSize()), count);
     }
 
     private List<LookupVo> pageLookup() {
-        List<LookupField> createUserField = List.of(
-            LookupField.builder().field(USERNAME).alias("createUsername").build(),
-            LookupField.builder().field(NICKNAME).alias("createNickname").build()
-        );
         List<LookupField> managerUserField = List.of(
             LookupField.builder().field(USERNAME).alias("apiManager").build()
         );
         List<LookupField> tagField = List.of(LookupField.builder().field(TAG_NAME).build());
         return List.of(LookupVo.builder().from(API_TAG).localField(TAG_ID).foreignField(ID).queryFields(tagField)
                 .as("apiTag").build(),
-            LookupVo.builder().from(USER).localField(CREATE_USER_ID).foreignField(ID).as("createUser")
-                .queryFields(createUserField).build(),
             LookupVo.builder().from(USER).localField(API_MANAGER_ID).foreignField(ID).as("manager")
                 .queryFields(managerUserField).build()
         );
     }
 
     private List<LookupVo> getLookupVo() {
-        List<LookupField> groupField =
-            List.of(LookupField.builder().field(GROUP_NAME).alias("groupName").build());
+        List<LookupField> createUserField = List.of(
+            LookupField.builder().field(USERNAME).alias("createUsername").build(),
+            LookupField.builder().field(NICKNAME).alias("createNickname").build()
+        );
+        List<LookupField> groupField = List.of(LookupField.builder().field(GROUP_NAME).alias("groupName").build());
         List<LookupVo> pageLookup = new ArrayList<>(pageLookup());
         pageLookup.add(LookupVo.builder().from(API_GROUP).localField(GROUP_ID).foreignField(ID).queryFields(groupField)
             .as("apiGroup").build());
+        pageLookup.add(LookupVo.builder().from(USER).localField(CREATE_USER_ID).foreignField(ID).as("createUser")
+            .queryFields(createUserField).build());
         return pageLookup;
     }
 
@@ -149,6 +157,7 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         Query query = new Query(Criteria.where(GROUP_ID.getName()).in(groupIds));
         Update update = Update.update(REMOVE.getName(), Boolean.TRUE);
         update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
+        update.unset(GROUP_ID.getName());
         mongoTemplate.updateMulti(query, update, ApiEntity.class);
     }
 
@@ -157,19 +166,29 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         return commonRepository.updateFieldByIds(ids, updateRequest, ApiEntity.class);
     }
 
-    private List<Optional<Criteria>> getCriteriaList(ApiPageRequest apiPageRequest) {
-        List<Optional<Criteria>> criteriaList = new ArrayList<>();
-        criteriaList.add(REMOVE.is(apiPageRequest.isRemoved()));
-        criteriaList.add(PROJECT_ID.is(apiPageRequest.getProjectId()));
-        criteriaList.add(API_NAME.like(apiPageRequest.getApiName()));
-        criteriaList.add(API_PATH.like(apiPageRequest.getApiPath()));
-        criteriaList.add(API_PROTOCOL.in(apiPageRequest.getApiProtocol()));
-        criteriaList.add(API_STATUS.in(apiPageRequest.getApiStatus()));
-        criteriaList.add(GROUP_ID.in(getApiGroupId(apiPageRequest.getGroupId())));
-        criteriaList.add(REQUEST_METHOD.in(apiPageRequest.getRequestMethod()));
-        criteriaList.add(TAG_ID.in(apiPageRequest.getTagId()));
-        criteriaList.add(API_MANAGER_ID.in(apiPageRequest.getApiManagerId()));
-        return criteriaList;
+    @Override
+    public Boolean update(String json) {
+        Document document = Document.parse(json);
+        Update update = Update.fromDocument(document, "caseCount", "sceneCaseCount");
+        Object id = document.get("id");
+        if (Objects.isNull(id)) {
+            return false;
+        }
+        Query query = Query.query(Criteria.where(ID.getName()).is(id));
+        return mongoTemplate.updateFirst(query, update, ApiEntity.class).getModifiedCount() == 1;
+    }
+
+    private void addCriteria(ApiPageRequest apiPageRequest, Query query) {
+        REMOVE.is(apiPageRequest.isRemoved()).ifPresent(query::addCriteria);
+        PROJECT_ID.is(apiPageRequest.getProjectId()).ifPresent(query::addCriteria);
+        API_NAME.like(apiPageRequest.getApiName()).ifPresent(query::addCriteria);
+        API_PATH.like(apiPageRequest.getApiPath()).ifPresent(query::addCriteria);
+        API_PROTOCOL.in(apiPageRequest.getApiProtocol()).ifPresent(query::addCriteria);
+        API_STATUS.in(apiPageRequest.getApiStatus()).ifPresent(query::addCriteria);
+        GROUP_ID.in(getApiGroupId(apiPageRequest.getGroupId())).ifPresent(query::addCriteria);
+        REQUEST_METHOD.in(apiPageRequest.getRequestMethod()).ifPresent(query::addCriteria);
+        TAG_ID.in(apiPageRequest.getTagId()).ifPresent(query::addCriteria);
+        API_MANAGER_ID.in(apiPageRequest.getApiManagerId()).ifPresent(query::addCriteria);
     }
 
     private List<ObjectId> getApiGroupId(ObjectId groupId) {
@@ -182,5 +201,23 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
             .map(ApiGroupEntity::getId)
             .map(ObjectId::new)
             .collect(Collectors.toList());
+    }
+
+    private List<String> getTagName(Map<String, String> tagMap, List<String> tagId) {
+        List<String> tagName = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(tagId)) {
+            tagId.forEach(a -> tagName.add(tagMap.get(a)));
+        }
+        return tagName;
+    }
+
+    private Map<String, String> getUserMap(List<String> userIds) {
+        return userRepository.findByIdIn(userIds).stream()
+            .collect(Collectors.toMap(UserInfoResponse::getId, UserInfoResponse::getUsername));
+    }
+
+    private Map<String, String> getTagMap(List<String> tagIds) {
+        return apiTagRepository.findAllByIdIn(tagIds)
+            .collect(Collectors.toMap(ApiTagEntity::getId, ApiTagEntity::getTagName));
     }
 }

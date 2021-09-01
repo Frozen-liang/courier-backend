@@ -18,6 +18,6 @@ public class SceneCaseJobReportResponse {
     private String message;
     private Integer totalTimeCost;
     private Integer paramsTotalTimeCost;
-
+    private Integer delayTimeTotalTimeCost;
     private List<String> infoList;
 }

@@ -75,7 +75,9 @@ public class ApiResponse extends LookupUserResponse {
 
     private String apiManager;
 
-    private int caseCount;
-
     private Integer apiEncodingType;
+
+    private Integer caseCount;
+
+    private Integer sceneCaseCount;
 }

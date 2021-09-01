@@ -1,9 +1,13 @@
 package com.sms.courier.repository.impl;
 
 import static com.sms.courier.common.field.ApiTestCaseJobField.API_TEST_CASE_ID;
+import static com.sms.courier.common.field.ApiTestCaseJobField.DELAY_TIME_TOTAL_TIME_COST;
 import static com.sms.courier.common.field.ApiTestCaseJobField.ENGINE_ID;
+import static com.sms.courier.common.field.ApiTestCaseJobField.INFO_LIST;
 import static com.sms.courier.common.field.ApiTestCaseJobField.JOB_API_ID;
 import static com.sms.courier.common.field.ApiTestCaseJobField.JOB_STATUS;
+import static com.sms.courier.common.field.ApiTestCaseJobField.PARAMS_TOTAL_TIME_COST;
+import static com.sms.courier.common.field.ApiTestCaseJobField.TOTAL_TIME_COST;
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
 import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
 import static com.sms.courier.common.field.CommonField.ID;
@@ -48,6 +52,10 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
         document.put(CREATE_USER_NAME, true);
         document.put(CREATE_DATE_TIME.getName(), true);
         document.put(MESSAGE, true);
+        document.put(TOTAL_TIME_COST.getName(), true);
+        document.put(PARAMS_TOTAL_TIME_COST.getName(), true);
+        document.put(DELAY_TIME_TOTAL_TIME_COST.getName(), true);
+        document.put(INFO_LIST.getName(), true);
         BasicQuery query = new BasicQuery(new Document(), document);
         API_TEST_CASE_ID.is(apiTestCaseJobPageRequest.getApiTestCaseId()).ifPresent(query::addCriteria);
         CREATE_USER_ID.in(apiTestCaseJobPageRequest.getUserIds()).ifPresent(query::addCriteria);

@@ -23,4 +23,6 @@ public interface CustomizedApiRepository {
     void deleteByGroupIds(List<String> groupIds);
 
     Boolean updateFieldByIds(List<String> ids, UpdateRequest<Object> updateRequest);
+
+    Boolean update(String json);
 }

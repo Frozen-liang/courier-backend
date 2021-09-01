@@ -42,21 +42,5 @@ public class ApiPageResponse extends LookupUserResponse {
 
     private int caseCount;
 
-
-    private Integer apiRequestParamType;
-    private String requestRaw;
-    private Integer requestRawType;
-    private List<ParamInfoResponse> requestHeaders;
-    private List<ParamInfoResponse> responseHeaders;
-    private List<ParamInfoResponse> pathParams;
-    private List<ParamInfoResponse> restfulParams;
-    private List<ParamInfoResponse> requestParams;
-    private List<ParamInfoResponse> responseParams;
-    private String preInject;
-    private String postInject;
-    private Integer apiResponseJsonType;
-    private Integer apiRequestJsonType;
-    private Integer apiResponseParamType;
-    private String responseRaw;
-    private Integer responseRawType;
+    private int sceneCount;
 }
