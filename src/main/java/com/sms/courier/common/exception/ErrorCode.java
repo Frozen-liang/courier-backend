@@ -3,6 +3,12 @@ package com.sms.courier.common.exception;
 public enum ErrorCode {
 
     SYSTEM_ERROR("9999", "System error"),
+    EMAIL_CONFIGURATION_ALREADY_EXIST("10001", "The email configuration has already exist"),
+    EMAIL_CONFIGURATION_NOT_EXIST("10002", "The email configuration is not exist"),
+    MAIL_SERVICE_IS_DISABLE("10003", "Mail service is disabled"),
+    NOTIFICATION_TEMPLATE_NOT_EXIST("10005", "The %s is not exist"),
+    RESET_ALREADY_PROCESSING("10100", "The reset is already being processed."),
+    USER_RESET_CODE_WRONG("10101", "The reset code was wrong."),
     PARSER_OPEN_API_ERROR("30001", "Document of OpenApi parsing has failed"),
     FILE_FORMAT_ERROR("30002", "File format error"),
     FILE_READ_ERROR("30003", "File has been read to fail"),
@@ -196,6 +202,7 @@ public enum ErrorCode {
     EDIT_DATA_STRUCTURE_ERROR("4188", "Failed to edit the DataStructure!"),
     THE_NAME_EXISTS_ERROR("4189", "The name of the %s already exists!"),
     GET_DATA_STRUCTURE_DATA_LIST_ERROR("4190", "Failed to get the DataStructure data list!"),
+    ACCOUNT_NOT_EXIST("4191", "The user account does not exist"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),

@@ -5,11 +5,13 @@ import static com.sms.courier.common.constant.Constants.USER_PATH;
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.request.BatchUpdateByIdRequest;
+import com.sms.courier.dto.request.PasswordResetByEmailRequest;
 import com.sms.courier.dto.request.UserPasswordUpdateRequest;
 import com.sms.courier.dto.request.UserQueryListRequest;
 import com.sms.courier.dto.request.UserRequest;
 import com.sms.courier.dto.response.UserProfileResponse;
 import com.sms.courier.dto.response.UserResponse;
+import com.sms.courier.service.UserComplexService;
 import com.sms.courier.service.UserService;
 import java.util.List;
 import org.bson.types.ObjectId;
@@ -29,9 +31,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+    private final UserComplexService userComplexService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserComplexService userComplexService) {
         this.userService = userService;
+        this.userComplexService = userComplexService;
     }
 
     @GetMapping("/profile")
@@ -85,4 +89,13 @@ public class UserController {
         return userService.batchUpdateByIds(batchUpdateRequest);
     }
 
+    @PostMapping("/password/reset")
+    public Boolean sendResetEmail(String email) {
+        return userComplexService.sendResetEmail(email);
+    }
+
+    @PostMapping("/password/reset/verify")
+    public Boolean resetPwdByEmail(@RequestBody PasswordResetByEmailRequest request) {
+        return userComplexService.resetPwdByEmail(request);
+    }
 }

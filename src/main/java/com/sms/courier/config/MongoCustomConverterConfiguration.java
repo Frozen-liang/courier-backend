@@ -86,6 +86,7 @@ public class MongoCustomConverterConfiguration {
         } catch (NoSuchBeanDefinitionException ignore) {
             throw new ApiTestPlatformException(ErrorCode.SYSTEM_ERROR);
         }
+        mappingConverter.setMapKeyDotReplacement("-");
         mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
         return mappingConverter;
     }

@@ -1,5 +1,6 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.exception.ErrorCode.ACCOUNT_NOT_EXIST;
 import static com.sms.courier.common.field.CommonField.GROUP_ID;
 
 import com.sms.courier.common.aspect.annotation.Enhance;
@@ -259,6 +260,23 @@ public class UserServiceImpl implements UserService {
             throw ExceptionUtils
                 .mpe(ErrorCode.BATCH_UPDATE_ERROR, ids, "User", updateRequest.getKey(), updateRequest.getValue());
         }
+    }
+
+    @Override
+    public Optional<UserEntity> findByEmail(String email) {
+        return userRepository.findByUsernameOrEmail(email, email);
+    }
+
+    @Override
+    public Boolean setPasswordByEmail(String email, String password) {
+        Optional<UserEntity> optional = findByEmail(email);
+        optional.ifPresentOrElse(userEntity -> {
+            userEntity.setPassword(passwordEncoder.encode(password));
+            userRepository.save(userEntity);
+        }, () -> {
+            throw new ApiTestPlatformException(ACCOUNT_NOT_EXIST);
+        });
+        return Boolean.TRUE;
     }
 
 }

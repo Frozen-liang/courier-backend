@@ -37,6 +37,8 @@ public class Constants {
     public static final String ENGINE_PATH = SDK_VERSION + "/engine";
     public static final String USER_ENV_PATH = SDK_VERSION + "/user-env";
     public static final String DATA_STRUCTURE_PATE = SDK_VERSION + "/data-structure";
+    public static final String NOTIFICATION_TEMPLATE_PATH = SDK_VERSION + "/notification-template";
+    public static final String EMAIL_SERVICE_PATH = SDK_VERSION + "/email-service";
 
     public static final int MAX_DEPTH = 3;
     public static final String HTTP_DEFAULT_STATUS_CODE = "200";
