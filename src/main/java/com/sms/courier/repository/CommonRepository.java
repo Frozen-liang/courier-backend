@@ -49,4 +49,7 @@ public interface CommonRepository {
     Boolean updateFieldByIds(List<String> ids, UpdateRequest<?> updateRequest, Class<?> entityClass);
 
     Boolean updateField(Query query, UpdateDefinition update, Class<?> entityClass);
+
+    <T> Optional<T> findByIdAndIncludeField(String id, String collectionName, List<String> filedList,
+        Class<T> responseClass);
 }
