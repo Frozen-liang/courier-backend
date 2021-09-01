@@ -20,8 +20,8 @@ public class AddSceneCaseJobRequest {
 
     private String projectId;
 
-    @JsonProperty("isLock")
-    private boolean lock;
+    @JsonProperty("isNext")
+    private boolean next;
 
     private DataCollectionRequest dataCollectionRequest;
 

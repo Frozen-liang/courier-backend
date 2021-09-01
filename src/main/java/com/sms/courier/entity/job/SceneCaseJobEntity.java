@@ -47,10 +47,10 @@ public class SceneCaseJobEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
     /**
-     * 是否锁定，当前步骤出错或未通过时，依然执行下一个步骤.
+     * 出错时，是否执行下一个步骤.
      */
-    @Field("isLock")
-    private boolean lock;
+    @Field("isNext")
+    private boolean next;
 
     private List<JobSceneCaseApi> apiTestCase;
 

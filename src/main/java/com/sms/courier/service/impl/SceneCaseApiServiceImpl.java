@@ -53,7 +53,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     @Override
     @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API,
-        template = "{{#addSceneCaseApiDto.addSceneCaseApiRequestList?.![#this.apiTestCase.apiName]}}",
+        template = "{{#addSceneCaseApiDto.addSceneCaseApiRequestList?.![#this.apiTestCase.caseName]}}",
         projectId = "addSceneCaseApiRequestList[0].projectId")
     public Boolean batchAdd(BatchAddSceneCaseApiRequest addSceneCaseApiDto) {
         log.info("SceneCaseApiService-batchAdd()-params: [SceneCaseApi]={}", addSceneCaseApiDto.toString());
@@ -70,7 +70,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     @Override
     @LogRecord(operationType = REMOVE, operationModule = SCENE_CASE_API,
-        template = "{{#result?.![#this.apiTestCase.apiName]}}",
+        template = "{{#result?.![#this.apiTestCase.caseName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("SceneCaseApiService-deleteByIds()-params: [ids]={}", ids);
@@ -85,7 +85,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
-        template = "{{#updateSceneCaseApiRequest.apiTestCase.apiName}}")
+        template = "{{#updateSceneCaseApiRequest.apiTestCase.caseName}}")
     public Boolean edit(UpdateSceneCaseApiRequest updateSceneCaseApiRequest) {
         log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", updateSceneCaseApiRequest.toString());
         try {
@@ -101,7 +101,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
-        template = "{{#updateSceneCaseApiSortOrderDto.sceneCaseApiRequestList?.![#this.apiTestCase.apiName]}}",
+        template = "{{#updateSceneCaseApiSortOrderDto.sceneCaseApiRequestList?.![#this.apiTestCase.caseName]}}",
         projectId = "sceneCaseApiRequestList[0].projectId")
     public Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiSortOrderDto) {
         log.info("SceneCaseApiService-batchEdit()-params: [SceneCaseApi]={}",
