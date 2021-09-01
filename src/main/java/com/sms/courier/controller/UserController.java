@@ -98,6 +98,7 @@ public class UserController {
     public Boolean resetPwdByEmail(@RequestBody PasswordResetByEmailRequest request) {
         return userComplexService.resetPwdByEmail(request);
     }
+
     @GetMapping("/workspaceId/{workspaceId}")
     public List<UserInfoResponse> getByWorkspaceId(@PathVariable String workspaceId) {
         return userService.getByWorkspaceId(workspaceId);

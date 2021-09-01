@@ -11,7 +11,6 @@ import com.sms.courier.dto.response.UserResponse;
 import com.sms.courier.entity.system.UserEntity;
 import java.util.List;
 import java.util.Optional;
-import org.bson.types.ObjectId;
 
 public interface UserService {
 
@@ -35,11 +34,10 @@ public interface UserService {
 
     UserEntityAuthority getUserDetailsByUserId(String id);
 
-    Boolean batchUpdateByIds(BatchUpdateByIdRequest<ObjectId> batchUpdateRequest);
-
     Optional<UserEntity> findByEmail(String email);
 
     Boolean setPasswordByEmail(String email, String password);
+
     Boolean batchUpdateByIds(BatchUpdateByIdRequest<Object> batchUpdateRequest);
 
     List<UserInfoResponse> getByWorkspaceId(String workspaceId);
