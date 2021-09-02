@@ -101,12 +101,12 @@ public class LogAspect {
     private Object getQueryResult(OperationModule operationModule, Object value) {
         if (value instanceof Collection) {
             Query query = Query.query(Criteria.where(ID.getName()).in((Collection) value));
-            return mongoTemplate.find(query, Object.class, operationModule.getCollectionName());
+            return mongoTemplate.find(query, operationModule.getEntityClass());
         }
         if (operationModule == OperationModule.TEST_FILE) {
             return fileService.findById((String) value);
         }
-        return mongoTemplate.findById(value, Object.class, operationModule.getCollectionName());
+        return mongoTemplate.findById(value, operationModule.getEntityClass());
 
     }
 

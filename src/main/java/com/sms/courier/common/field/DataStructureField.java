@@ -7,6 +7,7 @@ public enum DataStructureField implements Field {
     REF_ID("refId"),
     REF_STRUCT_IDS("refStructIds"),
     STRUCT("struct"),
+    STRUCTURE_REF("structureRef"),
     STRUCT_TYPE("structType");
 
     private final String name;

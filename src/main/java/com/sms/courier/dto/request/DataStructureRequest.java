@@ -45,5 +45,7 @@ public class DataStructureRequest {
 
     private String description;
 
-    private List<String> refStructIds;
+    private List<String> addStructIds;
+
+    private List<String> removeStructIds;
 }

@@ -12,6 +12,7 @@ import com.sms.courier.dto.response.DataStructureReferenceResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
 import com.sms.courier.service.DataStructureService;
 import java.util.List;
+import java.util.Map;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,13 +58,18 @@ public class DataStructureController {
         return dataStructureService.getDataStructureDataList(request);
     }
 
-    @DeleteMapping("/{ids}")
-    public Boolean delete(@PathVariable List<String> ids) {
-        return dataStructureService.delete(ids);
+    @PostMapping("/ref/list")
+    public List<DataStructureResponse> refStructList(@RequestBody DataStructureListRequest request) {
+        return dataStructureService.getRefStructList(request);
+    }
+
+    @DeleteMapping("/{id}")
+    public Boolean delete(@PathVariable String id) {
+        return dataStructureService.delete(id);
     }
 
     @GetMapping("/getReference/{id}")
-    public List<DataStructureReferenceResponse> getReference(@PathVariable String id) {
+    public Map<String, List<DataStructureReferenceResponse>> getReference(@PathVariable String id) {
         return dataStructureService.getReference(id);
     }
 }

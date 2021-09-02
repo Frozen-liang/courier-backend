@@ -11,7 +11,7 @@ public interface ApiGroupRepository extends MongoRepository<ApiGroupEntity, Stri
 
     void deleteAllByIdIn(List<String> ids);
 
-    List<ApiGroupEntity> findApiGroupEntitiesByProjectIdOrderByCreateDateTimeDesc(String projectId);
+    List<ApiGroupEntity> findByProjectIdOrderByNameAscCreateDateTimeDesc(String projectId);
 
     List<ApiGroupEntity> findApiGroupEntitiesByProjectId(String projectId);
 }
