@@ -9,9 +9,11 @@ public class AddCaseEvent {
 
     private final List<String> apiIds;
     private final CaseType caseType;
+    private final Integer count;
 
-    public AddCaseEvent(List<String> apiIds, CaseType caseType) {
+    public AddCaseEvent(List<String> apiIds, CaseType caseType, Integer count) {
         this.apiIds = apiIds;
         this.caseType = caseType;
+        this.count = count;
     }
 }

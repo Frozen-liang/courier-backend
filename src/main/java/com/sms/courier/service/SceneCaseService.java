@@ -33,8 +33,6 @@ public interface SceneCaseService {
 
     Boolean addTemplate(AddCaseTemplateConnRequest addCaseTemplateConnRequest);
 
-    Boolean deleteConn(String sceneCaseApiId);
-
     Boolean delete(List<String> ids);
 
     Boolean recover(List<String> ids);

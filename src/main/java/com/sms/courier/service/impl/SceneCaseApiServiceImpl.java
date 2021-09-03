@@ -14,6 +14,7 @@ import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.enums.ApiBindingStatus;
+import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.field.SceneField;
 import com.sms.courier.dto.request.BatchAddSceneCaseApiRequest;
 import com.sms.courier.dto.request.BatchUpdateSceneCaseApiRequest;
@@ -23,9 +24,11 @@ import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.mapper.SceneCaseApiMapper;
 import com.sms.courier.repository.CustomizedSceneCaseApiRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
+import com.sms.courier.service.CaseApiCountHandler;
 import com.sms.courier.service.SceneCaseApiService;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -43,12 +46,15 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     private final SceneCaseApiRepository sceneCaseApiRepository;
     private final SceneCaseApiMapper sceneCaseApiMapper;
     private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository;
+    private final CaseApiCountHandler sceneCaseApiCountHandler;
 
     public SceneCaseApiServiceImpl(SceneCaseApiRepository sceneCaseApiRepository,
-        SceneCaseApiMapper sceneCaseApiMapper, CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository) {
+        SceneCaseApiMapper sceneCaseApiMapper, CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository,
+        CaseApiCountHandler sceneCaseApiCountHandler) {
         this.sceneCaseApiRepository = sceneCaseApiRepository;
         this.sceneCaseApiMapper = sceneCaseApiMapper;
         this.customizedSceneCaseApiRepository = customizedSceneCaseApiRepository;
+        this.sceneCaseApiCountHandler = sceneCaseApiCountHandler;
     }
 
     @Override
@@ -61,6 +67,10 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
             List<SceneCaseApiEntity> caseApiList =
                 sceneCaseApiMapper.toSceneCaseApiListByAddRequest(addSceneCaseApiDto.getAddSceneCaseApiRequestList());
             sceneCaseApiRepository.insert(caseApiList);
+            List<String> addApiList = caseApiList.stream().filter(entity -> Objects.equals(entity.getApiType(),
+                ApiType.API)).map(entity -> entity.getApiTestCase().getApiEntity().getId())
+                .collect(Collectors.toList());
+            sceneCaseApiCountHandler.addSceneCaseByApiIds(addApiList);
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseApi!", e);
@@ -75,6 +85,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     public Boolean deleteByIds(List<String> ids) {
         log.info("SceneCaseApiService-deleteByIds()-params: [ids]={}", ids);
         try {
+            sceneCaseApiCountHandler.deleteSceneCaseBySceneCaseApiIds(ids);
             Long count = sceneCaseApiRepository.deleteAllByIdIsIn(ids);
             return count > 0;
         } catch (Exception e) {
@@ -188,6 +199,11 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
             log.error("Failed to update status the SceneCaseApi!", e);
             throw ExceptionUtils.mpe(ADD_SCENE_CASE_API_ERROR);
         }
+    }
+
+    @Override
+    public Long deleteAllBySceneCaseIds(List<String> ids) {
+        return sceneCaseApiRepository.deleteAllBySceneCaseIdIsIn(ids);
     }
 
 }

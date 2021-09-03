@@ -22,9 +22,10 @@ public class ApiCaseCountListenerTest {
     @DisplayName("Test deleteCase in apiCaseCountListener")
     @Test
     public void deleteCase_test() {
-        DeleteCaseEvent deleteCaseEvent = new DeleteCaseEvent(List.of("1", "1", "2", "1", "3", "4"), CaseType.CASE);
-        when(mongoTemplate.upsert(any(), any(), any(Class.class))).thenReturn(null);
+        DeleteCaseEvent deleteCaseEvent = new DeleteCaseEvent(List.of("1", "1", "2", "1", "3", "4"), CaseType.CASE,
+            null);
+        when(mongoTemplate.updateMulti(any(), any(), any(Class.class))).thenReturn(null);
         apiCaseCountListener.doProcess(deleteCaseEvent);
-        verify(mongoTemplate, times(2)).upsert(any(), any(), any(Class.class));
+        verify(mongoTemplate, times(2)).updateMulti(any(), any(), any(Class.class));
     }
 }

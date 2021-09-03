@@ -50,6 +50,6 @@ public interface CommonRepository {
 
     Boolean updateField(Query query, UpdateDefinition update, Class<?> entityClass);
 
-    <T> Optional<T> findByIdAndIncludeField(String id, String collectionName, List<String> filedList,
+    <T> List<T> findIncludeFieldByIds(List<String> ids, String collectionName, List<String> filedList,
         Class<T> responseClass);
 }

@@ -39,6 +39,7 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -78,6 +79,7 @@ class SceneCaseServiceTest {
     private CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository;
     private SceneCaseApiMapper sceneCaseApiMapper;
     private CaseTemplateApiMapper caseTemplateApiMapper;
+    private CaseApiCountHandler caseApiCountHandler;
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -102,10 +104,11 @@ class SceneCaseServiceTest {
         customizedSceneCaseApiRepository = mock(CustomizedSceneCaseApiRepository.class);
         sceneCaseApiMapper = mock(SceneCaseApiMapper.class);
         caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
+        caseApiCountHandler = mock(CaseApiCountHandler.class);
         sceneCaseService = new SceneCaseServiceImpl(sceneCaseRepository, customizedSceneCaseRepository,
             sceneCaseMapper, sceneCaseApiService, caseTemplateApiService, apiTestCaseRepository,
             apiRepository, apiTestCaseMapper, sceneCaseApiRepository, customizedSceneCaseApiRepository,
-            sceneCaseApiMapper, caseTemplateApiMapper);
+            sceneCaseApiMapper, caseTemplateApiMapper, caseApiCountHandler);
     }
 
     @Test
@@ -151,7 +154,7 @@ class SceneCaseServiceTest {
     void deleteByIds_test_thenThrownException() {
         Optional<SceneCaseEntity> sceneCase = Optional.ofNullable(SceneCaseEntity.builder().id(MOCK_ID).build());
         when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
-        doThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_ERROR)).when(sceneCaseRepository).deleteById(any());
+        doThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_ERROR)).when(sceneCaseRepository).deleteAllByIdIsIn(any());
         assertThatThrownBy(() -> sceneCaseService.deleteByIds(Lists.newArrayList(MOCK_ID)))
             .isInstanceOf(ApiTestPlatformException.class);
     }
@@ -161,7 +164,7 @@ class SceneCaseServiceTest {
     void deleteByIds_test_thenThrown_Exception() {
         Optional<SceneCaseEntity> sceneCase = Optional.ofNullable(SceneCaseEntity.builder().id(MOCK_ID).build());
         when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
-        doThrow(new RuntimeException()).when(sceneCaseRepository).deleteById(any());
+        doThrow(new RuntimeException()).when(sceneCaseRepository).deleteAllByIdIsIn(any());
         assertThatThrownBy(() -> sceneCaseService.deleteByIds(Lists.newArrayList(MOCK_ID)))
             .isInstanceOf(ApiTestPlatformException.class);
     }
@@ -404,27 +407,10 @@ class SceneCaseServiceTest {
     }
 
     @Test
-    @DisplayName("Test the deleteConn method in the SceneCase service")
-    void deleteConn_thenRight() {
-        doNothing().when(sceneCaseApiRepository).deleteById(any());
-        Boolean isSuccess = sceneCaseService.deleteConn(MOCK_ID);
-        assertTrue(isSuccess);
-    }
-
-    @Test
-    @DisplayName("Test the deleteConn method in the SceneCase service thrown exception")
-    void deleteConn_thenThrownException() {
-        doThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_CONN_ERROR)).when(sceneCaseApiRepository)
-            .deleteById(any());
-        assertThatThrownBy(() -> sceneCaseService.deleteConn(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
     @DisplayName("Test the delete method in the SceneCase service")
     void delete_thenRight() {
         when(customizedSceneCaseRepository.deleteByIds(any())).thenReturn(Boolean.TRUE);
-        List<SceneCaseApiEntity> sceneCaseApiEntityList =
-            Lists.newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).build());
+        List<String> sceneCaseApiEntityList = Lists.newArrayList(MOCK_ID);
         when(customizedSceneCaseApiRepository.findSceneCaseApiIdsBySceneCaseIds(any()))
             .thenReturn(sceneCaseApiEntityList);
         when(customizedSceneCaseApiRepository.deleteByIds(any())).thenReturn(Boolean.TRUE);
@@ -454,8 +440,7 @@ class SceneCaseServiceTest {
     @DisplayName("Test the recover method in the SceneCase service")
     void recover_thenRight() {
         when(customizedSceneCaseRepository.recover(any())).thenReturn(Boolean.TRUE);
-        List<SceneCaseApiEntity> sceneCaseApiEntityList =
-            Lists.newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).build());
+        List<String> sceneCaseApiEntityList = Lists.newArrayList(MOCK_ID);
         when(customizedSceneCaseApiRepository.findSceneCaseApiIdsBySceneCaseIds(any()))
             .thenReturn(sceneCaseApiEntityList);
         when(customizedSceneCaseApiRepository.recover(any())).thenReturn(Boolean.TRUE);

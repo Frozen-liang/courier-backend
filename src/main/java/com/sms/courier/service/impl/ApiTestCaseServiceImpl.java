@@ -1,6 +1,5 @@
 package com.sms.courier.service.impl;
 
-import static com.sms.courier.common.enums.CaseType.CASE;
 import static com.sms.courier.common.enums.OperationModule.API_TEST_CASE;
 import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.CLEAR_RECYCLE_BIN;
@@ -20,8 +19,6 @@ import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
-import com.sms.courier.common.listener.event.AddCaseEvent;
-import com.sms.courier.common.listener.event.DeleteCaseEvent;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
@@ -30,12 +27,12 @@ import com.sms.courier.mapper.ApiTestCaseMapper;
 import com.sms.courier.repository.ApiTestCaseRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.service.ApiTestCaseService;
+import com.sms.courier.service.CaseApiCountHandler;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
@@ -47,16 +44,16 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     private final ApiTestCaseRepository apiTestCaseRepository;
     private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository;
     private final ApiTestCaseMapper apiTestCaseMapper;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final CaseApiCountHandler caseApiCountHandler;
 
     public ApiTestCaseServiceImpl(ApiTestCaseRepository apiTestCaseRepository,
         CustomizedApiTestCaseRepository customizedApiTestCaseRepository,
         ApiTestCaseMapper apiTestCaseMapper,
-        ApplicationEventPublisher applicationEventPublisher) {
+        CaseApiCountHandler caseApiCountHandler) {
         this.apiTestCaseRepository = apiTestCaseRepository;
         this.customizedApiTestCaseRepository = customizedApiTestCaseRepository;
         this.apiTestCaseMapper = apiTestCaseMapper;
-        this.applicationEventPublisher = applicationEventPublisher;
+        this.caseApiCountHandler = caseApiCountHandler;
     }
 
     @Override
@@ -89,8 +86,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         try {
             ApiTestCaseEntity apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
             apiTestCaseRepository.insert(apiTestCase);
-            AddCaseEvent addCaseEvent = new AddCaseEvent(List.of(apiTestCase.getApiEntity().getId()), CASE);
-            applicationEventPublisher.publishEvent(addCaseEvent);
+            caseApiCountHandler.addTestCaseByApiIds(List.of(apiTestCase.getApiEntity().getId()));
         } catch (Exception e) {
             log.error("Failed to add the ApiTestCase!", e);
             throw new ApiTestPlatformException(ADD_API_TEST_CASE_ERROR);
@@ -128,8 +124,8 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         try {
             Boolean result = customizedApiTestCaseRepository.deleteByIds(ids);
             if (result) {
-                DeleteCaseEvent deleteCaseEvent = new DeleteCaseEvent(ids, CASE);
-                applicationEventPublisher.publishEvent(deleteCaseEvent);
+                List<String> apiIds = customizedApiTestCaseRepository.findApiIdsByTestIds(ids);
+                caseApiCountHandler.deleteTestCaseByApiIds(apiIds);
             }
             return result;
         } catch (Exception e) {
@@ -167,7 +163,12 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         template = "{{#result?.![#this.caseName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean recover(List<String> ids) {
-        return customizedApiTestCaseRepository.recover(ids);
+        Boolean isSuccess = customizedApiTestCaseRepository.recover(ids);
+        if (isSuccess) {
+            List<String> apiIds = customizedApiTestCaseRepository.findApiIdsByTestIds(ids);
+            caseApiCountHandler.addTestCaseByApiIds(apiIds);
+        }
+        return isSuccess;
     }
 
     @Override

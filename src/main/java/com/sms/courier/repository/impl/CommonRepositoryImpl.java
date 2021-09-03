@@ -263,16 +263,15 @@ public class CommonRepositoryImpl implements CommonRepository {
     }
 
     @Override
-    public <T> Optional<T> findByIdAndIncludeField(String id, String collectionName, List<String> filedList,
+    public <T> List<T> findIncludeFieldByIds(List<String> ids, String collectionName, List<String> filedList,
         Class<T> responseClass) {
         Document document = new Document();
         for (String str : filedList) {
             document.put(str, true);
         }
         BasicQuery query = new BasicQuery(new Document(), document);
-        ID.is(id).ifPresent(query::addCriteria);
-        List<T> result = mongoTemplate.find(query, responseClass);
-        return Optional.ofNullable(CollectionUtils.isNotEmpty(result) ? result.get(0) : null);
+        ID.in(ids).ifPresent(query::addCriteria);
+        return mongoTemplate.find(query, responseClass);
     }
 
     private <T> ProjectionOperation getProjectionOperation(Class<T> responseClass) {
