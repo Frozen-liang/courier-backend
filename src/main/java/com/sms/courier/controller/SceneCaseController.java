@@ -76,12 +76,6 @@ public class SceneCaseController {
         return sceneCaseService.addApi(request);
     }
 
-    @DeleteMapping("/conn/{sceneCaseApiId}")
-    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_CRE_UPD_DEL)")
-    public Boolean deleteConn(@PathVariable String sceneCaseApiId) {
-        return sceneCaseService.deleteConn(sceneCaseApiId);
-    }
-
     @PostMapping("/template")
     @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_CRE_UPD_DEL)")
     public Boolean addTemplate(@Valid @RequestBody AddCaseTemplateConnRequest addCaseTemplateConnRequest) {

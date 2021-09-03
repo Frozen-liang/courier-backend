@@ -13,7 +13,7 @@ public enum SceneField implements Field {
     STATUS("status"),
     PARENT_ID("parentId"),
     ORDER("order"),
-    API_ID("apiTestCase.apiId"),
+    API_ID("apiTestCase.apiEntity._id"),
     API_IS_EXECUTE("apiTestCase.isExecute"),
     CASE_TEMPLATE_API_CONN_LIST("caseTemplateApiConnList"),
     IS_LOCK("isLock");

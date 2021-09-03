@@ -8,6 +8,9 @@ import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedSceneCaseApiRepository;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -53,11 +56,12 @@ public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCase
     }
 
     @Override
-    public List<SceneCaseApiEntity> findSceneCaseApiIdsBySceneCaseIds(List<String> ids) {
+    public List<String> findSceneCaseApiIdsBySceneCaseIds(List<String> ids) {
         Query query = new Query();
         query.fields().include(CommonField.ID.getName());
         SceneField.SCENE_CASE_ID.in(ids).ifPresent(query::addCriteria);
-        return mongoTemplate.find(query, SceneCaseApiEntity.class);
+        return mongoTemplate.find(query, SceneCaseApiEntity.class).stream().map(SceneCaseApiEntity::getId).filter(
+            Objects::nonNull).collect(Collectors.toList());
     }
 
     @Override
@@ -68,6 +72,14 @@ public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCase
     @Override
     public Boolean recover(List<String> sceneCaseApiIds) {
         return commonRepository.recover(sceneCaseApiIds, SceneCaseApiEntity.class);
+    }
+
+    @Override
+    public long findCountByCaseTemplateId(ObjectId caseTemplateId) {
+        Query query = new Query();
+        SceneField.CASE_TEMPLATE_ID.is(caseTemplateId).ifPresent(query::addCriteria);
+        CommonField.REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
+        return mongoTemplate.count(query, "SceneCaseApi");
     }
 
 }

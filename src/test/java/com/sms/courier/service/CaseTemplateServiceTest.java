@@ -73,11 +73,12 @@ class CaseTemplateServiceTest {
     private final ApiTestCaseRepository apiTestCaseRepository = mock(ApiTestCaseRepository.class);
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository =
         mock(CustomizedCaseTemplateApiRepository.class);
+    private final CaseApiCountHandler sceneCaseApiCountHandler = mock(CaseApiCountHandler.class);
     private final CaseTemplateServiceImpl caseTemplateService = new CaseTemplateServiceImpl(caseTemplateRepository,
         customizedCaseTemplateRepository, caseTemplateMapper, caseTemplateApiService,
         sceneCaseRepository, sceneCaseApiService, caseTemplateApiMapper,
         caseTemplateApiRepository, apiRepository, apiTestCaseMapper, apiTestCaseRepository,
-        customizedCaseTemplateApiRepository);
+        customizedCaseTemplateApiRepository, sceneCaseApiCountHandler);
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -182,7 +183,7 @@ class CaseTemplateServiceTest {
     @DisplayName("Test the deleteById method in the CaseTemplate service throws exception")
     void deleteByIds_test_thenThrownException() {
         doThrow(new ApiTestPlatformException(DELETE_CASE_TEMPLATE_ERROR)).when(caseTemplateRepository)
-            .deleteById(any());
+            .deleteAllByIdIsIn(any());
         assertThatThrownBy(() -> caseTemplateService.deleteByIds(Lists.newArrayList(MOCK_ID)))
             .isInstanceOf(ApiTestPlatformException.class);
     }
@@ -191,7 +192,7 @@ class CaseTemplateServiceTest {
     @DisplayName("Test the deleteById method in the CaseTemplate service throws exception")
     void deleteByIds_test_then_thrownException() {
         doThrow(new RuntimeException()).when(caseTemplateRepository)
-            .deleteById(any());
+            .deleteAllByIdIsIn(any());
         assertThatThrownBy(() -> caseTemplateService.deleteByIds(Lists.newArrayList(MOCK_ID)))
             .isInstanceOf(ApiTestPlatformException.class);
     }
@@ -284,6 +285,15 @@ class CaseTemplateServiceTest {
 
     @Test
     @DisplayName("Test the getApiList method in the CaseTemplate service thrown exception")
+    void getApiListCaseTemplateIsNull_then_thrownSmsException() {
+        when(customizedCaseTemplateRepository.findById(any()))
+            .thenThrow(new ApiTestPlatformException(GET_CASE_TEMPLATE_ERROR));
+        assertThatThrownBy(() -> caseTemplateService.getApiList(MOCK_ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the getApiList method in the CaseTemplate service thrown exception")
     void getApiListCaseTemplateIsNull_then_thrownException() {
         when(customizedCaseTemplateRepository.findById(any())).thenThrow(new RuntimeException());
         assertThatThrownBy(() -> caseTemplateService.getApiList(MOCK_ID))
@@ -304,7 +314,7 @@ class CaseTemplateServiceTest {
         ApiTestCaseEntity testCase = ApiTestCaseEntity.builder().id(MOCK_ID).build();
         when(apiTestCaseMapper.toEntityByApiEntity(any())).thenReturn(testCase);
         when(caseTemplateApiRepository.insert(any(CaseTemplateApiEntity.class)))
-            .thenReturn(CaseTemplateApiEntity.builder().build());
+            .thenReturn(CaseTemplateApiEntity.builder().id(MOCK_ID).build());
         AddCaseTemplateApiByIdsRequest request = getAddRequest();
         Boolean isSuccess = caseTemplateService.addApi(request);
         assertTrue(isSuccess);

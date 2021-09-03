@@ -30,21 +30,26 @@ import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Test cases for CaseTemplateApiServiceTest")
 class CaseTemplateApiServiceTest {
 
+    private final CaseApiCountHandler caseApiCountHandler = mock(CaseApiCountHandler.class);
     private final CaseTemplateApiRepository caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
     private final CaseTemplateApiMapper caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
     private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository =
         mock(CustomizedSceneCaseApiRepository.class);
     private CaseTemplateApiServiceImpl caseTemplateApiService = new CaseTemplateApiServiceImpl(
-        caseTemplateApiRepository, caseTemplateApiMapper,
-        customizedSceneCaseApiRepository);
+        caseTemplateApiRepository,
+        caseTemplateApiMapper, customizedSceneCaseApiRepository,
+        caseApiCountHandler);
 
     private final static String MOCK_SCENE_CASE_ID = "1";
     private final static String MOCK_ID = new ObjectId().toString();
@@ -214,6 +219,14 @@ class CaseTemplateApiServiceTest {
         when(caseTemplateApiRepository.findById(any()))
             .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_API_BY_ID_ERROR));
         assertThatThrownBy(() -> caseTemplateApiService.getCaseTemplateApiById(MOCK_ID));
+    }
+
+    @Test
+    @DisplayName("Test the deleteAllByCaseTemplateIds method in the CaseTemplateApi service")
+    void deleteAllByCaseTemplateIds_test() {
+        when(caseTemplateApiRepository.deleteAllByCaseTemplateIdIsIn(any())).thenReturn(1L);
+        caseTemplateApiService.deleteAllByCaseTemplateIds(List.of(MOCK_ID));
+        verify(caseTemplateApiRepository, times(1)).deleteAllByCaseTemplateIdIsIn(any());
     }
 
     private BatchAddCaseTemplateApiRequest getAddDto() {

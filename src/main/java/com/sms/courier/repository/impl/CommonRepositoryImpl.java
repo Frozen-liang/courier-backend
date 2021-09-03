@@ -29,6 +29,7 @@ import java.util.Optional;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +41,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -256,6 +258,18 @@ public class CommonRepositoryImpl implements CommonRepository {
         }
         UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
         return updateResult.getModifiedCount() > 0;
+    }
+
+    @Override
+    public <T> List<T> findIncludeFieldByIds(List<String> ids, String collectionName, List<String> filedList,
+        Class<T> responseClass) {
+        Document document = new Document();
+        for (String str : filedList) {
+            document.put(str, true);
+        }
+        BasicQuery query = new BasicQuery(new Document(), document);
+        ID.in(ids).ifPresent(query::addCriteria);
+        return mongoTemplate.find(query, responseClass);
     }
 
     private <T> ProjectionOperation getProjectionOperation(Class<T> responseClass) {
