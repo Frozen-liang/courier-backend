@@ -11,7 +11,6 @@ import static com.sms.courier.common.field.UserField.USERNAME;
 
 import com.mongodb.client.result.UpdateResult;
 import com.sms.courier.common.enums.CollectionName;
-import com.sms.courier.common.field.CommonField;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.UpdateRequest;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
