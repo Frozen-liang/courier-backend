@@ -5,6 +5,7 @@ import com.sms.courier.dto.response.DataStructureListResponse;
 import com.sms.courier.dto.response.DataStructureReferenceResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
 import com.sms.courier.entity.structure.StructureEntity;
+import com.sms.courier.entity.structure.StructureRefRecordEntity;
 import com.sms.courier.utils.EnumCommonUtils;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -25,5 +26,7 @@ public interface DataStructureMapper {
 
     StructureEntity toEntity(DataStructureRequest dataStructureRequest);
 
-    List<DataStructureReferenceResponse> toReferenceResponse(List<StructureEntity> dataStructureList);
+    DataStructureReferenceResponse toReferenceResponse(StructureRefRecordEntity dataStructure);
+
+    List<DataStructureReferenceResponse> toReferenceResponses(List<StructureRefRecordEntity> dataStructureList);
 }

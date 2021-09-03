@@ -6,6 +6,7 @@ import com.sms.courier.dto.response.DataStructureListResponse;
 import com.sms.courier.dto.response.DataStructureReferenceResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
 import java.util.List;
+import java.util.Map;
 
 public interface DataStructureService {
 
@@ -15,11 +16,13 @@ public interface DataStructureService {
 
     Boolean edit(DataStructureRequest dataStructureRequest);
 
-    Boolean delete(List<String> ids);
+    Boolean delete(String ids);
 
     List<DataStructureListResponse> getDataStructureList(DataStructureListRequest request);
 
     List<DataStructureResponse> getDataStructureDataList(DataStructureListRequest request);
 
-    List<DataStructureReferenceResponse> getReference(String id);
+    Map<String, List<DataStructureReferenceResponse>> getReference(String id);
+
+    List<DataStructureResponse> getRefStructList(DataStructureListRequest request);
 }

@@ -1,6 +1,5 @@
 package com.sms.courier.repository.impl;
 
-import static com.sms.courier.common.enums.OperationModule.USER;
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
 import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
 import static com.sms.courier.common.field.CommonField.ID;
@@ -11,6 +10,7 @@ import static com.sms.courier.common.field.UserField.NICKNAME;
 import static com.sms.courier.common.field.UserField.USERNAME;
 
 import com.mongodb.client.result.UpdateResult;
+import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.field.CommonField;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.PageDto;
@@ -138,7 +138,7 @@ public class CommonRepositoryImpl implements CommonRepository {
             LookupField.builder().field(NICKNAME).alias("createNickname").build()
         );
         LookupVo lookupVo = LookupVo.builder()
-            .from(USER)
+            .from(CollectionName.USER)
             .localField(CREATE_USER_ID)
             .foreignField(ID).as("user")
             .queryFields(lookupFields).build();
@@ -283,7 +283,7 @@ public class CommonRepositoryImpl implements CommonRepository {
         ProjectionOperation projectionOperation = getProjectionOperation(responseClass);
         for (LookupVo lookupVo : lookupVos) {
             LookupOperation lookupOperation =
-                LookupOperation.newLookup().from(lookupVo.getFrom().getCollectionName())
+                LookupOperation.newLookup().from(lookupVo.getFrom().getName())
                     .localField(lookupVo.getLocalField().getName())
                     .foreignField(lookupVo.getForeignField().getName())
                     .as(lookupVo.getAs());

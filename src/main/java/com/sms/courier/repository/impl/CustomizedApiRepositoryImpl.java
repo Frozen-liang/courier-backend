@@ -1,9 +1,5 @@
 package com.sms.courier.repository.impl;
 
-import static com.sms.courier.common.enums.OperationModule.API;
-import static com.sms.courier.common.enums.OperationModule.API_GROUP;
-import static com.sms.courier.common.enums.OperationModule.API_TAG;
-import static com.sms.courier.common.enums.OperationModule.USER;
 import static com.sms.courier.common.field.ApiField.API_MANAGER_ID;
 import static com.sms.courier.common.field.ApiField.API_NAME;
 import static com.sms.courier.common.field.ApiField.API_PATH;
@@ -22,6 +18,7 @@ import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.common.field.UserField.NICKNAME;
 import static com.sms.courier.common.field.UserField.USERNAME;
 
+import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
@@ -80,7 +77,7 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
 
     @Override
     public Optional<ApiResponse> findById(String id) {
-        return commonRepository.findById(id, API.getCollectionName(), getLookupVo(), ApiResponse.class);
+        return commonRepository.findById(id, CollectionName.API.getName(), getLookupVo(), ApiResponse.class);
     }
 
     @Override
@@ -94,7 +91,7 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
             return Page.empty();
         }
         query.with(pageable);
-        List<ApiPageResponse> records = mongoTemplate.find(query, ApiPageResponse.class, API.getCollectionName());
+        List<ApiPageResponse> records = mongoTemplate.find(query, ApiPageResponse.class, CollectionName.API.getName());
         List<String> tagIds = new ArrayList<>();
         List<String> userIds = new ArrayList<>();
         records.forEach(api -> {
@@ -116,9 +113,11 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
             LookupField.builder().field(USERNAME).alias("apiManager").build()
         );
         List<LookupField> tagField = List.of(LookupField.builder().field(TAG_NAME).build());
-        return List.of(LookupVo.builder().from(API_TAG).localField(TAG_ID).foreignField(ID).queryFields(tagField)
+        return List.of(LookupVo.builder().from(CollectionName.API_TAG).localField(TAG_ID).foreignField(ID)
+                .queryFields(tagField)
                 .as("apiTag").build(),
-            LookupVo.builder().from(USER).localField(API_MANAGER_ID).foreignField(ID).as("manager")
+            LookupVo.builder().from(CollectionName.USER).localField(API_MANAGER_ID).foreignField(ID).as(
+                "manager")
                 .queryFields(managerUserField).build()
         );
     }
@@ -130,9 +129,11 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         );
         List<LookupField> groupField = List.of(LookupField.builder().field(GROUP_NAME).alias("groupName").build());
         List<LookupVo> pageLookup = new ArrayList<>(pageLookup());
-        pageLookup.add(LookupVo.builder().from(API_GROUP).localField(GROUP_ID).foreignField(ID).queryFields(groupField)
+        pageLookup.add(LookupVo.builder().from(CollectionName.API_GROUP).localField(GROUP_ID).foreignField(ID)
+            .queryFields(groupField)
             .as("apiGroup").build());
-        pageLookup.add(LookupVo.builder().from(USER).localField(CREATE_USER_ID).foreignField(ID).as("createUser")
+        pageLookup.add(LookupVo.builder().from(CollectionName.USER).localField(CREATE_USER_ID).foreignField(ID).as(
+            "createUser")
             .queryFields(createUserField).build());
         return pageLookup;
     }

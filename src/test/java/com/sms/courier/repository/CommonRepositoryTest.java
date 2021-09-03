@@ -9,7 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.mongodb.client.result.UpdateResult;
-import com.sms.courier.common.enums.OperationModule;
+import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.field.ApiField;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.PageDto;
@@ -51,7 +51,7 @@ class CommonRepositoryTest {
 
     private final Field field = ApiField.API_NAME;
 
-    private final LookupVo lookupVo = LookupVo.builder().from(OperationModule.API).localField(field).foreignField(field)
+    private final LookupVo lookupVo = LookupVo.builder().from(CollectionName.API).localField(field).foreignField(field)
         .as(COLLECTION_NAME)
         .queryFields(List.of(LookupField.builder().field(field).alias(COLLECTION_NAME).build())).build();
     private final QueryVo queryVo = QueryVo.builder().collectionName(COLLECTION_NAME).lookupVo(List.of(lookupVo))

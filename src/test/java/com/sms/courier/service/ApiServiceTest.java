@@ -30,6 +30,7 @@ import com.sms.courier.mapper.ApiHistoryMapper;
 import com.sms.courier.mapper.ApiMapper;
 import com.sms.courier.mapper.ApiMapperImpl;
 import com.sms.courier.mapper.ParamInfoMapperImpl;
+import com.sms.courier.repository.ApiDataStructureRefRecordRepository;
 import com.sms.courier.repository.ApiHistoryRepository;
 import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
@@ -54,9 +55,11 @@ class ApiServiceTest {
     private final ProjectImportSourceService projectImportSourceService = mock(ProjectImportSourceService.class);
     private final ApiHistoryMapper apiHistoryMapper = mock(ApiHistoryMapper.class);
     private final AsyncService asyncService = mock(AsyncService.class);
+    private final ApiDataStructureRefRecordRepository apiDataStructureRefRecordRepository = mock(
+        ApiDataStructureRefRecordRepository.class);
     private final ApiService apiService = new ApiServiceImpl(
         apiRepository, apiHistoryRepository, apiMapper, apiHistoryMapper, customizedApiRepository,
-        asyncService, projectImportSourceService);
+        apiDataStructureRefRecordRepository, asyncService, projectImportSourceService);
     private final ApiEntity api = ApiEntity.builder().id(ID).build();
     private final ApiResponse apiResponseDto = ApiResponse.builder().id(ID).build();
     private final ApiRequest apiRequestDto = ApiRequest.builder().id(ID).build();

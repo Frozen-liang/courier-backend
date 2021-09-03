@@ -12,7 +12,7 @@ import static com.sms.courier.common.field.SceneField.TAG_ID;
 
 import com.google.common.collect.Lists;
 import com.sms.courier.common.enums.ApiBindingStatus;
-import com.sms.courier.common.enums.OperationModule;
+import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.mongo.LookupField;
@@ -92,14 +92,14 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
     private List<LookupVo> getLookupVoList() {
         return Lists.newArrayList(
             LookupVo.builder()
-                .from(OperationModule.API_TAG)
+                .from(CollectionName.API_TAG)
                 .localField(TAG_ID)
                 .foreignField(ID)
                 .as("apiTag")
                 .queryFields(Lists.newArrayList(LookupField.builder().field(TAG_NAME).build()))
                 .build(),
             LookupVo.builder()
-                .from(OperationModule.USER)
+                .from(CollectionName.USER)
                 .localField(CREATE_USER_ID)
                 .foreignField(ID)
                 .as("user")

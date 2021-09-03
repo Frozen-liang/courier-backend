@@ -42,8 +42,4 @@ public class StructureEntity extends BaseEntity {
     private ApiRequestParamType structType;
 
     private String description;
-
-    @Indexed
-    private List<String> refStructIds;
-
 }
