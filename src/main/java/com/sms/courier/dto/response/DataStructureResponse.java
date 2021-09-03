@@ -30,5 +30,4 @@ public class DataStructureResponse extends BaseResponse {
     private String description;
 
     private List<String> refStructIds;
-
 }

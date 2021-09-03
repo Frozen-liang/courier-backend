@@ -203,6 +203,14 @@ public enum ErrorCode {
     DELETE_MOCK_API_ERROR("4195", "Failed to delete the MockApi!"),
     EDIT_MOCK_SETTING_API_ERROR("4196", "Failed to edit the Mock Setting!"),
     QUERY_MOCK_SETTING_API_ERROR("4197", "Failed to query the Mock Setting!"),
+    ADD_EMAIL_SETTINGS_ERROR("4198", "Failed to add the EmailSettings!"),
+    GET_EMAIL_SETTINGS_LIST_ERROR("4199", "Failed to get the EmailSettings list!"),
+    GET_EMAIL_SETTINGS_BY_ID_ERROR("4200", "The EmailSettings not exist!"),
+    DELETE_EMAIL_SETTINGS_BY_ID_ERROR("4201", "Failed to delete the EmailSettings!"),
+    EDIT_EMAIL_SETTINGS_ERROR("4202", "Failed to edit the EmailSettings!"),
+    CIRCULAR_REFERENCE_ERROR("4203", "There are Circular references. reference name = %s!"),
+    GET_DATA_STRUCTURE_REF_LIST_ERROR("4204", "Failed to get the DataStructure ref list!"),
+    DATE_STRUCTURE_CANNOT_DELETE_ERROR("4205", "Delete fail. This data structure has %s references!"),
 
 
     // 60001 - 61000 describes api import exception

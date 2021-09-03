@@ -1,6 +1,6 @@
 package com.sms.courier.entity.mongo;
 
-import com.sms.courier.common.enums.OperationModule;
+import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.field.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LookupVo {
 
-    // 关联的表
-    private OperationModule from;
+    // 关联的表的collectionName
+    private CollectionName from;
     // 主表的字段
     private Field localField;
     // 关联表的字段

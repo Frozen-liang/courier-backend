@@ -52,7 +52,7 @@ class ApiGroupServiceTest {
     @Test
     @DisplayName("Test the list method in the ApiGroup service")
     void list_test() {
-        when(apiGroupRepository.findApiGroupEntitiesByProjectIdOrderByCreateDateTimeDesc(any())).thenReturn(null);
+        when(apiGroupRepository.findByProjectIdOrderByNameAscCreateDateTimeDesc(any())).thenReturn(null);
         when(apiGroupMapper.toResponse(any()))
             .thenReturn(List.of(ApiGroupResponse.builder().id("1").depth(1).build(),
                 ApiGroupResponse.builder().id("2").parentId("1").depth(2).build()));
@@ -63,7 +63,7 @@ class ApiGroupServiceTest {
     @Test
     @DisplayName("Test the list method in the ApiGroup service throw exception")
     void list_test_throwException() {
-        when(apiGroupRepository.findApiGroupEntitiesByProjectIdOrderByCreateDateTimeDesc(any()))
+        when(apiGroupRepository.findByProjectIdOrderByNameAscCreateDateTimeDesc(any()))
             .thenThrow(new ApiTestPlatformException(GET_API_GROUP_LIST_ERROR));
         assertThatThrownBy(() -> apiGroupService.list(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
     }

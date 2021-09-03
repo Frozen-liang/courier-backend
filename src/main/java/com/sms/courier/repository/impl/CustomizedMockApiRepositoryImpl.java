@@ -5,7 +5,7 @@ import static com.sms.courier.common.field.CommonField.ID;
 import static com.sms.courier.common.field.CommonField.USERNAME;
 
 import com.google.common.collect.Lists;
-import com.sms.courier.common.enums.OperationModule;
+import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.field.MockField;
 import com.sms.courier.dto.request.MockApiPageRequest;
 import com.sms.courier.dto.response.MockApiResponse;
@@ -55,7 +55,7 @@ public class CustomizedMockApiRepositoryImpl implements CustomizedMockApiReposit
     private List<LookupVo> getLookupVoList() {
         return Lists.newArrayList(
             LookupVo.builder()
-                .from(OperationModule.USER)
+                .from(CollectionName.USER)
                 .localField(CREATE_USER_ID)
                 .foreignField(ID)
                 .as("user")

@@ -7,6 +7,7 @@ import com.sms.courier.dto.response.DataStructureListResponse;
 import com.sms.courier.dto.response.DataStructureReferenceResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
 import com.sms.courier.entity.structure.StructureEntity;
+import com.sms.courier.entity.structure.StructureRefRecordEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,12 +91,12 @@ class DataStructureMapperTest {
     @DisplayName("Test the method for converting an DataStructure entity list object to a reference response list "
         + "object")
     void toReferenceResponse_test() {
-        List<StructureEntity> dataStructures = new ArrayList<>();
+        List<StructureRefRecordEntity> dataStructures = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
-            dataStructures.add(StructureEntity.builder().name(NAME).build());
+            dataStructures.add(StructureRefRecordEntity.builder().name(NAME).build());
         }
         List<DataStructureReferenceResponse> referenceResponses = dataStructureMapper
-            .toReferenceResponse(dataStructures);
+            .toReferenceResponses(dataStructures);
         assertThat(referenceResponses).hasSize(SIZE);
         assertThat(referenceResponses).allMatch(result -> StringUtils.equals(result.getName(), NAME));
     }

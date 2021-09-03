@@ -15,6 +15,7 @@ import static com.sms.courier.utils.Assert.isFalse;
 
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
+import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.UserGroupRequest;
 import com.sms.courier.dto.response.UserGroupResponse;
@@ -69,7 +70,8 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     public List<UserGroupResponse> list() {
         try {
-            return commonRepository.listLookupUser(USER_GROUP.getCollectionName(), Collections.emptyList(),
+            return commonRepository.listLookupUser(CollectionName.USER_GROUP.getName(),
+                Collections.emptyList(),
                 UserGroupResponse.class);
         } catch (Exception e) {
             log.error("Failed to get the UserGroup list!", e);

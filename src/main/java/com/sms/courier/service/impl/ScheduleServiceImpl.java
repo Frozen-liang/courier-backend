@@ -1,6 +1,5 @@
 package com.sms.courier.service.impl;
 
-import static com.sms.courier.common.enums.OperationModule.SCHEDULE;
 import static com.sms.courier.common.enums.ScheduleStatusType.CREATE;
 import static com.sms.courier.common.enums.ScheduleStatusType.UPDATE;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCHEDULE_ERROR;
@@ -12,6 +11,7 @@ import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_LIST_ERROR
 import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.common.field.ScheduleField.SCHEDULE_STATUS;
 
+import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.enums.ScheduleStatusType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.field.Field;
@@ -55,7 +55,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public List<ScheduleResponse> list(ScheduleListRequest request) {
         try {
-            return commonRepository.listLookupUser(SCHEDULE.getCollectionName(), List.of(REMOVE.is(true)),
+            return commonRepository.listLookupUser(CollectionName.SCHEDULE.getName(),
+                List.of(REMOVE.is(true)),
                 ScheduleResponse.class);
         } catch (Exception e) {
             log.error("Failed to get Schedule list.");

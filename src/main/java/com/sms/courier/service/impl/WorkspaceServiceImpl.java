@@ -17,6 +17,7 @@ import static com.sms.courier.utils.Assert.isFalse;
 
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
+import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.WorkspaceRequest;
 import com.sms.courier.dto.response.WorkspaceResponse;
@@ -61,7 +62,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public List<WorkspaceResponse> list() {
         try {
-            String collectionName = WORKSPACE.getCollectionName();
+            String collectionName = CollectionName.WORKSPACE.getName();
             return commonRepository
                 .listLookupUser(collectionName, List.of(REMOVE.is(Boolean.FALSE)), WorkspaceResponse.class);
         } catch (Exception e) {
@@ -124,7 +125,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public List<WorkspaceResponse> findByUserId() {
-        return commonRepository.listLookupUser(WORKSPACE.getCollectionName(),
+        return commonRepository.listLookupUser(CollectionName.WORKSPACE.getName(),
             List.of(REMOVE.is(Boolean.FALSE), USER_IDS.is(new ObjectId(SecurityUtil.getCurrUserId()))),
             WorkspaceResponse.class
         );
