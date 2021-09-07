@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 @AllArgsConstructor
 @Builder
 @Document(collection = "Services")
-@CompoundIndex(def = "{'ip': 1, 'port': 1}",unique = true)
+@CompoundIndex(def = "{'ip': 1, 'port': 1}", unique = true)
 public class ServicesEntity {
 
     @MongoId(FieldType.OBJECT_ID)
