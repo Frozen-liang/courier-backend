@@ -34,6 +34,14 @@ public class Role {
     public static final String PROJECT_DELETE = "Project" + DELETE;
     public static final String PROJECT_QUERY_ALL = "Project" + QUERY_ALL;
     public static final String PROJECT_QUERY_OWN = "Project" + QUERY_OWN;
+    
+    
+    // DataStructure
+    public static final String DATA_STRUCTURE_CREATE = "Data_Structure" + CREATE;
+    public static final String DATA_STRUCTURE_UPDATE = "Data_Structure" + UPDATE;
+    public static final String DATA_STRUCTURE_DELETE = "Data_Structure" + DELETE;
+    public static final String DATA_STRUCTURE_QUERY_ALL = "Data_Structure" + QUERY_ALL;
+    public static final String DATA_STRUCTURE_QUERY_OWN = "Data_Structure" + QUERY_OWN;
 
     // GlobalEnvironment
     public static final String GLOBAL_ENV_CREATE = "Global_Env" + CREATE;

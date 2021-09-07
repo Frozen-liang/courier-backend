@@ -73,6 +73,30 @@
       "roleType": 0
     },
     {
+      "id": "610126d056617f032835a96a",
+      "name": "Data_Structure_Create",
+      "description": "数据结构增加",
+      "roleType": 0
+    },
+    {
+      "id": "610126d056617f032835a96b",
+      "name": "Data_Structure_Update",
+      "description": "数据结构修改",
+      "roleType": 0
+    },
+    {
+      "id": "610126d056617f032835a96c",
+      "name": "Data_Structure_Delete",
+      "description": "数据结构删除",
+      "roleType": 0
+    },
+    {
+      "id": "610126d056617f032835a96d",
+      "name": "Data_Structure_Query_All",
+      "description": "查询所有数据结构",
+      "roleType": 0
+    },
+    {
       "id": "610126d056617f032835a95c",
       "name": "Global_Env_Create",
       "description": "全局环境增加",
@@ -118,6 +142,18 @@
       "id": "610126d056617f032835a963",
       "name": "Global_Fun_Query_All",
       "description": "查询所有的全局函数",
+      "roleType": 0
+    },
+    {
+      "id": "610126d056617f032835a76e",
+      "name": "Mock_Setting_Create_Update_Delete",
+      "description": "Mock设置增加修改删除",
+      "roleType": 0
+    },
+    {
+      "id": "610126d056617f032835a76s",
+      "name": "Mock_Setting_Query_All",
+      "description": "查询所有的Mock设置",
       "roleType": 0
     },
     {
@@ -172,6 +208,18 @@
       "id": "610126d056617f032835a96c",
       "name": "Api_Group_Create_Update_Delete",
       "description": "Api分组增加修改删除",
+      "roleType": 0
+    },
+    {
+      "id": "610126d056617f032835a96e",
+      "name": "Mock_Api_Create_Update_Delete",
+      "description": "MockApi增加修改删除",
+      "roleType": 0
+    },
+    {
+      "id": "610126d056617f032835a96f",
+      "name": "Mock_Api_Query_All",
+      "description": "查询所有的MockApi",
       "roleType": 0
     },
     {
