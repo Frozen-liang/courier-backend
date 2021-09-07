@@ -40,7 +40,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         log.error("[Application = API Testing Platform][Exception Level=INTERNAL_SERVER_ERROR]:", e);
         return Response.error(Integer.toString(HttpStatus.INTERNAL_SERVER_ERROR.value()),
-            e.getMessage());
+            "Server error");
     }
 
     @ExceptionHandler(AccessDeniedException.class)

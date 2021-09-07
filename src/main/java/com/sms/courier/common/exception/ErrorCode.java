@@ -208,7 +208,7 @@ public enum ErrorCode {
     GET_EMAIL_SETTINGS_BY_ID_ERROR("4200", "The EmailSettings not exist!"),
     DELETE_EMAIL_SETTINGS_BY_ID_ERROR("4201", "Failed to delete the EmailSettings!"),
     EDIT_EMAIL_SETTINGS_ERROR("4202", "Failed to edit the EmailSettings!"),
-    CIRCULAR_REFERENCE_ERROR("4203", "There are Circular references. reference name = %s!"),
+    CIRCULAR_REFERENCE_ERROR("4203", "There are Circular references."),
     GET_DATA_STRUCTURE_REF_LIST_ERROR("4204", "Failed to get the DataStructure ref list!"),
     DATE_STRUCTURE_CANNOT_DELETE_ERROR("4205", "Delete fail. This data structure has %s references!"),
 

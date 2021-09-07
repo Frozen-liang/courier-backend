@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface EmailSettingsRepository extends MongoRepository<EmailSettingsEntity, String> {
 
-    Boolean deleteByIdIn(List<String> ids);
+    Long deleteByIdIn(List<String> ids);
 }

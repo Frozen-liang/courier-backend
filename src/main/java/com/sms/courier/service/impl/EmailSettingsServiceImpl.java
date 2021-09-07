@@ -89,7 +89,7 @@ public class EmailSettingsServiceImpl implements EmailSettingsService {
     @Override
     public Boolean delete(List<String> ids) {
         try {
-            return emailSettingsRepository.deleteByIdIn(ids);
+            return emailSettingsRepository.deleteByIdIn(ids) > 0;
         } catch (Exception e) {
             log.error("Failed to delete the EmailSettings!", e);
             throw new ApiTestPlatformException(DELETE_EMAIL_SETTINGS_BY_ID_ERROR);

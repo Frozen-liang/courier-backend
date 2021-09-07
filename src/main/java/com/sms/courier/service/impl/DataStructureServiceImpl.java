@@ -261,7 +261,7 @@ public class DataStructureServiceImpl implements DataStructureService {
         for (StructureRefRecordEntity refRecordEntity : refEntities) {
             // 如果当前数据结构直接引用或间接引用中包含当前结构 则出现了循环引用 抛出异常
             if (id.equals(refRecordEntity.getId())) {
-                throw ExceptionUtils.mpe(CIRCULAR_REFERENCE_ERROR, refRecordEntity.getName());
+                throw ExceptionUtils.mpe(CIRCULAR_REFERENCE_ERROR);
             }
             checkRefEntity(refRecordEntity.getStructureRef(), id);
         }
