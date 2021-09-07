@@ -46,6 +46,7 @@ import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
 import com.sms.courier.mapper.CaseTemplateApiMapper;
 import com.sms.courier.mapper.CaseTemplateMapper;
+import com.sms.courier.mapper.MatchParamInfoMapper;
 import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.ApiTestCaseRepository;
 import com.sms.courier.repository.CaseTemplateApiRepository;
@@ -88,6 +89,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     private final ApiTestCaseRepository apiTestCaseRepository;
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
     private final CaseApiCountHandler caseApiCountHandler;
+    private final MatchParamInfoMapper matchParamInfoMapper;
 
 
     public CaseTemplateServiceImpl(CaseTemplateRepository caseTemplateRepository,
@@ -98,7 +100,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         CaseTemplateApiRepository caseTemplateApiRepository, ApiRepository apiRepository,
         ApiTestCaseMapper apiTestCaseMapper, ApiTestCaseRepository apiTestCaseRepository,
         CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository,
-        CaseApiCountHandler sceneCaseApiCountHandler) {
+        CaseApiCountHandler sceneCaseApiCountHandler, MatchParamInfoMapper matchParamInfoMapper) {
         this.caseTemplateRepository = caseTemplateRepository;
         this.customizedCaseTemplateRepository = customizedCaseTemplateRepository;
         this.caseTemplateMapper = caseTemplateMapper;
@@ -112,6 +114,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         this.apiTestCaseRepository = apiTestCaseRepository;
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
         this.caseApiCountHandler = sceneCaseApiCountHandler;
+        this.matchParamInfoMapper = matchParamInfoMapper;
     }
 
     @Override
@@ -362,8 +365,11 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         apiTestCase.setResponseParamsExtractionType(ResponseParamsExtractionType.JSON);
         apiTestCase.setHttpStatusVerification(HttpStatusVerification.builder().statusCode(
             Constants.HTTP_DEFAULT_STATUS_CODE).build());
-        apiTestCase.setResponseResultVerification(ResponseResultVerification.builder().resultVerificationType(
-            ResultVerificationType.JSON).apiResponseJsonType(apiEntity.getApiResponseJsonType()).build());
+        apiTestCase.setResponseResultVerification(ResponseResultVerification.builder()
+            .resultVerificationType(ResultVerificationType.JSON)
+            .apiResponseJsonType(apiEntity.getApiResponseJsonType())
+            .params(matchParamInfoMapper.toMatchParamInfoList(apiEntity.getResponseParams()))
+            .build());
     }
 
     private void resetApiTestCaseByCase(ApiTestCaseEntity apiTestCase) {

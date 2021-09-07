@@ -51,6 +51,7 @@ import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
 import com.sms.courier.mapper.CaseTemplateApiMapper;
+import com.sms.courier.mapper.MatchParamInfoMapper;
 import com.sms.courier.mapper.SceneCaseApiMapper;
 import com.sms.courier.mapper.SceneCaseMapper;
 import com.sms.courier.repository.ApiRepository;
@@ -96,6 +97,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private final SceneCaseApiMapper sceneCaseApiMapper;
     private final CaseTemplateApiMapper caseTemplateApiMapper;
     private final CaseApiCountHandler caseApiCountHandler;
+    private final MatchParamInfoMapper matchParamInfoMapper;
 
     public SceneCaseServiceImpl(SceneCaseRepository sceneCaseRepository,
         CustomizedSceneCaseRepository customizedSceneCaseRepository,
@@ -105,7 +107,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         ApiTestCaseMapper apiTestCaseMapper, SceneCaseApiRepository sceneCaseApiRepository,
         CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository,
         SceneCaseApiMapper sceneCaseApiMapper, CaseTemplateApiMapper caseTemplateApiMapper,
-        CaseApiCountHandler sceneCaseApiCountHandler) {
+        CaseApiCountHandler sceneCaseApiCountHandler, MatchParamInfoMapper matchParamInfoMapper) {
         this.sceneCaseRepository = sceneCaseRepository;
         this.customizedSceneCaseRepository = customizedSceneCaseRepository;
         this.sceneCaseMapper = sceneCaseMapper;
@@ -119,6 +121,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         this.sceneCaseApiMapper = sceneCaseApiMapper;
         this.caseTemplateApiMapper = caseTemplateApiMapper;
         this.caseApiCountHandler = sceneCaseApiCountHandler;
+        this.matchParamInfoMapper = matchParamInfoMapper;
     }
 
     @Override
@@ -379,8 +382,11 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private void resetApiTestCaseByApi(ApiTestCaseEntity apiTestCase, ApiEntity apiEntity) {
         apiTestCase.setHttpStatusVerification(HttpStatusVerification.builder().statusCode(
             Constants.HTTP_DEFAULT_STATUS_CODE).build());
-        apiTestCase.setResponseResultVerification(ResponseResultVerification.builder().resultVerificationType(
-            ResultVerificationType.JSON).apiResponseJsonType(apiEntity.getApiResponseJsonType()).build());
+        apiTestCase.setResponseResultVerification(ResponseResultVerification.builder()
+            .resultVerificationType(ResultVerificationType.JSON)
+            .apiResponseJsonType(apiEntity.getApiResponseJsonType())
+            .params(matchParamInfoMapper.toMatchParamInfoList(apiEntity.getResponseParams()))
+            .build());
     }
 
     private void resetSceneCaseApiConn(SceneCaseApiConnResponse response,

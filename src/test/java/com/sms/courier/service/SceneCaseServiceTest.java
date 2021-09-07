@@ -24,6 +24,7 @@ import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
 import com.sms.courier.mapper.CaseTemplateApiMapper;
+import com.sms.courier.mapper.MatchParamInfoMapper;
 import com.sms.courier.mapper.SceneCaseApiMapper;
 import com.sms.courier.mapper.SceneCaseMapper;
 import com.sms.courier.repository.ApiRepository;
@@ -39,7 +40,6 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -47,7 +47,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_CONN_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
@@ -80,6 +79,7 @@ class SceneCaseServiceTest {
     private SceneCaseApiMapper sceneCaseApiMapper;
     private CaseTemplateApiMapper caseTemplateApiMapper;
     private CaseApiCountHandler caseApiCountHandler;
+    private MatchParamInfoMapper matchParamInfoMapper;
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -105,10 +105,11 @@ class SceneCaseServiceTest {
         sceneCaseApiMapper = mock(SceneCaseApiMapper.class);
         caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
         caseApiCountHandler = mock(CaseApiCountHandler.class);
+        matchParamInfoMapper = mock(MatchParamInfoMapper.class);
         sceneCaseService = new SceneCaseServiceImpl(sceneCaseRepository, customizedSceneCaseRepository,
             sceneCaseMapper, sceneCaseApiService, caseTemplateApiService, apiTestCaseRepository,
             apiRepository, apiTestCaseMapper, sceneCaseApiRepository, customizedSceneCaseApiRepository,
-            sceneCaseApiMapper, caseTemplateApiMapper, caseApiCountHandler);
+            sceneCaseApiMapper, caseTemplateApiMapper, caseApiCountHandler, matchParamInfoMapper);
     }
 
     @Test

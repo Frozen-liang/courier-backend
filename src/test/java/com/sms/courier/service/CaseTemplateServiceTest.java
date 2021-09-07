@@ -21,6 +21,7 @@ import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
 import com.sms.courier.mapper.CaseTemplateApiMapper;
 import com.sms.courier.mapper.CaseTemplateMapper;
+import com.sms.courier.mapper.MatchParamInfoMapper;
 import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.ApiTestCaseRepository;
 import com.sms.courier.repository.CaseTemplateApiRepository;
@@ -74,11 +75,12 @@ class CaseTemplateServiceTest {
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository =
         mock(CustomizedCaseTemplateApiRepository.class);
     private final CaseApiCountHandler sceneCaseApiCountHandler = mock(CaseApiCountHandler.class);
+    private final MatchParamInfoMapper matchParamInfoMapper = mock(MatchParamInfoMapper.class);
     private final CaseTemplateServiceImpl caseTemplateService = new CaseTemplateServiceImpl(caseTemplateRepository,
         customizedCaseTemplateRepository, caseTemplateMapper, caseTemplateApiService,
         sceneCaseRepository, sceneCaseApiService, caseTemplateApiMapper,
         caseTemplateApiRepository, apiRepository, apiTestCaseMapper, apiTestCaseRepository,
-        customizedCaseTemplateApiRepository, sceneCaseApiCountHandler);
+        customizedCaseTemplateApiRepository, sceneCaseApiCountHandler, matchParamInfoMapper);
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
