@@ -53,6 +53,7 @@ import com.sms.courier.repository.CaseTemplateRepository;
 import com.sms.courier.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.courier.repository.CustomizedCaseTemplateRepository;
 import com.sms.courier.repository.SceneCaseRepository;
+import com.sms.courier.service.CaseApiCountHandler;
 import com.sms.courier.service.CaseTemplateApiService;
 import com.sms.courier.service.CaseTemplateService;
 import com.sms.courier.service.SceneCaseApiService;
@@ -86,6 +87,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     private final ApiTestCaseMapper apiTestCaseMapper;
     private final ApiTestCaseRepository apiTestCaseRepository;
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
+    private final CaseApiCountHandler caseApiCountHandler;
+
 
     public CaseTemplateServiceImpl(CaseTemplateRepository caseTemplateRepository,
         CustomizedCaseTemplateRepository customizedCaseTemplateRepository,
@@ -94,7 +97,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         CaseTemplateApiMapper caseTemplateApiMapper,
         CaseTemplateApiRepository caseTemplateApiRepository, ApiRepository apiRepository,
         ApiTestCaseMapper apiTestCaseMapper, ApiTestCaseRepository apiTestCaseRepository,
-        CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository) {
+        CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository,
+        CaseApiCountHandler sceneCaseApiCountHandler) {
         this.caseTemplateRepository = caseTemplateRepository;
         this.customizedCaseTemplateRepository = customizedCaseTemplateRepository;
         this.caseTemplateMapper = caseTemplateMapper;
@@ -107,6 +111,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         this.apiTestCaseMapper = apiTestCaseMapper;
         this.apiTestCaseRepository = apiTestCaseRepository;
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
+        this.caseApiCountHandler = sceneCaseApiCountHandler;
     }
 
     @Override
@@ -181,10 +186,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     public Boolean deleteByIds(List<String> ids) {
         log.info("CaseTemplateService-deleteById()-params: [id]={}", ids);
         try {
-            for (String id : ids) {
-                caseTemplateRepository.deleteById(id);
-                deleteCaseTemplateApi(id);
-            }
+            caseTemplateRepository.deleteAllByIdIsIn(ids);
+            caseTemplateApiService.deleteAllByCaseTemplateIds(ids);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
@@ -288,6 +291,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
                     caseTemplateApiEntityList.stream().map(CaseTemplateApiEntity::getId).collect(
                         Collectors.toList());
                 customizedCaseTemplateApiRepository.deleteByIds(caseTemplateApiIds);
+                caseApiCountHandler.deleteTemplateCaseByCaseTemplateApiIds(caseTemplateApiIds);
             }
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
@@ -313,6 +317,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
                     caseTemplateApiEntityList.stream().map(CaseTemplateApiEntity::getId).collect(
                         Collectors.toList());
                 customizedCaseTemplateApiRepository.recover(caseTemplateApiIds);
+                caseApiCountHandler.addTemplateCaseByCaseTemplateApiIds(caseTemplateApiIds);
             }
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
@@ -346,16 +351,9 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
                 .order(addSceneCaseApi.getOrder())
                 .apiType(ApiType.API)
                 .build();
-        caseTemplateApiRepository.insert(caseTemplateApi);
-
-    }
-
-    private void deleteCaseTemplateApi(String id) {
-        List<CaseTemplateApiEntity> caseTemplateApiList = caseTemplateApiService.listByCaseTemplateId(id);
-        if (CollectionUtils.isNotEmpty(caseTemplateApiList)) {
-            List<String> ids = caseTemplateApiList.stream().map(CaseTemplateApiEntity::getId)
-                .collect(Collectors.toList());
-            caseTemplateApiService.deleteByIds(ids);
+        caseTemplateApi = caseTemplateApiRepository.insert(caseTemplateApi);
+        if (Objects.nonNull(caseTemplateApi.getId())) {
+            caseApiCountHandler.addTemplateCaseByCaseTemplateApiIds(List.of(caseTemplateApi.getId()));
         }
     }
 
@@ -372,4 +370,5 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         apiTestCase.setExecute(Boolean.TRUE);
         apiTestCase.setResponseParamsExtractionType(ResponseParamsExtractionType.JSON);
     }
+
 }

@@ -2,6 +2,7 @@ package com.sms.courier.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
@@ -12,6 +13,7 @@ import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.repository.impl.CustomizedSceneCaseApiRepositoryImpl;
 import java.util.List;
 import org.assertj.core.util.Lists;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -67,9 +69,18 @@ class CustomizedSceneCaseApiRepositoryTest {
     @DisplayName("Test the findSceneCaseApiIdsBySceneCaseIds method in the CustomizedSceneCaseApiRepository")
     void findSceneCaseApiIdsBySceneCaseIds_test() {
         when(mongoTemplate.find(any(), any()))
-            .thenReturn(Lists.newArrayList(CaseTemplateEntity.builder().build()));
-        List<SceneCaseApiEntity> dto =
+            .thenReturn(Lists.newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).build()));
+        List<String> dto =
             customizedSceneCaseApiRepository.findSceneCaseApiIdsBySceneCaseIds(Lists.newArrayList(MOCK_ID));
         assertThat(dto).isNotEmpty();
     }
+
+    @Test
+    @DisplayName("Test the findCountByCaseTemplateId method in the CustomizedSceneCaseApiRepository")
+    void findCountByCaseTemplateId_test() {
+        when(mongoTemplate.count(any(),anyString())).thenReturn(1L);
+        long count = customizedSceneCaseApiRepository.findCountByCaseTemplateId(new ObjectId());
+        assertThat(count).isEqualTo(1L);
+    }
+
 }

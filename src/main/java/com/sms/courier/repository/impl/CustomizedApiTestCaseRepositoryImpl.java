@@ -23,6 +23,7 @@ import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -78,6 +79,14 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
             .criteriaList(buildCriteria(apiId, projectId, removed))
             .build();
         return commonRepository.list(queryVo, ApiTestCaseResponse.class);
+    }
+
+    @Override
+    public List<String> findApiIdsByTestIds(List<String> ids) {
+        List<ApiTestCaseEntity> entityList = commonRepository.findIncludeFieldByIds(ids, "ApiTestCase",
+            Lists.newArrayList(API_ID.getName()), ApiTestCaseEntity.class);
+        return entityList.stream().map(entity -> entity.getApiEntity().getId())
+            .collect(Collectors.toList());
     }
 
     private List<LookupVo> getLookupVoList() {

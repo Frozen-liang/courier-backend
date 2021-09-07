@@ -8,7 +8,6 @@ import static com.sms.courier.common.enums.OperationType.RECOVER;
 import static com.sms.courier.common.enums.OperationType.REMOVE;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_CONN_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_CONN_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
@@ -60,6 +59,7 @@ import com.sms.courier.repository.CustomizedSceneCaseApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
 import com.sms.courier.repository.SceneCaseRepository;
+import com.sms.courier.service.CaseApiCountHandler;
 import com.sms.courier.service.CaseTemplateApiService;
 import com.sms.courier.service.SceneCaseApiService;
 import com.sms.courier.service.SceneCaseService;
@@ -95,6 +95,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository;
     private final SceneCaseApiMapper sceneCaseApiMapper;
     private final CaseTemplateApiMapper caseTemplateApiMapper;
+    private final CaseApiCountHandler caseApiCountHandler;
 
     public SceneCaseServiceImpl(SceneCaseRepository sceneCaseRepository,
         CustomizedSceneCaseRepository customizedSceneCaseRepository,
@@ -103,7 +104,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         ApiTestCaseRepository apiTestCaseRepository, ApiRepository apiRepository,
         ApiTestCaseMapper apiTestCaseMapper, SceneCaseApiRepository sceneCaseApiRepository,
         CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository,
-        SceneCaseApiMapper sceneCaseApiMapper, CaseTemplateApiMapper caseTemplateApiMapper) {
+        SceneCaseApiMapper sceneCaseApiMapper, CaseTemplateApiMapper caseTemplateApiMapper,
+        CaseApiCountHandler sceneCaseApiCountHandler) {
         this.sceneCaseRepository = sceneCaseRepository;
         this.customizedSceneCaseRepository = customizedSceneCaseRepository;
         this.sceneCaseMapper = sceneCaseMapper;
@@ -116,6 +118,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         this.customizedSceneCaseApiRepository = customizedSceneCaseApiRepository;
         this.sceneCaseApiMapper = sceneCaseApiMapper;
         this.caseTemplateApiMapper = caseTemplateApiMapper;
+        this.caseApiCountHandler = sceneCaseApiCountHandler;
     }
 
     @Override
@@ -138,10 +141,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     public Boolean deleteByIds(List<String> ids) {
         log.info("SceneCaseService-deleteById()-params: [ids]={}", ids.toString());
         try {
-            for (String id : ids) {
-                sceneCaseRepository.deleteById(id);
-                deleteSceneCaseApi(id);
-            }
+            sceneCaseRepository.deleteAllByIdIsIn(ids);
+            sceneCaseApiService.deleteAllBySceneCaseIds(ids);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
@@ -287,6 +288,10 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                     .caseTemplateApiConnList(sceneCaseMapper.toCaseTemplateApiConnList(caseTemplateApiList))
                     .build();
                 sceneCaseApiRepository.insert(sceneCaseApi);
+                List<String> apiIds =
+                    caseTemplateApiList.stream().filter(template -> Objects.equals(template.getApiType(), ApiType.API))
+                        .map(template -> template.getApiTestCase().getApiEntity().getId()).collect(Collectors.toList());
+                caseApiCountHandler.addSceneCaseByApiIds(apiIds);
             }
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
@@ -299,29 +304,17 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
-    public Boolean deleteConn(String sceneCaseApiId) {
-        try {
-            sceneCaseApiRepository.deleteById(sceneCaseApiId);
-            return Boolean.TRUE;
-        } catch (Exception e) {
-            log.error("Failed to delete the SceneCase conn!", e);
-            throw ExceptionUtils.mpe(DELETE_SCENE_CASE_CONN_ERROR);
-        }
-    }
-
-    @Override
     @LogRecord(operationType = DELETE, operationModule = SCENE_CASE,
         template = "{{#res?.![#this.caseName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids", queryResultKey = "res"))
     public Boolean delete(List<String> ids) {
         try {
             customizedSceneCaseRepository.deleteByIds(ids);
-            List<SceneCaseApiEntity> sceneCaseApiEntityList = customizedSceneCaseApiRepository
+            List<String> sceneCaseApiIds = customizedSceneCaseApiRepository
                 .findSceneCaseApiIdsBySceneCaseIds(ids);
-            if (CollectionUtils.isNotEmpty(sceneCaseApiEntityList)) {
-                List<String> sceneCaseApiIds = sceneCaseApiEntityList.stream().map(SceneCaseApiEntity::getId).collect(
-                    Collectors.toList());
+            if (CollectionUtils.isNotEmpty(sceneCaseApiIds)) {
                 customizedSceneCaseApiRepository.deleteByIds(sceneCaseApiIds);
+                caseApiCountHandler.deleteSceneCaseBySceneCaseApiIds(sceneCaseApiIds);
             }
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
@@ -340,12 +333,10 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     public Boolean recover(List<String> ids) {
         try {
             customizedSceneCaseRepository.recover(ids);
-            List<SceneCaseApiEntity> sceneCaseApiEntityList = customizedSceneCaseApiRepository
-                .findSceneCaseApiIdsBySceneCaseIds(ids);
-            if (CollectionUtils.isNotEmpty(sceneCaseApiEntityList)) {
-                List<String> sceneCaseApiIds = sceneCaseApiEntityList.stream().map(SceneCaseApiEntity::getId).collect(
-                    Collectors.toList());
+            List<String> sceneCaseApiIds = customizedSceneCaseApiRepository.findSceneCaseApiIdsBySceneCaseIds(ids);
+            if (CollectionUtils.isNotEmpty(sceneCaseApiIds)) {
                 customizedSceneCaseApiRepository.recover(sceneCaseApiIds);
+                caseApiCountHandler.addSceneCaseBySceneCaseApiIds(sceneCaseApiIds);
             }
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
@@ -354,14 +345,6 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         } catch (Exception e) {
             log.error("Failed to recover the SceneCase!", e);
             throw ExceptionUtils.mpe(RECOVER_SCENE_CASE_ERROR);
-        }
-    }
-
-    private void deleteSceneCaseApi(String id) {
-        List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiService.listBySceneCaseId(id);
-        if (CollectionUtils.isNotEmpty(sceneCaseApiList)) {
-            List<String> ids = sceneCaseApiList.stream().map(SceneCaseApiEntity::getId).collect(Collectors.toList());
-            sceneCaseApiService.deleteByIds(ids);
         }
     }
 
@@ -387,7 +370,10 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 .projectId(sceneCase.getProjectId())
                 .apiType(ApiType.API)
                 .build();
-        sceneCaseApiRepository.insert(sceneCaseApi);
+        sceneCaseApi = sceneCaseApiRepository.insert(sceneCaseApi);
+        if (Objects.nonNull(sceneCaseApi.getId())) {
+            caseApiCountHandler.addSceneCaseByApiIds(List.of(apiTestCase.getApiEntity().getId()));
+        }
     }
 
     private void resetApiTestCaseByApi(ApiTestCaseEntity apiTestCase, ApiEntity apiEntity) {

@@ -17,4 +17,6 @@ public interface CustomizedApiTestCaseRepository {
     Boolean recover(List<String> ids);
 
     List<ApiTestCaseResponse> listByJoin(ObjectId apiId, ObjectId projectId, boolean removed);
+
+    List<String> findApiIdsByTestIds(List<String> ids);
 }

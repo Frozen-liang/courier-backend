@@ -2,6 +2,7 @@ package com.sms.courier.repository;
 
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import java.util.List;
+import org.bson.types.ObjectId;
 
 public interface CustomizedSceneCaseApiRepository {
 
@@ -9,9 +10,11 @@ public interface CustomizedSceneCaseApiRepository {
 
     Boolean deleteSceneCaseApiConn(List<String> caseTemplateApiId);
 
-    List<SceneCaseApiEntity> findSceneCaseApiIdsBySceneCaseIds(List<String> ids);
+    List<String> findSceneCaseApiIdsBySceneCaseIds(List<String> ids);
 
     Boolean deleteByIds(List<String> sceneCaseApiIds);
 
     Boolean recover(List<String> sceneCaseApiIds);
+
+    long findCountByCaseTemplateId(ObjectId caseTemplateId);
 }

@@ -47,11 +47,12 @@ class ApiTestCaseServiceTest {
     private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository = mock(
         CustomizedApiTestCaseRepository.class);
     private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
-    private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository = mock(
         CustomizedApiTestCaseJobRepository.class);
+    private final CaseApiCountHandler caseApiCountHandler = mock(CaseApiCountHandler.class);
     private final ApiTestCaseService apiTestCaseService = new ApiTestCaseServiceImpl(
-        apiTestCaseRepository, customizedApiTestCaseRepository, apiTestCaseMapper, applicationEventPublisher);
+        apiTestCaseRepository, customizedApiTestCaseRepository, apiTestCaseMapper,
+        caseApiCountHandler);
     private final ApiTestCaseEntity apiTestCase =
         ApiTestCaseEntity.builder().id(ID).apiEntity(ApiEntity.builder().id(ID).build()).build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
@@ -97,7 +98,6 @@ class ApiTestCaseServiceTest {
         CustomUser customUser = mock(CustomUser.class);
         when(apiTestCaseMapper.toEntity(apiTestCaseRequest)).thenReturn(apiTestCase);
         when(apiTestCaseRepository.insert(any(ApiTestCaseEntity.class))).thenReturn(apiTestCase);
-        doNothing().when(applicationEventPublisher).publishEvent(any());
         assertThat(apiTestCaseService.add(apiTestCaseRequest)).isTrue();
     }
 
