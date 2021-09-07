@@ -13,6 +13,7 @@ import com.sms.courier.dto.response.DataStructureResponse;
 import com.sms.courier.service.DataStructureService;
 import java.util.List;
 import java.util.Map;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,16 +40,19 @@ public class DataStructureController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.DATA_STRUCTURE_CREATE)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody DataStructureRequest dataStructureRequest) {
         return dataStructureService.add(dataStructureRequest);
     }
 
     @PutMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.DATA_STRUCTURE_UPDATE)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody DataStructureRequest dataStructureRequest) {
         return dataStructureService.edit(dataStructureRequest);
     }
 
     @PostMapping("/list")
+    @PreAuthorize("hasRoleOrAdmin(@role.DATA_STRUCTURE_QUERY_ALL)")
     public List<DataStructureListResponse> list(@RequestBody DataStructureListRequest request) {
         return dataStructureService.getDataStructureList(request);
     }
@@ -64,6 +68,7 @@ public class DataStructureController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRoleOrAdmin(@role.DATA_STRUCTURE_DELETE)")
     public Boolean delete(@PathVariable String id) {
         return dataStructureService.delete(id);
     }

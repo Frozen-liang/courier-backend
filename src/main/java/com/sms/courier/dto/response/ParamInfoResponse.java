@@ -62,9 +62,6 @@ public class ParamInfoResponse {
     @Field("isRef")
     private boolean ref;
 
-    /**
-     * 自定义结构 用于struct.
-     */
     private StructureRefResponse structureRef;
 
     private String paramId;

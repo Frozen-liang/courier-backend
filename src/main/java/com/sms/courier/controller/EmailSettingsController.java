@@ -8,6 +8,7 @@ import com.sms.courier.dto.request.EmailSettingsRequest;
 import com.sms.courier.dto.response.EmailSettingsResponse;
 import com.sms.courier.service.EmailSettingsService;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(EMAIL_SETTINGS_PATH)
+@PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
 public class EmailSettingsController {
 
     private final EmailSettingsService emailSettingsService;

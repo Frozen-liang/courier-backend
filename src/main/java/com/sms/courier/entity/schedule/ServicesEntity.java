@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 @Data
 @NoArgsConstructor
@@ -17,6 +19,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @CompoundIndex(def = "{'ip': 1, 'port': 1}", unique = true)
 public class ServicesEntity {
 
+    @MongoId(FieldType.OBJECT_ID)
+    private String id;
     private String ip;
     private int port;
     @Field("isAvailableServices")

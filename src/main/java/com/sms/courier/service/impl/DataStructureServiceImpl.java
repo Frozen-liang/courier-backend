@@ -1,6 +1,11 @@
 package com.sms.courier.service.impl;
 
 
+import static com.sms.courier.common.enums.OperationModule.DATA_STRUCTURE;
+import static com.sms.courier.common.enums.OperationModule.EMAIL_SETTINGS;
+import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.DELETE;
+import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.exception.ErrorCode.ADD_DATA_STRUCTURE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.CIRCULAR_REFERENCE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DATE_STRUCTURE_CANNOT_DELETE_ERROR;
@@ -22,6 +27,8 @@ import static com.sms.courier.common.field.DataStructureField.STRUCT;
 import static com.sms.courier.common.field.DataStructureField.STRUCTURE_REF;
 import static com.sms.courier.common.field.DataStructureField.STRUCT_TYPE;
 
+import com.sms.courier.common.aspect.annotation.Enhance;
+import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.DataStructureListRequest;
 import com.sms.courier.dto.request.DataStructureRequest;
@@ -86,6 +93,8 @@ public class DataStructureServiceImpl implements DataStructureService {
 
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = EMAIL_SETTINGS,
+        template = "{{#dataStructureRequest.name}}")
     public Boolean add(DataStructureRequest dataStructureRequest) {
         log.info("DataStructureService-add()-params: [DataStructure]={}", dataStructureRequest.toString());
         try {
@@ -105,6 +114,8 @@ public class DataStructureServiceImpl implements DataStructureService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = EMAIL_SETTINGS,
+        template = "{{#dataStructureRequest.name}}")
     public Boolean edit(DataStructureRequest dataStructureRequest) {
         log.info("DataStructureService-edit()-params: [DataStructure]={}", dataStructureRequest.toString());
         try {
@@ -134,6 +145,9 @@ public class DataStructureServiceImpl implements DataStructureService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = DATA_STRUCTURE,
+        template = "{{#result.name}}",
+        enhance = @Enhance(enable = true))
     public Boolean delete(String id) {
         try {
             List<StructureRefRecordEntity> refRecord = getRefRecord(id);
@@ -261,7 +275,7 @@ public class DataStructureServiceImpl implements DataStructureService {
         for (StructureRefRecordEntity refRecordEntity : refEntities) {
             // 如果当前数据结构直接引用或间接引用中包含当前结构 则出现了循环引用 抛出异常
             if (id.equals(refRecordEntity.getId())) {
-                throw ExceptionUtils.mpe(CIRCULAR_REFERENCE_ERROR, refRecordEntity.getName());
+                throw ExceptionUtils.mpe(CIRCULAR_REFERENCE_ERROR);
             }
             checkRefEntity(refRecordEntity.getStructureRef(), id);
         }

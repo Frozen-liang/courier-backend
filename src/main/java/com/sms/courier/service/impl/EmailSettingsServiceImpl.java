@@ -1,5 +1,9 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.enums.OperationModule.EMAIL_SETTINGS;
+import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.DELETE;
+import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.exception.ErrorCode.ADD_EMAIL_SETTINGS_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_EMAIL_SETTINGS_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_EMAIL_SETTINGS_ERROR;
@@ -8,6 +12,8 @@ import static com.sms.courier.common.exception.ErrorCode.GET_EMAIL_SETTINGS_BY_I
 import static com.sms.courier.common.exception.ErrorCode.GET_EMAIL_SETTINGS_LIST_ERROR;
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
 
+import com.sms.courier.common.aspect.annotation.Enhance;
+import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.EmailSettingsRequest;
 import com.sms.courier.dto.response.EmailSettingsResponse;
@@ -54,6 +60,8 @@ public class EmailSettingsServiceImpl implements EmailSettingsService {
 
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = EMAIL_SETTINGS,
+        template = "{{#emailSettingsRequest.emailSuffix}}")
     public Boolean add(EmailSettingsRequest emailSettingsRequest) {
         log.info("EmailSettingsService-add()-params: [EmailSettings]={}", emailSettingsRequest.toString());
         try {
@@ -67,6 +75,8 @@ public class EmailSettingsServiceImpl implements EmailSettingsService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = EMAIL_SETTINGS,
+        template = "{{#emailSettingsRequest.emailSuffix}}")
     public Boolean edit(EmailSettingsRequest emailSettingsRequest) {
         log.info("EmailSettingsService-edit()-params: [EmailSettings]={}", emailSettingsRequest.toString());
         try {
@@ -87,9 +97,12 @@ public class EmailSettingsServiceImpl implements EmailSettingsService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = EMAIL_SETTINGS,
+        template = "{{#result?.![#this.emailSuffix]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            return emailSettingsRepository.deleteByIdIn(ids);
+            return emailSettingsRepository.deleteByIdIn(ids) > 0;
         } catch (Exception e) {
             log.error("Failed to delete the EmailSettings!", e);
             throw new ApiTestPlatformException(DELETE_EMAIL_SETTINGS_BY_ID_ERROR);
