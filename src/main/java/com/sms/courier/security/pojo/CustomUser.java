@@ -3,6 +3,7 @@ package com.sms.courier.security.pojo;
 import com.sms.courier.security.TokenType;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Collections;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,23 +23,34 @@ public class CustomUser extends User {
     private TokenType tokenType;
     private LocalDate expiredDate;
 
+    // engine or mock
+    public CustomUser(String id, String username, TokenType tokenType) {
+        super(username, "", Collections.emptyList());
+        this.id = id;
+        this.tokenType = tokenType;
+    }
+
     public CustomUser(String username, String password,
-        Collection<? extends GrantedAuthority> authorities, String id, String email, TokenType tokenType,
+        Collection<? extends GrantedAuthority> authorities, String id, String email, String nickname,
+        TokenType tokenType,
         LocalDate expiredDate) {
         super(username, password, authorities);
         this.id = id;
         this.email = email;
+        this.nickname = nickname;
         this.expiredDate = expiredDate;
         this.tokenType = tokenType;
     }
 
     public CustomUser(String username, String password, boolean enabled, boolean accountNonExpired,
         boolean credentialsNonExpired, boolean accountNonLocked,
-        Collection<? extends GrantedAuthority> authorities, String id, String email, TokenType tokenType,
+        Collection<? extends GrantedAuthority> authorities, String id, String email, String nickname,
+        TokenType tokenType,
         LocalDate expiredDate) {
         super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
         this.id = id;
         this.email = email;
+        this.nickname = nickname;
         this.tokenType = tokenType;
         this.expiredDate = expiredDate;
     }

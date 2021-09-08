@@ -12,7 +12,7 @@ import static com.sms.courier.common.field.SceneField.TAG_ID;
 
 import com.google.common.collect.Lists;
 import com.sms.courier.common.enums.ApiBindingStatus;
-import com.sms.courier.common.enums.OperationModule;
+import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.mongo.LookupField;
@@ -23,6 +23,7 @@ import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -80,17 +81,25 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
         return commonRepository.list(queryVo, ApiTestCaseResponse.class);
     }
 
+    @Override
+    public List<String> findApiIdsByTestIds(List<String> ids) {
+        List<ApiTestCaseEntity> entityList = commonRepository.findIncludeFieldByIds(ids, "ApiTestCase",
+            Lists.newArrayList(API_ID.getName()), ApiTestCaseEntity.class);
+        return entityList.stream().map(entity -> entity.getApiEntity().getId())
+            .collect(Collectors.toList());
+    }
+
     private List<LookupVo> getLookupVoList() {
         return Lists.newArrayList(
             LookupVo.builder()
-                .from(OperationModule.API_TAG)
+                .from(CollectionName.API_TAG)
                 .localField(TAG_ID)
                 .foreignField(ID)
                 .as("apiTag")
                 .queryFields(Lists.newArrayList(LookupField.builder().field(TAG_NAME).build()))
                 .build(),
             LookupVo.builder()
-                .from(OperationModule.USER)
+                .from(CollectionName.USER)
                 .localField(CREATE_USER_ID)
                 .foreignField(ID)
                 .as("user")

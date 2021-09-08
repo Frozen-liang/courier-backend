@@ -100,4 +100,12 @@ public class ApiRequest {
     private ApiNodeType apiNodeType;
 
     private ApiEncodingType apiEncodingType;
+
+    private Integer caseCount;
+
+    private Integer sceneCaseCount;
+
+    private List<String> addStructIds;
+
+    private List<String> removeStructIds;
 }

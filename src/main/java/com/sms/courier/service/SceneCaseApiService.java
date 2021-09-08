@@ -27,4 +27,6 @@ public interface SceneCaseApiService {
     SceneCaseApiResponse getSceneCaseApiById(String id);
 
     Boolean updateStatusByApiIds(List<String> ids, ApiBindingStatus apiBindingStatus);
+
+    Long deleteAllBySceneCaseIds(List<String> ids);
 }

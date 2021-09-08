@@ -3,6 +3,7 @@ package com.sms.courier.mapper;
 import com.sms.courier.dto.request.MatchParamInfoRequest;
 import com.sms.courier.dto.response.MatchParamInfoResponse;
 import com.sms.courier.entity.api.common.MatchParamInfo;
+import com.sms.courier.entity.api.common.ParamInfo;
 import com.sms.courier.utils.EnumCommonUtils;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -27,4 +28,6 @@ public interface MatchParamInfoMapper {
     MatchParamInfo toEntity(MatchParamInfoRequest request);
 
     List<MatchParamInfo> toEntityList(List<MatchParamInfoRequest> request);
+
+    List<MatchParamInfo> toMatchParamInfoList(List<ParamInfo> responseParams);
 }

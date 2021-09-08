@@ -1,4 +1,4 @@
-数据集名称,name,age,height
-数据集01,zhangsan,23,172.5
-数据集02,lisi,20,180
-数据集03,wangwu,18,160
+collectionName,name,age,height
+example-1,jack,23,172.5
+example-2,eva,20,180
+example-3,ross,18,160

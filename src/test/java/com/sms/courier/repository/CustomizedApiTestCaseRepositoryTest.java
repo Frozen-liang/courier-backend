@@ -1,21 +1,24 @@
 package com.sms.courier.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.sms.courier.common.enums.ApiBindingStatus;
+import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.repository.impl.CustomizedApiTestCaseRepositoryImpl;
 import java.util.Collections;
 import java.util.List;
+import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @DisplayName("Tests for CustomizedApiTestCaseRepository")
 class CustomizedApiTestCaseRepositoryTest {
@@ -51,4 +54,16 @@ class CustomizedApiTestCaseRepositoryTest {
         when(commonRepository.deleteByIds(ID_LIST, ApiTestCaseEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(customizedApiTestCaseRepository.deleteByIds(ID_LIST)).isTrue();
     }
+
+    @Test
+    @DisplayName("Test the findApiIdsByTestIds method in the CustomizedApiTestCaseRepository")
+    public void findApiIdsByTestIds() {
+        List<ApiTestCaseEntity> entityList =
+            Lists.list(ApiTestCaseEntity.builder().id(ID).apiEntity(ApiEntity.builder().id(ID).build()).build());
+        when(commonRepository.findIncludeFieldByIds(any(), any(), any(), eq(ApiTestCaseEntity.class)))
+            .thenReturn(entityList);
+        List<String> dtoList = customizedApiTestCaseRepository.findApiIdsByTestIds(ID_LIST);
+        assertThat(dtoList).isNotEmpty();
+    }
+
 }

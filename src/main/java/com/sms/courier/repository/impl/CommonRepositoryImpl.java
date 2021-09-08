@@ -1,6 +1,5 @@
 package com.sms.courier.repository.impl;
 
-import static com.sms.courier.common.enums.OperationModule.USER;
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
 import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
 import static com.sms.courier.common.field.CommonField.ID;
@@ -11,6 +10,7 @@ import static com.sms.courier.common.field.UserField.NICKNAME;
 import static com.sms.courier.common.field.UserField.USERNAME;
 
 import com.mongodb.client.result.UpdateResult;
+import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.UpdateRequest;
@@ -29,6 +29,7 @@ import java.util.Optional;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -40,6 +41,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
+import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -134,7 +136,7 @@ public class CommonRepositoryImpl implements CommonRepository {
             LookupField.builder().field(NICKNAME).alias("createNickname").build()
         );
         LookupVo lookupVo = LookupVo.builder()
-            .from(USER)
+            .from(CollectionName.USER)
             .localField(CREATE_USER_ID)
             .foreignField(ID).as("user")
             .queryFields(lookupFields).build();
@@ -258,6 +260,18 @@ public class CommonRepositoryImpl implements CommonRepository {
         return updateResult.getModifiedCount() > 0;
     }
 
+    @Override
+    public <T> List<T> findIncludeFieldByIds(List<String> ids, String collectionName, List<String> filedList,
+        Class<T> responseClass) {
+        Document document = new Document();
+        for (String str : filedList) {
+            document.put(str, true);
+        }
+        BasicQuery query = new BasicQuery(new Document(), document);
+        ID.in(ids).ifPresent(query::addCriteria);
+        return mongoTemplate.find(query, responseClass);
+    }
+
     private <T> ProjectionOperation getProjectionOperation(Class<T> responseClass) {
         return Aggregation.project(responseClass);
     }
@@ -267,7 +281,7 @@ public class CommonRepositoryImpl implements CommonRepository {
         ProjectionOperation projectionOperation = getProjectionOperation(responseClass);
         for (LookupVo lookupVo : lookupVos) {
             LookupOperation lookupOperation =
-                LookupOperation.newLookup().from(lookupVo.getFrom().getCollectionName())
+                LookupOperation.newLookup().from(lookupVo.getFrom().getName())
                     .localField(lookupVo.getLocalField().getName())
                     .foreignField(lookupVo.getForeignField().getName())
                     .as(lookupVo.getAs());

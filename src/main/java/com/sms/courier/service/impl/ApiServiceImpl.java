@@ -16,8 +16,10 @@ import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.api.ApiHistoryEntity;
 import com.sms.courier.entity.project.ProjectImportSourceEntity;
+import com.sms.courier.entity.structure.ApiStructureRefRecordEntity;
 import com.sms.courier.mapper.ApiHistoryMapper;
 import com.sms.courier.mapper.ApiMapper;
+import com.sms.courier.repository.ApiDataStructureRefRecordRepository;
 import com.sms.courier.repository.ApiHistoryRepository;
 import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
@@ -28,9 +30,12 @@ import com.sms.courier.utils.Assert;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.MD5Util;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -45,12 +50,14 @@ public class ApiServiceImpl implements ApiService {
     private final ApiMapper apiMapper;
     private final ApiHistoryMapper apiHistoryMapper;
     private final CustomizedApiRepository customizedApiRepository;
+    private final ApiDataStructureRefRecordRepository apiDataStructureRefRecordRepository;
     private final AsyncService asyncService;
     private final ProjectImportSourceService projectImportSourceService;
 
 
     public ApiServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository, ApiMapper apiMapper,
         ApiHistoryMapper apiHistoryMapper, CustomizedApiRepository customizedApiRepository,
+        ApiDataStructureRefRecordRepository apiDataStructureRefRecordRepository,
         AsyncService asyncService,
         ProjectImportSourceService projectImportSourceService) {
         this.apiRepository = apiRepository;
@@ -58,6 +65,7 @@ public class ApiServiceImpl implements ApiService {
         this.apiMapper = apiMapper;
         this.apiHistoryMapper = apiHistoryMapper;
         this.customizedApiRepository = customizedApiRepository;
+        this.apiDataStructureRefRecordRepository = apiDataStructureRefRecordRepository;
         this.asyncService = asyncService;
         this.projectImportSourceService = projectImportSourceService;
     }
@@ -107,6 +115,11 @@ public class ApiServiceImpl implements ApiService {
             ApiEntity newApiEntity = apiRepository.insert(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
+            // 如果没用引用数据结构 则不需要保存引用关系
+            if (CollectionUtils.isNotEmpty(apiRequest.getAddStructIds())) {
+                saveRef(newApiEntity.getId(), newApiEntity.getApiName(), apiRequest.getAddStructIds(),
+                    apiRequest.getRemoveStructIds());
+            }
             apiHistoryRepository.insert(apiHistoryEntity);
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
@@ -114,6 +127,7 @@ public class ApiServiceImpl implements ApiService {
         }
         return true;
     }
+
 
     @Override
     @LogRecord(operationType = OperationType.EDIT, operationModule = OperationModule.API,
@@ -128,6 +142,8 @@ public class ApiServiceImpl implements ApiService {
             newApiEntity.setMd5(MD5Util.getMD5(newApiEntity));
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
+            saveRef(newApiEntity.getId(), newApiEntity.getApiName(), apiRequest.getAddStructIds(),
+                apiRequest.getRemoveStructIds());
             apiHistoryRepository.insert(apiHistoryEntity);
         } catch (ApiTestPlatformException courierException) {
             log.error(courierException.getMessage());
@@ -140,7 +156,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    @LogRecord(operationType = OperationType.ADD, operationModule = OperationModule.API,
+    @LogRecord(operationType = OperationType.DELETE, operationModule = OperationModule.API,
         template = "{{#result?.![#this.apiName]}}", enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
@@ -193,5 +209,20 @@ public class ApiServiceImpl implements ApiService {
                 .mpe(ErrorCode.BATCH_UPDATE_ERROR, ids, "Api", updateRequest.getKey(), updateRequest.getValue());
         }
     }
+
+    private void saveRef(String id, String name, List<String> addStructIds, List<String> removeStructIds) {
+        addStructIds = Objects.requireNonNullElse(addStructIds, new ArrayList<>());
+        removeStructIds = Objects.requireNonNullElse(removeStructIds, new ArrayList<>());
+        ApiStructureRefRecordEntity apiStructureRefRecordEntity = apiDataStructureRefRecordRepository.findById(id)
+            .orElse(ApiStructureRefRecordEntity.builder().id(id).refStructIds(new ArrayList<>()).build());
+        List<String> refStructIds = apiStructureRefRecordEntity.getRefStructIds();
+        refStructIds.addAll(addStructIds);
+        if (!refStructIds.isEmpty()) {
+            removeStructIds.forEach(refStructIds::remove);
+        }
+        apiStructureRefRecordEntity.setName(name);
+        apiDataStructureRefRecordRepository.save(apiStructureRefRecordEntity);
+    }
+
 
 }

@@ -4,11 +4,12 @@ import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.mongodb.client.result.UpdateResult;
-import com.sms.courier.common.enums.OperationModule;
+import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.field.ApiField;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.PageDto;
@@ -18,6 +19,7 @@ import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
+import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.repository.impl.CommonRepositoryImpl;
 import com.sms.courier.utils.SecurityUtil;
 import java.util.Collections;
@@ -25,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
@@ -48,7 +51,7 @@ class CommonRepositoryTest {
 
     private final Field field = ApiField.API_NAME;
 
-    private final LookupVo lookupVo = LookupVo.builder().from(OperationModule.API).localField(field).foreignField(field)
+    private final LookupVo lookupVo = LookupVo.builder().from(CollectionName.API).localField(field).foreignField(field)
         .as(COLLECTION_NAME)
         .queryFields(List.of(LookupField.builder().field(field).alias(COLLECTION_NAME).build())).build();
     private final QueryVo queryVo = QueryVo.builder().collectionName(COLLECTION_NAME).lookupVo(List.of(lookupVo))
@@ -228,4 +231,15 @@ class CommonRepositoryTest {
             UpdateResult.acknowledged(1, 1L, null));
         assertThat(commonRepository.updateField(new Query(), new Update(), ApiEntity.class)).isTrue();
     }
+
+    @Test
+    @DisplayName("Test the findIncludeFieldByIds method in the CommonRepository")
+    void findIncludeFieldByIds() {
+        List<ApiEntity> apiEntityList = Lists.newArrayList(ApiEntity.builder().build());
+        when(mongoTemplate.find(any(), eq(ApiEntity.class))).thenReturn(apiEntityList);
+        List<ApiEntity> dtoList = commonRepository.findIncludeFieldByIds(ID_LIST, COLLECTION_NAME, ID_LIST,
+            ApiEntity.class);
+        assertThat(dtoList).isNotEmpty();
+    }
+
 }

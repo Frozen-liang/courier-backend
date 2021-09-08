@@ -19,6 +19,7 @@ import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 
@@ -33,6 +34,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
 
@@ -43,8 +46,9 @@ class SceneCaseApiServiceTest {
     private final SceneCaseApiMapper sceneCaseApiMapper = mock(SceneCaseApiMapper.class);
     private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository =
         mock(CustomizedSceneCaseApiRepository.class);
+    private final CaseApiCountHandler sceneCaseApiCountHandler = mock(CaseApiCountHandler.class);
     private final SceneCaseApiServiceImpl sceneCaseApiService = new SceneCaseApiServiceImpl(sceneCaseApiRepository,
-        sceneCaseApiMapper, customizedSceneCaseApiRepository);
+        sceneCaseApiMapper, customizedSceneCaseApiRepository, sceneCaseApiCountHandler);
 
     private final static String MOCK_SCENE_CASE_ID = "1";
     private final static String MOCK_ID = new ObjectId().toString();
@@ -229,6 +233,14 @@ class SceneCaseApiServiceTest {
             .thenThrow(new ApiTestPlatformException(ADD_SCENE_CASE_API_ERROR));
         assertThatThrownBy(() -> sceneCaseApiService.updateStatusByApiIds(Lists.newArrayList(MOCK_SCENE_CASE_ID),
             ApiBindingStatus.BINDING));
+    }
+
+    @Test
+    @DisplayName("Test the deleteAllBySceneCaseIds method in the SceneCaseApi service")
+    void deleteAllBySceneCaseIds_test() {
+        when(sceneCaseApiRepository.deleteAllBySceneCaseIdIsIn(any())).thenReturn(1L);
+        sceneCaseApiService.deleteAllBySceneCaseIds(List.of(MOCK_ID));
+        verify(sceneCaseApiRepository, times(1)).deleteAllBySceneCaseIdIsIn(any());
     }
 
     private BatchUpdateSceneCaseApiRequest getUpdateSortOrder() {

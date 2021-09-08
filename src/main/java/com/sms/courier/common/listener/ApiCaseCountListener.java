@@ -33,9 +33,13 @@ public class ApiCaseCountListener {
     public void doProcess(AddCaseEvent addCaseEvent) {
         List<String> apiIds = addCaseEvent.getApiIds();
         if (CollectionUtils.isNotEmpty(apiIds)) {
-            Map<Integer, List<String>> apiMap = getApiMap(apiIds);
-            for (Entry<Integer, List<String>> entry : apiMap.entrySet()) {
-                updateApi(entry.getValue(), addCaseEvent.getCaseType().getName(), entry.getKey());
+            if (Objects.nonNull(addCaseEvent.getCount())) {
+                updateApi(apiIds, addCaseEvent.getCaseType().getName(), addCaseEvent.getCount());
+            } else {
+                Map<Integer, List<String>> apiMap = getApiMap(apiIds);
+                for (Entry<Integer, List<String>> entry : apiMap.entrySet()) {
+                    updateApi(entry.getValue(), addCaseEvent.getCaseType().getName(), entry.getKey());
+                }
             }
         }
     }
@@ -44,9 +48,13 @@ public class ApiCaseCountListener {
     public void doProcess(DeleteCaseEvent deleteCaseEvent) {
         List<String> apiIds = deleteCaseEvent.getApiIds();
         if (CollectionUtils.isNotEmpty(apiIds)) {
-            Map<Integer, List<String>> apiMap = getApiMap(apiIds);
-            for (Entry<Integer, List<String>> entry : apiMap.entrySet()) {
-                updateApi(entry.getValue(), deleteCaseEvent.getCaseType().getName(), -entry.getKey());
+            if (Objects.nonNull(deleteCaseEvent.getCount())) {
+                updateApi(apiIds, deleteCaseEvent.getCaseType().getName(), -deleteCaseEvent.getCount());
+            } else {
+                Map<Integer, List<String>> apiMap = getApiMap(apiIds);
+                for (Entry<Integer, List<String>> entry : apiMap.entrySet()) {
+                    updateApi(entry.getValue(), deleteCaseEvent.getCaseType().getName(), -entry.getKey());
+                }
             }
         }
     }
@@ -69,7 +77,7 @@ public class ApiCaseCountListener {
         query.addCriteria(Criteria.where(CommonField.ID.getName()).in(apiIds));
         Update update = new Update();
         update.inc(fieldName, inc);
-        mongoTemplate.upsert(query, update, ApiEntity.class);
+        mongoTemplate.updateMulti(query, update, ApiEntity.class);
     }
 
 }

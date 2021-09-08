@@ -2,8 +2,8 @@ package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.OperationModule.MOCK_API;
 import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
-import static com.sms.courier.common.enums.OperationType.REMOVE;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_MOCK_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_MOCK_API_ERROR;
@@ -117,7 +117,7 @@ public class MockApiServiceImpl implements MockApiService {
     }
 
     @Override
-    @LogRecord(operationType = REMOVE, operationModule = MOCK_API,
+    @LogRecord(operationType = DELETE, operationModule = MOCK_API,
         template = "{{#result?.![#this.mockName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {

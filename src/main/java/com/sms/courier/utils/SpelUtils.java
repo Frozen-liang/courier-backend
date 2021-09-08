@@ -1,6 +1,7 @@
 package com.sms.courier.utils;
 
 import static com.sms.courier.common.enums.OperationType.DELETE;
+import static com.sms.courier.common.enums.OperationType.RECOVER;
 import static com.sms.courier.common.enums.OperationType.REMOVE;
 import static com.sms.courier.utils.Assert.isTrue;
 
@@ -31,7 +32,7 @@ public class SpelUtils {
     private static final SpelExpressionParser spelExpressionParser = new SpelExpressionParser();
     private static final LocalVariableTableParameterNameDiscoverer parameterNameDiscoverer =
         new LocalVariableTableParameterNameDiscoverer();
-    private static final List<OperationType> OPERATION_TYPES = List.of(DELETE, REMOVE);
+    private static final List<OperationType> OPERATION_TYPES = List.of(DELETE, REMOVE, RECOVER);
 
     private SpelUtils() {
     }

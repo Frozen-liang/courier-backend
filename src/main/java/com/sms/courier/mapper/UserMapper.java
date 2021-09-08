@@ -37,6 +37,6 @@ public interface UserMapper {
         if (expiredDate == null) {
             return true;
         }
-        return expiredDate.isAfter(LocalDate.now());
+        return expiredDate.isBefore(LocalDate.now());
     }
 }

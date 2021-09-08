@@ -2,8 +2,8 @@ package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.OperationModule.CASE_TEMPLATE_API;
 import static com.sms.courier.common.enums.OperationType.ADD;
-import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
+import static com.sms.courier.common.enums.OperationType.REMOVE;
 import static com.sms.courier.common.exception.ErrorCode.ADD_CASE_TEMPLATE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.BATCH_EDIT_CASE_TEMPLATE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_API_ERROR;
@@ -22,6 +22,7 @@ import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.mapper.CaseTemplateApiMapper;
 import com.sms.courier.repository.CaseTemplateApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseApiRepository;
+import com.sms.courier.service.CaseApiCountHandler;
 import com.sms.courier.service.CaseTemplateApiService;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.List;
@@ -41,12 +42,15 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     private final CaseTemplateApiRepository caseTemplateApiRepository;
     private final CaseTemplateApiMapper caseTemplateApiMapper;
     private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository;
+    private final CaseApiCountHandler sceneCaseApiCountHandler;
 
-    public CaseTemplateApiServiceImpl(CaseTemplateApiRepository sceneCaseApiRepository,
-        CaseTemplateApiMapper sceneCaseApiMapper, CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository) {
-        this.caseTemplateApiRepository = sceneCaseApiRepository;
-        this.caseTemplateApiMapper = sceneCaseApiMapper;
+    public CaseTemplateApiServiceImpl(CaseTemplateApiRepository caseTemplateApiRepository,
+        CaseTemplateApiMapper caseTemplateApiMapper, CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository,
+        CaseApiCountHandler sceneCaseApiCountHandler) {
+        this.caseTemplateApiRepository = caseTemplateApiRepository;
+        this.caseTemplateApiMapper = caseTemplateApiMapper;
         this.customizedSceneCaseApiRepository = customizedSceneCaseApiRepository;
+        this.sceneCaseApiCountHandler = sceneCaseApiCountHandler;
     }
 
     @Override
@@ -68,12 +72,13 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE_API,
+    @LogRecord(operationType = REMOVE, operationModule = CASE_TEMPLATE_API,
         template = "{{#result?.![#this.apiTestCase.caseName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("CaseTemplateApiService-deleteById()-params: [id]={}", ids);
         try {
+            sceneCaseApiCountHandler.deleteTemplateCaseByCaseTemplateApiIds(ids);
             Long count = caseTemplateApiRepository.deleteAllByIdIsIn(ids);
             customizedSceneCaseApiRepository.deleteSceneCaseApiConn(ids);
             return count > 0;
@@ -169,6 +174,11 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
             log.error("Failed to get the CaseTemplateApi by id!", e);
             throw ExceptionUtils.mpe(GET_CASE_TEMPLATE_API_BY_ID_ERROR);
         }
+    }
+
+    @Override
+    public void deleteAllByCaseTemplateIds(List<String> ids) {
+        caseTemplateApiRepository.deleteAllByCaseTemplateIdIsIn(ids);
     }
 
 }

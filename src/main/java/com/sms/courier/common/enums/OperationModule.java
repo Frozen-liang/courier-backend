@@ -1,5 +1,31 @@
 package com.sms.courier.common.enums;
 
+import com.sms.courier.dto.response.FileInfoResponse;
+import com.sms.courier.entity.api.ApiEntity;
+import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
+import com.sms.courier.entity.datacollection.DataCollectionEntity;
+import com.sms.courier.entity.env.GlobalEnvironmentEntity;
+import com.sms.courier.entity.env.ProjectEnvironmentEntity;
+import com.sms.courier.entity.function.GlobalFunctionEntity;
+import com.sms.courier.entity.function.ProjectFunctionEntity;
+import com.sms.courier.entity.group.ApiGroupEntity;
+import com.sms.courier.entity.group.ApiTagGroupEntity;
+import com.sms.courier.entity.group.CaseTemplateGroupEntity;
+import com.sms.courier.entity.group.SceneCaseGroupEntity;
+import com.sms.courier.entity.mock.MockApiEntity;
+import com.sms.courier.entity.mock.MockSettingEntity;
+import com.sms.courier.entity.project.ProjectEntity;
+import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
+import com.sms.courier.entity.scenetest.CaseTemplateEntity;
+import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
+import com.sms.courier.entity.scenetest.SceneCaseEntity;
+import com.sms.courier.entity.schedule.ScheduleEntity;
+import com.sms.courier.entity.structure.StructureEntity;
+import com.sms.courier.entity.system.EmailSettingsEntity;
+import com.sms.courier.entity.system.UserEntity;
+import com.sms.courier.entity.system.UserGroupEntity;
+import com.sms.courier.entity.tag.ApiTagEntity;
+import com.sms.courier.entity.workspace.WorkspaceEntity;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -8,43 +34,45 @@ import java.util.stream.Collectors;
 import org.springframework.lang.Nullable;
 
 public enum OperationModule implements EnumCommon {
-    PROJECT(0, "Project"),
-    API(1, "Api"),
-    API_TEST_CASE(2, "ApiTestCase"),
-    SCENE_CASE(3, "SceneCase"),
-    SCENE_CASE_API(4, "SceneCaseApi"),
-    CASE_TEMPLATE_API(5, "CaseTemplateApi"),
-    CASE_TEMPLATE(6, "CaseTemplate"),
-    GLOBAL_ENV(7, "GlobalEnvironment"),
-    PROJECT_ENV(8, "ProjectEnvironment"),
-    GLOBAL_FUNCTION(9, "GlobalFunction"),
-    PROJECT_FUNCTION(10, "ProjectFunction"),
-    DATA_COLLECTION(11, "DataCollection"),
-    API_TAG(12, "ApiTag"),
-    API_TAG_GROUP(13, "ApiTagGroup"),
-    API_GROUP(14, "ApiGroup"),
-    SCENE_CASE_GROUP(15, "SceneCaseGroup"),
-    CASE_TEMPLATE_GROUP(16, "CaseTemplateGroup"),
-    TEST_FILE(17, "TestFile"),
-    WORKSPACE(18, "Workspace"),
-    USER(19, "User"),
-    USER_GROUP(20, "UserGroup"),
-    SCHEDULE(21, "UserGroup"),
-    MOCK_API(22, "MockApi");
+    PROJECT(0, ProjectEntity.class),
+    API(1, ApiEntity.class),
+    API_TEST_CASE(2, ApiTestCaseEntity.class),
+    SCENE_CASE(3, SceneCaseEntity.class),
+    SCENE_CASE_API(4, SceneCaseApiEntity.class),
+    CASE_TEMPLATE_API(5, CaseTemplateApiEntity.class),
+    CASE_TEMPLATE(6, CaseTemplateEntity.class),
+    GLOBAL_ENV(7, GlobalEnvironmentEntity.class),
+    PROJECT_ENV(8, ProjectEnvironmentEntity.class),
+    GLOBAL_FUNCTION(9, GlobalFunctionEntity.class),
+    PROJECT_FUNCTION(10, ProjectFunctionEntity.class),
+    DATA_COLLECTION(11, DataCollectionEntity.class),
+    API_TAG(12, ApiTagEntity.class),
+    API_TAG_GROUP(13, ApiTagGroupEntity.class),
+    API_GROUP(14, ApiGroupEntity.class),
+    SCENE_CASE_GROUP(15, SceneCaseGroupEntity.class),
+    CASE_TEMPLATE_GROUP(16, CaseTemplateGroupEntity.class),
+    TEST_FILE(17, FileInfoResponse.class),
+    WORKSPACE(18, WorkspaceEntity.class),
+    USER(19, UserEntity.class),
+    USER_GROUP(20, UserGroupEntity.class),
+    SCHEDULE(21, ScheduleEntity.class),
+    MOCK_API(22, MockApiEntity.class),
+    DATA_STRUCTURE(23, StructureEntity.class),
+    EMAIL_SETTINGS(24, EmailSettingsEntity.class),
+    MOCK_SETTING(25, MockSettingEntity.class),;
 
     private static final Map<Integer, OperationModule> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationModule::getCode, Function.identity()));
     private final int code;
-    private final String collectionName;
+    private final Class<?> entityClass;
 
-    OperationModule(int code, String collectionName) {
+    OperationModule(int code, Class<?> entityClass) {
         this.code = code;
-        this.collectionName = collectionName;
-
+        this.entityClass = entityClass;
     }
 
-    public String getCollectionName() {
-        return collectionName;
+    public Class<?> getEntityClass() {
+        return entityClass;
     }
 
     @Override

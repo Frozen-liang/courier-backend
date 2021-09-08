@@ -15,7 +15,7 @@ import static com.sms.courier.common.field.SceneField.TAG_ID;
 import static com.sms.courier.common.field.SceneField.TEST_STATUS;
 
 import com.google.common.collect.Lists;
-import com.sms.courier.common.enums.OperationModule;
+import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.field.CommonField;
 import com.sms.courier.dto.request.CaseTemplateSearchRequest;
 import com.sms.courier.dto.response.CaseTemplateResponse;
@@ -89,21 +89,21 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
     private List<LookupVo> getLookupVoList() {
         return Lists.newArrayList(
             LookupVo.builder()
-                .from(OperationModule.CASE_TEMPLATE_GROUP)
+                .from(CollectionName.CASE_TEMPLATE_GROUP)
                 .localField(GROUP_ID)
                 .foreignField(ID)
                 .as("caseTemplateGroup")
                 .queryFields(Lists.newArrayList(LookupField.builder().field(GROUP_NAME).alias("groupName").build()))
                 .build(),
             LookupVo.builder()
-                .from(OperationModule.API_TAG)
+                .from(CollectionName.API_TAG)
                 .localField(TAG_ID)
                 .foreignField(ID)
                 .as("apiTag")
                 .queryFields(Lists.newArrayList(LookupField.builder().field(TAG_NAME).build()))
                 .build(),
             LookupVo.builder()
-                .from(OperationModule.USER)
+                .from(CollectionName.USER)
                 .localField(CREATE_USER_ID)
                 .foreignField(ID)
                 .as("user")

@@ -18,6 +18,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -92,7 +93,8 @@ public class MockApiRequest {
     @JsonDeserialize(using = StringToDurationSerializer.class)
     private Duration delayTime;
 
+    @Default
     @JsonProperty(value = "isEnable")
-    private boolean enable;
+    private boolean enable = true;
 
 }

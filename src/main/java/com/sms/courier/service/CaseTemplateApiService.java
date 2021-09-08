@@ -25,4 +25,5 @@ public interface CaseTemplateApiService {
 
     CaseTemplateApiResponse getCaseTemplateApiById(String id);
 
+    void deleteAllByCaseTemplateIds(List<String> ids);
 }
