@@ -13,11 +13,11 @@ public enum OperationType implements EnumCommon {
     ADD(0),
     // 修改
     EDIT(1),
-    // 逻辑删除
+    // 逻辑删除或真实删除
     DELETE(2),
     // 同步Api
     SYNC(3),
-    // 真实删除
+    // 回收站删除
     REMOVE(4),
     // 清空回收站
     CLEAR_RECYCLE_BIN(5),
