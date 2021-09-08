@@ -42,7 +42,7 @@ public class OperationIdDuplicateCheckerTest {
         SECURITY_UTIL_MOCKED_STATIC = mockStatic(SecurityUtil.class);
         SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrUserId).thenReturn(ObjectId.get().toString());
         SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(new CustomUser("username", "password",
-            Collections.emptyList(), "", "username@qq.com", TokenType.USER, LocalDate.now()));
+            Collections.emptyList(), "", "username@qq.com", "nickname", TokenType.USER, LocalDate.now()));
     }
 
     @AfterAll

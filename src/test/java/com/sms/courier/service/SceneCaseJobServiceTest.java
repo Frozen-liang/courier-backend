@@ -1,5 +1,19 @@
 package com.sms.courier.service;
 
+import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
+
 import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.AddSceneCaseJobRequest;
@@ -48,20 +62,6 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.wildfly.common.Assert.assertTrue;
-
 @DisplayName("Test cases for SceneCaseJobServiceTest")
 class SceneCaseJobServiceTest {
 
@@ -97,7 +97,7 @@ class SceneCaseJobServiceTest {
     private final SceneCaseJobEntity sceneCasejobEntity =
         SceneCaseJobEntity.builder().id(ObjectId.get().toString()).createUserId(ObjectId.get().toString()).build();
     private final CustomUser customUser = new CustomUser("username", "", Collections.emptyList(),
-        ObjectId.get().toString(), "", TokenType.USER, LocalDate.now());
+        ObjectId.get().toString(), "", "", TokenType.USER, LocalDate.now());
 
     private final static MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
 

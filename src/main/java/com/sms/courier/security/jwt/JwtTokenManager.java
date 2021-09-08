@@ -7,6 +7,7 @@ import static com.sms.courier.utils.JwtUtils.TOKEN_USER_ID;
 
 import com.sms.courier.dto.UserEntityAuthority;
 import com.sms.courier.entity.system.SystemRoleEntity;
+import com.sms.courier.entity.system.UserEntity;
 import com.sms.courier.repository.SystemRoleRepository;
 import com.sms.courier.security.TokenType;
 import com.sms.courier.security.pojo.CustomUser;
@@ -86,9 +87,10 @@ public class JwtTokenManager {
 
     private Authentication createUserAuthentication(String id, TokenType tokenType) {
         UserEntityAuthority userEntityAuthority = userService.getUserDetailsByUserId(id);
-        return SecurityUtil.newAuthentication(id, userEntityAuthority.getUserEntity().getEmail(),
-            userEntityAuthority.getUserEntity().getUsername(),
-            userEntityAuthority.getAuthorities(), tokenType, userEntityAuthority.getUserEntity().getExpiredDate());
+        UserEntity userEntity = userEntityAuthority.getUserEntity();
+        return SecurityUtil.newAuthentication(id, userEntity.getEmail(),
+            userEntity.getUsername(), userEntity.getNickname(),
+            userEntityAuthority.getAuthorities(), tokenType, userEntity.getExpiredDate());
 
     }
 
@@ -96,7 +98,7 @@ public class JwtTokenManager {
         List<SimpleGrantedAuthority> roles = roleRepository.findAllByRoleType(ENGINE)
             .map(SystemRoleEntity::getName).map(SimpleGrantedAuthority::new
             ).collect(Collectors.toList());
-        return SecurityUtil.newAuthentication(id, "", "engine", roles, tokenType, LocalDate.now());
+        return SecurityUtil.newAuthentication(id, "", "engine", "engine", roles, tokenType, LocalDate.now());
 
     }
 
@@ -104,7 +106,7 @@ public class JwtTokenManager {
         List<SimpleGrantedAuthority> roles = roleRepository.findAllByRoleType(MOCK)
             .map(SystemRoleEntity::getName).map(SimpleGrantedAuthority::new
             ).collect(Collectors.toList());
-        return SecurityUtil.newAuthentication(id, "", "mock", roles, tokenType, LocalDate.now());
+        return SecurityUtil.newAuthentication(id, "", "mock", "mock", roles, tokenType, LocalDate.now());
 
     }
 

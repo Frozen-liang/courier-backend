@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(EMAIL_SETTINGS_PATH)
-@PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
 public class EmailSettingsController {
 
     private final EmailSettingsService emailSettingsService;
@@ -31,16 +30,19 @@ public class EmailSettingsController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public EmailSettingsResponse getById(@PathVariable("id") String id) {
         return emailSettingsService.findById(id);
     }
 
     @PostMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody EmailSettingsRequest emailSettingsRequest) {
         return emailSettingsService.add(emailSettingsRequest);
     }
 
     @PutMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody EmailSettingsRequest emailSettingsRequest) {
         return emailSettingsService.edit(emailSettingsRequest);
     }
@@ -51,6 +53,7 @@ public class EmailSettingsController {
     }
 
     @DeleteMapping("/{ids}")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean delete(@PathVariable List<String> ids) {
         return emailSettingsService.delete(ids);
     }

@@ -56,11 +56,11 @@ public class SecurityUtil {
         return (CustomUser) authentication.getPrincipal();
     }
 
-    public static Authentication newAuthentication(String userId, String email, String username,
+    public static Authentication newAuthentication(String userId, String email, String username, String nickname,
         Collection<? extends GrantedAuthority> authorities, TokenType tokenType, LocalDate expiredDate) {
         CustomUser customUser = new CustomUser(username, "",
             true, true, true, true,
-            authorities, userId, email, tokenType, expiredDate);
+            authorities, userId, email, nickname, tokenType, expiredDate);
         return new UsernamePasswordAuthenticationToken(customUser, null, authorities);
     }
 
