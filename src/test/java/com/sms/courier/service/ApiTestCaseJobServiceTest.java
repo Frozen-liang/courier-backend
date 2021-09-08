@@ -95,7 +95,8 @@ class ApiTestCaseJobServiceTest {
     private static final String ENGINE_ID = "/engine/13/invoke";
     private static final List<String> ENGINE_ID_LIST = Collections.singletonList(ENGINE_ID);
     private final CustomUser customUser =
-        new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "", TokenType.USER,
+        new CustomUser("username", "", Collections.emptyList(), ObjectId.get().toString(), "", "nickname",
+            TokenType.USER,
             LocalDate.now());
     private static final MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
 

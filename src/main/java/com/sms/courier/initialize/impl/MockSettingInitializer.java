@@ -7,8 +7,6 @@ import com.sms.courier.initialize.DataInitializer;
 import com.sms.courier.repository.MockSettingRepository;
 import com.sms.courier.security.jwt.JwtTokenManager;
 import com.sms.courier.security.pojo.CustomUser;
-import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
@@ -25,9 +23,8 @@ public class MockSettingInitializer implements DataInitializer {
         List<MockSettingEntity> entityList = mockSettingRepository.findAll();
         if (CollectionUtils.isEmpty(entityList)) {
             JwtTokenManager jwtTokenManager = applicationContext.getBean(JwtTokenManager.class);
-            CustomUser engine = new CustomUser("mock", "", Collections.emptyList(), "mockid", "",
-                MOCK, LocalDate.now());
-            String token = jwtTokenManager.generateAccessToken(engine);
+            CustomUser mock = new CustomUser("mock", "mock", MOCK);
+            String token = jwtTokenManager.generateAccessToken(mock);
             MockSettingEntity mockSettingEntity = MockSettingEntity.builder().mockToken(token).build();
             mockSettingRepository.insert(mockSettingEntity);
         }
