@@ -9,6 +9,7 @@ import com.sms.courier.common.enums.ApiProtocol;
 import com.sms.courier.common.enums.ApiStatus;
 import com.sms.courier.common.enums.In;
 import com.sms.courier.common.enums.Media;
+import com.sms.courier.common.enums.ParamType;
 import com.sms.courier.common.enums.RequestMethod;
 import com.sms.courier.common.enums.SchemaType;
 import com.sms.courier.entity.api.ApiEntity;
@@ -266,8 +267,15 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
                     .required(ifRequired(schema, key))
                     .build();
                 if (List.of(SchemaType.JSON, SchemaType.OBJECT, SchemaType.ARRAY).contains(childSchemaType)) {
-
-                    childParam.setChildParam(toComplexParams(paths, childSchema, components, currentIndex));
+                    if (childSchemaType == SchemaType.ARRAY) {
+                        List<ParamInfo> arrayChildParam = toComplexParams(paths, childSchema, components, currentIndex);
+                        if (CollectionUtils.isNotEmpty(arrayChildParam)) {
+                            childParam.setChildParam(List.of(
+                                ParamInfo.builder().paramType(ParamType.OBJECT).childParam(arrayChildParam).build()));
+                        }
+                    } else {
+                        childParam.setChildParam(toComplexParams(paths, childSchema, components, currentIndex));
+                    }
                 }
                 paramInfos.add(childParam);
             }
