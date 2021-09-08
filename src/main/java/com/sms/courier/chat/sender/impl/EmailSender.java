@@ -89,7 +89,7 @@ public class EmailSender extends AbstractSender implements InitializingBean {
             helper.setCc(cc.toArray(new String[]{}));
             helper.setText(content, true);
             helper.setSubject(title);
-            helper.setFrom(emailService.getEmailConfigurationResponse().getProperties().getUsername());
+            helper.setFrom(emailService.getEmailConfigurationResponse().getUsername());
             invokeExtension(notificationPayload, helper);
             javaMailSender.send(message);
         } catch (Exception exception) {

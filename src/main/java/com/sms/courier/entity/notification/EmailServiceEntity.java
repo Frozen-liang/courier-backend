@@ -21,7 +21,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "EmailService")
 public class EmailServiceEntity extends BaseEntity {
 
-    private String name;
     private EmailProperties properties;
     @Builder.Default
     @Field(name = "isEnabled")

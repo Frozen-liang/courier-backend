@@ -3,7 +3,7 @@ package com.sms.courier.service.impl;
 import static com.sms.courier.common.exception.ErrorCode.EMAIL_CONFIGURATION_NOT_EXIST;
 import static com.sms.courier.utils.Assert.isTrue;
 
-import com.sms.courier.dto.response.EmailConfigurationResponse;
+import com.sms.courier.dto.response.EmailPropertiesResponse;
 import com.sms.courier.entity.notification.EmailServiceEntity;
 import com.sms.courier.mapper.EmailServiceMapper;
 import com.sms.courier.repository.EmailServiceRepository;
@@ -33,9 +33,9 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public EmailConfigurationResponse getEmailConfigurationResponse() {
+    public EmailPropertiesResponse getEmailConfigurationResponse() {
         EmailServiceEntity entity = getEmailServiceEntity();
-        return emailServiceMapper.toResponse(entity);
+        return emailServiceMapper.toResponse(entity.getProperties());
     }
 
     @Override

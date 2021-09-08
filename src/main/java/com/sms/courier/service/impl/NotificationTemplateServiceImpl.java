@@ -2,6 +2,7 @@ package com.sms.courier.service.impl;
 
 import com.sms.courier.chat.common.NotificationTemplateType;
 import com.sms.courier.dto.request.NotificationTemplateRequest;
+import com.sms.courier.dto.response.NotificationTemplateResponse;
 import com.sms.courier.entity.notification.NotificationTemplateEntity;
 import com.sms.courier.mapper.NotificationTemplateMapper;
 import com.sms.courier.repository.NotificationTemplateRepository;
@@ -36,5 +37,10 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         }
         notificationTemplateRepository.save(newEntity);
         return true;
+    }
+
+    @Override
+    public NotificationTemplateResponse getResponseByType(Integer templateType) {
+        return mapper.toResponse(notificationTemplateRepository.findByType(templateType));
     }
 }

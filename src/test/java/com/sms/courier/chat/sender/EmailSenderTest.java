@@ -13,7 +13,7 @@ import com.sms.courier.chat.common.NotificationTemplateType;
 import com.sms.courier.chat.modal.NotificationPayload;
 import com.sms.courier.chat.sender.impl.EmailSender;
 import com.sms.courier.config.EmailProperties;
-import com.sms.courier.dto.response.EmailConfigurationResponse;
+import com.sms.courier.dto.response.EmailPropertiesResponse;
 import com.sms.courier.entity.notification.EmailServiceEntity;
 import com.sms.courier.entity.notification.NotificationTemplateEntity;
 import com.sms.courier.service.EmailService;
@@ -81,11 +81,9 @@ public class EmailSenderTest {
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
 
         String from = "from";
-        EmailConfigurationResponse response = mock(EmailConfigurationResponse.class);
-        EmailProperties properties = mock(EmailProperties.class);
+        EmailPropertiesResponse response = mock(EmailPropertiesResponse.class);
         when(emailService.getEmailConfigurationResponse()).thenReturn(response);
-        when(response.getProperties()).thenReturn(properties);
-        when(properties.getUsername()).thenReturn(from);
+        when(response.getUsername()).thenReturn(from);
 
         Map<AdditionalParam, Object> additionalParam = new HashMap<>();
         additionalParam.put(AdditionalParam.EMAIL_TO, Arrays.asList("to1", "to2"));

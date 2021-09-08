@@ -33,9 +33,7 @@ public class EmailServiceMapperTest {
     void to_entity_test() {
         String pwd = "pwd";
         EmailRequest request = mock(EmailRequest.class);
-        EmailProperties properties = mock(EmailProperties.class);
-        when(request.getProperties()).thenReturn(properties);
-        when(properties.getPassword()).thenReturn(pwd);
+        when(request.getPassword()).thenReturn(pwd);
         AES_UTIL_MOCKED_STATIC.when(() -> AesUtil.encrypt(pwd)).thenReturn(pwd);
         EmailServiceEntity entity = mapper.toEntity(request);
         assertThat(entity.getProperties().getPassword()).isEqualTo(pwd);
@@ -49,11 +47,9 @@ public class EmailServiceMapperTest {
     @Test
     void to_response_test() {
         String username = "username";
-        EmailServiceEntity entity = mock(EmailServiceEntity.class);
         EmailProperties property = mock(EmailProperties.class);
-        when(entity.getProperties()).thenReturn(property);
         when(property.getUsername()).thenReturn(username);
-        assertThat(mapper.toResponse(entity).getProperties().getUsername()).isEqualTo(username);
+        assertThat(mapper.toResponse(property).getUsername()).isEqualTo(username);
     }
 
     @Test

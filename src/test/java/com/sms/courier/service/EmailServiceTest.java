@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.config.EmailProperties;
-import com.sms.courier.dto.response.EmailConfigurationResponse;
+import com.sms.courier.dto.response.EmailPropertiesResponse;
 import com.sms.courier.entity.notification.EmailServiceEntity;
 import com.sms.courier.mapper.EmailServiceMapper;
 import com.sms.courier.repository.EmailServiceRepository;
@@ -53,9 +53,11 @@ public class EmailServiceTest {
     @Test
     void get_email_configuration_response() {
         EmailServiceEntity entity = mock(EmailServiceEntity.class);
+        EmailProperties properties = mock(EmailProperties.class);
         when(repository.findAll()).thenReturn(Collections.singletonList(entity));
-        EmailConfigurationResponse response = mock(EmailConfigurationResponse.class);
-        when(mapper.toResponse(entity)).thenReturn(response);
+        when(entity.getProperties()).thenReturn(properties);
+        EmailPropertiesResponse response = mock(EmailPropertiesResponse.class);
+        when(mapper.toResponse(properties)).thenReturn(response);
         assertThat(emailService.getEmailConfigurationResponse()).isEqualTo(response);
     }
 

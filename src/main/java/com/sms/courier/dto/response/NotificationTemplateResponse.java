@@ -1,6 +1,5 @@
 package com.sms.courier.dto.response;
 
-import com.sms.courier.config.EmailProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,8 +9,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmailConfigurationResponse {
+public class NotificationTemplateResponse {
 
-    private EmailProperties properties;
-    private Boolean enabled;
+    private String title;
+    private String content;
+    private String titleVariableKey;
+    private String contentVariableKey;
 }

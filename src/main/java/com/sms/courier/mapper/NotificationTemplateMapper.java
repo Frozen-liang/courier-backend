@@ -1,6 +1,7 @@
 package com.sms.courier.mapper;
 
 import com.sms.courier.dto.request.NotificationTemplateRequest;
+import com.sms.courier.dto.response.NotificationTemplateResponse;
 import com.sms.courier.entity.notification.NotificationTemplateEntity;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -11,4 +12,6 @@ import org.mapstruct.ReportingPolicy;
 public interface NotificationTemplateMapper {
 
     NotificationTemplateEntity toEntity(NotificationTemplateRequest request);
+
+    NotificationTemplateResponse toResponse(NotificationTemplateEntity entity);
 }
