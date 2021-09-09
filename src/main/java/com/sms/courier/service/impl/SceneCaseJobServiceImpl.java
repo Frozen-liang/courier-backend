@@ -190,22 +190,24 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             throw new ApiTestPlatformException(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR);
         }
         JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
-        Optional<SceneCaseEntity> sceneCase = Optional.empty();
-        Optional<CaseTemplateEntity> caseTemplate = Optional.empty();
+        SceneCaseEntity sceneCase = null;
+        CaseTemplateEntity caseTemplate = null;
         if (Objects.nonNull(request.getSceneCaseId())) {
-            sceneCase = sceneCaseRepository.findById(request.getSceneCaseId());
+            sceneCase = sceneCaseRepository.findById(request.getSceneCaseId()).orElse(null);
         }
         if (Objects.nonNull(request.getCaseTemplateId())) {
-            caseTemplate = caseTemplateRepository.findById(request.getCaseTemplateId());
+            caseTemplate = caseTemplateRepository.findById(request.getCaseTemplateId()).orElse(null);
         }
-        if (sceneCase.isEmpty() && caseTemplate.isEmpty()) {
+        if (Objects.isNull(sceneCase) && Objects.isNull(caseTemplate)) {
             throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
         }
+        boolean next = Objects.isNull(sceneCase) ? caseTemplate.isNext() : sceneCase.isNext();
         List<JobSceneCaseApi> caseList = getApiCaseList(request);
         List<SceneCaseJobEntity> jobEntityList = Lists.newArrayList();
         if (Objects.isNull(request.getDataCollectionRequest())) {
             SceneCaseJobEntity sceneCaseJob = getSceneCaseJobEntity(request, currentUser, jobEnvironment,
                 caseList);
+            sceneCaseJob.setNext(next);
             jobEntityList.add(sceneCaseJob);
         } else {
             for (TestDataRequest testData : request.getDataCollectionRequest().getDataList()) {
@@ -215,6 +217,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
                 SceneCaseJobEntity sceneCaseJob = getSceneCaseJobEntity(request, currentUser, jobEnvironment,
                     caseList);
                 sceneCaseJob.setDataCollection(jobDataCollection);
+                sceneCaseJob.setNext(next);
                 jobEntityList.add(sceneCaseJob);
             }
         }
@@ -229,7 +232,6 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             .jobStatus(JobStatus.RUNNING)
             .environment(jobEnvironment)
             .apiTestCase(caseList)
-            .next(request.isNext())
             .createDateTime(LocalDateTime.now())
             .modifyDateTime(LocalDateTime.now())
             .workspaceId(request.getWorkspaceId())
@@ -255,7 +257,9 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
 
                 } else {
                     List<CaseTemplateApiEntity> templateApiList =
-                        caseTemplateApiRepository.findAllByCaseTemplateIdOrderByOrder(sceneCaseApi.getCaseTemplateId());
+                        caseTemplateApiRepository
+                            .findAllByCaseTemplateIdAndRemovedOrderByOrder(sceneCaseApi.getCaseTemplateId(),
+                                Boolean.FALSE);
                     for (CaseTemplateApiEntity caseTemplateApi : templateApiList) {
                         caseTemplateApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : caseTemplateApi.getOrder());
                         caseTemplateApi.setCaseTemplateId(null);

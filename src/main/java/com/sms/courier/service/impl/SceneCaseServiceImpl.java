@@ -209,10 +209,10 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         try {
             sceneCaseRepository.findById(updateSceneTemplateRequest.getSceneCaseId())
                 .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_BY_ID_ERROR));
-            if (CollectionUtils.isNotEmpty(updateSceneTemplateRequest.getUpdateSceneCaseApiRequests())) {
+            if (CollectionUtils.isNotEmpty(updateSceneTemplateRequest.getSceneCaseApiRequest())) {
                 List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList();
                 for (UpdateSceneCaseApiConnRequest request :
-                    updateSceneTemplateRequest.getUpdateSceneCaseApiRequests()) {
+                    updateSceneTemplateRequest.getSceneCaseApiRequest()) {
                     Optional<SceneCaseApiEntity> sceneCaseApi = sceneCaseApiRepository.findById(request.getId());
                     sceneCaseApi.ifPresent(api -> {
                         api.setOrder(request.getOrder());
@@ -396,8 +396,13 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         Map<String, Boolean> isExecuteMap =
             sceneCaseApi.getCaseTemplateApiConnList().stream().collect(
                 Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::isExecute));
-        caseTemplateApiList.forEach(api -> api.getApiTestCase().setExecute(
-            isExecuteMap.getOrDefault(api.getId(), Boolean.TRUE)));
+        Map<String, Boolean> isLockMap =
+            sceneCaseApi.getCaseTemplateApiConnList().stream().collect(
+                Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::isLock));
+        caseTemplateApiList.forEach(api -> {
+            api.getApiTestCase().setExecute(isExecuteMap.getOrDefault(api.getId(), Boolean.TRUE));
+            api.setLock(isLockMap.getOrDefault(api.getId(), Boolean.FALSE));
+        });
         response.setCaseTemplateApiList(caseTemplateApiMapper.toCaseTemplateApiDtoList(caseTemplateApiList));
     }
 

@@ -1,6 +1,5 @@
 package com.sms.courier.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,9 +18,6 @@ public class AddSceneCaseJobRequest {
     private String caseTemplateId;
 
     private String projectId;
-
-    @JsonProperty("isNext")
-    private boolean next;
 
     private DataCollectionRequest dataCollectionRequest;
 
