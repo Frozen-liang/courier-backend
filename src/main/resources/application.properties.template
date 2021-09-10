@@ -9,7 +9,7 @@ spring.data.mongodb.uri=mongodb://username:password@192.168.24.175:27017/x-api
 logging.level.io.swagger.v3.parser.OpenAPIV3Parser=warn
 hive.security.access-token.user_secret_key=2U9TBPRTm6aVlxymkBqR255tLNKkGwGhBoYvJBNci+BvPaO/tnwEsFhxPEw7ESqG14icm6OyJwAAYeJB6XKKcw==
 hive.security.access-token.engine_secret_key=CouD72b2StSGNpOSnBnb7OZ5aeBFbJJVJxzNyH/hhrOTaMOTi0o5ovWXvUtmlgRKol4aXb8X9JqHs+/f7EvP0g==
-hive.security.ignore-path=/user/**,/engine/**,/v1/engine/bind,/v1/email-settings/list
+hive.security.ignore-path=/user/**,/engine/**,/v1/engine/bind,/v1/email-settings/list,/v1/file/stream/*
 websocket.user_allowed_origin_patterns=*
 websocket.engine_allowed_origin_patterns=*
 websocket.message_size_limit=655360

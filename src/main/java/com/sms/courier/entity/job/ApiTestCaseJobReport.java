@@ -21,6 +21,6 @@ public class ApiTestCaseJobReport {
     private Integer paramsTotalTimeCost;
     private Integer delayTimeTotalTimeCost;
     private CaseReport caseReport;
-    private List<String> infoList;
+    private List<Object> infoList;
     private String message;
 }

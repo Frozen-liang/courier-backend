@@ -46,6 +46,6 @@ public class SceneCaseJobResponse extends BaseResponse {
 
     private Integer delayTimeTotalTimeCost;
 
-    private List<String> infoList;
+    private List<Object> infoList;
 
 }

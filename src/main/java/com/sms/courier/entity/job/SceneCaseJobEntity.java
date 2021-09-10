@@ -73,5 +73,5 @@ public class SceneCaseJobEntity {
 
     private Integer delayTimeTotalTimeCost;
 
-    private List<String> infoList;
+    private List<Object> infoList;
 }

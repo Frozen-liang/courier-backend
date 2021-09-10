@@ -59,7 +59,8 @@ public class ApiTestCaseEntity extends BaseEntity {
     @Default
     private boolean execute = true;
 
-    private AdvancedSetting advancedSetting;
+    @Default
+    private AdvancedSetting advancedSetting = new AdvancedSetting();
 
     private ApiEntity apiEntity;
 
