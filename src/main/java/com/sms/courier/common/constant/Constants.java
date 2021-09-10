@@ -40,6 +40,8 @@ public class Constants {
     public static final String API_HISTORY_PATH = SDK_VERSION + "/api-history";
     public static final String MOCK_API_PATH = SDK_VERSION + "/mock-api";
     public static final String MOCK_SETTING_PATH = SDK_VERSION + "/mock-setting";
+    public static final String NOTIFICATION_TEMPLATE_PATH = SDK_VERSION + "/notification-template";
+    public static final String EMAIL_SERVICE_PATH = SDK_VERSION + "/email-service";
     public static final String EMAIL_SETTINGS_PATH = SDK_VERSION + "/email-settings";
 
     public static final int MAX_DEPTH = 3;

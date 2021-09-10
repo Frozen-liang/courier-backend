@@ -77,12 +77,17 @@ dependencies {
     val versionLombok by extra("1.18.20")
     val versionMapstruct by extra("1.4.2.Final")
     val versionJjwt by extra("0.11.2")
+    val caffeine by extra("3.0.0")
 
     implementation(platform(SpringBootPlugin.BOM_COORDINATES))
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("org.springframework.boot:spring-boot-starter-web") {
         exclude(module = "spring-boot-starter-tomcat")
     }
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.thymeleaf:thymeleaf-spring5")
+    implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
+    implementation("com.github.ben-manes.caffeine:caffeine:$caffeine")
     implementation("org.springframework.boot:spring-boot-starter-undertow")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-security")
