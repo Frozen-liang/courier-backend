@@ -46,6 +46,6 @@ public class CaseReport {
 
     private Integer delayTime;
 
-    private List<String> infoList;
+    private List<Object> infoList;
 
 }

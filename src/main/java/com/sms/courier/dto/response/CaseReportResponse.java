@@ -40,6 +40,6 @@ public class CaseReportResponse {
 
     private Integer paramsTimeCost;
 
-    private List<String> infoList;
+    private List<Object> infoList;
 
 }

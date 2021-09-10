@@ -19,5 +19,5 @@ public class ApiTestCaseJobReportResponse {
     private String message;
     private Integer paramsTotalTimeCost;
     private Integer totalTimeCost;
-    private List<String> infoList;
+    private List<Object> infoList;
 }

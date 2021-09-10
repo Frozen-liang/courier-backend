@@ -93,6 +93,7 @@ public class FileController {
     public void getOutputStream(@PathVariable("id") String id, HttpServletResponse response) {
         GridFsResource gridFsResource = fileService.downloadTestFile(id);
         response.setContentType(gridFsResource.getContentType());
+        response.setHeader("filename", gridFsResource.getFilename());
         writeStream(response, gridFsResource);
     }
 

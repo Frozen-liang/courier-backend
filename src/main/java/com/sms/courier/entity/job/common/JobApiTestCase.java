@@ -9,6 +9,7 @@ import com.sms.courier.entity.api.common.ResponseResultVerification;
 import com.sms.courier.entity.api.common.ResponseTimeVerification;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -43,7 +44,8 @@ public class JobApiTestCase {
     @Field(name = "isExecute")
     private boolean execute;
 
-    private AdvancedSetting advancedSetting;
+    @Default
+    private AdvancedSetting advancedSetting = new AdvancedSetting();
 
     private JobApi jobApi;
 

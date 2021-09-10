@@ -21,5 +21,5 @@ public class SceneCaseJobReport {
     private Integer totalTimeCost;
     private Integer paramsTotalTimeCost;
     private Integer delayTimeTotalTimeCost;
-    private List<String> infoList;
+    private List<Object> infoList;
 }
