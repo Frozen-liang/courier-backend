@@ -144,7 +144,8 @@ class CaseTemplateServiceTest {
         CaseTemplateApiEntity caseTemplateApi = CaseTemplateApiEntity.builder().id(MOCK_ID).order(MOCK_PAGE).build();
         when(caseTemplateApiMapper.toCaseTemplateApiBySceneCaseApi(any())).thenReturn(caseTemplateApi);
         List<CaseTemplateApiEntity> templateApiList = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
-        when(caseTemplateApiRepository.findAllByCaseTemplateIdOrderByOrder(any())).thenReturn(templateApiList);
+        when(caseTemplateApiRepository.findAllByCaseTemplateIdAndRemovedOrderByOrder(any(), anyBoolean()))
+            .thenReturn(templateApiList);
         when(caseTemplateApiRepository.insert(any(List.class))).thenReturn(templateApiList);
         IdResponse response =
             caseTemplateService.add(ConvertCaseTemplateRequest.builder().sceneCaseId(MOCK_ID).groupId(MOCK_ID).build());

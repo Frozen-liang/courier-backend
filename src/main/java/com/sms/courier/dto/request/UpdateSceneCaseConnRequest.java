@@ -14,5 +14,5 @@ public class UpdateSceneCaseConnRequest {
 
     private String sceneCaseId;
 
-    private List<UpdateSceneCaseApiConnRequest> updateSceneCaseApiRequests;
+    private List<UpdateSceneCaseApiConnRequest> sceneCaseApiRequest;
 }
