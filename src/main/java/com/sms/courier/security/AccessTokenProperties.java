@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "hive.security.access-token")
+@ConfigurationProperties(prefix = "hive.courier.access-token")
 public class AccessTokenProperties {
 
     private String userSecretKey = Encoders.BASE64.encode(Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded());

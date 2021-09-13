@@ -36,6 +36,7 @@ import com.sms.courier.dto.response.DataStructureListResponse;
 import com.sms.courier.dto.response.DataStructureReferenceResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
 import com.sms.courier.entity.api.common.ParamInfo;
+import com.sms.courier.entity.mongo.CustomQuery;
 import com.sms.courier.entity.structure.StructureEntity;
 import com.sms.courier.entity.structure.StructureRefRecordEntity;
 import com.sms.courier.mapper.DataStructureMapper;
@@ -53,12 +54,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -155,6 +158,7 @@ public class DataStructureServiceImpl implements DataStructureService {
             List<DataStructureReferenceResponse> apiRefs = apiDataStructureRefRecordRepository
                 .findByRefStructIdsIs(id);
             Assert.isTrue(CollectionUtils.isEmpty(apiRefs), DATE_STRUCTURE_CANNOT_DELETE_ERROR, "api");
+            structureRefRecordRepository.deleteById(id);
             return dataStructureRepository.deleteByIdIs(id);
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
@@ -169,17 +173,19 @@ public class DataStructureServiceImpl implements DataStructureService {
      * 查询数据结构列表.
      */
     @Override
-    public List<DataStructureListResponse> getDataStructureList(DataStructureListRequest request) {
+    public Page<DataStructureListResponse> getDataStructureList(DataStructureListRequest request) {
         try {
-            Query query = new Query();
-            query.fields().exclude(STRUCT.getName(), REF_STRUCT_IDS.getName());
-            NAME.like(request.getName()).ifPresent(query::addCriteria);
-            REF_ID.in(getIds(request.getProjectId(), request.getWorkspaceId())).ifPresent(query::addCriteria);
-            DESCRIPTION.like(request.getDescription()).ifPresent(query::addCriteria);
-            STRUCT_TYPE.is(request.getStructType()).ifPresent(query::addCriteria);
-            return commonRepository.list(query, StructureEntity.class).stream()
-                .map(dataStructureMapper::toListResponse)
-                .collect(Collectors.toList());
+            List<Optional<Criteria>> criteriaList = new ArrayList<>();
+            criteriaList.add(NAME.like(request.getName()));
+            criteriaList.add(REF_ID.in(getIds(request.getProjectId(), request.getWorkspaceId())));
+            criteriaList.add(DESCRIPTION.like(request.getDescription()));
+            criteriaList.add(STRUCT_TYPE.is(request.getStructType()));
+            CustomQuery customQuery = new CustomQuery();
+            customQuery.setIncludeFields(List.of(STRUCT, REF_STRUCT_IDS));
+            customQuery.setCriteriaList(criteriaList);
+            Page<StructureEntity> page = commonRepository
+                .page(customQuery, request, StructureEntity.class);
+            return page.map(dataStructureMapper::toListResponse);
         } catch (Exception e) {
             log.error("Failed to get the DataStructure list!", e);
             throw new ApiTestPlatformException(GET_DATA_STRUCTURE_LIST_ERROR);
@@ -194,10 +200,8 @@ public class DataStructureServiceImpl implements DataStructureService {
         try {
             Query query = new Query();
             query.fields().exclude(CREATE_USER_ID.getName());
-            // ID.ne(request.getId()).ifPresent(query::addCriteria);
             STRUCT_TYPE.is(request.getStructType()).ifPresent(query::addCriteria);
             REF_ID.in(getIds(request.getProjectId(), request.getWorkspaceId())).ifPresent(query::addCriteria);
-            // REF_STRUCT_IDS.ne(request.getId()).ifPresent(query::addCriteria);
             return dataStructureMapper.toResponseList(commonRepository.list(query, StructureEntity.class));
         } catch (Exception e) {
             log.error("Failed to get the DataStructure data list!", e);

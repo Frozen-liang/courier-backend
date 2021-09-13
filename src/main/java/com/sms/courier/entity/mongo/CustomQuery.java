@@ -15,18 +15,16 @@ import org.springframework.data.mongodb.core.query.Criteria;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class QueryVo {
-
-    // 查询的表
-    private String collectionName;
-
-    // 关联的表
-    private List<LookupVo> lookupVo;
+public class CustomQuery {
 
     // 查询条件
     @Default
     private List<Optional<Criteria>> criteriaList = new ArrayList<>();
 
-    // 查询主表字段 此字段只有在不联表查询时生效 不设置则查所有
-    private List<Field> queryFields;
+    // 查询字段
+    private List<Field> includeFields;
+
+    // 不查询字段
+    private List<Field> excludeFields;
+
 }

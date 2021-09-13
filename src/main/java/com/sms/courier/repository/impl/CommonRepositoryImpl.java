@@ -14,6 +14,7 @@ import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.UpdateRequest;
+import com.sms.courier.entity.mongo.CustomQuery;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
@@ -33,6 +34,7 @@ import org.bson.Document;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
@@ -202,9 +204,31 @@ public class CommonRepositoryImpl implements CommonRepository {
         List<T> records = mongoTemplate.aggregate(aggregation, queryVo.getCollectionName(), responseClass)
             .getMappedResults();
 
-        return new PageImpl<T>(records,
+        return new PageImpl<>(records,
             PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort), count);
     }
+
+    @Override
+    public <T> Page<T> page(CustomQuery customQuery, PageDto pageRequest, Class<T> entityClass) {
+        Query query = new Query();
+        PageDtoConverter.frontMapping(pageRequest);
+        Pageable pageable = PageDtoConverter.createPageable(pageRequest);
+        query.with(pageable);
+        if (CollectionUtils.isNotEmpty(customQuery.getIncludeFields())) {
+            customQuery.getIncludeFields().forEach(field -> query.fields().include(field.getName()));
+        }
+        if (CollectionUtils.isNotEmpty(customQuery.getExcludeFields())) {
+            customQuery.getExcludeFields().forEach(field -> query.fields().exclude(field.getName()));
+        }
+        customQuery.getCriteriaList().forEach(criteria -> criteria.ifPresent(query::addCriteria));
+        long count = mongoTemplate.count(query, entityClass);
+        if (count == 0L) {
+            return Page.empty();
+        }
+        List<T> records = mongoTemplate.find(query, entityClass);
+        return new PageImpl<>(records, pageable, count);
+    }
+
 
     @Override
     public Boolean deleteFieldById(String id, String fieldName, Class<?> entityClass) {
