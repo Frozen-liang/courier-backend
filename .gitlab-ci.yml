@@ -32,7 +32,7 @@ task_test:
     - ./gradlew check --build-cache --stacktrace
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, "instructions covered"; print "Total " int(100*covered/instructions) "% covered"}' $JACOCO_CSV_LOCATION
   cache:
-    key: ${CI_PROJECT_NAME}-test
+    key: ${CI_PROJECT_NAME}
     paths:
       - .gradle/caches
       - .gradle/wrapper
@@ -52,9 +52,9 @@ task_build_artifact:
   script:
     - ./gradlew bootjar --build-cache
     - IMAGE_TAG=$(ls ./build/libs | grep $PROD_RELEASE_NAME)&&IMAGE_TAG=${IMAGE_TAG:${#PROD_RELEASE_NAME}+1}&&IMAGE_TAG=${IMAGE_TAG%%.jar}
-    - echo IMAGE_TAG
+    - echo "export IMAGE_TAG=$IMAGE_TAG" > ./build/libs/version
   cache:
-    key: ${CI_PROJECT_NAME}-master
+    key: ${CI_PROJECT_NAME}
     paths:
       - .gradle/caches
       - .gradle/wrapper
@@ -73,10 +73,11 @@ task_build_image:
     refs:
       - develop
   image: docker:19.03.1
+  before_script:
+    - 'source ./build/libs/version'
   script:
     - echo "Running build docker image"
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "application.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./build/application.properties" -once'
-    - echo IMAGE_TAG
     - 'docker build -t ${IMAGE}:${IMAGE_TAG} .'
     - 'docker --config=/tool/.docker/ push ${IMAGE}:${IMAGE_TAG}'
     - echo "Clean image cache for docker runner"
