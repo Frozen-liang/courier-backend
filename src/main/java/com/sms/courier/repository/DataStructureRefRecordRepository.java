@@ -7,4 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface DataStructureRefRecordRepository extends MongoRepository<StructureRefRecordEntity, String> {
 
     List<StructureRefRecordEntity> findByIdIn(List<String> ids);
+
+    boolean existsByStructureRef(StructureRefRecordEntity refRecordEntity);
 }

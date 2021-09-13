@@ -2,6 +2,7 @@ package com.sms.courier.engine.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -18,6 +19,7 @@ import com.sms.courier.engine.model.EngineMemberEntity;
 import com.sms.courier.engine.request.EngineRegistrationRequest;
 import com.sms.courier.engine.task.SuspiciousEngineManagement;
 import com.sms.courier.mapper.EngineMapper;
+import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.EngineMemberRepository;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -30,12 +32,15 @@ public class EngineMemberManagementTest {
 
     private final EngineMemberRepository engineMemberRepository = mock(EngineMemberRepository.class);
     private final SuspiciousEngineManagement suspiciousEngineManagement = mock(SuspiciousEngineManagement.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final EngineMapper engineMapper = mock(EngineMapper.class);
     private final EngineMemberManagement engineMemberManagement =
-        new EngineMemberManagementImpl(engineMemberRepository, suspiciousEngineManagement, engineMapper);
+        new EngineMemberManagementImpl(engineMemberRepository, commonRepository, suspiciousEngineManagement,
+            engineMapper);
     private final EngineMemberEntity engineMember = EngineMemberEntity.builder().destination(EngineId.generate()).id(
         ObjectId.get().toString()).status(EngineStatus.RUNNING).build();
     private static final String DESTINATION = EngineId.generate();
+    private static final String ID = ObjectId.get().toString();
 
     @Test
     @DisplayName("Test for bind in EngineMemberManagement")
@@ -49,7 +54,8 @@ public class EngineMemberManagementTest {
     @Test
     @DisplayName("Test for getAvailableMember in EngineMemberManagement")
     public void getAvailableMember_test() {
-        when(engineMemberRepository.findAllByStatus(EngineStatus.RUNNING)).thenReturn(Stream.of(engineMember));
+        when(engineMemberRepository.findAllByStatusAndOpenIsTrue(EngineStatus.RUNNING))
+            .thenReturn(Stream.of(engineMember));
         String result = engineMemberManagement.getAvailableMember();
         assertThat(result).isEqualTo(engineMember.getDestination());
     }
@@ -57,7 +63,7 @@ public class EngineMemberManagementTest {
     @Test
     @DisplayName("Test for getAvailableMember throw Exception in EngineMemberManagement")
     public void getAvailableMember_exception_test() {
-        when(engineMemberRepository.findAllByStatus(EngineStatus.RUNNING)).thenReturn(Stream.empty());
+        when(engineMemberRepository.findAllByStatusAndOpenIsTrue(EngineStatus.RUNNING)).thenReturn(Stream.empty());
         assertThatThrownBy(engineMemberManagement::getAvailableMember)
             .isInstanceOf(ApiTestPlatformException.class);
     }
@@ -110,6 +116,22 @@ public class EngineMemberManagementTest {
         when(engineMemberRepository.save(engineMember)).thenReturn(engineMember);
         engineMemberManagement.countTaskRecord(DESTINATION, 1);
         verify(engineMemberRepository, times(1)).save(engineMember);
+    }
+
+    @Test
+    @DisplayName("Test for openEngine in EngineMemberManagement")
+    public void openEngine_test() {
+        when(commonRepository.updateFieldById(any(), any(), any())).thenReturn(Boolean.TRUE);
+        Boolean result = engineMemberManagement.openEngine(ID);
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test for closeEngine in EngineMemberManagement")
+    public void closeEngine_test() {
+        when(commonRepository.updateFieldById(any(), any(), any())).thenReturn(Boolean.TRUE);
+        Boolean result = engineMemberManagement.closeEngine(ID);
+        assertThat(result).isTrue();
     }
 
 }

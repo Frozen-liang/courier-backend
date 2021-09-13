@@ -2,7 +2,6 @@ package com.sms.courier.service.impl;
 
 
 import static com.sms.courier.common.enums.OperationModule.DATA_STRUCTURE;
-import static com.sms.courier.common.enums.OperationModule.EMAIL_SETTINGS;
 import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
@@ -93,7 +92,7 @@ public class DataStructureServiceImpl implements DataStructureService {
 
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = EMAIL_SETTINGS,
+    @LogRecord(operationType = ADD, operationModule = DATA_STRUCTURE,
         template = "{{#dataStructureRequest.name}}")
     public Boolean add(DataStructureRequest dataStructureRequest) {
         log.info("DataStructureService-add()-params: [DataStructure]={}", dataStructureRequest.toString());
@@ -114,7 +113,7 @@ public class DataStructureServiceImpl implements DataStructureService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = EMAIL_SETTINGS,
+    @LogRecord(operationType = EDIT, operationModule = DATA_STRUCTURE,
         template = "{{#dataStructureRequest.name}}")
     public Boolean edit(DataStructureRequest dataStructureRequest) {
         log.info("DataStructureService-edit()-params: [DataStructure]={}", dataStructureRequest.toString());
@@ -179,6 +178,9 @@ public class DataStructureServiceImpl implements DataStructureService {
             STRUCT_TYPE.is(request.getStructType()).ifPresent(query::addCriteria);
             return commonRepository.list(query, StructureEntity.class).stream()
                 .map(dataStructureMapper::toListResponse)
+                .peek(response -> response.setQuoted(structureRefRecordRepository.existsByStructureRef(
+                    StructureRefRecordEntity.builder().id(response.getId()).build())
+                    || apiDataStructureRefRecordRepository.existsByRefStructIdsIs(response.getId())))
                 .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Failed to get the DataStructure list!", e);
