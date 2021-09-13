@@ -74,7 +74,7 @@ task_build_image:
   script:
     - echo "Running build docker image"
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "application.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./build/application.properties" -once'
-    - IMAGE_TAG=${$(./gradlew properties | grep '^version:')#*:}'
+    - IMAGE_TAG=${$(./gradlew properties | grep '^version:')#*:}
     - echo $IMAGE_TAG
     - 'docker build -t ${IMAGE}:${IMAGE_TAG} .'
     - 'docker --config=/tool/.docker/ push ${IMAGE}:${IMAGE_TAG}'
