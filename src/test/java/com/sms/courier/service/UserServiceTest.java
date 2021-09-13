@@ -11,6 +11,7 @@ import static com.sms.courier.common.exception.ErrorCode.UNLOCK_USER_BY_ID_ERROR
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -307,5 +308,34 @@ class UserServiceTest {
             .thenThrow(new RuntimeException());
         assertThatThrownBy(() -> userService.batchUpdateByIds(batchUpdateRequest))
             .isInstanceOf(ApiTestPlatformException.class).extracting("code").isEqualTo(BATCH_UPDATE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the findByEmail method in the UserService")
+    public void findByEmailTest() {
+        String email = "email";
+        when(userRepository.findByUsernameOrEmail(email, email)).thenReturn(Optional.empty());
+        assertThat(userService.findByEmail(email).isPresent()).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("Test the setPasswordByEmail method in UserService")
+    public void setPasswordByEmailTest() {
+        String email = "email";
+        String password = "password";
+        UserEntity userEntity = mock(UserEntity.class);
+        when(userService.findByEmail(email)).thenReturn(Optional.of(userEntity));
+        doReturn(userEntity).when(userRepository).save(any(UserEntity.class));
+        assertThat(userService.setPasswordByEmail(email, password)).isEqualTo(Boolean.TRUE);
+    }
+
+    @Test
+    @DisplayName("Test the setPasswordByEmail method in UserService while email is not eexist")
+    public void setPasswordByEmailEmailEmptyTest() {
+        String email = "email";
+        String password = "password";
+        when(userService.findByEmail(email)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> userService.setPasswordByEmail(email, password))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 }

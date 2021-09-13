@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "hive.courier")
+@ConfigurationProperties(prefix = "courier.security")
 public class SecurityProperties {
 
     private List<String> ignorePath = new ArrayList<>();
