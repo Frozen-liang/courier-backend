@@ -12,6 +12,7 @@ stages:
 
 variables:
   IMAGE: ${CI_REGISTRY}/${CI_PROJECT_PATH}
+  IMAGE_TAG: 1.0.0
   PROD_RELEASE_NAME: ${CI_PROJECT_NAME}
   JACOCO_CSV_LOCATION: $CI_PROJECT_DIR/build/reports/jacoco/test/jacocoTestReport.csv
   GIT_DEPTH: 1
@@ -75,7 +76,6 @@ task_build_image:
   script:
     - echo "Running build docker image"
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "application.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./build/application.properties" -once'
-    - IMAGE_TAG=$(ls ./build/libs | grep $PROD_RELEASE_NAME)&&IMAGE_TAG=${IMAGE_TAG:${#PROD_RELEASE_NAME}+1}&&IMAGE_TAG=${IMAGE_TAG%%.jar}
     - echo IMAGE_TAG
     - 'docker build -t ${IMAGE}:${IMAGE_TAG} .'
     - 'docker --config=/tool/.docker/ push ${IMAGE}:${IMAGE_TAG}'
