@@ -76,7 +76,7 @@ task_build_image:
     - echo "Running build docker image"
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "application.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./build/application.properties" -once'
     - IMAGE_TAG=$(ls ./build/libs | grep $PROD_RELEASE_NAME)
-    - IMAGE_TAG=${${IMAGE_TAG%%.jar}#$PROD_RELEASE_NAME-*}
+    - IMAGE_TAG=$($(IMAGE_TAG%%.jar)#$PROD_RELEASE_NAME-*)
     - 'docker build -t ${IMAGE}:${IMAGE_TAG} .'
     - 'docker --config=/tool/.docker/ push ${IMAGE}:${IMAGE_TAG}'
     - echo "Clean image cache for docker runner"
