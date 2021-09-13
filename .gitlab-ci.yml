@@ -73,9 +73,8 @@ task_build_image:
     refs:
       - develop
   image: docker:19.03.1
-  before_script:
-    - 'source ./build/libs/version'
   script:
+    - 'source ./build/libs/version'
     - echo "Running build docker image"
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "application.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./build/application.properties" -once'
     - 'docker build -t ${IMAGE}:${IMAGE_TAG} .'
