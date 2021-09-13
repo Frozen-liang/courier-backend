@@ -28,6 +28,8 @@ task_test:
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
   script:
+    - 'IMAGE_TAG=${$(./gradlew properties | grep "^version:")#*:}'
+    - echo $IMAGE_TAG
     - echo $CI_COMMIT_REF_NAME
     - ./gradlew check --build-cache --stacktrace
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, "instructions covered"; print "Total " int(100*covered/instructions) "% covered"}' $JACOCO_CSV_LOCATION
@@ -48,7 +50,7 @@ task_build_artifact:
   stage: build_code
   only:
     refs:
-      - master
+      - develop
   script:
     - ./gradlew bootjar --build-cache
   cache:
