@@ -28,9 +28,8 @@ task_test:
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
   script:
-    - 'IMAGE_TAG=$(./gradlew properties | grep "^version:")'
-    - echo $IMAGE_TAG
-    - echo $CI_COMMIT_REF_NAME
+    - IMAGE_TAG=$(ls ./build/libs | grep $PROD_RELEASE_NAME)
+    - IMAGE_TAG=${${IMAGE_TAG%%.jar}#$PROD_RELEASE_NAME-*}
     - ./gradlew check --build-cache --stacktrace
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, "instructions covered"; print "Total " int(100*covered/instructions) "% covered"}' $JACOCO_CSV_LOCATION
   cache:
@@ -76,8 +75,8 @@ task_build_image:
   script:
     - echo "Running build docker image"
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "application.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./build/application.properties" -once'
-    - IMAGE_TAG=${$(./gradlew properties | grep '^version:')#*:}
-    - echo $IMAGE_TAG
+    - IMAGE_TAG=$(ls ./build/libs | grep $PROD_RELEASE_NAME)
+    - IMAGE_TAG=${${IMAGE_TAG%%.jar}#$PROD_RELEASE_NAME-*}
     - 'docker build -t ${IMAGE}:${IMAGE_TAG} .'
     - 'docker --config=/tool/.docker/ push ${IMAGE}:${IMAGE_TAG}'
     - echo "Clean image cache for docker runner"
