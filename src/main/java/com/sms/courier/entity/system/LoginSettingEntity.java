@@ -13,8 +13,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @SuperBuilder
-@Document(collection = "EmailSettings")
-public class EmailSettingsEntity extends BaseEntity {
+@Document(collection = "LoginSetting")
+public class LoginSettingEntity extends BaseEntity {
 
     private String emailSuffix;
 }

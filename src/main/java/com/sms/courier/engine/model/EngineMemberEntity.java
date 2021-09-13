@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -38,4 +39,7 @@ public class EngineMemberEntity extends BaseEntity {
     private Integer taskCount = 0;
     @Default
     private EngineStatus status = EngineStatus.PENDING;
+    @Default
+    @Field(value = "isOpen")
+    private boolean open = true;
 }

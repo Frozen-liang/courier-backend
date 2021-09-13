@@ -21,4 +21,8 @@ public interface EngineMemberManagement {
     void countTaskRecord(String destination, Integer size);
 
     List<EngineResponse> getRunningEngine();
+
+    Boolean openEngine(String id);
+
+    Boolean closeEngine(String id);
 }

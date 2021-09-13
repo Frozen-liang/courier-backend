@@ -15,6 +15,8 @@ public interface EngineMemberRepository extends MongoRepository<EngineMemberEnti
 
     Stream<EngineMemberEntity> findAllByStatus(EngineStatus status);
 
+    Stream<EngineMemberEntity> findAllByStatusAndOpenIsTrue(EngineStatus status);
+
     List<EngineMemberEntity> findAllByDestinationIn(List<String> destinations);
 
 }

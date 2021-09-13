@@ -42,7 +42,7 @@ public class Constants {
     public static final String MOCK_SETTING_PATH = SDK_VERSION + "/mock-setting";
     public static final String NOTIFICATION_TEMPLATE_PATH = SDK_VERSION + "/notification-template";
     public static final String EMAIL_SERVICE_PATH = SDK_VERSION + "/email-service";
-    public static final String EMAIL_SETTINGS_PATH = SDK_VERSION + "/email-settings";
+    public static final String LOGIN_SETTING_PATH = SDK_VERSION + "/login-setting";
 
     public static final int MAX_DEPTH = 3;
     public static final String HTTP_DEFAULT_STATUS_CODE = "200";
