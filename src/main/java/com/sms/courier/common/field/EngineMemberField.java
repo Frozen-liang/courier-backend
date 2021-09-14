@@ -2,7 +2,11 @@ package com.sms.courier.common.field;
 
 public enum EngineMemberField implements Field {
 
-    OPEN("isOpen");
+    OPEN("isOpen"),
+    DESTINATION("destination"),
+    TASK_COUNT("taskCount"),
+    CASE_TASK("caseTask"),
+    SCENE_CASE_TASK("sceneCaseTask");
 
     private final String name;
 

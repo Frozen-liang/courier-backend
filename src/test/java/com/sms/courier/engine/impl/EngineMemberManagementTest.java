@@ -74,9 +74,9 @@ public class EngineMemberManagementTest {
         String destination = "destination";
         CaseRecordRequest caseRecordRequest =
             CaseRecordRequest.builder().caseCount(1).sceneCaseCount(1).destination(destination).build();
-        when(engineMemberRepository.findFirstByDestination(destination)).thenReturn(Optional.of(engineMember));
+        when(commonRepository.updateField(any(), any(), any())).thenReturn(Boolean.TRUE);
         engineMemberManagement.caseRecord(caseRecordRequest);
-        verify(engineMemberRepository, times(1)).save(engineMember);
+        verify(commonRepository, times(1)).updateField(any(), any(), any());
     }
 
     @Test
@@ -112,10 +112,9 @@ public class EngineMemberManagementTest {
     @Test
     @DisplayName("Test for taskCountRecord in EngineMemberManagement")
     public void taskCountRecord_test() {
-        when(engineMemberRepository.findFirstByDestination(anyString())).thenReturn(Optional.of(engineMember));
-        when(engineMemberRepository.save(engineMember)).thenReturn(engineMember);
+        when(commonRepository.updateField(any(), any(), any())).thenReturn(true);
         engineMemberManagement.countTaskRecord(DESTINATION, 1);
-        verify(engineMemberRepository, times(1)).save(engineMember);
+        verify(commonRepository, times(1)).updateField(any(), any(), any());
     }
 
     @Test
