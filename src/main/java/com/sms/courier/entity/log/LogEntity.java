@@ -25,7 +25,7 @@ public class LogEntity {
     private String id;
 
     @Field(targetType = FieldType.OBJECT_ID)
-    private String projectId;
+    private String refId;
 
     private OperationType operationType;
 

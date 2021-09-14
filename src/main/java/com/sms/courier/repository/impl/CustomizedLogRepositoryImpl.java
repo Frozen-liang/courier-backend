@@ -1,7 +1,7 @@
 package com.sms.courier.repository.impl;
 
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
-import static com.sms.courier.common.field.CommonField.PROJECT_ID;
+import static com.sms.courier.common.field.CommonField.REF_ID;
 import static com.sms.courier.common.field.LogField.OPERATION_DESC;
 import static com.sms.courier.common.field.LogField.OPERATION_MODULE;
 import static com.sms.courier.common.field.LogField.OPERATION_TYPE;
@@ -35,7 +35,7 @@ public class CustomizedLogRepositoryImpl implements CustomizedLogRepository {
         Query query = new Query();
         CREATE_DATE_TIME.lteAndGte(logPageRequest.getQueryBeginTime(), logPageRequest.getQueryEndTime())
             .ifPresent(query::addCriteria);
-        PROJECT_ID.projectIdIs(logPageRequest.getProjectId()).ifPresent(query::addCriteria);
+        REF_ID.projectIdIs(logPageRequest.getProjectId()).ifPresent(query::addCriteria);
         OPERATION_DESC.is(logPageRequest.getOperationDesc()).ifPresent(query::addCriteria);
         OPERATION_TYPE.is(logPageRequest.getOperationType()).ifPresent(query::addCriteria);
         OPERATION_MODULE.is(logPageRequest.getOperationModule()).ifPresent(query::addCriteria);

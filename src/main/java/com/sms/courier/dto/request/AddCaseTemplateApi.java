@@ -15,4 +15,5 @@ public class AddCaseTemplateApi {
 
     private Integer order;
 
+    private String name;
 }

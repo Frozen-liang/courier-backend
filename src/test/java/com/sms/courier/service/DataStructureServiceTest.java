@@ -267,7 +267,7 @@ class DataStructureServiceTest {
     @Test
     @DisplayName("Test the delete method in the DataStructure service")
     public void delete_test() {
-        when(dataStructureRepository.deleteByIdIs(ID)).thenReturn(Boolean.TRUE);
+        when(dataStructureRepository.deleteByIdIs(ID)).thenReturn(1L);
         when(apiDataStructureRefRecordRepository.findByRefStructIdsIs(ID)).thenReturn(Collections.emptyList());
         assertThat(dataStructureService.delete(ID)).isTrue();
     }
@@ -285,7 +285,7 @@ class DataStructureServiceTest {
     @Test
     @DisplayName("Test the delete method in the DataStructure service")
     public void delete_reference_exception_test() {
-        when(dataStructureRepository.deleteByIdIs(ID)).thenReturn(Boolean.TRUE);
+        when(dataStructureRepository.deleteByIdIs(ID)).thenReturn(1L);
         when(apiDataStructureRefRecordRepository.findByRefStructIdsIs(ID))
             .thenReturn(List.of(DataStructureReferenceResponse.builder().build()));
         assertThatThrownBy(() -> dataStructureService.delete(ID))

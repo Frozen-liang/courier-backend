@@ -19,7 +19,7 @@ public @interface LogRecord {
 
     OperationModule operationModule();
 
-    String projectId() default "projectId";
+    String refId() default "projectId";
 
     String template() default "";
 

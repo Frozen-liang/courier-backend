@@ -2,8 +2,8 @@ package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.OperationModule.API_GROUP;
 import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
-import static com.sms.courier.common.enums.OperationType.REMOVE;
 import static com.sms.courier.common.exception.ErrorCode.ADD_API_GROUP_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_API_GROUP_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_API_GROUP_ERROR;
@@ -113,7 +113,7 @@ public class ApiGroupServiceImpl implements ApiGroupService {
     }
 
     @Override
-    @LogRecord(operationType = REMOVE, operationModule = API_GROUP, template = "{{#result?.name}}",
+    @LogRecord(operationType = DELETE, operationModule = API_GROUP, template = "{{#result?.name}}",
         enhance = @Enhance(enable = true))
     public Boolean delete(String id) {
         try {
