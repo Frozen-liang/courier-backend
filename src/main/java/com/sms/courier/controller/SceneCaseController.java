@@ -60,6 +60,7 @@ public class SceneCaseController {
     }
 
     @GetMapping("/conn/{id}")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_API_QUERY_ALL)")
     public SceneTemplateResponse getConn(@PathVariable String id) {
         return sceneCaseService.getConn(id);
     }

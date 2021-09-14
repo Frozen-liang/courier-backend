@@ -1,8 +1,6 @@
 package com.sms.courier.service.impl;
 
-
 import static com.sms.courier.common.enums.OperationModule.DATA_STRUCTURE;
-import static com.sms.courier.common.enums.OperationModule.EMAIL_SETTINGS;
 import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
@@ -93,8 +91,8 @@ public class DataStructureServiceImpl implements DataStructureService {
 
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = EMAIL_SETTINGS,
-        template = "{{#dataStructureRequest.name}}")
+    @LogRecord(operationType = ADD, operationModule = DATA_STRUCTURE,
+        template = "{{#dataStructureRequest.name}}", refId = "refId")
     public Boolean add(DataStructureRequest dataStructureRequest) {
         log.info("DataStructureService-add()-params: [DataStructure]={}", dataStructureRequest.toString());
         try {
@@ -114,8 +112,8 @@ public class DataStructureServiceImpl implements DataStructureService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = EMAIL_SETTINGS,
-        template = "{{#dataStructureRequest.name}}")
+    @LogRecord(operationType = EDIT, operationModule = DATA_STRUCTURE,
+        template = "{{#dataStructureRequest.name}}", refId = "refId")
     public Boolean edit(DataStructureRequest dataStructureRequest) {
         log.info("DataStructureService-edit()-params: [DataStructure]={}", dataStructureRequest.toString());
         try {
@@ -147,7 +145,7 @@ public class DataStructureServiceImpl implements DataStructureService {
     @Override
     @LogRecord(operationType = DELETE, operationModule = DATA_STRUCTURE,
         template = "{{#result.name}}",
-        enhance = @Enhance(enable = true))
+        enhance = @Enhance(enable = true), refId = "refId")
     public Boolean delete(String id) {
         try {
             List<StructureRefRecordEntity> refRecord = getRefRecord(id);
@@ -155,7 +153,7 @@ public class DataStructureServiceImpl implements DataStructureService {
             List<DataStructureReferenceResponse> apiRefs = apiDataStructureRefRecordRepository
                 .findByRefStructIdsIs(id);
             Assert.isTrue(CollectionUtils.isEmpty(apiRefs), DATE_STRUCTURE_CANNOT_DELETE_ERROR, "api");
-            return dataStructureRepository.deleteByIdIs(id);
+            return dataStructureRepository.deleteByIdIs(id) > 0;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
             throw e;

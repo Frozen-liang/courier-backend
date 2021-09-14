@@ -1,6 +1,7 @@
 package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.OperationModule.PROJECT;
+import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.exception.ErrorCode.ADD_PROJECT_ERROR;
@@ -64,8 +65,8 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    /*@LogRecord(operationType = ADD, operationModule = PROJECT, projectId = "id",
-        template = "{{#projectRequest.name}}")*/
+    @LogRecord(operationType = ADD, operationModule = PROJECT, refId = "workspaceId",
+        template = "{{#projectRequest.name}}")
     public Boolean add(ProjectRequest projectRequest) {
         log.info("ProjectService-add()-params: [Project]={}", projectRequest.toString());
         try {
@@ -87,7 +88,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = PROJECT, projectId = "id",
+    @LogRecord(operationType = EDIT, operationModule = PROJECT, refId = "id",
         template = "{{#projectRequest.name}}")
     public Boolean edit(ProjectRequest projectRequest) {
         log.info("ProjectService-edit()-params: [Project]={}", projectRequest.toString());
@@ -107,7 +108,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = PROJECT, projectId = "id",
+    @LogRecord(operationType = DELETE, operationModule = PROJECT, refId = "id",
         template = "{{#result?.![#this.name]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {

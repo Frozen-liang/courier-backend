@@ -66,6 +66,7 @@ public class CaseTemplateController {
     }
 
     @GetMapping("/list/{caseTemplateId}")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_QUERY_ALL)")
     public CaseTemplateDetailResponse getApiList(@PathVariable String caseTemplateId) {
         return caseTemplateService.getApiList(caseTemplateId);
     }

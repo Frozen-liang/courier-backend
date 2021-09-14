@@ -1,6 +1,7 @@
 package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.OperationModule.CASE_TEMPLATE;
+import static com.sms.courier.common.enums.OperationModule.CASE_TEMPLATE_API;
 import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
@@ -264,6 +265,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE_API,
+        template = "{{#request.caseTemplateApis?.![#this.name]}}")
     public Boolean addApi(AddCaseTemplateApiByIdsRequest request) {
         try {
             CaseTemplateEntity caseTemplate =

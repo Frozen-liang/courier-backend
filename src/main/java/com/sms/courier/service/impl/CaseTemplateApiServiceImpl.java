@@ -2,8 +2,8 @@ package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.OperationModule.CASE_TEMPLATE_API;
 import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
-import static com.sms.courier.common.enums.OperationType.REMOVE;
 import static com.sms.courier.common.exception.ErrorCode.ADD_CASE_TEMPLATE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.BATCH_EDIT_CASE_TEMPLATE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_API_ERROR;
@@ -56,7 +56,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     @Override
     @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE_API,
         template = "{{#addCaseTemplateApiRequest.addCaseTemplateApiRequestList?.![#this.apiTestCase.caseName]}}",
-        projectId = "addCaseTemplateApiRequestList[0].projectId")
+        refId = "addCaseTemplateApiRequestList[0].projectId")
     public Boolean batchAdd(BatchAddCaseTemplateApiRequest addCaseTemplateApiRequest) {
         log.info("CaseTemplateApiService-batchAdd()-params: [CaseTemplateApi]={}",
             addCaseTemplateApiRequest.toString());
@@ -72,7 +72,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    @LogRecord(operationType = REMOVE, operationModule = CASE_TEMPLATE_API,
+    @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE_API,
         template = "{{#result?.![#this.apiTestCase.caseName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
@@ -107,7 +107,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     @Override
     @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API, template = "{{#updateCaseTemplateApiDto"
         + ".updateCaseTemplateApiRequestList?.![#this.apiTestCase.caseName]}}",
-        projectId = "updateCaseTemplateApiRequestList[0].projectId")
+        refId = "updateCaseTemplateApiRequestList[0].projectId")
     public Boolean batchEdit(BatchUpdateCaseTemplateApiRequest updateCaseTemplateApiDto) {
         log.info("CaseTemplateApiService-batchEdit()-params: [CaseTemplateApi]={}",
             updateCaseTemplateApiDto.toString());
