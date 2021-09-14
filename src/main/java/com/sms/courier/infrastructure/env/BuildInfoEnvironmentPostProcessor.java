@@ -17,7 +17,7 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 public class BuildInfoEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
-    public static final String X_API_BUILD = "courier.build.";
+    public static final String COURIER_BUILD = "courier.build.";
     public static final String BUILD_KEY = "build.";
     public static final int ORDER = ConfigDataEnvironmentPostProcessor.ORDER + 10;
     private static final String BUILD_INFO_SOURCE_NAME = "courierEnvironment";
@@ -44,7 +44,7 @@ public class BuildInfoEnvironmentPostProcessor implements EnvironmentPostProcess
         Properties target = new Properties();
         for (String key : source.stringPropertyNames()) {
             if (key.startsWith(BUILD_KEY)) {
-                target.put(key.replace(BUILD_KEY, X_API_BUILD), source.get(key));
+                target.put(key.replace(BUILD_KEY, COURIER_BUILD), source.get(key));
             }
         }
         return target;
