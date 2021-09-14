@@ -8,4 +8,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface ApiDataStructureRefRecordRepository extends MongoRepository<ApiStructureRefRecordEntity, String> {
 
     List<DataStructureReferenceResponse> findByRefStructIdsIs(String dataStructId);
+
+    boolean existsByRefStructIdsIs(String structId);
 }

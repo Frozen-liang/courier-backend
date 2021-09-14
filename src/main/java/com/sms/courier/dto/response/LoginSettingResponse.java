@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class EmailSettingsResponse extends BaseResponse {
+public class LoginSettingResponse extends BaseResponse {
 
     private String emailSuffix;
 }

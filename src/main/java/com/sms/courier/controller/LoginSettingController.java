@@ -1,12 +1,12 @@
 package com.sms.courier.controller;
 
-import static com.sms.courier.common.constant.Constants.EMAIL_SETTINGS_PATH;
+import static com.sms.courier.common.constant.Constants.LOGIN_SETTING_PATH;
 
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
-import com.sms.courier.dto.request.EmailSettingsRequest;
-import com.sms.courier.dto.response.EmailSettingsResponse;
-import com.sms.courier.service.EmailSettingsService;
+import com.sms.courier.dto.request.LoginSettingRequest;
+import com.sms.courier.dto.response.LoginSettingResponse;
+import com.sms.courier.service.LoginSettingService;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -20,41 +20,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(EMAIL_SETTINGS_PATH)
-public class EmailSettingsController {
+@RequestMapping(LOGIN_SETTING_PATH)
+public class LoginSettingController {
 
-    private final EmailSettingsService emailSettingsService;
+    private final LoginSettingService loginSettingService;
 
-    public EmailSettingsController(EmailSettingsService emailSettingsService) {
-        this.emailSettingsService = emailSettingsService;
+    public LoginSettingController(LoginSettingService loginSettingService) {
+        this.loginSettingService = loginSettingService;
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
-    public EmailSettingsResponse getById(@PathVariable("id") String id) {
-        return emailSettingsService.findById(id);
+    public LoginSettingResponse getById(@PathVariable("id") String id) {
+        return loginSettingService.findById(id);
     }
 
     @PostMapping
     @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
-    public Boolean add(@Validated(InsertGroup.class) @RequestBody EmailSettingsRequest emailSettingsRequest) {
-        return emailSettingsService.add(emailSettingsRequest);
+    public Boolean add(@Validated(InsertGroup.class) @RequestBody LoginSettingRequest loginSettingRequest) {
+        return loginSettingService.add(loginSettingRequest);
     }
 
     @PutMapping
     @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
-    public Boolean edit(@Validated(UpdateGroup.class) @RequestBody EmailSettingsRequest emailSettingsRequest) {
-        return emailSettingsService.edit(emailSettingsRequest);
+    public Boolean edit(@Validated(UpdateGroup.class) @RequestBody LoginSettingRequest loginSettingRequest) {
+        return loginSettingService.edit(loginSettingRequest);
     }
 
     @GetMapping("/list")
-    public List<EmailSettingsResponse> list() {
-        return emailSettingsService.list();
+    public List<LoginSettingResponse> list() {
+        return loginSettingService.list();
     }
 
     @DeleteMapping("/{ids}")
     @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean delete(@PathVariable List<String> ids) {
-        return emailSettingsService.delete(ids);
+        return loginSettingService.delete(ids);
     }
 }

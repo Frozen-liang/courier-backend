@@ -1,5 +1,6 @@
 package com.sms.courier.service;
 
+import static com.sms.courier.common.exception.ErrorCode.GET_EMAIL_CONFIGURATION_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -62,6 +63,14 @@ public class EmailServiceTest {
     }
 
     @Test
+    void get_email_configuration_response_exception_test() {
+        when(repository.findAll()).thenThrow(RuntimeException.class);
+        assertThatThrownBy(() -> emailService.getEmailConfigurationResponse())
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_EMAIL_CONFIGURATION_ERROR.getCode());
+    }
+
+    @Test
     void get_entity_with_decrypt_pwd_test() {
         String secretPwd = "secret-pwd";
         String pwd = "pwd";
@@ -82,5 +91,11 @@ public class EmailServiceTest {
         when(repository.findAll()).thenReturn(Collections.singletonList(entity));
         when(entity.getEnabled()).thenReturn(Boolean.TRUE);
         assertThat(emailService.isServiceEnabled()).isEqualTo(Boolean.TRUE);
+    }
+
+    @Test
+    void is_service_enabled_exception_test() {
+        when(repository.findAll()).thenThrow(RuntimeException.class);
+        assertThat(emailService.isServiceEnabled()).isEqualTo(Boolean.FALSE);
     }
 }

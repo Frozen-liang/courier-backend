@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "websocket")
+@ConfigurationProperties(prefix = "courier.websocket")
 public class WebsocketProperties {
 
     private String[] userAllowedOriginPatterns = {"*"};

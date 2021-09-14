@@ -1,5 +1,7 @@
 package com.sms.courier.engine.impl;
 
+import static com.sms.courier.common.field.EngineMemberField.OPEN;
+
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.CaseRecordRequest;
 import com.sms.courier.dto.response.EngineResponse;
@@ -10,10 +12,12 @@ import com.sms.courier.engine.model.EngineMemberEntity;
 import com.sms.courier.engine.request.EngineRegistrationRequest;
 import com.sms.courier.engine.task.SuspiciousEngineManagement;
 import com.sms.courier.mapper.EngineMapper;
+import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.EngineMemberRepository;
 import com.sms.courier.utils.ExceptionUtils;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -27,12 +31,15 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     private final SecureRandom random = new SecureRandom();
     private final EngineMemberRepository engineMemberRepository;
+    private final CommonRepository commonRepository;
     private final SuspiciousEngineManagement suspiciousEngineManagement;
     private final EngineMapper engineMapper;
 
     public EngineMemberManagementImpl(EngineMemberRepository engineMemberRepository,
+        CommonRepository commonRepository,
         SuspiciousEngineManagement suspiciousEngineManagement, EngineMapper engineMapper) {
         this.engineMemberRepository = engineMemberRepository;
+        this.commonRepository = commonRepository;
         this.suspiciousEngineManagement = suspiciousEngineManagement;
         this.engineMapper = engineMapper;
     }
@@ -54,9 +61,10 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     @Override
     public String getAvailableMember() throws ApiTestPlatformException {
-        List<String> availableMembers = engineMemberRepository.findAllByStatus(EngineStatus.RUNNING)
-            .map(EngineMemberEntity::getDestination).collect(
-                Collectors.toUnmodifiableList());
+        List<String> availableMembers = engineMemberRepository.findAllByStatusAndOpenIsTrue(EngineStatus.RUNNING)
+            .filter(this::taskSizeLimit)
+            .map(EngineMemberEntity::getDestination)
+            .collect(Collectors.toUnmodifiableList());
         if (CollectionUtils.isEmpty(availableMembers)) {
             throw ExceptionUtils.mpe("No engines are available.");
         }
@@ -94,6 +102,16 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     }
 
     @Override
+    public Boolean openEngine(String id) {
+        return commonRepository.updateFieldById(id, Map.of(OPEN, true), EngineMemberEntity.class);
+    }
+
+    @Override
+    public Boolean closeEngine(String id) {
+        return commonRepository.updateFieldById(id, Map.of(OPEN, false), EngineMemberEntity.class);
+    }
+
+    @Override
     public void unBind(String sessionId) {
         Optional<EngineMemberEntity> engineMemberOptional = engineMemberRepository.findFirstBySessionId(sessionId);
         engineMemberOptional.ifPresent((engineMember -> {
@@ -123,4 +141,11 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
         });
     }
 
+    private boolean taskSizeLimit(EngineMemberEntity engineMemberEntity) {
+        Integer taskSizeLimit = engineMemberEntity.getTaskSizeLimit();
+        if (taskSizeLimit == -1) {
+            return Boolean.TRUE;
+        }
+        return taskSizeLimit >= (engineMemberEntity.getCaseTask() + engineMemberEntity.getSceneCaseTask());
+    }
 }

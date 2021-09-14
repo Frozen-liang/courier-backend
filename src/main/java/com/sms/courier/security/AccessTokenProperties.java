@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "hive.security.access-token")
+@ConfigurationProperties(prefix = "courier.security.access-token")
 public class AccessTokenProperties {
 
     private String userSecretKey = Encoders.BASE64.encode(Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded());
     private Duration userExpire = Duration.ofDays(7);
 
     private String engineSecretKey = Encoders.BASE64.encode(Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded());
-    private Duration engineExpire = Duration.ofDays(7);
+    private Duration engineExpire = Duration.ZERO;
 }

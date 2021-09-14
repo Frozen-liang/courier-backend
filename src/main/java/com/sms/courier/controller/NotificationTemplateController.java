@@ -8,6 +8,7 @@ import com.sms.courier.dto.response.NotificationTemplateResponse;
 import com.sms.courier.dto.response.NotificationTemplateTypeResponse;
 import com.sms.courier.service.NotificationTemplateService;
 import java.util.List;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,7 +38,7 @@ public class NotificationTemplateController {
     }
 
     @PostMapping
-    public Boolean save(@RequestBody NotificationTemplateRequest request) {
+    public Boolean save(@Validated @RequestBody NotificationTemplateRequest request) {
         return notificationTemplateService.save(request);
     }
 }

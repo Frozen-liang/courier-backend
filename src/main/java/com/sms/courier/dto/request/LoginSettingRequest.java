@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmailSettingsRequest {
+public class LoginSettingRequest {
 
     @NotBlank(groups = UpdateGroup.class, message = "The id cannot be empty.")
     @Null(groups = InsertGroup.class, message = "The id must be null.")
