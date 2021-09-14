@@ -75,4 +75,6 @@ public class ParamInfoRequest {
     private String paramId;
 
     private String mockRule;
+
+    private Integer structConsumer;
 }

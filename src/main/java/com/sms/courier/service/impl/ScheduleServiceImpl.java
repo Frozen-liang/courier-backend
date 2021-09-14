@@ -1,5 +1,8 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.enums.OperationModule.SCHEDULE;
+import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.enums.ScheduleStatusType.CREATE;
 import static com.sms.courier.common.enums.ScheduleStatusType.UPDATE;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCHEDULE_ERROR;
@@ -11,7 +14,10 @@ import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_LIST_ERROR
 import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.common.field.ScheduleField.SCHEDULE_STATUS;
 
+import com.sms.courier.common.aspect.annotation.Enhance;
+import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.enums.CollectionName;
+import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.enums.ScheduleStatusType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.field.Field;
@@ -65,6 +71,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = SCHEDULE, template = "{{#request.name}}")
     public Boolean add(ScheduleRequest request) {
         try {
             ScheduleEntity schedule = scheduleMapper.toEntity(request);
@@ -78,6 +85,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = SCHEDULE, template = "{{#request.name}}")
     public Boolean edit(ScheduleRequest request) {
         try {
             ScheduleEntity oldSchedule = scheduleRepository.findById(request.getId())
@@ -98,6 +106,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
+    @LogRecord(operationType = OperationType.DELETE, operationModule = SCHEDULE, template = "{{#result.name}}",
+        enhance = @Enhance(enable = true))
     public Boolean delete(String id) {
         try {
             Map<Field, Object> updateFields = new HashMap<>();
@@ -111,6 +121,9 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     private boolean checkScheduleTime(ScheduleEntity oldSchedule, ScheduleEntity newSchedule) {
+        if (oldSchedule.isLoop() != newSchedule.isLoop()) {
+            return true;
+        }
         if (oldSchedule.getCycle() != newSchedule.getCycle()) {
             return true;
         }

@@ -79,4 +79,9 @@ public class ParamInfo {
      * mock api xml 属性.
      */
     private String attribute;
+
+    /**
+     * 用于前端显示更多操作.
+     */
+    private Integer structConsumer;
 }
