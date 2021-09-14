@@ -87,7 +87,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = WORKSPACE, template = "{{#workspaceRequest.name}}")
+    @LogRecord(operationType = EDIT, operationModule = WORKSPACE, template = "{{#workspaceRequest.name}}", refId = "id")
     public Boolean edit(WorkspaceRequest workspaceRequest) {
         log.info("WorkspaceService-edit()-params: [Workspace]={}", workspaceRequest.toString());
         try {
@@ -109,7 +109,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     @LogRecord(operationType = DELETE, operationModule = WORKSPACE, template = "{{#result.name}}",
-        enhance = @Enhance(enable = true))
+        enhance = @Enhance(enable = true), refId = "id")
     public Boolean delete(String id) {
         try {
             isFalse(projectService.existsByWorkspaceId(id), THE_WORKSPACE_CANNOT_DELETE_ERROR);

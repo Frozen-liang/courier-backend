@@ -93,7 +93,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
 
     @Override
     @LogRecord(operationType = ADD, operationModule = GLOBAL_FUNCTION,
-        template = "{{#globalFunctionRequest.functionName}}")
+        template = "{{#globalFunctionRequest.functionName}}", refId = "workspaceId")
     public Boolean add(GlobalFunctionRequest globalFunctionRequest) {
         log.info("GlobalFunctionService-add()-params: [GlobalFunction]={}", globalFunctionRequest.toString());
         try {
@@ -116,7 +116,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = GLOBAL_FUNCTION,
-        template = "{{#globalFunctionRequest.functionName}}")
+        template = "{{#globalFunctionRequest.functionName}}", refId = "workspaceId")
     public Boolean edit(GlobalFunctionRequest globalFunctionRequest) {
         log.info("GlobalFunctionService-edit()-params: [GlobalFunction]={}", globalFunctionRequest.toString());
         try {
@@ -144,7 +144,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     @Override
     @LogRecord(operationType = DELETE, operationModule = GLOBAL_FUNCTION,
         template = "{{#result?.![#this.functionName]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        enhance = @Enhance(enable = true, primaryKey = "ids"), refId = "workspaceId")
     public Boolean delete(List<String> ids) {
         try {
             String workspaceId = globalFunctionRepository.findById(ids.get(0)).map(GlobalFunctionEntity::getWorkspaceId)

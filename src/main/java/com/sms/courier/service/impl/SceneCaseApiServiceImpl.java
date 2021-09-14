@@ -2,8 +2,8 @@ package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.OperationModule.SCENE_CASE_API;
 import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
-import static com.sms.courier.common.enums.OperationType.REMOVE;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.BATCH_EDIT_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_API_ERROR;
@@ -60,7 +60,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     @Override
     @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API,
         template = "{{#addSceneCaseApiDto.addSceneCaseApiRequestList?.![#this.apiTestCase.caseName]}}",
-        projectId = "addSceneCaseApiRequestList[0].projectId")
+        refId = "addSceneCaseApiRequestList[0].projectId")
     public Boolean batchAdd(BatchAddSceneCaseApiRequest addSceneCaseApiDto) {
         log.info("SceneCaseApiService-batchAdd()-params: [SceneCaseApi]={}", addSceneCaseApiDto.toString());
         try {
@@ -79,7 +79,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    @LogRecord(operationType = REMOVE, operationModule = SCENE_CASE_API,
+    @LogRecord(operationType = DELETE, operationModule = SCENE_CASE_API,
         template = "{{#result?.![#this.apiTestCase.caseName]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
@@ -113,7 +113,7 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     @Override
     @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
         template = "{{#updateSceneCaseApiSortOrderDto.sceneCaseApiRequestList?.![#this.apiTestCase.caseName]}}",
-        projectId = "sceneCaseApiRequestList[0].projectId")
+        refId = "sceneCaseApiRequestList[0].projectId")
     public Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiSortOrderDto) {
         log.info("SceneCaseApiService-batchEdit()-params: [SceneCaseApi]={}",
             updateSceneCaseApiSortOrderDto.toString());

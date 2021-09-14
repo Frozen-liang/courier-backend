@@ -1,5 +1,12 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.enums.OperationModule.PROJECT_IMPORT_SOURCE;
+import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.DELETE;
+import static com.sms.courier.common.enums.OperationType.EDIT;
+
+import com.sms.courier.common.aspect.annotation.Enhance;
+import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.dto.request.ProjectImportSourceRequest;
 import com.sms.courier.dto.response.ProjectImportFlowResponse;
 import com.sms.courier.dto.response.ProjectImportSourceResponse;
@@ -34,6 +41,8 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = PROJECT_IMPORT_SOURCE,
+        template = "{{#projectImportSourceRequest.name}}")
     public Boolean create(ProjectImportSourceRequest projectImportSourceRequest) {
         this.projectImportSourceRepository
             .insert(projectImportSourceMapper.toProjectImportSourceEntity(projectImportSourceRequest));
@@ -41,6 +50,8 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = PROJECT_IMPORT_SOURCE,
+        template = "{{#projectImportSourceRequest.name}}")
     public Boolean update(ProjectImportSourceRequest projectImportSourceRequest) {
 
         this.projectImportSourceRepository
@@ -70,6 +81,9 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = PROJECT_IMPORT_SOURCE,
+        template = "{{#result?.![#this.name]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         return commonRepository.deleteByIds(ids, ProjectImportSourceEntity.class);
     }

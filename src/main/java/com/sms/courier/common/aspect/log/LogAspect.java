@@ -73,7 +73,7 @@ public class LogAspect {
                 method, logRecord.template());
         }
         LogEntity logEntity = LogEntity.builder().operationType(operationType).operationModule(operationModule)
-            .operationDesc(operationDesc).operator(SecurityUtil.getCurrentUser().getUsername()).projectId(projectId)
+            .operationDesc(operationDesc).operator(SecurityUtil.getCurrentUser().getUsername()).refId(projectId)
             .build();
         logService.add(logEntity);
         return result;

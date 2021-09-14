@@ -2,8 +2,8 @@ package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.OperationModule.SCENE_CASE_GROUP;
 import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
-import static com.sms.courier.common.enums.OperationType.REMOVE;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_GROUP_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_GROUP_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
@@ -106,7 +106,7 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
     }
 
     @Override
-    @LogRecord(operationType = REMOVE, operationModule = SCENE_CASE_GROUP, template = "{{#result?.name}}",
+    @LogRecord(operationType = DELETE, operationModule = SCENE_CASE_GROUP, template = "{{#result?.name}}",
         enhance = @Enhance(enable = true))
     public Boolean deleteById(String id) {
         try {

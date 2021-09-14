@@ -17,5 +17,5 @@ public class AccessTokenProperties {
     private Duration userExpire = Duration.ofDays(7);
 
     private String engineSecretKey = Encoders.BASE64.encode(Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded());
-    private Duration engineExpire = Duration.ofDays(7);
+    private Duration engineExpire = Duration.ZERO;
 }

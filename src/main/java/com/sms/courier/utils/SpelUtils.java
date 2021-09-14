@@ -53,14 +53,14 @@ public class SpelUtils {
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public static String getProjectId(EvaluationContext context, LogRecord logRecord, Method method, Object[] args) {
         try {
-            Objects.requireNonNull(logRecord.projectId());
+            Objects.requireNonNull(logRecord.refId());
             if (OPERATION_TYPES.contains(logRecord.operationType())) {
                 isTrue(logRecord.enhance().enable(), "The enhance enable is false.");
                 return getProjectByResult(context, logRecord);
             }
             return getProjectIdByParams(context, logRecord, method, args);
         } catch (Exception e) {
-            log.error("Parse expression:{} error,methodName:{}, message :{}", logRecord.projectId(), method,
+            log.error("Parse expression:{} error,methodName:{}, message :{}", logRecord.refId(), method,
                 e.getMessage());
         }
         return null;
@@ -76,9 +76,9 @@ public class SpelUtils {
         Objects.requireNonNull(parameterNames);
         for (int i = 0; i < parameterNames.length; i++) {
             if (args[i] instanceof Collection) {
-                exp = createListExpression(parameterNames[i], logRecord.projectId());
+                exp = createListExpression(parameterNames[i], logRecord.refId());
             } else {
-                exp = createObjectExpression(parameterNames[i], logRecord.projectId());
+                exp = createObjectExpression(parameterNames[i], logRecord.refId());
             }
             expression = spelExpressionParser.parseExpression(exp, templateParserContext);
             try {
@@ -98,7 +98,7 @@ public class SpelUtils {
         String exp;
         Expression expression;
         String resultKey = logRecord.enhance().queryResultKey();
-        exp = createListExpression(resultKey, logRecord.projectId());
+        exp = createListExpression(resultKey, logRecord.refId());
         expression = spelExpressionParser.parseExpression(exp, templateParserContext);
         try {
             value = expression.getValue(context, String.class);
@@ -106,7 +106,7 @@ public class SpelUtils {
             log.warn("The expression:{} cannot get the value.", exp);
         }
         if (StringUtils.isBlank(value)) {
-            exp = createObjectExpression(resultKey, logRecord.projectId());
+            exp = createObjectExpression(resultKey, logRecord.refId());
             expression = spelExpressionParser.parseExpression(exp, templateParserContext);
             return expression.getValue(context, String.class);
         }

@@ -1,6 +1,7 @@
 package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.OperationModule.SCENE_CASE;
+import static com.sms.courier.common.enums.OperationModule.SCENE_CASE_API;
 import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
@@ -255,6 +256,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API,
+        template = "{{#request.sceneCaseApis?.![#this.name]}}")
     public Boolean addApi(AddSceneCaseApiByIdsRequest request) {
         try {
             SceneCaseEntity sceneCase =
@@ -274,6 +277,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API,
+        template = "{{#addCaseTemplateConnRequest.caseTemplateIds?.![#this.name]}}")
     public Boolean addTemplate(AddCaseTemplateConnRequest addCaseTemplateConnRequest) {
         try {
             SceneCaseEntity sceneCase =
@@ -308,7 +313,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
 
     @Override
     @LogRecord(operationType = DELETE, operationModule = SCENE_CASE,
-        template = "{{#res?.![#this.caseName]}}",
+        template = "{{#res?.![#this.name]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids", queryResultKey = "res"))
     public Boolean delete(List<String> ids) {
         try {
@@ -331,7 +336,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
 
     @Override
     @LogRecord(operationType = RECOVER, operationModule = SCENE_CASE,
-        template = "{{#result?.![#this.caseName]}}",
+        template = "{{#result?.![#this.name]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean recover(List<String> ids) {
         try {
