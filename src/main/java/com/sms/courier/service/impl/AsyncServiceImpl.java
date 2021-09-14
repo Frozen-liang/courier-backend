@@ -141,7 +141,7 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
             log.error(e.getMessage());
             importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, e.getCode(), e.getMessage());
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("Sync api error.", e);
             importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, ErrorCode.SYSTEM_ERROR.getCode(),
                 ErrorCode.SYSTEM_ERROR.getMessage());
         }
