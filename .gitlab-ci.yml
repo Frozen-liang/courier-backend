@@ -48,7 +48,7 @@ task_build_artifact:
   stage: build_code
   only:
     refs:
-      - develop
+      - master
   script:
     - ./gradlew bootjar --build-cache
     - IMAGE_TAG=$(ls ./build/libs | grep $PROD_RELEASE_NAME)&&IMAGE_TAG=${IMAGE_TAG:${#PROD_RELEASE_NAME}+1}&&IMAGE_TAG=${IMAGE_TAG%%.jar}
@@ -71,7 +71,7 @@ task_build_image:
   stage: build_image
   only:
     refs:
-      - develop
+      - master
   image: docker:19.03.1
   script:
     - 'source ./build/libs/version'
