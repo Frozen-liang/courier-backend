@@ -1,4 +1,4 @@
-package com.sms.courier.initialize.impl;
+package com.sms.courier.initialize.vo;
 
 import com.sms.courier.entity.system.SystemRoleEntity;
 import java.util.List;

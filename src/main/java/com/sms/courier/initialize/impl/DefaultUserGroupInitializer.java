@@ -25,7 +25,7 @@ public class DefaultUserGroupInitializer implements DataInitializer {
             }
             UserGroupEntity userGroup = UserGroupEntity.builder().name(DEFAULT_GROUP_NAME).defaultGroup(true).build();
             userGroupRepository.save(userGroup);
-            log.debug("Init DefaultUserGroup.");
+            log.info("Init DefaultUserGroup.");
         } catch (BeansException e) {
             log.error("Init DefaultUserGroup error.", e);
         }

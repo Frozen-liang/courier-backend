@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.courier.common.enums.RoleType;
 import com.sms.courier.entity.system.SystemRoleEntity;
 import com.sms.courier.entity.system.SystemVersionEntity;
+import com.sms.courier.initialize.vo.RoleConvert;
 import com.sms.courier.repository.SystemRoleRepository;
 import com.sms.courier.repository.SystemVersionRepository;
 import java.io.IOException;
