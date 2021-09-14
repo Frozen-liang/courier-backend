@@ -1,8 +1,14 @@
 package com.sms.courier.initialize.impl;
 
+import static com.sms.courier.initialize.constant.Initializer.FAIL;
+import static com.sms.courier.initialize.constant.Initializer.PREFIX;
+import static com.sms.courier.initialize.constant.Initializer.SUCCESS;
+import static com.sms.courier.initialize.constant.Initializer.SUFFIX;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.courier.entity.system.SystemVersionEntity;
 import com.sms.courier.initialize.DataInitializer;
+import com.sms.courier.initialize.constant.Order;
 import com.sms.courier.repository.SystemRoleRepository;
 import com.sms.courier.repository.SystemVersionRepository;
 import java.time.LocalDateTime;
@@ -18,11 +24,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class RoleInitializer implements DataInitializer {
 
-    private static final String SUFFIX = "-SystemRole.json";
-    private static final String PREFIX = "db/";
-    private static final int SUCCESS = 1;
-    private static final int FAIL = 0;
-
     @Override
     public void init(ApplicationContext applicationContext) {
         BuildProperties buildProperties = applicationContext.getBean(BuildProperties.class);
@@ -34,7 +35,7 @@ public class RoleInitializer implements DataInitializer {
             String version = buildProperties.getVersion();
             String name = buildProperties.getName();
             String group = buildProperties.getGroup();
-            log.debug("version:{},name:{},group:{},buildTime:{}", version, name, group, buildTime);
+            log.info("version:{},name:{},group:{},buildTime:{}", version, name, group, buildTime);
             Objects.requireNonNull(name);
             Objects.requireNonNull(version);
             SystemVersionEntity systemVersion = systemVersionRepository.findByVersion(version);
@@ -46,7 +47,7 @@ public class RoleInitializer implements DataInitializer {
                 systemVersion.setBuildTime(buildTime);
                 systemVersion.setName(name);
                 if (!classPathResource.exists()) {
-                    log.debug("The file not exists. path:{}", path);
+                    log.info("The file not exists. path:{}", path);
                     systemVersion.setInitialized(false);
                     systemVersion.setStatus(FAIL);
                     systemVersionRepository.save(systemVersion);
@@ -57,10 +58,10 @@ public class RoleInitializer implements DataInitializer {
                 systemVersion.setInitialized(true);
                 systemVersion.setStatus(SUCCESS);
                 systemVersionRepository.save(systemVersion);
-                log.debug("Initialize role success");
+                log.info("Initialize role success");
             }
         } catch (Exception e) {
-            log.error("Initialize role error. message:{}", e.getMessage());
+            log.error("Initialize role error.", e);
         }
     }
 
@@ -71,6 +72,6 @@ public class RoleInitializer implements DataInitializer {
 
     @Override
     public int getOrder() {
-        return 1;
+        return Order.ROLE;
     }
 }

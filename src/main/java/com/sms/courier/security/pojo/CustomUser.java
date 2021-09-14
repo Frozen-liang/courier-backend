@@ -23,10 +23,15 @@ public class CustomUser extends User {
     private TokenType tokenType;
     private LocalDate expiredDate;
 
-    // engine or mock
-    public CustomUser(String id, String username, TokenType tokenType) {
+
+    private CustomUser(String id, String username, TokenType tokenType) {
         super(username, "", Collections.emptyList());
         this.id = id;
+        this.tokenType = tokenType;
+    }
+
+    private CustomUser(String username, TokenType tokenType) {
+        super(username, "", Collections.emptyList());
         this.tokenType = tokenType;
     }
 
@@ -64,5 +69,13 @@ public class CustomUser extends User {
         this.email = email;
         this.tokenType = tokenType;
         this.expiredDate = expiredDate;
+    }
+
+    public static CustomUser createEngine(String id) {
+        return new CustomUser(id, "engine", TokenType.ENGINE);
+    }
+
+    public static CustomUser createMock() {
+        return new CustomUser("mock", TokenType.ENGINE);
     }
 }

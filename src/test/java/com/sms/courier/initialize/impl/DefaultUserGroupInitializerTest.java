@@ -17,7 +17,8 @@ public class DefaultUserGroupInitializerTest {
     private final DefaultUserGroupInitializer defaultUserGroupInitializer = new DefaultUserGroupInitializer();
     private final ConfigurableApplicationContext applicationContext = mock(ConfigurableApplicationContext.class);
     private final UserGroupRepository userGroupRepository = mock(UserGroupRepository.class);
-    private final UserGroupEntity userGroupEntity = UserGroupEntity.builder().name("默认分组").defaultGroup(true).build();
+    private final UserGroupEntity userGroupEntity =
+        UserGroupEntity.builder().name("DefaultGroup").defaultGroup(true).build();
 
 
     @Test

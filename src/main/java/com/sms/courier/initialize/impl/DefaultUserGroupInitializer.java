@@ -1,7 +1,10 @@
 package com.sms.courier.initialize.impl;
 
+import static com.sms.courier.initialize.constant.Initializer.DEFAULT_GROUP_NAME;
+
 import com.sms.courier.entity.system.UserGroupEntity;
 import com.sms.courier.initialize.DataInitializer;
+import com.sms.courier.initialize.constant.Order;
 import com.sms.courier.repository.UserGroupRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -20,7 +23,7 @@ public class DefaultUserGroupInitializer implements DataInitializer {
             if (exists) {
                 return;
             }
-            UserGroupEntity userGroup = UserGroupEntity.builder().name("默认分组").defaultGroup(true).build();
+            UserGroupEntity userGroup = UserGroupEntity.builder().name(DEFAULT_GROUP_NAME).defaultGroup(true).build();
             userGroupRepository.save(userGroup);
             log.debug("Init DefaultUserGroup.");
         } catch (BeansException e) {
@@ -30,6 +33,6 @@ public class DefaultUserGroupInitializer implements DataInitializer {
 
     @Override
     public int getOrder() {
-        return 2;
+        return Order.DEFAULT_USER_GROUP;
     }
 }
