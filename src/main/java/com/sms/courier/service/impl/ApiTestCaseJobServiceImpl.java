@@ -1,15 +1,19 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.enums.JobStatus.RUNNING;
 import static com.sms.courier.common.exception.ErrorCode.BUILD_CASE_JOB_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_JOB_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.THE_CASE_NOT_EXIST;
 import static com.sms.courier.common.exception.ErrorCode.THE_ENV_NOT_EXIST;
+import static com.sms.courier.common.field.ApiTestCaseJobField.ENGINE_ID;
+import static com.sms.courier.common.field.ApiTestCaseJobField.JOB_STATUS;
 import static com.sms.courier.utils.Assert.notEmpty;
 import static com.sms.courier.utils.Assert.notNull;
 
 import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.enums.ResultType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.request.ApiTestCaseJobPageRequest;
 import com.sms.courier.dto.request.ApiTestCaseJobRunRequest;
 import com.sms.courier.dto.request.ApiTestRequest;
@@ -28,8 +32,10 @@ import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.JobDataCollection;
 import com.sms.courier.entity.job.common.JobEnvironment;
+import com.sms.courier.entity.job.common.RunningJobAck;
 import com.sms.courier.mapper.JobMapper;
 import com.sms.courier.repository.ApiTestCaseJobRepository;
+import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.ApiTestCaseJobService;
@@ -40,6 +46,7 @@ import com.sms.courier.utils.SecurityUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
@@ -57,18 +64,20 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
     private final CaseDispatcherService caseDispatcherService;
     private final ProjectEnvironmentService projectEnvironmentService;
     private final ApiTestCaseService apiTestCaseService;
+    private final CommonRepository commonRepository;
     private final JobMapper jobMapper;
 
     public ApiTestCaseJobServiceImpl(ApiTestCaseJobRepository apiTestCaseJobRepository,
         CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository,
         CaseDispatcherService caseDispatcherService,
         ProjectEnvironmentService projectEnvironmentService, ApiTestCaseService apiTestCaseService,
-        JobMapper jobMapper) {
+        CommonRepository commonRepository, JobMapper jobMapper) {
         this.apiTestCaseJobRepository = apiTestCaseJobRepository;
         this.customizedApiTestCaseJobRepository = customizedApiTestCaseJobRepository;
         this.caseDispatcherService = caseDispatcherService;
         this.projectEnvironmentService = projectEnvironmentService;
         this.apiTestCaseService = apiTestCaseService;
+        this.commonRepository = commonRepository;
         this.jobMapper = jobMapper;
     }
 
@@ -113,8 +122,8 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
     public void apiTest(ApiTestRequest apiTestRequest, CustomUser currentUser) {
         try {
             ApiTestCaseJobEntity apiTestCaseJob = getApiTestCaseJobEntity(apiTestRequest, currentUser);
-            dispatcherJob(apiTestCaseJob);
             apiTestCaseJobRepository.save(apiTestCaseJob);
+            dispatcherJob(apiTestCaseJob);
         } catch (ApiTestPlatformException courierException) {
             log.error(courierException.getMessage());
             caseDispatcherService.sendErrorMessage(currentUser.getId(), courierException.getMessage());
@@ -137,8 +146,8 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                 apiTestCaseJobEntity.setId(ObjectId.get().toString());
                 apiTestCaseJobEntity.setCreateDateTime(LocalDateTime.now());
                 userId = apiTestCaseJobEntity.getCreateUserId();
-                dispatcherJob(apiTestCaseJobEntity);
                 apiTestCaseJobRepository.save(apiTestCaseJobEntity);
+                dispatcherJob(apiTestCaseJobEntity);
             }
         } catch (ApiTestPlatformException courierException) {
             log.error(courierException.getMessage());
@@ -188,6 +197,13 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
         return true;
     }
 
+    @Override
+    public void runningJobAck(RunningJobAck runningJobAck) {
+        Map<Field, Object> updateField = Map.of(JOB_STATUS, RUNNING, ENGINE_ID, runningJobAck.getDestination());
+        commonRepository
+            .updateFieldById(runningJobAck.getJobId(), updateField, ApiTestCaseJobEntity.class);
+    }
+
     private void updateJobReport(ApiTestCaseJobReport jobReport, ApiTestCaseJobEntity job) {
         JobApiTestCase jobApiTestCase = job.getApiTestCase().getJobApiTestCase();
         CaseReport caseReport = jobReport.getCaseReport();
@@ -227,7 +243,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             .createDateTime(LocalDateTime.now())
             .modifyUserId(currentUser.getId())
             .createUserId(currentUser.getId())
-            .jobStatus(JobStatus.RUNNING)
+            .jobStatus(JobStatus.PENDING)
             .createUserName(currentUser.getUsername())
             .environment(jobEnvironment)
             .apiTestCase(JobCaseApi.builder().jobApiTestCase(jobApiTestCase).build())
@@ -254,13 +270,13 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
                     apiTestCaseJob.setId(ObjectId.get().toString());
                     jobDataCollection.setTestData(jobMapper.toTestDataEntity(dataList));
                     apiTestCaseJob.setDataCollection(jobDataCollection);
-                    consumer.accept(apiTestCaseJob);
                     apiTestCaseJobRepository.save(apiTestCaseJob);
+                    consumer.accept(apiTestCaseJob);
                 }
             } else {
                 apiTestCaseJob.setId(ObjectId.get().toString());
-                consumer.accept(apiTestCaseJob);
                 apiTestCaseJobRepository.save(apiTestCaseJob);
+                consumer.accept(apiTestCaseJob);
             }
         }
     }
@@ -273,8 +289,12 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
     }
 
     private void dispatcherJob(ApiTestCaseJobEntity apiTestCaseJob) {
-        String engineId = caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
-        apiTestCaseJob.setEngineId(engineId);
+        try {
+            caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse(apiTestCaseJob));
+        } catch (ApiTestPlatformException e) {
+            apiTestCaseJobRepository.deleteById(apiTestCaseJob.getId());
+            throw e;
+        }
     }
 
 }

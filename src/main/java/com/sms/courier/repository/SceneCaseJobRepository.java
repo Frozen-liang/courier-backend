@@ -8,4 +8,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface SceneCaseJobRepository extends MongoRepository<SceneCaseJobEntity, String> {
 
     List<SceneCaseJobEntity> removeByEngineIdInAndJobStatus(List<String> engineId, JobStatus jobStatus);
+
 }
