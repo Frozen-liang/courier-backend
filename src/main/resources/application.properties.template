@@ -9,6 +9,7 @@ spring.data.mongodb.uri=
 logging.level.io.swagger.v3.parser.OpenAPIV3Parser=warn
 courier.security.access-token.user_secret_key=
 courier.security.access-token.engine_secret_key=
+courier.security.access-token.mock_secret_key=
 courier.security.ignore-path=/user/**,/engine/**,/v1/engine/bind,/v1/login-setting/list,/v1/file/stream/*
 courier.websocket.user_allowed_origin_patterns=*
 courier.websocket.engine_allowed_origin_patterns=*

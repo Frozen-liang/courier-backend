@@ -14,6 +14,7 @@ import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_CONN_ER
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_COUNT_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.RECOVER_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
@@ -353,6 +354,19 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         } catch (Exception e) {
             log.error("Failed to recover the SceneCase!", e);
             throw ExceptionUtils.mpe(RECOVER_SCENE_CASE_ERROR);
+        }
+    }
+
+    @Override
+    public Long count(String projectId) {
+        try {
+            ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+                .withIgnorePaths("isNext");
+            return sceneCaseRepository
+                .count(Example.of(SceneCaseEntity.builder().projectId(projectId).build(), exampleMatcher));
+        } catch (Exception e) {
+            log.error("Failed to get the SceneCase count!", e);
+            throw ExceptionUtils.mpe(GET_SCENE_CASE_COUNT_ERROR);
         }
     }
 

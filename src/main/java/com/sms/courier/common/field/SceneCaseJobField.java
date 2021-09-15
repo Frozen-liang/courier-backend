@@ -1,6 +1,6 @@
 package com.sms.courier.common.field;
 
-public enum SceneCaseJobField {
+public enum SceneCaseJobField implements Field {
 
     API_TEST_CASE("apiTestCase"),
     JOB_STATUS("jobStatus"),

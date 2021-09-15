@@ -36,4 +36,6 @@ public interface SceneCaseService {
     Boolean delete(List<String> ids);
 
     Boolean recover(List<String> ids);
+
+    Long count(String projectId);
 }

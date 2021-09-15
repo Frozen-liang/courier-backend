@@ -37,8 +37,10 @@ public class ApiTestCaseJobEntity {
     @Field("isRemoved")
     private boolean removed = false;
 
+    @Field(targetType = FieldType.OBJECT_ID)
     private String createUserId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
     private String modifyUserId;
 
     private LocalDateTime createDateTime;

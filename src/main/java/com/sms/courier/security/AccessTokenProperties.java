@@ -18,4 +18,7 @@ public class AccessTokenProperties {
 
     private String engineSecretKey = Encoders.BASE64.encode(Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded());
     private Duration engineExpire = Duration.ZERO;
+
+    private String mockSecretKey = Encoders.BASE64.encode(Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded());
+    private Duration mockExpire = Duration.ZERO;
 }

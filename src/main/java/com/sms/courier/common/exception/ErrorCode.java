@@ -224,6 +224,7 @@ public enum ErrorCode {
     GET_DATA_STRUCTURE_REF_LIST_ERROR("4204", "Failed to get the DataStructure ref list!"),
     DATE_STRUCTURE_CANNOT_DELETE_ERROR("4205", "Delete fail. This data structure has %s references!"),
     ACCOUNT_NOT_EXIST("4206", "The user account does not exist"),
+    GET_SCENE_CASE_COUNT_ERROR("4207", "Failed to get the SceneCase count!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),

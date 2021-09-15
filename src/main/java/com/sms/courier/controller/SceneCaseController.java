@@ -94,4 +94,9 @@ public class SceneCaseController {
     public Boolean recover(@RequestBody List<String> ids) {
         return sceneCaseService.recover(ids);
     }
+
+    @GetMapping("/count/pid/{projectId}")
+    public Long count(@PathVariable String projectId) {
+        return sceneCaseService.count(projectId);
+    }
 }

@@ -1,13 +1,16 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.enums.JobStatus.RUNNING;
 import static com.sms.courier.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
+import static com.sms.courier.common.field.SceneCaseJobField.ENGINE_ID;
+import static com.sms.courier.common.field.SceneCaseJobField.JOB_STATUS;
 
 import com.google.common.collect.Lists;
-import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.request.AddSceneCaseJobRequest;
 import com.sms.courier.dto.request.SceneCaseJobRequest;
 import com.sms.courier.dto.request.TestDataRequest;
@@ -21,6 +24,7 @@ import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.JobDataCollection;
 import com.sms.courier.entity.job.common.JobEnvironment;
+import com.sms.courier.entity.job.common.RunningJobAck;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
@@ -28,6 +32,7 @@ import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.mapper.JobMapper;
 import com.sms.courier.repository.CaseTemplateApiRepository;
 import com.sms.courier.repository.CaseTemplateRepository;
+import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseJobRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
@@ -68,6 +73,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     private final CaseTemplateRepository caseTemplateRepository;
     private final CaseTemplateApiRepository caseTemplateApiRepository;
     private final SceneCaseApiRepository sceneCaseApiRepository;
+    private final CommonRepository commonRepository;
 
     public SceneCaseJobServiceImpl(
         ProjectEnvironmentService projectEnvironmentService,
@@ -79,7 +85,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository,
         CaseTemplateRepository caseTemplateRepository,
         CaseTemplateApiRepository caseTemplateApiRepository,
-        SceneCaseApiRepository sceneCaseApiRepository) {
+        SceneCaseApiRepository sceneCaseApiRepository, CommonRepository commonRepository) {
         this.projectEnvironmentService = projectEnvironmentService;
         this.sceneCaseRepository = sceneCaseRepository;
         this.sceneCaseJobRepository = sceneCaseJobRepository;
@@ -90,6 +96,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         this.caseTemplateRepository = caseTemplateRepository;
         this.caseTemplateApiRepository = caseTemplateApiRepository;
         this.sceneCaseApiRepository = sceneCaseApiRepository;
+        this.commonRepository = commonRepository;
     }
 
     @Override
@@ -139,9 +146,8 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         try {
             List<SceneCaseJobEntity> jobEntityList = getSceneCaseJobEntityList(request, currentUser);
             for (SceneCaseJobEntity sceneCaseJob : jobEntityList) {
-                String engineId = caseDispatcherService.dispatch(jobMapper.toSceneCaseJobResponse(sceneCaseJob));
-                sceneCaseJob.setEngineId(engineId);
                 sceneCaseJobRepository.save(sceneCaseJob);
+                dispatchJob(sceneCaseJob);
             }
         } catch (ApiTestPlatformException courierException) {
             log.error("Execute the SceneCaseJob error. errorMessage:{}", courierException.getMessage());
@@ -157,14 +163,13 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         String userId = "";
         try {
             List<SceneCaseJobEntity> sceneCaseJobEntities = sceneCaseJobRepository
-                .removeByEngineIdInAndJobStatus(engineIds, JobStatus.RUNNING);
+                .removeByEngineIdInAndJobStatus(engineIds, RUNNING);
             for (SceneCaseJobEntity sceneCaseJobEntity : sceneCaseJobEntities) {
                 userId = sceneCaseJobEntity.getCreateUserId();
                 sceneCaseJobEntity.setId(ObjectId.get().toString());
                 sceneCaseJobEntity.setCreateDateTime(LocalDateTime.now());
-                String engineId = caseDispatcherService.dispatch(jobMapper.toSceneCaseJobResponse(sceneCaseJobEntity));
-                sceneCaseJobEntity.setEngineId(engineId);
                 sceneCaseJobRepository.save(sceneCaseJobEntity);
+                dispatchJob(sceneCaseJobEntity);
             }
         } catch (ApiTestPlatformException courierException) {
             log.error("Reallocate SceneCaseJob error. errorMessage:{}", courierException.getMessage());
@@ -187,6 +192,13 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     public Boolean editReport(SceneCaseJobReport sceneCaseJobReport) {
         handleJobReport(sceneCaseJobReport);
         return Boolean.TRUE;
+    }
+
+    @Override
+    public void runningJobAck(RunningJobAck runningJobAck) {
+        Map<Field, Object> updateField = Map.of(JOB_STATUS, RUNNING, ENGINE_ID, runningJobAck.getDestination());
+        commonRepository
+            .updateFieldById(runningJobAck.getJobId(), updateField, SceneCaseJobEntity.class);
     }
 
     private List<SceneCaseJobEntity> getSceneCaseJobEntityList(AddSceneCaseJobRequest request, CustomUser currentUser) {
@@ -234,7 +246,7 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         return SceneCaseJobEntity.builder()
             .id(ObjectId.get().toString())
             .projectId(request.getProjectId())
-            .jobStatus(JobStatus.RUNNING)
+            .jobStatus(RUNNING)
             .environment(jobEnvironment)
             .apiTestCase(caseList)
             .createDateTime(LocalDateTime.now())
@@ -287,6 +299,15 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             caseList.sort(Comparator.comparingInt(JobSceneCaseApi::getOrder));
         }
         return caseList;
+    }
+
+    private void dispatchJob(SceneCaseJobEntity sceneCaseJob) {
+        try {
+            caseDispatcherService.dispatch(jobMapper.toSceneCaseJobResponse(sceneCaseJob));
+        } catch (ApiTestPlatformException e) {
+            sceneCaseJobRepository.deleteById(sceneCaseJob.getId());
+            throw e;
+        }
     }
 
 }
