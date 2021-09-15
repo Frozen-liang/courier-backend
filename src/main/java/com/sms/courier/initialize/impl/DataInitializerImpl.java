@@ -10,6 +10,7 @@ import com.sms.courier.entity.system.SystemVersionEntity;
 import com.sms.courier.initialize.DataInitializer;
 import com.sms.courier.initialize.constant.Order;
 import com.sms.courier.repository.SystemVersionRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -30,7 +31,7 @@ import org.springframework.stereotype.Component;
 public class DataInitializerImpl implements DataInitializer {
 
     @Override
-    @SuppressWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public void init(ApplicationContext applicationContext) {
         BuildProperties buildProperties = applicationContext.getBean(BuildProperties.class);
         SystemVersionRepository systemVersionRepository = applicationContext.getBean(SystemVersionRepository.class);
