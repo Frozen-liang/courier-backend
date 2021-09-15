@@ -75,6 +75,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
 
     @Override
     public void handleJobReport(ApiTestCaseJobReport apiTestCaseJobReport) {
+        log.info("Receive job report. jobReport:{}", apiTestCaseJobReport);
         apiTestCaseJobRepository.findById(apiTestCaseJobReport.getJobId()).ifPresent(job -> {
             log.info("Handle job report. jobReport:{}", apiTestCaseJobReport);
             updateJobReport(apiTestCaseJobReport, job);
