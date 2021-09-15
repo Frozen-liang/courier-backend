@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 public class DataInitializerImpl implements DataInitializer {
 
     @Override
+    @SuppressWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public void init(ApplicationContext applicationContext) {
         BuildProperties buildProperties = applicationContext.getBean(BuildProperties.class);
         SystemVersionRepository systemVersionRepository = applicationContext.getBean(SystemVersionRepository.class);
