@@ -1,9 +1,0 @@
-{
-  "className": "com.sms.courier.entity.system.UserGroupEntity",
-  "data": [
-    {
-      "name": "DefaultGroup",
-      "defaultGroup": true
-    }
-  ]
-}
