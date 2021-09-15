@@ -31,8 +31,11 @@ public class SceneCaseJobEntity {
     @Builder.Default
     @JsonIgnore
     private Boolean removed = false;
+    @Field(targetType = FieldType.OBJECT_ID)
     private String createUserId;
+    @Field(targetType = FieldType.OBJECT_ID)
     private String workspaceId;
+    @Field(targetType = FieldType.OBJECT_ID)
     private String modifyUserId;
     private LocalDateTime createDateTime;
     @LastModifiedDate

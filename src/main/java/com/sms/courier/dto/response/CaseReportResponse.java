@@ -40,6 +40,10 @@ public class CaseReportResponse {
 
     private Integer paramsTimeCost;
 
+    private Integer preInjectTimeCost;
+
+    private Integer postInjectTimeCost;
+
     private List<Object> infoList;
 
 }

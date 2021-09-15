@@ -8,6 +8,7 @@ import com.sms.courier.dto.request.CaseRecordRequest;
 import com.sms.courier.engine.EngineMemberManagement;
 import com.sms.courier.entity.job.ApiTestCaseJobReport;
 import com.sms.courier.entity.job.SceneCaseJobReport;
+import com.sms.courier.entity.job.common.RunningJobAck;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.ApiTestCaseJobService;
 import com.sms.courier.service.SceneCaseJobService;
@@ -64,6 +65,16 @@ public class ChannelController {
     @MessageMapping(Constants.SDK_VERSION + "/case-record")
     public void caseRecord(@Payload CaseRecordRequest caseRecordRequest) {
         engineMemberManagement.caseRecord(caseRecordRequest);
+    }
+
+    @MessageMapping(Constants.SDK_VERSION + "/runningCaseJobAck")
+    public void runningCaseJobAck(@Payload RunningJobAck runningJobAck) {
+        apiTestCaseJobService.runningJobAck(runningJobAck);
+    }
+
+    @MessageMapping(Constants.SDK_VERSION + "/runningSceneCaseJobAck")
+    public void runningSceneCaseJobAck(@Payload RunningJobAck runningJobAck) {
+        sceneCaseJobService.runningJobAck(runningJobAck);
     }
 
 }
