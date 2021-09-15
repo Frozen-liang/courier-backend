@@ -131,20 +131,24 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     @Override
     public void active(String sessionId, String destination) {
-        if (StringUtils.isBlank(destination) || !destination.startsWith("/engine") || !destination.endsWith("/invoke")) {
-            return;
+        if (isEngineDestination(destination)) {
+            EngineMemberEntity engineMember = engineMemberRepository.findFirstByDestination(destination)
+                .orElse(new EngineMemberEntity());
+            if (engineMember.getStatus() == EngineStatus.WAITING_FOR_RECONNECTION) {
+                suspiciousEngineManagement.remove(engineMember.getDestination());
+                log.info("The Engine reconnection.destination:{}", engineMember.getDestination());
+            }
+            engineMember.setStatus(EngineStatus.RUNNING);
+            engineMember.setDestination(destination);
+            engineMember.setSessionId(sessionId);
+            engineMemberRepository.save(engineMember);
+            log.info("The test engine {} activated.", destination);
         }
-        EngineMemberEntity engineMember = engineMemberRepository.findFirstByDestination(destination)
-            .orElse(new EngineMemberEntity());
-        if (engineMember.getStatus() == EngineStatus.WAITING_FOR_RECONNECTION) {
-            suspiciousEngineManagement.remove(engineMember.getDestination());
-            log.info("The Engine reconnection.destination:{}", engineMember.getDestination());
-        }
-        engineMember.setStatus(EngineStatus.RUNNING);
-        engineMember.setDestination(destination);
-        engineMember.setSessionId(sessionId);
-        engineMemberRepository.save(engineMember);
-        log.info("The test engine {} activated.", destination);
+    }
+
+    private boolean isEngineDestination(String destination) {
+        return StringUtils.isNotBlank(destination) && destination.startsWith("/engine")
+            && destination.endsWith("/invoke");
     }
 
     private boolean taskSizeLimit(EngineMemberEntity engineMemberEntity) {
