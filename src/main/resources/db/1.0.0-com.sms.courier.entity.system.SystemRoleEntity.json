@@ -1,423 +1,423 @@
 [
-    {
-      "id": "610126d056617f032835a951",
-      "name": "Admin",
-      "description": "管理员",
-      "roleType": 0
-    },
-    {
-      "id": "6119ca625ae8c73b0c824e7c",
-      "name": "Workspace_Query_Own",
-      "description": "查询已分配的工作空间",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a952",
-      "name": "User_Create",
-      "description": "用户增加",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a953",
-      "name": "User_Update",
-      "description": "用户修改",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a954",
-      "name": "User_Status_Control",
-      "description": "锁定和解锁用户",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a955",
-      "name": "User_Query_All",
-      "description": "查询所有的用户",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a956",
-      "name": "User_Group_Create_Update_Delete",
-      "description": "用户分组增加修改删除,删除分组时需要Api删除权限",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a957",
-      "name": "User_Group_Query_All",
-      "description": "查询所有的用户分组",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a958",
-      "name": "Project_Create",
-      "description": "项目增加",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a959",
-      "name": "Project_Update",
-      "description": "项目修改",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a95a",
-      "name": "Project_Delete",
-      "description": "项目删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a95b",
-      "name": "Project_Query_All",
-      "description": "查询所有的项目",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a566",
-      "name": "Data_Structure_Create",
-      "description": "数据结构增加",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a567",
-      "name": "Data_Structure_Update",
-      "description": "数据结构修改",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a568",
-      "name": "Data_Structure_Delete",
-      "description": "数据结构删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a569",
-      "name": "Data_Structure_Query_All",
-      "description": "查询所有数据结构",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a95c",
-      "name": "Global_Env_Create",
-      "description": "全局环境增加",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a95d",
-      "name": "Global_Env_Update",
-      "description": "全局环境修改",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a95e",
-      "name": "Global_Env_Delete",
-      "description": "全局环境删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a95f",
-      "name": "Global_Env_Query_All",
-      "description": "查询所有的全局环境",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a960",
-      "name": "Global_Fun_Create",
-      "description": "全局函数增加",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a961",
-      "name": "Global_Fun_Update",
-      "description": "全局函数修改",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a962",
-      "name": "Global_Fun_Delete",
-      "description": "全局函数删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a963",
-      "name": "Global_Fun_Query_All",
-      "description": "查询所有的全局函数",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a76e",
-      "name": "Mock_Setting_Create_Update_Delete",
-      "description": "Mock设置增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a765",
-      "name": "Mock_Setting_Query_All",
-      "description": "查询所有的Mock设置",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a964",
-      "name": "Project_Env_Create_Update_Delete",
-      "description": "项目环境增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a965",
-      "name": "Project_Env_Query_All",
-      "description": "查询所有的项目环境",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a966",
-      "name": "Project_Fun_Create_Update_Delete",
-      "description": "项目函数增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a967",
-      "name": "Project_Fun_Query_All",
-      "description": "查询所有的项目函数",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a968",
-      "name": "Api_Create_Update_Delete",
-      "description": "Api增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a969",
-      "name": "Api_Query_All",
-      "description": "查询所有的Api",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a96a",
-      "name": "Api_Sync",
-      "description": "Api的同步",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a96b",
-      "name": "Api_Import_By_File",
-      "description": "从文件导入Api",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a96c",
-      "name": "Api_Group_Create_Update_Delete",
-      "description": "Api分组增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835b96e",
-      "name": "Mock_Api_Create_Update_Delete",
-      "description": "MockApi增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032837a96f",
-      "name": "Mock_Api_Query_All",
-      "description": "查询所有的MockApi",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a96d",
-      "name": "Api_Group_Query_All",
-      "description": "查询所有的Api分组",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a96e",
-      "name": "Tag_Create_Update_Delete",
-      "description": "标签增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a96f",
-      "name": "Tag_Query_All",
-      "description": "查询所有的标签",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a970",
-      "name": "Tag_Group_Create_Update_Delete",
-      "description": "标签分组增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a971",
-      "name": "Tag_Group_Query_All",
-      "description": "查询所有的标签分组",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a972",
-      "name": "Case_Create_Update_Delete",
-      "description": "用例增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a973",
-      "name": "Case_Query_All",
-      "description": "查询所有的用例",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a974",
-      "name": "Scene_Case_Create_Update_Delete",
-      "description": "流程用例增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a975",
-      "name": "Scene_Case_Query_All",
-      "description": "查询所有的流程用例",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a976",
-      "name": "Data_Collection_Create_Update_Delete",
-      "description": "数据连接增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a977",
-      "name": "Data_Collection_Query_All",
-      "description": "查询所有的数据连接",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a978",
-      "name": "Test_File_Create_Update_Delete",
-      "description": "测试文件增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a979",
-      "name": "Test_File_Query_All",
-      "description": "查询所有的测试文件",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a97a",
-      "name": "Project_Import_Source_Create_Update_Delete",
-      "description": "项目导入资源增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a97b",
-      "name": "Project_Import_Source_Query_All",
-      "description": "查询所有的项目导入资源",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a97c",
-      "name": "Case_Template_Api_Create_Update_Delete",
-      "description": "用例模板Api增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a97d",
-      "name": "Case_Template_Api_Query_All",
-      "description": "查询所有的用例模板Api",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a97e",
-      "name": "Case_Template_Create_Update_Delete",
-      "description": "用例模板增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a97f",
-      "name": "Case_Template_Query_All",
-      "description": "查询所有的用例模板",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a980",
-      "name": "Case_Template_Group_Create_Update_Delete",
-      "description": "用例模板分组增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a981",
-      "name": "Case_Template_Group_Query_All",
-      "description": "查询所有的用例模板分组",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a982",
-      "name": "Scene_Case_Api_Create_Update_Delete",
-      "description": "流程用例Api增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a983",
-      "name": "Scene_Case_Api_Query_All",
-      "description": "查询所有的流程用例Api",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a984",
-      "name": "Scene_Case_Group_Create_Update_Delete",
-      "description": "流程用例分组增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a985",
-      "name": "Scene_Case_Group_Query_All",
-      "description": "查询所有的流程用例分组",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a986",
-      "name": "Log_Query_All",
-      "description": "查询所有的日志",
-      "roleType": 0
-    },
-    {
-      "id": "610a0bf495e1c9094c0a709c",
-      "name": "Schedule_Query_All",
-      "description": "查询所有的定时任务",
-      "roleType": 0
-    },
-    {
-      "id": "610a0bf495e1c9094c0a709d",
-      "name": "Schedule_Create_Update_Delete",
-      "description": "定时任务增加修改删除",
-      "roleType": 0
-    },
-    {
-      "id": "610126d056617f032835a987",
-      "name": "Global_Fun_Find_All",
-      "description": "引擎查询所有全局函数",
-      "roleType": 1
-    },
-    {
-      "id": "610126d056617f032835a988",
-      "name": "Project_Fun_Find_All",
-      "description": "引擎查询所有项目函数",
-      "roleType": 1
-    },
-    {
-      "id": "610126d056617f032835a989",
-      "name": "Global_Fun_Pull",
-      "description": "引擎查询拉取最新全局函数",
-      "roleType": 1
-    },
-    {
-      "id": "610126d056617f032835a98a",
-      "name": "Project_Fun_Pull",
-      "description": "引擎查询拉取最新项目函数",
-      "roleType": 1
-    },
-    {
-      "id": "610126d056617f032835a98b",
-      "name": "Mock_Api_Mock_Query_All",
-      "description": "查询mock api list",
-      "roleType": 2
-    }
-  ]
+  {
+    "id": "610126d056617f032835a951",
+    "name": "Admin",
+    "description": "管理员",
+    "roleType": 0
+  },
+  {
+    "id": "6119ca625ae8c73b0c824e7c",
+    "name": "Workspace_Query_Own",
+    "description": "查询已分配的工作空间",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a952",
+    "name": "User_Create",
+    "description": "用户增加",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a953",
+    "name": "User_Update",
+    "description": "用户修改",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a954",
+    "name": "User_Status_Control",
+    "description": "锁定和解锁用户",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a955",
+    "name": "User_Query_All",
+    "description": "查询所有的用户",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a956",
+    "name": "User_Group_Create_Update_Delete",
+    "description": "用户分组增加修改删除,删除分组时需要Api删除权限",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a957",
+    "name": "User_Group_Query_All",
+    "description": "查询所有的用户分组",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a958",
+    "name": "Project_Create",
+    "description": "项目增加",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a959",
+    "name": "Project_Update",
+    "description": "项目修改",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a95a",
+    "name": "Project_Delete",
+    "description": "项目删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a95b",
+    "name": "Project_Query_All",
+    "description": "查询所有的项目",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a566",
+    "name": "Data_Structure_Create",
+    "description": "数据结构增加",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a567",
+    "name": "Data_Structure_Update",
+    "description": "数据结构修改",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a568",
+    "name": "Data_Structure_Delete",
+    "description": "数据结构删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a569",
+    "name": "Data_Structure_Query_All",
+    "description": "查询所有数据结构",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a95c",
+    "name": "Global_Env_Create",
+    "description": "全局环境增加",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a95d",
+    "name": "Global_Env_Update",
+    "description": "全局环境修改",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a95e",
+    "name": "Global_Env_Delete",
+    "description": "全局环境删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a95f",
+    "name": "Global_Env_Query_All",
+    "description": "查询所有的全局环境",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a960",
+    "name": "Global_Fun_Create",
+    "description": "全局函数增加",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a961",
+    "name": "Global_Fun_Update",
+    "description": "全局函数修改",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a962",
+    "name": "Global_Fun_Delete",
+    "description": "全局函数删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a963",
+    "name": "Global_Fun_Query_All",
+    "description": "查询所有的全局函数",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a76e",
+    "name": "Mock_Setting_Create_Update_Delete",
+    "description": "Mock设置增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a765",
+    "name": "Mock_Setting_Query_All",
+    "description": "查询所有的Mock设置",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a964",
+    "name": "Project_Env_Create_Update_Delete",
+    "description": "项目环境增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a965",
+    "name": "Project_Env_Query_All",
+    "description": "查询所有的项目环境",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a966",
+    "name": "Project_Fun_Create_Update_Delete",
+    "description": "项目函数增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a967",
+    "name": "Project_Fun_Query_All",
+    "description": "查询所有的项目函数",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a968",
+    "name": "Api_Create_Update_Delete",
+    "description": "Api增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a969",
+    "name": "Api_Query_All",
+    "description": "查询所有的Api",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a96a",
+    "name": "Api_Sync",
+    "description": "Api的同步",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a96b",
+    "name": "Api_Import_By_File",
+    "description": "从文件导入Api",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a96c",
+    "name": "Api_Group_Create_Update_Delete",
+    "description": "Api分组增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835b96e",
+    "name": "Mock_Api_Create_Update_Delete",
+    "description": "MockApi增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032837a96f",
+    "name": "Mock_Api_Query_All",
+    "description": "查询所有的MockApi",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a96d",
+    "name": "Api_Group_Query_All",
+    "description": "查询所有的Api分组",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a96e",
+    "name": "Tag_Create_Update_Delete",
+    "description": "标签增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a96f",
+    "name": "Tag_Query_All",
+    "description": "查询所有的标签",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a970",
+    "name": "Tag_Group_Create_Update_Delete",
+    "description": "标签分组增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a971",
+    "name": "Tag_Group_Query_All",
+    "description": "查询所有的标签分组",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a972",
+    "name": "Case_Create_Update_Delete",
+    "description": "用例增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a973",
+    "name": "Case_Query_All",
+    "description": "查询所有的用例",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a974",
+    "name": "Scene_Case_Create_Update_Delete",
+    "description": "流程用例增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a975",
+    "name": "Scene_Case_Query_All",
+    "description": "查询所有的流程用例",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a976",
+    "name": "Data_Collection_Create_Update_Delete",
+    "description": "数据连接增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a977",
+    "name": "Data_Collection_Query_All",
+    "description": "查询所有的数据连接",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a978",
+    "name": "Test_File_Create_Update_Delete",
+    "description": "测试文件增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a979",
+    "name": "Test_File_Query_All",
+    "description": "查询所有的测试文件",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a97a",
+    "name": "Project_Import_Source_Create_Update_Delete",
+    "description": "项目导入资源增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a97b",
+    "name": "Project_Import_Source_Query_All",
+    "description": "查询所有的项目导入资源",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a97c",
+    "name": "Case_Template_Api_Create_Update_Delete",
+    "description": "用例模板Api增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a97d",
+    "name": "Case_Template_Api_Query_All",
+    "description": "查询所有的用例模板Api",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a97e",
+    "name": "Case_Template_Create_Update_Delete",
+    "description": "用例模板增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a97f",
+    "name": "Case_Template_Query_All",
+    "description": "查询所有的用例模板",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a980",
+    "name": "Case_Template_Group_Create_Update_Delete",
+    "description": "用例模板分组增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a981",
+    "name": "Case_Template_Group_Query_All",
+    "description": "查询所有的用例模板分组",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a982",
+    "name": "Scene_Case_Api_Create_Update_Delete",
+    "description": "流程用例Api增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a983",
+    "name": "Scene_Case_Api_Query_All",
+    "description": "查询所有的流程用例Api",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a984",
+    "name": "Scene_Case_Group_Create_Update_Delete",
+    "description": "流程用例分组增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a985",
+    "name": "Scene_Case_Group_Query_All",
+    "description": "查询所有的流程用例分组",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a986",
+    "name": "Log_Query_All",
+    "description": "查询所有的日志",
+    "roleType": 0
+  },
+  {
+    "id": "610a0bf495e1c9094c0a709c",
+    "name": "Schedule_Query_All",
+    "description": "查询所有的定时任务",
+    "roleType": 0
+  },
+  {
+    "id": "610a0bf495e1c9094c0a709d",
+    "name": "Schedule_Create_Update_Delete",
+    "description": "定时任务增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "610126d056617f032835a987",
+    "name": "Global_Fun_Find_All",
+    "description": "引擎查询所有全局函数",
+    "roleType": 1
+  },
+  {
+    "id": "610126d056617f032835a988",
+    "name": "Project_Fun_Find_All",
+    "description": "引擎查询所有项目函数",
+    "roleType": 1
+  },
+  {
+    "id": "610126d056617f032835a989",
+    "name": "Global_Fun_Pull",
+    "description": "引擎查询拉取最新全局函数",
+    "roleType": 1
+  },
+  {
+    "id": "610126d056617f032835a98a",
+    "name": "Project_Fun_Pull",
+    "description": "引擎查询拉取最新项目函数",
+    "roleType": 1
+  },
+  {
+    "id": "610126d056617f032835a98b",
+    "name": "Mock_Api_Mock_Query_All",
+    "description": "查询mock api list",
+    "roleType": 2
+  }
+]
 

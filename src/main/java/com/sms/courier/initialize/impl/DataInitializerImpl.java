@@ -1,14 +1,14 @@
 package com.sms.courier.initialize.impl;
 
 import static com.sms.courier.initialize.constant.Initializer.FAIL;
+import static com.sms.courier.initialize.constant.Initializer.PREFIX;
 import static com.sms.courier.initialize.constant.Initializer.SUCCESS;
+import static com.sms.courier.initialize.constant.Initializer.SUFFIX;
 
 import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.courier.entity.system.SystemVersionEntity;
 import com.sms.courier.initialize.DataInitializer;
 import com.sms.courier.initialize.constant.Order;
-import com.sms.courier.repository.SystemRoleRepository;
 import com.sms.courier.repository.SystemVersionRepository;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -27,15 +27,13 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class RoleInitializer implements DataInitializer {
+public class DataInitializerImpl implements DataInitializer {
 
     @Override
     public void init(ApplicationContext applicationContext) {
         BuildProperties buildProperties = applicationContext.getBean(BuildProperties.class);
-        SystemRoleRepository systemRoleRepository = applicationContext.getBean(SystemRoleRepository.class);
         SystemVersionRepository systemVersionRepository = applicationContext.getBean(SystemVersionRepository.class);
         MongoTemplate mongoTemplate = applicationContext.getBean(MongoTemplate.class);
-        ObjectMapper objectMapper = applicationContext.getBean(ObjectMapper.class);
         try {
             LocalDateTime buildTime = LocalDateTime.ofInstant(buildProperties.getTime(), ZoneId.systemDefault());
             String version = buildProperties.getVersion();
@@ -45,15 +43,12 @@ public class RoleInitializer implements DataInitializer {
             Objects.requireNonNull(name);
             Objects.requireNonNull(version);
             SystemVersionEntity systemVersion = systemVersionRepository.findByVersion(version);
-
             if (checkInitialized(systemVersion, version)) {
-
                 systemVersion = Objects.requireNonNullElse(systemVersion, SystemVersionEntity.builder().build());
                 systemVersion.setVersion(version);
                 systemVersion.setBuildTime(buildTime);
                 systemVersion.setName(name);
-
-                String pattern = "db/" + version + "*.json";
+                String pattern = PREFIX + version + SUFFIX;
                 Resource[] resources = new PathMatchingResourcePatternResolver().getResources(pattern);
                 if (resources.length == 0) {
                     log.info("The files not exists. pattern:{}", pattern);
@@ -63,22 +58,21 @@ public class RoleInitializer implements DataInitializer {
                     return;
                 }
                 for (Resource resource : resources) {
-                    InputStream inputStream = resource.getInputStream();
                     String filename = resource.getFilename();
+                    InputStream inputStream = resource.getInputStream();
                     String className = filename.substring(filename.indexOf("-") + 1, filename.lastIndexOf("."));
                     Class<?> entityClass = Class.forName(className);
                     List<?> list = JSON
                         .parseArray(IOUtils.toString(inputStream, StandardCharsets.UTF_8), entityClass);
                     mongoTemplate.insert(list, entityClass);
+                    log.info("Initialize {} success.", filename);
                 }
-
                 systemVersion.setInitialized(true);
                 systemVersion.setStatus(SUCCESS);
                 systemVersionRepository.save(systemVersion);
-                log.info("Initialize role success");
             }
         } catch (Exception e) {
-            log.error("Initialize role error.", e);
+            log.error("Initialize data error.", e);
         }
     }
 

@@ -127,18 +127,17 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
         if (StringUtils.isBlank(destination) || !destination.startsWith("/engine")) {
             return;
         }
-        Optional<EngineMemberEntity> engineMemberOptional = engineMemberRepository.findFirstByDestination(destination);
-        engineMemberOptional.ifPresent(engineMember -> {
-            if (engineMember.getStatus() == EngineStatus.WAITING_FOR_RECONNECTION) {
-                suspiciousEngineManagement.remove(engineMember.getDestination());
-                log.info("The Engine reconnection.destination:{}", engineMember.getDestination());
-            }
-            engineMember.setStatus(EngineStatus.RUNNING);
-            engineMember.setDestination(destination);
-            engineMember.setSessionId(sessionId);
-            engineMemberRepository.save(engineMember);
-            log.info("The test engine {} activated.", destination);
-        });
+        EngineMemberEntity engineMember = engineMemberRepository.findFirstByDestination(destination)
+            .orElse(new EngineMemberEntity());
+        if (engineMember.getStatus() == EngineStatus.WAITING_FOR_RECONNECTION) {
+            suspiciousEngineManagement.remove(engineMember.getDestination());
+            log.info("The Engine reconnection.destination:{}", engineMember.getDestination());
+        }
+        engineMember.setStatus(EngineStatus.RUNNING);
+        engineMember.setDestination(destination);
+        engineMember.setSessionId(sessionId);
+        engineMemberRepository.save(engineMember);
+        log.info("The test engine {} activated.", destination);
     }
 
     private boolean taskSizeLimit(EngineMemberEntity engineMemberEntity) {
