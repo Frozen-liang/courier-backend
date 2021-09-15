@@ -124,7 +124,7 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     @Override
     public void active(String sessionId, String destination) {
-        if (StringUtils.isBlank(destination) || !destination.startsWith("/engine")) {
+        if (StringUtils.isBlank(destination) || !destination.startsWith("/engine") || !destination.endsWith("/invoke")) {
             return;
         }
         EngineMemberEntity engineMember = engineMemberRepository.findFirstByDestination(destination)

@@ -39,15 +39,16 @@ import com.sms.courier.service.SceneCaseJobService;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
@@ -109,13 +110,17 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
 
     @Override
     public void handleJobReport(SceneCaseJobReport jobReport) {
+        List<CaseReport> caseReportList = Objects
+            .requireNonNullElse(jobReport.getCaseReportList(), Collections.emptyList());
         Map<String, CaseReport> caseReportMap =
-            jobReport.getCaseReportList().stream().distinct()
+            caseReportList.stream().distinct()
                 .collect(Collectors.toMap(CaseReport::getCaseId, Function.identity()));
         sceneCaseJobRepository.findById(jobReport.getJobId()).ifPresent(job -> {
-            for (JobSceneCaseApi jobSceneCaseApi : job.getApiTestCase()) {
-                JobApiTestCase jobApiTestCase = jobSceneCaseApi.getJobApiTestCase();
-                jobApiTestCase.setCaseReport(caseReportMap.get(jobSceneCaseApi.getId()));
+            if (MapUtils.isNotEmpty(caseReportMap)) {
+                for (JobSceneCaseApi jobSceneCaseApi : job.getApiTestCase()) {
+                    JobApiTestCase jobApiTestCase = jobSceneCaseApi.getJobApiTestCase();
+                    jobApiTestCase.setCaseReport(caseReportMap.get(jobSceneCaseApi.getId()));
+                }
             }
             job.setJobStatus(jobReport.getJobStatus());
             job.setMessage(jobReport.getMessage());
