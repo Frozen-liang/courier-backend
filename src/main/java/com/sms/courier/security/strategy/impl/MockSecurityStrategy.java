@@ -21,11 +21,11 @@ public class MockSecurityStrategy implements SatpSecurityStrategy {
 
     @Override
     public Key generateSecretKey(JwsHeader<?> jwsHeader) {
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessTokenProperties.getEngineSecretKey()));
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessTokenProperties.getMockSecretKey()));
     }
 
     @Override
     public Duration obtainTokenExpirationTime() {
-        return accessTokenProperties.getEngineExpire();
+        return accessTokenProperties.getMockExpire();
     }
 }
