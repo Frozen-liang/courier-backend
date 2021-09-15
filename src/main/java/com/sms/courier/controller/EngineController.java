@@ -1,7 +1,6 @@
 package com.sms.courier.controller;
 
 import static com.sms.courier.common.constant.Constants.ENGINE_PATH;
-import static com.sms.courier.security.TokenType.ENGINE;
 
 import com.sms.courier.dto.response.EngineRegistrationResponse;
 import com.sms.courier.dto.response.EngineResponse;
@@ -39,7 +38,7 @@ public class EngineController {
     @PostMapping("/bind")
     public EngineRegistrationResponse bind(@Validated @RequestBody EngineRegistrationRequest request) {
         String destination = engineMemberManagement.bind(request);
-        CustomUser engine = new CustomUser(destination, "engine", ENGINE);
+        CustomUser engine = CustomUser.createEngine(destination);
         return EngineRegistrationResponse.builder().subscribeAddress(destination)
             .token(jwtTokenManager.generateAccessToken(engine))
             .build();

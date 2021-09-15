@@ -1,9 +1,8 @@
 package com.sms.courier.initialize.impl;
 
-import static com.sms.courier.security.TokenType.MOCK;
-
 import com.sms.courier.entity.mock.MockSettingEntity;
 import com.sms.courier.initialize.DataInitializer;
+import com.sms.courier.initialize.constant.Order;
 import com.sms.courier.repository.MockSettingRepository;
 import com.sms.courier.security.jwt.JwtTokenManager;
 import com.sms.courier.security.pojo.CustomUser;
@@ -23,7 +22,7 @@ public class MockSettingInitializer implements DataInitializer {
         List<MockSettingEntity> entityList = mockSettingRepository.findAll();
         if (CollectionUtils.isEmpty(entityList)) {
             JwtTokenManager jwtTokenManager = applicationContext.getBean(JwtTokenManager.class);
-            CustomUser mock = new CustomUser("mock", "mock", MOCK);
+            CustomUser mock = CustomUser.createMock();
             String token = jwtTokenManager.generateAccessToken(mock);
             MockSettingEntity mockSettingEntity = MockSettingEntity.builder().mockToken(token).build();
             mockSettingRepository.insert(mockSettingEntity);
@@ -32,7 +31,7 @@ public class MockSettingInitializer implements DataInitializer {
 
     @Override
     public int getOrder() {
-        return 4;
+        return Order.MOCK_SETTING;
     }
 
 }
