@@ -48,4 +48,8 @@ public class CaseReport {
 
     private List<Object> infoList;
 
+    private Integer preInjectTimeCost;
+
+    private Integer postInjectTimeCost;
+
 }
