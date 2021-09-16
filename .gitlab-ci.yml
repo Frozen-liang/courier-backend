@@ -9,6 +9,7 @@ stages:
   - build_code
   - build_image
   - deploy
+  - release
 
 variables:
   IMAGE: ${CI_REGISTRY}/${CI_PROJECT_PATH}
@@ -31,9 +32,6 @@ task_test:
   script:
     - ./gradlew check --build-cache --stacktrace
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, "instructions covered"; print "Total " int(100*covered/instructions) "% covered"}' $JACOCO_CSV_LOCATION
-  release:
-    tag_name: v${IMAGE_TAG}
-    description: '测试'
   cache:
     key: ${CI_PROJECT_NAME}
     paths:
@@ -85,6 +83,21 @@ task_build_image:
     - echo "Clean image cache for docker runner"
     - 'docker --config=/tool/.docker/ rmi ${IMAGE}:${IMAGE_TAG}'
     - echo "Finished build docker image ${IMAGE} ${IMAGE_TAG}"
+
+task_release:
+  tags:
+    - docker-runner
+  stage: release
+  image: docker:19.03.1
+  only:
+    refs:
+      - develop
+  release:
+    tag_name: v${IMAGE_TAG}
+    description: '测试'
+  script:
+    - 'source ./build/libs/version'
+    - echo "Release ${IMAGE_TAG} Successful."
 
 #task_deploy:
 #  tags:
