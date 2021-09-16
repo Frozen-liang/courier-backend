@@ -55,6 +55,7 @@ public class CustomizedSceneCaseJobRepositoryImpl implements CustomizedSceneCase
         SceneField.CASE_TEMPLATE_ID.is(sceneCaseJobRequest.getCaseTemplateId()).ifPresent(query::addCriteria);
         CommonField.JOB_STATUS.in(Lists.newArrayList(JobStatus.SUCCESS.getCode(), JobStatus.FAIL.getCode()))
             .ifPresent(query::addCriteria);
+
         long total = mongoTemplate.count(query, SceneCaseJobEntity.class);
         Sort sort = Sort.by(Direction.fromString(sceneCaseJobRequest.getOrder()), sceneCaseJobRequest.getSort());
         Pageable pageable = PageRequest
