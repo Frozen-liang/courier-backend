@@ -162,7 +162,7 @@ class UserGroupServiceTest {
     public void delete_test() {
         List<String> ids = Collections.singletonList(ID);
         when(commonRepository.updateField(any(Query.class), any(), any())).thenReturn(Boolean.TRUE);
-        when(userGroupRepository.deleteByIdIn(ids)).thenReturn(Boolean.TRUE);
+        when(userGroupRepository.deleteByIdIn(ids)).thenReturn(1L);
         assertThat(userGroupService.delete(Collections.singletonList(ID))).isTrue();
     }
 

@@ -132,7 +132,7 @@ public class UserGroupServiceImpl implements UserGroupService {
             Query query = new Query();
             GROUP_ID.in(ids).ifPresent(query::addCriteria);
             commonRepository.updateField(query, update, UserEntity.class);
-            return userGroupRepository.deleteByIdIn(ids);
+            return userGroupRepository.deleteByIdIn(ids) > 0;
         } catch (Exception e) {
             log.error("Failed to delete the UserGroup!", e);
             throw new ApiTestPlatformException(DELETE_USER_GROUP_BY_ID_ERROR);

@@ -15,5 +15,5 @@ public interface UserGroupRepository extends MongoRepository<UserGroupEntity, St
 
     boolean existsByName(String name);
 
-    boolean deleteByIdIn(List<String> ids);
+    Long deleteByIdIn(List<String> ids);
 }
