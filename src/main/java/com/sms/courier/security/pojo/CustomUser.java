@@ -76,6 +76,6 @@ public class CustomUser extends User {
     }
 
     public static CustomUser createMock() {
-        return new CustomUser("mock", TokenType.ENGINE);
+        return new CustomUser("mock", TokenType.MOCK);
     }
 }

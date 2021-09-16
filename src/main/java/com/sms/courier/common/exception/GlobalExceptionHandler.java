@@ -47,6 +47,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public Response<?> runtimeExceptionHandler(final AccessDeniedException e,
         HttpServletResponse response) {
         response.setStatus(HttpStatus.FORBIDDEN.value());
+        log.error("Forbidden error", e);
         return Response.error(Integer.toString(HttpStatus.FORBIDDEN.value()),
             "Forbidden");
     }
