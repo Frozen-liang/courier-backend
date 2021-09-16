@@ -165,7 +165,7 @@ class SceneCaseJobServiceTest {
     @DisplayName("Test the runJob method in the SceneCaseJob service thrown exception")
     void runJob_test_EnvironmentIsNull() {
         when(projectEnvironmentService.findOne(any())).thenReturn(null);
-        doNothing().when(caseDispatcherService).sendErrorMessage(any(), any());
+        doNothing().when(caseDispatcherService).sendSceneCaseErrorMessage(any(), any());
         sceneCaseJobService.runJob(getAddRequest(), customUser);
         verify(projectEnvironmentService, times(1)).findOne(any());
     }
@@ -176,7 +176,7 @@ class SceneCaseJobServiceTest {
         ProjectEnvironmentEntity environment = ProjectEnvironmentEntity.builder().build();
         when(projectEnvironmentService.findOne(any())).thenReturn(environment);
         when(sceneCaseRepository.findById(any())).thenReturn(Optional.empty());
-        doNothing().when(caseDispatcherService).sendErrorMessage(any(), any());
+        doNothing().when(caseDispatcherService).sendSceneCaseErrorMessage(any(), any());
         sceneCaseJobService.runJob(getAddRequest(), customUser);
         verify(sceneCaseRepository, times(1)).findById(any());
     }
@@ -186,8 +186,8 @@ class SceneCaseJobServiceTest {
     public void environment_not_exist_exception_test() {
         when(projectEnvironmentService.findOne(any())).thenReturn(null);
         sceneCaseJobService.runJob(getAddRequest(), customUser);
-        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
-        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+        doNothing().when(caseDispatcherService).sendSceneCaseErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendSceneCaseErrorMessage(anyString(), anyString());
     }
 
     @Test
@@ -196,8 +196,8 @@ class SceneCaseJobServiceTest {
         when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
         sceneCaseJobService.runJob(getAddRequest(), customUser);
         doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(ApiTestCaseJobReportResponse.class));
-        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
-        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+        doNothing().when(caseDispatcherService).sendSceneCaseErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendSceneCaseErrorMessage(anyString(), anyString());
     }
 
     @Test
@@ -211,7 +211,7 @@ class SceneCaseJobServiceTest {
                             .builder().id(MOCK_ID).build()).build()))
                     .id(MOCK_ID).build());
         when(sceneCaseJobRepository.findById(any())).thenReturn(sceneCaseJob);
-        doNothing().when(caseDispatcherService).sendErrorMessage(any(), any());
+        doNothing().when(caseDispatcherService).sendSceneCaseErrorMessage(any(), any());
         when(sceneCaseJobRepository.save(any())).thenReturn(SceneCaseJobEntity.builder().id(MOCK_ID).build());
         SceneCaseJobReport sceneCaseJobReport = getReport();
         sceneCaseJobService.handleJobReport(sceneCaseJobReport);
@@ -277,7 +277,7 @@ class SceneCaseJobServiceTest {
         when(caseDispatcherService.dispatch(any(SceneCaseJobResponse.class)))
             .thenThrow(ExceptionUtils.mpe(""));
         sceneCaseJobService.reallocateJob(ENGINE_ID_LIST);
-        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendSceneCaseErrorMessage(anyString(), anyString());
     }
 
     @Test
@@ -289,7 +289,7 @@ class SceneCaseJobServiceTest {
         when(caseDispatcherService.dispatch(any(SceneCaseJobResponse.class)))
             .thenThrow(new RuntimeException());
         sceneCaseJobService.reallocateJob(ENGINE_ID_LIST);
-        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendSceneCaseErrorMessage(anyString(), anyString());
     }
 
     @Test
@@ -319,7 +319,7 @@ class SceneCaseJobServiceTest {
                             .builder().id(MOCK_ID).build()).build()))
                     .id(MOCK_ID).build());
         when(sceneCaseJobRepository.findById(any())).thenReturn(sceneCaseJob);
-        doNothing().when(caseDispatcherService).sendErrorMessage(any(), any());
+        doNothing().when(caseDispatcherService).sendSceneCaseErrorMessage(any(), any());
         when(sceneCaseJobRepository.save(any())).thenReturn(SceneCaseJobEntity.builder().id(MOCK_ID).build());
         SceneCaseJobReport sceneCaseJobReport = getReport();
         Boolean isSuccess = sceneCaseJobService.editReport(sceneCaseJobReport);

@@ -99,10 +99,10 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             handleJob(apiTestCaseJobRunRequest, currentUser, this::dispatcherJob);
         } catch (ApiTestPlatformException courierException) {
             log.error("Execute the ApiTestCase error. errorMessage:{}", courierException.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUser.getId(), courierException.getMessage());
+            caseDispatcherService.sendCaseErrorMessage(currentUser.getId(), courierException.getMessage());
         } catch (Exception e) {
             log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the ApiTestCase error.");
+            caseDispatcherService.sendCaseErrorMessage(currentUser.getId(), "Execute the ApiTestCase error.");
         }
     }
 
@@ -126,10 +126,10 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             dispatcherJob(apiTestCaseJob);
         } catch (ApiTestPlatformException courierException) {
             log.error(courierException.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUser.getId(), courierException.getMessage());
+            caseDispatcherService.sendCaseErrorMessage(currentUser.getId(), courierException.getMessage());
         } catch (Exception e) {
             log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the ApiTestCase error.");
+            caseDispatcherService.sendCaseErrorMessage(currentUser.getId(), "Execute the ApiTestCase error.");
         }
     }
 
@@ -151,10 +151,10 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             }
         } catch (ApiTestPlatformException courierException) {
             log.error(courierException.getMessage());
-            caseDispatcherService.sendErrorMessage(userId, courierException.getMessage());
+            caseDispatcherService.sendCaseErrorMessage(userId, courierException.getMessage());
         } catch (Exception e) {
             log.error("Reallocate job  errorMessage:{}", e.getMessage());
-            caseDispatcherService.sendErrorMessage(userId, "Execute the ApiTestCase error.");
+            caseDispatcherService.sendCaseErrorMessage(userId, "Execute the ApiTestCase error.");
         }
     }
 
