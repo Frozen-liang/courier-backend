@@ -3,6 +3,9 @@ package com.sms.courier.service.impl;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_MOCK_SETTING_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.QUERY_MOCK_SETTING_API_ERROR;
 
+import com.sms.courier.common.aspect.annotation.LogRecord;
+import com.sms.courier.common.enums.OperationModule;
+import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.dto.request.MockSettingRequest;
 import com.sms.courier.dto.response.MockSettingResponse;
 import com.sms.courier.entity.mock.MockSettingEntity;
@@ -30,6 +33,8 @@ public class MockSettingServiceImpl implements MockSettingService {
     }
 
     @Override
+    @LogRecord(operationType = OperationType.EDIT, operationModule = OperationModule.MOCK_SETTING,
+        template = "{{#userRequest.username}}")
     public Boolean editUrl(MockSettingRequest mockSettingRequest) {
         log.info("MockSettingService-editUrl()-params: [mockSettingRequest]={}", mockSettingRequest.toString());
         try {

@@ -1,6 +1,7 @@
 package com.sms.courier.common.enums;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -34,11 +35,13 @@ public enum SchemaType {
 
     @Nullable
     public static SchemaType resolve(@Nullable String type) {
-        return SCHEMA_TYPE_MAP.get(type);
+        if (StringUtils.isBlank(type)) {
+            return null;
+        }
+        return SCHEMA_TYPE_MAP.get(type.toLowerCase(Locale.ROOT));
     }
 
     public static SchemaType resolve(@Nullable String type, String format) {
-
         return resolve(SPECIAL_TYPE.getOrDefault(StringUtils.defaultIfBlank(format, ""), type));
     }
 

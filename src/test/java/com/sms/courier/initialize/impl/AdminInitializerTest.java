@@ -6,19 +6,23 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sms.courier.initialize.AdminProperties;
 import com.sms.courier.repository.UserGroupRepository;
 import com.sms.courier.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @DisplayName("Tests for AdminInitializerTest")
 public class AdminInitializerTest {
 
-    private final AdminInitializer adminInitializer = new AdminInitializer();
+    private final AdminProperties adminProperties = new AdminProperties();
+    private final AdminInitializer adminInitializer = new AdminInitializer(adminProperties);
     private final ConfigurableApplicationContext applicationContext = mock(ConfigurableApplicationContext.class);
     private final UserGroupRepository userGroupRepository = mock(UserGroupRepository.class);
     private final UserRepository userRepository = mock(UserRepository.class);
+    private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
     private static final String USER_ID = "6110d05508d2cf752483a7f9";
     private static final String GROUP_ID = "6110d05508d2cf752483a7fa";
 
@@ -27,7 +31,9 @@ public class AdminInitializerTest {
     public void init_not_exist_test() {
         when(applicationContext.getBean(UserGroupRepository.class)).thenReturn(userGroupRepository);
         when(applicationContext.getBean(UserRepository.class)).thenReturn(userRepository);
+        when(applicationContext.getBean(PasswordEncoder.class)).thenReturn(passwordEncoder);
         when(userGroupRepository.existsById(GROUP_ID)).thenReturn(false);
+        when(passwordEncoder.encode(any())).thenReturn("test");
         when(userRepository.existsById(USER_ID)).thenReturn(false);
         adminInitializer.init(applicationContext);
         verify(userGroupRepository).save(any());

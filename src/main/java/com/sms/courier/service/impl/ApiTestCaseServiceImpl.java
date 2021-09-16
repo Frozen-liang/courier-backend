@@ -173,7 +173,9 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
 
     @Override
     public Long count(String projectId) {
-        ExampleMatcher exampleMatcher = ExampleMatcher.matching().withIgnorePaths("isExecute");
+        ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+            .withIgnorePaths("isExecute")
+            .withIgnorePaths("advancedSetting.isEnableRedirect");
         return apiTestCaseRepository
             .count(Example.of(ApiTestCaseEntity.builder().projectId(projectId).build(), exampleMatcher));
     }

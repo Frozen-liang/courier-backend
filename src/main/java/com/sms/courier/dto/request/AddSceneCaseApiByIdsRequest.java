@@ -17,6 +17,9 @@ public class AddSceneCaseApiByIdsRequest {
     @NotNull(message = "The sceneCaseId can not be empty")
     private String sceneCaseId;
 
+    @NotNull(message = "The projectId can not be empty")
+    private String projectId;
+
     @NotEmpty(message = "The entity can not be empty")
     private List<AddSceneCaseApi> sceneCaseApis;
 }

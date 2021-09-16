@@ -1,6 +1,7 @@
 package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.OperationModule.SCENE_CASE;
+import static com.sms.courier.common.enums.OperationModule.SCENE_CASE_API;
 import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
@@ -13,6 +14,7 @@ import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_CONN_ER
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_COUNT_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.RECOVER_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
@@ -255,6 +257,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API,
+        template = "{{#request.sceneCaseApis?.![#this.name]}}")
     public Boolean addApi(AddSceneCaseApiByIdsRequest request) {
         try {
             SceneCaseEntity sceneCase =
@@ -274,6 +278,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API,
+        template = "{{#addCaseTemplateConnRequest.caseTemplateIds?.![#this.name]}}")
     public Boolean addTemplate(AddCaseTemplateConnRequest addCaseTemplateConnRequest) {
         try {
             SceneCaseEntity sceneCase =
@@ -308,7 +314,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
 
     @Override
     @LogRecord(operationType = DELETE, operationModule = SCENE_CASE,
-        template = "{{#res?.![#this.caseName]}}",
+        template = "{{#res?.![#this.name]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids", queryResultKey = "res"))
     public Boolean delete(List<String> ids) {
         try {
@@ -331,7 +337,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
 
     @Override
     @LogRecord(operationType = RECOVER, operationModule = SCENE_CASE,
-        template = "{{#result?.![#this.caseName]}}",
+        template = "{{#result?.![#this.name]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean recover(List<String> ids) {
         try {
@@ -348,6 +354,19 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         } catch (Exception e) {
             log.error("Failed to recover the SceneCase!", e);
             throw ExceptionUtils.mpe(RECOVER_SCENE_CASE_ERROR);
+        }
+    }
+
+    @Override
+    public Long count(String projectId) {
+        try {
+            ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+                .withIgnorePaths("isNext");
+            return sceneCaseRepository
+                .count(Example.of(SceneCaseEntity.builder().projectId(projectId).build(), exampleMatcher));
+        } catch (Exception e) {
+            log.error("Failed to get the SceneCase count!", e);
+            throw ExceptionUtils.mpe(GET_SCENE_CASE_COUNT_ERROR);
         }
     }
 

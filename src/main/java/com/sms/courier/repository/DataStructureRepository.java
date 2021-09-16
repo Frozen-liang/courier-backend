@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface DataStructureRepository extends MongoRepository<StructureEntity, String> {
 
-    Boolean deleteByIdIs(String id);
+    Long deleteByIdIs(String id);
 
     List<DataStructureResponse> findByRefIdInAndStructTypeAndIdNotIn(List<String> refIds, Integer structType,
         Set<String> ids);

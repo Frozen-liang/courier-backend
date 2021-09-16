@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +53,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 @Repository
+@Slf4j
 public class CommonRepositoryImpl implements CommonRepository {
 
     protected final MongoTemplate mongoTemplate;
@@ -325,8 +327,13 @@ public class CommonRepositoryImpl implements CommonRepository {
     }
 
     private Boolean updateMulti(List<String> ids, Update update, Class<?> entityClass) {
+        try {
+            String currUserId = SecurityUtil.getCurrUserId();
+            update.set(MODIFY_USER_ID.getName(), currUserId);
+        } catch (Exception e) {
+            log.info("The currentUserId is empty.");
+        }
         update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
-        update.set(MODIFY_USER_ID.getName(), SecurityUtil.getCurrUserId());
         Query query = new Query(Criteria.where(ID.getName()).in(ids));
         UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
         return updateResult.getModifiedCount() > 0;

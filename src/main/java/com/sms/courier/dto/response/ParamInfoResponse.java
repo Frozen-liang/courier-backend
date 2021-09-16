@@ -67,4 +67,9 @@ public class ParamInfoResponse {
     private String paramId;
 
     private String mockRule;
+
+    /**
+     * 用于前端显示更多操作.
+     */
+    private Integer structConsumer;
 }

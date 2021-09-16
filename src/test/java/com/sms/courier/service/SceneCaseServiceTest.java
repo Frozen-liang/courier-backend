@@ -155,7 +155,8 @@ class SceneCaseServiceTest {
     void deleteByIds_test_thenThrownException() {
         Optional<SceneCaseEntity> sceneCase = Optional.ofNullable(SceneCaseEntity.builder().id(MOCK_ID).build());
         when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
-        doThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_ERROR)).when(sceneCaseRepository).deleteAllByIdIsIn(any());
+        doThrow(new ApiTestPlatformException(DELETE_SCENE_CASE_ERROR)).when(sceneCaseRepository)
+            .deleteAllByIdIsIn(any());
         assertThatThrownBy(() -> sceneCaseService.deleteByIds(Lists.newArrayList(MOCK_ID)))
             .isInstanceOf(ApiTestPlatformException.class);
     }
@@ -465,6 +466,21 @@ class SceneCaseServiceTest {
             .thenThrow(new RuntimeException());
         assertThatThrownBy(() -> sceneCaseService.recover(Lists.newArrayList(MOCK_ID)))
             .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the count method in the SceneCase service")
+    void count_thenRight() {
+        when(sceneCaseRepository.count(any())).thenReturn(1L);
+        Long count = sceneCaseService.count(MOCK_PROJECT_ID);
+        assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("Test the count method in the SceneCase service thrown exception")
+    void count_then_Exception() {
+        when(sceneCaseRepository.count(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> sceneCaseService.count(MOCK_PROJECT_ID)).isInstanceOf(ApiTestPlatformException.class);
     }
 
     private AddCaseTemplateConnRequest getAddConnRequest() {

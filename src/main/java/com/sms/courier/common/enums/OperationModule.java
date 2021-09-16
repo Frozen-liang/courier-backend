@@ -15,13 +15,14 @@ import com.sms.courier.entity.group.SceneCaseGroupEntity;
 import com.sms.courier.entity.mock.MockApiEntity;
 import com.sms.courier.entity.mock.MockSettingEntity;
 import com.sms.courier.entity.project.ProjectEntity;
+import com.sms.courier.entity.project.ProjectImportSourceEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.entity.schedule.ScheduleEntity;
 import com.sms.courier.entity.structure.StructureEntity;
-import com.sms.courier.entity.system.EmailSettingsEntity;
+import com.sms.courier.entity.system.LoginSettingEntity;
 import com.sms.courier.entity.system.UserEntity;
 import com.sms.courier.entity.system.UserGroupEntity;
 import com.sms.courier.entity.tag.ApiTagEntity;
@@ -58,8 +59,9 @@ public enum OperationModule implements EnumCommon {
     SCHEDULE(21, ScheduleEntity.class),
     MOCK_API(22, MockApiEntity.class),
     DATA_STRUCTURE(23, StructureEntity.class),
-    EMAIL_SETTINGS(24, EmailSettingsEntity.class),
-    MOCK_SETTING(25, MockSettingEntity.class),;
+    LOGIN_SETTING(24, LoginSettingEntity.class),
+    MOCK_SETTING(25, MockSettingEntity.class),
+    PROJECT_IMPORT_SOURCE(26, ProjectImportSourceEntity.class);
 
     private static final Map<Integer, OperationModule> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationModule::getCode, Function.identity()));

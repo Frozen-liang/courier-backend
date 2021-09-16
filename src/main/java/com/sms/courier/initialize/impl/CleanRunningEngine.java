@@ -5,6 +5,7 @@ import static com.sms.courier.engine.enums.EngineStatus.RUNNING;
 import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.engine.model.EngineMemberEntity;
 import com.sms.courier.initialize.DataInitializer;
+import com.sms.courier.initialize.constant.Order;
 import com.sms.courier.repository.EngineMemberRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,12 +23,12 @@ public class CleanRunningEngine implements DataInitializer {
         List<EngineMemberEntity> engineMembers = engineMemberRepository.findAllByStatus(RUNNING)
             .collect(Collectors.toList());
         engineMembers.forEach(engine -> engine.setStatus(EngineStatus.INVALID));
-        log.debug("Clean running engine");
+        log.info("Clean running engine");
         engineMemberRepository.saveAll(engineMembers);
     }
 
     @Override
     public int getOrder() {
-        return 0;
+        return Order.ENGINE;
     }
 }

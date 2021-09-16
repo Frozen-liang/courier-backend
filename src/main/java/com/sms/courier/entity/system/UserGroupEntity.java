@@ -2,6 +2,7 @@ package com.sms.courier.entity.system;
 
 import com.sms.courier.entity.BaseEntity;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @SuperBuilder
 @Document(collection = "UserGroup")
+@AllArgsConstructor
 public class UserGroupEntity extends BaseEntity {
 
     @Indexed(unique = true, background = true)

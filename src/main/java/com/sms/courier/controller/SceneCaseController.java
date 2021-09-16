@@ -60,6 +60,7 @@ public class SceneCaseController {
     }
 
     @GetMapping("/conn/{id}")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_API_QUERY_ALL)")
     public SceneTemplateResponse getConn(@PathVariable String id) {
         return sceneCaseService.getConn(id);
     }
@@ -92,5 +93,10 @@ public class SceneCaseController {
     @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_CRE_UPD_DEL)")
     public Boolean recover(@RequestBody List<String> ids) {
         return sceneCaseService.recover(ids);
+    }
+
+    @GetMapping("/count/pid/{projectId}")
+    public Long count(@PathVariable String projectId) {
+        return sceneCaseService.count(projectId);
     }
 }

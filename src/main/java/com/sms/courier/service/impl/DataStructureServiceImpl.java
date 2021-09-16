@@ -1,8 +1,6 @@
 package com.sms.courier.service.impl;
 
-
 import static com.sms.courier.common.enums.OperationModule.DATA_STRUCTURE;
-import static com.sms.courier.common.enums.OperationModule.EMAIL_SETTINGS;
 import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
@@ -36,7 +34,6 @@ import com.sms.courier.dto.response.DataStructureListResponse;
 import com.sms.courier.dto.response.DataStructureReferenceResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
 import com.sms.courier.entity.api.common.ParamInfo;
-import com.sms.courier.entity.mongo.CustomQuery;
 import com.sms.courier.entity.structure.StructureEntity;
 import com.sms.courier.entity.structure.StructureRefRecordEntity;
 import com.sms.courier.mapper.DataStructureMapper;
@@ -54,14 +51,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -96,8 +91,8 @@ public class DataStructureServiceImpl implements DataStructureService {
 
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = EMAIL_SETTINGS,
-        template = "{{#dataStructureRequest.name}}")
+    @LogRecord(operationType = ADD, operationModule = DATA_STRUCTURE,
+        template = "{{#dataStructureRequest.name}}", refId = "refId")
     public Boolean add(DataStructureRequest dataStructureRequest) {
         log.info("DataStructureService-add()-params: [DataStructure]={}", dataStructureRequest.toString());
         try {
@@ -117,8 +112,8 @@ public class DataStructureServiceImpl implements DataStructureService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = EMAIL_SETTINGS,
-        template = "{{#dataStructureRequest.name}}")
+    @LogRecord(operationType = EDIT, operationModule = DATA_STRUCTURE,
+        template = "{{#dataStructureRequest.name}}", refId = "refId")
     public Boolean edit(DataStructureRequest dataStructureRequest) {
         log.info("DataStructureService-edit()-params: [DataStructure]={}", dataStructureRequest.toString());
         try {
@@ -150,7 +145,7 @@ public class DataStructureServiceImpl implements DataStructureService {
     @Override
     @LogRecord(operationType = DELETE, operationModule = DATA_STRUCTURE,
         template = "{{#result.name}}",
-        enhance = @Enhance(enable = true))
+        enhance = @Enhance(enable = true), refId = "refId")
     public Boolean delete(String id) {
         try {
             List<StructureRefRecordEntity> refRecord = getRefRecord(id);
@@ -158,8 +153,7 @@ public class DataStructureServiceImpl implements DataStructureService {
             List<DataStructureReferenceResponse> apiRefs = apiDataStructureRefRecordRepository
                 .findByRefStructIdsIs(id);
             Assert.isTrue(CollectionUtils.isEmpty(apiRefs), DATE_STRUCTURE_CANNOT_DELETE_ERROR, "api");
-            structureRefRecordRepository.deleteById(id);
-            return dataStructureRepository.deleteByIdIs(id);
+            return dataStructureRepository.deleteByIdIs(id) > 0;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
             throw e;
@@ -173,19 +167,20 @@ public class DataStructureServiceImpl implements DataStructureService {
      * 查询数据结构列表.
      */
     @Override
-    public Page<DataStructureListResponse> getDataStructureList(DataStructureListRequest request) {
+    public List<DataStructureListResponse> getDataStructureList(DataStructureListRequest request) {
         try {
-            List<Optional<Criteria>> criteriaList = new ArrayList<>();
-            criteriaList.add(NAME.like(request.getName()));
-            criteriaList.add(REF_ID.in(getIds(request.getProjectId(), request.getWorkspaceId())));
-            criteriaList.add(DESCRIPTION.like(request.getDescription()));
-            criteriaList.add(STRUCT_TYPE.is(request.getStructType()));
-            CustomQuery customQuery = new CustomQuery();
-            customQuery.setIncludeFields(List.of(STRUCT, REF_STRUCT_IDS));
-            customQuery.setCriteriaList(criteriaList);
-            Page<StructureEntity> page = commonRepository
-                .page(customQuery, request, StructureEntity.class);
-            return page.map(dataStructureMapper::toListResponse);
+            Query query = new Query();
+            query.fields().exclude(STRUCT.getName(), REF_STRUCT_IDS.getName());
+            NAME.like(request.getName()).ifPresent(query::addCriteria);
+            REF_ID.in(getIds(request.getProjectId(), request.getWorkspaceId())).ifPresent(query::addCriteria);
+            DESCRIPTION.like(request.getDescription()).ifPresent(query::addCriteria);
+            STRUCT_TYPE.is(request.getStructType()).ifPresent(query::addCriteria);
+            return commonRepository.list(query, StructureEntity.class).stream()
+                .map(dataStructureMapper::toListResponse)
+                .peek(response -> response.setQuoted(structureRefRecordRepository.existsByStructureRef(
+                    StructureRefRecordEntity.builder().id(response.getId()).build())
+                    || apiDataStructureRefRecordRepository.existsByRefStructIdsIs(response.getId())))
+                .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Failed to get the DataStructure list!", e);
             throw new ApiTestPlatformException(GET_DATA_STRUCTURE_LIST_ERROR);
@@ -200,8 +195,10 @@ public class DataStructureServiceImpl implements DataStructureService {
         try {
             Query query = new Query();
             query.fields().exclude(CREATE_USER_ID.getName());
+            // ID.ne(request.getId()).ifPresent(query::addCriteria);
             STRUCT_TYPE.is(request.getStructType()).ifPresent(query::addCriteria);
             REF_ID.in(getIds(request.getProjectId(), request.getWorkspaceId())).ifPresent(query::addCriteria);
+            // REF_STRUCT_IDS.ne(request.getId()).ifPresent(query::addCriteria);
             return dataStructureMapper.toResponseList(commonRepository.list(query, StructureEntity.class));
         } catch (Exception e) {
             log.error("Failed to get the DataStructure data list!", e);

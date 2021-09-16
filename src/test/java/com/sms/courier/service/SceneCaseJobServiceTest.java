@@ -38,6 +38,7 @@ import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.mapper.JobMapper;
 import com.sms.courier.repository.CaseTemplateApiRepository;
 import com.sms.courier.repository.CaseTemplateRepository;
+import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseJobRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
@@ -77,6 +78,7 @@ class SceneCaseJobServiceTest {
 
     private final CaseTemplateRepository caseTemplateRepository = mock(CaseTemplateRepository.class);
     private final CaseTemplateApiRepository caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final SceneCaseApiRepository sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
 
     private final SceneCaseJobService sceneCaseJobService = new SceneCaseJobServiceImpl(
@@ -88,7 +90,7 @@ class SceneCaseJobServiceTest {
         caseDispatcherService,
         customizedCaseTemplateApiRepository,
         caseTemplateRepository,
-        caseTemplateApiRepository, sceneCaseApiRepository);
+        caseTemplateApiRepository, sceneCaseApiRepository, commonRepository);
 
     private final static String MOCK_ID = "1";
     private final static Integer MOCK_NUM = 1;

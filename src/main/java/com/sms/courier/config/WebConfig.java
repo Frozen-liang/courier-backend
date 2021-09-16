@@ -14,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@ConfigurationProperties(prefix = "api.cors")
+@ConfigurationProperties(prefix = "courier.cors")
 @Data
 public class WebConfig implements WebMvcConfigurer {
 

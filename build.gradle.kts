@@ -11,7 +11,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 
 group = "com.sms.courier"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.0"
 description = "courier-backend"
 
 
@@ -62,8 +62,7 @@ jacoco {
 repositories {
 //    mavenLocal()
     maven {
-        url = uri("http://13.228.213.232:8081/repository/maven-public/")
-        isAllowInsecureProtocol = true
+        url = uri("https://maven.aliyun.com/repository/public")
     }
     mavenCentral()
 }
@@ -102,11 +101,12 @@ dependencies {
     compileOnly("org.mapstruct:mapstruct:$versionMapstruct")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     implementation("io.swagger.parser.v3:swagger-parser:2.0.27")
-    implementation("org.springdoc:springdoc-openapi-ui:1.5.9")
+    implementation("org.springdoc:springdoc-openapi-ui:1.5.10")
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("commons-io:commons-io:2.8.0")
     implementation("org.apache.commons:commons-collections4:4.4")
-    implementation("io.vavr:vavr:0.10.3")
+    implementation("com.alibaba:fastjson:1.2.76")
+    implementation("io.vavr:vavr:0.10.4")
     implementation("org.codehaus.groovy:groovy:3.0.8")
     compileOnly("com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}")
     spotbugs("com.github.spotbugs:spotbugs:${spotbugs.toolVersion.get()}")

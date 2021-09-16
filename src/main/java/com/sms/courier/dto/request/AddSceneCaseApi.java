@@ -19,4 +19,6 @@ public class AddSceneCaseApi {
     @JsonProperty("isCase")
     private boolean isCase;
 
+    private String name;
+
 }
