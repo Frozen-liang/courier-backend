@@ -17,5 +17,7 @@ public interface CaseDispatcherService {
 
     void sendJobReport(String userId, SceneCaseJobReportResponse caseReport);
 
-    void sendErrorMessage(String userId, String message);
+    void sendCaseErrorMessage(String userId, String message);
+
+    void sendSceneCaseErrorMessage(String userId, String message);
 }

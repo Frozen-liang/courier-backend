@@ -72,9 +72,17 @@ public class CaseDispatcherServiceTest {
     }
 
     @Test
-    @DisplayName("Test the sendMessage method in the CaseDispatcherService service")
-    public void sendMessage_test() {
-        caseDispatcherService.sendErrorMessage(USER_ID, MESSAGE);
+    @DisplayName("Test the sendCaseMessage method in the CaseDispatcherService service")
+    public void sendCaseMessage_test() {
+        caseDispatcherService.sendCaseErrorMessage(USER_ID, MESSAGE);
+        doNothing().when(simpMessagingTemplate).convertAndSend(anyString(), any(Object.class));
+        verify(simpMessagingTemplate, times(1)).convertAndSend(anyString(), any(Object.class));
+    }
+
+    @Test
+    @DisplayName("Test the sendSceneCaseErrorMessage method in the CaseDispatcherService service")
+    public void sendSceneCaseMessage_test() {
+        caseDispatcherService.sendSceneCaseErrorMessage(USER_ID, MESSAGE);
         doNothing().when(simpMessagingTemplate).convertAndSend(anyString(), any(Object.class));
         verify(simpMessagingTemplate, times(1)).convertAndSend(anyString(), any(Object.class));
     }

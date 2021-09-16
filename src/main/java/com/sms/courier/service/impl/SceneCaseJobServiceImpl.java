@@ -151,10 +151,10 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             }
         } catch (ApiTestPlatformException courierException) {
             log.error("Execute the SceneCaseJob error. errorMessage:{}", courierException.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUser.getId(), courierException.getMessage());
+            caseDispatcherService.sendSceneCaseErrorMessage(currentUser.getId(), courierException.getMessage());
         } catch (Exception e) {
             log.error("Execute the SceneCaseJob error. errorMessage:{}", e.getMessage());
-            caseDispatcherService.sendErrorMessage(currentUser.getId(), "Execute the SceneCaseJob error.");
+            caseDispatcherService.sendSceneCaseErrorMessage(currentUser.getId(), "Execute the SceneCaseJob error.");
         }
     }
 
@@ -173,10 +173,10 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
             }
         } catch (ApiTestPlatformException courierException) {
             log.error("Reallocate SceneCaseJob error. errorMessage:{}", courierException.getMessage());
-            caseDispatcherService.sendErrorMessage(userId, courierException.getMessage());
+            caseDispatcherService.sendSceneCaseErrorMessage(userId, courierException.getMessage());
         } catch (Exception e) {
             log.error("Reallocate SceneCaseJob error. errorMessage:{}", e.getMessage());
-            caseDispatcherService.sendErrorMessage(userId, "Execute the SceneCaseJob error.");
+            caseDispatcherService.sendSceneCaseErrorMessage(userId, "Execute the SceneCaseJob error.");
         }
     }
 
