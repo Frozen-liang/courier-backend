@@ -7,7 +7,6 @@ import com.sms.courier.dto.response.DataStructureReferenceResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
 import java.util.List;
 import java.util.Map;
-import org.springframework.data.domain.Page;
 
 public interface DataStructureService {
 
@@ -19,7 +18,7 @@ public interface DataStructureService {
 
     Boolean delete(String ids);
 
-    Page<DataStructureListResponse> getDataStructureList(DataStructureListRequest request);
+    List<DataStructureListResponse> getDataStructureList(DataStructureListRequest request);
 
     List<DataStructureResponse> getDataStructureDataList(DataStructureListRequest request);
 

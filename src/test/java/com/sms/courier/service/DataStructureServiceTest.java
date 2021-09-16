@@ -44,7 +44,6 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.query.Query;
 
 
@@ -190,7 +189,7 @@ class DataStructureServiceTest {
             dataStructureList.add(StructureEntity.builder().build());
         }
         when(commonRepository.list(any(Query.class), any())).thenReturn(dataStructureList);
-        Page<DataStructureListResponse> result = dataStructureService
+        List<DataStructureListResponse> result = dataStructureService
             .getDataStructureList(dataStructureListRequest);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
