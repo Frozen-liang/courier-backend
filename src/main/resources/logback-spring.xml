@@ -37,12 +37,57 @@
             <charset>UTF-8</charset>
         </encoder>
     </appender>
-    <logger name="com.sms.courier.engine" additivity="false">
+
+    <appender name="testCase"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/courier-test-case.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/courier-test-case.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <cleanHistoryOnStart>${LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START:-false}</cleanHistoryOnStart>
+            <maxFileSize>${LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE:-10MB}</maxFileSize>
+            <totalSizeCap>${LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP:-0}</totalSizeCap>
+            <maxHistory>${LOGBACK_ROLLINGPOLICY_MAX_HISTORY:-7}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>${FILE_LOG_PATTERN}</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="sceneCase"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/courier-scene-case.log</file>
+        <append>true</append>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/courier-scene-case.log.%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <cleanHistoryOnStart>${LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START:-false}</cleanHistoryOnStart>
+            <maxFileSize>${LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE:-10MB}</maxFileSize>
+            <totalSizeCap>${LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP:-0}</totalSizeCap>
+            <maxHistory>${LOGBACK_ROLLINGPOLICY_MAX_HISTORY:-7}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>${FILE_LOG_PATTERN}</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <logger name="com.sms.courier.service.impl.SceneCaseJobServiceImpl" additivity="true">
+        <level value="INFO"/>
+        <appender-ref ref="sceneCase"/>
+    </logger>
+
+    <logger name="com.sms.courier.service.impl.ApiTestCaseJobServiceImpl" additivity="true">
+        <level value="INFO"/>
+        <appender-ref ref="testCase"/>
+    </logger>
+
+    <logger name="com.sms.courier.engine" additivity="true">
         <level value="INFO"/>
         <appender-ref ref="engine"/>
     </logger>
 
-    <logger name="com.sms.courier.parser" additivity="false">
+    <logger name="com.sms.courier.parser" additivity="true">
         <level value="INFO"/>
         <appender-ref ref="parser"/>
     </logger>
