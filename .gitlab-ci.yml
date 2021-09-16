@@ -95,21 +95,21 @@ task_release:
       - master
   release:
     tag_name: v${IMAGE_TAG}
-    description: '测试'
+    description: 'Release'
   script:
-    - 'source ./build/libs/version'
+    - 'IMAGE_TAG=$(cat ./dist/version)'
     - echo "Release ${IMAGE_TAG} Successful."
 
-#task_deploy:
-#  tags:
-#    - linux
-#  stage: deploy
-#  only:
-#    refs:
-#      - master
-#  before_script:
-#    - echo "Running deploy docker image"
-#  script:
-#    - ssh API-DEV /home/ec2-user/courier/starter.sh ${IMAGE} ${IMAGE_TAG}
+task_deploy:
+  tags:
+    - linux
+  stage: deploy
+  only:
+    refs:
+      - master
+  before_script:
+    - echo "Running deploy docker image"
+  script:
+    - ssh API-DEV /home/ec2-user/courier/courier.sh reload ${PROD_RELEASE_NAME} ${IMAGE_TAG}
 
 
