@@ -19,6 +19,11 @@ WORKDIR application
 ENV TZ="Asia/Shanghai"
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN apt-get update \
+&& apt-get -y install netcat-traditional \
+&& update-alternatives --config nc \
+&& apt-get clean all
+
 # In the previous stage, multiple files were extracted from the jar. Here, the COPY command was executed to copy to the mirror space. Each COPY is a layer
 COPY --from=builder application/dependencies/ ./
 COPY --from=builder application/spring-boot-loader/ ./
@@ -26,6 +31,7 @@ COPY --from=builder application/snapshot-dependencies/ ./
 COPY --from=builder application/application/ ./
 COPY ./build/application.properties ./
 # security patch - remove apt from container
-EXPOSE 8011
-ENTRYPOINT ["sh","-c","java $JAVA_OPTS -Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom org.springframework.boot.loader.JarLauncher"]
+EXPOSE 8080
+EXPOSE 5005
+ENTRYPOINT ["sh","-c","java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 $JAVA_OPTS -Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom org.springframework.boot.loader.JarLauncher"]
 

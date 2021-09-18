@@ -9,10 +9,11 @@ stages:
   - build_code
   - build_image
   - deploy
+  - release
 
 variables:
   IMAGE: ${CI_REGISTRY}/${CI_PROJECT_PATH}
-  IMAGE_TAG: 1.0.0
+  IMAGE_TAG: 1.0.1
   PROD_RELEASE_NAME: ${CI_PROJECT_NAME}
   JACOCO_CSV_LOCATION: $CI_PROJECT_DIR/build/reports/jacoco/test/jacocoTestReport.csv
   GIT_DEPTH: 1
@@ -31,6 +32,7 @@ task_test:
   script:
     - ./gradlew check --build-cache --stacktrace
     - awk -F"," '{ instructions += $4 + $5; covered += $5 } END { print covered, "/", instructions, "instructions covered"; print "Total " int(100*covered/instructions) "% covered"}' $JACOCO_CSV_LOCATION
+
   cache:
     key: ${CI_PROJECT_NAME}
     paths:
@@ -83,16 +85,31 @@ task_build_image:
     - 'docker --config=/tool/.docker/ rmi ${IMAGE}:${IMAGE_TAG}'
     - echo "Finished build docker image ${IMAGE} ${IMAGE_TAG}"
 
-#task_deploy:
-#  tags:
-#    - linux
-#  stage: deploy
-#  only:
-#    refs:
-#      - master
-#  before_script:
-#    - echo "Running deploy docker image"
-#  script:
-#    - ssh API-DEV /home/ec2-user/courier/starter.sh ${IMAGE} ${IMAGE_TAG}
+task_release:
+  tags:
+    - docker-runner
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  only:
+    refs:
+      - master
+  release:
+    tag_name: v${IMAGE_TAG}
+    description: 'Release'
+  script:
+    - 'source ./build/libs/version'
+    - echo "Release ${IMAGE_TAG} Successful."
+
+task_deploy:
+  tags:
+    - linux
+  stage: deploy
+  only:
+    refs:
+      - master
+  before_script:
+    - echo "Running deploy docker image"
+  script:
+    - ssh API-DEV /home/ec2-user/courier/courier.sh reload ${PROD_RELEASE_NAME} ${IMAGE_TAG}
 
 

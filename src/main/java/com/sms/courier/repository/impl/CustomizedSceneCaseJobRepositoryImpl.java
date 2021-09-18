@@ -6,6 +6,8 @@ import static com.sms.courier.common.field.SceneCaseJobField.INFO_LIST;
 import static com.sms.courier.common.field.SceneCaseJobField.PARAMS_TOTAL_TIME_COST;
 import static com.sms.courier.common.field.SceneCaseJobField.TOTAL_TIME_COST;
 
+import com.google.common.collect.Lists;
+import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.field.CommonField;
 import com.sms.courier.common.field.SceneCaseJobField;
 import com.sms.courier.common.field.SceneField;
@@ -51,6 +53,9 @@ public class CustomizedSceneCaseJobRepositoryImpl implements CustomizedSceneCase
         CommonField.CREATE_USER_ID.in(sceneCaseJobRequest.getUserIds()).ifPresent(query::addCriteria);
         SceneField.SCENE_CASE_ID.is(sceneCaseJobRequest.getSceneCaseId()).ifPresent(query::addCriteria);
         SceneField.CASE_TEMPLATE_ID.is(sceneCaseJobRequest.getCaseTemplateId()).ifPresent(query::addCriteria);
+        CommonField.JOB_STATUS.in(Lists.newArrayList(JobStatus.SUCCESS.getCode(), JobStatus.FAIL.getCode()))
+            .ifPresent(query::addCriteria);
+
         long total = mongoTemplate.count(query, SceneCaseJobEntity.class);
         Sort sort = Sort.by(Direction.fromString(sceneCaseJobRequest.getOrder()), sceneCaseJobRequest.getSort());
         Pageable pageable = PageRequest

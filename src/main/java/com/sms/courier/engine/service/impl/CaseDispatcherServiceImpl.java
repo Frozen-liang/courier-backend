@@ -61,9 +61,17 @@ public class CaseDispatcherServiceImpl implements CaseDispatcherService {
     }
 
     @Override
-    public void sendErrorMessage(String userId, String message) {
+    public void sendCaseErrorMessage(String userId, String message) {
         String destination = getCaseDest(userId);
         log.info("Send message {} to {}", message, getCaseDest(userId));
         simpMessagingTemplate.convertAndSend(destination, Payload.fail(message));
     }
+
+    @Override
+    public void sendSceneCaseErrorMessage(String userId, String message) {
+        String destination = getSceneCaseDest(userId);
+        log.info("Send message {} to {}", message, getSceneCaseDest(userId));
+        simpMessagingTemplate.convertAndSend(destination, Payload.fail(message));
+    }
+
 }

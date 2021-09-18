@@ -175,8 +175,8 @@ class ApiTestCaseJobServiceTest {
         when(apiTestCaseService.findOne(any())).thenReturn(apiTestCaseEntity);
         when(projectEnvironmentService.findOne(any())).thenReturn(null);
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest, customUser);
-        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
-        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+        doNothing().when(caseDispatcherService).sendCaseErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendCaseErrorMessage(anyString(), anyString());
     }
 
     @Test
@@ -186,8 +186,8 @@ class ApiTestCaseJobServiceTest {
         when(projectEnvironmentService.findOne(any())).thenThrow(new RuntimeException());
         apiTestCaseJobService.runJob(apiTestCaseJobRunRequest, customUser);
         doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(ApiTestCaseJobReportResponse.class));
-        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
-        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+        doNothing().when(caseDispatcherService).sendCaseErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendCaseErrorMessage(anyString(), anyString());
     }
 
     @Test
@@ -206,8 +206,8 @@ class ApiTestCaseJobServiceTest {
     public void apiTest_exception1_test() {
         when(projectEnvironmentService.findOne(any())).thenReturn(null);
         apiTestCaseJobService.apiTest(apiTestRequest, customUser);
-        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
-        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+        doNothing().when(caseDispatcherService).sendCaseErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendCaseErrorMessage(anyString(), anyString());
 
     }
 
@@ -216,8 +216,8 @@ class ApiTestCaseJobServiceTest {
     public void apiTest_exception2_test() {
         when(projectEnvironmentService.findOne(any())).thenReturn(projectEnvironment);
         apiTestCaseJobService.apiTest(null, customUser);
-        doNothing().when(caseDispatcherService).sendErrorMessage(anyString(), anyString());
-        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+        doNothing().when(caseDispatcherService).sendCaseErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendCaseErrorMessage(anyString(), anyString());
 
     }
 
@@ -239,7 +239,7 @@ class ApiTestCaseJobServiceTest {
         when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class)))
             .thenThrow(ExceptionUtils.mpe(ErrorCode.EXECUTE_API_TEST_CASE_ERROR));
         apiTestCaseJobService.reallocateJob(ENGINE_ID_LIST);
-        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendCaseErrorMessage(anyString(), anyString());
     }
 
     @Test
@@ -250,7 +250,7 @@ class ApiTestCaseJobServiceTest {
         when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class)))
             .thenThrow(new RuntimeException());
         apiTestCaseJobService.reallocateJob(ENGINE_ID_LIST);
-        verify(caseDispatcherService, times(1)).sendErrorMessage(anyString(), anyString());
+        verify(caseDispatcherService, times(1)).sendCaseErrorMessage(anyString(), anyString());
     }
 
     @Test
