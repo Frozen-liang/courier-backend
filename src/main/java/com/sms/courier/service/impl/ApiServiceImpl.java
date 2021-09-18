@@ -26,7 +26,6 @@ import com.sms.courier.repository.CustomizedApiRepository;
 import com.sms.courier.service.ApiService;
 import com.sms.courier.service.AsyncService;
 import com.sms.courier.service.ProjectImportSourceService;
-import com.sms.courier.utils.Assert;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.MD5Util;
 import java.nio.charset.StandardCharsets;
@@ -135,11 +134,13 @@ public class ApiServiceImpl implements ApiService {
     public Boolean edit(ApiRequest apiRequest) {
         log.info("ApiService-edit()-params: [Api]={}", apiRequest.toString());
         try {
-            boolean exists = apiRepository.existsById(apiRequest.getId());
-            Assert.isTrue(exists, ErrorCode.EDIT_NOT_EXIST_ERROR, "Api", apiRequest.getId());
+            ApiEntity oldApiEntity = apiRepository.findById(apiRequest.getId())
+                .orElseThrow(() -> ExceptionUtils.mpe(ErrorCode.EDIT_NOT_EXIST_ERROR, "Api", apiRequest.getId()));
             ApiEntity apiEntity = apiMapper.toEntity(apiRequest);
             ApiEntity newApiEntity = apiRepository.save(apiEntity);
             newApiEntity.setMd5(MD5Util.getMD5(newApiEntity));
+            newApiEntity.setCaseCount(oldApiEntity.getCaseCount());
+            newApiEntity.setSceneCaseCount(oldApiEntity.getSceneCaseCount());
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             saveRef(newApiEntity.getId(), newApiEntity.getApiName(), apiRequest.getAddStructIds(),

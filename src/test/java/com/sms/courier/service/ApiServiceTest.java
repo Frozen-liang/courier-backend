@@ -106,7 +106,7 @@ class ApiServiceTest {
     @Test
     @DisplayName("Test the edit method in the Api service")
     public void edit_test() {
-        when(apiRepository.existsById(any())).thenReturn(Boolean.TRUE);
+        when(apiRepository.findById(any())).thenReturn(Optional.of(api));
         when(apiRepository.save(any(ApiEntity.class))).thenReturn(api);
         when(apiHistoryRepository.insert(any(ApiHistoryEntity.class))).thenReturn(ApiHistoryEntity.builder().build());
         Boolean bool = apiService.edit(apiRequestDto);
@@ -116,7 +116,7 @@ class ApiServiceTest {
     @Test
     @DisplayName("An exception occurred while edit Api")
     public void edit_exception_test() {
-        when(apiRepository.existsById(any())).thenReturn(Boolean.TRUE);
+        when(apiRepository.findById(any())).thenReturn(Optional.of(api));
         doThrow(new RuntimeException()).when(apiRepository).save(any(ApiEntity.class));
         assertThatThrownBy(() -> apiService.edit(apiRequestDto))
             .isInstanceOf(ApiTestPlatformException.class)

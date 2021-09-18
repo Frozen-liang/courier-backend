@@ -127,6 +127,7 @@ public class DataStructureServiceImpl implements DataStructureService {
             // Check for circular references.
             checkRefIds(addStructIds, removeStructIds, id);
             StructureEntity dataStructure = dataStructureMapper.toEntity(dataStructureRequest);
+            setParamId(dataStructure.getStruct());
             dataStructureRepository.save(dataStructure);
             saveRef(dataStructure.getId(), dataStructure.getName(), addStructIds, removeStructIds);
         } catch (ApiTestPlatformException courierException) {
@@ -247,7 +248,9 @@ public class DataStructureServiceImpl implements DataStructureService {
             return;
         }
         for (ParamInfo paramInfo : struct) {
-            paramInfo.setParamId(String.valueOf(IdUtil.generatorId()));
+            if (StringUtils.isBlank(paramInfo.getParamId())) {
+                paramInfo.setParamId(String.valueOf(IdUtil.generatorId()));
+            }
             setParamId(paramInfo.getChildParam());
         }
     }
