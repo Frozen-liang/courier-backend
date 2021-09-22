@@ -165,14 +165,17 @@ class ApiServiceTest {
     public void deleteByIds_test() {
         List<String> ids = Collections.singletonList(ID);
         doNothing().when(apiRepository).deleteAllByIdIn(ids);
+        doNothing().when(apiDataStructureRefRecordRepository).deleteAllByIdIn(any());
         assertThat(apiService.deleteByIds(ids)).isTrue();
     }
 
     @Test
     @DisplayName("Test the deleteAll method in the Api service")
     public void deleteAll_test() {
-        doNothing().when(apiRepository).deleteAllByRemovedIsTrue();
-        assertThat(apiService.deleteAll()).isTrue();
+        String projectId = ObjectId.get().toString();
+        when(apiRepository.deleteAllByProjectIdAndRemovedIsTrue(projectId)).thenReturn(Collections.emptyList());
+        doNothing().when(apiDataStructureRefRecordRepository).deleteAllByIdIn(any());
+        assertThat(apiService.deleteAll(projectId)).isTrue();
     }
 
     @Test

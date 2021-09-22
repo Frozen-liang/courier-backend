@@ -32,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -173,15 +174,18 @@ public class ApiServiceImpl implements ApiService {
         template = "{{#result?.![#this.apiName]}}", enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("Delete api ids:{}.", ids);
+        apiDataStructureRefRecordRepository.deleteAllByIdIn(ids);
         apiRepository.deleteAllByIdIn(ids);
         return Boolean.TRUE;
     }
 
     @Override
     @LogRecord(operationType = OperationType.CLEAR_RECYCLE_BIN, operationModule = OperationModule.API)
-    public Boolean deleteAll() {
-        log.info("Delete all api when removed is true.");
-        apiRepository.deleteAllByRemovedIsTrue();
+    public Boolean deleteAll(String projectId) {
+        log.info("Delete all api projectId:{}.", projectId);
+        List<ApiEntity> apiEntities = apiRepository.deleteAllByProjectIdAndRemovedIsTrue(projectId);
+        List<String> ids = apiEntities.stream().map(ApiEntity::getId).collect(Collectors.toList());
+        apiDataStructureRefRecordRepository.deleteAllByIdIn(ids);
         return Boolean.TRUE;
     }
 

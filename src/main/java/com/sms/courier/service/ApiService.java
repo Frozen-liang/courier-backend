@@ -29,7 +29,7 @@ public interface ApiService {
 
     Boolean deleteByIds(List<String> ids);
 
-    Boolean deleteAll();
+    Boolean deleteAll(String projectId);
 
     Boolean recover(List<String> ids);
 

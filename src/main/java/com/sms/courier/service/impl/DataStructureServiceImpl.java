@@ -154,6 +154,7 @@ public class DataStructureServiceImpl implements DataStructureService {
             List<DataStructureReferenceResponse> apiRefs = apiDataStructureRefRecordRepository
                 .findByRefStructIdsIs(id);
             Assert.isTrue(CollectionUtils.isEmpty(apiRefs), DATE_STRUCTURE_CANNOT_DELETE_ERROR, "api");
+            structureRefRecordRepository.deleteById(id);
             return dataStructureRepository.deleteByIdIs(id) > 0;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
