@@ -28,7 +28,7 @@ public class ApiTestCaseJobController {
         this.apiTestCaseJobService = apiTestCaseJobService;
     }
 
-    @GetMapping("/page")
+    @PostMapping("/page")
     public Page<ApiTestCaseJobPageResponse> page(ApiTestCaseJobPageRequest pageRequest) {
         return apiTestCaseJobService.page(pageRequest);
     }
