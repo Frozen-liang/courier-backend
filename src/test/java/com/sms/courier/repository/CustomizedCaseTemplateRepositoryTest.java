@@ -1,7 +1,15 @@
 package com.sms.courier.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
+
 import com.sms.courier.dto.request.CaseTemplateSearchRequest;
 import com.sms.courier.dto.response.CaseTemplateResponse;
+import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.repository.impl.CustomizedCaseTemplateRepositoryImpl;
 import java.util.ArrayList;
@@ -13,13 +21,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Tests for CustomizedCaseTemplateRepositoryTest")
 class CustomizedCaseTemplateRepositoryTest {
@@ -51,7 +52,7 @@ class CustomizedCaseTemplateRepositoryTest {
         request.setPageSize(1);
         Page<CaseTemplateResponse> responses = mock(Page.class);
         when(responses.getContent()).thenReturn(apiDtoList);
-        when(commonRepository.page(any(),any(),eq(CaseTemplateResponse.class))).thenReturn(responses);
+        when(commonRepository.page(any(QueryVo.class),any(),eq(CaseTemplateResponse.class))).thenReturn(responses);
         Page<CaseTemplateResponse> page = customizedCaseTemplateRepository.page(request, new ObjectId());
         assertThat(page).isNotNull();
     }

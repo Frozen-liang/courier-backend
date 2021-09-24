@@ -18,4 +18,6 @@ public interface ScheduleService {
     Boolean edit(ScheduleRequest request);
 
     Boolean delete(String id);
+
+    Boolean handle(String id);
 }

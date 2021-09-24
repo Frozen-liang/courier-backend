@@ -9,6 +9,7 @@ import static com.sms.courier.common.field.SceneCaseJobField.ENGINE_ID;
 import static com.sms.courier.common.field.SceneCaseJobField.JOB_STATUS;
 
 import com.google.common.collect.Lists;
+import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.request.AddSceneCaseJobRequest;
@@ -20,10 +21,10 @@ import com.sms.courier.entity.env.ProjectEnvironmentEntity;
 import com.sms.courier.entity.job.JobSceneCaseApi;
 import com.sms.courier.entity.job.SceneCaseJobEntity;
 import com.sms.courier.entity.job.SceneCaseJobReport;
-import com.sms.courier.entity.job.common.CaseReport;
-import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.JobDataCollection;
+import com.sms.courier.entity.job.common.JobEntity;
 import com.sms.courier.entity.job.common.JobEnvironment;
+import com.sms.courier.entity.job.common.JobReport;
 import com.sms.courier.entity.job.common.RunningJobAck;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
@@ -44,31 +45,23 @@ import com.sms.courier.service.SceneCaseJobService;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Slf4j
-@Service
-public class SceneCaseJobServiceImpl implements SceneCaseJobService {
+@Service(Constants.SCENE_CASE_SERVICE)
+public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepository> implements SceneCaseJobService {
 
-    private final ProjectEnvironmentService projectEnvironmentService;
     private final SceneCaseRepository sceneCaseRepository;
-    private final SceneCaseJobRepository sceneCaseJobRepository;
-    private final JobMapper jobMapper;
     private final CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository;
-    private final CaseDispatcherService caseDispatcherService;
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
     private final CaseTemplateRepository caseTemplateRepository;
     private final CaseTemplateApiRepository caseTemplateApiRepository;
@@ -86,12 +79,9 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         CaseTemplateRepository caseTemplateRepository,
         CaseTemplateApiRepository caseTemplateApiRepository,
         SceneCaseApiRepository sceneCaseApiRepository, CommonRepository commonRepository) {
-        this.projectEnvironmentService = projectEnvironmentService;
+        super(sceneCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService, commonRepository);
         this.sceneCaseRepository = sceneCaseRepository;
-        this.sceneCaseJobRepository = sceneCaseJobRepository;
-        this.jobMapper = jobMapper;
         this.customizedSceneCaseJobRepository = customizedSceneCaseJobRepository;
-        this.caseDispatcherService = caseDispatcherService;
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
         this.caseTemplateRepository = caseTemplateRepository;
         this.caseTemplateApiRepository = caseTemplateApiRepository;
@@ -111,34 +101,8 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
 
     @Override
     public SceneCaseJobResponse get(String jobId) {
-        return sceneCaseJobRepository.findById(jobId).map(jobMapper::toSceneCaseJobResponse)
+        return repository.findById(jobId).map(jobMapper::toSceneCaseJobResponse)
             .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_JOB_ERROR));
-    }
-
-    @Override
-    public void handleJobReport(SceneCaseJobReport jobReport) {
-        List<CaseReport> caseReportList = Objects
-            .requireNonNullElse(jobReport.getCaseReportList(), Collections.emptyList());
-        Map<String, CaseReport> caseReportMap =
-            caseReportList.stream().distinct()
-                .collect(Collectors.toMap(CaseReport::getCaseId, Function.identity()));
-        sceneCaseJobRepository.findById(jobReport.getJobId()).ifPresent(job -> {
-            if (MapUtils.isNotEmpty(caseReportMap)) {
-                for (JobSceneCaseApi jobSceneCaseApi : job.getApiTestCase()) {
-                    JobApiTestCase jobApiTestCase = jobSceneCaseApi.getJobApiTestCase();
-                    jobApiTestCase.setCaseReport(caseReportMap.get(jobSceneCaseApi.getId()));
-                }
-            }
-            job.setJobStatus(jobReport.getJobStatus());
-            job.setMessage(jobReport.getMessage());
-            job.setParamsTotalTimeCost(jobReport.getParamsTotalTimeCost());
-            job.setTotalTimeCost(jobReport.getTotalTimeCost());
-            job.setInfoList(jobReport.getInfoList());
-            job.setDelayTimeTotalTimeCost(jobReport.getDelayTimeTotalTimeCost());
-            caseDispatcherService
-                .sendJobReport(job.getCreateUserId(), jobMapper.toSceneCaseJobReportResponse(jobReport));
-            sceneCaseJobRepository.save(job);
-        });
     }
 
     @Override
@@ -146,14 +110,14 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         try {
             List<SceneCaseJobEntity> jobEntityList = getSceneCaseJobEntityList(request, currentUser);
             for (SceneCaseJobEntity sceneCaseJob : jobEntityList) {
-                sceneCaseJobRepository.save(sceneCaseJob);
-                dispatchJob(sceneCaseJob);
+                repository.save(sceneCaseJob);
+                this.dispatcherJob(sceneCaseJob);
             }
         } catch (ApiTestPlatformException courierException) {
-            log.error("Execute the SceneCaseJob error. errorMessage:{}", courierException.getMessage());
+            log.error("Execute the SceneCaseJob error.", courierException);
             caseDispatcherService.sendSceneCaseErrorMessage(currentUser.getId(), courierException.getMessage());
         } catch (Exception e) {
-            log.error("Execute the SceneCaseJob error. errorMessage:{}", e.getMessage());
+            log.error("Execute the SceneCaseJob error.", e);
             caseDispatcherService.sendSceneCaseErrorMessage(currentUser.getId(), "Execute the SceneCaseJob error.");
         }
     }
@@ -162,20 +126,20 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     public void reallocateJob(List<String> engineIds) {
         String userId = "";
         try {
-            List<SceneCaseJobEntity> sceneCaseJobEntities = sceneCaseJobRepository
+            List<SceneCaseJobEntity> sceneCaseJobEntities = repository
                 .removeByEngineIdInAndJobStatus(engineIds, RUNNING);
             for (SceneCaseJobEntity sceneCaseJobEntity : sceneCaseJobEntities) {
                 userId = sceneCaseJobEntity.getCreateUserId();
                 sceneCaseJobEntity.setId(ObjectId.get().toString());
                 sceneCaseJobEntity.setCreateDateTime(LocalDateTime.now());
-                sceneCaseJobRepository.save(sceneCaseJobEntity);
-                dispatchJob(sceneCaseJobEntity);
+                repository.save(sceneCaseJobEntity);
+                this.dispatcherJob(sceneCaseJobEntity);
             }
         } catch (ApiTestPlatformException courierException) {
-            log.error("Reallocate SceneCaseJob error. errorMessage:{}", courierException.getMessage());
+            log.error("Reallocate SceneCaseJob error.", courierException);
             caseDispatcherService.sendSceneCaseErrorMessage(userId, courierException.getMessage());
         } catch (Exception e) {
-            log.error("Reallocate SceneCaseJob error. errorMessage:{}", e.getMessage());
+            log.error("Reallocate SceneCaseJob error.", e);
             caseDispatcherService.sendSceneCaseErrorMessage(userId, "Execute the SceneCaseJob error.");
         }
     }
@@ -184,13 +148,16 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
     public List<SceneCaseJobResponse> buildJob(AddSceneCaseJobRequest sceneCaseJobRequest) {
         List<SceneCaseJobEntity> jobEntityList = getSceneCaseJobEntityList(sceneCaseJobRequest,
             SecurityUtil.getCurrentUser());
-        sceneCaseJobRepository.saveAll(jobEntityList);
+        repository.saveAll(jobEntityList);
         return jobMapper.toSceneCaseJobResponseList(jobEntityList);
     }
 
     @Override
     public Boolean editReport(SceneCaseJobReport sceneCaseJobReport) {
-        handleJobReport(sceneCaseJobReport);
+        repository.findById(sceneCaseJobReport.getJobId()).ifPresent(job -> {
+            setJobReport(sceneCaseJobReport, job);
+            repository.save(job);
+        });
         return Boolean.TRUE;
     }
 
@@ -301,13 +268,28 @@ public class SceneCaseJobServiceImpl implements SceneCaseJobService {
         return caseList;
     }
 
-    private void dispatchJob(SceneCaseJobEntity sceneCaseJob) {
+    @Override
+    public void dispatcherJob(JobEntity jobEntity) {
         try {
-            caseDispatcherService.dispatch(jobMapper.toSceneCaseJobResponse(sceneCaseJob));
+            caseDispatcherService.dispatch(jobMapper.toSceneCaseJobResponse((SceneCaseJobEntity) jobEntity));
         } catch (ApiTestPlatformException e) {
-            sceneCaseJobRepository.deleteById(sceneCaseJob.getId());
+            repository.deleteById(jobEntity.getId());
             throw e;
         }
     }
 
+
+    @Override
+    public void saveJobReport(JobReport jobReport, JobEntity job) {
+        try {
+            SceneCaseJobReport sceneCaseJobReport = (SceneCaseJobReport) jobReport;
+            SceneCaseJobEntity sceneCaseJobEntity = (SceneCaseJobEntity) job;
+            caseDispatcherService
+                .sendJobReport(sceneCaseJobEntity.getCreateUserId(),
+                    jobMapper.toSceneCaseJobReportResponse(sceneCaseJobReport));
+            repository.save(sceneCaseJobEntity);
+        } catch (Exception e) {
+            log.error("Save scene case job error!", e);
+        }
+    }
 }

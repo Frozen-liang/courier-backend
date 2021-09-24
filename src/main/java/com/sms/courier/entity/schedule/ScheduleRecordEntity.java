@@ -17,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 @AllArgsConstructor
 @Builder
 @Document(collection = "ScheduleRecord")
-public class ScheduleRecord {
+public class ScheduleRecordEntity {
 
     @MongoId(FieldType.OBJECT_ID)
     private String id;
@@ -30,6 +30,9 @@ public class ScheduleRecord {
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String workspaceId;
+
     @Field("isExecute")
     @Default
     private boolean execute = true;
@@ -41,4 +44,9 @@ public class ScheduleRecord {
     private List<JobRecord> jobRecords;
 
     private LocalDateTime createDateTime;
+
+    // 记录此次定时任务所有正在运行job,当jobIds为空,说明此次定时任务都已完成.
+    private List<String> jobIds;
+
+    private int version;
 }

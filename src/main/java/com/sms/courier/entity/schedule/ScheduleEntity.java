@@ -2,6 +2,7 @@ package com.sms.courier.entity.schedule;
 
 
 import com.sms.courier.common.enums.CaseFilter;
+import com.sms.courier.common.enums.CaseType;
 import com.sms.courier.common.enums.CycleType;
 import com.sms.courier.common.enums.NoticeType;
 import com.sms.courier.common.enums.ScheduleStatusType;
@@ -34,6 +35,9 @@ public class ScheduleEntity extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String workspaceId;
+
     private String name;
 
     private String description;
@@ -50,9 +54,15 @@ public class ScheduleEntity extends BaseEntity {
 
     private Set<Integer> week;
 
+    // 0 为单个用例 1为流程用例
+    private CaseType caseType;
+
     private CaseFilter caseFilter;
 
     private CaseCondition caseCondition;
+
+    @Field(targetType = FieldType.OBJECT_ID)
+    private List<String> caseIds;
 
     private NoticeType noticeType;
 

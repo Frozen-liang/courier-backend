@@ -2,6 +2,7 @@ package com.sms.courier.entity.schedule;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,7 +19,8 @@ public class JobRecord {
     private String caseName;
 
     // 场景数量
-    private int sceneCount;
+    @Default
+    private int sceneCount = 1;
 
     // 成功数量
     private int success;

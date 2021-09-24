@@ -1,6 +1,7 @@
 package com.sms.courier.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sms.courier.common.enums.JobType;
 import com.sms.courier.entity.job.common.JobDataCollection;
 import com.sms.courier.entity.job.common.JobEnvironment;
 import java.util.List;
@@ -47,5 +48,7 @@ public class SceneCaseJobResponse extends BaseResponse {
     private Integer delayTimeTotalTimeCost;
 
     private List<Object> infoList;
+
+    private JobType jobType;
 
 }

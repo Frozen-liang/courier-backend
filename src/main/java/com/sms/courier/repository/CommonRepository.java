@@ -28,6 +28,8 @@ public interface CommonRepository {
 
     <T> Optional<T> findById(String id, String collectionName, List<LookupVo> lookupVo, Class<T> responseClass);
 
+    <T> Optional<T> findById(String id, Class<T> entityClass);
+
     <T> List<T> listLookupUser(String collectionName, List<Optional<Criteria>> criteriaList, Class<T> responseClass);
 
     <T> List<T> list(QueryVo queryVo, Class<T> responseClass);

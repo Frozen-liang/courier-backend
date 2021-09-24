@@ -1,7 +1,15 @@
 package com.sms.courier.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
+
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.response.SceneCaseResponse;
+import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.repository.impl.CustomizedSceneCaseRepositoryImpl;
@@ -14,13 +22,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Tests for CustomizedSceneCaseRepositoryTest")
 class CustomizedSceneCaseRepositoryTest {
@@ -52,7 +53,7 @@ class CustomizedSceneCaseRepositoryTest {
         request.setPageSize(1);
         Page<SceneCaseResponse> responses = mock(Page.class);
         when(responses.getContent()).thenReturn(apiDtoList);
-        when(commonRepository.page(any(), any(), eq(SceneCaseResponse.class))).thenReturn(responses);
+        when(commonRepository.page(any(QueryVo.class), any(), eq(SceneCaseResponse.class))).thenReturn(responses);
         Page<SceneCaseResponse> page = customizedSceneCaseRepository.search(request, new ObjectId());
         assertThat(page).isNotNull();
     }

@@ -38,8 +38,10 @@ class ScheduleServiceTest {
     private final ScheduleRepository scheduleRepository = mock(ScheduleRepository.class);
     private final ScheduleMapper scheduleMapper = new ScheduleMapperImpl();
     private final CommonRepository commonRepository = mock(CommonRepository.class);
+    private final ScheduleCaseJobService scheduleCaseJobService = mock(ScheduleCaseJobService.class);
+    private final ScheduleSceneCaseJobService scheduleSceneCaseJobService = mock(ScheduleSceneCaseJobService.class);
     private final ScheduleService scheduleService = new ScheduleServiceImpl(scheduleRepository, commonRepository,
-        scheduleMapper);
+        scheduleMapper, scheduleCaseJobService, scheduleSceneCaseJobService);
     private static final String ID = ObjectId.get().toString();
     private final ScheduleEntity schedule =
         ScheduleEntity.builder().id(ID).cycle(CycleType.DAY).time(Set.of("11:40")).build();

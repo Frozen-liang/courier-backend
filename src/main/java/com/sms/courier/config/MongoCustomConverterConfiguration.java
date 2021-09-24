@@ -9,6 +9,7 @@ import com.sms.courier.common.enums.ApiStatus;
 import com.sms.courier.common.enums.ApiTagType;
 import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.enums.CaseFilter;
+import com.sms.courier.common.enums.CaseType;
 import com.sms.courier.common.enums.CycleType;
 import com.sms.courier.common.enums.DocumentType;
 import com.sms.courier.common.enums.DocumentUrlType;
@@ -122,7 +123,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToNoticeTypeConverter.INSTANCE, IntegerToCaseFilterConverter.INSTANCE,
                 IntegerToTaskStatusConverter.INSTANCE, DurationToLongConverter.INSTANCE,
                 LongToDurationConverter.INSTANCE, IntegerToMockApiResponseParamTypeConverter.INSTANCE,
-                IntegerToApiEncodingTypeConverter.INSTANCE, IntegerToMockApiJsonLocateTypeConverter.INSTANCE);
+                IntegerToApiEncodingTypeConverter.INSTANCE, IntegerToMockApiJsonLocateTypeConverter.INSTANCE,
+                IntegerToCaseTypeConverter.INSTANCE);
 
         return new MongoCustomConversions(converters);
     }
@@ -481,6 +483,15 @@ public class MongoCustomConverterConfiguration {
 
         public MockApiJsonLocateType convert(@NonNull Integer code) {
             return MockApiJsonLocateType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToCaseTypeConverter implements Converter<Integer, CaseType> {
+        INSTANCE;
+
+        public CaseType convert(@NonNull Integer code) {
+            return CaseType.getType(code);
         }
     }
 }

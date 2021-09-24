@@ -47,5 +47,9 @@ public class Constants {
 
     public static final int MAX_DEPTH = 3;
     public static final String HTTP_DEFAULT_STATUS_CODE = "200";
+    public static final String CASE_SERVICE = "apiTestCaseJobService";
+    public static final String SCHEDULE_CASE_SERVICE = "scheduleCaseJobService";
+    public static final String SCENE_CASE_SERVICE = "sceneCaseJobService";
+    public static final String SCHEDULE_SCENE_CASE_SERVICE = "scheduleSceneCaseJobService";
 
 }

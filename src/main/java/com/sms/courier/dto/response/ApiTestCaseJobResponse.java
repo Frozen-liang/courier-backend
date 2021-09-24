@@ -1,5 +1,6 @@
 package com.sms.courier.dto.response;
 
+import com.sms.courier.common.enums.JobType;
 import com.sms.courier.entity.job.common.JobDataCollection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,5 +34,7 @@ public class ApiTestCaseJobResponse extends BaseResponse {
     private String createUserName;
 
     private Integer time;
+
+    private JobType jobType;
 
 }

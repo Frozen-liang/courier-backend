@@ -1,10 +1,13 @@
 package com.sms.courier.dto.request;
 
 
+import com.sms.courier.common.enums.CaseFilter;
+import com.sms.courier.common.enums.CaseType;
 import com.sms.courier.common.enums.CycleType;
 import com.sms.courier.common.enums.NoticeType;
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
+import com.sms.courier.entity.schedule.CaseCondition;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -42,6 +45,15 @@ public class ScheduleRequest {
 
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The cycle must not be null.")
     private CycleType cycle;
+
+    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The caseType must not be null.")
+    private CaseType caseType;
+
+    private CaseFilter caseFilter;
+
+    private CaseCondition caseCondition;
+
+    private List<String> caseIds;
 
     @NotNull
     @Size(min = 1)

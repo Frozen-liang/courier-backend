@@ -1,25 +1,21 @@
 package com.sms.courier.entity.job;
 
-import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.entity.job.common.CaseReport;
+import com.sms.courier.entity.job.common.JobReport;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class SceneCaseJobReport {
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class SceneCaseJobReport extends JobReport {
 
-    private String jobId;
-    private JobStatus jobStatus;
     private List<CaseReport> caseReportList;
-    private String message;
-    private Integer totalTimeCost;
-    private Integer paramsTotalTimeCost;
-    private Integer delayTimeTotalTimeCost;
-    private List<Object> infoList;
+
 }

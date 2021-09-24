@@ -2,7 +2,9 @@ package com.sms.courier.common.field;
 
 public enum ScheduleField implements Field {
 
-    SCHEDULE_STATUS("scheduleStatus");
+    SCHEDULE_STATUS("scheduleStatus"),
+    LAST_TASK_COMPLETE_TIME("lastTaskCompleteTime"),
+    TASK_STATUS("taskStatus");
 
     private final String name;
 

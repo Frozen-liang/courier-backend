@@ -9,4 +9,11 @@ public interface ApiTestCaseRepository extends MongoRepository<ApiTestCaseEntity
     void deleteAllByIdIn(List<String> ids);
 
     void deleteAllByRemovedIsTrue();
+
+    List<ApiTestCaseEntity> findByRemovedIsFalse();
+
+    List<ApiTestCaseEntity> findByIdIn(List<String> ids);
+
+    List<ApiTestCaseEntity> findByTagIdIn(List<String> tagIds);
+
 }
