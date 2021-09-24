@@ -7,6 +7,7 @@ import static com.sms.courier.common.field.ApiField.API_PROTOCOL;
 import static com.sms.courier.common.field.ApiField.API_STATUS;
 import static com.sms.courier.common.field.ApiField.GROUP_ID;
 import static com.sms.courier.common.field.ApiField.REQUEST_METHOD;
+import static com.sms.courier.common.field.ApiField.SCENE_CASE_COUNT;
 import static com.sms.courier.common.field.ApiField.TAG_ID;
 import static com.sms.courier.common.field.ApiTag.GROUP_NAME;
 import static com.sms.courier.common.field.ApiTag.TAG_NAME;
@@ -51,6 +52,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.CountOperation;
+import org.springframework.data.mongodb.core.aggregation.GroupOperation;
+import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -177,6 +184,15 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         }
         Query query = Query.query(Criteria.where(ID.getName()).is(id));
         return mongoTemplate.updateFirst(query, update, ApiEntity.class).getModifiedCount() == 1;
+    }
+
+    @Override
+    public Long sceneCount(ObjectId projectId) {
+        Query query = new Query();
+        PROJECT_ID.is(projectId).ifPresent(query::addCriteria);
+        REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
+        SCENE_CASE_COUNT.gt(0).ifPresent(query::addCriteria);
+        return mongoTemplate.count(query, "Api");
     }
 
     private void addCriteria(ApiPageRequest apiPageRequest, Query query) {
