@@ -213,4 +213,20 @@ class ApiServiceTest {
         assertThatThrownBy(() -> apiService.batchUpdateByIds(batchUpdateRequest))
             .isInstanceOf(ApiTestPlatformException.class).extracting("code").isEqualTo(BATCH_UPDATE_ERROR.getCode());
     }
+
+    @Test
+    @DisplayName("Test for sceneCount in ApiService")
+    public void sceneCount_test() {
+        when(customizedApiRepository.sceneCount(any())).thenReturn(1L);
+        Long count = apiService.sceneCount(new ObjectId());
+        assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while test sceneCount in ApiService.")
+    public void sceneCount_exception_test() {
+        when(customizedApiRepository.sceneCount(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> apiService.sceneCount(new ObjectId())).isInstanceOf(ApiTestPlatformException.class);
+    }
+
 }

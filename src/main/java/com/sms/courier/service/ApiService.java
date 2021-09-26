@@ -7,6 +7,7 @@ import com.sms.courier.dto.request.BatchUpdateByIdRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import java.util.List;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -36,4 +37,6 @@ public interface ApiService {
     Long count(String projectId);
 
     Boolean batchUpdateByIds(BatchUpdateByIdRequest<Object> batchUpdateRequest);
+
+    Long sceneCount(ObjectId projectId);
 }

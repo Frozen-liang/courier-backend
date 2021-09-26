@@ -117,4 +117,13 @@ class CustomizedApiRepositoryTest {
         Boolean result = customizedApiRepository.updateFieldByIds(List.of(ID), new UpdateRequest<>());
         assertThat(result).isTrue();
     }
+
+    @Test
+    @DisplayName("Test for sceneCount in CustomizedApiRepository")
+    public void sceneCount_test() {
+        when(mongoTemplate.count(any(),anyString())).thenReturn(1L);
+        Long count = customizedApiRepository.sceneCount(new ObjectId());
+        assertThat(count).isEqualTo(1L);
+    }
+
 }

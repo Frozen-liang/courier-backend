@@ -12,6 +12,7 @@ import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.service.ApiService;
 import java.util.List;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -104,4 +105,8 @@ public class ApiController {
         return apiService.batchUpdateByIds(batchUpdateRequest);
     }
 
+    @GetMapping("/scene/count/pid/{projectId}")
+    public Long sceneCount(@PathVariable ObjectId projectId) {
+        return apiService.sceneCount(projectId);
+    }
 }

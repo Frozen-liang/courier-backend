@@ -37,6 +37,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -207,6 +208,16 @@ public class ApiServiceImpl implements ApiService {
                 ids, "Api", updateRequest.getKey(), updateRequest.getValue(), e.getMessage());
             throw ExceptionUtils
                 .mpe(ErrorCode.BATCH_UPDATE_ERROR, ids, "Api", updateRequest.getKey(), updateRequest.getValue());
+        }
+    }
+
+    @Override
+    public Long sceneCount(ObjectId projectId) {
+        try {
+            return customizedApiRepository.sceneCount(projectId);
+        } catch (Exception e) {
+            log.error("Failed to query scene count the Api!", e);
+            throw new ApiTestPlatformException(ErrorCode.GET_SCENE_COUNT_BY_API_ERROR);
         }
     }
 
