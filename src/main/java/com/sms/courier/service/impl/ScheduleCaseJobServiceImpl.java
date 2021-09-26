@@ -195,7 +195,7 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
 
     private List<ApiTestCaseEntity> getApiTestCaseEntity(CaseFilter caseFilter, CaseCondition caseCondition,
         List<String> caseIds) {
-        List<ApiTestCaseEntity> apiTestCaseEntities = new ArrayList<>();
+        List<ApiTestCaseEntity> apiTestCaseEntities;
         switch (caseFilter) {
             case ALL:
                 apiTestCaseEntities = apiTestCaseRepository.findByRemovedIsFalse();

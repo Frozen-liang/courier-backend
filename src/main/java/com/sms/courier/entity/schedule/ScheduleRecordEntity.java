@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -24,11 +25,13 @@ public class ScheduleRecordEntity {
     private String id;
 
     @Field(targetType = FieldType.OBJECT_ID)
+    @Indexed
     private String scheduleId;
 
     private String scheduleName;
 
     @Field(targetType = FieldType.OBJECT_ID)
+    @Indexed
     private String projectId;
 
     @Field(targetType = FieldType.OBJECT_ID)

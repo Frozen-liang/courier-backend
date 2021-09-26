@@ -60,7 +60,6 @@ import org.springframework.stereotype.Service;
 public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJobRepository> implements
     ApiTestCaseJobService {
 
-    private final ApiTestCaseJobRepository apiTestCaseJobRepository;
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository;
     private final ApiTestCaseService apiTestCaseService;
     private final CommonRepository commonRepository;

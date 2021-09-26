@@ -29,7 +29,7 @@ import com.sms.courier.entity.job.ScheduleSceneCaseJobEntity;
 import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.RunningJobAck;
-import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
+import com.sms.courier.entity.scenetest.CaseTemplateApiConn;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.entity.schedule.CaseCondition;
@@ -156,15 +156,13 @@ class ScheduleSceneCaseJobServiceTest {
         List<SceneCaseEntity> apiTestCaseEntities = Collections.singletonList(sceneCaseEntity);
         when(sceneCaseRepository.findByIdIn(any())).thenReturn(apiTestCaseEntities);
         when(sceneCaseRepository.findByRemovedIsFalse()).thenReturn(apiTestCaseEntities);
-        when(sceneCaseRepository.findByTagIdInAndPriorityIn(any(),any())).thenReturn(apiTestCaseEntities);
+        when(sceneCaseRepository.findByTagIdInAndPriorityIn(any(), any())).thenReturn(apiTestCaseEntities);
         when(projectEnvironmentService.findOne(anyString())).thenReturn(ProjectEnvironmentEntity.builder().build());
         List<SceneCaseApiEntity> sceneCaseApiList1 = getSceneCaseApiList();
         when(sceneCaseApiRepository.findSceneCaseApiEntitiesBySceneCaseIdAndRemovedOrderByOrder(any(), anyBoolean()))
             .thenReturn(sceneCaseApiList1);
-        List<CaseTemplateApiEntity> templateApiList =
-            Lists.newArrayList(CaseTemplateApiEntity.builder().id(ID).order(2).build());
         when(caseTemplateApiRepository.findAllByCaseTemplateIdAndRemovedOrderByOrder(any(), anyBoolean()))
-            .thenReturn(templateApiList);
+            .thenReturn(Collections.emptyList());
         when(commonRepository.findById(ID, DataCollectionEntity.class))
             .thenReturn(Optional.of(DataCollectionEntity.builder().dataList(List.of(
                 TestData.builder().dataName("name").data(List.of(DataParam.builder().build())).build())).build()));
@@ -215,14 +213,19 @@ class ScheduleSceneCaseJobServiceTest {
         return Lists.newArrayList(
             SceneCaseApiEntity.builder()
                 .id(ID)
-                .order(Math.subtractExact(1,20))
+                .order(Math.subtractExact(1, 20))
                 .apiTestCase(ApiTestCaseEntity.builder().id(ID).execute(Boolean.TRUE).build())
                 .build(),
             SceneCaseApiEntity.builder()
                 .caseTemplateId(ID)
-                .order(Math.subtractExact(1,20))
+                .order(Math.subtractExact(1, 20))
                 .apiTestCase(ApiTestCaseEntity.builder().id(ID).execute(Boolean.TRUE).build())
+                .caseTemplateApiConnList(
+                    Lists.newArrayList(CaseTemplateApiConn.builder().caseTemplateApiId(ID).execute(Boolean.TRUE)
+                        .lock(Boolean.TRUE)
+                        .build()))
                 .build());
+
     }
 
 }

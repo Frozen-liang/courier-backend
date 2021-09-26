@@ -195,7 +195,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
 
     private List<SceneCaseEntity> getSceneCaseEntity(CaseFilter caseFilter, CaseCondition caseCondition,
         List<String> caseIds) {
-        List<SceneCaseEntity> sceneCaseEntities = new ArrayList<>();
+        List<SceneCaseEntity> sceneCaseEntities;
         switch (caseFilter) {
             case ALL:
                 sceneCaseEntities = sceneCaseRepository.findByRemovedIsFalse();
@@ -219,33 +219,28 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
             .findSceneCaseApiEntitiesBySceneCaseIdAndRemovedOrderByOrder(sceneCaseId, Boolean.FALSE);
         Integer index = 0;
         for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
-            // TODO Repair bug.
-            if (Objects.isNull(sceneCaseApi.getCaseTemplateId())
-                && sceneCaseApi.getApiTestCase().isExecute()) {
-                sceneCaseApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : sceneCaseApi.getOrder());
-                caseList.add(jobMapper.toJobSceneCaseApi(sceneCaseApi));
-                index = sceneCaseApi.getOrder();
-
+            if (Objects.isNull(sceneCaseApi.getCaseTemplateId())) {
+                index = setSceneCaseApiData(sceneCaseApi, caseList, index);
             } else {
-                List<CaseTemplateApiEntity> templateApiList =
-                    caseTemplateApiRepository
-                        .findAllByCaseTemplateIdAndRemovedOrderByOrder(sceneCaseApi.getCaseTemplateId(),
-                            Boolean.FALSE);
-                for (CaseTemplateApiEntity caseTemplateApi : templateApiList) {
-                    caseTemplateApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : caseTemplateApi.getOrder());
-                    caseTemplateApi.setCaseTemplateId(null);
-                    JobSceneCaseApi jobSceneCaseApi = jobMapper.toJobSceneCaseApiByTemplate(caseTemplateApi);
-                    jobSceneCaseApi.setSceneCaseId(sceneCaseApi.getSceneCaseId());
-                    caseList.add(jobSceneCaseApi);
-                    index = caseTemplateApi.getOrder();
-                }
+                index = setCaseTemplateApiData(sceneCaseApi, caseList, index);
             }
+
         }
         if (CollectionUtils.isNotEmpty(caseList)) {
             caseList.sort(Comparator.comparingInt(JobSceneCaseApi::getOrder));
         }
         return caseList;
     }
+
+    private Integer setCaseTemplateApiData(SceneCaseApiEntity sceneCaseApi, List<JobSceneCaseApi> caseList,
+        Integer index) {
+        List<CaseTemplateApiEntity> templateApiList =
+            caseTemplateApiRepository
+                .findAllByCaseTemplateIdAndRemovedOrderByOrder(sceneCaseApi.getCaseTemplateId(),
+                    Boolean.FALSE);
+        return super.createIndex(sceneCaseApi, caseList, index, templateApiList);
+    }
+
 
     private ScheduleSceneCaseJobEntity getSceneCaseJobEntity(String sceneCaseId, ScheduleRecordEntity scheduleRecord,
         JobEnvironment jobEnvironment, List<JobSceneCaseApi> caseList) {

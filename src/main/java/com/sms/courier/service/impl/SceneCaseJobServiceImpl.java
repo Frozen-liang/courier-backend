@@ -26,7 +26,6 @@ import com.sms.courier.entity.job.common.JobEntity;
 import com.sms.courier.entity.job.common.JobEnvironment;
 import com.sms.courier.entity.job.common.JobReport;
 import com.sms.courier.entity.job.common.RunningJobAck;
-import com.sms.courier.entity.scenetest.CaseTemplateApiConn;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
@@ -261,35 +260,7 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
             caseTemplateApiRepository
                 .findAllByCaseTemplateIdAndRemovedOrderByOrder(sceneCaseApi.getCaseTemplateId(),
                     Boolean.FALSE);
-        Map<String, Boolean> isExecuteMap =
-            sceneCaseApi.getCaseTemplateApiConnList().stream().collect(
-                Collectors
-                    .toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::isExecute));
-        Map<String, Boolean> isLockMap =
-            sceneCaseApi.getCaseTemplateApiConnList().stream().collect(
-                Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::isLock));
-        for (CaseTemplateApiEntity caseTemplateApi : templateApiList) {
-            caseTemplateApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : caseTemplateApi.getOrder());
-            caseTemplateApi.setCaseTemplateId(null);
-            caseTemplateApi.getApiTestCase()
-                .setExecute(isExecuteMap.getOrDefault(caseTemplateApi.getId(), Boolean.TRUE));
-            caseTemplateApi.setLock(isLockMap.getOrDefault(caseTemplateApi.getId(), Boolean.FALSE));
-            JobSceneCaseApi jobSceneCaseApi = jobMapper.toJobSceneCaseApiByTemplate(caseTemplateApi);
-            jobSceneCaseApi.setSceneCaseId(sceneCaseApi.getSceneCaseId());
-            caseList.add(jobSceneCaseApi);
-            index = caseTemplateApi.getOrder();
-        }
-        return index;
-    }
-
-    private Integer setSceneCaseApiData(SceneCaseApiEntity sceneCaseApi, List<JobSceneCaseApi> caseList,
-        Integer index) {
-        if (sceneCaseApi.getApiTestCase().isExecute()) {
-            sceneCaseApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : sceneCaseApi.getOrder());
-            caseList.add(jobMapper.toJobSceneCaseApi(sceneCaseApi));
-            index = sceneCaseApi.getOrder();
-        }
-        return index;
+        return super.createIndex(sceneCaseApi, caseList, index, templateApiList);
     }
 
     @Override
