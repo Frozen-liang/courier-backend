@@ -101,7 +101,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             log.error("Execute the ApiTestCase error. errorMessage:{}", courierException.getMessage());
             caseDispatcherService.sendCaseErrorMessage(currentUser.getId(), courierException.getMessage());
         } catch (Exception e) {
-            log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
+            log.error("Execute the ApiTestCase error.", e);
             caseDispatcherService.sendCaseErrorMessage(currentUser.getId(), "Execute the ApiTestCase error.");
         }
     }
@@ -128,7 +128,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             log.error(courierException.getMessage());
             caseDispatcherService.sendCaseErrorMessage(currentUser.getId(), courierException.getMessage());
         } catch (Exception e) {
-            log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
+            log.error("Execute the ApiTestCase error.", e);
             caseDispatcherService.sendCaseErrorMessage(currentUser.getId(), "Execute the ApiTestCase error.");
         }
     }
@@ -153,7 +153,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             log.error(courierException.getMessage());
             caseDispatcherService.sendCaseErrorMessage(userId, courierException.getMessage());
         } catch (Exception e) {
-            log.error("Reallocate job  errorMessage:{}", e.getMessage());
+            log.error("Reallocate job  error.", e);
             caseDispatcherService.sendCaseErrorMessage(userId, "Execute the ApiTestCase error.");
         }
     }
@@ -167,7 +167,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             log.error("Build the case job error. message:{}", courierException.getMessage());
             throw courierException;
         } catch (Exception e) {
-            log.error("Build the case job error. message:{}", e.getMessage());
+            log.error("Build the case job error.", e);
             throw new ApiTestPlatformException(BUILD_CASE_JOB_ERROR);
         }
     }
@@ -183,7 +183,7 @@ public class ApiTestCaseJobServiceImpl implements ApiTestCaseJobService {
             log.error("Build the case job error. message:{}", courierException.getMessage());
             throw courierException;
         } catch (Exception e) {
-            log.error("Build the case job error. message:{}", e.getMessage());
+            log.error("Build the case job error.", e);
             throw new ApiTestPlatformException(BUILD_CASE_JOB_ERROR);
         }
     }
