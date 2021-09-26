@@ -7,5 +7,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ScheduleSceneCaseJobRepository extends MongoRepository<ScheduleSceneCaseJobEntity, String> {
 
-    List<ScheduleSceneCaseJobEntity> removeByEngineIdInAndJobStatus(List<String> engineIds, JobStatus jobStatus);
+    List<ScheduleSceneCaseJobEntity> findByEngineIdInAndJobStatus(List<String> engineIds, JobStatus jobStatus);
 }

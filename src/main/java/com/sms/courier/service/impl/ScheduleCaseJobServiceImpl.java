@@ -37,6 +37,7 @@ import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.ScheduleCaseJobService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -87,7 +88,7 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
     @Override
     public void reallocateJob(List<String> engineIds) {
         List<ScheduleCaseJobEntity> scheduleCaseJobEntityList = repository
-            .removeByEngineIdInAndJobStatus(engineIds, JobStatus.RUNNING);
+            .findByEngineIdInAndJobStatus(engineIds, JobStatus.RUNNING);
         try {
             if (CollectionUtils.isEmpty(scheduleCaseJobEntityList)) {
                 return;
@@ -148,6 +149,7 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
                             .testData(testData).projectId(dataCollectionEntity.getProjectId()).build();
                         scheduleRecordEntity.getJobIds().add(scheduleCaseJobEntity.getId());
                         scheduleCaseJobEntity.setDataCollection(jobDataCollection);
+                        scheduleCaseJobEntity.setName(testData.getDataName());
                         scheduleCaseJobEntities.add(scheduleCaseJobEntity);
                     }
                 } else {
@@ -179,6 +181,7 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
         JobApiTestCase jobApiTestCase) {
         return ScheduleCaseJobEntity.builder()
             .id(ObjectId.get().toString())
+            .name(jobApiTestCase.getCaseName())
             .scheduleRecordId(scheduleRecord.getId())
             .apiTestCase(JobCaseApi.builder().jobApiTestCase(jobApiTestCase).build())
             .createDateTime(LocalDateTime.now())
@@ -203,6 +206,8 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
             case CUSTOM:
                 apiTestCaseEntities = apiTestCaseRepository.findByIdIn(caseIds);
                 break;
+            default:
+                apiTestCaseEntities = Collections.emptyList();
         }
         return apiTestCaseEntities;
     }

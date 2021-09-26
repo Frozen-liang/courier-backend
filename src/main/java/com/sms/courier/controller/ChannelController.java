@@ -1,8 +1,5 @@
 package com.sms.courier.controller;
 
-import static com.sms.courier.common.constant.Constants.SCHEDULE_CASE_SERVICE;
-import static com.sms.courier.common.constant.Constants.SCHEDULE_SCENE_CASE_SERVICE;
-
 import com.sms.courier.common.constant.Constants;
 import com.sms.courier.dto.request.AddSceneCaseJobRequest;
 import com.sms.courier.dto.request.ApiTestCaseJobRunRequest;
@@ -56,14 +53,12 @@ public class ChannelController {
 
     @MessageMapping(Constants.SDK_VERSION + "/job-report")
     public void jobReport(@Payload ApiTestCaseJobReport jobReport) {
-//        caseJobServiceMap.get(jobReport.getJobType().getServiceName()).handleJobReport(jobReport);
-        caseJobServiceMap.get(SCHEDULE_CASE_SERVICE).handleJobReport(jobReport);
+        caseJobServiceMap.get(jobReport.getJobType().getServiceName()).handleJobReport(jobReport);
     }
 
     @MessageMapping(Constants.SDK_VERSION + "/scene-job-report")
     public void sceneJobReport(@Payload SceneCaseJobReport jobReport) {
-//        caseJobServiceMap.get(jobReport.getJobType().getServiceName()).handleJobReport(jobReport);
-        caseJobServiceMap.get(SCHEDULE_SCENE_CASE_SERVICE).handleJobReport(jobReport);
+        caseJobServiceMap.get(jobReport.getJobType().getServiceName()).handleJobReport(jobReport);
     }
 
     @MessageMapping(Constants.SDK_VERSION + "/case-record")
@@ -73,14 +68,12 @@ public class ChannelController {
 
     @MessageMapping(Constants.SDK_VERSION + "/runningCaseJobAck")
     public void runningCaseJobAck(@Payload RunningJobAck runningJobAck) {
-//        caseJobServiceMap.get(runningJobAck.getJobType().getServiceName()).runningJobAck(runningJobAck);
-        caseJobServiceMap.get(SCHEDULE_CASE_SERVICE).runningJobAck(runningJobAck);
+        caseJobServiceMap.get(runningJobAck.getJobType().getServiceName()).runningJobAck(runningJobAck);
     }
 
     @MessageMapping(Constants.SDK_VERSION + "/runningSceneCaseJobAck")
     public void runningSceneCaseJobAck(@Payload RunningJobAck runningJobAck) {
-//        caseJobServiceMap.get(runningJobAck.getJobType().getServiceName()).runningJobAck(runningJobAck);
-        caseJobServiceMap.get(SCHEDULE_SCENE_CASE_SERVICE).runningJobAck(runningJobAck);
+        caseJobServiceMap.get(runningJobAck.getJobType().getServiceName()).runningJobAck(runningJobAck);
     }
 
     private ApiTestCaseJobService getApiTestCaseJobService() {

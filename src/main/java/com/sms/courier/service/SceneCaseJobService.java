@@ -8,7 +8,7 @@ import com.sms.courier.security.pojo.CustomUser;
 import java.util.List;
 import org.springframework.data.domain.Page;
 
-public interface SceneCaseJobService extends JobService{
+public interface SceneCaseJobService extends JobService {
 
     Page<SceneCaseJobResponse> page(SceneCaseJobRequest sceneCaseJobRequest);
 

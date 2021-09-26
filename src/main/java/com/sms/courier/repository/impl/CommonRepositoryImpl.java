@@ -134,7 +134,7 @@ public class CommonRepositoryImpl implements CommonRepository {
 
     @Override
     public <T> Optional<T> findById(String id, Class<T> entityClass) {
-        return Optional.ofNullable(mongoTemplate.findById(id,entityClass));
+        return Optional.ofNullable(mongoTemplate.findById(id, entityClass));
     }
 
     @Override

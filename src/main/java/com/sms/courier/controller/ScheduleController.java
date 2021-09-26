@@ -62,7 +62,7 @@ public class ScheduleController {
 
     @PostMapping("/handle")
     public Boolean handle(String id) {
-       return scheduleService.handle(id);
+        return scheduleService.handle(id);
     }
 
 }

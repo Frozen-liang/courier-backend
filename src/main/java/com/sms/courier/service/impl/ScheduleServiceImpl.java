@@ -6,11 +6,13 @@ import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.enums.ScheduleStatusType.CREATE;
 import static com.sms.courier.common.enums.ScheduleStatusType.UPDATE;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCHEDULE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.CASE_TYPE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCHEDULE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCHEDULE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_LIST_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.SYSTEM_ERROR;
 import static com.sms.courier.common.field.CommonField.ID;
 import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.common.field.ScheduleField.SCHEDULE_STATUS;
@@ -145,25 +147,24 @@ public class ScheduleServiceImpl implements ScheduleService {
             Update update = new Update();
             update.set(TASK_STATUS.getName(), TaskStatus.RUNNING);
             commonRepository.updateField(query, update, ScheduleEntity.class);
-            boolean result = false;
             switch (caseType) {
                 case CASE:
                     scheduleCaseJobService.schedule(scheduleEntity);
-                    result = true;
                     break;
                 case SCENE_CASE:
                     scheduleSceneCaseJobService.schedule(scheduleEntity);
-                    result = true;
                     break;
+                default:
+                    throw ExceptionUtils.mpe(CASE_TYPE_ERROR);
             }
-            return result;
+            return true;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
             throw e;
         } catch (Exception e) {
             log.error("Handle schedule error.", e);
+            throw new ApiTestPlatformException(SYSTEM_ERROR);
         }
-        return false;
     }
 
     private boolean checkScheduleTime(ScheduleEntity oldSchedule, ScheduleEntity newSchedule) {

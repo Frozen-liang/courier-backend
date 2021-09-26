@@ -41,6 +41,7 @@ import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.ScheduleSceneCaseJobService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +100,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
     @Override
     public void reallocateJob(List<String> engineIds) {
         List<ScheduleSceneCaseJobEntity> scheduleCaseJobEntityList = repository
-            .removeByEngineIdInAndJobStatus(engineIds, JobStatus.RUNNING);
+            .findByEngineIdInAndJobStatus(engineIds, JobStatus.RUNNING);
         try {
             if (CollectionUtils.isEmpty(scheduleCaseJobEntityList)) {
                 return;
@@ -161,6 +162,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
                             getSceneCaseJobEntity(sceneCaseId, scheduleRecordEntity, jobEnv, apiCaseList);
                         scheduleSceneCaseJobEntity.setNext(sceneCaseEntity.isNext());
                         scheduleSceneCaseJobEntity.setDataCollection(jobDataCollection);
+                        scheduleSceneCaseJobEntity.setName(testData.getDataName());
                         scheduleRecordEntity.getJobIds().add(scheduleSceneCaseJobEntity.getId());
                         scheduleSceneCaseJobEntities.add(scheduleSceneCaseJobEntity);
                     }
@@ -205,6 +207,8 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
             case CUSTOM:
                 sceneCaseEntities = sceneCaseRepository.findByIdIn(caseIds);
                 break;
+            default:
+                sceneCaseEntities = Collections.emptyList();
         }
         return sceneCaseEntities;
     }

@@ -147,6 +147,7 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
             .scheduleName(scheduleEntity.getName())
             .createDateTime(LocalDateTime.now())
             .workspaceId(scheduleEntity.getWorkspaceId())
+            .caseType(scheduleEntity.getCaseType())
             .jobRecords(new ArrayList<>())
             .execute(true)
             .projectId(scheduleEntity.getProjectId())
