@@ -60,6 +60,7 @@ import org.springframework.stereotype.Service;
 public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJobRepository> implements
     ApiTestCaseJobService {
 
+    private final ApiTestCaseJobRepository apiTestCaseJobRepository;
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository;
     private final ApiTestCaseService apiTestCaseService;
     private final CommonRepository commonRepository;
@@ -85,7 +86,7 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
             log.error("Execute the ApiTestCase error. errorMessage:{}", courierException.getMessage());
             caseDispatcherService.sendCaseErrorMessage(currentUser.getId(), courierException.getMessage());
         } catch (Exception e) {
-            log.error("Execute the ApiTestCase error.", e);
+            log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
             caseDispatcherService.sendCaseErrorMessage(currentUser.getId(), "Execute the ApiTestCase error.");
         }
     }
@@ -112,7 +113,7 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
             log.error(courierException.getMessage());
             caseDispatcherService.sendCaseErrorMessage(currentUser.getId(), courierException.getMessage());
         } catch (Exception e) {
-            log.error("Execute the ApiTestCase error.", e);
+            log.error("Execute the ApiTestCase error. errorMessage:{}", e.getMessage());
             caseDispatcherService.sendCaseErrorMessage(currentUser.getId(), "Execute the ApiTestCase error.");
         }
     }

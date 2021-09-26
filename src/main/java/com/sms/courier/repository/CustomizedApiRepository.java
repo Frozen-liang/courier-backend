@@ -6,6 +6,7 @@ import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import java.util.List;
 import java.util.Optional;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 
 public interface CustomizedApiRepository {
@@ -25,4 +26,7 @@ public interface CustomizedApiRepository {
     Boolean updateFieldByIds(List<String> ids, UpdateRequest<Object> updateRequest);
 
     Boolean update(String json);
+
+    Long sceneCount(ObjectId projectId);
+
 }

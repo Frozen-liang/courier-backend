@@ -149,7 +149,7 @@ public class UserServiceImpl implements UserService {
 
     private boolean checkPassword(String password) {
         Pattern pattern = Pattern
-            .compile("^(?=.*\\d)(?=.*?[_\\-@&=!#$%^*<.>~`?'\"/;:'(){}\\[\\]])(?=.*[a-z])(?=.*[A-Z]).{8,40}$");
+            .compile("^.*(?=.{8,16})(?=.*\\d)(?=.*[A-Z]{1,})(?=.*[a-z]{1,})(?=.*[.!@#$%^&*?\\[\\]()]).*$");
         return pattern.matcher(password).matches();
     }
 

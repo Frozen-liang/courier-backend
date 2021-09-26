@@ -10,4 +10,6 @@ public interface ApiDataStructureRefRecordRepository extends MongoRepository<Api
     List<DataStructureReferenceResponse> findByRefStructIdsIs(String dataStructId);
 
     boolean existsByRefStructIdsIs(String structId);
+
+    void deleteAllByIdIn(List<String> ids);
 }

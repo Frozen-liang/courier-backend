@@ -13,7 +13,6 @@ stages:
 
 variables:
   IMAGE: ${CI_REGISTRY}/${CI_PROJECT_PATH}
-  IMAGE_TAG: 1.0.1
   PROD_RELEASE_NAME: ${CI_PROJECT_NAME}
   JACOCO_CSV_LOCATION: $CI_PROJECT_DIR/build/reports/jacoco/test/jacocoTestReport.csv
   GIT_DEPTH: 1
@@ -54,7 +53,7 @@ task_build_artifact:
   script:
     - ./gradlew bootjar --build-cache
     - IMAGE_TAG=$(ls ./build/libs | grep $PROD_RELEASE_NAME)&&IMAGE_TAG=${IMAGE_TAG:${#PROD_RELEASE_NAME}+1}&&IMAGE_TAG=${IMAGE_TAG%%.jar}
-    - echo "export IMAGE_TAG=$IMAGE_TAG" > ./build/libs/version
+    - echo "export IMAGE_TAG=$IMAGE_TAG" >> version.env
   cache:
     key: ${CI_PROJECT_NAME}
     paths:
@@ -64,6 +63,9 @@ task_build_artifact:
   artifacts:
     paths:
       - build/libs
+    reports:
+      dotenv:
+        - version.env
     expire_in: 1 day
 
 
@@ -76,7 +78,6 @@ task_build_image:
       - master
   image: docker:19.03.1
   script:
-    - 'source ./build/libs/version'
     - echo "Running build docker image"
     - 'REPO=${PROD_RELEASE_NAME} consul-template -config /tool/consul-config/.consul-template.hcl -template "application.tpl:tmp.tpl" -once && consul-template -config /tool/consul-config/.consul-template.hcl -template "tmp.tpl:./build/application.properties" -once'
     - 'docker build -t ${IMAGE}:${IMAGE_TAG} .'
@@ -97,7 +98,6 @@ task_release:
     tag_name: v${IMAGE_TAG}
     description: 'Release'
   script:
-    - 'source ./build/libs/version'
     - echo "Release ${IMAGE_TAG} Successful."
 
 task_deploy:

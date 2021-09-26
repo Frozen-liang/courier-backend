@@ -101,10 +101,6 @@ public class ApiRequest {
 
     private ApiEncodingType apiEncodingType;
 
-    private Integer caseCount;
-
-    private Integer sceneCaseCount;
-
     private List<String> addStructIds;
 
     private List<String> removeStructIds;

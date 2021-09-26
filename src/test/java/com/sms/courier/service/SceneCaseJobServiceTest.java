@@ -32,6 +32,7 @@ import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.JobDataCollection;
 import com.sms.courier.entity.job.common.RunningJobAck;
+import com.sms.courier.entity.scenetest.CaseTemplateApiConn;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
@@ -126,7 +127,9 @@ class SceneCaseJobServiceTest {
         when(sceneCaseApiRepository.findSceneCaseApiEntitiesBySceneCaseIdAndRemovedOrderByOrder(any(), anyBoolean()))
             .thenReturn(sceneCaseApiList1);
         List<CaseTemplateApiEntity> templateApiList =
-            Lists.newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID).order(MOCK_NUM).build());
+            Lists.newArrayList(
+                CaseTemplateApiEntity.builder().id(MOCK_ID).apiTestCase(ApiTestCaseEntity.builder().build())
+                    .order(MOCK_NUM).build());
         when(caseTemplateApiRepository.findAllByCaseTemplateIdAndRemovedOrderByOrder(any(), anyBoolean()))
             .thenReturn(templateApiList);
         when(jobMapper.toJobSceneCaseApi(any()))
@@ -360,6 +363,10 @@ class SceneCaseJobServiceTest {
                 .caseTemplateId(MOCK_ID)
                 .order(MOCK_NUM)
                 .apiTestCase(ApiTestCaseEntity.builder().id(MOCK_ID).execute(Boolean.TRUE).build())
+                .caseTemplateApiConnList(
+                    Lists.newArrayList(CaseTemplateApiConn.builder().caseTemplateApiId(MOCK_ID).execute(Boolean.TRUE)
+                        .lock(Boolean.TRUE)
+                        .build()))
                 .build());
     }
 

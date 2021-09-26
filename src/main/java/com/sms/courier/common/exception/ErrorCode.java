@@ -225,8 +225,9 @@ public enum ErrorCode {
     DATE_STRUCTURE_CANNOT_DELETE_ERROR("4205", "Delete fail. This data structure has %s references!"),
     ACCOUNT_NOT_EXIST("4206", "The user account does not exist"),
     GET_SCENE_CASE_COUNT_ERROR("4207", "Failed to get the SceneCase count!"),
-    GET_SCHEDULE_RECORD_PAGE_ERROR("4208", "Failed to get the ScheduleRecord page!"),
-    CASE_TYPE_ERROR("4209", "The caseType not exists!"),
+    GET_SCENE_COUNT_BY_API_ERROR("4208", "Failed to query scene count the Api!"),
+    GET_SCHEDULE_RECORD_PAGE_ERROR("4209", "Failed to get the ScheduleRecord page!"),
+    CASE_TYPE_ERROR("4210", "The caseType not exists!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),

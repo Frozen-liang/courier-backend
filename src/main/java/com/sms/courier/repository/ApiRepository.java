@@ -11,7 +11,7 @@ public interface ApiRepository extends MongoRepository<ApiEntity, String> {
 
     void deleteAllByIdIn(List<String> ids);
 
-    void deleteAllByRemovedIsTrue();
+    List<ApiEntity> deleteAllByProjectIdAndRemovedIsTrue(String projectId);
 
     ApiEntity findApiEntityByIdAndRemoved(String id, boolean removed);
 }

@@ -106,7 +106,7 @@ class ApiServiceTest {
     @Test
     @DisplayName("Test the edit method in the Api service")
     public void edit_test() {
-        when(apiRepository.existsById(any())).thenReturn(Boolean.TRUE);
+        when(apiRepository.findById(any())).thenReturn(Optional.of(api));
         when(apiRepository.save(any(ApiEntity.class))).thenReturn(api);
         when(apiHistoryRepository.insert(any(ApiHistoryEntity.class))).thenReturn(ApiHistoryEntity.builder().build());
         Boolean bool = apiService.edit(apiRequestDto);
@@ -116,7 +116,7 @@ class ApiServiceTest {
     @Test
     @DisplayName("An exception occurred while edit Api")
     public void edit_exception_test() {
-        when(apiRepository.existsById(any())).thenReturn(Boolean.TRUE);
+        when(apiRepository.findById(any())).thenReturn(Optional.of(api));
         doThrow(new RuntimeException()).when(apiRepository).save(any(ApiEntity.class));
         assertThatThrownBy(() -> apiService.edit(apiRequestDto))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -165,14 +165,17 @@ class ApiServiceTest {
     public void deleteByIds_test() {
         List<String> ids = Collections.singletonList(ID);
         doNothing().when(apiRepository).deleteAllByIdIn(ids);
+        doNothing().when(apiDataStructureRefRecordRepository).deleteAllByIdIn(any());
         assertThat(apiService.deleteByIds(ids)).isTrue();
     }
 
     @Test
     @DisplayName("Test the deleteAll method in the Api service")
     public void deleteAll_test() {
-        doNothing().when(apiRepository).deleteAllByRemovedIsTrue();
-        assertThat(apiService.deleteAll()).isTrue();
+        String projectId = ObjectId.get().toString();
+        when(apiRepository.deleteAllByProjectIdAndRemovedIsTrue(projectId)).thenReturn(Collections.emptyList());
+        doNothing().when(apiDataStructureRefRecordRepository).deleteAllByIdIn(any());
+        assertThat(apiService.deleteAll(projectId)).isTrue();
     }
 
     @Test
@@ -213,4 +216,20 @@ class ApiServiceTest {
         assertThatThrownBy(() -> apiService.batchUpdateByIds(batchUpdateRequest))
             .isInstanceOf(ApiTestPlatformException.class).extracting("code").isEqualTo(BATCH_UPDATE_ERROR.getCode());
     }
+
+    @Test
+    @DisplayName("Test for sceneCount in ApiService")
+    public void sceneCount_test() {
+        when(customizedApiRepository.sceneCount(any())).thenReturn(1L);
+        Long count = apiService.sceneCount(new ObjectId());
+        assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while test sceneCount in ApiService.")
+    public void sceneCount_exception_test() {
+        when(customizedApiRepository.sceneCount(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> apiService.sceneCount(new ObjectId())).isInstanceOf(ApiTestPlatformException.class);
+    }
+
 }
