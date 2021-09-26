@@ -40,7 +40,6 @@ public class AuthenticationSuccessHandler extends SavedRequestAwareAuthenticatio
 
     private void saveLoginLog(CustomUser customUser) {
         LogEntity logEntity = LogEntity.builder().operator(customUser.getUsername()).operatorId(customUser.getId())
-            .operationDesc("登录")
             .operationType(LOGIN).build();
         logService.add(logEntity);
     }

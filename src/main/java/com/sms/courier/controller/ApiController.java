@@ -82,10 +82,10 @@ public class ApiController {
         return apiService.deleteByIds(ids);
     }
 
-    @DeleteMapping("/deleteAll")
+    @DeleteMapping("/deleteAll/{projectId}")
     @PreAuthorize("hasRoleOrAdmin(@role.API_CRE_UPD_DEL)")
-    public Boolean deleteAll() {
-        return apiService.deleteAll();
+    public Boolean deleteAll(@PathVariable String projectId) {
+        return apiService.deleteAll(projectId);
     }
 
     @PutMapping("/recover")

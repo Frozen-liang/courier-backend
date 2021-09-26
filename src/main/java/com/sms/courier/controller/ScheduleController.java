@@ -61,7 +61,7 @@ public class ScheduleController {
         return scheduleService.delete(id);
     }
 
-    @PostMapping("/run")
+    @PostMapping("/handle")
     public Boolean run(String id) {
         // TODO handle schedule
         System.out.println("now:" + LocalDateTime.now() + ",id:" + id);

@@ -40,7 +40,7 @@ public class ParamInfoResponse {
      */
     @Field("isRequired")
     @JsonProperty("isRequired")
-    private boolean required;
+    private Boolean required;
     /**
      * 是否提取.
      */

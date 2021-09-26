@@ -127,6 +127,7 @@ public class DataStructureServiceImpl implements DataStructureService {
             // Check for circular references.
             checkRefIds(addStructIds, removeStructIds, id);
             StructureEntity dataStructure = dataStructureMapper.toEntity(dataStructureRequest);
+            setParamId(dataStructure.getStruct());
             dataStructureRepository.save(dataStructure);
             saveRef(dataStructure.getId(), dataStructure.getName(), addStructIds, removeStructIds);
         } catch (ApiTestPlatformException courierException) {
@@ -153,6 +154,7 @@ public class DataStructureServiceImpl implements DataStructureService {
             List<DataStructureReferenceResponse> apiRefs = apiDataStructureRefRecordRepository
                 .findByRefStructIdsIs(id);
             Assert.isTrue(CollectionUtils.isEmpty(apiRefs), DATE_STRUCTURE_CANNOT_DELETE_ERROR, "api");
+            structureRefRecordRepository.deleteById(id);
             return dataStructureRepository.deleteByIdIs(id) > 0;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
@@ -247,7 +249,9 @@ public class DataStructureServiceImpl implements DataStructureService {
             return;
         }
         for (ParamInfo paramInfo : struct) {
-            paramInfo.setParamId(String.valueOf(IdUtil.generatorId()));
+            if (StringUtils.isBlank(paramInfo.getParamId())) {
+                paramInfo.setParamId(String.valueOf(IdUtil.generatorId()));
+            }
             setParamId(paramInfo.getChildParam());
         }
     }
