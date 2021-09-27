@@ -65,8 +65,7 @@ task_build_artifact:
     paths:
       - build/libs
     reports:
-      dotenv:
-        - version.env
+      dotenv: version.env
     expire_in: 1 day
 
 
