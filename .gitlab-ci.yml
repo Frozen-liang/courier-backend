@@ -24,7 +24,7 @@ task_test:
   stage: test
   only:
     - merge_requests
-    - develop
+    - master
   except:
     variables:
       - $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"
@@ -49,7 +49,7 @@ task_build_artifact:
   stage: build_code
   only:
     refs:
-      - master
+      - develop
   script:
     - ./gradlew bootjar --build-cache
     - IMAGE_TAG=$(ls ./build/libs | grep $PROD_RELEASE_NAME)&&IMAGE_TAG=${IMAGE_TAG:${#PROD_RELEASE_NAME}+1}&&IMAGE_TAG=${IMAGE_TAG%%.jar}
@@ -93,10 +93,12 @@ task_release:
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   only:
     refs:
-      - master
+      - develop
   release:
     tag_name: v${IMAGE_TAG}
-    description: 'Release'
+    description: './CHANGELOG.md'
+    milestones:
+      - v${IMAGE_TAG}
   script:
     - echo "Release ${IMAGE_TAG} Successful."
 
