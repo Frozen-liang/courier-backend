@@ -49,11 +49,12 @@ task_build_artifact:
   stage: build_code
   only:
     refs:
-      - master
+      - develop
   script:
     - ./gradlew bootjar --build-cache
     - IMAGE_TAG=$(ls ./build/libs | grep $PROD_RELEASE_NAME)&&IMAGE_TAG=${IMAGE_TAG:${#PROD_RELEASE_NAME}+1}&&IMAGE_TAG=${IMAGE_TAG%%.jar}
     - echo "export IMAGE_TAG=$IMAGE_TAG" >> version.env
+    - cat version.env
   cache:
     key: ${CI_PROJECT_NAME}
     paths:
