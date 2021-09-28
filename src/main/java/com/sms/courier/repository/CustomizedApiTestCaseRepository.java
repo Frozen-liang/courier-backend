@@ -19,4 +19,6 @@ public interface CustomizedApiTestCaseRepository {
     List<ApiTestCaseResponse> listByJoin(ObjectId apiId, ObjectId projectId, boolean removed);
 
     List<String> findApiIdsByTestIds(List<String> ids);
+
+    Long countByProjectIds(List<String> projectIds);
 }

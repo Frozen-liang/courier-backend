@@ -89,6 +89,15 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
             .collect(Collectors.toList());
     }
 
+    @Override
+    public Long countByProjectIds(List<String> projectIds) {
+        Query query = new Query();
+        List<ObjectId> objectIdList = projectIds.stream().map(ObjectId::new).collect(Collectors.toList());
+        PROJECT_ID.in(objectIdList).ifPresent(query::addCriteria);
+        REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
+        return mongoTemplate.count(query, "ApiTestCase");
+    }
+
     private List<LookupVo> getLookupVoList() {
         return Lists.newArrayList(
             LookupVo.builder()
