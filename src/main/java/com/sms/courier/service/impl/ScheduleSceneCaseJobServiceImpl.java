@@ -171,6 +171,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
                     ScheduleSceneCaseJobEntity scheduleSceneCaseJobEntity =
                         getSceneCaseJobEntity(sceneCaseId, scheduleRecordEntity, jobEnv, apiCaseList);
                     scheduleSceneCaseJobEntity.setNext(sceneCaseEntity.isNext());
+                    scheduleSceneCaseJobEntity.setName(sceneCaseEntity.getName());
                     scheduleRecordEntity.getJobIds().add(scheduleSceneCaseJobEntity.getId());
                     scheduleSceneCaseJobEntities.add(scheduleSceneCaseJobEntity);
                 }
