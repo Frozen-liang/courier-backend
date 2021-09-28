@@ -33,4 +33,6 @@ public interface ApiTestCaseService {
     Long count(String projectId);
 
     void insertTestResult(String id, TestResult testResult);
+
+    Long countByProjectIds(List<String> projectIds);
 }
