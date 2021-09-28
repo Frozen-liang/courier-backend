@@ -226,6 +226,11 @@ public enum ErrorCode {
     ACCOUNT_NOT_EXIST("4206", "The user account does not exist"),
     GET_SCENE_CASE_COUNT_ERROR("4207", "Failed to get the SceneCase count!"),
     GET_SCENE_COUNT_BY_API_ERROR("4208", "Failed to query scene count the Api!"),
+    ADD_SCHEDULE_GROUP_ERROR("4209", "Failed to add the ScheduleGroup!"),
+    GET_SCHEDULE_GROUP_LIST_ERROR("4210", "Failed to get the ScheduleGroup list!"),
+    GET_SCHEDULE_GROUP_BY_ID_ERROR("4211", "The ScheduleGroup not exist!"),
+    DELETE_SCHEDULE_GROUP_BY_ID_ERROR("4212", "Failed to delete the ScheduleGroup!"),
+    EDIT_SCHEDULE_GROUP_ERROR("4213", "Failed to edit the ScheduleGroup!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),

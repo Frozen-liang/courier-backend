@@ -37,7 +37,7 @@ public class ScheduleController {
         return scheduleService.findById(id);
     }
 
-    @PostMapping("/page")
+    @PostMapping("/list")
     @PreAuthorize("hasRoleOrAdmin(@role.SCHEDULE_QUERY_ALL)")
     public List<ScheduleResponse> list(@RequestBody @Validated ScheduleListRequest request) {
         return scheduleService.list(request);
