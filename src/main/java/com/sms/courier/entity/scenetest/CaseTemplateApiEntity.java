@@ -40,5 +40,7 @@ public class CaseTemplateApiEntity extends BaseEntity {
     @Field("isLock")
     private boolean lock;
 
+    private String aliasName;
+
     private ApiTestCaseEntity apiTestCase;
 }
