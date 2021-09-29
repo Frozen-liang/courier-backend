@@ -1,7 +1,9 @@
 package com.sms.courier.service;
 
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.WorkspaceRequest;
+import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.dto.response.ProjectResponse;
 import com.sms.courier.dto.response.WorkspaceResponse;
 import com.sms.courier.entity.workspace.WorkspaceEntity;
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.springframework.data.domain.Page;
 
 import static com.sms.courier.common.exception.ErrorCode.ADD_WORKSPACE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_WORKSPACE_BY_ID_ERROR;
@@ -210,6 +213,34 @@ class WorkspaceServiceTest {
     public void caseCount_exception_test() {
         when(projectService.list(any())).thenThrow(new RuntimeException());
         assertThatThrownBy(() -> workspaceService.caseCount(ID)).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the getCase method in the Workspace service")
+    public void getCase_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        Page<ApiTestCaseResponse> page = mock(Page.class);
+        when(page.getContent()).thenReturn(Lists.newArrayList(ApiTestCaseResponse.builder().build()));
+        when(apiTestCaseService.getCasePageByProjectIdsAndCreateDate(any(), any(), any())).thenReturn(page);
+        Page<ApiTestCaseResponse> pageDto = workspaceService.getCase(ID, new PageDto());
+        assertThat(pageDto.getContent().size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Test the getCase method in the Workspace service")
+    public void getCaseProjectIsNull_test() {
+        when(projectService.list(any())).thenReturn(Lists.newArrayList());
+        Page<ApiTestCaseResponse> pageDto = workspaceService.getCase(ID, new PageDto());
+        assertThat(pageDto).isEmpty();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getCase Workspace")
+    public void getCase_exception_test() {
+        when(projectService.list(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceService.getCase(ID, new PageDto()))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
 }

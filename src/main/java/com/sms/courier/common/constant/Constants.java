@@ -48,5 +48,6 @@ public class Constants {
 
     public static final int MAX_DEPTH = 3;
     public static final String HTTP_DEFAULT_STATUS_CODE = "200";
+    public static final Integer CASE_DAY = 7;
 
 }

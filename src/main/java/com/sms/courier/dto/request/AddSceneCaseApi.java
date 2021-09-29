@@ -21,4 +21,6 @@ public class AddSceneCaseApi {
 
     private String name;
 
+    private ApiRequest apiEntity;
+
 }

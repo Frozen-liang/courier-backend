@@ -1,8 +1,11 @@
 package com.sms.courier.service;
 
+import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.WorkspaceRequest;
+import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.dto.response.WorkspaceResponse;
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface WorkspaceService {
 
@@ -19,4 +22,6 @@ public interface WorkspaceService {
     List<WorkspaceResponse> findByUserId();
 
     Long caseCount(String id);
+
+    Page<ApiTestCaseResponse> getCase(String id, PageDto pageDto);
 }

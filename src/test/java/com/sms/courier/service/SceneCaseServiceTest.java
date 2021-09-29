@@ -7,6 +7,7 @@ import com.sms.courier.dto.request.AddCaseTemplateConnRequest;
 import com.sms.courier.dto.request.AddSceneCaseApi;
 import com.sms.courier.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.courier.dto.request.AddSceneCaseRequest;
+import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseApiConnRequest;
@@ -500,6 +501,7 @@ class SceneCaseServiceTest {
                     .build(),
                 AddSceneCaseApi.builder().id(MOCK_ID)
                     .isCase(Boolean.FALSE)
+                    .apiEntity(ApiRequest.builder().build())
                     .order(MOCK_PAGE)
                     .build()))
             .build();

@@ -5,6 +5,7 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.AddCaseTemplateApiByIdsRequest;
 import com.sms.courier.dto.request.AddCaseTemplateRequest;
 import com.sms.courier.dto.request.AddSceneCaseApi;
+import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.CaseTemplateSearchRequest;
 import com.sms.courier.dto.request.ConvertCaseTemplateRequest;
 import com.sms.courier.dto.request.UpdateCaseTemplateRequest;
@@ -416,6 +417,7 @@ class CaseTemplateServiceTest {
                 AddSceneCaseApi.builder()
                     .id(MOCK_ID)
                     .isCase(Boolean.FALSE)
+                    .apiEntity(ApiRequest.builder().build())
                     .order(MOCK_SIZE)
                     .build())).build();
     }

@@ -232,6 +232,7 @@ public enum ErrorCode {
     DELETE_SCHEDULE_GROUP_BY_ID_ERROR("4212", "Failed to delete the ScheduleGroup!"),
     EDIT_SCHEDULE_GROUP_ERROR("4213", "Failed to edit the ScheduleGroup!"),
     GET_WORKSPACE_CASE_COUNT_ERROR("4214", "Failed to get the Workspace case count!"),
+    GET_WORKSPACE_CASE_ERROR("4215", "Failed to get the Workspace case!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),

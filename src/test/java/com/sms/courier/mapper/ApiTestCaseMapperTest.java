@@ -117,7 +117,7 @@ class ApiTestCaseMapperTest {
     @Test
     @DisplayName("test the method an ApiTestCaseEntity to EntityByApiEntity")
     void ApiTestCaseEntity_toEntityByApiEntity() {
-        ApiEntity apiEntity = ApiEntity.builder().build();
+        ApiRequest apiEntity = ApiRequest.builder().build();
         assertThat(apiTestCaseMapper.toEntityByApiEntity(apiEntity)).isNotNull();
     }
 
@@ -130,7 +130,7 @@ class ApiTestCaseMapperTest {
     @Test
     @DisplayName("[Null Input Parameter]test the method an ApiTestCaseEntity to EntityByApiEntity")
     void NotNull_ApiTestCaseEntity_toEntityByApiEntity() {
-        ApiEntity apiEntity = ApiEntity.builder()
+        ApiRequest apiEntity = ApiRequest.builder()
             .requestHeaders(Lists.newArrayList())
             .responseHeaders(Lists.newArrayList())
             .pathParams(Lists.newArrayList())
