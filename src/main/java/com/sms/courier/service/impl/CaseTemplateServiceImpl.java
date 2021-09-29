@@ -29,6 +29,7 @@ import com.sms.courier.common.field.CommonField;
 import com.sms.courier.dto.request.AddCaseTemplateApiByIdsRequest;
 import com.sms.courier.dto.request.AddCaseTemplateRequest;
 import com.sms.courier.dto.request.AddSceneCaseApi;
+import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.CaseTemplateSearchRequest;
 import com.sms.courier.dto.request.ConvertCaseTemplateRequest;
 import com.sms.courier.dto.request.UpdateCaseTemplateRequest;
@@ -345,10 +346,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
                     .orElseThrow(() -> ExceptionUtils.mpe(THE_API_TEST_CASE_NOT_EXITS_ERROR));
             resetApiTestCaseByCase(apiTestCase);
         } else {
-            ApiEntity apiEntity = apiRepository.findById(addSceneCaseApi.getId())
-                .orElseThrow(() -> ExceptionUtils.mpe(THE_API_ENTITY_NOT_EXITS_ERROR));
-            apiTestCase = apiTestCaseMapper.toEntityByApiEntity(apiEntity);
-            resetApiTestCaseByApi(apiTestCase, apiEntity);
+            apiTestCase = apiTestCaseMapper.toEntityByApiEntity(addSceneCaseApi.getApiEntity());
+            resetApiTestCaseByApi(apiTestCase, addSceneCaseApi.getApiEntity());
         }
         apiTestCase.setExecute(Boolean.TRUE);
         CaseTemplateApiEntity caseTemplateApi =
@@ -365,7 +364,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         }
     }
 
-    private void resetApiTestCaseByApi(ApiTestCaseEntity apiTestCase, ApiEntity apiEntity) {
+    private void resetApiTestCaseByApi(ApiTestCaseEntity apiTestCase, ApiRequest apiEntity) {
         apiTestCase.setExecute(Boolean.TRUE);
         apiTestCase.setResponseParamsExtractionType(ResponseParamsExtractionType.JSON);
         apiTestCase.setHttpStatusVerification(HttpStatusVerification.builder().statusCode(
