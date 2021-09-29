@@ -20,6 +20,7 @@ import static org.wildfly.common.Assert.assertTrue;
 
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
@@ -33,6 +34,7 @@ import com.sms.courier.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.impl.ApiTestCaseServiceImpl;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +43,7 @@ import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
 
 @DisplayName("Tests for ApiTestCaseService")
 class ApiTestCaseServiceTest {
@@ -233,7 +236,7 @@ class ApiTestCaseServiceTest {
     public void insertTestResult_test() {
         when(apiTestCaseRepository.findById(any())).thenReturn(Optional.of(ApiTestCaseEntity.builder().build()));
         apiTestCaseService.insertTestResult(ID, TestResult.builder().build());
-        verify(apiTestCaseRepository,times(1)).save(any());
+        verify(apiTestCaseRepository, times(1)).save(any());
     }
 
     @Test
@@ -242,6 +245,19 @@ class ApiTestCaseServiceTest {
         when(customizedApiTestCaseRepository.countByProjectIds(any())).thenReturn(1L);
         Long count = apiTestCaseService.countByProjectIds(Lists.newArrayList(ID));
         assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("Test the getCasePageByProjectIdsAndCreateDate method in the ApiTestCase service")
+    public void getCasePageByProjectIdsAndCreateDate_test() {
+        Page<ApiTestCaseResponse> page = mock(Page.class);
+        when(page.getContent()).thenReturn(Lists.newArrayList(ApiTestCaseResponse.builder().build()));
+        when(customizedApiTestCaseRepository.getCasePageByProjectIdsAndCreateDate(any(), any(), any()))
+            .thenReturn(page);
+        Page<ApiTestCaseResponse> pageDto =
+            apiTestCaseService.getCasePageByProjectIdsAndCreateDate(Lists.newArrayList(ID), LocalDateTime.now(),
+                new PageDto());
+        assertThat(pageDto.getContent().size()).isEqualTo(1);
     }
 
 }

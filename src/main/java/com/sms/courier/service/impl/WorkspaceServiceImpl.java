@@ -10,6 +10,7 @@ import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_WORKSPACE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_COUNT_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_LIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.THE_WORKSPACE_CANNOT_DELETE_ERROR;
 import static com.sms.courier.common.field.CommonField.REMOVE;
@@ -18,9 +19,12 @@ import static com.sms.courier.utils.Assert.isFalse;
 
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
+import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.WorkspaceRequest;
+import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.dto.response.ProjectResponse;
 import com.sms.courier.dto.response.WorkspaceResponse;
 import com.sms.courier.entity.workspace.WorkspaceEntity;
@@ -32,11 +36,13 @@ import com.sms.courier.service.ProjectService;
 import com.sms.courier.service.WorkspaceService;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -151,6 +157,23 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         } catch (Exception e) {
             log.error("Failed to get the Workspace case count!", e);
             throw new ApiTestPlatformException(GET_WORKSPACE_CASE_COUNT_ERROR);
+        }
+    }
+
+    @Override
+    public Page<ApiTestCaseResponse> getCase(String id, PageDto pageDto) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(id);
+            if (CollectionUtils.isNotEmpty(projectResponses)) {
+                List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                    .collect(Collectors.toList());
+                LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
+                return apiTestCaseService.getCasePageByProjectIdsAndCreateDate(projectIds, dateTime, pageDto);
+            }
+            return Page.empty();
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace case!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_CASE_ERROR);
         }
     }
 

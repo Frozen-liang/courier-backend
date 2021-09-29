@@ -1,12 +1,15 @@
 package com.sms.courier.service;
 
 import com.sms.courier.common.enums.ApiBindingStatus;
+import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.apitestcase.TestResult;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
 
 public interface ApiTestCaseService {
 
@@ -35,4 +38,7 @@ public interface ApiTestCaseService {
     void insertTestResult(String id, TestResult testResult);
 
     Long countByProjectIds(List<String> projectIds);
+
+    Page<ApiTestCaseResponse> getCasePageByProjectIdsAndCreateDate(List<String> projectIds, LocalDateTime dateTime,
+        PageDto pageDto);
 }
