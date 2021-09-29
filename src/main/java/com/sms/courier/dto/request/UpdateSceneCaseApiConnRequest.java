@@ -25,6 +25,8 @@ public class UpdateSceneCaseApiConnRequest {
     @JsonProperty("isLock")
     private boolean lock;
 
+    private String aliasName;
+
     private ApiTestCaseRequest apiTestCase;
 
     private List<CaseTemplateApiResponse> caseTemplateApiList;

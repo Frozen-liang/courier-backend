@@ -44,6 +44,8 @@ public class SceneCaseApiEntity extends BaseEntity {
     @Field("isLock")
     private boolean lock;
 
+    private String aliasName;
+
     private ApiTestCaseEntity apiTestCase;
 
     private List<CaseTemplateApiConn> caseTemplateApiConnList;

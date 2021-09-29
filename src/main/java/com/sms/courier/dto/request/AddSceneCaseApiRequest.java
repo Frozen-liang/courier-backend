@@ -30,6 +30,7 @@ public class AddSceneCaseApiRequest {
     @JsonProperty("isLock")
     private boolean lock;
 
+    private String aliasName;
     /**
      * API绑定状态.
      */

@@ -21,5 +21,6 @@ public class SceneCaseApiResponse extends BaseResponse {
     private Integer order;
     @JsonProperty("isLock")
     private boolean lock;
+    private String aliasName;
     private ApiTestCaseResponse apiTestCase;
 }
