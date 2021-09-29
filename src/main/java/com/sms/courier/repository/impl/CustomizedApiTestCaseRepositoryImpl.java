@@ -2,6 +2,7 @@ package com.sms.courier.repository.impl;
 
 import static com.sms.courier.common.field.ApiTag.TAG_NAME;
 import static com.sms.courier.common.field.CommonField.API_ID;
+import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
 import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
 import static com.sms.courier.common.field.CommonField.ID;
 import static com.sms.courier.common.field.CommonField.MODIFY_DATE_TIME;
@@ -13,6 +14,7 @@ import static com.sms.courier.common.field.SceneField.TAG_ID;
 import com.google.common.collect.Lists;
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.CollectionName;
+import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.mongo.LookupField;
@@ -25,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -96,6 +99,22 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
         PROJECT_ID.in(objectIdList).ifPresent(query::addCriteria);
         REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
         return mongoTemplate.count(query, "ApiTestCase");
+    }
+
+    @Override
+    public Page<ApiTestCaseResponse> getCasePageByProjectIdsAndCreateDate(List<String> projectIds,
+        LocalDateTime dateTime, PageDto pageDto) {
+        List<ObjectId> objectIdList = projectIds.stream().map(ObjectId::new).collect(Collectors.toList());
+        List<LookupVo> lookupVoList = getLookupVoList();
+        QueryVo queryVo = QueryVo.builder()
+            .collectionName("ApiTestCase")
+            .criteriaList(
+                Lists.newArrayList(PROJECT_ID.in(objectIdList),
+                    CREATE_DATE_TIME.gt(dateTime),
+                    REMOVE.is(Boolean.FALSE)))
+            .lookupVo(lookupVoList)
+            .build();
+        return commonRepository.page(queryVo, pageDto, ApiTestCaseResponse.class);
     }
 
     private List<LookupVo> getLookupVoList() {
