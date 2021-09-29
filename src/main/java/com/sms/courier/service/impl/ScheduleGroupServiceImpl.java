@@ -1,5 +1,8 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.enums.OperationModule.SCHEDULE_GROUP;
+import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCHEDULE_GROUP_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCHEDULE_GROUP_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
@@ -7,6 +10,9 @@ import static com.sms.courier.common.exception.ErrorCode.EDIT_SCHEDULE_GROUP_ERR
 import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_GROUP_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_GROUP_LIST_ERROR;
 
+import com.sms.courier.common.aspect.annotation.Enhance;
+import com.sms.courier.common.aspect.annotation.LogRecord;
+import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.ScheduleGroupRequest;
 import com.sms.courier.dto.response.ScheduleGroupResponse;
@@ -14,6 +20,7 @@ import com.sms.courier.entity.group.ScheduleGroupEntity;
 import com.sms.courier.mapper.ScheduleGroupMapper;
 import com.sms.courier.repository.ScheduleGroupRepository;
 import com.sms.courier.service.ScheduleGroupService;
+import com.sms.courier.service.ScheduleService;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -23,11 +30,14 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ScheduleGroupServiceImpl implements ScheduleGroupService {
 
+    private final ScheduleService scheduleService;
     private final ScheduleGroupRepository scheduleGroupRepository;
     private final ScheduleGroupMapper scheduleGroupMapper;
 
-    public ScheduleGroupServiceImpl(ScheduleGroupRepository scheduleGroupRepository,
+    public ScheduleGroupServiceImpl(ScheduleService scheduleService,
+        ScheduleGroupRepository scheduleGroupRepository,
         ScheduleGroupMapper scheduleGroupMapper) {
+        this.scheduleService = scheduleService;
         this.scheduleGroupRepository = scheduleGroupRepository;
         this.scheduleGroupMapper = scheduleGroupMapper;
     }
@@ -50,6 +60,7 @@ public class ScheduleGroupServiceImpl implements ScheduleGroupService {
 
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = SCHEDULE_GROUP, template = "{{#scheduleGroupRequest.name}}")
     public Boolean add(ScheduleGroupRequest scheduleGroupRequest) {
         log.info("ScheduleGroupService-add()-params: [ScheduleGroup]={}", scheduleGroupRequest.toString());
         try {
@@ -63,6 +74,7 @@ public class ScheduleGroupServiceImpl implements ScheduleGroupService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = SCHEDULE_GROUP, template = "{{#scheduleGroupRequest.name}}")
     public Boolean edit(ScheduleGroupRequest scheduleGroupRequest) {
         log.info("ScheduleGroupService-edit()-params: [ScheduleGroup]={}", scheduleGroupRequest.toString());
         try {
@@ -83,9 +95,12 @@ public class ScheduleGroupServiceImpl implements ScheduleGroupService {
     }
 
     @Override
+    @LogRecord(operationType = OperationType.DELETE, operationModule = SCHEDULE_GROUP, template = "{{#result.name}}",
+        enhance = @Enhance(enable = true))
     public Boolean delete(String id) {
         try {
             scheduleGroupRepository.deleteById(id);
+            scheduleService.deleteByGroupId(id);
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to delete the ScheduleGroup!", e);

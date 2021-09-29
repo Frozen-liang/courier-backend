@@ -55,10 +55,10 @@ public class ScheduleController {
         return scheduleService.edit(request);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("{ids}")
     @PreAuthorize("hasRoleOrAdmin(@role.SCHEDULE_CRE_UPD_DEL)")
-    public Boolean delete(@PathVariable("id") String id) {
-        return scheduleService.delete(id);
+    public Boolean delete(@PathVariable("ids") List<String> ids) {
+        return scheduleService.delete(ids);
     }
 
     @PostMapping("/handle")

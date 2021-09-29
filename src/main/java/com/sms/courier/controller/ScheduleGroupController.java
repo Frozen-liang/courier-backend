@@ -8,6 +8,7 @@ import com.sms.courier.dto.request.ScheduleGroupRequest;
 import com.sms.courier.dto.response.ScheduleGroupResponse;
 import com.sms.courier.service.ScheduleGroupService;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,21 +35,25 @@ public class ScheduleGroupController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.SCHEDULE_GROUP_CRE_UPD_DEL)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody ScheduleGroupRequest scheduleGroupRequest) {
         return scheduleGroupService.add(scheduleGroupRequest);
     }
 
     @PutMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.SCHEDULE_GROUP_CRE_UPD_DEL)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody ScheduleGroupRequest scheduleGroupRequest) {
         return scheduleGroupService.edit(scheduleGroupRequest);
     }
 
     @GetMapping("/list")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCHEDULE_GROUP_QUERY_ALL)")
     public List<ScheduleGroupResponse> list(String projectId) {
         return scheduleGroupService.list(projectId);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAllRoleOrAdmin(@role.SCHEDULE_GROUP_CRE_UPD_DEL,@role.SCHEDULE_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable String id) {
         return scheduleGroupService.delete(id);
     }

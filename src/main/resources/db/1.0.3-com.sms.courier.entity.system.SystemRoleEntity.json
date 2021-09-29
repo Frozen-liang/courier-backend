@@ -1,0 +1,15 @@
+[
+  {
+    "id": "6153cfdc09c9af6d76bef0f8",
+    "name": "Schedule_Group_Create_Update_Delete",
+    "description": "定时任务分组增加修改删除,删除分组时需要定时任务删除权限",
+    "roleType": 0
+  },
+  {
+    "id": "6153cfdc09c9af6d76bef0f7",
+    "name": "Schedule_Group_Query_All",
+    "description": "查询所有的定时任务分组",
+    "roleType": 0
+  }
+]
+

@@ -32,10 +32,11 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Tests for ScheduleGroupService")
 class ScheduleGroupServiceTest {
 
+    private final ScheduleService scheduleService = mock(ScheduleService.class);
     private final ScheduleGroupRepository scheduleGroupRepository = mock(ScheduleGroupRepository.class);
     private final ScheduleGroupMapper scheduleGroupMapper = new ScheduleGroupMapperImpl();
     private final ScheduleGroupService scheduleGroupService = new ScheduleGroupServiceImpl(
-        scheduleGroupRepository, scheduleGroupMapper);
+        scheduleService, scheduleGroupRepository, scheduleGroupMapper);
     private final ScheduleGroupEntity scheduleGroup = ScheduleGroupEntity.builder().id(ID).build();
     private final ScheduleGroupResponse scheduleGroupResponse = ScheduleGroupResponse.builder()
         .id(ID).build();
@@ -130,6 +131,7 @@ class ScheduleGroupServiceTest {
     @DisplayName("Test the delete method in the ScheduleGroup service")
     public void delete_test() {
         doNothing().when(scheduleGroupRepository).deleteById(ID);
+        doNothing().when(scheduleService).deleteByGroupId(ID);
         assertThat(scheduleGroupService.delete(ID)).isTrue();
     }
 
