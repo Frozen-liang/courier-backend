@@ -63,4 +63,9 @@ public class WorkspaceController {
     public Boolean delete(@PathVariable String id) {
         return workspaceService.delete(id);
     }
+
+    @GetMapping("/casecount/{id}")
+    public Long caseCount(@PathVariable String id) {
+        return workspaceService.caseCount(id);
+    }
 }

@@ -17,4 +17,6 @@ public interface WorkspaceService {
     Boolean delete(String id);
 
     List<WorkspaceResponse> findByUserId();
+
+    Long caseCount(String id);
 }

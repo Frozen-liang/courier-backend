@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -66,4 +67,11 @@ class CustomizedApiTestCaseRepositoryTest {
         assertThat(dtoList).isNotEmpty();
     }
 
+    @Test
+    @DisplayName("Test the countByProjectIds method in the CustomizedApiTestCaseRepository")
+    public void countByProjectIds() {
+        when(mongoTemplate.count(any(),anyString())).thenReturn(1L);
+        Long count = customizedApiTestCaseRepository.countByProjectIds(ID_LIST);
+        assertThat(count).isEqualTo(1L);
+    }
 }
