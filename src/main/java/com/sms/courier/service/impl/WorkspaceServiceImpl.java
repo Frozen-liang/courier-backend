@@ -9,6 +9,7 @@ import static com.sms.courier.common.exception.ErrorCode.DELETE_WORKSPACE_BY_ID_
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_WORKSPACE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_BY_ID_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_COUNT_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_LIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.THE_WORKSPACE_CANNOT_DELETE_ERROR;
 import static com.sms.courier.common.field.CommonField.REMOVE;
@@ -20,17 +21,21 @@ import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.WorkspaceRequest;
+import com.sms.courier.dto.response.ProjectResponse;
 import com.sms.courier.dto.response.WorkspaceResponse;
 import com.sms.courier.entity.workspace.WorkspaceEntity;
 import com.sms.courier.mapper.WorkspaceMapper;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.WorkspaceRepository;
+import com.sms.courier.service.ApiTestCaseService;
 import com.sms.courier.service.ProjectService;
 import com.sms.courier.service.WorkspaceService;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
@@ -42,15 +47,17 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final CommonRepository commonRepository;
     private final WorkspaceMapper workspaceMapper;
+    private final ApiTestCaseService apiTestCaseService;
 
     public WorkspaceServiceImpl(ProjectService projectService,
         WorkspaceRepository workspaceRepository,
         CommonRepository commonRepository,
-        WorkspaceMapper workspaceMapper) {
+        WorkspaceMapper workspaceMapper, ApiTestCaseService apiTestCaseService) {
         this.projectService = projectService;
         this.workspaceRepository = workspaceRepository;
         this.commonRepository = commonRepository;
         this.workspaceMapper = workspaceMapper;
+        this.apiTestCaseService = apiTestCaseService;
     }
 
     @Override
@@ -129,6 +136,22 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             List.of(REMOVE.is(Boolean.FALSE), USER_IDS.is(new ObjectId(SecurityUtil.getCurrUserId()))),
             WorkspaceResponse.class
         );
+    }
+
+    @Override
+    public Long caseCount(String id) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(id);
+            if (CollectionUtils.isNotEmpty(projectResponses)) {
+                List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                    .collect(Collectors.toList());
+                return apiTestCaseService.countByProjectIds(projectIds);
+            }
+            return 0L;
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace case count!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_CASE_COUNT_ERROR);
+        }
     }
 
 }

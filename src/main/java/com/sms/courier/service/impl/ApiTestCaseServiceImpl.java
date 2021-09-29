@@ -192,4 +192,14 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         });
     }
 
+    @Override
+    public Long countByProjectIds(List<String> projectIds) {
+        try {
+            return customizedApiTestCaseRepository.countByProjectIds(projectIds);
+        } catch (Exception e) {
+            log.error("Failed to get the ApiTestCase list!", e);
+            throw new ApiTestPlatformException(GET_API_TEST_CASE_LIST_ERROR);
+        }
+    }
+
 }

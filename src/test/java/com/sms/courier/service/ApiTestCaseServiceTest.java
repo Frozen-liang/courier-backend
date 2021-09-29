@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
 
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
@@ -24,6 +25,7 @@ import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
+import com.sms.courier.entity.apitestcase.TestResult;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
 import com.sms.courier.repository.ApiTestCaseRepository;
@@ -35,10 +37,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationEventPublisher;
 
 @DisplayName("Tests for ApiTestCaseService")
 class ApiTestCaseServiceTest {
@@ -207,4 +209,39 @@ class ApiTestCaseServiceTest {
         doNothing().when(apiTestCaseRepository).deleteAllByRemovedIsTrue();
         assertThat(apiTestCaseService.deleteAll()).isTrue();
     }
+
+    @Test
+    @DisplayName("Test the recover method in the ApiTestCase service")
+    public void recover_test() {
+        when(customizedApiTestCaseRepository.recover(any())).thenReturn(Boolean.TRUE);
+        List<String> apiIds = Lists.newArrayList(ID);
+        when(customizedApiTestCaseRepository.findApiIdsByTestIds(any())).thenReturn(apiIds);
+        Boolean isSuccess = apiTestCaseService.recover(Lists.newArrayList(ID));
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the count method in the ApiTestCase service")
+    public void count_test() {
+        when(apiTestCaseRepository.count(any())).thenReturn(1L);
+        Long count = apiTestCaseService.count(ID);
+        assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("Test the insertTestResult method in the ApiTestCase service")
+    public void insertTestResult_test() {
+        when(apiTestCaseRepository.findById(any())).thenReturn(Optional.of(ApiTestCaseEntity.builder().build()));
+        apiTestCaseService.insertTestResult(ID, TestResult.builder().build());
+        verify(apiTestCaseRepository,times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("Test the countByProjectIds method in the ApiTestCase service")
+    public void countByProjectIds_test() {
+        when(customizedApiTestCaseRepository.countByProjectIds(any())).thenReturn(1L);
+        Long count = apiTestCaseService.countByProjectIds(Lists.newArrayList(ID));
+        assertThat(count).isEqualTo(1L);
+    }
+
 }
