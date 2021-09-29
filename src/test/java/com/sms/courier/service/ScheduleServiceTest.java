@@ -12,6 +12,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.enums.CycleType;
@@ -26,8 +28,11 @@ import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.ScheduleRepository;
 import com.sms.courier.service.impl.ScheduleServiceImpl;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -126,16 +131,24 @@ class ScheduleServiceTest {
     @Test
     @DisplayName("Test the delete method in the Schedule service")
     public void delete_test() {
-        when(commonRepository.updateFieldById(anyString(), any(), any())).thenReturn(true);
-        assertThat(scheduleService.delete(ID)).isTrue();
+        when(commonRepository.updateFieldByIds(any(), any(Map.class), any())).thenReturn(true);
+        assertThat(scheduleService.delete(Collections.singletonList(ID))).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while delete Schedule")
     public void delete_exception_test() {
-        doThrow(new RuntimeException()).when(commonRepository).updateFieldById(anyString(), any(), any());
-        assertThatThrownBy(() -> scheduleService.delete(ID))
+        doThrow(new RuntimeException()).when(commonRepository).updateFieldByIds(any(List.class), any(Map.class), any());
+        assertThatThrownBy(() -> scheduleService.delete(Collections.singletonList(ID)))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_SCHEDULE_BY_ID_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the deleteByGroupId method in the Schedule service")
+    public void deleteByGroupId_test() {
+        when(scheduleRepository.findByGroupId(any())).thenReturn(Stream.empty());
+       scheduleService.deleteByGroupId(ID);
+       verify(commonRepository,never()).updateFieldByIds(any(List.class), any(Map.class), any());
     }
 }

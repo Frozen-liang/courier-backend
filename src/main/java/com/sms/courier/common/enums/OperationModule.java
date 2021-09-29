@@ -12,6 +12,7 @@ import com.sms.courier.entity.group.ApiGroupEntity;
 import com.sms.courier.entity.group.ApiTagGroupEntity;
 import com.sms.courier.entity.group.CaseTemplateGroupEntity;
 import com.sms.courier.entity.group.SceneCaseGroupEntity;
+import com.sms.courier.entity.group.ScheduleGroupEntity;
 import com.sms.courier.entity.mock.MockApiEntity;
 import com.sms.courier.entity.mock.MockSettingEntity;
 import com.sms.courier.entity.project.ProjectEntity;
@@ -61,7 +62,8 @@ public enum OperationModule implements EnumCommon {
     DATA_STRUCTURE(23, StructureEntity.class),
     LOGIN_SETTING(24, LoginSettingEntity.class),
     MOCK_SETTING(25, MockSettingEntity.class),
-    PROJECT_IMPORT_SOURCE(26, ProjectImportSourceEntity.class);
+    PROJECT_IMPORT_SOURCE(26, ProjectImportSourceEntity.class),
+    SCHEDULE_GROUP(27, ScheduleGroupEntity.class);
 
     private static final Map<Integer, OperationModule> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationModule::getCode, Function.identity()));
