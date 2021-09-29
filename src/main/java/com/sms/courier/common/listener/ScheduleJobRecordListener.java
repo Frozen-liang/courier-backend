@@ -45,8 +45,9 @@ public class ScheduleJobRecordListener {
         try {
             String id = event.getId();
             scheduleRecordRepository.findById(id).ifPresent(scheduleRecord -> {
-                log.info("Update schedule record. id={}", scheduleRecord.getId());
                 while (true) {
+                    log.info("Update schedule record. id={} name={}",
+                        scheduleRecord.getScheduleId(), scheduleRecord.getScheduleName());
                     Boolean res = updateJobIds(event, scheduleRecord);
                     if (res) {
                         break;
