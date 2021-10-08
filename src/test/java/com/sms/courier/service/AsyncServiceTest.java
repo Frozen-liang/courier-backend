@@ -26,7 +26,9 @@ import com.sms.courier.websocket.Payload;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
@@ -100,7 +102,7 @@ public class AsyncServiceTest {
         when(projectImportFlowRepository.save(any(ProjectImportFlowEntity.class))).thenReturn(
             ProjectImportFlowEntity.builder().build());
         doNothing().when(messageService).projectMessage(any(), any(Payload.class));
-        when(apiGroupRepository.findApiGroupEntitiesByProjectId(any()))
+        when(apiGroupRepository.findByProjectIdAndDepth(any(),any()))
             .thenReturn(getApiGroup());
         when(apiRepository.findApiEntitiesByProjectIdAndSwaggerIdNotNull(any()))
             .thenReturn(Streamable.of(getApi()));
@@ -114,12 +116,12 @@ public class AsyncServiceTest {
         when(apiHistoryRepository.insert(any(ApiHistoryEntity.class))).thenReturn(null);
     }
 
-    private List<ApiGroupEntity> getApiGroup() {
-        ArrayList<ApiGroupEntity> list = new ArrayList<>();
+    private Set<ApiGroupEntity> getApiGroup() {
+        Set<ApiGroupEntity> set = new HashSet<>();
         for (int i = 0; i < 5; i++) {
-            list.add(ApiGroupEntity.builder().id(ObjectId.get().toString()).name("test" + Math.random()).build());
+            set.add(ApiGroupEntity.builder().id(ObjectId.get().toString()).name("test" + Math.random()).build());
         }
-        return list;
+        return set;
     }
 
     private List<ApiEntity> getApi() {
