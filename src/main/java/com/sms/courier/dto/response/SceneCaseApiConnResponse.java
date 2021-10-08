@@ -30,6 +30,8 @@ public class SceneCaseApiConnResponse extends BaseResponse {
     @JsonProperty("isLock")
     private boolean lock;
 
+    private String aliasName;
+
     private ApiTestCaseResponse apiTestCase;
 
     private List<CaseTemplateApiResponse> caseTemplateApiList;

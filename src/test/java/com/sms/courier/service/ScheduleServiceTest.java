@@ -14,6 +14,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.enums.CaseFilter;
@@ -31,8 +33,10 @@ import com.sms.courier.repository.ScheduleRepository;
 import com.sms.courier.service.impl.ScheduleServiceImpl;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -179,5 +183,13 @@ class ScheduleServiceTest {
         assertThatThrownBy(() -> scheduleService.handle(ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_SCHEDULE_BY_ID_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the deleteByGroupId method in the Schedule service")
+    public void deleteByGroupId_test() {
+        when(scheduleRepository.findByGroupId(any())).thenReturn(Stream.empty());
+       scheduleService.deleteByGroupId(ID);
+       verify(commonRepository,never()).updateFieldByIds(any(List.class), any(Map.class), any());
     }
 }

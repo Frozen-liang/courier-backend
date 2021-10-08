@@ -19,5 +19,7 @@ public interface ScheduleService {
 
     Boolean delete(String id);
 
+    void deleteByGroupId(String groupId);
+
     Boolean handle(String id);
 }

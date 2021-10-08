@@ -138,6 +138,16 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
+    public void deleteByGroupId(String groupId) {
+        List<String> ids = scheduleRepository.findByGroupId(groupId).map(ScheduleEntity::getId)
+            .collect(Collectors.toList());
+        if (ids.isEmpty()) {
+            return;
+        }
+        this.delete(ids);
+    }
+
+    @Override
     public Boolean handle(String id) {
         try {
             ScheduleEntity scheduleEntity = scheduleRepository.findById(id)

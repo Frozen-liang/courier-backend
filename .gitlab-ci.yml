@@ -53,7 +53,8 @@ task_build_artifact:
   script:
     - ./gradlew bootjar --build-cache
     - IMAGE_TAG=$(ls ./build/libs | grep $PROD_RELEASE_NAME)&&IMAGE_TAG=${IMAGE_TAG:${#PROD_RELEASE_NAME}+1}&&IMAGE_TAG=${IMAGE_TAG%%.jar}
-    - echo "export IMAGE_TAG=$IMAGE_TAG" >> version.env
+    - echo "IMAGE_TAG=$IMAGE_TAG" >> version.env
+    - cat version.env
   cache:
     key: ${CI_PROJECT_NAME}
     paths:
@@ -64,8 +65,7 @@ task_build_artifact:
     paths:
       - build/libs
     reports:
-      dotenv:
-        - version.env
+      dotenv: version.env
     expire_in: 1 day
 
 
@@ -96,7 +96,9 @@ task_release:
       - master
   release:
     tag_name: v${IMAGE_TAG}
-    description: 'Release'
+    description: './CHANGELOG.md'
+    milestones:
+      - v${IMAGE_TAG}
   script:
     - echo "Release ${IMAGE_TAG} Successful."
 

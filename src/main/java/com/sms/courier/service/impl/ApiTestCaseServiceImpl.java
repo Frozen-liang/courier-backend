@@ -19,6 +19,7 @@ import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
@@ -29,12 +30,14 @@ import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.service.ApiTestCaseService;
 import com.sms.courier.service.CaseApiCountHandler;
 import com.sms.courier.utils.ExceptionUtils;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -190,6 +193,17 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
             apiTestCaseEntity.setLastTestResult(testResult);
             apiTestCaseRepository.save(apiTestCaseEntity);
         });
+    }
+
+    @Override
+    public Long countByProjectIds(List<String> projectIds) {
+        return customizedApiTestCaseRepository.countByProjectIds(projectIds);
+    }
+
+    @Override
+    public Page<ApiTestCaseResponse> getCasePageByProjectIdsAndCreateDate(List<String> projectIds,
+        LocalDateTime dateTime, PageDto pageDto) {
+        return customizedApiTestCaseRepository.getCasePageByProjectIdsAndCreateDate(projectIds, dateTime, pageDto);
     }
 
 }

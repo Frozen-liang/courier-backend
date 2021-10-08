@@ -4,10 +4,13 @@ import static com.sms.courier.common.constant.Constants.WORKSPACE_PATH;
 
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
+import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.WorkspaceRequest;
+import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.dto.response.WorkspaceResponse;
 import com.sms.courier.service.WorkspaceService;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -63,4 +66,15 @@ public class WorkspaceController {
     public Boolean delete(@PathVariable String id) {
         return workspaceService.delete(id);
     }
+
+    @GetMapping("/casecount/{id}")
+    public Long caseCount(@PathVariable String id) {
+        return workspaceService.caseCount(id);
+    }
+
+    @GetMapping("/case/{id}")
+    public Page<ApiTestCaseResponse> getCase(@PathVariable String id, PageDto pageDto) {
+        return workspaceService.getCase(id, pageDto);
+    }
+
 }

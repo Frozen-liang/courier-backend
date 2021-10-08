@@ -36,6 +36,7 @@ import com.sms.courier.dto.request.AddCaseTemplateConnRequest;
 import com.sms.courier.dto.request.AddSceneCaseApi;
 import com.sms.courier.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.courier.dto.request.AddSceneCaseRequest;
+import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseApiConnRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseConnRequest;
@@ -377,10 +378,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 apiTestCaseRepository.findById(addSceneCaseApi.getId())
                     .orElseThrow(() -> ExceptionUtils.mpe(THE_API_TEST_CASE_NOT_EXITS_ERROR));
         } else {
-            ApiEntity apiEntity = apiRepository.findById(addSceneCaseApi.getId())
-                .orElseThrow(() -> ExceptionUtils.mpe(THE_API_ENTITY_NOT_EXITS_ERROR));
-            apiTestCase = apiTestCaseMapper.toEntityByApiEntity(apiEntity);
-            resetApiTestCaseByApi(apiTestCase, apiEntity);
+            apiTestCase = apiTestCaseMapper.toEntityByApiEntity(addSceneCaseApi.getApiEntity());
+            resetApiTestCaseByApi(apiTestCase, addSceneCaseApi.getApiEntity());
         }
         apiTestCase.setResponseParamsExtractionType(ResponseParamsExtractionType.JSON);
         apiTestCase.setStatus(ApiBindingStatus.BINDING);
@@ -398,7 +397,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         }
     }
 
-    private void resetApiTestCaseByApi(ApiTestCaseEntity apiTestCase, ApiEntity apiEntity) {
+    private void resetApiTestCaseByApi(ApiTestCaseEntity apiTestCase, ApiRequest apiEntity) {
         apiTestCase.setHttpStatusVerification(HttpStatusVerification.builder().statusCode(
             Constants.HTTP_DEFAULT_STATUS_CODE).build());
         apiTestCase.setResponseResultVerification(ResponseResultVerification.builder()

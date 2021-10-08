@@ -11,7 +11,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 
 group = "com.sms.courier"
-version = "1.0.1"
+version = "1.0.3-SNAPSHOT"
 description = "courier-backend"
 
 
@@ -113,6 +113,8 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:$versionJjwt")
     implementation("io.jsonwebtoken:jjwt-impl:$versionJjwt")
     implementation("io.jsonwebtoken:jjwt-jackson:$versionJjwt")
+    implementation("net.bytebuddy","byte-buddy-agent")
+    implementation("net.bytebuddy","byte-buddy")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.2.0")
     testImplementation("org.springframework.security:spring-security-test")

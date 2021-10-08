@@ -1,8 +1,8 @@
 package com.sms.courier.mapper;
 
+import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
-import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.utils.EnumCommonUtils;
 import java.util.List;
@@ -42,5 +42,5 @@ public interface ApiTestCaseMapper {
     @Mapping(target = "apiEntity.postInject", source = "postInject")
     @Mapping(target = "apiEntity.apiResponseJsonType", source = "apiResponseJsonType")
     @Mapping(target = "apiEntity.apiRequestJsonType", source = "apiRequestJsonType")
-    ApiTestCaseEntity toEntityByApiEntity(ApiEntity apiEntity);
+    ApiTestCaseEntity toEntityByApiEntity(ApiRequest apiEntity);
 }

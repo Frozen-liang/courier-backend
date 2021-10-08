@@ -1,5 +1,28 @@
 package com.sms.courier.service;
 
+import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.dto.PageDto;
+import com.sms.courier.dto.request.WorkspaceRequest;
+import com.sms.courier.dto.response.ApiTestCaseResponse;
+import com.sms.courier.dto.response.ProjectResponse;
+import com.sms.courier.dto.response.WorkspaceResponse;
+import com.sms.courier.entity.workspace.WorkspaceEntity;
+import com.sms.courier.mapper.WorkspaceMapper;
+import com.sms.courier.repository.CommonRepository;
+import com.sms.courier.repository.WorkspaceRepository;
+import com.sms.courier.service.impl.WorkspaceServiceImpl;
+import com.sms.courier.utils.SecurityUtil;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.assertj.core.util.Lists;
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.springframework.data.domain.Page;
+
 import static com.sms.courier.common.exception.ErrorCode.ADD_WORKSPACE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_WORKSPACE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
@@ -15,24 +38,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.sms.courier.common.exception.ApiTestPlatformException;
-import com.sms.courier.dto.request.WorkspaceRequest;
-import com.sms.courier.dto.response.WorkspaceResponse;
-import com.sms.courier.entity.workspace.WorkspaceEntity;
-import com.sms.courier.mapper.WorkspaceMapper;
-import com.sms.courier.repository.CommonRepository;
-import com.sms.courier.repository.WorkspaceRepository;
-import com.sms.courier.service.impl.WorkspaceServiceImpl;
-import com.sms.courier.utils.SecurityUtil;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import org.bson.types.ObjectId;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
-
 @DisplayName("Tests for WorkspaceService")
 class WorkspaceServiceTest {
 
@@ -41,8 +46,9 @@ class WorkspaceServiceTest {
         CommonRepository.class);
     private final WorkspaceMapper workspaceMapper = mock(WorkspaceMapper.class);
     private final ProjectService projectService = mock(ProjectService.class);
+    private final ApiTestCaseService apiTestCaseService = mock(ApiTestCaseService.class);
     private final WorkspaceService workspaceService = new WorkspaceServiceImpl(projectService,
-        workspaceRepository, commonRepository, workspaceMapper);
+        workspaceRepository, commonRepository, workspaceMapper, apiTestCaseService);
     private final WorkspaceEntity workspace = WorkspaceEntity.builder().id(ID).build();
     private final WorkspaceResponse workspaceResponse = WorkspaceResponse.builder()
         .id(ID).build();
@@ -181,6 +187,60 @@ class WorkspaceServiceTest {
         assertThatThrownBy(() -> workspaceService.delete(ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_WORKSPACE_BY_ID_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the caseCount method in the Workspace service")
+    public void caseCount_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        when(apiTestCaseService.countByProjectIds(any())).thenReturn(1L);
+        Long count = workspaceService.caseCount(ID);
+        assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("Test the caseCount method in the Workspace service")
+    public void caseCountProjectIsNull_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList();
+        when(projectService.list(any())).thenReturn(projectResponses);
+        Long count = workspaceService.caseCount(ID);
+        assertThat(count).isEqualTo(0L);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while caseCount Workspace")
+    public void caseCount_exception_test() {
+        when(projectService.list(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceService.caseCount(ID)).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the getCase method in the Workspace service")
+    public void getCase_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        Page<ApiTestCaseResponse> page = mock(Page.class);
+        when(page.getContent()).thenReturn(Lists.newArrayList(ApiTestCaseResponse.builder().build()));
+        when(apiTestCaseService.getCasePageByProjectIdsAndCreateDate(any(), any(), any())).thenReturn(page);
+        Page<ApiTestCaseResponse> pageDto = workspaceService.getCase(ID, new PageDto());
+        assertThat(pageDto.getContent().size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Test the getCase method in the Workspace service")
+    public void getCaseProjectIsNull_test() {
+        when(projectService.list(any())).thenReturn(Lists.newArrayList());
+        Page<ApiTestCaseResponse> pageDto = workspaceService.getCase(ID, new PageDto());
+        assertThat(pageDto).isEmpty();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while getCase Workspace")
+    public void getCase_exception_test() {
+        when(projectService.list(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceService.getCase(ID, new PageDto()))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
 }
