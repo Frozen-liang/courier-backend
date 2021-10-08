@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @ToString(callSuper = true)
@@ -30,7 +31,12 @@ public class ScheduleResponse extends BaseResponse {
     private String envId;
 
     @JsonProperty("isLoop")
+    @Field("isLoop")
     private boolean loop;
+
+    @JsonProperty("isOpen")
+    @Field("isOpen")
+    private boolean open;
 
     private Integer cycle;
 
@@ -52,6 +58,7 @@ public class ScheduleResponse extends BaseResponse {
     private List<String> userIds;
 
     @JsonProperty("isDisplayError")
+    @Field("isDisplayError")
     private boolean displayError;
 
 }

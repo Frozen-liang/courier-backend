@@ -1,6 +1,7 @@
 package com.sms.courier.common.listener;
 
 import static com.sms.courier.common.enums.TaskStatus.COMPLETE;
+import static com.sms.courier.common.field.ScheduleField.LAST_TASK_COMPLETE_TIME;
 import static com.sms.courier.common.field.ScheduleField.TASK_STATUS;
 import static com.sms.courier.common.field.ScheduleRecordField.FAIL;
 import static com.sms.courier.common.field.ScheduleRecordField.JOB_IDS;
@@ -57,8 +58,8 @@ public class ScheduleJobRecordListener {
                 }
                 if (scheduleRecord.getJobIds().isEmpty()) {
                     log.info("Update schedule task status is complete");
-                    commonRepository.updateFieldById(scheduleRecord.getScheduleId(), Map.of(TASK_STATUS, COMPLETE),
-                        ScheduleEntity.class);
+                    commonRepository.updateFieldById(scheduleRecord.getScheduleId(), Map.of(TASK_STATUS, COMPLETE,
+                        LAST_TASK_COMPLETE_TIME, LocalDateTime.now()), ScheduleEntity.class);
                 }
             });
         } catch (Exception e) {
