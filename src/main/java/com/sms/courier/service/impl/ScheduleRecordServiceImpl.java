@@ -4,6 +4,7 @@ import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_RECORD_PAG
 import static com.sms.courier.common.field.CommonField.PROJECT_ID;
 import static com.sms.courier.common.field.ScheduleRecordField.EXECUTE;
 import static com.sms.courier.common.field.ScheduleRecordField.FAIL;
+import static com.sms.courier.common.field.ScheduleRecordField.SCHEDULE_ID;
 import static com.sms.courier.common.field.ScheduleRecordField.SCHEDULE_NAME;
 import static com.sms.courier.common.field.ScheduleRecordField.SUCCESS;
 import static com.sms.courier.common.field.ScheduleRecordField.VERSION;
@@ -46,6 +47,7 @@ public class ScheduleRecordServiceImpl implements ScheduleRecordService {
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(SCHEDULE_NAME.getName(), GenericPropertyMatchers.contains())
                 .withMatcher(PROJECT_ID.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(SCHEDULE_ID.getName(), GenericPropertyMatchers.exact())
                 .withMatcher(EXECUTE.getName(), GenericPropertyMatchers.exact())
                 .withIgnorePaths(SUCCESS.getName(), FAIL.getName(), VERSION.getName())
                 .withIgnoreNullValues();

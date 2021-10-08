@@ -152,10 +152,11 @@ class ScheduleSceneCaseJobServiceTest {
     public void schedule_test_when_data_collection_is_not_empty(String caseFilter) {
         ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envId(ObjectId.get().toString())
             .caseFilter(CaseFilter.valueOf(caseFilter))
-            .caseCondition(CaseCondition.builder().build()).caseType(CaseType.CASE).build();
+            .caseCondition(CaseCondition.builder().tag(Collections.singletonList(ID)).build()).caseType(CaseType.SCENE_CASE).build();
         List<SceneCaseEntity> apiTestCaseEntities = Collections.singletonList(sceneCaseEntity);
         when(sceneCaseRepository.findByIdIn(any())).thenReturn(apiTestCaseEntities);
         when(sceneCaseRepository.findByRemovedIsFalse()).thenReturn(apiTestCaseEntities);
+        when(sceneCaseRepository.findByTagIdIn(any())).thenReturn(apiTestCaseEntities);
         when(sceneCaseRepository.findByTagIdInAndPriorityIn(any(), any())).thenReturn(apiTestCaseEntities);
         when(projectEnvironmentService.findOne(anyString())).thenReturn(ProjectEnvironmentEntity.builder().build());
         List<SceneCaseApiEntity> sceneCaseApiList1 = getSceneCaseApiList();
@@ -179,9 +180,10 @@ class ScheduleSceneCaseJobServiceTest {
     public void schedule_test_when_data_collection_is_empty(String caseFilter) {
         ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envId(ObjectId.get().toString())
             .caseFilter(CaseFilter.valueOf(caseFilter))
-            .caseCondition(CaseCondition.builder().build()).caseType(CaseType.CASE).build();
+            .caseCondition(CaseCondition.builder().priority(List.of(1)).build()).caseType(CaseType.SCENE_CASE).build();
         List<SceneCaseEntity> apiTestCaseEntities = Collections.singletonList(sceneCaseEntity);
         when(sceneCaseRepository.findByIdIn(any())).thenReturn(apiTestCaseEntities);
+        when(sceneCaseRepository.findByPriorityIn(any())).thenReturn(apiTestCaseEntities);
         when(sceneCaseRepository.findByRemovedIsFalse()).thenReturn(apiTestCaseEntities);
         when(sceneCaseRepository.findByTagIdInAndPriorityIn(any(), any())).thenReturn(apiTestCaseEntities);
         when(projectEnvironmentService.findOne(anyString())).thenReturn(ProjectEnvironmentEntity.builder().build());

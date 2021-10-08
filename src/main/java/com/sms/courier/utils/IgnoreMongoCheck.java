@@ -10,10 +10,9 @@ import net.bytebuddy.implementation.FixedValue;
 
 public class IgnoreMongoCheck {
 
-    public static void run (){
+    public static void run() {
         ByteBuddyAgent.install();
         new ByteBuddy()
-
             .redefine(CollectibleDocumentFieldNameValidator.class)
             .method(named("validate"))
             .intercept(FixedValue.value(true))

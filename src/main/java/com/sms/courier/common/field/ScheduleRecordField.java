@@ -7,6 +7,7 @@ public enum ScheduleRecordField implements Field {
     TEST_COMPLETION_TIME("testCompletionTime"),
     EXECUTE("isExecute"),
     SCHEDULE_NAME("scheduleName"),
+    SCHEDULE_ID("scheduleId"),
     SUCCESS("success"),
     FAIL("fail"),
     VERSION("version");

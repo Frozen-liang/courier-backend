@@ -139,18 +139,19 @@ class ScheduleServiceTest {
     @Test
     @DisplayName("Test the delete method in the Schedule service")
     public void delete_test() {
-        when(commonRepository.updateFieldById(anyString(), any(), any())).thenReturn(true);
-        assertThat(scheduleService.delete(ID)).isTrue();
+        when(commonRepository.updateFieldByIds(any(), any(Map.class), any())).thenReturn(true);
+        assertThat(scheduleService.delete(Collections.singletonList(ID))).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while delete Schedule")
     public void delete_exception_test() {
-        doThrow(new RuntimeException()).when(commonRepository).updateFieldById(anyString(), any(), any());
-        assertThatThrownBy(() -> scheduleService.delete(ID))
+        doThrow(new RuntimeException()).when(commonRepository).updateFieldByIds(any(List.class), any(Map.class), any());
+        assertThatThrownBy(() -> scheduleService.delete(Collections.singletonList(ID)))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_SCHEDULE_BY_ID_ERROR.getCode());
     }
+
 
     @ParameterizedTest
     @DisplayName("Test the handle method in the Schedule service")

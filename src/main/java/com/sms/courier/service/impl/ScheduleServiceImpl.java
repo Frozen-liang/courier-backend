@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -123,19 +124,21 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    @LogRecord(operationType = OperationType.DELETE, operationModule = SCHEDULE, template = "{{#result.name}}",
-        enhance = @Enhance(enable = true))
-    public Boolean delete(String id) {
+    @LogRecord(operationType = OperationType.DELETE, operationModule = SCHEDULE,
+        template = "{{#result?.![#this.name]}}",
+        enhance = @Enhance(enable = true, primaryKey = "ids"))
+    public Boolean delete(List<String> ids) {
         try {
             Map<Field, Object> updateFields = new HashMap<>();
             updateFields.put(REMOVE, true);
             updateFields.put(SCHEDULE_STATUS, ScheduleStatusType.DELETE);
-            return commonRepository.updateFieldById(id, updateFields, ScheduleEntity.class);
+            return commonRepository.updateFieldByIds(ids, updateFields, ScheduleEntity.class);
         } catch (Exception e) {
             log.error("Failed to delete Schedule. message:{}", e.getMessage());
             throw ExceptionUtils.mpe(DELETE_SCHEDULE_BY_ID_ERROR);
         }
     }
+
 
     @Override
     public void deleteByGroupId(String groupId) {
