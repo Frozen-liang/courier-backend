@@ -18,8 +18,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class SceneCaseJobResponse extends BaseResponse {
 
-    private String id;
-
     private String workspaceId;
 
     private String projectId;

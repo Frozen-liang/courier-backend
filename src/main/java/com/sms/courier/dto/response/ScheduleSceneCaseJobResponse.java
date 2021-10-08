@@ -1,5 +1,7 @@
 package com.sms.courier.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,8 +13,12 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class ScheduleCaseJobResponse extends JobResponse {
+public class ScheduleSceneCaseJobResponse extends JobResponse {
 
-    private JobCaseApiResponse apiTestCase;
+    @JsonProperty("isNext")
+    private boolean next;
+
+    private List<JobSceneCaseApiResponse> apiTestCase;
+
     private String name;
 }

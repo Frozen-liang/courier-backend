@@ -10,5 +10,7 @@ public interface ScheduleCaseJobRepository extends MongoRepository<ScheduleCaseJ
 
     List<ScheduleCaseJobEntity> findByEngineIdInAndJobStatus(List<String> engineIds, JobStatus jobStatus);
 
-    List<ScheduleCaseJobResponse> findByScheduleRecordIdIs(String scheduleRecordId);
+    List<ScheduleCaseJobResponse> findByScheduleRecordIdAndApiTestCase_JobApiTestCase_Id(String scheduleRecordId,
+        String caseId);
+
 }

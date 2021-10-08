@@ -2,7 +2,9 @@ package com.sms.courier.controller;
 
 import static com.sms.courier.common.constant.Constants.SCHEDULE_JOB_PATH;
 
+import com.sms.courier.dto.request.ScheduleJobRequest;
 import com.sms.courier.dto.response.ScheduleCaseJobResponse;
+import com.sms.courier.dto.response.ScheduleSceneCaseJobResponse;
 import com.sms.courier.service.ScheduleJobService;
 import java.util.List;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,8 +21,13 @@ public class ScheduleJobController {
         this.scheduleJobService = scheduleJobService;
     }
 
-    @PostMapping("/getScheduleJobInfo")
-    public List<ScheduleCaseJobResponse> getScheduleJobInfo(String scheduleRecordId) {
-        return scheduleJobService.getScheduleJobInfo(scheduleRecordId);
+    @PostMapping("/getCaseJobInfo")
+    public List<ScheduleCaseJobResponse> getCaseJobInfo(ScheduleJobRequest request) {
+        return scheduleJobService.getCaseJobInfoString(request);
+    }
+
+    @PostMapping("/getSceneCaseJobInfo")
+    public List<ScheduleSceneCaseJobResponse> getSceneCaseJobInfo(ScheduleJobRequest request) {
+        return scheduleJobService.getSceneCaseJobInfo(request);
     }
 }

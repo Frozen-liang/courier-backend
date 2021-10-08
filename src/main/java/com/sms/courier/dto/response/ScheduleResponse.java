@@ -5,8 +5,6 @@ import static com.sms.courier.common.constant.TimePatternConstant.DEFAULT_PATTER
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sms.courier.common.enums.CycleType;
-import com.sms.courier.common.enums.NoticeType;
 import com.sms.courier.entity.schedule.CaseCondition;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,7 +32,7 @@ public class ScheduleResponse extends BaseResponse {
     @JsonProperty("isLoop")
     private boolean loop;
 
-    private CycleType cycle;
+    private Integer cycle;
 
     private List<String> time;
 
@@ -44,7 +42,9 @@ public class ScheduleResponse extends BaseResponse {
 
     private CaseCondition caseCondition;
 
-    private NoticeType noticeType;
+    private List<String> caseIds;
+
+    private Integer noticeType;
 
     @JsonFormat(pattern = DEFAULT_PATTERN)
     private LocalDateTime lastTaskCompleteTime;
