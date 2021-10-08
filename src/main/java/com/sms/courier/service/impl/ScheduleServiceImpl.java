@@ -13,8 +13,11 @@ import static com.sms.courier.common.exception.ErrorCode.EDIT_SCHEDULE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_LIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.SYSTEM_ERROR;
+import static com.sms.courier.common.field.CommonField.GROUP_ID;
 import static com.sms.courier.common.field.CommonField.ID;
+import static com.sms.courier.common.field.CommonField.PROJECT_ID;
 import static com.sms.courier.common.field.CommonField.REMOVE;
+import static com.sms.courier.common.field.ScheduleField.NAME;
 import static com.sms.courier.common.field.ScheduleField.OPEN;
 import static com.sms.courier.common.field.ScheduleField.SCHEDULE_STATUS;
 import static com.sms.courier.common.field.ScheduleField.TASK_STATUS;
@@ -81,7 +84,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     public List<ScheduleResponse> list(ScheduleListRequest request) {
         try {
             return commonRepository.listLookupUser(CollectionName.SCHEDULE.getName(),
-                List.of(REMOVE.is(false)),
+                List.of(REMOVE.is(false), PROJECT_ID.is(request.getProjectId()), GROUP_ID.is(request.getGroupId()),
+                    NAME.like(request.getName())),
                 ScheduleResponse.class);
         } catch (Exception e) {
             log.error("Failed to get Schedule list.");
@@ -182,8 +186,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = SCHEDULE,
-        template = "{{#result.name}}", enhance = @Enhance(enable = true))
     public Boolean open(String id, boolean enable) {
         try {
             Map<Field, Object> updateFields = new HashMap<>();

@@ -56,7 +56,7 @@ public class ScheduleController {
 
     @PutMapping("/enable")
     @PreAuthorize("hasRoleOrAdmin(@role.SCHEDULE_CRE_UPD_DEL)")
-    public Boolean isOpen(String id, boolean enable) {
+    public Boolean open(String id, boolean enable) {
         return scheduleService.open(id, enable);
     }
 
