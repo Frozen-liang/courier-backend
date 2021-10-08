@@ -54,6 +54,12 @@ public class ScheduleController {
         return scheduleService.edit(request);
     }
 
+    @PutMapping("/enable")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCHEDULE_CRE_UPD_DEL)")
+    public Boolean isOpen(String id, boolean enable) {
+        return scheduleService.open(id, enable);
+    }
+
     @DeleteMapping("{ids}")
     @PreAuthorize("hasRoleOrAdmin(@role.SCHEDULE_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable("ids") List<String> ids) {

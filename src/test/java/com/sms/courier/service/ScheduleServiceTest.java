@@ -152,6 +152,22 @@ class ScheduleServiceTest {
             .extracting("code").isEqualTo(DELETE_SCHEDULE_BY_ID_ERROR.getCode());
     }
 
+    @Test
+    @DisplayName("Test the open method in the Schedule service")
+    public void open_test() {
+        when(commonRepository.updateFieldById(any(), any(Map.class), any())).thenReturn(true);
+        assertThat(scheduleService.open(ID,true)).isTrue();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while open Schedule")
+    public void open_exception_test() {
+        doThrow(new RuntimeException()).when(commonRepository).updateFieldById(any(), any(Map.class), any());
+        assertThatThrownBy(() -> scheduleService.open(ID,true))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(EDIT_SCHEDULE_ERROR.getCode());
+    }
+
 
     @ParameterizedTest
     @DisplayName("Test the handle method in the Schedule service")

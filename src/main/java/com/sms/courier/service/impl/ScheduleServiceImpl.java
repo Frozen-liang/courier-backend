@@ -15,6 +15,7 @@ import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_LIST_ERROR
 import static com.sms.courier.common.exception.ErrorCode.SYSTEM_ERROR;
 import static com.sms.courier.common.field.CommonField.ID;
 import static com.sms.courier.common.field.CommonField.REMOVE;
+import static com.sms.courier.common.field.ScheduleField.OPEN;
 import static com.sms.courier.common.field.ScheduleField.SCHEDULE_STATUS;
 import static com.sms.courier.common.field.ScheduleField.TASK_STATUS;
 
@@ -117,7 +118,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             log.error(e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("Failed to add Schedule.", e);
+            log.error("Failed to edit Schedule.", e);
             throw ExceptionUtils.mpe(EDIT_SCHEDULE_ERROR);
         }
         return Boolean.TRUE;
@@ -179,6 +180,22 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new ApiTestPlatformException(SYSTEM_ERROR);
         }
     }
+
+    @Override
+    @LogRecord(operationType = EDIT, operationModule = SCHEDULE,
+        template = "{{#result.name}}", enhance = @Enhance(enable = true))
+    public Boolean open(String id, boolean enable) {
+        try {
+            Map<Field, Object> updateFields = new HashMap<>();
+            updateFields.put(OPEN, enable);
+            updateFields.put(SCHEDULE_STATUS, UPDATE);
+            return commonRepository.updateFieldById(id, updateFields, ScheduleEntity.class);
+        } catch (Exception e) {
+            log.error("Failed to update Schedule status.", e);
+            throw ExceptionUtils.mpe(EDIT_SCHEDULE_ERROR);
+        }
+    }
+
 
     private boolean checkScheduleTime(ScheduleEntity oldSchedule, ScheduleEntity newSchedule) {
         if (oldSchedule.isLoop() != newSchedule.isLoop()) {

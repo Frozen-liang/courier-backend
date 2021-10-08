@@ -4,6 +4,7 @@ public enum ScheduleField implements Field {
 
     SCHEDULE_STATUS("scheduleStatus"),
     LAST_TASK_COMPLETE_TIME("lastTaskCompleteTime"),
+    OPEN("isOpen"),
     TASK_STATUS("taskStatus");
 
     private final String name;

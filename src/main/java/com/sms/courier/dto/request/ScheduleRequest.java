@@ -33,6 +33,8 @@ public class ScheduleRequest {
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId must not be empty.")
     private String projectId;
 
+    private String workspaceId;
+
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The name must not be empty.")
     private String name;
 
@@ -55,8 +57,8 @@ public class ScheduleRequest {
 
     private List<String> caseIds;
 
-    @NotNull
-    @Size(min = 1)
+    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The time must not be null.")
+    @Size(min = 1, groups = {InsertGroup.class, UpdateGroup.class}, message = "The time must not be empty.")
     private List<String> time;
 
     private List<Integer> week;
