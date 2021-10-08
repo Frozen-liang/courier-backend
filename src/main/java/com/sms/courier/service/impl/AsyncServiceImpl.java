@@ -50,6 +50,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
 
+    private static final int DEPTH = 1;
     private final DefaultIdentifierGenerator identifierGenerator = DefaultIdentifierGenerator.getSharedInstance();
     private final ApiRepository apiRepository;
     private final ApiHistoryRepository apiHistoryRepository;
@@ -175,8 +176,8 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
     private Map<String, String> updateGroupIfNeed(String projectId, Set<ApiGroupEntity> apiGroupEntities,
         List<ApiGroupEntity> incrementApiGroup) {
         // Get all old group by project id.
-        List<ApiGroupEntity> oldGroupEntities =
-            apiGroupRepository.findApiGroupEntitiesByProjectId(projectId);
+        Set<ApiGroupEntity> oldGroupEntities =
+            apiGroupRepository.findByProjectIdAndDepth(projectId, DEPTH);
         Collection<ApiGroupEntity> unsavedGroupEntities = CollectionUtils
             .subtract(apiGroupEntities, oldGroupEntities);
         unsavedGroupEntities.forEach((entity) -> {

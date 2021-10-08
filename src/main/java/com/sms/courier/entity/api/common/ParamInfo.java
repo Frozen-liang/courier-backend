@@ -38,8 +38,7 @@ public class ParamInfo {
      * 是否必填.
      */
     @Field("isRequired")
-    @Default
-    private Boolean required = false;
+    private Boolean required;
     /**
      * 是否提取.
      */

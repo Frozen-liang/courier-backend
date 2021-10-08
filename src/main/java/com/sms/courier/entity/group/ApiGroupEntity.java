@@ -36,6 +36,7 @@ public class ApiGroupEntity extends BaseEntity {
     @Default
     @EqualsAndHashCode.Exclude
     private List<Long> path = new ArrayList<>();
+
     @Field(targetType = FieldType.OBJECT_ID)
     private String parentId;
     @Default
