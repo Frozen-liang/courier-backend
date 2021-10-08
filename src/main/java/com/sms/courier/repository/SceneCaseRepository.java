@@ -12,5 +12,9 @@ public interface SceneCaseRepository extends MongoRepository<SceneCaseEntity, St
 
     List<SceneCaseEntity> findByTagIdInAndPriorityIn(List<String> tag, List<Integer> priority);
 
+    List<SceneCaseEntity> findByTagIdIn(List<String> tag);
+
+    List<SceneCaseEntity> findByPriorityIn(List<Integer> priority);
+
     List<SceneCaseEntity> findByIdIn(List<String> caseIds);
 }

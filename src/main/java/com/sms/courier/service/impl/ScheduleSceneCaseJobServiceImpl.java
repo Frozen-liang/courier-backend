@@ -50,6 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service(Constants.SCHEDULE_SCENE_CASE_SERVICE)
@@ -136,6 +137,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
     }
 
     @Override
+    @Async
     public void schedule(ScheduleEntity scheduleEntity) {
         try {
             CaseFilter caseFilter = scheduleEntity.getCaseFilter();
@@ -202,8 +204,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
                 sceneCaseEntities = sceneCaseRepository.findByRemovedIsFalse();
                 break;
             case PRIORITY_AND_TAG:
-                sceneCaseEntities = sceneCaseRepository.findByTagIdInAndPriorityIn(caseCondition.getTag(),
-                    caseCondition.getPriority());
+                sceneCaseEntities = findByTagIdInAndPriorityIn(caseCondition.getTag(), caseCondition.getPriority());
                 break;
             case CUSTOM:
                 sceneCaseEntities = sceneCaseRepository.findByIdIn(caseIds);
@@ -212,6 +213,19 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
                 sceneCaseEntities = Collections.emptyList();
         }
         return sceneCaseEntities;
+    }
+
+    private List<SceneCaseEntity> findByTagIdInAndPriorityIn(List<String> tag, List<Integer> priority) {
+        if (CollectionUtils.isNotEmpty(tag) && CollectionUtils.isNotEmpty(priority)) {
+            return sceneCaseRepository.findByTagIdInAndPriorityIn(tag, priority);
+        }
+        if (CollectionUtils.isNotEmpty(tag)) {
+            return sceneCaseRepository.findByTagIdIn(tag);
+        }
+        if (CollectionUtils.isNotEmpty(priority)) {
+            return sceneCaseRepository.findByPriorityIn(priority);
+        }
+        return Collections.emptyList();
     }
 
     private List<JobSceneCaseApi> getApiCaseList(String sceneCaseId) {

@@ -79,7 +79,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     public List<ScheduleResponse> list(ScheduleListRequest request) {
         try {
             return commonRepository.listLookupUser(CollectionName.SCHEDULE.getName(),
-                List.of(REMOVE.is(true)),
+                List.of(REMOVE.is(false)),
                 ScheduleResponse.class);
         } catch (Exception e) {
             log.error("Failed to get Schedule list.");

@@ -30,7 +30,7 @@ public class ScheduleRequest {
 
     private String groupId;
 
-    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The name must not be empty.")
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId must not be empty.")
     private String projectId;
 
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The name must not be empty.")
