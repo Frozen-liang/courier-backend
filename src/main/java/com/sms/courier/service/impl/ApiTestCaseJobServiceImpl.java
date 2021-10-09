@@ -43,6 +43,7 @@ import com.sms.courier.service.ApiTestCaseService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -244,6 +245,7 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
     }
 
     @Override
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public void saveJobReport(JobReport jobReport, JobEntity job) {
         ApiTestCaseJobEntity apiTestCaseJob = (ApiTestCaseJobEntity) job;
         try {

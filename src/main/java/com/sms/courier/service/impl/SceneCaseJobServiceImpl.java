@@ -44,6 +44,7 @@ import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.SceneCaseJobService;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -275,6 +276,7 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
 
 
     @Override
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public void saveJobReport(JobReport jobReport, JobEntity job) {
         SceneCaseJobEntity sceneCaseJobEntity = (SceneCaseJobEntity) job;
         try {

@@ -39,6 +39,7 @@ import com.sms.courier.repository.ScheduleRecordRepository;
 import com.sms.courier.repository.ScheduleSceneCaseJobRepository;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.ScheduleSceneCaseJobService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,6 +84,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
     }
 
     @Override
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public void saveJobReport(JobReport jobReport, JobEntity job) {
         try {
             ScheduleSceneCaseJobEntity scheduleCaseJob = (ScheduleSceneCaseJobEntity) job;
