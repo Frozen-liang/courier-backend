@@ -245,8 +245,8 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
 
     @Override
     public void saveJobReport(JobReport jobReport, JobEntity job) {
+        ApiTestCaseJobEntity apiTestCaseJob = (ApiTestCaseJobEntity) job;
         try {
-            ApiTestCaseJobEntity apiTestCaseJob = (ApiTestCaseJobEntity) job;
             ApiTestCaseJobReport apiTestCaseJobReport = (ApiTestCaseJobReport) jobReport;
             setJobReport(apiTestCaseJobReport, apiTestCaseJob);
             CaseReport caseReport = apiTestCaseJobReport.getCaseReport();
@@ -267,6 +267,8 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
                     jobMapper.toApiTestCaseJobReportResponse(apiTestCaseJobReport));
         } catch (Exception e) {
             log.error("Save case job error!", e);
+            caseDispatcherService
+                .sendCaseErrorMessage(apiTestCaseJob.getCreateUserId(), "Save case report error!");
         }
     }
 

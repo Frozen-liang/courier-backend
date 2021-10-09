@@ -1,6 +1,7 @@
 package com.sms.courier.dto.request;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sms.courier.common.enums.CaseFilter;
 import com.sms.courier.common.enums.CaseType;
 import com.sms.courier.common.enums.CycleType;
@@ -43,6 +44,7 @@ public class ScheduleRequest {
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The envId must not be empty.")
     private String envId;
 
+    @JsonProperty("isLoop")
     private boolean loop;
 
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The cycle must not be null.")

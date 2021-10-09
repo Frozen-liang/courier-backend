@@ -276,9 +276,9 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
 
     @Override
     public void saveJobReport(JobReport jobReport, JobEntity job) {
+        SceneCaseJobEntity sceneCaseJobEntity = (SceneCaseJobEntity) job;
         try {
             SceneCaseJobReport sceneCaseJobReport = (SceneCaseJobReport) jobReport;
-            SceneCaseJobEntity sceneCaseJobEntity = (SceneCaseJobEntity) job;
             setJobReport(sceneCaseJobReport, sceneCaseJobEntity);
             repository.save(sceneCaseJobEntity);
             caseDispatcherService
@@ -286,6 +286,8 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
                     jobMapper.toSceneCaseJobReportResponse(sceneCaseJobReport));
         } catch (Exception e) {
             log.error("Save scene case job error!", e);
+            caseDispatcherService
+                .sendSceneCaseErrorMessage(sceneCaseJobEntity.getCreateUserId(), "Save scene case report error!");
         }
     }
 }

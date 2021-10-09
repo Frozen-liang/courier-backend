@@ -8,13 +8,14 @@ public interface SceneCaseRepository extends MongoRepository<SceneCaseEntity, St
 
     Long deleteAllByIdIsIn(List<String> ids);
 
-    List<SceneCaseEntity> findByRemovedIsFalse();
+    List<SceneCaseEntity> findByProjectIdAndRemovedIsFalse(String projectId);
 
-    List<SceneCaseEntity> findByTagIdInAndPriorityIn(List<String> tag, List<Integer> priority);
+    List<SceneCaseEntity> findByProjectIdAndTagIdInAndPriorityIn(String projectId, List<String> tag,
+        List<Integer> priority);
 
-    List<SceneCaseEntity> findByTagIdIn(List<String> tag);
+    List<SceneCaseEntity> findByProjectIdAndTagIdIn(String projectId, List<String> tag);
 
-    List<SceneCaseEntity> findByPriorityIn(List<Integer> priority);
+    List<SceneCaseEntity> findByProjectIdAndPriorityIn(String projectId, List<Integer> priority);
 
     List<SceneCaseEntity> findByIdIn(List<String> caseIds);
 }

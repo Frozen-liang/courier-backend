@@ -129,8 +129,8 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
     public void schedule(ScheduleEntity scheduleEntity) {
         try {
             CaseFilter caseFilter = scheduleEntity.getCaseFilter();
-            List<ApiTestCaseEntity> apiTestCaseEntities = getApiTestCaseEntity(caseFilter,
-                scheduleEntity.getCaseCondition(), scheduleEntity.getCaseIds());
+            List<ApiTestCaseEntity> apiTestCaseEntities = getApiTestCaseEntity(scheduleEntity.getProjectId(),
+                caseFilter, scheduleEntity.getCaseCondition(), scheduleEntity.getCaseIds());
             final JobEnvironment jobEnv = getJobEnv(scheduleEntity.getEnvId());
             ScheduleRecordEntity scheduleRecordEntity = createScheduleRecord(scheduleEntity);
             List<ScheduleCaseJobEntity> scheduleCaseJobEntities = new ArrayList<>();
@@ -195,15 +195,17 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
     }
 
 
-    private List<ApiTestCaseEntity> getApiTestCaseEntity(CaseFilter caseFilter, CaseCondition caseCondition,
+    private List<ApiTestCaseEntity> getApiTestCaseEntity(String projectId, CaseFilter caseFilter,
+        CaseCondition caseCondition,
         List<String> caseIds) {
         List<ApiTestCaseEntity> apiTestCaseEntities;
         switch (caseFilter) {
             case ALL:
-                apiTestCaseEntities = apiTestCaseRepository.findByRemovedIsFalse();
+                apiTestCaseEntities = apiTestCaseRepository.findByProjectIdIsAndRemovedIsFalse(projectId);
                 break;
             case PRIORITY_AND_TAG:
-                apiTestCaseEntities = apiTestCaseRepository.findByTagIdIn(caseCondition.getTag());
+                apiTestCaseEntities = apiTestCaseRepository
+                    .findByTagIdInAndProjectId(caseCondition.getTag(), projectId);
                 break;
             case CUSTOM:
                 apiTestCaseEntities = apiTestCaseRepository.findByIdIn(caseIds);

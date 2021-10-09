@@ -141,7 +141,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
     public void schedule(ScheduleEntity scheduleEntity) {
         try {
             CaseFilter caseFilter = scheduleEntity.getCaseFilter();
-            List<SceneCaseEntity> sceneCaseEntities = getSceneCaseEntity(caseFilter,
+            List<SceneCaseEntity> sceneCaseEntities = getSceneCaseEntity(scheduleEntity.getProjectId(), caseFilter,
                 scheduleEntity.getCaseCondition(), scheduleEntity.getCaseIds());
             JobEnvironment jobEnv = getJobEnv(scheduleEntity.getEnvId());
             ScheduleRecordEntity scheduleRecordEntity = createScheduleRecord(scheduleEntity);
@@ -196,15 +196,16 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
 
     }
 
-    private List<SceneCaseEntity> getSceneCaseEntity(CaseFilter caseFilter, CaseCondition caseCondition,
-        List<String> caseIds) {
+    private List<SceneCaseEntity> getSceneCaseEntity(String projectId, CaseFilter caseFilter,
+        CaseCondition caseCondition, List<String> caseIds) {
         List<SceneCaseEntity> sceneCaseEntities;
         switch (caseFilter) {
             case ALL:
-                sceneCaseEntities = sceneCaseRepository.findByRemovedIsFalse();
+                sceneCaseEntities = sceneCaseRepository.findByProjectIdAndRemovedIsFalse(projectId);
                 break;
             case PRIORITY_AND_TAG:
-                sceneCaseEntities = findByTagIdInAndPriorityIn(caseCondition.getTag(), caseCondition.getPriority());
+                sceneCaseEntities = findByTagIdInAndPriorityIn(projectId, caseCondition.getTag(),
+                    caseCondition.getPriority());
                 break;
             case CUSTOM:
                 sceneCaseEntities = sceneCaseRepository.findByIdIn(caseIds);
@@ -215,15 +216,16 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
         return sceneCaseEntities;
     }
 
-    private List<SceneCaseEntity> findByTagIdInAndPriorityIn(List<String> tag, List<Integer> priority) {
+    private List<SceneCaseEntity> findByTagIdInAndPriorityIn(String projectId, List<String> tag,
+        List<Integer> priority) {
         if (CollectionUtils.isNotEmpty(tag) && CollectionUtils.isNotEmpty(priority)) {
-            return sceneCaseRepository.findByTagIdInAndPriorityIn(tag, priority);
+            return sceneCaseRepository.findByProjectIdAndTagIdInAndPriorityIn(projectId, tag, priority);
         }
         if (CollectionUtils.isNotEmpty(tag)) {
-            return sceneCaseRepository.findByTagIdIn(tag);
+            return sceneCaseRepository.findByProjectIdAndTagIdIn(projectId, tag);
         }
         if (CollectionUtils.isNotEmpty(priority)) {
-            return sceneCaseRepository.findByPriorityIn(priority);
+            return sceneCaseRepository.findByProjectIdAndPriorityIn(projectId, priority);
         }
         return Collections.emptyList();
     }

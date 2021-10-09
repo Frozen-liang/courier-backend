@@ -5,6 +5,7 @@ import static com.sms.courier.common.constant.TimePatternConstant.DEFAULT_PATTER
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.sms.courier.common.enums.TaskStatus;
 import com.sms.courier.entity.schedule.CaseCondition;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,6 +52,8 @@ public class ScheduleResponse extends BaseResponse {
     private List<String> caseIds;
 
     private Integer noticeType;
+
+    private TaskStatus taskStatus;
 
     @JsonFormat(pattern = DEFAULT_PATTERN)
     private LocalDateTime lastTaskCompleteTime;

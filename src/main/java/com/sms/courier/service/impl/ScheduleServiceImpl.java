@@ -117,6 +117,8 @@ public class ScheduleServiceImpl implements ScheduleService {
             if (checkScheduleTime(oldSchedule, schedule)) {
                 schedule.setScheduleStatus(UPDATE);
             }
+            schedule.setLastTaskCompleteTime(oldSchedule.getLastTaskCompleteTime());
+            schedule.setTaskStatus(oldSchedule.getTaskStatus());
             scheduleRepository.save(schedule);
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
