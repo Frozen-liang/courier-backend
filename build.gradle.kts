@@ -11,7 +11,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 
 group = "com.sms.courier"
-version = "1.0.3-SNAPSHOT"
+version = "1.0.3"
 description = "courier-backend"
 
 
@@ -94,7 +94,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-websocket") {
         exclude(module = "spring-boot-starter-tomcat")
     }
-    implementation("net.java.dev.jna:jna:5.5.0")
+    implementation("net.java.dev.jna:jna:5.9.0")
     compileOnly("org.projectlombok:lombok:$versionLombok")
     annotationProcessor("org.mapstruct:mapstruct-processor:$versionMapstruct")
     annotationProcessor("org.projectlombok:lombok:$versionLombok")
