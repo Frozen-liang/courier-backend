@@ -5,6 +5,7 @@ import static com.sms.courier.common.field.ApiField.API_NAME;
 import static com.sms.courier.common.field.ApiField.API_PATH;
 import static com.sms.courier.common.field.ApiField.API_PROTOCOL;
 import static com.sms.courier.common.field.ApiField.API_STATUS;
+import static com.sms.courier.common.field.ApiField.CASE_COUNT;
 import static com.sms.courier.common.field.ApiField.GROUP_ID;
 import static com.sms.courier.common.field.ApiField.REQUEST_METHOD;
 import static com.sms.courier.common.field.ApiField.SCENE_CASE_COUNT;
@@ -192,6 +193,15 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         PROJECT_ID.is(projectId).ifPresent(query::addCriteria);
         REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
         SCENE_CASE_COUNT.gt(0).ifPresent(query::addCriteria);
+        return mongoTemplate.count(query, "Api");
+    }
+
+    @Override
+    public Long caseCount(ObjectId projectId) {
+        Query query = new Query();
+        PROJECT_ID.is(projectId).ifPresent(query::addCriteria);
+        REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
+        CASE_COUNT.gt(0).ifPresent(query::addCriteria);
         return mongoTemplate.count(query, "Api");
     }
 
