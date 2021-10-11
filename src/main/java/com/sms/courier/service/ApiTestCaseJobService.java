@@ -6,14 +6,11 @@ import com.sms.courier.dto.request.ApiTestRequest;
 import com.sms.courier.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.courier.dto.response.ApiTestCaseJobResponse;
 import com.sms.courier.entity.job.ApiTestCaseJobReport;
-import com.sms.courier.entity.job.common.RunningJobAck;
 import com.sms.courier.security.pojo.CustomUser;
 import java.util.List;
 import org.springframework.data.domain.Page;
 
-public interface ApiTestCaseJobService {
-
-    void handleJobReport(ApiTestCaseJobReport apiTestCaseJobReport);
+public interface ApiTestCaseJobService extends JobService {
 
     void runJob(ApiTestCaseJobRunRequest apiTestCaseJobRunRequest, CustomUser currentUser);
 
@@ -23,13 +20,9 @@ public interface ApiTestCaseJobService {
 
     void apiTest(ApiTestRequest apiTestRequest, CustomUser currentUser);
 
-    void reallocateJob(List<String> engineIds);
-
     ApiTestCaseJobResponse buildJob(ApiTestRequest request);
 
     List<ApiTestCaseJobResponse> buildJob(ApiTestCaseJobRunRequest apiTestCaseJobRunRequest);
 
     Boolean insertJobReport(ApiTestCaseJobReport jobReport);
-
-    void runningJobAck(RunningJobAck runningJobAck);
 }

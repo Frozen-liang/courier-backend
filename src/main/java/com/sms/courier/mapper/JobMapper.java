@@ -13,12 +13,15 @@ import com.sms.courier.dto.response.SceneCaseJobResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.apitestcase.TestResult;
 import com.sms.courier.entity.datacollection.TestData;
+import com.sms.courier.entity.env.GlobalEnvironmentEntity;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobReport;
 import com.sms.courier.entity.job.JobSceneCaseApi;
 import com.sms.courier.entity.job.SceneCaseJobEntity;
 import com.sms.courier.entity.job.SceneCaseJobReport;
+import com.sms.courier.entity.job.ScheduleCaseJobEntity;
+import com.sms.courier.entity.job.ScheduleSceneCaseJobEntity;
 import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.JobDataCollection;
@@ -39,6 +42,8 @@ import org.mapstruct.ReportingPolicy;
 public interface JobMapper {
 
     JobEnvironment toJobEnvironment(ProjectEnvironmentEntity projectEnvironment);
+
+    JobEnvironment toJobEnvironment(GlobalEnvironmentEntity globalEnvironmentEntity);
 
     @Mapping(target = "jobApi", source = "apiEntity")
     JobApiTestCase toJobApiTestCase(ApiTestCaseEntity apiTestCaseEntity);
@@ -82,7 +87,11 @@ public interface JobMapper {
 
     TestData toTestDataEntity(TestDataRequest testDataRequest);
 
-    ApiTestCaseJobResponse toApiTestCaseJobResponse(ApiTestCaseJobEntity apiTestCaseJob);
+    @Mapping(target = "jobType", expression = "java(com.sms.courier.common.enums.JobType.CASE)")
+    ApiTestCaseJobResponse toApiTestCaseJobResponse(ApiTestCaseJobEntity caseJobEntity);
+
+    @Mapping(target = "jobType", expression = "java(com.sms.courier.common.enums.JobType.SCHEDULE_CATE)")
+    ApiTestCaseJobResponse toScheduleCaseJobResponse(ScheduleCaseJobEntity caseJobEntity);
 
     @Mapping(target = "testDateTime", source = "createDateTime", dateFormat = DEFAULT_PATTERN)
     @Mapping(target = "testUser", source = "createUserName")
@@ -99,7 +108,11 @@ public interface JobMapper {
     @Mapping(target = "jobApiTestCase", source = "apiTestCase")
     JobSceneCaseApi toJobSceneCaseApiByTemplate(CaseTemplateApiEntity caseTemplateApiList);
 
+    @Mapping(target = "jobType", expression = "java(com.sms.courier.common.enums.JobType.SCENE_CASE)")
     SceneCaseJobResponse toSceneCaseJobResponse(SceneCaseJobEntity sceneCaseJob);
+
+    @Mapping(target = "jobType", expression = "java(com.sms.courier.common.enums.JobType.SCHEDULER_SCENE_CASE)")
+    SceneCaseJobResponse toScheduleSceneCaseJobResponse(ScheduleSceneCaseJobEntity sceneCaseJob);
 
     ApiTestCaseJobReportResponse toApiTestCaseJobReportResponse(ApiTestCaseJobReport caseJobReport);
 
@@ -108,4 +121,5 @@ public interface JobMapper {
     TestResult toTestResult(CaseReport caseReport);
 
     List<SceneCaseJobResponse> toSceneCaseJobResponseList(List<SceneCaseJobEntity> jobEntityList);
+
 }

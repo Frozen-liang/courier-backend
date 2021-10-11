@@ -5,8 +5,7 @@ import static com.sms.courier.common.constant.TimePatternConstant.DEFAULT_PATTER
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.sms.courier.common.enums.CycleType;
-import com.sms.courier.common.enums.NoticeType;
+import com.sms.courier.common.enums.TaskStatus;
 import com.sms.courier.entity.schedule.CaseCondition;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,6 +14,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @ToString(callSuper = true)
@@ -32,9 +32,14 @@ public class ScheduleResponse extends BaseResponse {
     private String envId;
 
     @JsonProperty("isLoop")
+    @Field("isLoop")
     private boolean loop;
 
-    private CycleType cycle;
+    @JsonProperty("isOpen")
+    @Field("isOpen")
+    private boolean open;
+
+    private Integer cycle;
 
     private List<String> time;
 
@@ -44,7 +49,11 @@ public class ScheduleResponse extends BaseResponse {
 
     private CaseCondition caseCondition;
 
-    private NoticeType noticeType;
+    private List<String> caseIds;
+
+    private Integer noticeType;
+
+    private TaskStatus taskStatus;
 
     @JsonFormat(pattern = DEFAULT_PATTERN)
     private LocalDateTime lastTaskCompleteTime;
@@ -52,6 +61,7 @@ public class ScheduleResponse extends BaseResponse {
     private List<String> userIds;
 
     @JsonProperty("isDisplayError")
+    @Field("isDisplayError")
     private boolean displayError;
 
 }

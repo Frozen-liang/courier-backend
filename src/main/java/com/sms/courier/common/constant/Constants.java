@@ -44,10 +44,16 @@ public class Constants {
     public static final String EMAIL_SERVICE_PATH = SDK_VERSION + "/email-service";
     public static final String LOGIN_SETTING_PATH = SDK_VERSION + "/login-setting";
     public static final String CHECK_HEALTH = SDK_VERSION + "/check-health";
+    public static final String SCHEDULE_RECORD_PATH = SDK_VERSION + "/schedule-record";
+    public static final String SCHEDULE_JOB_PATH = SDK_VERSION + "/schedule-job";
     public static final String SCHEDULE_GROUP_PATH = SDK_VERSION + "/schedule-group";
 
     public static final int MAX_DEPTH = 3;
     public static final String HTTP_DEFAULT_STATUS_CODE = "200";
     public static final Integer CASE_DAY = 7;
+    public static final String CASE_SERVICE = "apiTestCaseJobService";
+    public static final String SCHEDULE_CASE_SERVICE = "scheduleCaseJobService";
+    public static final String SCENE_CASE_SERVICE = "sceneCaseJobService";
+    public static final String SCHEDULE_SCENE_CASE_SERVICE = "scheduleSceneCaseJobService";
 
 }

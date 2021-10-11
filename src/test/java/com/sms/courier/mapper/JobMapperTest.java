@@ -128,12 +128,6 @@ class JobMapperTest {
 
     @Test
     @DisplayName("Test the method to convert the apiTestCaseJob object to a apiTestCaseJobPageResponse object")
-    void toTestDataEntityIsNull_Test(){
-        assertThat(jobMapper.toApiTestCaseJobResponse(null)).isNull();
-    }
-
-    @Test
-    @DisplayName("Test the method to convert the apiTestCaseJob object to a apiTestCaseJobPageResponse object")
     void toJobApiTestCaseIsNull_Test(){
         ApiTestRequest apiTestRequest=null;
         JobApiTestCase dot=jobMapper.toJobApiTestCase(apiTestRequest);
@@ -201,12 +195,7 @@ class JobMapperTest {
         assertThat(dot).isNotNull();
     }
 
-    @Test
-    @DisplayName("Test the method to convert the apiTestCaseJob object to a apiTestCaseJobPageResponse object")
-    void toSceneCaseJobResponse_isNull_Test(){
-        SceneCaseJobResponse dot=jobMapper.toSceneCaseJobResponse(null);
-        assertThat(dot).isNull();
-    }
+
 
     @Test
     @DisplayName("Test the method to convert the apiTestCaseJob object to a apiTestCaseJobPageResponse object")

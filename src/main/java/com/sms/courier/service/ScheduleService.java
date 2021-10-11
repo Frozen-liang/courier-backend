@@ -20,4 +20,8 @@ public interface ScheduleService {
     Boolean delete(List<String> ids);
 
     void deleteByGroupId(String groupId);
+
+    Boolean handle(String id);
+
+    Boolean open(String id, boolean enable);
 }

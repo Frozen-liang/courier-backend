@@ -31,6 +31,7 @@ import com.sms.courier.entity.job.SceneCaseJobReport;
 import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.JobDataCollection;
+import com.sms.courier.entity.job.common.RunningJobAck;
 import com.sms.courier.entity.scenetest.CaseTemplateApiConn;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
@@ -327,6 +328,17 @@ class SceneCaseJobServiceTest {
         SceneCaseJobReport sceneCaseJobReport = getReport();
         Boolean isSuccess = sceneCaseJobService.editReport(sceneCaseJobReport);
         assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the runningJobAck method in the SceneCaseJob service")
+    public void runningJobAck_test() {
+        when(commonRepository.updateFieldById(anyString(), any(), any())).thenReturn(true);
+        RunningJobAck runningJobAck = new RunningJobAck();
+        runningJobAck.setDestination(ENGINE_ID);
+        runningJobAck.setJobId(ObjectId.get().toString());
+        sceneCaseJobService.runningJobAck(runningJobAck);
+        verify(commonRepository, times(1)).updateFieldById(anyString(), any(), any());
     }
 
     private AddSceneCaseJobRequest getAddRequest() {

@@ -54,10 +54,12 @@ public class SpelUtils {
     public static String getProjectId(EvaluationContext context, LogRecord logRecord, Method method, Object[] args) {
         try {
             Objects.requireNonNull(logRecord.refId());
+            // 如果是删除操作 则从result获取projectId或workspaceId
             if (OPERATION_TYPES.contains(logRecord.operationType())) {
                 isTrue(logRecord.enhance().enable(), "The enhance enable is false.");
                 return getProjectByResult(context, logRecord);
             }
+            // 从请求参数中获取projectId或workspaceId
             return getProjectIdByParams(context, logRecord, method, args);
         } catch (Exception e) {
             log.error("Parse expression:{} error,methodName:{}, message :{}", logRecord.refId(), method,
@@ -127,11 +129,13 @@ public class SpelUtils {
         }
     }
 
+    // 创建对象表达式
     private static String createObjectExpression(String prefixName, String name) {
         // PREFIX + SYMBOL + prefixName + DOT + name + SUFFIX;
         return String.join("", PREFIX, SYMBOL, prefixName, DOT, name, SUFFIX);
     }
 
+    // 创建集合表达式
     private static String createListExpression(String prefixName, String name) {
         // PREFIX + SYMBOL + prefixName + "[0]" + DOT + name + SUFFIX
         return String.join("", PREFIX, SYMBOL, prefixName, "[0]", DOT, name, SUFFIX);

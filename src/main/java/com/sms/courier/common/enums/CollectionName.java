@@ -11,6 +11,7 @@ public enum CollectionName {
     SCENE_CASE_GROUP("SceneCaseGroup"),
     SCHEDULE("Schedule"),
     USER_GROUP("UserGroup"),
+    DATA_STRUCTURE("DataStructure"),
     WORKSPACE("Workspace");
 
     private final String name;

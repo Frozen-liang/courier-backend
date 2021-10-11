@@ -1,6 +1,5 @@
 package com.sms.courier;
 
-import com.sms.courier.utils.IgnoreMongoCheck;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration;
@@ -15,11 +14,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAsync
 @EnableScheduling
 public class CourierBackendApplication {
-
-    static {
-        // Temporarily fix MongoDB check $ /. Problem
-        IgnoreMongoCheck.run();
-    }
 
     public static void main(String[] args) {
         SpringApplication.run(CourierBackendApplication.class, args);

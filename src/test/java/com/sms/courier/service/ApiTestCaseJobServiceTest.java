@@ -31,6 +31,7 @@ import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobReport;
 import com.sms.courier.entity.job.JobCaseApi;
 import com.sms.courier.entity.job.common.JobApiTestCase;
+import com.sms.courier.entity.job.common.RunningJobAck;
 import com.sms.courier.mapper.JobMapper;
 import com.sms.courier.mapper.JobMapperImpl;
 import com.sms.courier.mapper.MatchParamInfoMapperImpl;
@@ -326,5 +327,16 @@ class ApiTestCaseJobServiceTest {
             .insertJobReport(ApiTestCaseJobReport.builder().jobId(ObjectId.get().toString()).build());
         verify(apiTestCaseJobRepository, times(1)).save(any(ApiTestCaseJobEntity.class));
         assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test the runningJobAck method in the ApiTestCaseJob service")
+    public void runningJobAck_test() {
+        when(commonRepository.updateFieldById(anyString(), any(), any())).thenReturn(true);
+        RunningJobAck runningJobAck = new RunningJobAck();
+        runningJobAck.setDestination(ENGINE_ID);
+        runningJobAck.setJobId(ObjectId.get().toString());
+        apiTestCaseJobService.runningJobAck(runningJobAck);
+        verify(commonRepository, times(1)).updateFieldById(anyString(), any(), any());
     }
 }

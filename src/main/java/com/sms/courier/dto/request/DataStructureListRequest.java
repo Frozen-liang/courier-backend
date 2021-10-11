@@ -1,15 +1,18 @@
 package com.sms.courier.dto.request;
 
+import com.sms.courier.dto.PageDto;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DataStructureListRequest {
+@EqualsAndHashCode(callSuper = true)
+public class DataStructureListRequest extends PageDto {
 
     private String id;
 

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 
 @Data
 @NoArgsConstructor
@@ -12,9 +13,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ScheduleListRequest {
 
-    private String projectId;
+    private ObjectId projectId;
 
-    private String groupId;
+    private ObjectId groupId;
 
     private String name;
 }

@@ -3,6 +3,7 @@ package com.sms.courier.repository;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.UpdateRequest;
+import com.sms.courier.entity.mongo.CustomQuery;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
 import java.util.List;
@@ -27,6 +28,8 @@ public interface CommonRepository {
 
     <T> Optional<T> findById(String id, String collectionName, List<LookupVo> lookupVo, Class<T> responseClass);
 
+    <T> Optional<T> findById(String id, Class<T> entityClass);
+
     <T> List<T> listLookupUser(String collectionName, List<Optional<Criteria>> criteriaList, Class<T> responseClass);
 
     <T> List<T> list(QueryVo queryVo, Class<T> responseClass);
@@ -36,7 +39,11 @@ public interface CommonRepository {
 
     <T> List<T> list(Query query, Class<T> entityClass);
 
+    // 联表分页查询
     <T> Page<T> page(QueryVo queryVo, PageDto pageRequest, Class<T> responseClass);
+
+    // 不联表分页查询
+    <T> Page<T> page(CustomQuery customQuery, PageDto pageRequest, Class<T> entityClass);
 
     Boolean deleteFieldById(String id, String fieldName, Class<?> entityClass);
 

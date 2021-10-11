@@ -8,7 +8,6 @@ import com.sms.courier.dto.request.ScheduleListRequest;
 import com.sms.courier.dto.request.ScheduleRequest;
 import com.sms.courier.dto.response.ScheduleResponse;
 import com.sms.courier.service.ScheduleService;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -55,6 +54,12 @@ public class ScheduleController {
         return scheduleService.edit(request);
     }
 
+    @PutMapping("/enable")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCHEDULE_CRE_UPD_DEL)")
+    public Boolean open(String id, boolean enable) {
+        return scheduleService.open(id, enable);
+    }
+
     @DeleteMapping("{ids}")
     @PreAuthorize("hasRoleOrAdmin(@role.SCHEDULE_CRE_UPD_DEL)")
     public Boolean delete(@PathVariable("ids") List<String> ids) {
@@ -62,10 +67,8 @@ public class ScheduleController {
     }
 
     @PostMapping("/handle")
-    public Boolean run(String id) {
-        // TODO handle schedule
-        System.out.println("now:" + LocalDateTime.now() + ",id:" + id);
-        return true;
+    public Boolean handle(String id) {
+        return scheduleService.handle(id);
     }
 
 }
