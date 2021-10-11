@@ -105,7 +105,6 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("commons-io:commons-io:2.8.0")
     implementation("org.apache.commons:commons-collections4:4.4")
-    implementation("com.alibaba:fastjson:1.2.76")
     implementation("io.vavr:vavr:0.10.4")
     implementation("org.codehaus.groovy:groovy:3.0.8")
     compileOnly("com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}")

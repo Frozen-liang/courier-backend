@@ -5,20 +5,19 @@ import static com.sms.courier.initialize.constant.Initializer.PREFIX;
 import static com.sms.courier.initialize.constant.Initializer.SUCCESS;
 import static com.sms.courier.initialize.constant.Initializer.SUFFIX;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.courier.entity.system.SystemVersionEntity;
 import com.sms.courier.initialize.DataInitializer;
 import com.sms.courier.initialize.constant.Order;
+import com.sms.courier.initialize.enums.JsonType;
 import com.sms.courier.repository.SystemVersionRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
@@ -35,6 +34,7 @@ public class DataInitializerImpl implements DataInitializer {
     public void init(ApplicationContext applicationContext) {
         BuildProperties buildProperties = applicationContext.getBean(BuildProperties.class);
         SystemVersionRepository systemVersionRepository = applicationContext.getBean(SystemVersionRepository.class);
+        ObjectMapper objectMapper = applicationContext.getBean(ObjectMapper.class);
         MongoTemplate mongoTemplate = applicationContext.getBean(MongoTemplate.class);
         try {
             LocalDateTime buildTime = LocalDateTime.ofInstant(buildProperties.getTime(), ZoneId.systemDefault());
@@ -62,11 +62,10 @@ public class DataInitializerImpl implements DataInitializer {
                 for (Resource resource : resources) {
                     String filename = resource.getFilename();
                     InputStream inputStream = resource.getInputStream();
-                    String className = filename.substring(filename.indexOf("-") + 1, filename.lastIndexOf("."));
-                    Class<?> entityClass = Class.forName(className);
-                    List<?> list = JSON
-                        .parseArray(IOUtils.toString(inputStream, StandardCharsets.UTF_8), entityClass);
-                    mongoTemplate.insert(list, entityClass);
+                    String entityName = filename.substring(filename.indexOf("-") + 1, filename.lastIndexOf("."));
+                    JsonType jsonType = JsonType.valueOf(entityName);
+                    List<?> list = (List<?>) objectMapper.readValue(inputStream, jsonType.getTypeReference());
+                    mongoTemplate.insert(list, jsonType.getEntityClass());
                     log.info("Initialize {} success.", filename);
                 }
                 systemVersion.setInitialized(true);

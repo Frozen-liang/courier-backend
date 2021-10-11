@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.courier.entity.system.SystemVersionEntity;
 import com.sms.courier.repository.SystemVersionRepository;
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class DataInitializerImplTest {
     private final SystemVersionRepository systemVersionRepository = mock(SystemVersionRepository.class);
     private final BuildProperties buildProperties = mock(BuildProperties.class);
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final Instant instant = Instant.now();
     private final SystemVersionEntity systemVersionEntity = SystemVersionEntity.builder().id(ID)
         .version(VERSION).name(NAME).group(GROUP).buildTime(LOCAL_DATE_TIME).initialized(true).status(0)
@@ -41,6 +43,7 @@ public class DataInitializerImplTest {
     @DisplayName("Test the onApplicationEvent_test method in the DataInitializerImpl")
     public void onApplicationEvent_test() throws IOException {
         when(applicationContext.getBean(BuildProperties.class)).thenReturn(buildProperties);
+        when(applicationContext.getBean(ObjectMapper.class)).thenReturn(objectMapper);
         when(applicationContext.getBean(MongoTemplate.class)).thenReturn(mongoTemplate);
         when(applicationContext.getBean(SystemVersionRepository.class)).thenReturn(systemVersionRepository);
         when(buildProperties.getTime()).thenReturn(instant);
@@ -58,6 +61,7 @@ public class DataInitializerImplTest {
     public void onApplicationEvent_path_not_exist_test() {
         when(applicationContext.getBean(BuildProperties.class)).thenReturn(buildProperties);
         when(applicationContext.getBean(MongoTemplate.class)).thenReturn(mongoTemplate);
+        when(applicationContext.getBean(ObjectMapper.class)).thenReturn(objectMapper);
         when(applicationContext.getBean(SystemVersionRepository.class)).thenReturn(systemVersionRepository);
         when(buildProperties.getTime()).thenReturn(instant);
         when(buildProperties.getVersion()).thenReturn("v1");
