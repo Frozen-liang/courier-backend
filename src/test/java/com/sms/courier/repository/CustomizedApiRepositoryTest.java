@@ -126,4 +126,12 @@ class CustomizedApiRepositoryTest {
         assertThat(count).isEqualTo(1L);
     }
 
+    @Test
+    @DisplayName("Test for caseCount in CustomizedApiRepository")
+    public void caseCount_test() {
+        when(mongoTemplate.count(any(),anyString())).thenReturn(1L);
+        Long count = customizedApiRepository.caseCount(new ObjectId());
+        assertThat(count).isEqualTo(1L);
+    }
+
 }

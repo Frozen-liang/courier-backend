@@ -39,4 +39,6 @@ public interface ApiService {
     Boolean batchUpdateByIds(BatchUpdateByIdRequest<Object> batchUpdateRequest);
 
     Long sceneCount(ObjectId projectId);
+
+    Long caseCount(ObjectId projectId);
 }
