@@ -59,6 +59,7 @@ public class ApiEntity extends BaseEntity {
 
     private String apiPath;
 
+    @JsonIgnore
     private ApiProtocol apiProtocol;
 
     private RequestMethod requestMethod;
