@@ -37,8 +37,9 @@ public interface ApiTestCaseService {
 
     void insertTestResult(String id, TestResult testResult);
 
-    Long countByProjectIds(List<String> projectIds);
+    Long countByProjectIds(List<String> projectIds, LocalDateTime dateTime);
 
     Page<ApiTestCaseResponse> getCasePageByProjectIdsAndCreateDate(List<String> projectIds, LocalDateTime dateTime,
         PageDto pageDto);
+
 }

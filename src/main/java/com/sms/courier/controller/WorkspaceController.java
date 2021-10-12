@@ -67,11 +67,6 @@ public class WorkspaceController {
         return workspaceService.delete(id);
     }
 
-    @GetMapping("/casecount/{id}")
-    public Long caseCount(@PathVariable String id) {
-        return workspaceService.caseCount(id);
-    }
-
     @GetMapping("/case/{id}")
     public Page<ApiTestCaseResponse> getCase(@PathVariable String id, PageDto pageDto) {
         return workspaceService.getCase(id, pageDto);
