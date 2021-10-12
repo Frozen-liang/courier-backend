@@ -22,7 +22,7 @@ public interface CustomizedApiTestCaseRepository {
 
     List<String> findApiIdsByTestIds(List<String> ids);
 
-    Long countByProjectIds(List<String> projectIds);
+    Long countByProjectIds(List<String> projectIds, LocalDateTime dateTime);
 
     Page<ApiTestCaseResponse> getCasePageByProjectIdsAndCreateDate(List<String> projectIds, LocalDateTime dateTime,
         PageDto pageDto);

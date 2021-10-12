@@ -21,7 +21,5 @@ public interface WorkspaceService {
 
     List<WorkspaceResponse> findByUserId();
 
-    Long caseCount(String id);
-
     Page<ApiTestCaseResponse> getCase(String id, PageDto pageDto);
 }

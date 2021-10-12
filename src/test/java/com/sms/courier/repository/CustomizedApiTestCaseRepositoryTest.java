@@ -1,14 +1,5 @@
 package com.sms.courier.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
@@ -25,6 +16,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @DisplayName("Tests for CustomizedApiTestCaseRepository")
 class CustomizedApiTestCaseRepositoryTest {
@@ -76,7 +76,7 @@ class CustomizedApiTestCaseRepositoryTest {
     @DisplayName("Test the countByProjectIds method in the CustomizedApiTestCaseRepository")
     public void countByProjectIds() {
         when(mongoTemplate.count(any(), anyString())).thenReturn(1L);
-        Long count = customizedApiTestCaseRepository.countByProjectIds(ID_LIST);
+        Long count = customizedApiTestCaseRepository.countByProjectIds(ID_LIST, LocalDateTime.now());
         assertThat(count).isEqualTo(1L);
     }
 
@@ -85,7 +85,7 @@ class CustomizedApiTestCaseRepositoryTest {
     public void getCasePageByProjectIdsAndCreateDate() {
         Page<ApiTestCaseResponse> page = mock(Page.class);
         when(page.getContent()).thenReturn(Lists.newArrayList(ApiTestCaseResponse.builder().build()));
-        when(commonRepository.page(any(QueryVo.class),any(),eq(ApiTestCaseResponse.class))).thenReturn(page);
+        when(commonRepository.page(any(QueryVo.class), any(), eq(ApiTestCaseResponse.class))).thenReturn(page);
         Page<ApiTestCaseResponse> pageDto =
             customizedApiTestCaseRepository.getCasePageByProjectIdsAndCreateDate(ID_LIST, LocalDateTime.now(),
                 new PageDto());
