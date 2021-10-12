@@ -235,6 +235,11 @@ public enum ErrorCode {
     GET_WORKSPACE_CASE_ERROR("4215", "Failed to get the Workspace case!"),
     GET_SCHEDULE_RECORD_PAGE_ERROR("4216", "Failed to get the ScheduleRecord page!"),
     CASE_TYPE_ERROR("4217", "The caseType not exists!"),
+    ADD_API_COMMENT_ERROR("4218", "Failed to add the ApiComment!"),
+    GET_API_COMMENT_LIST_ERROR("4219", "Failed to get the ApiComment list!"),
+    GET_API_COMMENT_BY_ID_ERROR("4220", "The ApiComment not exist!"),
+    DELETE_API_COMMENT_BY_ID_ERROR("4221", "Failed to delete the ApiComment!"),
+    EDIT_API_COMMENT_ERROR("4222", "Failed to edit the ApiComment!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),

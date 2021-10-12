@@ -1,0 +1,15 @@
+[
+  {
+    "id": "616549b5606ffd0b6e987af6",
+    "name": "Api_Comment_Query_All",
+    "description": "查询所有Api评论",
+    "roleType": 0
+  },
+  {
+    "id": "616549b5606ffd0b6e987af5",
+    "name": "Api_Comment_Create_Update_Delete",
+    "description": "Api评论增加修改删除",
+    "roleType": 0
+  }
+]
+
