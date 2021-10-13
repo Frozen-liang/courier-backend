@@ -9,4 +9,6 @@ public interface ProjectRepository extends MongoRepository<ProjectEntity, String
     List<ProjectEntity> findAllByRemovedIsFalseAndWorkspaceIdOrderByCreateDateTimeDesc(String workspaceId);
 
     boolean existsByWorkspaceIdAndRemovedIsFalse(String workspaceId);
+
+    List<ProjectEntity> findAllByWorkspaceId(String workspaceId);
 }

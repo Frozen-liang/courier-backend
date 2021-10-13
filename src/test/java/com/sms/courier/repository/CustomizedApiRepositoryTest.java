@@ -3,11 +3,17 @@ package com.sms.courier.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.endsWith;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.Lists;
+import com.mongodb.client.result.UpdateResult;
+import com.sms.courier.common.field.ApiField;
+import com.sms.courier.common.field.CommonField;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
@@ -16,6 +22,7 @@ import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
 import com.sms.courier.entity.mongo.GroupResultVo;
 import com.sms.courier.entity.mongo.QueryVo;
+import com.sms.courier.initialize.ApiCaseCount;
 import com.sms.courier.repository.impl.CustomizedApiRepositoryImpl;
 import java.util.Arrays;
 import java.util.Collections;
@@ -121,9 +128,27 @@ class CustomizedApiRepositoryTest {
     @Test
     @DisplayName("Test for sceneCount in CustomizedApiRepository")
     public void sceneCount_test() {
-        when(mongoTemplate.count(any(),anyString())).thenReturn(1L);
+        when(mongoTemplate.count(any(), anyString())).thenReturn(1L);
         Long count = customizedApiRepository.sceneCount(new ObjectId());
         assertThat(count).isEqualTo(1L);
     }
 
+    @Test
+    @DisplayName("Test for updateCountFieldByIds in CustomizedApiRepository")
+    public void updateCountFieldByIds_test() {
+        UpdateResult updateResult = mock(UpdateResult.class);
+        when(updateResult.getMatchedCount()).thenReturn(1L);
+        when(mongoTemplate.updateMulti(any(), any(), eq(ApiEntity.class))).thenReturn(updateResult);
+        List<ApiCaseCount> apiCaseCountList = Lists.newArrayList(ApiCaseCount.builder().apiId(ID).count(1L).build());
+        long count = customizedApiRepository.updateCountFieldByIds(apiCaseCountList, ApiField.CASE_COUNT);
+        assertThat(count).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Test for updateCountFieldByIds in CustomizedApiRepository")
+    public void updateCountFieldByIds_ApiCaseCountIsNull_test() {
+        List<ApiCaseCount> apiCaseCountList = Lists.newArrayList(ApiCaseCount.builder().build());
+        long count = customizedApiRepository.updateCountFieldByIds(apiCaseCountList, ApiField.CASE_COUNT);
+        assertThat(count).isEqualTo(0);
+    }
 }
