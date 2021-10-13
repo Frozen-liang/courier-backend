@@ -1,23 +1,5 @@
 package com.sms.courier.service;
 
-import static com.sms.courier.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.DELETE_API_TEST_CASE_BY_ID_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_BY_ID_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_LIST_ERROR;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.wildfly.common.Assert.assertTrue;
-
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.PageDto;
@@ -44,6 +26,24 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
+
+import static com.sms.courier.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DELETE_API_TEST_CASE_BY_ID_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_BY_ID_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_LIST_ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Tests for ApiTestCaseService")
 class ApiTestCaseServiceTest {
@@ -242,9 +242,16 @@ class ApiTestCaseServiceTest {
     @Test
     @DisplayName("Test the countByProjectIds method in the ApiTestCase service")
     public void countByProjectIds_test() {
-        when(customizedApiTestCaseRepository.countByProjectIds(any())).thenReturn(1L);
-        Long count = apiTestCaseService.countByProjectIds(Lists.newArrayList(ID));
+        when(customizedApiTestCaseRepository.countByProjectIds(any(), any())).thenReturn(1L);
+        Long count = apiTestCaseService.countByProjectIds(Lists.newArrayList(ID), LocalDateTime.now());
         assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("Test the countByProjectIds method in the ApiTestCase service")
+    public void countByProjectIds_projectIdIsNull_test() {
+        Long count = apiTestCaseService.countByProjectIds(Lists.newArrayList(), LocalDateTime.now());
+        assertThat(count).isEqualTo(0L);
     }
 
     @Test

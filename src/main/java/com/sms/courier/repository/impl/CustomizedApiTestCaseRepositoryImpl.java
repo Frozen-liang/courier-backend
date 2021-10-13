@@ -98,10 +98,11 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
     }
 
     @Override
-    public Long countByProjectIds(List<String> projectIds) {
+    public Long countByProjectIds(List<String> projectIds, LocalDateTime dateTime) {
         Query query = new Query();
         List<ObjectId> objectIdList = projectIds.stream().map(ObjectId::new).collect(Collectors.toList());
         PROJECT_ID.in(objectIdList).ifPresent(query::addCriteria);
+        CREATE_DATE_TIME.gt(dateTime).ifPresent(query::addCriteria);
         REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
         return mongoTemplate.count(query, "ApiTestCase");
     }

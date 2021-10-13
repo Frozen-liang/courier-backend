@@ -232,4 +232,19 @@ class ApiServiceTest {
         assertThatThrownBy(() -> apiService.sceneCount(new ObjectId())).isInstanceOf(ApiTestPlatformException.class);
     }
 
+    @Test
+    @DisplayName("Test for caseCount in ApiService")
+    public void caseCount_test() {
+        when(customizedApiRepository.caseCount(any())).thenReturn(1L);
+        Long count = apiService.caseCount(new ObjectId());
+        assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while test caseCount in ApiService.")
+    public void caseCount_exception_test() {
+        when(customizedApiRepository.caseCount(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> apiService.caseCount(new ObjectId())).isInstanceOf(ApiTestPlatformException.class);
+    }
+
 }

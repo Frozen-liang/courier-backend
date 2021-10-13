@@ -31,5 +31,7 @@ public interface CustomizedApiRepository {
 
     Long sceneCount(ObjectId projectId);
 
+    Long caseCount(ObjectId projectId);
+
     long updateCountFieldByIds(List<ApiCaseCount> caseCountList, Field filedName);
 }

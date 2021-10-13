@@ -235,6 +235,7 @@ public enum ErrorCode {
     GET_WORKSPACE_CASE_ERROR("4215", "Failed to get the Workspace case!"),
     GET_SCHEDULE_RECORD_PAGE_ERROR("4216", "Failed to get the ScheduleRecord page!"),
     CASE_TYPE_ERROR("4217", "The caseType not exists!"),
+    GET_CASE_COUNT_BY_API_ERROR("4218", "Failed to query case count the Api!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),

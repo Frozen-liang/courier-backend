@@ -33,6 +33,7 @@ import com.sms.courier.utils.ExceptionUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
@@ -196,8 +197,11 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     }
 
     @Override
-    public Long countByProjectIds(List<String> projectIds) {
-        return customizedApiTestCaseRepository.countByProjectIds(projectIds);
+    public Long countByProjectIds(List<String> projectIds, LocalDateTime dateTime) {
+        if (CollectionUtils.isEmpty(projectIds)) {
+            return 0L;
+        }
+        return customizedApiTestCaseRepository.countByProjectIds(projectIds, dateTime);
     }
 
     @Override
