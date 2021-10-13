@@ -109,4 +109,9 @@ public class ApiController {
     public Long sceneCount(@PathVariable ObjectId projectId) {
         return apiService.sceneCount(projectId);
     }
+
+    @GetMapping("/case/count/pid/{projectId}")
+    public Long caseCount(@PathVariable ObjectId projectId) {
+        return apiService.caseCount(projectId);
+    }
 }

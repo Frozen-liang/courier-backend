@@ -240,6 +240,7 @@ public enum ErrorCode {
     GET_API_COMMENT_BY_ID_ERROR("4220", "The ApiComment not exist!"),
     DELETE_API_COMMENT_BY_ID_ERROR("4221", "Failed to delete the ApiComment!"),
     EDIT_API_COMMENT_ERROR("4222", "Failed to edit the ApiComment!"),
+    GET_CASE_COUNT_BY_API_ERROR("4223", "Failed to query case count the Api!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),

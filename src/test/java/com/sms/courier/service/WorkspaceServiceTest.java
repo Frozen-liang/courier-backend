@@ -172,6 +172,18 @@ class WorkspaceServiceTest {
     }
 
     @Test
+    @DisplayName("An exception occurred while delete Workspace")
+    public void findByUserId_exception_test() {
+        ArrayList<WorkspaceResponse> workspaceResponseList = new ArrayList<>();
+        for (int i = 0; i < TOTAL_ELEMENTS; i++) {
+            workspaceResponseList.add(WorkspaceResponse.builder().build());
+        }
+        when(commonRepository.listLookupUser(anyString(), any(), any(Class.class)))
+           .thenThrow(new RuntimeException());
+        assertThatThrownBy(()->workspaceService.findByUserId()).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
     @DisplayName("Test the delete method in the Workspace service")
     public void delete_test() {
         when(commonRepository.deleteById(ID, WorkspaceEntity.class)).thenReturn(Boolean.TRUE);
@@ -187,32 +199,6 @@ class WorkspaceServiceTest {
         assertThatThrownBy(() -> workspaceService.delete(ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_WORKSPACE_BY_ID_ERROR.getCode());
-    }
-
-    @Test
-    @DisplayName("Test the caseCount method in the Workspace service")
-    public void caseCount_test() {
-        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
-        when(projectService.list(any())).thenReturn(projectResponses);
-        when(apiTestCaseService.countByProjectIds(any())).thenReturn(1L);
-        Long count = workspaceService.caseCount(ID);
-        assertThat(count).isEqualTo(1L);
-    }
-
-    @Test
-    @DisplayName("Test the caseCount method in the Workspace service")
-    public void caseCountProjectIsNull_test() {
-        List<ProjectResponse> projectResponses = Lists.newArrayList();
-        when(projectService.list(any())).thenReturn(projectResponses);
-        Long count = workspaceService.caseCount(ID);
-        assertThat(count).isEqualTo(0L);
-    }
-
-    @Test
-    @DisplayName("An exception occurred while caseCount Workspace")
-    public void caseCount_exception_test() {
-        when(projectService.list(any())).thenThrow(new RuntimeException());
-        assertThatThrownBy(() -> workspaceService.caseCount(ID)).isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test

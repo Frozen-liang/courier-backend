@@ -226,6 +226,16 @@ public class ApiServiceImpl implements ApiService {
         }
     }
 
+    @Override
+    public Long caseCount(ObjectId projectId) {
+        try {
+            return customizedApiRepository.caseCount(projectId);
+        } catch (Exception e) {
+            log.error("Failed to query case count the Api!", e);
+            throw new ApiTestPlatformException(ErrorCode.GET_CASE_COUNT_BY_API_ERROR);
+        }
+    }
+
     private void saveRef(String id, String name, List<String> addStructIds, List<String> removeStructIds) {
         addStructIds = Objects.requireNonNullElse(addStructIds, new ArrayList<>());
         removeStructIds = Objects.requireNonNullElse(removeStructIds, new ArrayList<>());

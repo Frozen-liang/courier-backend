@@ -16,4 +16,8 @@ public class WorkspaceResponse extends LookupUserResponse {
     private String name;
 
     private Integer limit;
+
+    private Long allCaseCount;
+
+    private Long recentCaseCount;
 }
