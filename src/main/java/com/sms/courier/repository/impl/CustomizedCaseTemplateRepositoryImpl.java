@@ -1,7 +1,7 @@
 package com.sms.courier.repository.impl;
 
-import static com.sms.courier.common.field.ApiTag.GROUP_NAME;
-import static com.sms.courier.common.field.ApiTag.TAG_NAME;
+import static com.sms.courier.common.field.ApiTagField.GROUP_NAME;
+import static com.sms.courier.common.field.ApiTagField.TAG_NAME;
 import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
 import static com.sms.courier.common.field.CommonField.ID;
 import static com.sms.courier.common.field.CommonField.PROJECT_ID;
