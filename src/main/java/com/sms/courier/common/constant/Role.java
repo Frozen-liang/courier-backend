@@ -165,8 +165,14 @@ public class Role {
     public static final String MOCK_SETTING_GRE_UPD_DEL = "Mock_Setting" + CRE_UPD_DEL;
     public static final String MOCK_SETTING_QUERY_ALL = "Mock_Setting" + QUERY_ALL;
 
+    // Schedule Group
     public static final String SCHEDULE_GROUP_CRE_UPD_DEL = "Schedule_Group" + CRE_UPD_DEL;
     public static final String SCHEDULE_GROUP_QUERY_ALL = "Schedule_Group" + QUERY_ALL;
     public static final String SCHEDULE_GROUP_QUERY_OWN = "Schedule_Group" + QUERY_OWN;
+
+    // Api Comment
+    public static final String API_COMMENT_CRE_UPD_DEL = "Api_Comment" + CRE_UPD_DEL;
+    public static final String API_COMMENT_QUERY_ALL = "Api_Comment" + QUERY_ALL;
+    public static final String API_COMMENT_QUERY_OWN = "Api_Comment" + QUERY_OWN;
 
 }

@@ -11,7 +11,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 
 group = "com.sms.courier"
-version = "1.0.3"
+version = "1.0.4"
 description = "courier-backend"
 
 
