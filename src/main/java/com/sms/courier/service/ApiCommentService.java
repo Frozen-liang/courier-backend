@@ -9,7 +9,7 @@ public interface ApiCommentService {
 
     ApiCommentResponse findById(String id);
 
-    List<ApiCommentResponse> list(ObjectId apiId);
+    List<ApiCommentResponse> list(ObjectId apiId, ObjectId parentId);
 
     Boolean add(ApiCommentRequest apiCommentRequest);
 

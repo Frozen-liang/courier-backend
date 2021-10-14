@@ -52,6 +52,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -147,6 +148,7 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
     public ApiTestCaseJobResponse buildJob(ApiTestRequest request) {
         try {
             ApiTestCaseJobEntity apiTestCaseJobEntity = getApiTestCaseJobEntity(request, SecurityUtil.getCurrentUser());
+            repository.save(apiTestCaseJobEntity);
             return jobMapper.toApiTestCaseJobResponse(apiTestCaseJobEntity);
         } catch (ApiTestPlatformException courierException) {
             log.error("Build the case job error. message:{}", courierException.getMessage());
@@ -179,6 +181,7 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
             log.info("Insert job report. jobReport:{}", jobReport);
             setJobReport(jobReport, job);
             repository.save(job);
+            saveTestResult(jobReport, job);
         });
         return true;
     }
@@ -251,19 +254,8 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
         try {
             ApiTestCaseJobReport apiTestCaseJobReport = (ApiTestCaseJobReport) jobReport;
             setJobReport(apiTestCaseJobReport, apiTestCaseJob);
-            CaseReport caseReport = apiTestCaseJobReport.getCaseReport();
             repository.save(apiTestCaseJob);
-            caseReport = Objects
-                .requireNonNullElse(caseReport, CaseReport.builder().errCode(jobReport.getErrCode())
-                    .failMessage(jobReport.getMessage()).isSuccess(
-                        ResultType.FAIL).build());
-            TestResult testResult = jobMapper.toTestResult(caseReport);
-            testResult.setJobId(apiTestCaseJob.getId());
-            testResult.setTestUsername(apiTestCaseJob.getCreateUserName());
-            testResult.setTestTime(apiTestCaseJob.getCreateDateTime());
-            // Sava test result in api test case.
-            apiTestCaseService
-                .insertTestResult(apiTestCaseJob.getApiTestCase().getJobApiTestCase().getId(), testResult);
+            saveTestResult(apiTestCaseJobReport, apiTestCaseJob);
             caseDispatcherService
                 .sendJobReport(apiTestCaseJob.getCreateUserId(),
                     jobMapper.toApiTestCaseJobReportResponse(apiTestCaseJobReport));
@@ -272,6 +264,24 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
             caseDispatcherService
                 .sendCaseErrorMessage(apiTestCaseJob.getCreateUserId(), "Save case report error!");
         }
+    }
+
+    private void saveTestResult(ApiTestCaseJobReport jobReport, ApiTestCaseJobEntity apiTestCaseJob) {
+        String caseId = apiTestCaseJob.getApiTestCase().getJobApiTestCase().getId();
+        if (StringUtils.isBlank(caseId)) {
+            return;
+        }
+        CaseReport caseReport = jobReport.getCaseReport();
+        caseReport = Objects
+            .requireNonNullElse(caseReport, CaseReport.builder().errCode(jobReport.getErrCode())
+                .failMessage(jobReport.getMessage()).isSuccess(
+                    ResultType.FAIL).build());
+        TestResult testResult = jobMapper.toTestResult(caseReport);
+        testResult.setJobId(apiTestCaseJob.getId());
+        testResult.setTestUsername(apiTestCaseJob.getCreateUserName());
+        testResult.setTestTime(apiTestCaseJob.getCreateDateTime());
+        // Sava test result in api test case.
+        apiTestCaseService.insertTestResult(caseId, testResult);
     }
 
     @Override

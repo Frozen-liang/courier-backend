@@ -21,6 +21,9 @@ public class ApiCommentEntity extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String apiId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String parentId;
+
     private String comment;
 
 }

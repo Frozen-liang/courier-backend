@@ -47,6 +47,7 @@ class ApiCommentServiceTest {
     private static final String ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
     private static final ObjectId API_ID = ObjectId.get();
+    private static final ObjectId PARENT_ID = ObjectId.get();
 
     @Test
     @DisplayName("Test the findById method in the ApiComment service")
@@ -116,7 +117,7 @@ class ApiCommentServiceTest {
             apiCommentList.add(ApiCommentResponse.builder().build());
         }
         when(commonRepository.listLookupUser(anyString(), any(), any(Class.class))).thenReturn(apiCommentList);
-        List<ApiCommentResponse> result = apiCommentService.list(API_ID);
+        List<ApiCommentResponse> result = apiCommentService.list(API_ID, PARENT_ID);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -124,7 +125,7 @@ class ApiCommentServiceTest {
     @DisplayName("An exception occurred while getting ApiComment list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(commonRepository).listLookupUser(anyString(), any(), any(Class.class));
-        assertThatThrownBy(() -> apiCommentService.list(API_ID))
+        assertThatThrownBy(() -> apiCommentService.list(API_ID, PARENT_ID))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_API_COMMENT_LIST_ERROR.getCode());
     }

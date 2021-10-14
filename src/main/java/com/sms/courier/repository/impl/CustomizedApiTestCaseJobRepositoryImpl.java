@@ -73,15 +73,6 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
     }
 
     @Override
-    public ApiTestCaseJobEntity findRecentlyCaseReportByCaseId(String apiTestCaseId) {
-        ApiTestCaseJobPageRequest pageRequest = ApiTestCaseJobPageRequest.builder().pageSize(1)
-            .apiTestCaseId(apiTestCaseId)
-            .pageNumber(1).build();
-        Page<ApiTestCaseJobEntity> page = this.page(pageRequest);
-        return page.stream().findFirst().orElse(ApiTestCaseJobEntity.builder().build());
-    }
-
-    @Override
     public void updateJobById(String id, String engineId, JobStatus jobStatus) {
         Query query = Query.query(Criteria.where(ID.getName()).is(id));
         Update update = new Update();

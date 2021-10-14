@@ -50,8 +50,9 @@ public class ApiCommentController {
 
     @GetMapping("/list")
     @PreAuthorize("hasRoleOrAdmin(@role.API_COMMENT_QUERY_ALL)")
-    public List<ApiCommentResponse> list(@RequestParam ObjectId apiId) {
-        return apiCommentService.list(apiId);
+    public List<ApiCommentResponse> list(@RequestParam ObjectId apiId,
+        @RequestParam(required = false) ObjectId parentId) {
+        return apiCommentService.list(apiId, parentId);
     }
 
     @DeleteMapping("/{ids}")
