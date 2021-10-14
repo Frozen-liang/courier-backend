@@ -18,7 +18,8 @@ public enum CommonField implements Field {
     GROUP_ID("groupId"),
     USERNAME("username"),
     REF_ID("refId"),
-    JOB_STATUS("jobStatus");
+    JOB_STATUS("jobStatus"),
+    API_ID_GROUP_SEARCH("apiEntity.id");
 
     private final String name;
 

@@ -20,7 +20,9 @@ import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.common.field.UserField.NICKNAME;
 import static com.sms.courier.common.field.UserField.USERNAME;
 
+import com.mongodb.client.result.UpdateResult;
 import com.sms.courier.common.enums.CollectionName;
+import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
@@ -31,6 +33,7 @@ import com.sms.courier.entity.group.ApiGroupEntity;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.tag.ApiTagEntity;
+import com.sms.courier.initialize.ApiCaseCount;
 import com.sms.courier.repository.ApiGroupRepository;
 import com.sms.courier.repository.ApiTagRepository;
 import com.sms.courier.repository.CommonRepository;
@@ -46,6 +49,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
@@ -53,12 +57,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.CountOperation;
-import org.springframework.data.mongodb.core.aggregation.GroupOperation;
-import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -203,6 +201,22 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
         CASE_COUNT.gt(0).ifPresent(query::addCriteria);
         return mongoTemplate.count(query, "Api");
+    }
+
+    @Override
+    public long updateCountFieldByIds(List<ApiCaseCount> caseCountList, Field filedName) {
+        long count = 0;
+        for (ApiCaseCount apiCaseCount : caseCountList) {
+            if (StringUtils.isNotBlank(apiCaseCount.getApiId())) {
+                Query query = new Query();
+                query.addCriteria(Criteria.where(ID.getName()).is(new ObjectId(apiCaseCount.getApiId())));
+                Update update = new Update();
+                update.set(filedName.getName(), apiCaseCount.getCount());
+                UpdateResult result = mongoTemplate.updateMulti(query, update, ApiEntity.class);
+                count += result.getMatchedCount();
+            }
+        }
+        return count;
     }
 
     private void addCriteria(ApiPageRequest apiPageRequest, Query query) {
