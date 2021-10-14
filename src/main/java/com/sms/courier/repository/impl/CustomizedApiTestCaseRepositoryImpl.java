@@ -14,12 +14,14 @@ import static com.sms.courier.common.field.SceneField.TAG_ID;
 import com.google.common.collect.Lists;
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.CollectionName;
+import com.sms.courier.common.field.CommonField;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
+import com.sms.courier.initialize.ApiCaseCount;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import java.time.LocalDateTime;
@@ -29,6 +31,9 @@ import java.util.stream.Collectors;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -143,6 +148,19 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
             REMOVE.is(removed),
             API_ID.is(apiId)
         );
+    }
+
+    @Override
+    public List<ApiCaseCount> findProjectIdAndGroupByApiId(String projectId, boolean removed) {
+        List<AggregationOperation> aggregationOperations = Lists.newArrayList();
+        aggregationOperations.add(Aggregation.match(Criteria.where(PROJECT_ID.getName()).is(new ObjectId(projectId))));
+        aggregationOperations.add(Aggregation.match(Criteria.where(REMOVE.getName()).is(removed)));
+        aggregationOperations.add(Aggregation.group(CommonField.API_ID_GROUP_SEARCH.getName()).count().as("count"));
+        aggregationOperations.add(Aggregation.project("count").and("apiId").previousOperation());
+        Aggregation aggregation1 = Aggregation.newAggregation(aggregationOperations);
+        AggregationResults<ApiCaseCount> results =  mongoTemplate.aggregate(aggregation1, ApiTestCaseEntity.class,
+            ApiCaseCount.class);
+        return results.getMappedResults();
     }
 
 }
