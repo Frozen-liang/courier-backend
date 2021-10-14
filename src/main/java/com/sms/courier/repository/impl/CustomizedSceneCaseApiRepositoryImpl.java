@@ -75,9 +75,10 @@ public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCase
     }
 
     @Override
-    public long findCountByCaseTemplateId(ObjectId caseTemplateId) {
+    public long findCountByCaseTemplateIdAndNowProjectId(ObjectId caseTemplateId, ObjectId projectId) {
         Query query = new Query();
         SceneField.CASE_TEMPLATE_ID.is(caseTemplateId).ifPresent(query::addCriteria);
+        CommonField.PROJECT_ID.is(projectId).ifPresent(query::addCriteria);
         CommonField.REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
         return mongoTemplate.count(query, "SceneCaseApi");
     }

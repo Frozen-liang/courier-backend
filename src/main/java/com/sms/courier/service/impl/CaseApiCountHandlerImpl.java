@@ -50,7 +50,8 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
         for (CaseTemplateApiEntity entity : entityList) {
             long count =
                 customizedSceneCaseApiRepository
-                    .findCountByCaseTemplateId(new ObjectId(entity.getCaseTemplateId()));
+                    .findCountByCaseTemplateIdAndNowProjectId(new ObjectId(entity.getCaseTemplateId()),
+                        new ObjectId(entity.getProjectId()));
             if (count > 0) {
                 AddCaseEvent addCaseEvent = new AddCaseEvent(List.of(entity.getApiTestCase().getApiEntity().getId()),
                     CaseType.SCENE_CASE, Integer.parseInt(String.valueOf(count)));
@@ -67,7 +68,9 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
                 .filter(entity -> Objects.equals(entity.getApiType(), ApiType.API)).collect(Collectors.toList());
         for (CaseTemplateApiEntity entity : entityList) {
             long count =
-                customizedSceneCaseApiRepository.findCountByCaseTemplateId(new ObjectId(entity.getCaseTemplateId()));
+                customizedSceneCaseApiRepository
+                    .findCountByCaseTemplateIdAndNowProjectId(new ObjectId(entity.getCaseTemplateId()),
+                        new ObjectId(entity.getProjectId()));
             if (count > 0) {
                 DeleteCaseEvent deleteCaseEvent = new DeleteCaseEvent(
                     List.of(entity.getApiTestCase().getApiEntity().getId()),
@@ -119,7 +122,8 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
     private List<String> getApiIdsByEntityList(List<SceneCaseApiEntity> sceneCaseApiEntityList) {
         List<String> sceneCaseApiIds = sceneCaseApiEntityList.stream()
             .filter(entity -> Objects.isNull(entity.getCaseTemplateId())
-                && CollectionUtils.isEmpty(entity.getCaseTemplateApiConnList()))
+                && CollectionUtils.isEmpty(entity.getCaseTemplateApiConnList())
+                && Objects.equals(entity.getProjectId(), entity.getApiTestCase().getProjectId()))
             .map(entity -> entity.getApiTestCase().getApiEntity().getId())
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
@@ -131,7 +135,8 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
         List<String> templateApiIds = CollectionUtils.isNotEmpty(templateIds)
             ? caseTemplateApiRepository.findAllByCaseTemplateIdIn(templateIds)
             .stream()
-            .filter(entity -> Objects.equals(entity.getApiType(), ApiType.API))
+            .filter(entity -> Objects.equals(entity.getApiType(), ApiType.API)
+                && Objects.equals(entity.getProjectId(), entity.getApiTestCase().getProjectId()))
             .map(entity -> entity.getApiTestCase().getApiEntity().getId())
             .filter(Objects::nonNull)
             .collect(Collectors.toList())

@@ -298,9 +298,11 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                     .caseTemplateApiConnList(sceneCaseMapper.toCaseTemplateApiConnList(caseTemplateApiList))
                     .build();
                 sceneCaseApiRepository.insert(sceneCaseApi);
-                List<String> apiIds =
-                    caseTemplateApiList.stream().filter(template -> Objects.equals(template.getApiType(), ApiType.API))
-                        .map(template -> template.getApiTestCase().getApiEntity().getId()).collect(Collectors.toList());
+                List<String> apiIds = caseTemplateApiList.stream()
+                    .filter(template -> Objects.equals(template.getApiType(), ApiType.API)
+                        && Objects.equals(template.getProjectId(), template.getApiTestCase().getProjectId()))
+                    .map(template -> template.getApiTestCase().getApiEntity().getId())
+                    .collect(Collectors.toList());
                 caseApiCountHandler.addSceneCaseByApiIds(apiIds);
             }
             return Boolean.TRUE;
@@ -393,7 +395,9 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 .build();
         sceneCaseApi = sceneCaseApiRepository.insert(sceneCaseApi);
         if (Objects.nonNull(sceneCaseApi.getId())) {
-            caseApiCountHandler.addSceneCaseByApiIds(List.of(apiTestCase.getApiEntity().getId()));
+            if (Objects.equals(sceneCaseApi.getProjectId(), sceneCaseApi.getApiTestCase().getProjectId())) {
+                caseApiCountHandler.addSceneCaseByApiIds(List.of(apiTestCase.getApiEntity().getId()));
+            }
         }
     }
 
