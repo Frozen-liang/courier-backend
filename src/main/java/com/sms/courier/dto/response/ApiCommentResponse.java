@@ -16,5 +16,7 @@ public class ApiCommentResponse extends LookupUserResponse {
 
     private String apiId;
 
+    private String parentId;
+
     private String comment;
 }

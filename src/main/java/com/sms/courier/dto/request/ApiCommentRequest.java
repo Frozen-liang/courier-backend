@@ -22,6 +22,8 @@ public class ApiCommentRequest {
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The apiId must not null.")
     private String apiId;
 
+    private String parentId;
+
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The comment must not null.")
     private String comment;
 }

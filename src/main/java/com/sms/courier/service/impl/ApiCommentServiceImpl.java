@@ -7,6 +7,7 @@ import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_API_COMMENT_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_API_COMMENT_LIST_ERROR;
 import static com.sms.courier.common.field.ApiCommentField.API_ID;
+import static com.sms.courier.common.field.ApiCommentField.PARENT_ID;
 
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.ApiCommentRequest;
@@ -45,10 +46,11 @@ public class ApiCommentServiceImpl implements ApiCommentService {
     }
 
     @Override
-    public List<ApiCommentResponse> list(ObjectId apiId) {
+    public List<ApiCommentResponse> list(ObjectId apiId, ObjectId parentId) {
         try {
-            return commonRepository.listLookupUser("ApiComment", List.of(API_ID.is(apiId)),
-                ApiCommentResponse.class);
+            return commonRepository
+                .listLookupUser("ApiComment", List.of(API_ID.is(apiId), PARENT_ID.hasParentId(parentId)),
+                    ApiCommentResponse.class);
         } catch (Exception e) {
             log.error("Failed to get the ApiComment list!", e);
             throw new ApiTestPlatformException(GET_API_COMMENT_LIST_ERROR);
