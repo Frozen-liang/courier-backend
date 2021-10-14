@@ -96,6 +96,10 @@ public interface JobMapper {
     @Mapping(target = "testDateTime", source = "createDateTime", dateFormat = DEFAULT_PATTERN)
     @Mapping(target = "testUser", source = "createUserName")
     @Mapping(target = "testReport", source = "apiTestCaseJob.apiTestCase.jobApiTestCase.caseReport")
+    @Mapping(target = "httpStatusVerification", source = "apiTestCaseJob.apiTestCase.jobApiTestCase.httpStatusVerification")
+    @Mapping(target = "responseHeadersVerification", source = "apiTestCaseJob.apiTestCase.jobApiTestCase.responseHeadersVerification")
+    @Mapping(target = "responseResultVerification", source = "apiTestCaseJob.apiTestCase.jobApiTestCase.responseResultVerification")
+    @Mapping(target = "responseTimeVerification", source = "apiTestCaseJob.apiTestCase.jobApiTestCase.responseTimeVerification")
     ApiTestCaseJobPageResponse toApiTestCaseJobPageResponse(ApiTestCaseJobEntity apiTestCaseJob);
 
     List<JobSceneCaseApi> toJobSceneCaseApiList(List<SceneCaseApiEntity> sceneCaseApiList);
