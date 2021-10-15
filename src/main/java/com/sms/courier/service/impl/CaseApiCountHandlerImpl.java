@@ -51,7 +51,7 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
             long count =
                 customizedSceneCaseApiRepository
                     .findCountByCaseTemplateIdAndNowProjectId(new ObjectId(entity.getCaseTemplateId()),
-                        new ObjectId(entity.getProjectId()));
+                        new ObjectId(entity.getApiTestCase().getProjectId()));
             if (count > 0) {
                 AddCaseEvent addCaseEvent = new AddCaseEvent(List.of(entity.getApiTestCase().getApiEntity().getId()),
                     CaseType.SCENE_CASE, Integer.parseInt(String.valueOf(count)));
@@ -70,7 +70,7 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
             long count =
                 customizedSceneCaseApiRepository
                     .findCountByCaseTemplateIdAndNowProjectId(new ObjectId(entity.getCaseTemplateId()),
-                        new ObjectId(entity.getProjectId()));
+                        new ObjectId(entity.getApiTestCase().getProjectId()));
             if (count > 0) {
                 DeleteCaseEvent deleteCaseEvent = new DeleteCaseEvent(
                     List.of(entity.getApiTestCase().getApiEntity().getId()),
