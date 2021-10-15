@@ -1,6 +1,9 @@
 package com.sms.courier.dto.response;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.sms.courier.common.constant.TimePatternConstant;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,11 +15,18 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class ApiCommentResponse extends LookupUserResponse {
+public class ApiCommentResponse extends TreeResponse {
 
     private String apiId;
 
-    private String parentId;
+    @JsonFormat(pattern = TimePatternConstant.DEFAULT_PATTERN)
+    private LocalDateTime createDateTime;
+
+    private String createUserId;
+
+    private String createUsername;
+
+    private String createNickname;
 
     private String comment;
 }
