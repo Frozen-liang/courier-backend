@@ -35,6 +35,11 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
 
     private final MongoTemplate mongoTemplate;
     private static final String CASE_REPORT = "apiTestCase.jobApiTestCase.caseReport";
+    private static final String HTTP_STATUS_VERIFICATION = "apiTestCase.jobApiTestCase.httpStatusVerification";
+    private static final String RESPONSE_HEADERS_VERIFICATION = "apiTestCase.jobApiTestCase"
+        + ".responseHeadersVerification";
+    private static final String RESPONSE_RESULT_VERIFICATION = "apiTestCase.jobApiTestCase.responseResultVerification";
+    private static final String RESPONSE_TIME_VERIFICATION = "apiTestCase.jobApiTestCase.responseTimeVerification";
     private static final String CREATE_USER_NAME = "createUserName";
     private static final String MESSAGE = "message";
     private static final List<JobStatus> JOB_STATUSES = List.of(JobStatus.SUCCESS, JobStatus.FAIL);
@@ -56,6 +61,10 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
         document.put(PARAMS_TOTAL_TIME_COST.getName(), true);
         document.put(DELAY_TIME_TOTAL_TIME_COST.getName(), true);
         document.put(INFO_LIST.getName(), true);
+        document.put(HTTP_STATUS_VERIFICATION, true);
+        document.put(RESPONSE_HEADERS_VERIFICATION, true);
+        document.put(RESPONSE_RESULT_VERIFICATION, true);
+        document.put(RESPONSE_TIME_VERIFICATION, true);
         BasicQuery query = new BasicQuery(new Document(), document);
         API_TEST_CASE_ID.is(apiTestCaseJobPageRequest.getApiTestCaseId()).ifPresent(query::addCriteria);
         CREATE_USER_ID.in(apiTestCaseJobPageRequest.getUserIds()).ifPresent(query::addCriteria);
@@ -70,15 +79,6 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
         List<ApiTestCaseJobEntity> apiTestCaseJobs = mongoTemplate.find(query.with(pageable),
             ApiTestCaseJobEntity.class);
         return new PageImpl<>(apiTestCaseJobs, pageable, count);
-    }
-
-    @Override
-    public ApiTestCaseJobEntity findRecentlyCaseReportByCaseId(String apiTestCaseId) {
-        ApiTestCaseJobPageRequest pageRequest = ApiTestCaseJobPageRequest.builder().pageSize(1)
-            .apiTestCaseId(apiTestCaseId)
-            .pageNumber(1).build();
-        Page<ApiTestCaseJobEntity> page = this.page(pageRequest);
-        return page.stream().findFirst().orElse(ApiTestCaseJobEntity.builder().build());
     }
 
     @Override

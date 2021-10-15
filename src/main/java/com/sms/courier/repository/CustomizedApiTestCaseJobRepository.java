@@ -9,7 +9,5 @@ public interface CustomizedApiTestCaseJobRepository {
 
     Page<ApiTestCaseJobEntity> page(ApiTestCaseJobPageRequest apiTestCaseJobPageRequest);
 
-    ApiTestCaseJobEntity findRecentlyCaseReportByCaseId(String apiTestCaseId);
-
     void updateJobById(String id, String engineId, JobStatus jobStatus);
 }

@@ -1,32 +1,5 @@
 package com.sms.courier.service;
 
-import com.sms.courier.common.enums.ApiBindingStatus;
-import com.sms.courier.common.exception.ApiTestPlatformException;
-import com.sms.courier.dto.PageDto;
-import com.sms.courier.dto.request.ApiRequest;
-import com.sms.courier.dto.request.ApiTestCaseRequest;
-import com.sms.courier.dto.response.ApiTestCaseResponse;
-import com.sms.courier.entity.api.ApiEntity;
-import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
-import com.sms.courier.entity.apitestcase.TestResult;
-import com.sms.courier.entity.job.ApiTestCaseJobEntity;
-import com.sms.courier.mapper.ApiTestCaseMapper;
-import com.sms.courier.repository.ApiTestCaseRepository;
-import com.sms.courier.repository.CustomizedApiTestCaseJobRepository;
-import com.sms.courier.repository.CustomizedApiTestCaseRepository;
-import com.sms.courier.security.pojo.CustomUser;
-import com.sms.courier.service.impl.ApiTestCaseServiceImpl;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import org.assertj.core.util.Lists;
-import org.bson.types.ObjectId;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Page;
-
 import static com.sms.courier.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_API_TEST_CASE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
@@ -44,6 +17,32 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
+
+import com.sms.courier.common.enums.ApiBindingStatus;
+import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.dto.PageDto;
+import com.sms.courier.dto.request.ApiRequest;
+import com.sms.courier.dto.request.ApiTestCaseRequest;
+import com.sms.courier.dto.response.ApiTestCaseResponse;
+import com.sms.courier.entity.api.ApiEntity;
+import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
+import com.sms.courier.entity.apitestcase.TestResult;
+import com.sms.courier.mapper.ApiTestCaseMapper;
+import com.sms.courier.repository.ApiTestCaseRepository;
+import com.sms.courier.repository.CustomizedApiTestCaseJobRepository;
+import com.sms.courier.repository.CustomizedApiTestCaseRepository;
+import com.sms.courier.security.pojo.CustomUser;
+import com.sms.courier.service.impl.ApiTestCaseServiceImpl;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import org.assertj.core.util.Lists;
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
 
 @DisplayName("Tests for ApiTestCaseService")
 class ApiTestCaseServiceTest {
@@ -155,8 +154,6 @@ class ApiTestCaseServiceTest {
         }
         when(customizedApiTestCaseRepository.listByJoin(any(), any(), anyBoolean()))
             .thenReturn(apiTestCaseResponseList);
-        when(customizedApiTestCaseJobRepository.findRecentlyCaseReportByCaseId(any()))
-            .thenReturn(ApiTestCaseJobEntity.builder().build());
         List<ApiTestCaseResponse> result = apiTestCaseService.list(API_ID, PROJECT_ID, REMOVED);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }

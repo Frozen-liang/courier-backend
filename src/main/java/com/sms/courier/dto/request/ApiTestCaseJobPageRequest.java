@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.bson.types.ObjectId;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -15,10 +16,10 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class ApiTestCaseJobPageRequest extends PageDto {
 
-    private List<String> userIds;
+    private List<ObjectId> userIds;
 
-    private String apiTestCaseId;
+    private ObjectId apiTestCaseId;
 
-    private String apiId;
+    private ObjectId apiId;
 
 }
