@@ -48,6 +48,7 @@ public class Constants {
     public static final String SCHEDULE_JOB_PATH = SDK_VERSION + "/schedule-job";
     public static final String SCHEDULE_GROUP_PATH = SDK_VERSION + "/schedule-group";
     public static final String API_COMMENT_PATE = SDK_VERSION + "/api-comment";
+    public static final String SYSTEM_VERSION_PATE = SDK_VERSION + "/system-version";
 
     public static final int MAX_DEPTH = 3;
     public static final String HTTP_DEFAULT_STATUS_CODE = "200";
