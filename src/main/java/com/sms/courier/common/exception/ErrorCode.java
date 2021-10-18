@@ -242,9 +242,9 @@ public enum ErrorCode {
     GET_CASE_COUNT_BY_API_ERROR("4222", "Failed to query case count the Api!"),
 
     // 60001 - 61000 describes api import exception
-    PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),
-    PARSE_SWAGGER_URL_ERROR("61002", "Parse the swagger url error, Please check the url."),
-    THE_OPERATION_ID_NOT_UNIQUE_ERROR("61020", "%s"),
+    PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),
+    PARSE_SWAGGER_URL_ERROR("60002", "Parse the swagger url error, Please check the url."),
+    THE_OPERATION_ID_NOT_UNIQUE_ERROR("60003", "%s"),
 
 
     // 61001  describes the test exception
