@@ -9,16 +9,14 @@ import org.apache.commons.lang3.StringUtils;
 
 public abstract class TreeUtils {
 
-    private static final Integer PARENT_DEPTH = 1;
-
     public static List<TreeResponse> createTree(List<? extends TreeResponse> treeResponses) {
         List<TreeResponse> parentList = treeResponses.stream()
-            .filter((tree) -> PARENT_DEPTH.equals(tree.getDepth()))
+            .filter((tree) -> StringUtils.isBlank(tree.getParentId()))
             .collect(Collectors.toList());
         Map<String, List<TreeResponse>> childMap =
             treeResponses.stream()
-                .filter(
-                    (tree) -> tree.getDepth() > PARENT_DEPTH && !StringUtils.equals(tree.getParentId(), tree.getId()))
+                .filter((tree) -> !StringUtils.isBlank(tree.getParentId()) && !StringUtils
+                    .equals(tree.getParentId(), tree.getId()))
                 .collect(Collectors.groupingBy(TreeResponse::getParentId));
         setChild(parentList, childMap);
         return parentList;

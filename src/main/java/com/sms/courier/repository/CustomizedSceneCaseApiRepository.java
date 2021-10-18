@@ -16,5 +16,5 @@ public interface CustomizedSceneCaseApiRepository {
 
     Boolean recover(List<String> sceneCaseApiIds);
 
-    long findCountByCaseTemplateId(ObjectId caseTemplateId);
+    long findCountByCaseTemplateIdAndNowProjectId(ObjectId caseTemplateId, ObjectId projectId);
 }

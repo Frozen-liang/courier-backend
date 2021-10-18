@@ -27,7 +27,6 @@ import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.apitestcase.TestResult;
-import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
 import com.sms.courier.repository.ApiTestCaseRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseJobRepository;
@@ -155,8 +154,6 @@ class ApiTestCaseServiceTest {
         }
         when(customizedApiTestCaseRepository.listByJoin(any(), any(), anyBoolean()))
             .thenReturn(apiTestCaseResponseList);
-        when(customizedApiTestCaseJobRepository.findRecentlyCaseReportByCaseId(any()))
-            .thenReturn(ApiTestCaseJobEntity.builder().build());
         List<ApiTestCaseResponse> result = apiTestCaseService.list(API_ID, PROJECT_ID, REMOVED);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
@@ -242,9 +239,16 @@ class ApiTestCaseServiceTest {
     @Test
     @DisplayName("Test the countByProjectIds method in the ApiTestCase service")
     public void countByProjectIds_test() {
-        when(customizedApiTestCaseRepository.countByProjectIds(any())).thenReturn(1L);
-        Long count = apiTestCaseService.countByProjectIds(Lists.newArrayList(ID));
+        when(customizedApiTestCaseRepository.countByProjectIds(any(), any())).thenReturn(1L);
+        Long count = apiTestCaseService.countByProjectIds(Lists.newArrayList(ID), LocalDateTime.now());
         assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("Test the countByProjectIds method in the ApiTestCase service")
+    public void countByProjectIds_projectIdIsNull_test() {
+        Long count = apiTestCaseService.countByProjectIds(Lists.newArrayList(), LocalDateTime.now());
+        assertThat(count).isEqualTo(0L);
     }
 
     @Test

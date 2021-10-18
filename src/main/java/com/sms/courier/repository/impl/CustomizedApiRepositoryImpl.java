@@ -5,6 +5,7 @@ import static com.sms.courier.common.field.ApiField.API_NAME;
 import static com.sms.courier.common.field.ApiField.API_PATH;
 import static com.sms.courier.common.field.ApiField.API_PROTOCOL;
 import static com.sms.courier.common.field.ApiField.API_STATUS;
+import static com.sms.courier.common.field.ApiField.CASE_COUNT;
 import static com.sms.courier.common.field.ApiField.GROUP_ID;
 import static com.sms.courier.common.field.ApiField.REQUEST_METHOD;
 import static com.sms.courier.common.field.ApiField.SCENE_CASE_COUNT;
@@ -19,7 +20,9 @@ import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.common.field.UserField.NICKNAME;
 import static com.sms.courier.common.field.UserField.USERNAME;
 
+import com.mongodb.client.result.UpdateResult;
 import com.sms.courier.common.enums.CollectionName;
+import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
@@ -30,6 +33,7 @@ import com.sms.courier.entity.group.ApiGroupEntity;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.tag.ApiTagEntity;
+import com.sms.courier.initialize.ApiCaseCount;
 import com.sms.courier.repository.ApiGroupRepository;
 import com.sms.courier.repository.ApiTagRepository;
 import com.sms.courier.repository.CommonRepository;
@@ -45,6 +49,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
@@ -187,6 +192,31 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
         SCENE_CASE_COUNT.gt(0).ifPresent(query::addCriteria);
         return mongoTemplate.count(query, "Api");
+    }
+
+    @Override
+    public Long caseCount(ObjectId projectId) {
+        Query query = new Query();
+        PROJECT_ID.is(projectId).ifPresent(query::addCriteria);
+        REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
+        CASE_COUNT.gt(0).ifPresent(query::addCriteria);
+        return mongoTemplate.count(query, "Api");
+    }
+
+    @Override
+    public long updateCountFieldByIds(List<ApiCaseCount> caseCountList, Field filedName) {
+        long count = 0;
+        for (ApiCaseCount apiCaseCount : caseCountList) {
+            if (StringUtils.isNotBlank(apiCaseCount.getApiId())) {
+                Query query = new Query();
+                query.addCriteria(Criteria.where(ID.getName()).is(new ObjectId(apiCaseCount.getApiId())));
+                Update update = new Update();
+                update.set(filedName.getName(), apiCaseCount.getCount());
+                UpdateResult result = mongoTemplate.updateMulti(query, update, ApiEntity.class);
+                count += result.getMatchedCount();
+            }
+        }
+        return count;
     }
 
     private void addCriteria(ApiPageRequest apiPageRequest, Query query) {

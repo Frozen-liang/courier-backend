@@ -16,3 +16,4 @@ courier.websocket.engine_allowed_origin_patterns=*
 courier.websocket.message_size_limit=655360
 courier.admin.username=
 courier.admin.password=
+courier.api.count.reset.case_count=

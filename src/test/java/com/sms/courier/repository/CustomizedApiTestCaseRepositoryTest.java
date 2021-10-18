@@ -1,20 +1,12 @@
 package com.sms.courier.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.mongo.QueryVo;
+import com.sms.courier.initialize.ApiCaseCount;
 import com.sms.courier.repository.impl.CustomizedApiTestCaseRepositoryImpl;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -25,6 +17,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @DisplayName("Tests for CustomizedApiTestCaseRepository")
 class CustomizedApiTestCaseRepositoryTest {
@@ -76,7 +78,7 @@ class CustomizedApiTestCaseRepositoryTest {
     @DisplayName("Test the countByProjectIds method in the CustomizedApiTestCaseRepository")
     public void countByProjectIds() {
         when(mongoTemplate.count(any(), anyString())).thenReturn(1L);
-        Long count = customizedApiTestCaseRepository.countByProjectIds(ID_LIST);
+        Long count = customizedApiTestCaseRepository.countByProjectIds(ID_LIST, LocalDateTime.now());
         assertThat(count).isEqualTo(1L);
     }
 
@@ -85,11 +87,22 @@ class CustomizedApiTestCaseRepositoryTest {
     public void getCasePageByProjectIdsAndCreateDate() {
         Page<ApiTestCaseResponse> page = mock(Page.class);
         when(page.getContent()).thenReturn(Lists.newArrayList(ApiTestCaseResponse.builder().build()));
-        when(commonRepository.page(any(QueryVo.class),any(),eq(ApiTestCaseResponse.class))).thenReturn(page);
+        when(commonRepository.page(any(QueryVo.class), any(), eq(ApiTestCaseResponse.class))).thenReturn(page);
         Page<ApiTestCaseResponse> pageDto =
             customizedApiTestCaseRepository.getCasePageByProjectIdsAndCreateDate(ID_LIST, LocalDateTime.now(),
                 new PageDto());
         assertThat(pageDto.getContent().size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Test the findProjectIdAndGroupByApiId method in the CustomizedApiTestCaseRepository")
+    public void findProjectIdAndGroupByApiId() {
+        List<ApiCaseCount> apiCaseCountList = Lists.newArrayList(ApiCaseCount.builder().build());
+        AggregationResults<ApiCaseCount> results = mock(AggregationResults.class);
+        when(results.getMappedResults()).thenReturn(apiCaseCountList);
+        when(mongoTemplate.aggregate(any(), eq(ApiTestCaseEntity.class), eq(ApiCaseCount.class))).thenReturn(results);
+        List<ApiCaseCount> result = customizedApiTestCaseRepository.findProjectIdAndGroupByApiId(ID, Boolean.FALSE);
+        assertThat(result.size()).isEqualTo(1);
     }
 
 }

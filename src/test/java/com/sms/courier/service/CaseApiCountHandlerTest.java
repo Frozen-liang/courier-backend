@@ -44,10 +44,11 @@ public class CaseApiCountHandlerTest {
             Lists.list(CaseTemplateApiEntity.builder().id(MOCK_ID.toString())
                 .caseTemplateId(MOCK_ID.toString())
                 .apiType(ApiType.API)
-                .apiTestCase(ApiTestCaseEntity.builder().apiEntity(
+                .projectId(MOCK_ID.toString())
+                .apiTestCase(ApiTestCaseEntity.builder().projectId(MOCK_ID.toString()).apiEntity(
                     ApiEntity.builder().id(MOCK_ID.toString()).build()).build()).build());
         when(caseTemplateApiRepository.findAllByIdIsIn(any())).thenReturn(entityList);
-        when(customizedSceneCaseApiRepository.findCountByCaseTemplateId(any())).thenReturn(1L);
+        when(customizedSceneCaseApiRepository.findCountByCaseTemplateIdAndNowProjectId(any(), any())).thenReturn(1L);
         doNothing().when(applicationEventPublisher).publishEvent(any());
         caseApiCountHandler.addTemplateCaseByCaseTemplateApiIds(List.of(MOCK_ID.toString()));
         verify(caseTemplateApiRepository, times(1)).findAllByIdIsIn(List.of(MOCK_ID.toString()));
@@ -59,11 +60,12 @@ public class CaseApiCountHandlerTest {
         List<CaseTemplateApiEntity> entityList =
             Lists.list(CaseTemplateApiEntity.builder().id(MOCK_ID.toString())
                 .caseTemplateId(MOCK_ID.toString())
+                .projectId(MOCK_ID.toString())
                 .apiType(ApiType.API)
-                .apiTestCase(ApiTestCaseEntity.builder().apiEntity(
-                    ApiEntity.builder().id(MOCK_ID.toString()).build()).build()).build());
+                .apiTestCase(ApiTestCaseEntity.builder().projectId(MOCK_ID.toString())
+                    .apiEntity(ApiEntity.builder().id(MOCK_ID.toString()).build()).build()).build());
         when(caseTemplateApiRepository.findAllByIdIsIn(any())).thenReturn(entityList);
-        when(customizedSceneCaseApiRepository.findCountByCaseTemplateId(any())).thenReturn(1L);
+        when(customizedSceneCaseApiRepository.findCountByCaseTemplateIdAndNowProjectId(any(), any())).thenReturn(1L);
         doNothing().when(applicationEventPublisher).publishEvent(any());
         caseApiCountHandler.deleteTemplateCaseByCaseTemplateApiIds(List.of(MOCK_ID.toString()));
         verify(caseTemplateApiRepository, times(1)).findAllByIdIsIn(List.of(MOCK_ID.toString()));
@@ -110,22 +112,22 @@ public class CaseApiCountHandlerTest {
 
     @Test
     @DisplayName("Test the addSceneCaseByApiIds method in the CaseApiCountHandler service")
-    void addSceneCaseByApiIds_test(){
+    void addSceneCaseByApiIds_test() {
         caseApiCountHandler.addSceneCaseByApiIds(List.of(MOCK_ID.toString()));
-        verify(applicationEventPublisher,times(1)).publishEvent(any(AddCaseEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(AddCaseEvent.class));
     }
 
     @Test
     @DisplayName("Test the addTestCaseByApiIds method in the CaseApiCountHandler service")
-    void addTestCaseByApiIds_test(){
+    void addTestCaseByApiIds_test() {
         caseApiCountHandler.addTestCaseByApiIds(List.of(MOCK_ID.toString()));
-        verify(applicationEventPublisher,times(1)).publishEvent(any(AddCaseEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(AddCaseEvent.class));
     }
 
     @Test
     @DisplayName("Test the deleteTestCaseByApiIds method in the CaseApiCountHandler service")
-    void deleteTestCaseByApiIds_test(){
+    void deleteTestCaseByApiIds_test() {
         caseApiCountHandler.deleteTestCaseByApiIds(List.of(MOCK_ID.toString()));
-        verify(applicationEventPublisher,times(1)).publishEvent(any(DeleteCaseEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(DeleteCaseEvent.class));
     }
 }

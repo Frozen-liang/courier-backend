@@ -29,7 +29,7 @@ public class ApiTestCaseJobController {
     }
 
     @PostMapping("/page")
-    public Page<ApiTestCaseJobPageResponse> page(ApiTestCaseJobPageRequest pageRequest) {
+    public Page<ApiTestCaseJobPageResponse> page(@RequestBody ApiTestCaseJobPageRequest pageRequest) {
         return apiTestCaseJobService.page(pageRequest);
     }
 

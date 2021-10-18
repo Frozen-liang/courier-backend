@@ -67,8 +67,10 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
             List<SceneCaseApiEntity> caseApiList =
                 sceneCaseApiMapper.toSceneCaseApiListByAddRequest(addSceneCaseApiDto.getAddSceneCaseApiRequestList());
             sceneCaseApiRepository.insert(caseApiList);
-            List<String> addApiList = caseApiList.stream().filter(entity -> Objects.equals(entity.getApiType(),
-                ApiType.API)).map(entity -> entity.getApiTestCase().getApiEntity().getId())
+            List<String> addApiList = caseApiList.stream()
+                .filter(entity -> Objects.equals(entity.getApiType(), ApiType.API)
+                    && Objects.equals(entity.getProjectId(), entity.getApiTestCase().getProjectId()))
+                .map(entity -> entity.getApiTestCase().getApiEntity().getId())
                 .collect(Collectors.toList());
             sceneCaseApiCountHandler.addSceneCaseByApiIds(addApiList);
             return Boolean.TRUE;

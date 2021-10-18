@@ -9,7 +9,6 @@ import static com.sms.courier.common.exception.ErrorCode.DELETE_WORKSPACE_BY_ID_
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_WORKSPACE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_BY_ID_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_COUNT_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_LIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.THE_WORKSPACE_CANNOT_DELETE_ERROR;
@@ -138,25 +137,22 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Override
     public List<WorkspaceResponse> findByUserId() {
-        return commonRepository.listLookupUser(CollectionName.WORKSPACE.getName(),
-            List.of(REMOVE.is(Boolean.FALSE), USER_IDS.is(new ObjectId(SecurityUtil.getCurrUserId()))),
-            WorkspaceResponse.class
-        );
-    }
-
-    @Override
-    public Long caseCount(String id) {
         try {
-            List<ProjectResponse> projectResponses = projectService.list(id);
-            if (CollectionUtils.isNotEmpty(projectResponses)) {
-                List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
-                    .collect(Collectors.toList());
-                return apiTestCaseService.countByProjectIds(projectIds);
+            List<WorkspaceResponse> responseList = commonRepository.listLookupUser(CollectionName.WORKSPACE.getName(),
+                List.of(REMOVE.is(Boolean.FALSE), USER_IDS.is(new ObjectId(SecurityUtil.getCurrUserId()))),
+                WorkspaceResponse.class
+            );
+            for (WorkspaceResponse response : responseList) {
+                List<String> projectIds = projectService.list(response.getId())
+                    .stream().map(ProjectResponse::getId).collect(Collectors.toList());
+                response.setAllCaseCount(apiTestCaseService.countByProjectIds(projectIds, null));
+                LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
+                response.setRecentCaseCount(apiTestCaseService.countByProjectIds(projectIds, dateTime));
             }
-            return 0L;
+            return responseList;
         } catch (Exception e) {
-            log.error("Failed to get the Workspace case count!", e);
-            throw new ApiTestPlatformException(GET_WORKSPACE_CASE_COUNT_ERROR);
+            log.error("Failed to get the Workspace list by userId!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_LIST_ERROR);
         }
     }
 
