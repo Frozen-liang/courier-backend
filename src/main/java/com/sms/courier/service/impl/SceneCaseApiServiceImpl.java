@@ -72,7 +72,13 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
                     && Objects.equals(entity.getProjectId(), entity.getApiTestCase().getProjectId()))
                 .map(entity -> entity.getApiTestCase().getApiEntity().getId())
                 .collect(Collectors.toList());
-            sceneCaseApiCountHandler.addSceneCaseByApiIds(addApiList);
+            sceneCaseApiCountHandler.addSceneCaseByApiIds(addApiList, Boolean.TRUE);
+            List<String> otherObjectApiList = caseApiList.stream()
+                .filter(entity -> Objects.equals(entity.getApiType(), ApiType.API)
+                    && !Objects.equals(entity.getProjectId(), entity.getApiTestCase().getProjectId()))
+                .map(entity -> entity.getApiTestCase().getApiEntity().getId())
+                .collect(Collectors.toList());
+            sceneCaseApiCountHandler.addSceneCaseByApiIds(otherObjectApiList, Boolean.FALSE);
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to add the SceneCaseApi!", e);

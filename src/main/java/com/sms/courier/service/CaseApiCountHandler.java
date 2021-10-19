@@ -12,7 +12,7 @@ public interface CaseApiCountHandler {
 
     void addSceneCaseBySceneCaseApiIds(List<String> sceneCaseApiIds);
 
-    void addSceneCaseByApiIds(List<String> apiIds);
+    void addSceneCaseByApiIds(List<String> apiIds, boolean isNowObject);
 
     void addTestCaseByApiIds(List<String> apiIds);
 

@@ -40,7 +40,9 @@ public class ApiPageResponse extends LookupUserResponse {
 
     private String apiManager;
 
-    private int caseCount;
+    private Integer caseCount;
 
-    private int sceneCount;
+    private Integer sceneCaseCount;
+
+    private Integer otherObjectSceneCaseCount;
 }

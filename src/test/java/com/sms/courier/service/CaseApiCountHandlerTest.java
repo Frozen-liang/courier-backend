@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -48,7 +49,8 @@ public class CaseApiCountHandlerTest {
                 .apiTestCase(ApiTestCaseEntity.builder().projectId(MOCK_ID.toString()).apiEntity(
                     ApiEntity.builder().id(MOCK_ID.toString()).build()).build()).build());
         when(caseTemplateApiRepository.findAllByIdIsIn(any())).thenReturn(entityList);
-        when(customizedSceneCaseApiRepository.findCountByCaseTemplateIdAndNowProjectId(any(), any())).thenReturn(1L);
+        when(customizedSceneCaseApiRepository.findCountByCaseTemplateIdAndNowProjectId(any(), any(), anyBoolean()))
+            .thenReturn(1L);
         doNothing().when(applicationEventPublisher).publishEvent(any());
         caseApiCountHandler.addTemplateCaseByCaseTemplateApiIds(List.of(MOCK_ID.toString()));
         verify(caseTemplateApiRepository, times(1)).findAllByIdIsIn(List.of(MOCK_ID.toString()));
@@ -65,7 +67,8 @@ public class CaseApiCountHandlerTest {
                 .apiTestCase(ApiTestCaseEntity.builder().projectId(MOCK_ID.toString())
                     .apiEntity(ApiEntity.builder().id(MOCK_ID.toString()).build()).build()).build());
         when(caseTemplateApiRepository.findAllByIdIsIn(any())).thenReturn(entityList);
-        when(customizedSceneCaseApiRepository.findCountByCaseTemplateIdAndNowProjectId(any(), any())).thenReturn(1L);
+        when(customizedSceneCaseApiRepository.findCountByCaseTemplateIdAndNowProjectId(any(), any(), anyBoolean()))
+            .thenReturn(1L);
         doNothing().when(applicationEventPublisher).publishEvent(any());
         caseApiCountHandler.deleteTemplateCaseByCaseTemplateApiIds(List.of(MOCK_ID.toString()));
         verify(caseTemplateApiRepository, times(1)).findAllByIdIsIn(List.of(MOCK_ID.toString()));
@@ -85,7 +88,8 @@ public class CaseApiCountHandlerTest {
             List.of(CaseTemplateApiEntity.builder().apiType(ApiType.API).apiTestCase(
                 ApiTestCaseEntity.builder().apiEntity(ApiEntity.builder().id(MOCK_ID.toString()).build()).build())
                 .build());
-        when(caseTemplateApiRepository.findAllByCaseTemplateIdIn(any())).thenReturn(caseTemplateApiEntityList);
+        when(caseTemplateApiRepository.findAllByCaseTemplateIdAndRemovedOrderByOrder(any(), anyBoolean()))
+            .thenReturn(caseTemplateApiEntityList);
         doNothing().when(applicationEventPublisher).publishEvent(any());
         caseApiCountHandler.deleteSceneCaseBySceneCaseApiIds(List.of(MOCK_ID.toString()));
         verify(sceneCaseApiRepository, times(1)).findAllByIdIsIn(List.of(MOCK_ID.toString()));
@@ -104,7 +108,8 @@ public class CaseApiCountHandlerTest {
             List.of(CaseTemplateApiEntity.builder().apiTestCase(
                 ApiTestCaseEntity.builder().apiEntity(ApiEntity.builder().id(MOCK_ID.toString()).build()).build())
                 .build());
-        when(caseTemplateApiRepository.findAllByCaseTemplateIdIn(any())).thenReturn(caseTemplateApiEntityList);
+        when(caseTemplateApiRepository.findAllByCaseTemplateIdAndRemovedOrderByOrder(any(), anyBoolean()))
+            .thenReturn(caseTemplateApiEntityList);
         doNothing().when(applicationEventPublisher).publishEvent(any());
         caseApiCountHandler.addSceneCaseBySceneCaseApiIds(List.of(MOCK_ID.toString()));
         verify(sceneCaseApiRepository, times(1)).findAllByIdIsIn(List.of(MOCK_ID.toString()));
@@ -113,7 +118,7 @@ public class CaseApiCountHandlerTest {
     @Test
     @DisplayName("Test the addSceneCaseByApiIds method in the CaseApiCountHandler service")
     void addSceneCaseByApiIds_test() {
-        caseApiCountHandler.addSceneCaseByApiIds(List.of(MOCK_ID.toString()));
+        caseApiCountHandler.addSceneCaseByApiIds(List.of(MOCK_ID.toString()), Boolean.TRUE);
         verify(applicationEventPublisher, times(1)).publishEvent(any(AddCaseEvent.class));
     }
 
