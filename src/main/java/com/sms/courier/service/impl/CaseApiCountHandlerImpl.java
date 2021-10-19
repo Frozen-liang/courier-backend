@@ -1,13 +1,14 @@
 package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.CaseType.CASE;
+import static com.sms.courier.common.enums.CaseType.OTHER_OBJECT_SCENE_CASE_COUNT;
 import static com.sms.courier.common.enums.CaseType.SCENE_CASE;
 
-import com.google.common.collect.Lists;
 import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.enums.CaseType;
 import com.sms.courier.common.listener.event.AddCaseEvent;
 import com.sms.courier.common.listener.event.DeleteCaseEvent;
+import com.sms.courier.dto.ApiCountIdsDto;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.repository.CaseTemplateApiRepository;
@@ -51,10 +52,18 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
             long count =
                 customizedSceneCaseApiRepository
                     .findCountByCaseTemplateIdAndNowProjectId(new ObjectId(entity.getCaseTemplateId()),
-                        new ObjectId(entity.getApiTestCase().getProjectId()));
+                        new ObjectId(entity.getApiTestCase().getProjectId()), Boolean.TRUE);
             if (count > 0) {
                 AddCaseEvent addCaseEvent = new AddCaseEvent(List.of(entity.getApiTestCase().getApiEntity().getId()),
                     CaseType.SCENE_CASE, Integer.parseInt(String.valueOf(count)));
+                applicationEventPublisher.publishEvent(addCaseEvent);
+            }
+            long otherObjectCount = customizedSceneCaseApiRepository
+                .findCountByCaseTemplateIdAndNowProjectId(new ObjectId(entity.getCaseTemplateId()),
+                    new ObjectId(entity.getApiTestCase().getProjectId()), Boolean.FALSE);
+            if (otherObjectCount > 0) {
+                AddCaseEvent addCaseEvent = new AddCaseEvent(List.of(entity.getApiTestCase().getApiEntity().getId()),
+                    CaseType.OTHER_OBJECT_SCENE_CASE_COUNT, Integer.parseInt(String.valueOf(otherObjectCount)));
                 applicationEventPublisher.publishEvent(addCaseEvent);
             }
         }
@@ -70,11 +79,20 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
             long count =
                 customizedSceneCaseApiRepository
                     .findCountByCaseTemplateIdAndNowProjectId(new ObjectId(entity.getCaseTemplateId()),
-                        new ObjectId(entity.getApiTestCase().getProjectId()));
+                        new ObjectId(entity.getApiTestCase().getProjectId()), Boolean.TRUE);
             if (count > 0) {
                 DeleteCaseEvent deleteCaseEvent = new DeleteCaseEvent(
                     List.of(entity.getApiTestCase().getApiEntity().getId()),
                     CaseType.SCENE_CASE, Integer.parseInt(String.valueOf(count)));
+                applicationEventPublisher.publishEvent(deleteCaseEvent);
+            }
+            long otherObjectCount = customizedSceneCaseApiRepository
+                .findCountByCaseTemplateIdAndNowProjectId(new ObjectId(entity.getCaseTemplateId()),
+                    new ObjectId(entity.getApiTestCase().getProjectId()), Boolean.FALSE);
+            if (otherObjectCount > 0) {
+                DeleteCaseEvent deleteCaseEvent = new DeleteCaseEvent(
+                    List.of(entity.getApiTestCase().getApiEntity().getId()),
+                    CaseType.OTHER_OBJECT_SCENE_CASE_COUNT, Integer.parseInt(String.valueOf(otherObjectCount)));
                 applicationEventPublisher.publishEvent(deleteCaseEvent);
             }
         }
@@ -84,24 +102,39 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
     @Override
     public void deleteSceneCaseBySceneCaseApiIds(List<String> ids) {
         List<SceneCaseApiEntity> entityList = sceneCaseApiRepository.findAllByIdIsIn(ids);
-        List<String> apiIds = getApiIdsByEntityList(entityList);
-        DeleteCaseEvent deleteCaseEvent = new DeleteCaseEvent(apiIds, SCENE_CASE, null);
-        applicationEventPublisher.publishEvent(deleteCaseEvent);
+        ApiCountIdsDto apiIds = getApiIdsByEntityList(entityList);
+        if (CollectionUtils.isNotEmpty(apiIds.getSceneCaseCountApiIds())) {
+            DeleteCaseEvent deleteCaseEvent = new DeleteCaseEvent(apiIds.getSceneCaseCountApiIds(), SCENE_CASE, null);
+            applicationEventPublisher.publishEvent(deleteCaseEvent);
+        }
+        if (CollectionUtils.isNotEmpty(apiIds.getOtherObjectSceneCaseCountApiIds())) {
+            DeleteCaseEvent deleteCaseEvent = new DeleteCaseEvent(apiIds.getOtherObjectSceneCaseCountApiIds(),
+                OTHER_OBJECT_SCENE_CASE_COUNT, null);
+            applicationEventPublisher.publishEvent(deleteCaseEvent);
+        }
     }
 
     //增加流程用例api时，发送事件
     @Override
     public void addSceneCaseBySceneCaseApiIds(List<String> sceneCaseApiIds) {
         List<SceneCaseApiEntity> entityList = sceneCaseApiRepository.findAllByIdIsIn(sceneCaseApiIds);
-        List<String> apiIds = getApiIdsByEntityList(entityList);
-        AddCaseEvent addCaseEvent = new AddCaseEvent(apiIds, SCENE_CASE, null);
-        applicationEventPublisher.publishEvent(addCaseEvent);
+        ApiCountIdsDto apiIds = getApiIdsByEntityList(entityList);
+        if (CollectionUtils.isNotEmpty(apiIds.getSceneCaseCountApiIds())) {
+            AddCaseEvent addCaseEvent = new AddCaseEvent(apiIds.getSceneCaseCountApiIds(), SCENE_CASE, null);
+            applicationEventPublisher.publishEvent(addCaseEvent);
+        }
+        if (CollectionUtils.isNotEmpty(apiIds.getOtherObjectSceneCaseCountApiIds())) {
+            AddCaseEvent addCaseEvent = new AddCaseEvent(apiIds.getOtherObjectSceneCaseCountApiIds(),
+                OTHER_OBJECT_SCENE_CASE_COUNT, null);
+            applicationEventPublisher.publishEvent(addCaseEvent);
+        }
     }
 
     //增加流程用例api时，发送事件
     @Override
-    public void addSceneCaseByApiIds(List<String> apiIds) {
-        AddCaseEvent addCaseEvent = new AddCaseEvent(apiIds, SCENE_CASE, null);
+    public void addSceneCaseByApiIds(List<String> apiIds, boolean isNowObject) {
+        AddCaseEvent addCaseEvent = new AddCaseEvent(apiIds, isNowObject ? SCENE_CASE : OTHER_OBJECT_SCENE_CASE_COUNT,
+            null);
         applicationEventPublisher.publishEvent(addCaseEvent);
     }
 
@@ -119,7 +152,7 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
         applicationEventPublisher.publishEvent(deleteCaseEvent);
     }
 
-    private List<String> getApiIdsByEntityList(List<SceneCaseApiEntity> sceneCaseApiEntityList) {
+    private ApiCountIdsDto getApiIdsByEntityList(List<SceneCaseApiEntity> sceneCaseApiEntityList) {
         List<String> sceneCaseApiIds = sceneCaseApiEntityList.stream()
             .filter(entity -> Objects.isNull(entity.getCaseTemplateId())
                 && CollectionUtils.isEmpty(entity.getCaseTemplateApiConnList())
@@ -127,22 +160,34 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
             .map(entity -> entity.getApiTestCase().getApiEntity().getId())
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-        List<String> templateIds = sceneCaseApiEntityList.stream()
-            .map(SceneCaseApiEntity::getCaseTemplateId)
+        List<String> otherObjectSceneCaseApiIds = sceneCaseApiEntityList.stream()
+            .filter(entity -> Objects.isNull(entity.getCaseTemplateId())
+                && CollectionUtils.isEmpty(entity.getCaseTemplateApiConnList())
+                && !Objects.equals(entity.getProjectId(), entity.getApiTestCase().getProjectId()))
+            .map(entity -> entity.getApiTestCase().getApiEntity().getId())
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
 
-        List<String> templateApiIds = CollectionUtils.isNotEmpty(templateIds)
-            ? caseTemplateApiRepository.findAllByCaseTemplateIdIn(templateIds)
-            .stream()
-            .filter(entity -> Objects.equals(entity.getApiType(), ApiType.API)
-                && Objects.equals(entity.getProjectId(), entity.getApiTestCase().getProjectId()))
-            .map(entity -> entity.getApiTestCase().getApiEntity().getId())
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList())
-            : Lists.newArrayList();
-        sceneCaseApiIds.addAll(templateApiIds);
-        return sceneCaseApiIds;
+        List<SceneCaseApiEntity> templateApiCase = sceneCaseApiEntityList.stream()
+            .filter(entity -> Objects.nonNull(entity.getCaseTemplateId()))
+            .collect(Collectors.toList());
+        for (SceneCaseApiEntity sceneCaseApiEntity : templateApiCase) {
+            List<CaseTemplateApiEntity> caseTemplateApiEntityList = caseTemplateApiRepository
+                .findAllByCaseTemplateIdAndRemovedOrderByOrder(sceneCaseApiEntity.getCaseTemplateId(), Boolean.FALSE);
+            for (CaseTemplateApiEntity caseTemplateApiEntity : caseTemplateApiEntityList) {
+                if (Objects.equals(caseTemplateApiEntity.getApiType(), ApiType.API)) {
+                    if (Objects.equals(sceneCaseApiEntity.getProjectId(),
+                        caseTemplateApiEntity.getApiTestCase().getProjectId())) {
+                        sceneCaseApiIds.add(caseTemplateApiEntity.getApiTestCase().getApiEntity().getId());
+                    } else {
+                        otherObjectSceneCaseApiIds.add(caseTemplateApiEntity.getApiTestCase().getApiEntity().getId());
+                    }
+                }
+            }
+        }
+
+        return ApiCountIdsDto.builder().sceneCaseCountApiIds(sceneCaseApiIds)
+            .otherObjectSceneCaseCountApiIds(otherObjectSceneCaseApiIds).build();
     }
 
 }
