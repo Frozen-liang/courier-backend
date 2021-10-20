@@ -11,7 +11,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 
 group = "com.sms.courier"
-version = "1.0.3"
+version = "1.0.5"
 description = "courier-backend"
 
 
@@ -73,7 +73,7 @@ springBoot {
 
 
 dependencies {
-    implementation("net.logstash.logback:logstash-logback-encoder:6.6")
+
     val versionLombok by extra("1.18.20")
     val versionMapstruct by extra("1.4.2.Final")
     val versionJjwt by extra("0.11.2")
@@ -106,7 +106,6 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("commons-io:commons-io:2.8.0")
     implementation("org.apache.commons:commons-collections4:4.4")
-    implementation("com.alibaba:fastjson:1.2.76")
     implementation("io.vavr:vavr:0.10.4")
     implementation("org.codehaus.groovy:groovy:3.0.8")
     compileOnly("com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}")
@@ -114,9 +113,11 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:$versionJjwt")
     implementation("io.jsonwebtoken:jjwt-impl:$versionJjwt")
     implementation("io.jsonwebtoken:jjwt-jackson:$versionJjwt")
+    implementation("net.logstash.logback:logstash-logback-encoder:6.6")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.mockito:mockito-inline:3.6.28")
+
 
 }
 
