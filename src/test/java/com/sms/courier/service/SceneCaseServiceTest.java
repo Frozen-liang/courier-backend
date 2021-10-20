@@ -246,7 +246,7 @@ class SceneCaseServiceTest {
         List<CaseTemplateApiEntity> caseTemplateApiList =
             Lists.newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID)
                 .apiTestCase(ApiTestCaseEntity.builder().id(MOCK_ID).execute(Boolean.TRUE).build()).build());
-        when(caseTemplateApiService.listByCaseTemplateId(any())).thenReturn(caseTemplateApiList);
+        when(caseTemplateApiService.listByCaseTemplateId(any(), anyBoolean())).thenReturn(caseTemplateApiList);
         List<CaseTemplateApiResponse> caseTemplateApiResponses =
             Lists.newArrayList(CaseTemplateApiResponse.builder().build());
         when(caseTemplateApiMapper.toCaseTemplateApiDtoList(any())).thenReturn(caseTemplateApiResponses);
@@ -381,7 +381,7 @@ class SceneCaseServiceTest {
         Optional<SceneCaseEntity> sceneCase = Optional.ofNullable(SceneCaseEntity.builder().build());
         when(sceneCaseRepository.findById(any())).thenReturn(sceneCase);
         List<CaseTemplateApiEntity> caseTemplateApiList = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
-        when(caseTemplateApiService.listByCaseTemplateId(any())).thenReturn(caseTemplateApiList);
+        when(caseTemplateApiService.listByCaseTemplateId(any(), anyBoolean())).thenReturn(caseTemplateApiList);
         List<CaseTemplateApiConn> caseTemplateApiConnList = Lists
             .newArrayList(CaseTemplateApiConn.builder().execute(Boolean.TRUE).caseTemplateApiId(MOCK_ID).build());
         when(sceneCaseMapper.toCaseTemplateApiConnList(any())).thenReturn(caseTemplateApiConnList);
