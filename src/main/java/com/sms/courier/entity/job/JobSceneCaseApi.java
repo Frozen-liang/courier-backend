@@ -15,6 +15,8 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @Builder
 public class JobSceneCaseApi {
 
+    private String caseId;
+
     private String id;
 
     @Field(targetType = FieldType.OBJECT_ID)
