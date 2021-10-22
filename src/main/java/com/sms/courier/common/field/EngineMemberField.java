@@ -6,7 +6,8 @@ public enum EngineMemberField implements Field {
     DESTINATION("destination"),
     TASK_COUNT("taskCount"),
     CASE_TASK("caseTask"),
-    SCENE_CASE_TASK("sceneCaseTask");
+    SCENE_CASE_TASK("sceneCaseTask"),
+    STATUS("status");
 
     private final String name;
 

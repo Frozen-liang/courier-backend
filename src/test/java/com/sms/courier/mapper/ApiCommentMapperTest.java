@@ -24,7 +24,7 @@ class ApiCommentMapperTest {
 
     @Test
     @DisplayName("Test the method to convert the ApiComment's entity object to a dto object")
-    void entity_to_dto() {
+    void entity_to_dto() throws InterruptedException {
         ApiCommentEntity apiComment = ApiCommentEntity.builder()
             .comment(COMMENT)
             .createDateTime(CREATE_TIME)

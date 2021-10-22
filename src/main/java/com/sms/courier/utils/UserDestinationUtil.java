@@ -6,6 +6,7 @@ public abstract class UserDestinationUtil {
     private static final String CASE = PREFIX + "/case/";
     private static final String SCENE_CASE = PREFIX + "/scene/case/";
     private static final String PROJECT = PREFIX + "/project/";
+    private static final String LOG = PREFIX + "/log/";
 
     public static String getCaseDest(String userId) {
         return CASE + userId;
@@ -19,4 +20,7 @@ public abstract class UserDestinationUtil {
         return PROJECT + projectId;
     }
 
+    public static String getLogDest(String id) {
+        return PROJECT + SecurityUtil.getCurrUserId() + "/" + id;
+    }
 }

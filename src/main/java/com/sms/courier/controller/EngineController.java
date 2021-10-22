@@ -2,6 +2,7 @@ package com.sms.courier.controller;
 
 import static com.sms.courier.common.constant.Constants.ENGINE_PATH;
 
+import com.sms.courier.dto.request.DockerLogRequest;
 import com.sms.courier.dto.response.EngineRegistrationResponse;
 import com.sms.courier.dto.response.EngineResponse;
 import com.sms.courier.engine.EngineMemberManagement;
@@ -10,6 +11,7 @@ import com.sms.courier.security.jwt.JwtTokenManager;
 import com.sms.courier.security.pojo.CustomUser;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -52,6 +54,26 @@ public class EngineController {
     @PutMapping("/close")
     public Boolean closeEngine(String id) {
         return engineMemberManagement.closeEngine(id);
+    }
+
+    @PostMapping("/create")
+    public Boolean createEngine() {
+        return engineMemberManagement.createEngine();
+    }
+
+    @PostMapping("/restart")
+    public Boolean restartEngine(String id) {
+        return engineMemberManagement.restartEngine(id);
+    }
+
+    @DeleteMapping("/delete")
+    public Boolean deleteEngine(String id) {
+        return engineMemberManagement.deleteEngine(id);
+    }
+
+    @GetMapping("/queryLog")
+    public Boolean queryLog(@Validated DockerLogRequest request) {
+        return engineMemberManagement.queryLog(request);
     }
 
 }

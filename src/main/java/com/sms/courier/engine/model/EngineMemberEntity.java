@@ -24,6 +24,7 @@ public class EngineMemberEntity extends BaseEntity {
     private String destination;
     private String sessionId;
     private String host;
+    @Indexed(unique = true)
     private String name;
     /**
      * The engine version.

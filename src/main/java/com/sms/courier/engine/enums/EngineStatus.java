@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public enum EngineStatus implements EnumCommon {
+    CREATE(-1),
     PENDING(0),
     RUNNING(1),
     WAITING_FOR_RECONNECTION(2),

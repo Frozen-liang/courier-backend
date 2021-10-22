@@ -108,6 +108,7 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
     private void populateJob(JobReport jobReport, JobEntity job) {
         job.setJobStatus(jobReport.getJobStatus());
         job.setMessage(jobReport.getMessage());
+        job.setErrCode(jobReport.getErrCode());
         job.setTotalTimeCost(jobReport.getTotalTimeCost());
         job.setParamsTotalTimeCost(jobReport.getParamsTotalTimeCost());
         job.setInfoList(jobReport.getInfoList());

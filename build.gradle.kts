@@ -11,7 +11,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 
 group = "com.sms.courier"
-version = "1.0.4"
+version = "1.0.6"
 description = "courier-backend"
 
 
@@ -94,6 +94,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-websocket") {
         exclude(module = "spring-boot-starter-tomcat")
     }
+    // docker api
+    implementation("com.github.docker-java:docker-java:3.2.12")
+    implementation("com.github.docker-java:docker-java-transport-httpclient5:3.2.12")
     compileOnly("org.projectlombok:lombok:$versionLombok")
     annotationProcessor("org.mapstruct:mapstruct-processor:$versionMapstruct")
     annotationProcessor("org.projectlombok:lombok:$versionLombok")

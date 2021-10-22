@@ -19,4 +19,5 @@ public interface EngineMemberRepository extends MongoRepository<EngineMemberEnti
 
     List<EngineMemberEntity> findAllByDestinationIn(List<String> destinations);
 
+    Optional<EngineMemberEntity> findFirstByName(String name);
 }
