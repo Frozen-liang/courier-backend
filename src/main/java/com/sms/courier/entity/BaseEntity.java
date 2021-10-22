@@ -21,18 +21,23 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 public class BaseEntity {
 
     @MongoId(FieldType.OBJECT_ID)
+    @JsonIgnore
     private String id;
     @Field(name = "isRemoved")
     @JsonIgnore
     private boolean removed;
     @CreatedBy
     @Field(targetType = FieldType.OBJECT_ID)
+    @JsonIgnore
     private String createUserId;
     @LastModifiedBy
     @Field(targetType = FieldType.OBJECT_ID)
+    @JsonIgnore
     private String modifyUserId;
     @CreatedDate
+    @JsonIgnore
     private LocalDateTime createDateTime;
     @LastModifiedDate
+    @JsonIgnore
     private LocalDateTime modifyDateTime;
 }

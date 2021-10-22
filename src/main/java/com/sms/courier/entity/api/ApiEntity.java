@@ -130,5 +130,5 @@ public class ApiEntity extends BaseEntity {
     private Integer sceneCaseCount;
 
     @JsonIgnore
-    private Integer otherObjectSceneCaseCount;
+    private Integer otherProjectSceneCaseCount;
 }

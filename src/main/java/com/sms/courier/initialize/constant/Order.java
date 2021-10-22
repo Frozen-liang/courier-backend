@@ -10,5 +10,4 @@ public class Order {
     public static final int DEFAULT_USER_GROUP = 2;
     public static final int ADMIN = 3;
     public static final int MOCK_SETTING = 4;
-    public static final int API_CASE_COUNT_REST = 5;
 }

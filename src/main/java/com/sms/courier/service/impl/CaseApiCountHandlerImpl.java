@@ -107,8 +107,8 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
             DeleteCaseEvent deleteCaseEvent = new DeleteCaseEvent(apiIds.getSceneCaseCountApiIds(), SCENE_CASE, null);
             applicationEventPublisher.publishEvent(deleteCaseEvent);
         }
-        if (CollectionUtils.isNotEmpty(apiIds.getOtherObjectSceneCaseCountApiIds())) {
-            DeleteCaseEvent deleteCaseEvent = new DeleteCaseEvent(apiIds.getOtherObjectSceneCaseCountApiIds(),
+        if (CollectionUtils.isNotEmpty(apiIds.getOtherProjectSceneCaseCountApiIds())) {
+            DeleteCaseEvent deleteCaseEvent = new DeleteCaseEvent(apiIds.getOtherProjectSceneCaseCountApiIds(),
                 OTHER_OBJECT_SCENE_CASE_COUNT, null);
             applicationEventPublisher.publishEvent(deleteCaseEvent);
         }
@@ -123,8 +123,8 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
             AddCaseEvent addCaseEvent = new AddCaseEvent(apiIds.getSceneCaseCountApiIds(), SCENE_CASE, null);
             applicationEventPublisher.publishEvent(addCaseEvent);
         }
-        if (CollectionUtils.isNotEmpty(apiIds.getOtherObjectSceneCaseCountApiIds())) {
-            AddCaseEvent addCaseEvent = new AddCaseEvent(apiIds.getOtherObjectSceneCaseCountApiIds(),
+        if (CollectionUtils.isNotEmpty(apiIds.getOtherProjectSceneCaseCountApiIds())) {
+            AddCaseEvent addCaseEvent = new AddCaseEvent(apiIds.getOtherProjectSceneCaseCountApiIds(),
                 OTHER_OBJECT_SCENE_CASE_COUNT, null);
             applicationEventPublisher.publishEvent(addCaseEvent);
         }
@@ -187,7 +187,7 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
         }
 
         return ApiCountIdsDto.builder().sceneCaseCountApiIds(sceneCaseApiIds)
-            .otherObjectSceneCaseCountApiIds(otherObjectSceneCaseApiIds).build();
+            .otherProjectSceneCaseCountApiIds(otherObjectSceneCaseApiIds).build();
     }
 
 }
