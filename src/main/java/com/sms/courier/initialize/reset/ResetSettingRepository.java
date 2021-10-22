@@ -4,5 +4,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ResetSettingRepository extends MongoRepository<ResetSetting, String> {
 
-   ResetSetting findByResetType(String type);
+    ResetSetting findByResetType(String type);
 }
