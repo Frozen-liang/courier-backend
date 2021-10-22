@@ -53,8 +53,10 @@ public class ApiEntity extends BaseEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private List<String> tagId;
 
+    @JsonIgnore
     private String apiName;
 
+    @JsonIgnore
     private String description;
 
     private String apiPath;
@@ -109,12 +111,16 @@ public class ApiEntity extends BaseEntity {
     @JsonIgnore
     private String apiManagerId;
 
+    @JsonIgnore
     private String richText;
 
+    @JsonIgnore
     private String markdown;
 
+    @JsonIgnore
     private ApiNodeType apiNodeType;
 
+    @JsonIgnore
     private ApiEncodingType apiEncodingType;
 
     @JsonIgnore
@@ -122,4 +128,7 @@ public class ApiEntity extends BaseEntity {
 
     @JsonIgnore
     private Integer sceneCaseCount;
+
+    @JsonIgnore
+    private Integer otherObjectSceneCaseCount;
 }

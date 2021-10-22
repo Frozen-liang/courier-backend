@@ -48,6 +48,7 @@ public class DataInitializerImpl implements DataInitializer {
             if (checkInitialized(systemVersion, version)) {
                 systemVersion = Objects.requireNonNullElse(systemVersion, SystemVersionEntity.builder().build());
                 systemVersion.setVersion(version);
+                systemVersion.setGroup(group);
                 systemVersion.setBuildTime(buildTime);
                 systemVersion.setName(name);
                 String pattern = PREFIX + version + SUFFIX;

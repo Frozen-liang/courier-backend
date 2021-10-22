@@ -11,7 +11,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 
 group = "com.sms.courier"
-version = "1.0.4"
+version = "1.0.5"
 description = "courier-backend"
 
 
@@ -73,6 +73,7 @@ springBoot {
 
 
 dependencies {
+
     val versionLombok by extra("1.18.20")
     val versionMapstruct by extra("1.4.2.Final")
     val versionJjwt by extra("0.11.2")
@@ -112,9 +113,11 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:$versionJjwt")
     implementation("io.jsonwebtoken:jjwt-impl:$versionJjwt")
     implementation("io.jsonwebtoken:jjwt-jackson:$versionJjwt")
+    implementation("net.logstash.logback:logstash-logback-encoder:6.6")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.mockito:mockito-inline:3.6.28")
+
 
 }
 

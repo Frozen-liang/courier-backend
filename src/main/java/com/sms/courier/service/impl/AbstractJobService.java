@@ -98,7 +98,7 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
         if (MapUtils.isNotEmpty(caseReportMap)) {
             for (JobSceneCaseApi jobSceneCaseApi : job.getApiTestCase()) {
                 JobApiTestCase jobApiTestCase = jobSceneCaseApi.getJobApiTestCase();
-                jobApiTestCase.setCaseReport(caseReportMap.get(jobSceneCaseApi.getId()));
+                jobApiTestCase.setCaseReport(caseReportMap.get(jobSceneCaseApi.getCaseId()));
             }
         }
         populateJob(jobReport, job);
