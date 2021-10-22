@@ -247,7 +247,7 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
     }
 
     private List<ParamInfo> toParams(Optional<List<List<String>>> pathSummary, Schema<?> schema,
-        Map<String, Schema> components, int currentIndex) {
+        Map<String, Schema> components, int currentIndex, Schema<?> parentSchema) {
         List<ParamInfo> paramInfos = new ArrayList<>();
         List<List<String>> paths = pathSummary.orElse(new ArrayList<>());
         Map<String, Schema> properties = schema.getProperties();
@@ -283,6 +283,20 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
             paramInfos = toComplexParams(paths, schema,
                 components, currentIndex);
         }
+        return ifArrayIncludeObjectElement(parentSchema, paramInfos);
+    }
+
+    private List<ParamInfo> toParams(Optional<List<List<String>>> pathSummary, Schema<?> schema,
+        Map<String, Schema> components, int currentIndex) {
+        return toParams(pathSummary, schema, components, currentIndex, null);
+    }
+
+    private List<ParamInfo> ifArrayIncludeObjectElement(Schema<?> parentSchema, List<ParamInfo> paramInfos) {
+        if ((Objects.nonNull(parentSchema) && parentSchema instanceof ArraySchema) && !paramInfos.isEmpty()) {
+            paramInfos =
+                List.of(
+                    ParamInfo.builder().childParam(new ArrayList<>(paramInfos)).paramType(ParamType.OBJECT).build());
+        }
         return paramInfos;
     }
 
@@ -300,8 +314,7 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
             }
         }
         paths.get(currentIndex).add(componentKey);
-        return toParams(Optional.of(paths), components.get(componentKey),
-            components, currentIndex + 1);
+        return toParams(Optional.of(paths), components.get(componentKey), components, currentIndex + 1, schema);
     }
 
 }
