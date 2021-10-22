@@ -62,13 +62,13 @@ public class EngineController {
     }
 
     @PostMapping("/restart")
-    public Boolean restartEngine(String id) {
-        return engineMemberManagement.restartEngine(id);
+    public Boolean restartEngine(String name) {
+        return engineMemberManagement.restartEngine(name);
     }
 
     @DeleteMapping("/delete")
-    public Boolean deleteEngine(String id) {
-        return engineMemberManagement.deleteEngine(id);
+    public Boolean deleteEngine(String name) {
+        return engineMemberManagement.deleteEngine(name);
     }
 
     @GetMapping("/queryLog")

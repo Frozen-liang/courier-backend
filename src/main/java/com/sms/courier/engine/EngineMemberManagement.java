@@ -29,9 +29,9 @@ public interface EngineMemberManagement {
 
     Boolean createEngine();
 
-    Boolean restartEngine(String id);
+    Boolean restartEngine(String name);
 
-    Boolean deleteEngine(String id);
+    Boolean deleteEngine(String name);
 
     Boolean queryLog(DockerLogRequest request);
 }

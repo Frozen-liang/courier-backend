@@ -1,8 +1,10 @@
 package com.sms.courier.engine.impl;
 
+import static com.sms.courier.common.enums.OperationModule.ENGINE_MEMBER;
+import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.exception.ErrorCode.CREATE_ENGINE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_ENGINE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.GET_ENGINE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.RESTART_ENGINE_ERROR;
 import static com.sms.courier.common.field.EngineMemberField.CASE_TASK;
 import static com.sms.courier.common.field.EngineMemberField.DESTINATION;
@@ -10,6 +12,7 @@ import static com.sms.courier.common.field.EngineMemberField.OPEN;
 import static com.sms.courier.common.field.EngineMemberField.SCENE_CASE_TASK;
 import static com.sms.courier.common.field.EngineMemberField.TASK_COUNT;
 
+import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.CaseRecordRequest;
 import com.sms.courier.dto.request.DockerLogRequest;
@@ -139,6 +142,7 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = ENGINE_MEMBER)
     public Boolean createEngine() {
         try {
             EngineSettingResponse engineSetting = engineSettingService.findOne();
@@ -156,11 +160,10 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     }
 
     @Override
-    public Boolean restartEngine(String id) {
+    @LogRecord(operationType = DELETE, operationModule = ENGINE_MEMBER, template = "{{#name}}")
+    public Boolean restartEngine(String name) {
         try {
-            EngineMemberEntity engineMember =
-                engineMemberRepository.findById(id).orElseThrow(() -> ExceptionUtils.mpe(GET_ENGINE_BY_ID_ERROR));
-            dockerService.restartContainer(engineMember.getName());
+            dockerService.restartContainer(name);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
@@ -172,11 +175,10 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     }
 
     @Override
-    public Boolean deleteEngine(String id) {
+    @LogRecord(operationType = DELETE, operationModule = ENGINE_MEMBER, template = "{{#name}}")
+    public Boolean deleteEngine(String name) {
         try {
-            EngineMemberEntity engineMember =
-                engineMemberRepository.findById(id).orElseThrow(() -> ExceptionUtils.mpe(GET_ENGINE_BY_ID_ERROR));
-            dockerService.deleteContainer(engineMember.getName());
+            dockerService.deleteContainer(name);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
