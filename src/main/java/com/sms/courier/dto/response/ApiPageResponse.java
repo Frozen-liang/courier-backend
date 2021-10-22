@@ -44,5 +44,5 @@ public class ApiPageResponse extends LookupUserResponse {
 
     private Integer sceneCaseCount;
 
-    private Integer otherObjectSceneCaseCount;
+    private Integer otherProjectSceneCaseCount;
 }

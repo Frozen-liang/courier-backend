@@ -10,7 +10,7 @@ public enum CaseType implements EnumCommon {
 
     CASE(0, "caseCount"),
     SCENE_CASE(1, "sceneCaseCount"),
-    OTHER_OBJECT_SCENE_CASE_COUNT(2, "otherObjectSceneCaseCount");
+    OTHER_OBJECT_SCENE_CASE_COUNT(2, "otherProjectSceneCaseCount");
 
     CaseType(int code, String name) {
         this.code = code;
