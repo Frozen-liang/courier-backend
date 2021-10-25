@@ -14,5 +14,5 @@ public class EngineSettingRequest {
     @NotBlank(message = "The id must not be empty!")
     private String id;
     private String version;
-    private Map<String,String> envVariable;
+    private Map<String, String> envVariable;
 }
