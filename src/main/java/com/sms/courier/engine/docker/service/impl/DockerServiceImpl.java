@@ -91,7 +91,6 @@ public class DockerServiceImpl implements DockerService {
             logContainerCmd.exec(new Adapter<Frame>() {
                 @Override
                 public void onNext(Frame frame) {
-                    log.info(frame.toString());
                     messageService.dockerLog(request.getName(), frame.toString());
                 }
             });
