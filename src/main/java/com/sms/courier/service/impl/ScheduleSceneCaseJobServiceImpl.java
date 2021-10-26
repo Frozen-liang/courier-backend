@@ -12,6 +12,7 @@ import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.common.listener.event.ScheduleJobRecordEvent;
+import com.sms.courier.common.listener.event.ScheduleTestReportEvent;
 import com.sms.courier.engine.service.CaseDispatcherService;
 import com.sms.courier.entity.datacollection.DataCollectionEntity;
 import com.sms.courier.entity.datacollection.TestData;
@@ -95,6 +96,11 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
                 .publishEvent(ScheduleJobRecordEvent
                     .create(scheduleCaseJob.getScheduleRecordId(), job.getId(), scheduleCaseJob.getSceneCaseId(),
                         jobReport.getJobStatus()));
+            // Send email
+            applicationEventPublisher
+                .publishEvent(
+                    ScheduleTestReportEvent.create(scheduleCaseJob.getScheduleRecordId(), sceneCaseJobReport,
+                        scheduleCaseJob.getApiTestCase().size()));
         } catch (Exception e) {
             log.error("Save schedule scene case job report error. jobId={}", jobReport.getJobId(), e);
         }

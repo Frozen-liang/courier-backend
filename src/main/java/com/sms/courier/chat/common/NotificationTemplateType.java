@@ -10,9 +10,20 @@ import lombok.Getter;
 @Getter
 public enum NotificationTemplateType {
 
-    ACCOUNT_PWD_RESET(1, "Password-Reset-Template", accountPwdResetFiled());
+    ACCOUNT_PWD_RESET(1, "Password-Reset-Template", accountPwdResetFiled()),
+    TEST_REPORT(2, "Test-Report-Template", testReportFiled());
 
-    private static final List<TemplateField> accountPwdResetFiled() {
+    private static List<TemplateField> testReportFiled() {
+        return List.of(
+            TemplateField.builder().name("totalTimeCost").description("Execution time").build(),
+            TemplateField.builder().name("paramsTotalTimeCost").description("Parameter conversion time").build(),
+            TemplateField.builder().name("delayTimeTotalTimeCost").description("Delay time").build(),
+            TemplateField.builder().name("success").description("Success count").build(),
+            TemplateField.builder().name("fail").description("Fail count").build()
+        );
+    }
+
+    private static List<TemplateField> accountPwdResetFiled() {
         return Arrays.asList(
             TemplateField.builder()
                 .name("name").description("Username").build(),

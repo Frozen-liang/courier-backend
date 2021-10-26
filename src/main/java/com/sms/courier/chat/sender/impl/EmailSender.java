@@ -1,6 +1,7 @@
 package com.sms.courier.chat.sender.impl;
 
 import static com.sms.courier.chat.common.NotificationTemplateType.ACCOUNT_PWD_RESET;
+import static com.sms.courier.chat.common.NotificationTemplateType.TEST_REPORT;
 import static com.sms.courier.common.exception.ErrorCode.MAIL_SERVICE_IS_DISABLE;
 import static com.sms.courier.common.exception.ErrorCode.NOTIFICATION_TEMPLATE_NOT_EXIST;
 import static com.sms.courier.utils.Assert.isTrue;
@@ -71,7 +72,20 @@ public class EmailSender extends AbstractSender implements InitializingBean {
 
         String title = handleVariable(template.getTitle(), template.getTitleVariableKey(),
             notificationPayload.getTitleVariable());
-        String content =  handleVariable(template.getContent(), template.getContentVariableKey(),
+        String content = handleVariable(template.getContent(), template.getContentVariableKey(),
+            notificationPayload.getContentVariable());
+        send(notificationPayload, title, content);
+        return true;
+    }
+
+    @Override
+    public boolean sendTestReportNotification(NotificationPayload notificationPayload) {
+        isTrue(enabled, MAIL_SERVICE_IS_DISABLE);
+        NotificationTemplateEntity template = notificationTemplateService.findTemplateByType(TEST_REPORT);
+        isTrue(Objects.nonNull(template), NOTIFICATION_TEMPLATE_NOT_EXIST, TEST_REPORT.getName());
+        String title = handleVariable(template.getTitle(), template.getTitleVariableKey(),
+            notificationPayload.getTitleVariable());
+        String content = handleVariable(template.getContent(), template.getContentVariableKey(),
             notificationPayload.getContentVariable());
         send(notificationPayload, title, content);
         return true;
