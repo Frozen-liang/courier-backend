@@ -35,7 +35,6 @@ public class DockerServiceImpl implements DockerService {
 
     private final DockerClient client;
     private final MessageService messageService;
-    private static final String NET_WORK_ID = "courier_courier-network";
     private static final String EVN = "%s=%s";
     private static final String IMAGE = "%s:%s";
     private static final int DEFAULT_TAIL = 100;
@@ -48,6 +47,7 @@ public class DockerServiceImpl implements DockerService {
     @Override
     public void startContainer(EngineSettingResponse engineSetting) {
         try {
+            log.info("Create engine:{}", engineSetting);
             CreateContainerCmd createContainerCmd = client
                 .createContainerCmd(String.format(IMAGE, engineSetting.getImageName(), engineSetting.getVersion()))
                 .withName(engineSetting.getContainerName());
@@ -61,7 +61,8 @@ public class DockerServiceImpl implements DockerService {
                 createContainerCmd.withEnv(env);
             }
             CreateContainerResponse ccr = createContainerCmd.exec();
-            client.connectToNetworkCmd().withContainerId(ccr.getId()).withNetworkId(NET_WORK_ID).exec();
+            client.connectToNetworkCmd().withContainerId(ccr.getId())
+                .withNetworkId(engineSetting.getNetWorkId()).exec();
             client.startContainerCmd(ccr.getId()).exec();
         } catch (NotFoundException e) {
             log.error("No such container", e);
@@ -78,6 +79,7 @@ public class DockerServiceImpl implements DockerService {
     @Override
     public void queryLog(DockerLogRequest request) {
         try {
+            log.info("QueryLog engine: {}", request);
             LogContainerCmd logContainerCmd = client.logContainerCmd(request.getName()).withTimestamps(true)
                 .withSince(request.getSince()).withTail(request.getTail())
                 .withStdOut(true).withStdErr(true);
@@ -103,6 +105,7 @@ public class DockerServiceImpl implements DockerService {
     @Override
     public void deleteContainer(String name) {
         try {
+            log.info("Delete engine: {}", name);
             client.removeContainerCmd(name).withForce(true).exec();
         } catch (NotFoundException e) {
             log.error("No such container", e);
@@ -116,6 +119,7 @@ public class DockerServiceImpl implements DockerService {
     @Override
     public void restartContainer(String name) {
         try {
+            log.info("Restart engine: {}", name);
             client.restartContainerCmd(name).exec();
         } catch (NotFoundException e) {
             log.error("No such container", e);

@@ -13,8 +13,10 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class EngineSettingResponse extends BaseResponse {
+
+    private String netWorkId;
     private String imageName;
     private String containerName;
     private String version;
-    private Map<String,String> envVariable;
+    private Map<String, String> envVariable;
 }
