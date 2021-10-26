@@ -73,6 +73,7 @@ springBoot {
 
 
 dependencies {
+
     val versionLombok by extra("1.18.20")
     val versionMapstruct by extra("1.4.2.Final")
     val versionJjwt by extra("0.11.2")
@@ -94,10 +95,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-websocket") {
         exclude(module = "spring-boot-starter-tomcat")
     }
+    // docker api
     implementation ("com.github.docker-java:docker-java:3.2.12"){
         exclude(module = "docker-java-transport-jersey")
     }
-    implementation ("com.github.docker-java:docker-java-transport-httpclient5:3.2.12")
+    implementation("com.github.docker-java:docker-java-transport-httpclient5:3.2.12")
     compileOnly("org.projectlombok:lombok:$versionLombok")
     annotationProcessor("org.mapstruct:mapstruct-processor:$versionMapstruct")
     annotationProcessor("org.projectlombok:lombok:$versionLombok")
@@ -116,6 +118,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:$versionJjwt")
     implementation("io.jsonwebtoken:jjwt-impl:$versionJjwt")
     implementation("io.jsonwebtoken:jjwt-jackson:$versionJjwt")
+    implementation("net.logstash.logback:logstash-logback-encoder:6.6")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.mockito:mockito-inline:3.6.28")
