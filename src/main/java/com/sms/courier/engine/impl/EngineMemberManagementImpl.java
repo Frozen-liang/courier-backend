@@ -147,7 +147,8 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
         try {
             EngineSettingResponse engineSetting = engineSettingService.findOne();
             long count = engineMemberRepository.count();
-            engineSetting.setContainerName(engineSetting.getContainerName() + "-" + ++count);
+            count++;
+            engineSetting.setContainerName(engineSetting.getContainerName() + "-" + count);
             dockerService.startContainer(engineSetting);
             return true;
         } catch (ApiTestPlatformException e) {
