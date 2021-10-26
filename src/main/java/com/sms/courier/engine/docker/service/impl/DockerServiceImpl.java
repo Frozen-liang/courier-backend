@@ -3,6 +3,7 @@ package com.sms.courier.engine.docker.service.impl;
 import static com.sms.courier.common.exception.ErrorCode.CREATE_CONTAINER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_CONTAINER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.NO_SUCH_CONTAINER_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.NO_SUCH_IMAGE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.QUERY_CONTAINER_LOG_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.RESTART_CONTAINER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.THE_CONTAINER_ALREADY_EXISTED_ERROR;
@@ -65,8 +66,9 @@ public class DockerServiceImpl implements DockerService {
                 .withNetworkId(engineSetting.getNetWorkId()).exec();
             client.startContainerCmd(ccr.getId()).exec();
         } catch (NotFoundException e) {
-            log.error("No such container", e);
-            throw ExceptionUtils.mpe(NO_SUCH_CONTAINER_ERROR, engineSetting.getContainerName());
+            log.error("No such image", e);
+            throw ExceptionUtils.mpe(NO_SUCH_IMAGE_ERROR,
+                String.format(IMAGE, engineSetting.getImageName(), engineSetting.getVersion()));
         } catch (ConflictException e) {
             log.error("The container already existed!", e);
             throw ExceptionUtils.mpe(THE_CONTAINER_ALREADY_EXISTED_ERROR, engineSetting.getContainerName());
