@@ -1,6 +1,7 @@
 package com.sms.courier.common.enums;
 
 import com.sms.courier.dto.response.FileInfoResponse;
+import com.sms.courier.engine.model.EngineMemberEntity;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.datacollection.DataCollectionEntity;
@@ -63,7 +64,8 @@ public enum OperationModule implements EnumCommon {
     LOGIN_SETTING(24, LoginSettingEntity.class),
     MOCK_SETTING(25, MockSettingEntity.class),
     PROJECT_IMPORT_SOURCE(26, ProjectImportSourceEntity.class),
-    SCHEDULE_GROUP(27, ScheduleGroupEntity.class);
+    SCHEDULE_GROUP(27, ScheduleGroupEntity.class),
+    ENGINE_MEMBER(28, EngineMemberEntity.class);
 
     private static final Map<Integer, OperationModule> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationModule::getCode, Function.identity()));

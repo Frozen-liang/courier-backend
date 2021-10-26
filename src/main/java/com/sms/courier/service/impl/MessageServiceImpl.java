@@ -1,5 +1,6 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.utils.UserDestinationUtil.getLogDest;
 import static com.sms.courier.utils.UserDestinationUtil.getProjectDest;
 
 import com.sms.courier.entity.function.FunctionMessage;
@@ -37,5 +38,10 @@ public class MessageServiceImpl implements MessageService {
         log.info("Send engine message.functionIds:{},operationType:{}", functionMessage.getIds(),
             functionMessage.getOperationType());
         simpMessagingTemplate.convertAndSend(FUNCTION_DEST, Payload.ok(functionMessage));
+    }
+
+    @Override
+    public void dockerLog(String id, String message) {
+        simpMessagingTemplate.convertAndSend(getLogDest(id), message);
     }
 }

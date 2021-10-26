@@ -21,7 +21,7 @@ public class ScheduleJobRecordEvent {
 
     public static ScheduleJobRecordEvent create(String id, String jobId, String caseId, JobStatus jobStatus) {
         Objects.requireNonNull(id, "The id must not be null.");
-        Objects.requireNonNull(jobId, "The caseId must not be null.");
+        Objects.requireNonNull(jobId, "The jobId must not be null.");
         Objects.requireNonNull(caseId, "The caseId must not be null.");
         Objects.requireNonNull(jobStatus, "The jobStatus must not be null.");
         return new ScheduleJobRecordEvent(id, jobId, caseId, jobStatus);
