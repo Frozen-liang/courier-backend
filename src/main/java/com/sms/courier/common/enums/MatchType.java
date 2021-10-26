@@ -13,7 +13,7 @@ public enum MatchType implements EnumCommon {
     VALUE_GT(3), VALUE_GE(4), VALUE_LT(5),
     VALUE_LE(6), VALUE_INCLUDE(7), LENGTH_EQ(8),
     LENGTH_NE(9), LENGTH_GT(10), LENGTH_LT(11),
-    REGEX_MATCH(12);
+    REGEX_MATCH(12), VALUE_NOT_INCLUDE(13);
 
     private static final Map<Integer, MatchType> MAPPINGS =
         Arrays.stream(values()).collect(Collectors.toMap(MatchType::getCode, Function.identity()));

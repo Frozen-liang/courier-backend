@@ -109,11 +109,13 @@ public interface JobMapper {
     List<JobSceneCaseApi> toJobSceneCaseApiList(List<SceneCaseApiEntity> sceneCaseApiList);
 
     @Mapping(target = "jobApiTestCase", source = "apiTestCase")
+    @Mapping(target = "caseId", expression = "java(org.bson.types.ObjectId.get().toString())")
     JobSceneCaseApi toJobSceneCaseApi(SceneCaseApiEntity sceneCaseApi);
 
     List<JobSceneCaseApi> toJobSceneCaseApiListByTemplate(List<CaseTemplateApiEntity> caseTemplateApiList);
 
     @Mapping(target = "jobApiTestCase", source = "apiTestCase")
+    @Mapping(target = "caseId", expression = "java(org.bson.types.ObjectId.get().toString())")
     JobSceneCaseApi toJobSceneCaseApiByTemplate(CaseTemplateApiEntity caseTemplateApiList);
 
     @Mapping(target = "jobType", expression = "java(com.sms.courier.common.enums.JobType.SCENE_CASE)")

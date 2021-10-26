@@ -80,4 +80,6 @@ public class ApiResponse extends LookupUserResponse {
     private Integer caseCount;
 
     private Integer sceneCaseCount;
+
+    private Integer otherProjectSceneCaseCount;
 }

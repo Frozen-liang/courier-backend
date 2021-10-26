@@ -139,20 +139,7 @@ public class CaseTemplateApiServiceImpl implements CaseTemplateApiService {
     }
 
     @Override
-    public List<CaseTemplateApiEntity> listByCaseTemplateId(String caseTemplateId) {
-        try {
-            Example<CaseTemplateApiEntity> example = Example.of(
-                CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).build(),
-                ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName()));
-            return caseTemplateApiRepository.findAll(example);
-        } catch (Exception e) {
-            log.error("Failed to get the CaseTemplateApi list by caseTemplateId!", e);
-            throw ExceptionUtils.mpe(GET_CASE_TEMPLATE_API_LIST_BY_CASE_TEMPLATE_ID_ERROR);
-        }
-    }
-
-    @Override
-    public List<CaseTemplateApiEntity> getApiByCaseTemplateId(String caseTemplateId, boolean removed) {
+    public List<CaseTemplateApiEntity> listByCaseTemplateId(String caseTemplateId, boolean removed) {
         try {
             Example<CaseTemplateApiEntity> example = Example
                 .of(CaseTemplateApiEntity.builder().caseTemplateId(caseTemplateId).removed(removed).build(),
