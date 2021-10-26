@@ -1,0 +1,11 @@
+[
+  {
+    "imageName": "courier/courier-engine",
+    "containerName": "courier-engine",
+    "version": "1.0.0",
+    "envVariable": {
+      "ENGINE_URL": "http://courier-backend:8080"
+    }
+  }
+]
+

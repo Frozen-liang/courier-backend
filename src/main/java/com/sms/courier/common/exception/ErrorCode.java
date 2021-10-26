@@ -240,11 +240,23 @@ public enum ErrorCode {
     DELETE_API_COMMENT_BY_ID_ERROR("4220", "Failed to delete the ApiComment!"),
     THE_REPLIED_COMMENT_NOT_EXIST("4221", "The replied comment does not exist!"),
     GET_CASE_COUNT_BY_API_ERROR("4222", "Failed to query case count the Api!"),
+    GET_ENGINE_SETTING_ERROR("4223", "Failed to get engine setting!"),
+    EDIT_ENGINE_SETTING_ERROR("4224", "Failed to edit engine setting!"),
+    CREATE_CONTAINER_ERROR("4225", "Failed to create engine container!"),
+    DELETE_CONTAINER_ERROR("4226", "Failed to delete engine container!"),
+    RESTART_CONTAINER_ERROR("4227", "Failed to restart engine container!"),
+    NO_SUCH_CONTAINER_ERROR("4228", "No such engine: %s"),
+    THE_CONTAINER_ALREADY_EXISTED_ERROR("4229", "Engine: %s starting, please try again later!"),
+    QUERY_CONTAINER_LOG_ERROR("4230", "Failed to query container log!"),
+    CREATE_ENGINE_ERROR("4231", "Failed to create engine!"),
+    DELETE_ENGINE_ERROR("4232", "Failed to delete engine!"),
+    GET_ENGINE_BY_ID_ERROR("4233", "The engine not exist!"),
+    RESTART_ENGINE_ERROR("4234", "Failed to restart engine!"),
 
     // 60001 - 61000 describes api import exception
-    PARSE_SWAGGER_FILE_ERROR("61001", "Parse the swagger file error, Please check the format of the file contents."),
-    PARSE_SWAGGER_URL_ERROR("61002", "Parse the swagger url error, Please check the url."),
-    THE_OPERATION_ID_NOT_UNIQUE_ERROR("61020", "%s"),
+    PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),
+    PARSE_SWAGGER_URL_ERROR("60002", "Parse the swagger url error, Please check the url."),
+    THE_OPERATION_ID_NOT_UNIQUE_ERROR("60003", "%s"),
 
 
     // 61001  describes the test exception

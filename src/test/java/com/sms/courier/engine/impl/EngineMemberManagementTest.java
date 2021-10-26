@@ -14,6 +14,8 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.CaseRecordRequest;
 import com.sms.courier.engine.EngineId;
 import com.sms.courier.engine.EngineMemberManagement;
+import com.sms.courier.engine.EngineSettingService;
+import com.sms.courier.engine.docker.service.DockerService;
 import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.engine.model.EngineMemberEntity;
 import com.sms.courier.engine.request.EngineRegistrationRequest;
@@ -34,9 +36,11 @@ public class EngineMemberManagementTest {
     private final SuspiciousEngineManagement suspiciousEngineManagement = mock(SuspiciousEngineManagement.class);
     private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final EngineMapper engineMapper = mock(EngineMapper.class);
+    private final DockerService dockerService = mock(DockerService.class);
+    private final EngineSettingService engineSettingService = mock(EngineSettingService.class);
     private final EngineMemberManagement engineMemberManagement =
         new EngineMemberManagementImpl(engineMemberRepository, commonRepository, suspiciousEngineManagement,
-            engineMapper);
+            engineMapper, dockerService, engineSettingService);
     private final EngineMemberEntity engineMember = EngineMemberEntity.builder().destination(EngineId.generate()).id(
         ObjectId.get().toString()).status(EngineStatus.RUNNING).build();
     private static final String DESTINATION = EngineId.generate();

@@ -1,16 +1,27 @@
 package com.sms.courier.engine.impl;
 
+import static com.sms.courier.common.enums.OperationModule.ENGINE_MEMBER;
+import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.DELETE;
+import static com.sms.courier.common.exception.ErrorCode.CREATE_ENGINE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DELETE_ENGINE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.RESTART_ENGINE_ERROR;
 import static com.sms.courier.common.field.EngineMemberField.CASE_TASK;
 import static com.sms.courier.common.field.EngineMemberField.DESTINATION;
 import static com.sms.courier.common.field.EngineMemberField.OPEN;
 import static com.sms.courier.common.field.EngineMemberField.SCENE_CASE_TASK;
 import static com.sms.courier.common.field.EngineMemberField.TASK_COUNT;
 
+import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.CaseRecordRequest;
+import com.sms.courier.dto.request.DockerLogRequest;
 import com.sms.courier.dto.response.EngineResponse;
+import com.sms.courier.dto.response.EngineSettingResponse;
 import com.sms.courier.engine.EngineId;
 import com.sms.courier.engine.EngineMemberManagement;
+import com.sms.courier.engine.EngineSettingService;
+import com.sms.courier.engine.docker.service.DockerService;
 import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.engine.model.EngineMemberEntity;
 import com.sms.courier.engine.request.EngineRegistrationRequest;
@@ -41,26 +52,38 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     private final CommonRepository commonRepository;
     private final SuspiciousEngineManagement suspiciousEngineManagement;
     private final EngineMapper engineMapper;
+    private final DockerService dockerService;
+    private final EngineSettingService engineSettingService;
 
     public EngineMemberManagementImpl(EngineMemberRepository engineMemberRepository,
         CommonRepository commonRepository,
-        SuspiciousEngineManagement suspiciousEngineManagement, EngineMapper engineMapper) {
+        SuspiciousEngineManagement suspiciousEngineManagement, EngineMapper engineMapper,
+        DockerService dockerService, EngineSettingService engineSettingService) {
         this.engineMemberRepository = engineMemberRepository;
         this.commonRepository = commonRepository;
         this.suspiciousEngineManagement = suspiciousEngineManagement;
         this.engineMapper = engineMapper;
+        this.dockerService = dockerService;
+        this.engineSettingService = engineSettingService;
     }
 
     @Override
     public String bind(EngineRegistrationRequest request) {
-        EngineMemberEntity engineMember = EngineMemberEntity.builder()
-            .destination(EngineId.generate())
-            .host(request.getHost())
-            .status(EngineStatus.PENDING)
-            .name(request.getName())
-            .version(request.getVersion())
-            .build();
-        engineMemberRepository.insert(engineMember);
+        EngineMemberEntity engineMember;
+        Optional<EngineMemberEntity> optional = engineMemberRepository.findFirstByName(request.getName());
+        if (optional.isEmpty()) {
+            engineMember = EngineMemberEntity.builder()
+                .destination(EngineId.generate())
+                .host(request.getHost())
+                .status(EngineStatus.PENDING)
+                .name(request.getName())
+                .version(request.getVersion())
+                .build();
+        } else {
+            engineMember = optional.get();
+            engineMember.setStatus(EngineStatus.PENDING);
+        }
+        engineMemberRepository.save(engineMember);
         log.info("The destination {} of the test engine is binding.", engineMember.getDestination());
         return engineMember.getDestination();
     }
@@ -119,6 +142,61 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     }
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = ENGINE_MEMBER)
+    public Boolean createEngine() {
+        try {
+            EngineSettingResponse engineSetting = engineSettingService.findOne();
+            long count = engineMemberRepository.count();
+            count++;
+            engineSetting.setContainerName(engineSetting.getContainerName() + "-" + count);
+            dockerService.startContainer(engineSetting);
+            return true;
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Create engine error!", e);
+            throw ExceptionUtils.mpe(CREATE_ENGINE_ERROR);
+        }
+    }
+
+    @Override
+    @LogRecord(operationType = DELETE, operationModule = ENGINE_MEMBER, template = "{{#name}}")
+    public Boolean restartEngine(String name) {
+        try {
+            dockerService.restartContainer(name);
+            return Boolean.TRUE;
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Restart engine error!", e);
+            throw ExceptionUtils.mpe(RESTART_ENGINE_ERROR);
+        }
+    }
+
+    @Override
+    @LogRecord(operationType = DELETE, operationModule = ENGINE_MEMBER, template = "{{#name}}")
+    public Boolean deleteEngine(String name) {
+        try {
+            dockerService.deleteContainer(name);
+            return Boolean.TRUE;
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("Delete engine error!", e);
+            throw ExceptionUtils.mpe(DELETE_ENGINE_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean queryLog(DockerLogRequest request) {
+        dockerService.queryLog(request);
+        return Boolean.TRUE;
+    }
+
+    @Override
     public void unBind(String sessionId) {
         Optional<EngineMemberEntity> engineMemberOptional = engineMemberRepository.findFirstBySessionId(sessionId);
         engineMemberOptional.ifPresent((engineMember -> {
@@ -132,17 +210,17 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     @Override
     public void active(String sessionId, String destination) {
         if (isEngineDestination(destination)) {
-            EngineMemberEntity engineMember = engineMemberRepository.findFirstByDestination(destination)
-                .orElse(new EngineMemberEntity());
-            if (engineMember.getStatus() == EngineStatus.WAITING_FOR_RECONNECTION) {
-                suspiciousEngineManagement.remove(engineMember.getDestination());
-                log.info("The Engine reconnection.destination:{}", engineMember.getDestination());
-            }
-            engineMember.setStatus(EngineStatus.RUNNING);
-            engineMember.setDestination(destination);
-            engineMember.setSessionId(sessionId);
-            engineMemberRepository.save(engineMember);
-            log.info("The test engine {} activated.", destination);
+            engineMemberRepository.findFirstByDestination(destination).ifPresent(engineMember -> {
+                if (engineMember.getStatus() == EngineStatus.WAITING_FOR_RECONNECTION) {
+                    suspiciousEngineManagement.remove(engineMember.getDestination());
+                    log.info("The Engine reconnection.destination:{}", engineMember.getDestination());
+                }
+                engineMember.setStatus(EngineStatus.RUNNING);
+                engineMember.setDestination(destination);
+                engineMember.setSessionId(sessionId);
+                engineMemberRepository.save(engineMember);
+                log.info("The test engine {} activated.", destination);
+            });
         }
     }
 
