@@ -168,36 +168,18 @@ class CaseTemplateApiServiceTest {
     @DisplayName("Test the list by caseTemplateId method in the CaseTemplateApi service")
     void listBySceneCaseId_test_thenReturnSceneCaseApi() {
         List<CaseTemplateApiEntity> caseTemplateApiList = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
-        when(caseTemplateApiRepository.findAll(any(Example.class))).thenReturn(caseTemplateApiList);
-        List<CaseTemplateApiEntity> dto = caseTemplateApiService.listByCaseTemplateId(MOCK_SCENE_CASE_ID);
+        when(caseTemplateApiRepository.findAll(any(Example.class), any(Sort.class))).thenReturn(caseTemplateApiList);
+        List<CaseTemplateApiEntity> dto = caseTemplateApiService
+            .listByCaseTemplateId(MOCK_SCENE_CASE_ID, Boolean.FALSE);
         assertThat(dto).isNotEmpty();
     }
 
     @Test
     @DisplayName("Test the list by caseTemplateId method in the CaseTemplateApi service")
     void listBySceneCaseId_test_thenThrowException() {
-        when(caseTemplateApiRepository.findAll(any(Example.class)))
+        when(caseTemplateApiRepository.findAll(any(Example.class), any(Sort.class)))
             .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR));
-        assertThatThrownBy(() -> caseTemplateApiService.listByCaseTemplateId(MOCK_SCENE_CASE_ID))
-            .isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
-    @DisplayName("Test the getApiByCaseTemplateId method in the CaseTemplateApi service")
-    void getApiByCaseTemplateId_test() {
-        List<CaseTemplateApiEntity> caseTemplateApiList = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
-        when(caseTemplateApiRepository.findAll(any(), any(Sort.class))).thenReturn(caseTemplateApiList);
-        List<CaseTemplateApiEntity> dtoList = caseTemplateApiService
-            .getApiByCaseTemplateId(MOCK_SCENE_CASE_ID, Boolean.FALSE);
-        assertThat(dtoList).isNotEmpty();
-    }
-
-    @Test
-    @DisplayName("Test the getApiByCaseTemplateId method in the CaseTemplateApi service throws exception")
-    void getApiByCaseTemplateId_thenThrowException() {
-        when(caseTemplateApiRepository.findAll(any(), any(Sort.class)))
-            .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR));
-        assertThatThrownBy(() -> caseTemplateApiService.getApiByCaseTemplateId(MOCK_SCENE_CASE_ID, Boolean.FALSE))
+        assertThatThrownBy(() -> caseTemplateApiService.listByCaseTemplateId(MOCK_SCENE_CASE_ID, Boolean.FALSE))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 

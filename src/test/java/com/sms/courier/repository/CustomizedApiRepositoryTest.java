@@ -136,27 +136,8 @@ class CustomizedApiRepositoryTest {
     @Test
     @DisplayName("Test for caseCount in CustomizedApiRepository")
     public void caseCount_test() {
-        when(mongoTemplate.count(any(),anyString())).thenReturn(1L);
+        when(mongoTemplate.count(any(), anyString())).thenReturn(1L);
         Long count = customizedApiRepository.caseCount(new ObjectId());
         assertThat(count).isEqualTo(1L);
-    }
-
-    @Test
-    @DisplayName("Test for updateCountFieldByIds in CustomizedApiRepository")
-    public void updateCountFieldByIds_test() {
-        UpdateResult updateResult = mock(UpdateResult.class);
-        when(updateResult.getMatchedCount()).thenReturn(1L);
-        when(mongoTemplate.updateMulti(any(), any(), eq(ApiEntity.class))).thenReturn(updateResult);
-        List<ApiCaseCount> apiCaseCountList = Lists.newArrayList(ApiCaseCount.builder().apiId(ID).count(1L).build());
-        long count = customizedApiRepository.updateCountFieldByIds(apiCaseCountList, ApiField.CASE_COUNT);
-        assertThat(count).isEqualTo(1);
-    }
-
-    @Test
-    @DisplayName("Test for updateCountFieldByIds in CustomizedApiRepository")
-    public void updateCountFieldByIds_ApiCaseCountIsNull_test() {
-        List<ApiCaseCount> apiCaseCountList = Lists.newArrayList(ApiCaseCount.builder().build());
-        long count = customizedApiRepository.updateCountFieldByIds(apiCaseCountList, ApiField.CASE_COUNT);
-        assertThat(count).isEqualTo(0);
     }
 }

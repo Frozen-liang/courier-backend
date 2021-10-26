@@ -94,15 +94,4 @@ class CustomizedApiTestCaseRepositoryTest {
         assertThat(pageDto.getContent().size()).isEqualTo(1);
     }
 
-    @Test
-    @DisplayName("Test the findProjectIdAndGroupByApiId method in the CustomizedApiTestCaseRepository")
-    public void findProjectIdAndGroupByApiId() {
-        List<ApiCaseCount> apiCaseCountList = Lists.newArrayList(ApiCaseCount.builder().build());
-        AggregationResults<ApiCaseCount> results = mock(AggregationResults.class);
-        when(results.getMappedResults()).thenReturn(apiCaseCountList);
-        when(mongoTemplate.aggregate(any(), eq(ApiTestCaseEntity.class), eq(ApiCaseCount.class))).thenReturn(results);
-        List<ApiCaseCount> result = customizedApiTestCaseRepository.findProjectIdAndGroupByApiId(ID, Boolean.FALSE);
-        assertThat(result.size()).isEqualTo(1);
-    }
-
 }

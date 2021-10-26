@@ -175,10 +175,10 @@ class CaseTemplateServiceTest {
     @Test
     @DisplayName("Test the deleteByIds method in the CaseTemplate service")
     void deleteByIds_test() {
-        doNothing().when(caseTemplateRepository).deleteById(any());
+        doNothing().when(caseTemplateApiService).deleteAllByCaseTemplateIds(any());
         List<CaseTemplateApiEntity> caseTemplateApiList = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
-        when(caseTemplateApiService.listByCaseTemplateId(any())).thenReturn(caseTemplateApiList);
-        when(caseTemplateApiService.deleteByIds(any())).thenReturn(Boolean.TRUE);
+        when(caseTemplateApiService.listByCaseTemplateId(any(), anyBoolean())).thenReturn(caseTemplateApiList);
+        when(caseTemplateRepository.deleteAllByIdIsIn(any())).thenReturn(1L);
         Boolean isSuccess = caseTemplateService.deleteByIds(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }
@@ -214,7 +214,7 @@ class CaseTemplateServiceTest {
         when(caseTemplateRepository.save(any(CaseTemplateEntity.class))).thenReturn(caseTemplate);
         List<CaseTemplateApiEntity> caseTemplateApiDtoList = Lists
             .newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID).build());
-        when(caseTemplateApiService.getApiByCaseTemplateId(any(), anyBoolean())).thenReturn(caseTemplateApiDtoList);
+        when(caseTemplateApiService.listByCaseTemplateId(any(), anyBoolean())).thenReturn(caseTemplateApiDtoList);
         Boolean isSuccess = caseTemplateService
             .edit(UpdateCaseTemplateRequest.builder().build());
         assertTrue(isSuccess);

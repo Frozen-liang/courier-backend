@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class JobSceneCaseApiResponse {
 
+    private String caseId;
+
     private String id;
 
     private String sceneCaseId;

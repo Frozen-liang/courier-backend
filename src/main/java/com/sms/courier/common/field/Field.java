@@ -69,6 +69,10 @@ public interface Field {
         return Optional.of(Criteria.where(getName()).lte(gtValue));
     }
 
+    default Optional<Criteria> exists(boolean isExists) {
+        return Optional.of(Criteria.where(getName()).exists(isExists));
+    }
+
     default Optional<Criteria> like(String value) {
         if (Objects.isNull(value)) {
             return Optional.empty();

@@ -80,7 +80,7 @@ class CustomizedSceneCaseApiRepositoryTest {
     void findCountByCaseTemplateId_test() {
         when(mongoTemplate.count(any(), anyString())).thenReturn(1L);
         long count = customizedSceneCaseApiRepository
-            .findCountByCaseTemplateIdAndNowProjectId(new ObjectId(), new ObjectId());
+            .findCountByCaseTemplateIdAndNowProjectId(new ObjectId(), new ObjectId(), Boolean.TRUE);
         assertThat(count).isEqualTo(1L);
     }
 

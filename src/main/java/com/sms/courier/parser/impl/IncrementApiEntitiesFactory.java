@@ -66,6 +66,16 @@ public class IncrementApiEntitiesFactory implements DiffApiEntitiesFactory {
                 apiEntity.setTagId(oldApiEntity.getTagId());
                 apiEntity.setCreateUserId(oldApiEntity.getCreateUserId());
                 apiEntity.setCreateDateTime(oldApiEntity.getCreateDateTime());
+                apiEntity.setCaseCount(oldApiEntity.getCaseCount());
+                apiEntity.setSceneCaseCount(oldApiEntity.getSceneCaseCount());
+                apiEntity.setOtherProjectSceneCaseCount(apiEntity.getOtherProjectSceneCaseCount());
+                apiEntity.setApiName(oldApiEntity.getApiName());
+                apiEntity.setDescription(oldApiEntity.getDescription());
+                apiEntity.setApiProtocol(oldApiEntity.getApiProtocol());
+                apiEntity.setApiNodeType(oldApiEntity.getApiNodeType());
+                apiEntity.setApiManagerId(oldApiEntity.getApiManagerId());
+                apiEntity.setMarkdown(oldApiEntity.getMarkdown());
+                apiEntity.setRichText(oldApiEntity.getRichText());
             });
         return diffApiEntities;
     }

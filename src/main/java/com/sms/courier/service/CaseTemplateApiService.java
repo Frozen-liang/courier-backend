@@ -19,9 +19,7 @@ public interface CaseTemplateApiService {
 
     List<CaseTemplateApiResponse> listResponseByCaseTemplateId(String caseTemplateId);
 
-    List<CaseTemplateApiEntity> listByCaseTemplateId(String caseTemplateId);
-
-    List<CaseTemplateApiEntity> getApiByCaseTemplateId(String caseTemplateId, boolean remove);
+    List<CaseTemplateApiEntity> listByCaseTemplateId(String caseTemplateId, boolean remove);
 
     CaseTemplateApiResponse getCaseTemplateApiById(String id);
 
