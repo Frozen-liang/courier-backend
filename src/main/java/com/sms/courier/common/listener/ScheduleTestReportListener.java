@@ -20,6 +20,7 @@ import com.sms.courier.utils.ExceptionUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.event.EventListener;
@@ -47,7 +48,7 @@ public class ScheduleTestReportListener {
                 .findById(scheduleRecord.getScheduleId(), ScheduleEntity.class)
                 .orElseThrow(
                     () -> ExceptionUtils.mpe("The Schedule not exist! name = %s", scheduleRecord.getScheduleName()));
-            NoticeType noticeType = scheduleEntity.getNoticeType();
+            NoticeType noticeType = Objects.requireNonNullElse(scheduleEntity.getNoticeType(), NoticeType.CLOSE);
             switch (noticeType) {
                 case ALL:
                     sendEmail(scheduleEntity, event);
