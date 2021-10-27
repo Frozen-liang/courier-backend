@@ -1,7 +1,6 @@
 package com.sms.courier.config;
 
 import com.sms.courier.common.interceptors.ConnectChannelInterceptor;
-import com.sms.courier.common.interceptors.DataCompressionChannelInterceptor;
 import com.sms.courier.websocket.WebsocketProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -19,14 +18,12 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     private final WebsocketProperties websocketProperties;
     private final ConnectChannelInterceptor connectChannelInterceptor;
-    private final DataCompressionChannelInterceptor dataCompressionChannelInterceptor;
 
     public WebSocketConfiguration(WebsocketProperties websocketProperties,
-        ConnectChannelInterceptor connectChannelInterceptor,
-        DataCompressionChannelInterceptor dataCompressionChannelInterceptor) {
+        ConnectChannelInterceptor connectChannelInterceptor) {
         this.websocketProperties = websocketProperties;
         this.connectChannelInterceptor = connectChannelInterceptor;
-        this.dataCompressionChannelInterceptor = dataCompressionChannelInterceptor;
+
     }
 
     @Override
@@ -37,11 +34,6 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(connectChannelInterceptor);
-    }
-
-    @Override
-    public void configureClientOutboundChannel(ChannelRegistration registration) {
-        registration.interceptors(dataCompressionChannelInterceptor);
     }
 
     @Override

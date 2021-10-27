@@ -1,9 +1,13 @@
 package com.sms.courier.dto.request;
 
+import com.sms.courier.common.constant.TimePatternConstant;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
 @Builder
@@ -13,7 +17,9 @@ public class DockerLogRequest {
 
     private String name;
 
-    private Integer since;
+    @DateTimeFormat(pattern = TimePatternConstant.DEFAULT_PATTERN)
+    private Date since;
 
-    private Integer tail;
+    @Default
+    private Integer tail = 100;
 }
