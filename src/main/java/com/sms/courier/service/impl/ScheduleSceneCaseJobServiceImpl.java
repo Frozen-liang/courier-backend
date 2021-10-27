@@ -100,7 +100,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
             applicationEventPublisher
                 .publishEvent(
                     ScheduleTestReportEvent.create(scheduleCaseJob.getScheduleRecordId(), sceneCaseJobReport,
-                        scheduleCaseJob.getApiTestCase().size()));
+                        scheduleCaseJob.getApiTestCase().size(), scheduleCaseJob.getName()));
         } catch (Exception e) {
             log.error("Save schedule scene case job report error. jobId={}", jobReport.getJobId(), e);
         }
@@ -172,7 +172,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
                             getSceneCaseJobEntity(sceneCaseId, scheduleRecordEntity, jobEnv, apiCaseList);
                         scheduleSceneCaseJobEntity.setNext(sceneCaseEntity.isNext());
                         scheduleSceneCaseJobEntity.setDataCollection(jobDataCollection);
-                        scheduleSceneCaseJobEntity.setName(testData.getDataName());
+                        scheduleSceneCaseJobEntity.setName(sceneCaseEntity.getName() + "_" + testData.getDataName());
                         scheduleRecordEntity.getJobIds().add(scheduleSceneCaseJobEntity.getId());
                         scheduleSceneCaseJobEntities.add(scheduleSceneCaseJobEntity);
                     }

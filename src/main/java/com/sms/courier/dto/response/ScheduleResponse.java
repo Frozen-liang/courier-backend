@@ -58,10 +58,6 @@ public class ScheduleResponse extends BaseResponse {
     @JsonFormat(pattern = DEFAULT_PATTERN)
     private LocalDateTime lastTaskCompleteTime;
 
-    private List<String> userIds;
-
-    @JsonProperty("isDisplayError")
-    @Field("isDisplayError")
-    private boolean displayError;
+    private List<String> emails;
 
 }

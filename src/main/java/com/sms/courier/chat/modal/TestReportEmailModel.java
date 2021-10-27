@@ -7,6 +7,10 @@ import lombok.Data;
 @Builder
 public class TestReportEmailModel {
 
+    private String name;
+
+    private String projectId;
+
     private Integer totalTimeCost;
 
     private Integer paramsTotalTimeCost;

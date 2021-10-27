@@ -9,15 +9,17 @@ public class ScheduleTestReportEvent {
     private final String id;
     private final JobReport jobReport;
     private final int count;
+    private final String name;
 
-    private ScheduleTestReportEvent(String id, JobReport jobReport, int count) {
+    private ScheduleTestReportEvent(String id, JobReport jobReport, int count, String name) {
         this.id = id;
         this.jobReport = jobReport;
         this.count = count;
+        this.name = name;
     }
 
-    public static ScheduleTestReportEvent create(String id, JobReport jobReport, int count) {
-        return new ScheduleTestReportEvent(id, jobReport, count);
+    public static ScheduleTestReportEvent create(String id, JobReport jobReport, int count, String name) {
+        return new ScheduleTestReportEvent(id, jobReport, count, name);
     }
 }
 

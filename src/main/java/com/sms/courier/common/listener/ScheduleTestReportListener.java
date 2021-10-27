@@ -43,7 +43,8 @@ public class ScheduleTestReportListener {
             JobReport jobReport = event.getJobReport();
             ScheduleRecordEntity scheduleRecord = commonRepository.findById(event.getId(), ScheduleRecordEntity.class)
                 .orElseThrow(() -> ExceptionUtils.mpe("The ScheduleRecord not exist! id = %s", event.getId()));
-            ScheduleEntity scheduleEntity = commonRepository.findById(scheduleRecord.getId(), ScheduleEntity.class)
+            ScheduleEntity scheduleEntity = commonRepository
+                .findById(scheduleRecord.getScheduleId(), ScheduleEntity.class)
                 .orElseThrow(
                     () -> ExceptionUtils.mpe("The Schedule not exist! name = %s", scheduleRecord.getScheduleName()));
             NoticeType noticeType = scheduleEntity.getNoticeType();
@@ -79,7 +80,9 @@ public class ScheduleTestReportListener {
             TestReportEmailModelBuilder testReportEmailModelBuilder = TestReportEmailModel.builder()
                 .delayTimeTotalTimeCost(jobReport.getDelayTimeTotalTimeCost())
                 .paramsTotalTimeCost(jobReport.getParamsTotalTimeCost())
-                .totalTimeCost(jobReport.getTotalTimeCost());
+                .totalTimeCost(jobReport.getTotalTimeCost())
+                .projectId(scheduleEntity.getProjectId())
+                .name(scheduleEntity.getName() + "_" + event.getName());
             if (jobReport instanceof SceneCaseJobReport) {
                 SceneCaseJobReport sceneCaseJobReport = (SceneCaseJobReport) jobReport;
                 List<CaseReport> caseReportList = sceneCaseJobReport.getCaseReportList();
