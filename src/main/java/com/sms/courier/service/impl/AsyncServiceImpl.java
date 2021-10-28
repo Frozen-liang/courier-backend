@@ -9,18 +9,15 @@ import com.sms.courier.common.enums.SaveMode;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.entity.api.ApiEntity;
-import com.sms.courier.entity.api.ApiHistoryEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
 import com.sms.courier.entity.project.ImportSourceVo;
 import com.sms.courier.entity.project.ProjectImportFlowEntity;
 import com.sms.courier.infrastructure.id.DefaultIdentifierGenerator;
-import com.sms.courier.mapper.ApiHistoryMapper;
 import com.sms.courier.mapper.ProjectImportFlowMapper;
 import com.sms.courier.parser.ApiDocumentChecker;
 import com.sms.courier.parser.ApiDocumentTransformer;
 import com.sms.courier.parser.common.DocumentDefinition;
 import com.sms.courier.repository.ApiGroupRepository;
-import com.sms.courier.repository.ApiHistoryRepository;
 import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.ProjectImportFlowRepository;
 import com.sms.courier.service.AsyncService;
@@ -52,23 +49,18 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
     private static final int DEPTH = 1;
     private final DefaultIdentifierGenerator identifierGenerator = DefaultIdentifierGenerator.getSharedInstance();
     private final ApiRepository apiRepository;
-    private final ApiHistoryRepository apiHistoryRepository;
-    private final ApiHistoryMapper apiHistoryMapper;
     private final ApiGroupRepository apiGroupRepository;
     private final ProjectImportFlowRepository projectImportFlowRepository;
     private final ProjectImportFlowMapper projectImportFlowMapper;
     private ApplicationContext applicationContext;
     private final MessageService messageService;
 
-    public AsyncServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository,
-        ApiHistoryMapper apiHistoryMapper,
+    public AsyncServiceImpl(ApiRepository apiRepository,
         ApiGroupRepository apiGroupRepository,
         ProjectImportFlowRepository projectImportFlowRepository,
         ProjectImportFlowMapper projectImportFlowMapper,
         MessageService messageService) {
         this.apiRepository = apiRepository;
-        this.apiHistoryRepository = apiHistoryRepository;
-        this.apiHistoryMapper = apiHistoryMapper;
         this.apiGroupRepository = apiGroupRepository;
         this.projectImportFlowRepository = projectImportFlowRepository;
         this.projectImportFlowMapper = projectImportFlowMapper;
@@ -143,23 +135,6 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
         // Send import message.
         messageService.projectMessage(projectId,
             Payload.ok(projectImportFlowMapper.toProjectImportFlowResponse(projectImportFlowEntity)));
-    }
-
-    private void updateApiEntitiesIfNeed(String projectId, Collection<ApiEntity> diffApiEntities) {
-        if (CollectionUtils.isEmpty(diffApiEntities)) {
-            log.debug("The project whose Id is [{}],Update API documents in total [0].", projectId);
-            return;
-        }
-        List<ApiHistoryEntity> apiHistoryEntities = apiRepository.saveAll(diffApiEntities).stream()
-            .map(apiEntity -> ApiHistoryEntity.builder()
-                .record(apiHistoryMapper.toApiHistoryDetail(apiEntity)).build())
-            .collect(Collectors.toList());
-
-        apiHistoryRepository.insert(apiHistoryEntities);
-        if (log.isDebugEnabled()) {
-            log.debug("The project whose Id is [{}],Update API documents in total [{}].",
-                projectId, diffApiEntities.size());
-        }
     }
 
     private void isAllCheckPass(List<ApiEntity> apiEntities, List<ApiDocumentChecker> apiDocumentCheckers) {
