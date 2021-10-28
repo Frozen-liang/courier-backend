@@ -1,7 +1,9 @@
 [
   {
+    "id": "61775b9d176f2540b1c853f7",
     "imageName": "courier/courier-engine",
     "containerName": "courier-engine",
+    "netWorkId": "courier_courier-network",
     "version": "1.0.0",
     "envVariable": {
       "ENGINE_URL": "http://courier-backend:8080"

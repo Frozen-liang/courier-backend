@@ -21,6 +21,6 @@ public abstract class UserDestinationUtil {
     }
 
     public static String getLogDest(String id) {
-        return PROJECT + SecurityUtil.getCurrUserId() + "/" + id;
+        return LOG + SecurityUtil.getCurrUserId() + "/" + id;
     }
 }

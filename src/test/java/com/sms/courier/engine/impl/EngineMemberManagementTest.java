@@ -1,10 +1,15 @@
 package com.sms.courier.engine.impl;
 
+import static com.sms.courier.common.exception.ErrorCode.CREATE_ENGINE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DELETE_ENGINE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.NO_SUCH_CONTAINER_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.RESTART_ENGINE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -12,6 +17,8 @@ import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.CaseRecordRequest;
+import com.sms.courier.dto.request.DockerLogRequest;
+import com.sms.courier.dto.response.EngineSettingResponse;
 import com.sms.courier.engine.EngineId;
 import com.sms.courier.engine.EngineMemberManagement;
 import com.sms.courier.engine.EngineSettingService;
@@ -23,6 +30,7 @@ import com.sms.courier.engine.task.SuspiciousEngineManagement;
 import com.sms.courier.mapper.EngineMapper;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.EngineMemberRepository;
+import com.sms.courier.utils.ExceptionUtils;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.bson.types.ObjectId;
@@ -49,6 +57,17 @@ public class EngineMemberManagementTest {
     @Test
     @DisplayName("Test for bind in EngineMemberManagement")
     public void bind_test() {
+        when(engineMemberRepository.findById(any())).thenReturn(Optional.empty());
+        when(engineMemberRepository.save(engineMember)).thenReturn(engineMember);
+        EngineRegistrationRequest engineRegistrationRequest = new EngineRegistrationRequest();
+        String result = engineMemberManagement.bind(engineRegistrationRequest);
+        assertThat(result).isNotBlank();
+    }
+
+    @Test
+    @DisplayName("Test for bind in EngineMemberManagement")
+    public void bind_is_not_empty_test() {
+        when(engineMemberRepository.findById(any())).thenReturn(Optional.of(engineMember));
         when(engineMemberRepository.save(engineMember)).thenReturn(engineMember);
         EngineRegistrationRequest engineRegistrationRequest = new EngineRegistrationRequest();
         String result = engineMemberManagement.bind(engineRegistrationRequest);
@@ -137,4 +156,104 @@ public class EngineMemberManagementTest {
         assertThat(result).isTrue();
     }
 
+    @Test
+    @DisplayName("Test for createEngine in EngineMemberManagement")
+    public void createEngine_test() {
+        EngineSettingResponse engineSetting = EngineSettingResponse.builder().build();
+        when(engineSettingService.findOne()).thenReturn(engineSetting);
+        when(engineMemberRepository.count()).thenReturn(2L);
+        doNothing().when(dockerService).startContainer(engineSetting);
+        Boolean result = engineMemberManagement.createEngine();
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("An custom exception occurred while create engine.")
+    public void createEngine_custom_exception_test() {
+        EngineSettingResponse engineSetting = EngineSettingResponse.builder().build();
+        when(engineSettingService.findOne()).thenReturn(engineSetting);
+        when(engineMemberRepository.count()).thenReturn(2L);
+        doThrow(ExceptionUtils.mpe(NO_SUCH_CONTAINER_ERROR, engineSetting.getContainerName())).when(dockerService)
+            .startContainer(engineSetting);
+        assertThatThrownBy(engineMemberManagement::createEngine).isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(NO_SUCH_CONTAINER_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An system exception occurred while create engine.")
+    public void createEngine_system_exception_test() {
+        EngineSettingResponse engineSetting = EngineSettingResponse.builder().build();
+        when(engineSettingService.findOne()).thenReturn(engineSetting);
+        when(engineMemberRepository.count()).thenReturn(2L);
+        doThrow(new RuntimeException()).when(dockerService).startContainer(engineSetting);
+        assertThatThrownBy(engineMemberManagement::createEngine).isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(CREATE_ENGINE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test for restartEngine in EngineMemberManagement")
+    public void restartEngine_test() {
+        String name = "courier-engine-1";
+        doNothing().when(dockerService).restartContainer(name);
+        Boolean result = engineMemberManagement.restartEngine(name);
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("An custom exception occurred while restart engine.")
+    public void restartEngine_custom_exception_test() {
+        String name = "courier-engine-1";
+        doThrow(ExceptionUtils.mpe(NO_SUCH_CONTAINER_ERROR, name)).when(dockerService).restartContainer(name);
+        assertThatThrownBy(() -> engineMemberManagement.restartEngine(name))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(NO_SUCH_CONTAINER_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An system exception occurred while restart engine.")
+    public void restartEngine_system_exception_test() {
+        String name = "courier-engine-1";
+        doThrow(new RuntimeException()).when(dockerService).restartContainer(name);
+        assertThatThrownBy(() -> engineMemberManagement.restartEngine(name))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(RESTART_ENGINE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test for deleteEngine in EngineMemberManagement")
+    public void deleteEngine_test() {
+        String name = "courier-engine-1";
+        doNothing().when(dockerService).deleteContainer(name);
+        Boolean result = engineMemberManagement.deleteEngine(name);
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("An custom exception occurred while delete engine.")
+    public void deleteEngine_custom_exception_test() {
+        String name = "courier-engine-1";
+        doThrow(ExceptionUtils.mpe(NO_SUCH_CONTAINER_ERROR, name)).when(dockerService).deleteContainer(name);
+        assertThatThrownBy(() -> engineMemberManagement.deleteEngine(name))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(NO_SUCH_CONTAINER_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("An system exception occurred while delete engine.")
+    public void deleteEngine_system_exception_test() {
+        String name = "courier-engine-1";
+        doThrow(new RuntimeException()).when(dockerService).deleteContainer(name);
+        assertThatThrownBy(() -> engineMemberManagement.deleteEngine(name))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(DELETE_ENGINE_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test for queryLog in EngineMemberManagement")
+    public void queryLog_test() {
+        DockerLogRequest request = DockerLogRequest.builder().build();
+        doNothing().when(dockerService).queryLog(request);
+        Boolean result = engineMemberManagement.queryLog(request);
+        assertThat(result).isTrue();
+    }
 }
