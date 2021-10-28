@@ -258,6 +258,7 @@ public enum ErrorCode {
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),
     PARSE_SWAGGER_URL_ERROR("60002", "Parse the swagger url error, Please check the url."),
     THE_OPERATION_ID_NOT_UNIQUE_ERROR("60003", "%s"),
+    SYNC_API_ERROR("60004", "Sync api fail."),
 
 
     // 61001  describes the test exception

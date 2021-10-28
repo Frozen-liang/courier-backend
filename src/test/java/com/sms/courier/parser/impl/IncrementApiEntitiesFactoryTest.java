@@ -22,7 +22,7 @@ import org.springframework.context.ApplicationContext;
 @DisplayName("Test for CoverApiEntitiesFactory")
 public class IncrementApiEntitiesFactoryTest {
 
-    private final IncrementApiEntitiesFactory incrementApiEntitiesFactory = new IncrementApiEntitiesFactory();
+    private final IncrementApiImportHandler incrementApiEntitiesFactory = new IncrementApiImportHandler();
 
     @Test
     public void build_test() {

@@ -17,7 +17,7 @@ import org.springframework.context.ApplicationContext;
 @DisplayName("Test for CoverApiEntitiesFactory")
 public class RemainApiEntitiesFactoryTest {
 
-    private final RemainApiEntitiesFactory remainApiEntitiesFactory = new RemainApiEntitiesFactory();
+    private final RemainApiImportHandler remainApiEntitiesFactory = new RemainApiImportHandler();
 
     @Test
     public void build_test() {

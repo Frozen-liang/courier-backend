@@ -23,7 +23,7 @@ import org.springframework.context.ApplicationContext;
 @DisplayName("Test for CoverApiEntitiesFactory")
 public class CoverApiEntitiesFactoryTest {
 
-    private final CoverApiEntitiesFactory coverApiEntitiesFactory = new CoverApiEntitiesFactory();
+    private final CoverApiImportHandler coverApiEntitiesFactory = new CoverApiImportHandler();
 
     @Test
     public void build_test() {

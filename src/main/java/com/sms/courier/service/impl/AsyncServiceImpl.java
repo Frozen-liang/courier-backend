@@ -39,7 +39,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -121,20 +120,24 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
             //Check apiEntities, If check not pass,then throw exception.
             isAllCheckPass(apiEntities, documentType.getApiDocumentCheckers());
 
-            Collection<ApiEntity> diffApiEntities = apiEntities;
+//            Collection<ApiEntity> diffApiEntities = apiEntities;
             // Get old api by project id and swagger id is not empty.
             Map<String, ApiEntity> oldApiEntities = apiRepository
                 .findApiEntitiesByProjectIdAndSwaggerIdNotNull(projectId).stream()
                 .collect(Collectors.toConcurrentMap(ApiEntity::getSwaggerId, Function.identity()));
 
-            if (MapUtils.isNotEmpty(oldApiEntities)) {
+            saveMode.getApiImportHandler().handle(apiEntities, oldApiEntities,
+                applicationContext, importSource.getApiChangeStatus(), projectImportFlowEntity);
+            /*if (MapUtils.isNotEmpty(oldApiEntities)) {
                 // Create different api entity by save mode.
-                diffApiEntities = saveMode.getBuildDiffApiEntities().build(apiEntities, oldApiEntities,
-                    applicationContext, importSource.getApiChangeStatus());
-            }
+                saveMode.getApiImportHandler().handle(apiEntities, oldApiEntities,
+                    applicationContext, importSource.getApiChangeStatus(), projectImportFlowEntity);
+                *//*diffApiEntities = saveMode.getBuildDiffApiEntities().build(apiEntities, oldApiEntities,
+                    applicationContext, importSource.getApiChangeStatus());*//*
+            }*/
 
-            // Save different api.
-            updateApiEntitiesIfNeed(projectId, diffApiEntities);
+            /*// Save different api.
+            updateApiEntitiesIfNeed(projectId, diffApiEntities);*/
             projectImportFlowEntity.setImportStatus(ImportStatus.SUCCESS);
             projectImportFlowEntity.setEndTime(LocalDateTime.now());
 
@@ -143,8 +146,8 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
             importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, e.getCode(), e.getMessage());
         } catch (Exception e) {
             log.error("Sync api error.", e);
-            importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, ErrorCode.SYSTEM_ERROR.getCode(),
-                ErrorCode.SYSTEM_ERROR.getMessage());
+            importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, ErrorCode.SYNC_API_ERROR.getCode(),
+                ErrorCode.SYNC_API_ERROR.getMessage());
         }
         projectImportFlowRepository.save(projectImportFlowEntity);
         // Send import message.
