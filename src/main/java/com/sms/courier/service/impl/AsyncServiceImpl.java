@@ -120,24 +120,14 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
             //Check apiEntities, If check not pass,then throw exception.
             isAllCheckPass(apiEntities, documentType.getApiDocumentCheckers());
 
-//            Collection<ApiEntity> diffApiEntities = apiEntities;
             // Get old api by project id and swagger id is not empty.
             Map<String, ApiEntity> oldApiEntities = apiRepository
                 .findApiEntitiesByProjectIdAndSwaggerIdNotNull(projectId).stream()
                 .collect(Collectors.toConcurrentMap(ApiEntity::getSwaggerId, Function.identity()));
 
+            // Save api
             saveMode.getApiImportHandler().handle(apiEntities, oldApiEntities,
                 applicationContext, importSource.getApiChangeStatus(), projectImportFlowEntity);
-            /*if (MapUtils.isNotEmpty(oldApiEntities)) {
-                // Create different api entity by save mode.
-                saveMode.getApiImportHandler().handle(apiEntities, oldApiEntities,
-                    applicationContext, importSource.getApiChangeStatus(), projectImportFlowEntity);
-                *//*diffApiEntities = saveMode.getBuildDiffApiEntities().build(apiEntities, oldApiEntities,
-                    applicationContext, importSource.getApiChangeStatus());*//*
-            }*/
-
-            /*// Save different api.
-            updateApiEntitiesIfNeed(projectId, diffApiEntities);*/
             projectImportFlowEntity.setImportStatus(ImportStatus.SUCCESS);
             projectImportFlowEntity.setEndTime(LocalDateTime.now());
 

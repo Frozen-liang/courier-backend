@@ -9,6 +9,8 @@ import com.sms.courier.mapper.ApiHistoryMapper;
 import com.sms.courier.parser.ApiImportHandler;
 import com.sms.courier.repository.ApiHistoryRepository;
 import com.sms.courier.repository.ApiRepository;
+import com.sms.courier.utils.SecurityUtil;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,6 +51,8 @@ public abstract class AbstractApiImportHandler implements ApiImportHandler {
 
     protected void recordAddApi(ApiEntity apiEntity, ProjectImportFlowEntity projectImportFlowEntity) {
         apiEntity.setId(ObjectId.get().toString());
+        apiEntity.setCreateDateTime(LocalDateTime.now());
+        apiEntity.setCreateUserId(SecurityUtil.getCurrUserId());
         projectImportFlowEntity.getAddedApi().add(new ApiRecord(apiEntity.getId(), apiEntity.getApiName()));
     }
 

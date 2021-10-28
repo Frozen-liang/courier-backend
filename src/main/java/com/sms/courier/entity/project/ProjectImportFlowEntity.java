@@ -10,8 +10,10 @@ import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
@@ -34,6 +36,9 @@ public class ProjectImportFlowEntity {
     private String errorDetail;
     @LastModifiedDate
     private LocalDateTime createDateTime;
+    @CreatedBy
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String createUserId;
     @Default
     private List<ApiRecord> addedApi = new ArrayList<>();
     @Default
