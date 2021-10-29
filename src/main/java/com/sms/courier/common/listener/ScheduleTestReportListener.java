@@ -17,6 +17,7 @@ import com.sms.courier.entity.schedule.ScheduleEntity;
 import com.sms.courier.entity.schedule.ScheduleRecordEntity;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.utils.ExceptionUtils;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,22 +50,14 @@ public class ScheduleTestReportListener {
                 .orElseThrow(
                     () -> ExceptionUtils.mpe("The Schedule not exist! name = %s", scheduleRecord.getScheduleName()));
             NoticeType noticeType = Objects.requireNonNullElse(scheduleEntity.getNoticeType(), NoticeType.CLOSE);
-            switch (noticeType) {
-                case ALL:
-                    sendEmail(scheduleEntity, event);
-                    break;
-                case SUCCESS:
-                    if (jobReport.getJobStatus() == JobStatus.SUCCESS) {
-                        sendEmail(scheduleEntity, event);
-                    }
-                    break;
-                case FAIL:
-                    if (jobReport.getJobStatus() == JobStatus.FAIL) {
-                        sendEmail(scheduleEntity, event);
-                    }
-                    break;
-                default:
-                    break;
+            if (noticeType == NoticeType.ALL) {
+                sendEmail(scheduleEntity, event);
+            }
+            if (noticeType == NoticeType.SUCCESS && jobReport.getJobStatus() == JobStatus.SUCCESS) {
+                sendEmail(scheduleEntity, event);
+            }
+            if (noticeType == NoticeType.FAIL && jobReport.getJobStatus() == JobStatus.FAIL) {
+                sendEmail(scheduleEntity, event);
             }
         } catch (ApiTestPlatformException e) {
             log.error("Schedule test report custom error", e);
@@ -77,38 +70,38 @@ public class ScheduleTestReportListener {
         JobReport jobReport = event.getJobReport();
         int count = event.getCount();
         log.info("Send test report email to {}", scheduleEntity.getEmails());
-        if (CollectionUtils.isNotEmpty(scheduleEntity.getEmails())) {
-            TestReportEmailModelBuilder testReportEmailModelBuilder = TestReportEmailModel.builder()
-                .delayTimeTotalTimeCost(jobReport.getDelayTimeTotalTimeCost())
-                .paramsTotalTimeCost(jobReport.getParamsTotalTimeCost())
-                .totalTimeCost(jobReport.getTotalTimeCost())
-                .projectId(scheduleEntity.getProjectId())
-                .name(scheduleEntity.getName() + "_" + event.getName());
-            if (jobReport instanceof SceneCaseJobReport) {
-                SceneCaseJobReport sceneCaseJobReport = (SceneCaseJobReport) jobReport;
-                List<CaseReport> caseReportList = sceneCaseJobReport.getCaseReportList();
-                if (CollectionUtils.isEmpty(caseReportList)) {
-                    testReportEmailModelBuilder.success(0);
-                    testReportEmailModelBuilder.fail(count);
-                } else {
-                    int success =
-                        (int) caseReportList.stream().filter(report -> ResultType.SUCCESS == report.getIsSuccess())
-                            .count();
-                    testReportEmailModelBuilder.success(success);
-                    testReportEmailModelBuilder.fail(count - success);
-                }
-            } else {
-                testReportEmailModelBuilder.success(jobReport.getJobStatus() == JobStatus.SUCCESS ? 1 : 0);
-                testReportEmailModelBuilder.fail(jobReport.getJobStatus() == JobStatus.FAIL ? 1 : 0);
-            }
-            TestReportEmailModel testReportEmailModel = testReportEmailModelBuilder.build();
-            Map<AdditionalParam, Object> additionalParam = new HashMap<>();
-            additionalParam.put(AdditionalParam.EMAIL_TO, scheduleEntity.getEmails());
-            NotificationPayload notificationPayload = NotificationPayload.builder()
-                .contentVariable(testReportEmailModel)
-                .titleVariable(testReportEmailModel).additionalParam(additionalParam).build();
-            sender.sendTestReportNotification(notificationPayload);
+        if (CollectionUtils.isEmpty(scheduleEntity.getEmails())) {
+            return;
         }
+        TestReportEmailModel testReportEmailModel = buildTestReportEmailModel(jobReport, count);
+        testReportEmailModel.setName(scheduleEntity.getName() + "_" + event.getName());
+        testReportEmailModel.setProjectId(scheduleEntity.getProjectId());
+        Map<AdditionalParam, Object> additionalParam = new HashMap<>();
+        additionalParam.put(AdditionalParam.EMAIL_TO, scheduleEntity.getEmails());
+        NotificationPayload notificationPayload = NotificationPayload.builder()
+            .contentVariable(testReportEmailModel)
+            .titleVariable(testReportEmailModel).additionalParam(additionalParam).build();
+        sender.sendTestReportNotification(notificationPayload);
+    }
+
+    private TestReportEmailModel buildTestReportEmailModel(JobReport jobReport, int count) {
+        TestReportEmailModelBuilder testReportEmailModelBuilder = TestReportEmailModel.builder()
+            .delayTimeTotalTimeCost(jobReport.getDelayTimeTotalTimeCost())
+            .paramsTotalTimeCost(jobReport.getParamsTotalTimeCost())
+            .totalTimeCost(jobReport.getTotalTimeCost());
+        if (jobReport instanceof SceneCaseJobReport) {
+            SceneCaseJobReport sceneCaseJobReport = (SceneCaseJobReport) jobReport;
+            List<CaseReport> caseReportList = Objects.requireNonNullElse(sceneCaseJobReport.getCaseReportList(),
+                Collections.emptyList());
+            long success = caseReportList.stream().filter(report -> ResultType.SUCCESS == report.getIsSuccess())
+                .count();
+            testReportEmailModelBuilder.success(success);
+            testReportEmailModelBuilder.fail(count - success);
+        } else {
+            testReportEmailModelBuilder.success(jobReport.getJobStatus() == JobStatus.SUCCESS ? 1L : 0L);
+            testReportEmailModelBuilder.fail(jobReport.getJobStatus() == JobStatus.FAIL ? 1L : 0L);
+        }
+        return testReportEmailModelBuilder.build();
     }
 
 }

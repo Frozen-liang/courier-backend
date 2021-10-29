@@ -17,7 +17,7 @@ public class TestReportEmailModel {
 
     private Integer delayTimeTotalTimeCost;
 
-    private Integer success;
+    private Long success;
 
-    private Integer fail;
+    private Long fail;
 }
