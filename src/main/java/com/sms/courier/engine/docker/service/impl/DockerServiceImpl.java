@@ -81,8 +81,12 @@ public class DockerServiceImpl implements DockerService {
     public void queryLog(DockerLogRequest request) {
         try {
             log.info("QueryLog engine: {}", request);
+            int since = 0;
+            if (Objects.nonNull(request.getSince())) {
+                since = Integer.parseInt(String.valueOf(request.getSince().getTime() / 1000));
+            }
             LogContainerCmd logContainerCmd = client.logContainerCmd(request.getName()).withTimestamps(true)
-                .withSince(Objects.nonNull(request.getSince()) ? (int) (request.getSince().getTime()) / 1000 : 0)
+                .withSince(since)
                 .withTail(request.getTail())
                 .withStdOut(true).withStdErr(true);
 
