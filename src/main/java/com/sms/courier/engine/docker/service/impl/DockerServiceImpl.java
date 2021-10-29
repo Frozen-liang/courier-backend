@@ -38,7 +38,6 @@ public class DockerServiceImpl implements DockerService {
     private final MessageService messageService;
     private static final String EVN = "%s=%s";
     private static final String IMAGE = "%s:%s";
-    private static final int DEFAULT_TAIL = 100;
 
     public DockerServiceImpl(DockerClient client, MessageService messageService) {
         this.client = client;
@@ -83,11 +82,10 @@ public class DockerServiceImpl implements DockerService {
         try {
             log.info("QueryLog engine: {}", request);
             LogContainerCmd logContainerCmd = client.logContainerCmd(request.getName()).withTimestamps(true)
-                .withSince(request.getSince()).withTail(request.getTail())
+                .withSince(Objects.nonNull(request.getSince()) ? (int) (request.getSince().getTime()) / 1000 : 0)
+                .withTail(request.getTail())
                 .withStdOut(true).withStdErr(true);
-            if (Objects.isNull(request.getTail()) && Objects.isNull(request.getSince())) {
-                logContainerCmd.withTail(DEFAULT_TAIL);
-            }
+
             logContainerCmd.exec(new Adapter<Frame>() {
                 @Override
                 public void onNext(Frame frame) {

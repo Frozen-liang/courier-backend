@@ -67,6 +67,6 @@ public class ScheduleRequest {
 
     private NoticeType noticeType;
 
-    private List<String> userIds;
+    private List<String> emails;
 
 }

@@ -10,4 +10,6 @@ public interface Sender {
 
     boolean sendResetPwdNotification(NotificationPayload notificationPayload);
 
+    boolean sendTestReportNotification(NotificationPayload notificationPayload);
+
 }

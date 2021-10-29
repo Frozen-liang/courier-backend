@@ -100,6 +100,47 @@ public class EmailSenderTest {
     }
 
     @Test
+    void send_test_report_notification() throws MessagingException {
+        doNothing().when(javaMailSender).testConnection();
+        EmailServiceEntity entity = mock(EmailServiceEntity.class);
+        when(entity.getEnabled()).thenReturn(Boolean.FALSE);
+        emailSender.afterPropertiesSet();
+
+        String title = "title";
+        String content = "content";
+        String titleVariableKey = "titleVariableKey";
+        NotificationTemplateEntity templateEntity = mock(NotificationTemplateEntity.class);
+        when(templateEntity.getTitleVariableKey()).thenReturn(titleVariableKey);
+        when(templateEntity.getTitle()).thenReturn(title);
+        when(templateEntity.getContent()).thenReturn(content);
+        when(templateService.findTemplateByType(NotificationTemplateType.TEST_REPORT)).thenReturn(templateEntity);
+
+        String processResult = "result";
+        when(engine.process(any(String.class), any(Context.class))).thenReturn(processResult);
+
+        MimeMessage mimeMessage = mock(MimeMessage.class);
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+
+        String from = "from";
+        EmailPropertiesResponse response = mock(EmailPropertiesResponse.class);
+        when(emailService.getEmailConfigurationResponse()).thenReturn(response);
+        when(response.getUsername()).thenReturn(from);
+
+        Map<AdditionalParam, Object> additionalParam = new HashMap<>();
+        additionalParam.put(AdditionalParam.EMAIL_TO, Arrays.asList("to1", "to2"));
+        additionalParam.put(AdditionalParam.EMAIL_CC, Arrays.asList("cc1", "cc2"));
+
+        Map<String, String> inlinesOrAttachmentMap = new HashMap<>();
+        inlinesOrAttachmentMap.put("key", "value");
+        additionalParam.put(AdditionalParam.EMAIL_INLINES, inlinesOrAttachmentMap);
+        additionalParam.put(AdditionalParam.EMAIL_ATTACHMENT, inlinesOrAttachmentMap);
+
+        NotificationPayload payload = NotificationPayload.builder().additionalParam(additionalParam).build();
+
+        assertThat(emailSender.sendTestReportNotification(payload)).isTrue();
+    }
+
+    @Test
     void after_properties_set_test() throws MessagingException {
         doNothing().when(javaMailSender).testConnection();
         EmailServiceEntity entity = mock(EmailServiceEntity.class);
