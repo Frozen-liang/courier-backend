@@ -211,10 +211,7 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     public void active(String sessionId, String destination) {
         if (isEngineDestination(destination)) {
             engineMemberRepository.findFirstByDestination(destination).ifPresent(engineMember -> {
-                if (engineMember.getStatus() == EngineStatus.WAITING_FOR_RECONNECTION) {
-                    suspiciousEngineManagement.remove(engineMember.getDestination());
-                    log.info("The Engine reconnection.destination:{}", engineMember.getDestination());
-                }
+                suspiciousEngineManagement.remove(engineMember.getDestination());
                 engineMember.setStatus(EngineStatus.RUNNING);
                 engineMember.setDestination(destination);
                 engineMember.setSessionId(sessionId);
