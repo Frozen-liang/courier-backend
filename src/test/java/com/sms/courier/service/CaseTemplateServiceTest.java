@@ -1,5 +1,6 @@
 package com.sms.courier.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.AddCaseTemplateApiByIdsRequest;
@@ -77,11 +78,12 @@ class CaseTemplateServiceTest {
         mock(CustomizedCaseTemplateApiRepository.class);
     private final CaseApiCountHandler sceneCaseApiCountHandler = mock(CaseApiCountHandler.class);
     private final MatchParamInfoMapper matchParamInfoMapper = mock(MatchParamInfoMapper.class);
+    private final ObjectMapper objectMapper = mock(ObjectMapper.class);
     private final CaseTemplateServiceImpl caseTemplateService = new CaseTemplateServiceImpl(caseTemplateRepository,
         customizedCaseTemplateRepository, caseTemplateMapper, caseTemplateApiService,
         sceneCaseRepository, sceneCaseApiService, caseTemplateApiMapper,
         caseTemplateApiRepository, apiRepository, apiTestCaseMapper, apiTestCaseRepository,
-        customizedCaseTemplateApiRepository, sceneCaseApiCountHandler, matchParamInfoMapper);
+        customizedCaseTemplateApiRepository, sceneCaseApiCountHandler, matchParamInfoMapper, objectMapper);
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";

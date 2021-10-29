@@ -24,5 +24,11 @@ public interface ParamInfoMapper {
 
     List<ParamInfoResponse> toDtoList(List<ParamInfo> paramInfoList);
 
+    List<ParamInfo> toEntityByResponseList(List<ParamInfoResponse> responseList);
 
+    @Mapping(target = "paramType", expression = "java(com.sms.courier.common.enums.ParamType"
+        + ".getType(response.getParamType()))")
+    @Mapping(target = "structureRef.structType", expression = "java(com.sms.courier.common.enums.ApiRequestParamType"
+        + ".getType(structureRefResponse.getStructType()))")
+    ParamInfo toEntityByResponse(ParamInfoResponse response);
 }

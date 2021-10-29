@@ -14,9 +14,11 @@ import static com.sms.courier.common.exception.ErrorCode.GET_CASE_TEMPLATE_ERROR
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.RECOVER_CASE_TEMPLATE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.THE_API_ENTITY_NOT_EXITS_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.THE_API_TEST_CASE_NOT_EXITS_ERROR;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
@@ -37,7 +39,6 @@ import com.sms.courier.dto.response.CaseTemplateApiResponse;
 import com.sms.courier.dto.response.CaseTemplateDetailResponse;
 import com.sms.courier.dto.response.CaseTemplateResponse;
 import com.sms.courier.dto.response.IdResponse;
-import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.api.common.HttpStatusVerification;
 import com.sms.courier.entity.api.common.ResponseResultVerification;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
@@ -61,8 +62,13 @@ import com.sms.courier.service.CaseTemplateApiService;
 import com.sms.courier.service.CaseTemplateService;
 import com.sms.courier.service.SceneCaseApiService;
 import com.sms.courier.utils.ExceptionUtils;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -92,6 +98,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
     private final CaseApiCountHandler caseApiCountHandler;
     private final MatchParamInfoMapper matchParamInfoMapper;
+    private final ObjectMapper objectMapper;
 
 
     public CaseTemplateServiceImpl(CaseTemplateRepository caseTemplateRepository,
@@ -102,7 +109,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         CaseTemplateApiRepository caseTemplateApiRepository, ApiRepository apiRepository,
         ApiTestCaseMapper apiTestCaseMapper, ApiTestCaseRepository apiTestCaseRepository,
         CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository,
-        CaseApiCountHandler sceneCaseApiCountHandler, MatchParamInfoMapper matchParamInfoMapper) {
+        CaseApiCountHandler sceneCaseApiCountHandler, MatchParamInfoMapper matchParamInfoMapper,
+        ObjectMapper objectMapper) {
         this.caseTemplateRepository = caseTemplateRepository;
         this.customizedCaseTemplateRepository = customizedCaseTemplateRepository;
         this.caseTemplateMapper = caseTemplateMapper;
@@ -117,6 +125,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
         this.caseApiCountHandler = sceneCaseApiCountHandler;
         this.matchParamInfoMapper = matchParamInfoMapper;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -138,7 +147,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     @Override
-    @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE, template = "{{#convertCaseTemplateRequest.name}}")
+    @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE,
+        template = "{{#convertCaseTemplateRequest.sceneCaseName}}")
     public IdResponse add(ConvertCaseTemplateRequest convertCaseTemplateRequest) {
         try {
             SceneCaseEntity sceneCase =
@@ -168,14 +178,14 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
                     for (CaseTemplateApiEntity caseTemplateApi : templateApiList) {
                         caseTemplateApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : caseTemplateApi.getOrder());
                         caseTemplateApi.setCaseTemplateId(caseTemplate.getId());
-                        caseTemplateApi.setId(null);
                         index = caseTemplateApi.getOrder();
                     }
                     caseTemplateApiList.addAll(templateApiList);
                 }
             }
             if (CollectionUtils.isNotEmpty(caseTemplateApiList)) {
-                caseTemplateApiRepository.insert(caseTemplateApiList);
+                List<CaseTemplateApiEntity> entityList = setIdConvert(caseTemplateApiList);
+                caseTemplateApiRepository.insert(entityList);
             }
             return IdResponse.builder().id(caseTemplate.getId()).build();
         } catch (ApiTestPlatformException e) {
@@ -336,6 +346,32 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             log.error("Failed to recover the CaseTemplate!", e);
             throw ExceptionUtils.mpe(RECOVER_CASE_TEMPLATE_ERROR);
         }
+    }
+
+    private List<CaseTemplateApiEntity> setIdConvert(List<CaseTemplateApiEntity> caseTemplateApiList)
+        throws JsonProcessingException {
+        List<CaseTemplateApiResponse> caseTemplateApiResponseList =
+            caseTemplateApiMapper.toCaseTemplateApiDtoList(caseTemplateApiList);
+
+        if (CollectionUtils.isNotEmpty(caseTemplateApiResponseList)) {
+            caseTemplateApiResponseList.sort(Comparator.comparingInt(CaseTemplateApiResponse::getOrder).reversed());
+        }
+        Map<String, String> newIdAndOldIdMap = new HashMap<>();
+        for (CaseTemplateApiResponse caseTemplateApiResponse : caseTemplateApiResponseList) {
+            String objId = new ObjectId().toString();
+            newIdAndOldIdMap.put(caseTemplateApiResponse.getId(), objId);
+            caseTemplateApiResponse.setId(objId);
+        }
+        String jsonString = objectMapper.writeValueAsString(caseTemplateApiResponseList);
+        Set<Entry<String, String>> idSet = newIdAndOldIdMap.entrySet();
+        for (Entry<String, String> key : idSet) {
+            jsonString = jsonString.replace(key.getKey(), key.getValue());
+        }
+
+        List<CaseTemplateApiResponse> entityList = objectMapper
+            .readValue(jsonString, new TypeReference<List<CaseTemplateApiResponse>>() {
+            });
+        return caseTemplateApiMapper.toEntityByResponseList(entityList);
     }
 
     private void addCaseTemplateApi(CaseTemplateEntity caseTemplate, AddSceneCaseApi addSceneCaseApi) {
