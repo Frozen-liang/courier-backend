@@ -10,5 +10,5 @@ public class ApiCountIdsDto {
 
     private List<String> sceneCaseCountApiIds;
 
-    private List<String> otherObjectSceneCaseCountApiIds;
+    private List<String> otherProjectSceneCaseCountApiIds;
 }

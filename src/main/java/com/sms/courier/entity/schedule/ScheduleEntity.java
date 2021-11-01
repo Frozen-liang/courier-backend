@@ -66,7 +66,7 @@ public class ScheduleEntity extends BaseEntity {
 
     private NoticeType noticeType;
 
-    private List<String> userIds;
+    private List<String> emails;
 
     private ScheduleStatusType scheduleStatus;
 
@@ -75,11 +75,7 @@ public class ScheduleEntity extends BaseEntity {
 
     private LocalDateTime lastTaskCompleteTime;
 
-    @Field("isDisplayError")
-    private boolean displayError;
-
     @Field("isOpen")
     @Default
     private boolean open = true;
-
 }

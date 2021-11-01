@@ -36,6 +36,8 @@ public abstract class JobEntity {
 
     private JobStatus jobStatus;
 
+    private String errCode;
+
     private String message;
 
     private Integer totalTimeCost;

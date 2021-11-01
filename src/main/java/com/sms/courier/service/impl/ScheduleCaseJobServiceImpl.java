@@ -11,6 +11,7 @@ import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.common.listener.event.ScheduleJobRecordEvent;
+import com.sms.courier.common.listener.event.ScheduleTestReportEvent;
 import com.sms.courier.engine.service.CaseDispatcherService;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.datacollection.DataCollectionEntity;
@@ -83,6 +84,11 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
             applicationEventPublisher
                 .publishEvent(ScheduleJobRecordEvent.create(scheduleCaseJob.getScheduleRecordId(), job.getId(),
                     scheduleCaseJob.getApiTestCase().getJobApiTestCase().getId(), jobReport.getJobStatus()));
+            // Send email
+            applicationEventPublisher
+                .publishEvent(
+                    ScheduleTestReportEvent.create(scheduleCaseJob.getScheduleRecordId(), apiTestCaseJobReport, 1,
+                        scheduleCaseJob.getName()));
         } catch (Exception e) {
             log.error("Save schedule case job report error. jobId={}", jobReport.getJobId(), e);
         }
@@ -153,7 +159,7 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
                             .testData(testData).projectId(dataCollectionEntity.getProjectId()).build();
                         scheduleRecordEntity.getJobIds().add(scheduleCaseJobEntity.getId());
                         scheduleCaseJobEntity.setDataCollection(jobDataCollection);
-                        scheduleCaseJobEntity.setName(testData.getDataName());
+                        scheduleCaseJobEntity.setName(apiTestCaseEntity.getCaseName() + "_" + testData.getDataName());
                         scheduleCaseJobEntities.add(scheduleCaseJobEntity);
                     }
                 } else {

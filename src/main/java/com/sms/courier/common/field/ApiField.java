@@ -11,7 +11,8 @@ public enum ApiField implements Field {
     API_MANAGER_ID("apiManagerId"),
     API_STATUS("apiStatus"),
     CASE_COUNT("caseCount"),
-    SCENE_CASE_COUNT("sceneCaseCount");
+    SCENE_CASE_COUNT("sceneCaseCount"),
+    OTHER_PROJECT_SCENE_CASE_COUNT("otherProjectSceneCaseCount");
 
     private final String name;
 

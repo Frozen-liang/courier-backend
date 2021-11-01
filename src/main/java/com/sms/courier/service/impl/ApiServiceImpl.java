@@ -139,10 +139,11 @@ public class ApiServiceImpl implements ApiService {
             ApiEntity oldApiEntity = apiRepository.findById(apiRequest.getId())
                 .orElseThrow(() -> ExceptionUtils.mpe(ErrorCode.EDIT_NOT_EXIST_ERROR, "Api", apiRequest.getId()));
             ApiEntity apiEntity = apiMapper.toEntity(apiRequest);
-            apiEntity.setMd5(MD5Util.getMD5(apiEntity));
+            apiEntity.setSwaggerId(oldApiEntity.getSwaggerId());
             apiEntity.setCaseCount(oldApiEntity.getCaseCount());
             apiEntity.setSceneCaseCount(oldApiEntity.getSceneCaseCount());
-            apiEntity.setOtherObjectSceneCaseCount(oldApiEntity.getOtherObjectSceneCaseCount());
+            apiEntity.setOtherProjectSceneCaseCount(oldApiEntity.getOtherProjectSceneCaseCount());
+            apiEntity.setMd5(MD5Util.getMD5(apiEntity));
             ApiEntity newApiEntity = apiRepository.save(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
