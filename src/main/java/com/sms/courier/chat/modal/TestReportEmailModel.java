@@ -7,7 +7,11 @@ import lombok.Data;
 @Builder
 public class TestReportEmailModel {
 
-    private String name;
+    private String caseName;
+
+    private String scheduleName;
+
+    private String dataName;
 
     private String projectId;
 

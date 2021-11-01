@@ -74,7 +74,9 @@ public class ScheduleTestReportListener {
             return;
         }
         TestReportEmailModel testReportEmailModel = buildTestReportEmailModel(jobReport, count);
-        testReportEmailModel.setName(scheduleEntity.getName() + "_" + event.getName());
+        testReportEmailModel.setCaseName(event.getName());
+        testReportEmailModel.setScheduleName(scheduleEntity.getName());
+        testReportEmailModel.setDataName(event.getDataName());
         testReportEmailModel.setProjectId(scheduleEntity.getProjectId());
         Map<AdditionalParam, Object> additionalParam = new HashMap<>();
         additionalParam.put(AdditionalParam.EMAIL_TO, scheduleEntity.getEmails());
