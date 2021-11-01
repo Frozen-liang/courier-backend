@@ -17,4 +17,10 @@ public class ConvertCaseTemplateRequest {
 
     @NotNull(message = "The groupId can not be empty")
     private String groupId;
+
+    @NotNull(message = "The sceneCaseName can not be empty")
+    private String sceneCaseName;
+
+    @NotNull(message = "The projectId can not be empty")
+    private String projectId;
 }
