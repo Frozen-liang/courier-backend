@@ -61,20 +61,19 @@ public class DockerServiceImpl implements DockerService {
             pullImageCmd.exec(new Adapter<PullResponseItem>() {
                 @Override
                 public void onStart(Closeable stream) {
-                    super.onStart(stream);
                     log.info("Pull image start!");
+                    super.onStart(stream);
                 }
 
                 @Override
                 public void onError(Throwable throwable) {
-                    super.onError(throwable);
                     log.error("Pull image error!", throwable);
+                    super.onError(throwable);
                 }
 
                 @Override
                 public void onComplete() {
                     try {
-                        super.onComplete();
                         log.info("Pull image complete!");
                         log.info("Create engine:{}", engineSetting);
                         CreateContainerCmd createContainerCmd = client
@@ -99,6 +98,8 @@ public class DockerServiceImpl implements DockerService {
                         log.error("The container already existed!", e);
                     } catch (Exception e) {
                         log.error("Create container error!", e);
+                    } finally {
+                        super.onComplete();
                     }
                 }
             });
