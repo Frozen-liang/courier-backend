@@ -89,6 +89,8 @@ public class ApiHistoryDetail {
 
     private ApiJsonType apiRequestJsonType;
 
+    private ApiRequestParamType apiResponseParamType;
+
     private String responseRaw;
 
     private RawType responseRawType;
