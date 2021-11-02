@@ -310,8 +310,6 @@ public class CommonRepositoryImpl implements CommonRepository {
     private <T> ProjectionOperation addLookupOperation(List<LookupVo> lookupVos, Class<T> responseClass,
         List<AggregationOperation> aggregationOperations) {
         ProjectionOperation projectionOperation = getProjectionOperation(responseClass);
-//        Fields.fields("record");
-//        ProjectionOperation projectionOperation = new ProjectionOperation();
         for (LookupVo lookupVo : lookupVos) {
             LookupOperation lookupOperation =
                 LookupOperation.newLookup().from(lookupVo.getFrom().getName())
