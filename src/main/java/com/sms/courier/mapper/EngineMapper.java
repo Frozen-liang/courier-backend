@@ -1,6 +1,8 @@
 package com.sms.courier.mapper;
 
+import com.sms.courier.docker.entity.ContainerSetting;
 import com.sms.courier.dto.response.EngineResponse;
+import com.sms.courier.dto.response.EngineSettingResponse;
 import com.sms.courier.engine.model.EngineMemberEntity;
 import com.sms.courier.utils.EnumCommonUtils;
 import java.util.List;
@@ -15,4 +17,6 @@ public interface EngineMapper {
     EngineResponse toResponse(EngineMemberEntity entity);
 
     List<EngineResponse> toResponseList(List<EngineMemberEntity> entityList);
+
+    ContainerSetting toContainerSetting(EngineSettingResponse engineSettingResponse);
 }

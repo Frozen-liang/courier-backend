@@ -1,4 +1,4 @@
-package com.sms.courier.engine.docker.service.impl;
+package com.sms.courier.docker.service.impl;
 
 import static com.sms.courier.common.exception.ErrorCode.CREATE_CONTAINER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_CONTAINER_ERROR;
@@ -16,9 +16,9 @@ import com.github.dockerjava.api.command.LogContainerCmd;
 import com.github.dockerjava.api.exception.ConflictException;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.Frame;
+import com.sms.courier.docker.entity.ContainerSetting;
+import com.sms.courier.docker.service.DockerService;
 import com.sms.courier.dto.request.DockerLogRequest;
-import com.sms.courier.dto.response.EngineSettingResponse;
-import com.sms.courier.engine.docker.service.DockerService;
 import com.sms.courier.service.MessageService;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.ArrayList;
@@ -45,15 +45,16 @@ public class DockerServiceImpl implements DockerService {
     }
 
     @Override
-    public void startContainer(EngineSettingResponse engineSetting) {
+    public void startContainer(ContainerSetting containerSetting) {
         try {
-            log.info("Create engine:{}", engineSetting);
+            log.info("Create engine:{}", containerSetting);
             CreateContainerCmd createContainerCmd = client
-                .createContainerCmd(String.format(IMAGE, engineSetting.getImageName(), engineSetting.getVersion()))
-                .withName(engineSetting.getContainerName());
-            Map<String, String> envVariable = engineSetting.getEnvVariable();
+                .createContainerCmd(
+                    String.format(IMAGE, containerSetting.getImageName(), containerSetting.getVersion()))
+                .withName(containerSetting.getContainerName());
+            Map<String, String> envVariable = containerSetting.getEnvVariable();
             List<String> env = new ArrayList<>();
-            env.add(String.format(EVN, "CONTAINER_NAME", engineSetting.getContainerName()));
+            env.add(String.format(EVN, "CONTAINER_NAME", containerSetting.getContainerName()));
             if (MapUtils.isNotEmpty(envVariable)) {
                 for (Entry<String, String> entry : envVariable.entrySet()) {
                     env.add(String.format(EVN, entry.getKey(), entry.getValue()));
@@ -62,15 +63,15 @@ public class DockerServiceImpl implements DockerService {
             }
             CreateContainerResponse ccr = createContainerCmd.exec();
             client.connectToNetworkCmd().withContainerId(ccr.getId())
-                .withNetworkId(engineSetting.getNetWorkId()).exec();
+                .withNetworkId(containerSetting.getNetWorkId()).exec();
             client.startContainerCmd(ccr.getId()).exec();
         } catch (NotFoundException e) {
             log.error("No such image", e);
             throw ExceptionUtils.mpe(NO_SUCH_IMAGE_ERROR,
-                String.format(IMAGE, engineSetting.getImageName(), engineSetting.getVersion()));
+                String.format(IMAGE, containerSetting.getImageName(), containerSetting.getVersion()));
         } catch (ConflictException e) {
             log.error("The container already existed!", e);
-            throw ExceptionUtils.mpe(THE_CONTAINER_ALREADY_EXISTED_ERROR, engineSetting.getContainerName());
+            throw ExceptionUtils.mpe(THE_CONTAINER_ALREADY_EXISTED_ERROR, containerSetting.getContainerName());
         } catch (Exception e) {
             log.error("Create container error!", e);
             throw ExceptionUtils.mpe(CREATE_CONTAINER_ERROR);

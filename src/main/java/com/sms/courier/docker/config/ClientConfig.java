@@ -1,4 +1,4 @@
-package com.sms.courier.engine.docker.config;
+package com.sms.courier.docker.config;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
