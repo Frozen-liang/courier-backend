@@ -1,42 +1,45 @@
 package com.sms.courier.docker;
 
-import static com.sms.courier.common.exception.ErrorCode.CREATE_CONTAINER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_CONTAINER_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_CONTAINER_SETTING_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.NO_SUCH_CONTAINER_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.NO_SUCH_IMAGE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.PULL_IMAGE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.QUERY_CONTAINER_LOG_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.RESTART_CONTAINER_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.THE_CONTAINER_ALREADY_EXISTED_ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.ConnectToNetworkCmd;
-import com.github.dockerjava.api.command.CreateContainerCmd;
-import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.async.ResultCallback.Adapter;
 import com.github.dockerjava.api.command.LogContainerCmd;
+import com.github.dockerjava.api.command.PullImageCmd;
 import com.github.dockerjava.api.command.RemoveContainerCmd;
 import com.github.dockerjava.api.command.RestartContainerCmd;
-import com.github.dockerjava.api.command.StartContainerCmd;
-import com.github.dockerjava.api.exception.ConflictException;
 import com.github.dockerjava.api.exception.NotFoundException;
+import com.github.dockerjava.api.model.PullResponseItem;
 import com.sms.courier.common.exception.ApiTestPlatformException;
-import com.sms.courier.docker.entity.ContainerSetting;
+import com.sms.courier.docker.entity.ContainerInfo;
+import com.sms.courier.docker.entity.ContainerSettingEntity;
 import com.sms.courier.docker.service.DockerService;
 import com.sms.courier.docker.service.impl.DockerServiceImpl;
+import com.sms.courier.dto.request.ContainerSettingRequest;
 import com.sms.courier.dto.request.DockerLogRequest;
+import com.sms.courier.dto.response.ContainerSettingResponse;
+import com.sms.courier.mapper.DockerContainerMapper;
+import com.sms.courier.mapper.DockerContainerMapperImpl;
+import com.sms.courier.repository.ContainerSettingRepository;
 import com.sms.courier.service.MessageService;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -45,14 +48,24 @@ public class DockerServiceTest {
 
     private final DockerClient dockerClient = mock(DockerClient.class);
     private final MessageService messageService = mock(MessageService.class);
-    private final ContainerSetting containerSetting = new ContainerSetting("netWorkId", "imageName", "containerName",
+    private final ContainerSettingRepository containerSettingRepository = mock(ContainerSettingRepository.class);
+    private final DockerContainerMapper dockerContainerMapper = new DockerContainerMapperImpl();
+    private final ContainerInfo containerInfo = new ContainerInfo("netWorkId", "imageName", "containerName",
         "1.0.0", Map.of("key", "value"));
-    private final DockerService dockerService = new DockerServiceImpl(dockerClient, messageService);
+    private final DockerService dockerService = new DockerServiceImpl(dockerClient, messageService,
+        containerSettingRepository, dockerContainerMapper);
 
-    @DisplayName("Test the startContainer method in the docker service")
+    /*@DisplayName("Test the startContainer method in the docker service")
     @Test
     void startContainer_test() {
         Void v = mock(Void.class);
+        when(containerSettingRepository.getFirstByOrderByModifyDateTimeDesc()).thenReturn(Optional
+            .of(ContainerSettingEntity.builder().netWorkId("").username("username").password("p234f342fg").build()));
+        PullImageCmd pullImageCmd = mock(PullImageCmd.class);
+        when(dockerClient.pullImageCmd(anyString())).thenReturn(pullImageCmd);
+        when(pullImageCmd.withAuthConfig(any())).thenReturn(pullImageCmd);
+        Adapter<PullResponseItem> pullResponseItemAdapter = new Adapter<>();
+        when(pullImageCmd.exec(any())).thenReturn(pullResponseItemAdapter);
         CreateContainerCmd createContainerCmd = mock(CreateContainerCmd.class);
         when(dockerClient.createContainerCmd(anyString())).thenReturn(createContainerCmd);
         when(createContainerCmd.withName(anyString())).thenReturn(createContainerCmd);
@@ -68,11 +81,27 @@ public class DockerServiceTest {
         StartContainerCmd startContainerCmd = mock(StartContainerCmd.class);
         when(dockerClient.startContainerCmd(anyString())).thenReturn(startContainerCmd);
         doNothing().when(startContainerCmd).exec();
-        dockerService.startContainer(containerSetting);
+        dockerService.startContainer(containerInfo);
         verify(dockerClient, times(1)).startContainerCmd(anyString());
+    }*/
+
+    @DisplayName("Test the startContainer method in the docker service")
+    @Test
+    void startContainer_pullImageOnError_test() {
+        when(containerSettingRepository.getFirstByOrderByModifyDateTimeDesc()).thenReturn(Optional
+            .of(ContainerSettingEntity.builder().netWorkId("").username("username").password("DRKFZPy1E1M3zcZSFLVorg==")
+                .build()));
+        PullImageCmd pullImageCmd = mock(PullImageCmd.class);
+        when(dockerClient.pullImageCmd(anyString())).thenReturn(pullImageCmd);
+        when(pullImageCmd.withAuthConfig(any())).thenReturn(pullImageCmd);
+        Adapter<PullResponseItem> pullResponseItemAdapter = new Adapter<>();
+        when(pullImageCmd.exec(any())).thenReturn(pullResponseItemAdapter);
+        pullResponseItemAdapter.onError(new NotFoundException(""));
+        dockerService.startContainer(containerInfo);
+        verify(pullImageCmd, times(1)).exec(any());
     }
 
-    @DisplayName("An notFoundException occurred while start container")
+   /* @DisplayName("An notFoundException occurred while start container")
     @Test
     void startContainer_notFoundException_test() {
         Void v = mock(Void.class);
@@ -81,7 +110,7 @@ public class DockerServiceTest {
         when(createContainerCmd.withName(anyString())).thenReturn(createContainerCmd);
         when(createContainerCmd.withEnv(any(List.class))).thenReturn(createContainerCmd);
         when(createContainerCmd.exec()).thenThrow(new NotFoundException(""));
-        assertThatThrownBy(() -> dockerService.startContainer(containerSetting))
+        assertThatThrownBy(() -> dockerService.startContainer(containerInfo))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(NO_SUCH_IMAGE_ERROR.getCode());
     }
@@ -95,23 +124,27 @@ public class DockerServiceTest {
         when(createContainerCmd.withName(anyString())).thenReturn(createContainerCmd);
         when(createContainerCmd.withEnv(any(List.class))).thenReturn(createContainerCmd);
         when(createContainerCmd.exec()).thenThrow(new ConflictException(""));
-        assertThatThrownBy(() -> dockerService.startContainer(containerSetting))
+        assertThatThrownBy(() -> dockerService.startContainer(containerInfo))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(THE_CONTAINER_ALREADY_EXISTED_ERROR.getCode());
+    }*/
+
+    @DisplayName("An customException occurred while start container")
+    @Test
+    void startContainer_customException_test() {
+        when(containerSettingRepository.getFirstByOrderByModifyDateTimeDesc()).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> dockerService.startContainer(containerInfo))
+            .isInstanceOf(ApiTestPlatformException.class)
+            .extracting("code").isEqualTo(GET_CONTAINER_SETTING_ERROR.getCode());
     }
 
     @DisplayName("An runtimeException occurred while start container")
     @Test
     void startContainer_runtimeException_test() {
-        Void v = mock(Void.class);
-        CreateContainerCmd createContainerCmd = mock(CreateContainerCmd.class);
-        when(dockerClient.createContainerCmd(anyString())).thenReturn(createContainerCmd);
-        when(createContainerCmd.withName(anyString())).thenReturn(createContainerCmd);
-        when(createContainerCmd.withEnv(any(List.class))).thenReturn(createContainerCmd);
-        when(createContainerCmd.exec()).thenThrow(new RuntimeException(""));
-        assertThatThrownBy(() -> dockerService.startContainer(containerSetting))
+        when(containerSettingRepository.getFirstByOrderByModifyDateTimeDesc()).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> dockerService.startContainer(containerInfo))
             .isInstanceOf(ApiTestPlatformException.class)
-            .extracting("code").isEqualTo(CREATE_CONTAINER_ERROR.getCode());
+            .extracting("code").isEqualTo(PULL_IMAGE_ERROR.getCode());
     }
 
     @DisplayName("Test the queryLog method in the docker service")
@@ -214,4 +247,21 @@ public class DockerServiceTest {
             .extracting("code").isEqualTo(RESTART_CONTAINER_ERROR.getCode());
     }
 
+    @DisplayName("Test the findOne method in the docker service")
+    @Test
+    void findOne_test() {
+        when(containerSettingRepository.getFirstByOrderByModifyDateTimeDesc())
+            .thenReturn(Optional.of(ContainerSettingEntity.builder().build()));
+        ContainerSettingResponse one = dockerService.findOne();
+        assertThat(one).isNotNull();
+    }
+
+    @DisplayName("Test the editContainerSetting method in the docker service")
+    @Test
+    void editContainerSetting_test() {
+        ContainerSettingRequest containerSettingRequest = new ContainerSettingRequest();
+        when(containerSettingRepository.save(any())).thenReturn(new ContainerSettingEntity());
+        Boolean result = dockerService.editContainerSetting(containerSettingRequest);
+        assertThat(result).isTrue();
+    }
 }

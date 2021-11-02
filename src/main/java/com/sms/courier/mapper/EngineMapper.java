@@ -1,6 +1,6 @@
 package com.sms.courier.mapper;
 
-import com.sms.courier.docker.entity.ContainerSetting;
+import com.sms.courier.docker.entity.ContainerInfo;
 import com.sms.courier.dto.response.EngineResponse;
 import com.sms.courier.dto.response.EngineSettingResponse;
 import com.sms.courier.engine.model.EngineMemberEntity;
@@ -8,6 +8,7 @@ import com.sms.courier.utils.EnumCommonUtils;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
@@ -18,5 +19,6 @@ public interface EngineMapper {
 
     List<EngineResponse> toResponseList(List<EngineMemberEntity> entityList);
 
-    ContainerSetting toContainerSetting(EngineSettingResponse engineSettingResponse);
+    @Mapping(target = "destination", constant = "/user/engine/message")
+    ContainerInfo toContainerSetting(EngineSettingResponse engineSettingResponse);
 }

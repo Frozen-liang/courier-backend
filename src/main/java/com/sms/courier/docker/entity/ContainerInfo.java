@@ -8,9 +8,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContainerSetting {
+public class ContainerInfo {
 
-    private String netWorkId;
+    /**
+     * Message destination.
+     */
+    private String destination;
     private String imageName;
     private String containerName;
     private String version;
