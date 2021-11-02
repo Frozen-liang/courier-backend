@@ -3,24 +3,29 @@ package com.sms.courier.docker.service.impl;
 import static com.sms.courier.common.exception.ErrorCode.CREATE_CONTAINER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_CONTAINER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.NO_SUCH_CONTAINER_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.NO_SUCH_IMAGE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.QUERY_CONTAINER_LOG_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.RESTART_CONTAINER_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.THE_CONTAINER_ALREADY_EXISTED_ERROR;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback.Adapter;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.command.LogContainerCmd;
+import com.github.dockerjava.api.command.PullImageCmd;
 import com.github.dockerjava.api.exception.ConflictException;
 import com.github.dockerjava.api.exception.NotFoundException;
+import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.api.model.Frame;
 import com.sms.courier.docker.entity.ContainerSetting;
 import com.sms.courier.docker.service.DockerService;
+import com.github.dockerjava.api.model.PullResponseItem;
 import com.sms.courier.dto.request.DockerLogRequest;
+import com.sms.courier.dto.response.EngineSettingResponse;
+import com.sms.courier.engine.docker.service.DockerService;
 import com.sms.courier.service.MessageService;
+import com.sms.courier.utils.AesUtil;
 import com.sms.courier.utils.ExceptionUtils;
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,35 +52,64 @@ public class DockerServiceImpl implements DockerService {
     @Override
     public void startContainer(ContainerSetting containerSetting) {
         try {
-            log.info("Create engine:{}", containerSetting);
-            CreateContainerCmd createContainerCmd = client
-                .createContainerCmd(
-                    String.format(IMAGE, containerSetting.getImageName(), containerSetting.getVersion()))
-                .withName(containerSetting.getContainerName());
-            Map<String, String> envVariable = containerSetting.getEnvVariable();
-            List<String> env = new ArrayList<>();
-            env.add(String.format(EVN, "CONTAINER_NAME", containerSetting.getContainerName()));
-            if (MapUtils.isNotEmpty(envVariable)) {
-                for (Entry<String, String> entry : envVariable.entrySet()) {
-                    env.add(String.format(EVN, entry.getKey(), entry.getValue()));
-                }
-                createContainerCmd.withEnv(env);
+            String image = String.format(IMAGE, engineSetting.getImageName(), engineSetting.getVersion());
+            PullImageCmd pullImageCmd = client.pullImageCmd(image);
+            if (Objects.nonNull(engineSetting.getUsername()) && Objects.nonNull(engineSetting.getPassword())) {
+                AuthConfig authConfig = new AuthConfig().withPassword(AesUtil.decrypt(engineSetting.getPassword()))
+                    .withUsername(engineSetting.getUsername()).withRegistryAddress(engineSetting.getRegistryAddress());
+                pullImageCmd.withAuthConfig(authConfig);
             }
-            CreateContainerResponse ccr = createContainerCmd.exec();
-            client.connectToNetworkCmd().withContainerId(ccr.getId())
-                .withNetworkId(containerSetting.getNetWorkId()).exec();
-            client.startContainerCmd(ccr.getId()).exec();
-        } catch (NotFoundException e) {
-            log.error("No such image", e);
-            throw ExceptionUtils.mpe(NO_SUCH_IMAGE_ERROR,
-                String.format(IMAGE, containerSetting.getImageName(), containerSetting.getVersion()));
-        } catch (ConflictException e) {
-            log.error("The container already existed!", e);
-            throw ExceptionUtils.mpe(THE_CONTAINER_ALREADY_EXISTED_ERROR, containerSetting.getContainerName());
+            pullImageCmd.exec(new Adapter<PullResponseItem>() {
+                @Override
+                public void onStart(Closeable stream) {
+                    log.info("Pull image start!");
+                    super.onStart(stream);
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    log.error("Pull image error!", throwable);
+                    super.onError(throwable);
+                }
+
+                @Override
+                public void onComplete() {
+                    try {
+                        log.info("Pull image complete!");
+                        log.info("Create engine:{}", engineSetting);
+                        CreateContainerCmd createContainerCmd = client
+                            .createContainerCmd(image)
+                            .withName(engineSetting.getContainerName());
+                        Map<String, String> envVariable = engineSetting.getEnvVariable();
+                        List<String> env = new ArrayList<>();
+                        env.add(String.format(EVN, "CONTAINER_NAME", engineSetting.getContainerName()));
+                        if (MapUtils.isNotEmpty(envVariable)) {
+                            for (Entry<String, String> entry : envVariable.entrySet()) {
+                                env.add(String.format(EVN, entry.getKey(), entry.getValue()));
+                            }
+                            createContainerCmd.withEnv(env);
+                        }
+                        CreateContainerResponse ccr = createContainerCmd.exec();
+                        client.connectToNetworkCmd().withContainerId(ccr.getId())
+                            .withNetworkId(engineSetting.getNetWorkId()).exec();
+                        client.startContainerCmd(ccr.getId()).exec();
+                    } catch (NotFoundException e) {
+                        log.error("No such image", e);
+                    } catch (ConflictException e) {
+                        log.error("The container already existed!", e);
+                    } catch (Exception e) {
+                        log.error("Create container error!", e);
+                    } finally {
+                        super.onComplete();
+                    }
+                }
+            });
         } catch (Exception e) {
-            log.error("Create container error!", e);
+            log.error("Pull image error!", e);
             throw ExceptionUtils.mpe(CREATE_CONTAINER_ERROR);
         }
+
+
     }
 
     @Override

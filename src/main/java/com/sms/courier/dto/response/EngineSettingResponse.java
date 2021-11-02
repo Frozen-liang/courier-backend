@@ -18,5 +18,8 @@ public class EngineSettingResponse extends BaseResponse {
     private String imageName;
     private String containerName;
     private String version;
+    private String username;
+    private String password;
+    private String registryAddress;
     private Map<String, String> envVariable;
 }
