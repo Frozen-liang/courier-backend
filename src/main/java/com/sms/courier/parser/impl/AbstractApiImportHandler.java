@@ -31,6 +31,7 @@ public abstract class AbstractApiImportHandler implements ApiImportHandler {
         ApiHistoryRepository apiHistoryRepository = applicationContext.getBean(ApiHistoryRepository.class);
         List<ApiHistoryEntity> apiHistoryEntities = apiRepository.saveAll(diffApiList).stream()
             .map(apiEntity -> ApiHistoryEntity.builder()
+                .description("Sync api!")
                 .record(apiHistoryMapper.toApiHistoryDetail(apiEntity)).build())
             .collect(Collectors.toList());
         apiHistoryRepository.insert(apiHistoryEntities);

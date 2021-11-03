@@ -71,7 +71,7 @@ public class IncrementApiImportHandler extends AbstractApiImportHandler {
             apiEntity.setCreateDateTime(oldApiEntity.getCreateDateTime());
             apiEntity.setCaseCount(oldApiEntity.getCaseCount());
             apiEntity.setSceneCaseCount(oldApiEntity.getSceneCaseCount());
-            apiEntity.setOtherProjectSceneCaseCount(apiEntity.getOtherProjectSceneCaseCount());
+            apiEntity.setOtherProjectSceneCaseCount(oldApiEntity.getOtherProjectSceneCaseCount());
             apiEntity.setApiName(oldApiEntity.getApiName());
             apiEntity.setDescription(oldApiEntity.getDescription());
             apiEntity.setApiProtocol(oldApiEntity.getApiProtocol());
