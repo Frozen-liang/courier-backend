@@ -1,6 +1,6 @@
 package com.sms.courier.repository.impl;
 
-import static com.sms.courier.common.field.ApiTag.TAG_NAME;
+import static com.sms.courier.common.field.ApiTagField.TAG_NAME;
 import static com.sms.courier.common.field.CommonField.API_ID;
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
 import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
