@@ -26,7 +26,7 @@ public class AesUtilTest {
     private static final String CIPHER_ALGORITHM = "AES/ECB/PKCS5Padding";
     private static final String RANDOM_ALGORITHM = "SHA1PRNG";
     private static final String PASSWORD = "test";
-    private static final String CIPHERTEXT = "FAXz/0V+jL/JWnoIG3J8BQ==";
+    private static final String CIPHERTEXT = "DRKFZPy1E1M3zcZSFLVorg==";
 
     static {
         try {
@@ -49,6 +49,7 @@ public class AesUtilTest {
         cipher.init(Cipher.ENCRYPT_MODE, key);
         byte[] doFinal = cipher.doFinal(bytes);
         String result = Base64Utils.encodeToString(doFinal);
+        System.out.println(AesUtil.encrypt(PASSWORD));
         assertThat(AesUtil.encrypt(PASSWORD)).isEqualTo(result);
     }
 
@@ -58,7 +59,7 @@ public class AesUtilTest {
         assertThatThrownBy(() -> AesUtil.encrypt(null)).isInstanceOf(RuntimeException.class);
     }
 
-    /*@Test
+    @Test
     @DisplayName("Test the decrypt method in the AesUtilTest")
     public void decrypt_test()
         throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
@@ -67,7 +68,7 @@ public class AesUtilTest {
         byte[] doFinal = cipher.doFinal(Base64Utils.decodeFromString(CIPHERTEXT));
         String result = new String(doFinal, StandardCharsets.UTF_8);
         assertThat(AesUtil.decrypt(CIPHERTEXT)).isEqualTo(result);
-    }*/
+    }
 
     @Test
     @DisplayName("An exception occurred while decrypt AesUtil")

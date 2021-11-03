@@ -1,19 +1,19 @@
-package com.sms.courier.dto.response;
+package com.sms.courier.docker.entity;
 
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-public class EngineSettingResponse extends BaseResponse {
+public class ContainerInfo {
 
+    /**
+     * Message destination.
+     */
+    private String destination;
     private String imageName;
     private String containerName;
     private String version;

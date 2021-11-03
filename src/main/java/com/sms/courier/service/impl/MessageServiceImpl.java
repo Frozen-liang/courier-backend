@@ -44,4 +44,9 @@ public class MessageServiceImpl implements MessageService {
     public void dockerLog(String id, String message) {
         simpMessagingTemplate.convertAndSend(getLogDest(id), message);
     }
+
+    @Override
+    public void dockerMessage(String destination, Payload<?> payload) {
+        simpMessagingTemplate.convertAndSend(destination, payload);
+    }
 }
