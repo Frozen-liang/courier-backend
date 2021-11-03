@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationContext;
 
 public interface ApiImportHandler {
 
-    void handle(List<ApiEntity> ApiEntities,
+    void handle(List<ApiEntity> apiEntities,
         Map<String, ApiEntity> oldApiEntities,
         ApplicationContext applicationContext,
         ApiStatus apiChangeStatus,
