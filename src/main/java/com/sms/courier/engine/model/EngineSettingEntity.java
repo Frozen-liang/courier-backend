@@ -17,12 +17,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "EngineSetting")
 public class EngineSettingEntity extends BaseEntity {
 
-    private String netWorkId;
     private String imageName;
     private String containerName;
     private String version;
-    private String username;
-    private String password;
-    private String registryAddress;
     private Map<String, String> envVariable;
 }
