@@ -114,4 +114,9 @@ public class ApiController {
     public Long caseCount(@PathVariable ObjectId projectId) {
         return apiService.caseCount(projectId);
     }
+
+    @PutMapping("/reset/version/{historyId}")
+    public Boolean resetApiVersion(@PathVariable String historyId) {
+        return apiService.resetApiVersion(historyId);
+    }
 }

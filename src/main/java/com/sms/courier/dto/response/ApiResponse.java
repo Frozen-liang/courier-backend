@@ -82,4 +82,6 @@ public class ApiResponse extends LookupUserResponse {
     private Integer sceneCaseCount;
 
     private Integer otherProjectSceneCaseCount;
+
+    private String historyId;
 }
