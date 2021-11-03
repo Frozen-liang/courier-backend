@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @Document(collection = "ContainerSetting")
 public class ContainerSettingEntity extends BaseEntity {
