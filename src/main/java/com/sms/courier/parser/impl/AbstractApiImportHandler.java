@@ -53,7 +53,13 @@ public abstract class AbstractApiImportHandler implements ApiImportHandler {
     protected void recordAddApi(ApiEntity apiEntity, ProjectImportFlowEntity projectImportFlowEntity) {
         apiEntity.setId(ObjectId.get().toString());
         apiEntity.setCreateDateTime(LocalDateTime.now());
-        apiEntity.setCreateUserId(SecurityUtil.getCurrUserId());
+        String currUserId = null;
+        try {
+            currUserId = SecurityUtil.getCurrUserId();
+        } catch (Exception e) {
+            log.info("The currUserId is empty in sync api");
+        }
+        apiEntity.setCreateUserId(currUserId);
         projectImportFlowEntity.getAddedApi().add(new ApiRecord(apiEntity.getId(), apiEntity.getApiName()));
     }
 

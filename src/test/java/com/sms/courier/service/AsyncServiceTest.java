@@ -10,15 +10,11 @@ import static org.mockito.Mockito.when;
 import com.sms.courier.common.enums.DocumentType;
 import com.sms.courier.common.enums.SaveMode;
 import com.sms.courier.entity.api.ApiEntity;
-import com.sms.courier.entity.api.ApiHistoryEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
 import com.sms.courier.entity.project.ImportSourceVo;
 import com.sms.courier.entity.project.ProjectImportFlowEntity;
-import com.sms.courier.mapper.ApiHistoryMapper;
-import com.sms.courier.mapper.ApiHistoryMapperImpl;
 import com.sms.courier.mapper.ProjectImportFlowMapper;
 import com.sms.courier.repository.ApiGroupRepository;
-import com.sms.courier.repository.ApiHistoryRepository;
 import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.ProjectImportFlowRepository;
 import com.sms.courier.service.impl.AsyncServiceImpl;
@@ -42,15 +38,13 @@ import org.springframework.data.util.Streamable;
 public class AsyncServiceTest {
 
     private final ApiRepository apiRepository = mock(ApiRepository.class);
-    private final ApiHistoryRepository apiHistoryRepository = mock(ApiHistoryRepository.class);
-    private final ApiHistoryMapper apiHistoryMapper = new ApiHistoryMapperImpl();
     private final ApiGroupRepository apiGroupRepository = mock(ApiGroupRepository.class);
     private final ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
     private final ProjectImportFlowMapper projectImportFlowMapper = mock(ProjectImportFlowMapper.class);
     private ApplicationContext applicationContext = mock(ApplicationContext.class);
     private final MessageService messageService = mock(MessageService.class);
-    private final AsyncServiceImpl asyncService = new AsyncServiceImpl(apiRepository, apiHistoryRepository,
-        apiHistoryMapper, apiGroupRepository, projectImportFlowRepository, projectImportFlowMapper,
+    private final AsyncServiceImpl asyncService = new AsyncServiceImpl(apiRepository,
+        apiGroupRepository, projectImportFlowRepository, projectImportFlowMapper,
         messageService);
 
     @BeforeEach
@@ -102,7 +96,7 @@ public class AsyncServiceTest {
         when(projectImportFlowRepository.save(any(ProjectImportFlowEntity.class))).thenReturn(
             ProjectImportFlowEntity.builder().build());
         doNothing().when(messageService).projectMessage(any(), any(Payload.class));
-        when(apiGroupRepository.findByProjectIdAndDepth(any(),any()))
+        when(apiGroupRepository.findByProjectIdAndDepth(any(), any()))
             .thenReturn(getApiGroup());
         when(apiRepository.findApiEntitiesByProjectIdAndSwaggerIdNotNull(any()))
             .thenReturn(Streamable.of(getApi()));
@@ -113,7 +107,6 @@ public class AsyncServiceTest {
         doNothing().when(apiRepository).deleteAll();
         doNothing().when(applicationContext).publishEvent(any());
         when(apiRepository.saveAll(any())).thenReturn(getApi());
-        when(apiHistoryRepository.insert(any(ApiHistoryEntity.class))).thenReturn(null);
     }
 
     private Set<ApiGroupEntity> getApiGroup() {

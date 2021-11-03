@@ -90,7 +90,7 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
         try {
             log.info("The project whose Id is [{}] starts to import API documents.", projectId);
             messageService.projectMessage(projectId,
-                Payload.ok(projectImportFlowMapper.toProjectImportFlowResponse(projectImportFlowEntity)));
+                Payload.ok(projectImportFlowMapper.toMessageResponse(projectImportFlowEntity)));
 
             //Parse swagger or file.
             DocumentDefinition definition = documentType.getReader().read(importSource.getSource());
@@ -134,7 +134,7 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
         projectImportFlowRepository.save(projectImportFlowEntity);
         // Send import message.
         messageService.projectMessage(projectId,
-            Payload.ok(projectImportFlowMapper.toProjectImportFlowResponse(projectImportFlowEntity)));
+            Payload.ok(projectImportFlowMapper.toMessageResponse(projectImportFlowEntity)));
     }
 
     private void isAllCheckPass(List<ApiEntity> apiEntities, List<ApiDocumentChecker> apiDocumentCheckers) {

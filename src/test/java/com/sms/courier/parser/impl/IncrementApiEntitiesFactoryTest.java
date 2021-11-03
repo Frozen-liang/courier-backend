@@ -1,16 +1,20 @@
 package com.sms.courier.parser.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.enums.ApiStatus;
 import com.sms.courier.entity.api.ApiEntity;
+import com.sms.courier.entity.project.ProjectImportFlowEntity;
+import com.sms.courier.mapper.ApiHistoryMapper;
+import com.sms.courier.mapper.ApiHistoryMapperImpl;
+import com.sms.courier.repository.ApiHistoryRepository;
 import com.sms.courier.repository.ApiRepository;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -32,11 +36,14 @@ public class IncrementApiEntitiesFactoryTest {
         ApiRepository apiRepository = mock(ApiRepository.class);
         ApplicationContext applicationContext = mock(ApplicationContext.class);
         when(applicationContext.getBean(ApiRepository.class)).thenReturn(apiRepository);
-        doNothing().when(apiRepository).deleteAll(any());
+        ApiHistoryRepository apiHistoryRepository = mock(ApiHistoryRepository.class);
+        when(applicationContext.getBean(ApiHistoryMapper.class)).thenReturn(new ApiHistoryMapperImpl());
+        when(applicationContext.getBean(ApiHistoryRepository.class)).thenReturn(apiHistoryRepository);
+        doNothing().when(apiRepository).deleteAllByIdIn(any());
         doNothing().when(applicationContext).publishEvent(any());
-        Collection<ApiEntity> apiEntities = incrementApiEntitiesFactory.build(newApiEntities, oldApiEntities,
-            applicationContext, ApiStatus.DESIGN);
-        assertThat(apiEntities).isNotNull();
+        incrementApiEntitiesFactory.handle(newApiEntities, oldApiEntities,
+            applicationContext, ApiStatus.DESIGN, ProjectImportFlowEntity.builder().build());
+        verify(apiHistoryRepository, times(1)).insert(any(Iterable.class));
     }
 
 

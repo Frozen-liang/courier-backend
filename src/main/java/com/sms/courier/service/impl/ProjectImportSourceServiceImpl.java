@@ -5,22 +5,17 @@ import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
-import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
-import static com.sms.courier.common.field.CommonField.ID;
 import static com.sms.courier.common.field.CommonField.PROJECT_ID;
-import static com.sms.courier.common.field.CommonField.USERNAME;
 import static com.sms.courier.common.field.ProjectImportFlowField.IMPORT_SOURCE_ID;
 import static com.sms.courier.common.field.ProjectImportFlowField.IMPORT_STATUS;
 
 import com.google.common.collect.Lists;
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
-import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.dto.request.ProjectImportFlowPageRequest;
 import com.sms.courier.dto.request.ProjectImportSourceRequest;
 import com.sms.courier.dto.response.ProjectImportFlowResponse;
 import com.sms.courier.dto.response.ProjectImportSourceResponse;
-import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.entity.project.ProjectImportFlowEntity;
@@ -114,14 +109,8 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
 
     @Override
     public Page<ProjectImportFlowResponse> pageProjectImportFlow(ProjectImportFlowPageRequest request) {
-        QueryVo queryVo = QueryVo.builder().collectionName("ProjectImportFlow").lookupVo(Lists.newArrayList(
-            LookupVo.builder()
-                .from(CollectionName.USER)
-                .localField(CREATE_USER_ID)
-                .foreignField(ID)
-                .as("user")
-                .queryFields(Lists.newArrayList(LookupField.builder().field(USERNAME).alias("createUsername").build()))
-                .build()))
+        QueryVo queryVo = QueryVo.builder().collectionName("ProjectImportFlow")
+            .lookupVo(Lists.newArrayList(LookupVo.createLookupUser()))
             .criteriaList(List.of(PROJECT_ID.is(request.getProjectId()),
                 CREATE_DATE_TIME.lteAndGte(request.getStartTime(), request.getEndTime()),
                 IMPORT_SOURCE_ID.is(request.getImportSourceId()), IMPORT_STATUS.is(request.getImportStatus())))
