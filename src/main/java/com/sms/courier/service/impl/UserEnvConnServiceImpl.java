@@ -8,6 +8,7 @@ import com.sms.courier.repository.UserEnvRepository;
 import com.sms.courier.service.UserEnvConnService;
 import com.sms.courier.utils.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,11 +26,15 @@ public class UserEnvConnServiceImpl implements UserEnvConnService {
 
     @Override
     public UserEnvConnResponse userEnv(String projectId) {
-        return userEnvRepository.findByProjectIdAndCreateUserId(projectId, SecurityUtil.getCurrUserId()).orElse(null);
+        return userEnvRepository.findFirstByProjectIdAndCreateUserId(projectId, SecurityUtil.getCurrUserId())
+            .orElse(null);
     }
 
     @Override
     public UserEnvConnResponse userEnvConn(UserEnvConnRequest request) {
+        if (StringUtils.isBlank(request.getId())) {
+            userEnvRepository.deleteByProjectIdAndCreateUserId(request.getProjectId(), SecurityUtil.getCurrUserId());
+        }
         UserEnvConnEntity userEnvConnEntity = userEnvRepository.save(userEnvConnMapper.toEntity(request));
         return userEnvConnMapper.toResponse(userEnvConnEntity);
     }

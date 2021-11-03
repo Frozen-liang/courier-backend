@@ -7,5 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface UserEnvRepository extends MongoRepository<UserEnvConnEntity, String> {
 
-    Optional<UserEnvConnResponse> findByProjectIdAndCreateUserId(String project, String currentUserId);
+    Optional<UserEnvConnResponse> findFirstByProjectIdAndCreateUserId(String project, String currentUserId);
+
+    void deleteByProjectIdAndCreateUserId(String projectId, String currentUserId);
 }
