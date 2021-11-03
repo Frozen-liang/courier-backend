@@ -9,18 +9,15 @@ import com.sms.courier.common.enums.SaveMode;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.entity.api.ApiEntity;
-import com.sms.courier.entity.api.ApiHistoryEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
 import com.sms.courier.entity.project.ImportSourceVo;
 import com.sms.courier.entity.project.ProjectImportFlowEntity;
 import com.sms.courier.infrastructure.id.DefaultIdentifierGenerator;
-import com.sms.courier.mapper.ApiHistoryMapper;
 import com.sms.courier.mapper.ProjectImportFlowMapper;
 import com.sms.courier.parser.ApiDocumentChecker;
 import com.sms.courier.parser.ApiDocumentTransformer;
 import com.sms.courier.parser.common.DocumentDefinition;
 import com.sms.courier.repository.ApiGroupRepository;
-import com.sms.courier.repository.ApiHistoryRepository;
 import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.ProjectImportFlowRepository;
 import com.sms.courier.service.AsyncService;
@@ -39,7 +36,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -53,23 +49,18 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
     private static final int DEPTH = 1;
     private final DefaultIdentifierGenerator identifierGenerator = DefaultIdentifierGenerator.getSharedInstance();
     private final ApiRepository apiRepository;
-    private final ApiHistoryRepository apiHistoryRepository;
-    private final ApiHistoryMapper apiHistoryMapper;
     private final ApiGroupRepository apiGroupRepository;
     private final ProjectImportFlowRepository projectImportFlowRepository;
     private final ProjectImportFlowMapper projectImportFlowMapper;
     private ApplicationContext applicationContext;
     private final MessageService messageService;
 
-    public AsyncServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository,
-        ApiHistoryMapper apiHistoryMapper,
+    public AsyncServiceImpl(ApiRepository apiRepository,
         ApiGroupRepository apiGroupRepository,
         ProjectImportFlowRepository projectImportFlowRepository,
         ProjectImportFlowMapper projectImportFlowMapper,
         MessageService messageService) {
         this.apiRepository = apiRepository;
-        this.apiHistoryRepository = apiHistoryRepository;
-        this.apiHistoryMapper = apiHistoryMapper;
         this.apiGroupRepository = apiGroupRepository;
         this.projectImportFlowRepository = projectImportFlowRepository;
         this.projectImportFlowMapper = projectImportFlowMapper;
@@ -99,7 +90,7 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
         try {
             log.info("The project whose Id is [{}] starts to import API documents.", projectId);
             messageService.projectMessage(projectId,
-                Payload.ok(projectImportFlowMapper.toProjectImportFlowResponse(projectImportFlowEntity)));
+                Payload.ok(projectImportFlowMapper.toMessageResponse(projectImportFlowEntity)));
 
             //Parse swagger or file.
             DocumentDefinition definition = documentType.getReader().read(importSource.getSource());
@@ -121,20 +112,14 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
             //Check apiEntities, If check not pass,then throw exception.
             isAllCheckPass(apiEntities, documentType.getApiDocumentCheckers());
 
-            Collection<ApiEntity> diffApiEntities = apiEntities;
             // Get old api by project id and swagger id is not empty.
             Map<String, ApiEntity> oldApiEntities = apiRepository
                 .findApiEntitiesByProjectIdAndSwaggerIdNotNull(projectId).stream()
                 .collect(Collectors.toConcurrentMap(ApiEntity::getSwaggerId, Function.identity()));
 
-            if (MapUtils.isNotEmpty(oldApiEntities)) {
-                // Create different api entity by save mode.
-                diffApiEntities = saveMode.getBuildDiffApiEntities().build(apiEntities, oldApiEntities,
-                    applicationContext, importSource.getApiChangeStatus());
-            }
-
-            // Save different api.
-            updateApiEntitiesIfNeed(projectId, diffApiEntities);
+            // Save api
+            saveMode.getApiImportHandler().handle(apiEntities, oldApiEntities,
+                applicationContext, importSource.getApiChangeStatus(), projectImportFlowEntity);
             projectImportFlowEntity.setImportStatus(ImportStatus.SUCCESS);
             projectImportFlowEntity.setEndTime(LocalDateTime.now());
 
@@ -143,30 +128,13 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
             importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, e.getCode(), e.getMessage());
         } catch (Exception e) {
             log.error("Sync api error.", e);
-            importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, ErrorCode.SYSTEM_ERROR.getCode(),
-                ErrorCode.SYSTEM_ERROR.getMessage());
+            importApiErrorHandle(projectImportFlowEntity, incrementApiGroup, ErrorCode.SYNC_API_ERROR.getCode(),
+                ErrorCode.SYNC_API_ERROR.getMessage());
         }
         projectImportFlowRepository.save(projectImportFlowEntity);
         // Send import message.
         messageService.projectMessage(projectId,
-            Payload.ok(projectImportFlowMapper.toProjectImportFlowResponse(projectImportFlowEntity)));
-    }
-
-    private void updateApiEntitiesIfNeed(String projectId, Collection<ApiEntity> diffApiEntities) {
-        if (CollectionUtils.isEmpty(diffApiEntities)) {
-            log.debug("The project whose Id is [{}],Update API documents in total [0].", projectId);
-            return;
-        }
-        List<ApiHistoryEntity> apiHistoryEntities = apiRepository.saveAll(diffApiEntities).stream()
-            .map(apiEntity -> ApiHistoryEntity.builder()
-                .record(apiHistoryMapper.toApiHistoryDetail(apiEntity)).build())
-            .collect(Collectors.toList());
-
-        apiHistoryRepository.insert(apiHistoryEntities);
-        if (log.isDebugEnabled()) {
-            log.debug("The project whose Id is [{}],Update API documents in total [{}].",
-                projectId, diffApiEntities.size());
-        }
+            Payload.ok(projectImportFlowMapper.toMessageResponse(projectImportFlowEntity)));
     }
 
     private void isAllCheckPass(List<ApiEntity> apiEntities, List<ApiDocumentChecker> apiDocumentCheckers) {

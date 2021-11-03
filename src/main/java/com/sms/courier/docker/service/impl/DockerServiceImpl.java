@@ -1,5 +1,7 @@
 package com.sms.courier.docker.service.impl;
 
+import static com.sms.courier.common.enums.OperationModule.CONTAINER_SETTING;
+import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_CONTAINER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_CONTAINER_SETTING_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.NO_SUCH_CONTAINER_ERROR;
@@ -20,6 +22,7 @@ import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.api.model.Frame;
 import com.github.dockerjava.api.model.PullResponseItem;
+import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.docker.entity.ContainerInfo;
 import com.sms.courier.docker.entity.ContainerSettingEntity;
@@ -218,6 +221,7 @@ public class DockerServiceImpl implements DockerService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = CONTAINER_SETTING)
     public Boolean editContainerSetting(ContainerSettingRequest request) {
         ContainerSettingEntity containerSettingEntity = dockerContainerMapper.toEntity(request);
         containerSettingRepository.save(containerSettingEntity);
