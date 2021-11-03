@@ -16,13 +16,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.docker.service.DockerService;
 import com.sms.courier.dto.request.CaseRecordRequest;
 import com.sms.courier.dto.request.DockerLogRequest;
 import com.sms.courier.dto.response.EngineSettingResponse;
 import com.sms.courier.engine.EngineId;
 import com.sms.courier.engine.EngineMemberManagement;
 import com.sms.courier.engine.EngineSettingService;
-import com.sms.courier.engine.docker.service.DockerService;
 import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.engine.model.EngineMemberEntity;
 import com.sms.courier.engine.request.EngineRegistrationRequest;
@@ -162,7 +162,7 @@ public class EngineMemberManagementTest {
         EngineSettingResponse engineSetting = EngineSettingResponse.builder().build();
         when(engineSettingService.findOne()).thenReturn(engineSetting);
         when(engineMemberRepository.count()).thenReturn(2L);
-        doNothing().when(dockerService).startContainer(engineSetting);
+        doNothing().when(dockerService).startContainer(any());
         Boolean result = engineMemberManagement.createEngine();
         assertThat(result).isTrue();
     }
@@ -174,7 +174,7 @@ public class EngineMemberManagementTest {
         when(engineSettingService.findOne()).thenReturn(engineSetting);
         when(engineMemberRepository.count()).thenReturn(2L);
         doThrow(ExceptionUtils.mpe(NO_SUCH_CONTAINER_ERROR, engineSetting.getContainerName())).when(dockerService)
-            .startContainer(engineSetting);
+            .startContainer(any());
         assertThatThrownBy(engineMemberManagement::createEngine).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(NO_SUCH_CONTAINER_ERROR.getCode());
     }
@@ -185,7 +185,7 @@ public class EngineMemberManagementTest {
         EngineSettingResponse engineSetting = EngineSettingResponse.builder().build();
         when(engineSettingService.findOne()).thenReturn(engineSetting);
         when(engineMemberRepository.count()).thenReturn(2L);
-        doThrow(new RuntimeException()).when(dockerService).startContainer(engineSetting);
+        doThrow(new RuntimeException()).when(dockerService).startContainer(any());
         assertThatThrownBy(engineMemberManagement::createEngine).isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(CREATE_ENGINE_ERROR.getCode());
     }

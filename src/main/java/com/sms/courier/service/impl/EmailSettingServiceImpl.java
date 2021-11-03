@@ -1,10 +1,13 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.enums.OperationModule.EMAIL_SETTING;
+import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.exception.ErrorCode.DISABLE_EMAIL_SERVICE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.ENABLE_EMAIL_SERVICE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.UPDATE_EMAIL_CONFIGURATION_ERROR;
 
 import com.sms.courier.chat.sender.Sender;
+import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.EmailRequest;
 import com.sms.courier.entity.notification.EmailServiceEntity;
@@ -35,6 +38,7 @@ public class EmailSettingServiceImpl implements EmailSettingService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = EMAIL_SETTING)
     public boolean updateEmailConfiguration(EmailRequest emailRequest) {
         try {
             emailServiceRepository.deleteAll();

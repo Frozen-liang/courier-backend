@@ -1,5 +1,11 @@
 package com.sms.courier.entity.mongo;
 
+import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
+import static com.sms.courier.common.field.CommonField.ID;
+import static com.sms.courier.common.field.CommonField.USERNAME;
+import static com.sms.courier.common.field.UserField.NICKNAME;
+
+import com.google.common.collect.Lists;
 import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.field.Field;
 import java.util.ArrayList;
@@ -27,4 +33,17 @@ public class LookupVo {
     //查询的字段 如全部查询为空就行
     @Default
     private List<LookupField> queryFields = new ArrayList<>();
+
+    public static LookupVo createLookupUser() {
+        return LookupVo.builder()
+            .from(CollectionName.USER)
+            .localField(CREATE_USER_ID)
+            .foreignField(ID)
+            .as("user")
+            .queryFields(
+                Lists.newArrayList(
+                    LookupField.builder().field(USERNAME).alias("createUsername").build(),
+                    LookupField.builder().field(NICKNAME).alias("createNickname").build()))
+            .build();
+    }
 }

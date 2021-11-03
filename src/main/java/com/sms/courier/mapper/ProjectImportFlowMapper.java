@@ -1,5 +1,6 @@
 package com.sms.courier.mapper;
 
+import com.sms.courier.dto.response.ProjectImportFlowMessageResponse;
 import com.sms.courier.dto.response.ProjectImportFlowResponse;
 import com.sms.courier.entity.project.ProjectImportFlowEntity;
 import com.sms.courier.utils.EnumCommonUtils;
@@ -12,5 +13,7 @@ import org.mapstruct.ReportingPolicy;
 public interface ProjectImportFlowMapper {
 
     ProjectImportFlowResponse toProjectImportFlowResponse(ProjectImportFlowEntity entity);
+
+    ProjectImportFlowMessageResponse toMessageResponse(ProjectImportFlowEntity entity);
 
 }

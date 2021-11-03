@@ -14,12 +14,8 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class EngineSettingResponse extends BaseResponse {
 
-    private String netWorkId;
     private String imageName;
     private String containerName;
     private String version;
-    private String username;
-    private String password;
-    private String registryAddress;
     private Map<String, String> envVariable;
 }

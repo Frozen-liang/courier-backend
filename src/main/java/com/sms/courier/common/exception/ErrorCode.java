@@ -242,23 +242,25 @@ public enum ErrorCode {
     GET_CASE_COUNT_BY_API_ERROR("4222", "Failed to query case count the Api!"),
     GET_ENGINE_SETTING_ERROR("4223", "Failed to get engine setting!"),
     EDIT_ENGINE_SETTING_ERROR("4224", "Failed to edit engine setting!"),
-    CREATE_CONTAINER_ERROR("4225", "Failed to create engine container!"),
-    DELETE_CONTAINER_ERROR("4226", "Failed to delete engine container!"),
-    RESTART_CONTAINER_ERROR("4227", "Failed to restart engine container!"),
+    PULL_IMAGE_ERROR("4225", "Pull image: %s error!"),
+    DELETE_CONTAINER_ERROR("4226", "Failed to delete service!"),
+    RESTART_CONTAINER_ERROR("4227", "Failed to restart service!"),
     NO_SUCH_CONTAINER_ERROR("4228", "No such container: %s"),
     NO_SUCH_IMAGE_ERROR("4229", "No such image: %s"),
-    THE_CONTAINER_ALREADY_EXISTED_ERROR("4230", "Engine: %s starting, please try again later!"),
-    QUERY_CONTAINER_LOG_ERROR("4231", "Failed to query container log!"),
+    THE_CONTAINER_ALREADY_EXISTED_ERROR("4230", "Service: %s starting, please try again later!"),
+    QUERY_CONTAINER_LOG_ERROR("4231", "Failed to query service log!"),
     CREATE_ENGINE_ERROR("4232", "Failed to create engine!"),
     DELETE_ENGINE_ERROR("4233", "Failed to delete engine!"),
     GET_ENGINE_BY_ID_ERROR("4234", "The engine not exist!"),
     RESTART_ENGINE_ERROR("4235", "Failed to restart engine!"),
-    RESET_API_VERSION_ERROR("4236", "Failed to reset api version!"),
+    GET_CONTAINER_SETTING_ERROR("4236", "The container setting not exist, please configure it!"),
+    RESET_API_VERSION_ERROR("4237", "Failed to reset api version!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),
     PARSE_SWAGGER_URL_ERROR("60002", "Parse the swagger url error, Please check the url."),
     THE_OPERATION_ID_NOT_UNIQUE_ERROR("60003", "%s"),
+    SYNC_API_ERROR("60004", "Sync api fail."),
 
 
     // 61001  describes the test exception

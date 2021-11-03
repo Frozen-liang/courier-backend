@@ -6,6 +6,7 @@ import com.sms.courier.dto.request.EmailRequest;
 import com.sms.courier.dto.response.EmailPropertiesResponse;
 import com.sms.courier.service.EmailService;
 import com.sms.courier.service.EmailSettingService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,26 +28,31 @@ public class EmailServiceController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public boolean updateEmailProperty(@Validated @RequestBody EmailRequest emailRequest) {
         return emailSettingService.updateEmailConfiguration(emailRequest);
     }
 
     @GetMapping("/properties")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public EmailPropertiesResponse getPropertiesResponse() {
         return emailService.getEmailConfigurationResponse();
     }
 
     @GetMapping("/status")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public boolean getServiceStatus() {
         return emailService.isServiceEnabled();
     }
 
     @PostMapping("/enable")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public boolean enable() {
         return emailSettingService.enable();
     }
 
     @PostMapping("/disable")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public boolean disable() {
         return emailSettingService.disable();
     }

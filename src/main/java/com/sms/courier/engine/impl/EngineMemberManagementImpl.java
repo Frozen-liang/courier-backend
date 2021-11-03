@@ -14,6 +14,7 @@ import static com.sms.courier.common.field.EngineMemberField.TASK_COUNT;
 
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.docker.service.DockerService;
 import com.sms.courier.dto.request.CaseRecordRequest;
 import com.sms.courier.dto.request.DockerLogRequest;
 import com.sms.courier.dto.response.EngineResponse;
@@ -21,7 +22,6 @@ import com.sms.courier.dto.response.EngineSettingResponse;
 import com.sms.courier.engine.EngineId;
 import com.sms.courier.engine.EngineMemberManagement;
 import com.sms.courier.engine.EngineSettingService;
-import com.sms.courier.engine.docker.service.DockerService;
 import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.engine.model.EngineMemberEntity;
 import com.sms.courier.engine.request.EngineRegistrationRequest;
@@ -149,7 +149,7 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
             long count = engineMemberRepository.count();
             count++;
             engineSetting.setContainerName(engineSetting.getContainerName() + "-" + count);
-            dockerService.startContainer(engineSetting);
+            dockerService.startContainer(engineMapper.toContainerSetting(engineSetting));
             return true;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());

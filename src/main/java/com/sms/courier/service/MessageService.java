@@ -12,4 +12,6 @@ public interface MessageService {
     void enginePullFunctionMessage(FunctionMessage functionMessage);
 
     void dockerLog(String id, String message);
+
+    void dockerMessage(String destination, Payload<?> payload);
 }

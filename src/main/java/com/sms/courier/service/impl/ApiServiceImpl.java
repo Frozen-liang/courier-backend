@@ -38,6 +38,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -116,6 +117,7 @@ public class ApiServiceImpl implements ApiService {
             apiEntity.setMd5(MD5Util.getMD5(apiEntity));
             ApiEntity newApiEntity = apiRepository.insert(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
+                .description("First create api!")
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             // 如果没用引用数据结构 则不需要保存引用关系
             if (CollectionUtils.isNotEmpty(apiRequest.getAddStructIds())) {
@@ -147,6 +149,8 @@ public class ApiServiceImpl implements ApiService {
             apiEntity.setMd5(MD5Util.getMD5(apiEntity));
             ApiEntity newApiEntity = apiRepository.save(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
+                .description(StringUtils.isNotBlank(apiRequest.getEditDescription()) ? apiRequest.getEditDescription()
+                    : "Edit api!")
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             saveRef(newApiEntity.getId(), newApiEntity.getApiName(), apiRequest.getAddStructIds(),
                 apiRequest.getRemoveStructIds());
