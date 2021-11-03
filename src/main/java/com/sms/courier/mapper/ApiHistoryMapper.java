@@ -10,6 +10,5 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = ParamInfoMapper.class)
 public interface ApiHistoryMapper {
 
-
     ApiHistoryDetail toApiHistoryDetail(ApiEntity apiEntity);
 }

@@ -31,8 +31,10 @@ class CaseTemplateApiMapperTest {
         ResponseHeadersVerificationMapper.class);
     private final ResponseResultVerificationMapper resultVerificationMapper = mock(
         ResponseResultVerificationMapper.class);
+    private final MatchParamInfoMapper matchParamInfoMapper = mock(MatchParamInfoMapper.class);
+
     private final CaseTemplateApiMapper caseTemplateApiMapper = new CaseTemplateApiMapperImpl(apiTestCaseMapper,
-        paramInfoMapper, responseHeadersVerificationMapper, resultVerificationMapper);
+        paramInfoMapper,matchParamInfoMapper, responseHeadersVerificationMapper, resultVerificationMapper);
     private static final String MOCK_ID = "1";
 
     @Test
