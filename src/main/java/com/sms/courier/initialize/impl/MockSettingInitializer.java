@@ -1,5 +1,7 @@
 package com.sms.courier.initialize.impl;
 
+import static com.sms.courier.common.constant.Constants.MOCK_CONTAINER_NAME;
+
 import com.sms.courier.entity.mock.MockSettingEntity;
 import com.sms.courier.initialize.DataInitializer;
 import com.sms.courier.initialize.constant.Order;
@@ -9,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Component
@@ -23,6 +24,7 @@ public class MockSettingInitializer implements DataInitializer {
         AccessTokenProperties accessTokenProperties = applicationContext.getBean(AccessTokenProperties.class);
         if (StringUtils.isBlank(mockSetting.getSecretKey())) {
             mockSetting.setSecretKey(accessTokenProperties.getMockSecretKey());
+            mockSetting.setContainerName(MOCK_CONTAINER_NAME);
             mockSettingRepository.save(mockSetting);
         }
         accessTokenProperties.setMockSecretKey(mockSetting.getSecretKey());
