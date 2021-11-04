@@ -254,6 +254,7 @@ public enum ErrorCode {
     GET_ENGINE_BY_ID_ERROR("4234", "The engine not exist!"),
     RESTART_ENGINE_ERROR("4235", "Failed to restart engine!"),
     GET_CONTAINER_SETTING_ERROR("4236", "The container setting not exist, please configure it!"),
+    RESET_API_VERSION_ERROR("4237", "Failed to reset api version!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),

@@ -41,4 +41,7 @@ public interface ApiService {
     Long sceneCount(ObjectId projectId);
 
     Long caseCount(ObjectId projectId);
+
+    Boolean resetApiVersion(String historyId);
+
 }
