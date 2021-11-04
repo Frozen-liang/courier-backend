@@ -4,12 +4,13 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.MockSettingRequest;
 import com.sms.courier.dto.response.MockSettingResponse;
 import com.sms.courier.entity.mock.MockSettingEntity;
-import com.sms.courier.mapper.MockSettingMapper;
 import com.sms.courier.repository.MockSettingRepository;
+import com.sms.courier.security.AccessTokenProperties;
+import com.sms.courier.security.jwt.JwtTokenManager;
 import com.sms.courier.service.impl.MockSettingServiceImpl;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,11 +26,13 @@ import static org.wildfly.common.Assert.assertTrue;
 public class MockSettingServiceTest {
 
     private final MockSettingRepository mockSettingRepository = mock(MockSettingRepository.class);
-    private final MockSettingMapper mockSettingMapper = mock(MockSettingMapper.class);
+    private final JwtTokenManager jwtTokenManager = mock(JwtTokenManager.class);
+    private final AccessTokenProperties accessTokenProperties = mock(AccessTokenProperties.class);
     private final MockSettingService mockSettingService = new MockSettingServiceImpl(mockSettingRepository,
-        mockSettingMapper);
+        jwtTokenManager, accessTokenProperties);
 
     private final static String MOCK_ID = new ObjectId().toString();
+    private final static String MOCK_TOKEN = "test";
 
     @Test
     @DisplayName("Test the add method in the Mock Setting service")
@@ -37,7 +40,7 @@ public class MockSettingServiceTest {
         Optional<MockSettingEntity> mockSettingEntity = Optional.ofNullable(MockSettingEntity.builder().build());
         when(mockSettingRepository.findById(any())).thenReturn(mockSettingEntity);
         when(mockSettingRepository.save(any())).thenReturn(MockSettingEntity.builder().build());
-        Boolean isSuccess = mockSettingService.editUrl(MockSettingRequest.builder().id(MOCK_ID).build());
+        Boolean isSuccess = mockSettingService.edit(MockSettingRequest.builder().id(MOCK_ID).build());
         assertTrue(isSuccess);
     }
 
@@ -45,7 +48,7 @@ public class MockSettingServiceTest {
     @DisplayName("Test the add method in the Mock Setting service then exception")
     void editUrl_test_thenException() {
         when(mockSettingRepository.findById(any())).thenThrow(new RuntimeException());
-        assertThatThrownBy(() -> mockSettingService.editUrl(MockSettingRequest.builder().id(MOCK_ID).build()))
+        assertThatThrownBy(() -> mockSettingService.edit(MockSettingRequest.builder().id(MOCK_ID).build()))
             .isInstanceOf(
                 ApiTestPlatformException.class);
     }
@@ -53,27 +56,36 @@ public class MockSettingServiceTest {
     @Test
     @DisplayName("Test the get method in the Mock Setting service")
     void get_test() {
-        when(mockSettingRepository.findAll()).thenReturn(Lists.newArrayList(MockSettingEntity.builder().build()));
-        when(mockSettingMapper.toResponse(any())).thenReturn(MockSettingResponse.builder().id(MOCK_ID).build());
-        MockSettingResponse response = mockSettingService.get();
+        when(mockSettingRepository.getFirstByOrderByModifyDateTimeDesc())
+            .thenReturn(MockSettingResponse.builder().build());
+        MockSettingResponse response = mockSettingService.findOne();
         assertThat(response).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Test the get method in the Mock Setting service return null")
-    void get_test_ReturnNull() {
-        when(mockSettingRepository.findAll()).thenReturn(null);
-        when(mockSettingMapper.toResponse(any())).thenReturn(MockSettingResponse.builder().id(MOCK_ID).build());
-        MockSettingResponse response = mockSettingService.get();
-        assertThat(response).isNull();
     }
 
     @Test
     @DisplayName("Test the get method in the Mock Setting service then Exception")
     void get_test_thenException() {
-        when(mockSettingRepository.findAll()).thenThrow(new RuntimeException());
-        when(mockSettingMapper.toResponse(any())).thenReturn(MockSettingResponse.builder().id(MOCK_ID).build());
-        assertThatThrownBy(mockSettingService::get).isInstanceOf(ApiTestPlatformException.class);
+        when(mockSettingRepository.getFirstByOrderByModifyDateTimeDesc()).thenThrow(new RuntimeException());
+        assertThatThrownBy(mockSettingService::findOne).isInstanceOf(ApiTestPlatformException.class);
     }
 
+    @Test
+    @DisplayName("Test the reset token method in the Mock Setting service")
+    void resetToken_test() {
+        Map<String, String> map = new HashMap<>();
+        MockSettingEntity settingEntity = MockSettingEntity.builder().id(MOCK_ID).envVariable(map).build();
+        Optional<MockSettingEntity> optional = Optional.ofNullable(settingEntity);
+        when(mockSettingRepository.findById(any())).thenReturn(optional);
+        when(jwtTokenManager.generateAccessToken(any())).thenReturn(MOCK_TOKEN);
+        when(mockSettingRepository.save(any())).thenReturn(settingEntity);
+        Boolean isSuccess = mockSettingService.resetToken(MOCK_ID);
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the reset token method in the Mock Setting service")
+    void resetToken_test_thenException() {
+        when(mockSettingRepository.findById(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> mockSettingService.resetToken(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
+    }
 }

@@ -1,12 +1,15 @@
 package com.sms.courier.initialize.impl;
 
+import com.sms.courier.common.constant.Constants;
 import com.sms.courier.entity.mock.MockSettingEntity;
 import com.sms.courier.initialize.DataInitializer;
 import com.sms.courier.initialize.constant.Order;
 import com.sms.courier.repository.MockSettingRepository;
 import com.sms.courier.security.jwt.JwtTokenManager;
 import com.sms.courier.security.pojo.CustomUser;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -24,7 +27,9 @@ public class MockSettingInitializer implements DataInitializer {
             JwtTokenManager jwtTokenManager = applicationContext.getBean(JwtTokenManager.class);
             CustomUser mock = CustomUser.createMock();
             String token = jwtTokenManager.generateAccessToken(mock);
-            MockSettingEntity mockSettingEntity = MockSettingEntity.builder().mockToken(token).build();
+            Map<String, String> envMap = new HashMap<>();
+            envMap.put(Constants.API_TOKEN, token);
+            MockSettingEntity mockSettingEntity = MockSettingEntity.builder().envVariable(envMap).build();
             mockSettingRepository.insert(mockSettingEntity);
         }
     }
