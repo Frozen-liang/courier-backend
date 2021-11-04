@@ -23,7 +23,7 @@ public class JwtTokenFilterTest {
     HttpServletResponse response = mock(HttpServletResponse.class);
     FilterChain chain = mock(FilterChain.class);
 
-    UserTokenFilter userTokenFilter = new UserTokenFilter(jwtTokenManager);
+    JwtFilter userTokenFilter = new JwtFilter(jwtTokenManager);
 
     @Test
     @DisplayName("With incorrect authentication header format")

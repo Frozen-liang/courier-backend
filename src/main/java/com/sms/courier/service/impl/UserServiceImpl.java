@@ -162,9 +162,9 @@ public class UserServiceImpl implements UserService {
             UserEntity oldUser = userRepository.findById(userRequest.getId())
                 .orElseThrow(() -> ExceptionUtils.mpe(ErrorCode.EDIT_NOT_EXIST_ERROR, "User", userRequest.getId()));
             UserEntity user = userMapper.toEntity(userRequest);
-            Assert.isFalse(!oldUser.getUsername().equals(userRequest.getUsername())
+            Assert.isFalse(!StringUtils.equals(oldUser.getUsername(), userRequest.getUsername())
                 && userRepository.existsByUsername(userRequest.getUsername()), "The username exists.");
-            Assert.isFalse(!oldUser.getEmail().equals(userRequest.getEmail())
+            Assert.isFalse(!StringUtils.equals(oldUser.getEmail(), userRequest.getEmail())
                 && userRepository.existsByEmail(userRequest.getEmail()), "The email exists.");
             user.setPassword(oldUser.getPassword());
             user.setRemoved(oldUser.isRemoved());

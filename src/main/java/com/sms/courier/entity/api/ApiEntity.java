@@ -131,4 +131,8 @@ public class ApiEntity extends BaseEntity {
 
     @JsonIgnore
     private Integer otherProjectSceneCaseCount;
+
+    @Field(targetType = FieldType.OBJECT_ID)
+    @JsonIgnore
+    private String historyId;
 }

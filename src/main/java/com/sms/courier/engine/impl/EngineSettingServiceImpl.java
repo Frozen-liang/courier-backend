@@ -44,6 +44,7 @@ public class EngineSettingServiceImpl implements EngineSettingService {
                 .orElseThrow(() -> ExceptionUtils.mpe(EDIT_ENGINE_SETTING_ERROR));
             engineSettingEntity.setEnvVariable(request.getEnvVariable());
             engineSettingEntity.setVersion(request.getVersion());
+            engineSettingEntity.setImageName(request.getImageName());
             engineSettingRepository.save(engineSettingEntity);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
