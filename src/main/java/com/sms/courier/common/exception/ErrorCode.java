@@ -257,6 +257,9 @@ public enum ErrorCode {
     RESET_API_VERSION_ERROR("4237", "Failed to reset api version!"),
     GET_MOCK_SETTING_BY_ID_ERROR("4238", "Failed to get the Mock setting by id!"),
     RESET_MOCK_SETTING_TOKEN_ERROR("4239", "Failed to reset the Mock Setting token!"),
+    CREATE_MOCK_ERROR("4240", "Failed to create mock!"),
+    RESTART_MOCK_ERROR("4241", "Failed to restart mock!"),
+    DELETE_MOCK_ERROR("4242", "Failed to delete mock!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),

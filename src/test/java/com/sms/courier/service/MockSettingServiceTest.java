@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
 
-@DisplayName("Test cases for MockSettingServiceTest")
+@DisplayName("Test cases for MockSettingService")
 public class MockSettingServiceTest {
 
     private final MockSettingRepository mockSettingRepository = mock(MockSettingRepository.class);
