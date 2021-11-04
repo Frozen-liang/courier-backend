@@ -13,12 +13,18 @@ import com.sms.courier.dto.request.AddCaseTemplateApiRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.request.UpdateCaseTemplateApiRequest;
+import com.sms.courier.dto.response.ApiResponse;
+import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.dto.response.CaseTemplateApiResponse;
+import com.sms.courier.dto.response.MatchParamInfoResponse;
+import com.sms.courier.dto.response.ResponseHeadersVerificationResponse;
+import com.sms.courier.dto.response.TestResultResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -34,8 +40,19 @@ class CaseTemplateApiMapperTest {
     private final MatchParamInfoMapper matchParamInfoMapper = mock(MatchParamInfoMapper.class);
 
     private final CaseTemplateApiMapper caseTemplateApiMapper = new CaseTemplateApiMapperImpl(apiTestCaseMapper,
-        paramInfoMapper,matchParamInfoMapper, responseHeadersVerificationMapper, resultVerificationMapper);
+        paramInfoMapper, matchParamInfoMapper, responseHeadersVerificationMapper, resultVerificationMapper);
     private static final String MOCK_ID = "1";
+    private final CaseTemplateApiResponse response = CaseTemplateApiResponse.builder().id(MOCK_ID)
+        .apiTestCase(ApiTestCaseResponse.builder()
+            .id(MOCK_ID).tagId(Lists.newArrayList(MOCK_ID))
+            .responseHeadersVerification(
+                ResponseHeadersVerificationResponse.builder().checkStatus(Boolean.TRUE)
+                    .params(Lists.newArrayList(MatchParamInfoResponse.builder().build()))
+                    .build())
+            .apiEntity(ApiResponse.builder().id(MOCK_ID).build())
+            .lastTestResult(TestResultResponse.builder().jobId(MOCK_ID).build())
+            .build()
+        ).build();
 
     @Test
     @DisplayName("Test the toCaseTemplateApiByUpdateRequest method in the CaseTemplateApiMapper")
@@ -237,6 +254,29 @@ class CaseTemplateApiMapperTest {
         assertThat(caseTemplateApiMapper.toSceneCaseList(caseTemplateApiList)).size().isEqualTo(1);
     }
 
+    @Test
+    @DisplayName("Test the toEntityByResponseList is null method in the CaseTemplateApiMapper")
+    void toEntityByResponseList_Test_thenReturnNull() {
+        List<CaseTemplateApiEntity> entityList = caseTemplateApiMapper.toEntityByResponseList(null);
+        assertThat(entityList).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the toEntityByResponseList is null method in the CaseTemplateApiMapper")
+    void toEntityByResponseList_Test_thenReturnEmpty() {
+        CaseTemplateApiResponse response = null;
+        List<CaseTemplateApiResponse> responseList = Lists.newArrayList(response);
+        List<CaseTemplateApiEntity> entityList = caseTemplateApiMapper.toEntityByResponseList(responseList);
+        assertThat(entityList.get(0)).isNull();
+    }
+
+    @Test
+    @DisplayName("Test the toEntityByResponseList is null method in the CaseTemplateApiMapper")
+    void toEntityByResponseList_Test_thenRight() {
+        List<CaseTemplateApiEntity> entityList = caseTemplateApiMapper
+            .toEntityByResponseList(Lists.newArrayList(response));
+        assertThat(entityList).isNotEmpty();
+    }
 
 }
 

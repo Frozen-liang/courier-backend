@@ -32,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -239,6 +240,29 @@ public class ApiServiceImpl implements ApiService {
         } catch (Exception e) {
             log.error("Failed to query case count the Api!", e);
             throw new ApiTestPlatformException(ErrorCode.GET_CASE_COUNT_BY_API_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean resetApiVersion(String historyId) {
+        try {
+            ApiHistoryEntity apiHistoryEntity = apiHistoryRepository.findById(historyId)
+                .orElseThrow(() -> ExceptionUtils.mpe(ErrorCode.GET_INTERFACE_HISTORY_BY_ID_ERROR));
+            Optional<ApiEntity> optional = apiRepository.findById(apiHistoryEntity.getRecord().getId());
+            if (optional.isPresent()) {
+                ApiEntity oldApiEntity = optional.get();
+                ApiEntity newApiEntity = apiMapper.toEntityByHistory(apiHistoryEntity.getRecord());
+                newApiEntity.setHistoryId(apiHistoryEntity.getId());
+                newApiEntity.setCaseCount(oldApiEntity.getCaseCount());
+                newApiEntity.setSceneCaseCount(oldApiEntity.getSceneCaseCount());
+                newApiEntity.setOtherProjectSceneCaseCount(oldApiEntity.getOtherProjectSceneCaseCount());
+                apiRepository.save(newApiEntity);
+                return Boolean.TRUE;
+            }
+            return Boolean.FALSE;
+        } catch (Exception e) {
+            log.error("Failed to reset api version!", e);
+            throw ExceptionUtils.mpe(ErrorCode.RESET_API_VERSION_ERROR);
         }
     }
 

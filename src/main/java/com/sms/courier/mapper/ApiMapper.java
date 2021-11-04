@@ -8,6 +8,7 @@ import com.sms.courier.dto.request.ApiImportRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
+import com.sms.courier.entity.api.common.ApiHistoryDetail;
 import com.sms.courier.entity.project.ImportSourceVo;
 import com.sms.courier.entity.project.ProjectImportSourceEntity;
 import com.sms.courier.utils.EnumCommonUtils;
@@ -46,4 +47,8 @@ public interface ApiMapper {
     @Mapping(target = "source", source = "documentUrl")
     ImportSourceVo toImportSource(ProjectImportSourceEntity projectImportSourceEntity);
 
+    @Mapping(target = "caseCount", ignore = true)
+    @Mapping(target = "sceneCaseCount", ignore = true)
+    @Mapping(target = "otherProjectSceneCaseCount", ignore = true)
+    ApiEntity toEntityByHistory(ApiHistoryDetail record);
 }
