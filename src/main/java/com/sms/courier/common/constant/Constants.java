@@ -59,5 +59,6 @@ public class Constants {
     public static final String SCHEDULE_CASE_SERVICE = "scheduleCaseJobService";
     public static final String SCENE_CASE_SERVICE = "sceneCaseJobService";
     public static final String SCHEDULE_SCENE_CASE_SERVICE = "scheduleSceneCaseJobService";
+    public static final String API_TOKEN = "API_TOKEN";
 
 }

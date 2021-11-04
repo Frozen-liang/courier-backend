@@ -161,10 +161,6 @@ public class Role {
     public static final String MOCK_API_MOCK_QUERY_ALL = "Mock_Api_Mock" + QUERY_ALL;
     public static final String MOCK_API_QUERY_OWN = "Mock_Api" + QUERY_OWN;
 
-    //MOCK Setting
-    public static final String MOCK_SETTING_GRE_UPD_DEL = "Mock_Setting" + CRE_UPD_DEL;
-    public static final String MOCK_SETTING_QUERY_ALL = "Mock_Setting" + QUERY_ALL;
-
     // Schedule Group
     public static final String SCHEDULE_GROUP_CRE_UPD_DEL = "Schedule_Group" + CRE_UPD_DEL;
     public static final String SCHEDULE_GROUP_QUERY_ALL = "Schedule_Group" + QUERY_ALL;

@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.courier.security.authentication.AuthenticationFailHandler;
 import com.sms.courier.security.authentication.AuthenticationSuccessHandler;
 import com.sms.courier.security.authentication.RestAccessDeniedHandler;
-import com.sms.courier.security.filter.EngineTokenFilter;
-import com.sms.courier.security.filter.MockTokenFilter;
-import com.sms.courier.security.filter.UserTokenFilter;
+import com.sms.courier.security.filter.JwtFilter;
 import com.sms.courier.security.jwt.JwtTokenManager;
 import com.sms.courier.security.point.CustomLoginUrlAuthenticationEntryPoint;
 import com.sms.courier.service.LogService;
@@ -83,11 +81,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .accessDeniedHandler(accessDeniedHandler)
             .authenticationEntryPoint(authenticationEntryPoint);
         http.headers().cacheControl();
-        UserTokenFilter userTokenFilter = new UserTokenFilter(jwtTokenManager);
-        EngineTokenFilter engineTokenFilter = new EngineTokenFilter(jwtTokenManager);
-        MockTokenFilter mockTokenFilter = new MockTokenFilter(jwtTokenManager);
-        http.addFilterBefore(userTokenFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(engineTokenFilter, UserTokenFilter.class)
-            .addFilterBefore(mockTokenFilter, UserTokenFilter.class);
+        JwtFilter jwtFilter = new JwtFilter(jwtTokenManager);
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }

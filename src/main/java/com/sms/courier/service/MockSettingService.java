@@ -5,8 +5,10 @@ import com.sms.courier.dto.response.MockSettingResponse;
 
 public interface MockSettingService {
 
-    Boolean editUrl(MockSettingRequest mockSettingRequest);
+    Boolean edit(MockSettingRequest mockSettingRequest);
 
-    MockSettingResponse get();
+    MockSettingResponse findOne();
+
+    Boolean resetToken(String id);
 
 }
