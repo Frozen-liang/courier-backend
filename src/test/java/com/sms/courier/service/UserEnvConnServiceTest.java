@@ -40,7 +40,7 @@ public class UserEnvConnServiceTest {
     @Test
     @DisplayName("Test userEnv method in UserEnvConnService")
     public void userEnv_test() {
-        when(userEnvRepository.findByProjectIdAndCreateUserId(PROJECT_ID, CURRENT_USER_ID))
+        when(userEnvRepository.findFirstByProjectIdAndCreateUserId(PROJECT_ID, CURRENT_USER_ID))
             .thenReturn(Optional.of(new UserEnvConnResponse()));
         SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrUserId).thenReturn(CURRENT_USER_ID);
         UserEnvConnResponse userEnvConnResponse = userEnvConnService.userEnv(PROJECT_ID);
