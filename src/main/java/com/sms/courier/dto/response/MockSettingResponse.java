@@ -1,5 +1,6 @@
 package com.sms.courier.dto.response;
 
+import com.sms.courier.common.enums.ContainerStatus;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,4 +20,5 @@ public class MockSettingResponse extends BaseResponse {
     private String containerName;
     private String version;
     private Map<String, String> envVariable;
+    private Integer containerStatus;
 }
