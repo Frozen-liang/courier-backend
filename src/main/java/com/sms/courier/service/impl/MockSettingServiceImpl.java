@@ -52,6 +52,7 @@ public class MockSettingServiceImpl implements MockSettingService {
                     GET_MOCK_SETTING_BY_ID_ERROR));
             mockSettingEntity.setImageName(request.getImageName());
             mockSettingEntity.setContainerName(Constants.MOCK_CONTAINER_NAME);
+            mockSettingEntity.setPortMappings(request.getPortMappings());
             mockSettingEntity.setMockUrl(request.getMockUrl());
             mockSettingEntity.setVersion(request.getVersion());
             mockSettingEntity.setEnvVariable(request.getEnvVariable());
