@@ -10,6 +10,7 @@ import com.sms.courier.common.enums.ApiTagType;
 import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.enums.CaseFilter;
 import com.sms.courier.common.enums.CaseType;
+import com.sms.courier.common.enums.ContainerStatus;
 import com.sms.courier.common.enums.CycleType;
 import com.sms.courier.common.enums.DocumentType;
 import com.sms.courier.common.enums.DocumentUrlType;
@@ -124,7 +125,7 @@ public class MongoCustomConverterConfiguration {
                 IntegerToTaskStatusConverter.INSTANCE, DurationToLongConverter.INSTANCE,
                 LongToDurationConverter.INSTANCE, IntegerToMockApiResponseParamTypeConverter.INSTANCE,
                 IntegerToApiEncodingTypeConverter.INSTANCE, IntegerToMockApiJsonLocateTypeConverter.INSTANCE,
-                IntegerToCaseTypeConverter.INSTANCE);
+                IntegerToCaseTypeConverter.INSTANCE, IntegerToContainerStatusConverter.INSTANCE);
 
         return new MongoCustomConversions(converters);
     }
@@ -494,5 +495,15 @@ public class MongoCustomConverterConfiguration {
             return CaseType.getType(code);
         }
     }
+
+    @ReadingConverter
+    enum IntegerToContainerStatusConverter implements Converter<Integer, ContainerStatus> {
+        INSTANCE;
+
+        public ContainerStatus convert(@NonNull Integer code) {
+            return ContainerStatus.getType(code);
+        }
+    }
+
 }
 

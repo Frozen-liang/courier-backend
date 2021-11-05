@@ -1,5 +1,6 @@
 package com.sms.courier.entity.mock;
 
+import com.sms.courier.common.enums.ContainerStatus;
 import com.sms.courier.entity.BaseEntity;
 import java.util.Map;
 import lombok.Data;
@@ -18,9 +19,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class MockSettingEntity extends BaseEntity {
 
     private String mockUrl;
-    private String secretKey;
     private String imageName;
     private String containerName;
     private String version;
     private Map<String, String> envVariable;
+    private String secretKey;
+    private ContainerStatus containerStatus;
 }
