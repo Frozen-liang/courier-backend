@@ -16,6 +16,7 @@ import com.sms.courier.security.AccessTokenProperties;
 import com.sms.courier.security.jwt.JwtTokenManager;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.MockSettingService;
+import com.sms.courier.utils.AesUtil;
 import com.sms.courier.utils.ExceptionUtils;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Encoders;
@@ -50,7 +51,7 @@ public class MockSettingServiceImpl implements MockSettingService {
                 mockSettingRepository.findById(request.getId()).orElseThrow(() -> ExceptionUtils.mpe(
                     GET_MOCK_SETTING_BY_ID_ERROR));
             mockSettingEntity.setImageName(request.getImageName());
-            mockSettingEntity.setContainerName(request.getContainerName());
+            mockSettingEntity.setContainerName(Constants.MOCK_CONTAINER_NAME);
             mockSettingEntity.setMockUrl(request.getMockUrl());
             mockSettingEntity.setVersion(request.getVersion());
             mockSettingEntity.setEnvVariable(request.getEnvVariable());
@@ -85,7 +86,7 @@ public class MockSettingServiceImpl implements MockSettingService {
             Map<String, String> envVariable = Collections.isEmpty(mockSettingEntity.getEnvVariable()) ? new HashMap<>()
                 : mockSettingEntity.getEnvVariable();
             envVariable.put(Constants.API_TOKEN, token);
-            mockSettingEntity.setSecretKey(key);
+            mockSettingEntity.setSecretKey(AesUtil.encrypt(key));
             mockSettingEntity.setEnvVariable(envVariable);
             mockSettingRepository.save(mockSettingEntity);
             return Boolean.TRUE;

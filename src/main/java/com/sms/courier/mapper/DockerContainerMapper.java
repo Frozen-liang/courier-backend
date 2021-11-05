@@ -17,7 +17,7 @@ public interface DockerContainerMapper {
     ContainerSettingResponse toResponse(ContainerSettingEntity containerSetting);
 
     @Mapping(target = "password",
-        expression = "java(StringUtils.isNotBlank(request.getPassword()) ? AesUtil.decrypt(request.getPassword()) "
+        expression = "java(StringUtils.isNotBlank(request.getPassword()) ? AesUtil.encrypt(request.getPassword()) "
             + ": null)")
     ContainerSettingEntity toEntity(ContainerSettingRequest request);
 }

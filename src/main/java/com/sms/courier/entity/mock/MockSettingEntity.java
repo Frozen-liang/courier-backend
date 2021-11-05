@@ -1,7 +1,9 @@
 package com.sms.courier.entity.mock;
 
 import com.sms.courier.common.enums.ContainerStatus;
+import com.sms.courier.docker.entity.PortMapping;
 import com.sms.courier.entity.BaseEntity;
+import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,6 +25,7 @@ public class MockSettingEntity extends BaseEntity {
     private String containerName;
     private String version;
     private Map<String, String> envVariable;
+    private List<PortMapping> portMappings;
     private String secretKey;
     private ContainerStatus containerStatus;
 }

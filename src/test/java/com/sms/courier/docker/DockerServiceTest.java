@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback.Adapter;
+import com.github.dockerjava.api.command.ListImagesCmd;
 import com.github.dockerjava.api.command.LogContainerCmd;
 import com.github.dockerjava.api.command.PullImageCmd;
 import com.github.dockerjava.api.command.RemoveContainerCmd;
@@ -37,6 +38,7 @@ import com.sms.courier.mapper.DockerContainerMapper;
 import com.sms.courier.mapper.DockerContainerMapperImpl;
 import com.sms.courier.repository.ContainerSettingRepository;
 import com.sms.courier.service.MessageService;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
@@ -51,7 +53,7 @@ public class DockerServiceTest {
     private final ContainerSettingRepository containerSettingRepository = mock(ContainerSettingRepository.class);
     private final DockerContainerMapper dockerContainerMapper = new DockerContainerMapperImpl();
     private final ContainerInfo containerInfo = new ContainerInfo("netWorkId", "imageName", "containerName",
-        "1.0.0", Map.of("key", "value"));
+        "1.0.0", null, Map.of("key", "value"));
     private final DockerService dockerService = new DockerServiceImpl(dockerClient, messageService,
         containerSettingRepository, dockerContainerMapper);
 
@@ -87,10 +89,14 @@ public class DockerServiceTest {
 
     @DisplayName("Test the startContainer method in the docker service")
     @Test
-    void startContainer_pullImageOnError_test() {
+    void startContainer_test() {
         when(containerSettingRepository.getFirstByOrderByModifyDateTimeDesc()).thenReturn(Optional
             .of(ContainerSettingEntity.builder().netWorkId("").username("username").password("DRKFZPy1E1M3zcZSFLVorg==")
                 .build()));
+        ListImagesCmd listImagesCmd = mock(ListImagesCmd.class);
+        when(dockerClient.listImagesCmd()).thenReturn(listImagesCmd);
+        when(listImagesCmd.withImageNameFilter(any())).thenReturn(listImagesCmd);
+        when(listImagesCmd.exec()).thenReturn(Collections.emptyList());
         PullImageCmd pullImageCmd = mock(PullImageCmd.class);
         when(dockerClient.pullImageCmd(anyString())).thenReturn(pullImageCmd);
         when(pullImageCmd.withAuthConfig(any())).thenReturn(pullImageCmd);
