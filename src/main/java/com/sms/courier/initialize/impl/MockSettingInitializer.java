@@ -28,7 +28,7 @@ public class MockSettingInitializer implements DataInitializer {
         if (StringUtils.isBlank(mockSetting.getSecretKey())) {
             mockSetting.setSecretKey(AesUtil.encrypt(accessTokenProperties.getMockSecretKey()));
             mockSetting.setContainerName(MOCK_CONTAINER_NAME);
-            mockSetting.setPortMappings(List.of(new PortMapping(4001, 8885)));
+            mockSetting.setPortMappings(List.of(new PortMapping(8885, 4001)));
             mockSettingRepository.save(mockSetting);
         }
         accessTokenProperties.setMockSecretKey(AesUtil.decrypt(mockSetting.getSecretKey()));
