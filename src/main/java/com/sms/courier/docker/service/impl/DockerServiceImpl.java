@@ -20,12 +20,17 @@ import com.github.dockerjava.api.command.PullImageCmd;
 import com.github.dockerjava.api.exception.ConflictException;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.AuthConfig;
+import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Frame;
+import com.github.dockerjava.api.model.Image;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports.Binding;
 import com.github.dockerjava.api.model.PullResponseItem;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.docker.entity.ContainerInfo;
 import com.sms.courier.docker.entity.ContainerSettingEntity;
+import com.sms.courier.docker.entity.PortMapping;
 import com.sms.courier.docker.service.DockerService;
 import com.sms.courier.dto.request.ContainerSettingRequest;
 import com.sms.courier.dto.request.DockerLogRequest;
@@ -36,13 +41,16 @@ import com.sms.courier.service.MessageService;
 import com.sms.courier.utils.AesUtil;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.websocket.Payload;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Service;
 
@@ -74,6 +82,14 @@ public class DockerServiceImpl implements DockerService {
             ContainerSettingEntity containerSetting = containerSettingRepository
                 .getFirstByOrderByModifyDateTimeDesc()
                 .orElseThrow(() -> ExceptionUtils.mpe(GET_CONTAINER_SETTING_ERROR));
+
+            List<Image> imageList = client.listImagesCmd().withImageNameFilter(image).exec();
+
+            if (CollectionUtils.isNotEmpty(imageList)) {
+                initContainer(containerInfo, image, containerSetting.getNetWorkId());
+                return;
+            }
+
             PullImageCmd pullImageCmd = client.pullImageCmd(image);
             if (Objects.nonNull(containerSetting.getUsername()) && Objects.nonNull(containerSetting.getPassword())) {
                 AuthConfig authConfig = new AuthConfig().withPassword(AesUtil.decrypt(containerSetting.getPassword()))
@@ -104,45 +120,7 @@ public class DockerServiceImpl implements DockerService {
                         log.info("Pull image: {} complete!", image);
                         messageService.dockerMessage(containerInfo.getDestination(),
                             Payload.createPayload(true, String.format("Pull image: %s complete!", image), 2));
-                        log.info("Create engine:{}", containerInfo);
-                        CreateContainerCmd createContainerCmd = client
-                            .createContainerCmd(image)
-                            .withName(containerInfo.getContainerName());
-                        Map<String, String> envVariable = containerInfo.getEnvVariable();
-
-                        // Add env
-                        List<String> env = new ArrayList<>();
-                        env.add(String.format(EVN, "CONTAINER_NAME", containerInfo.getContainerName()));
-                        if (MapUtils.isNotEmpty(envVariable)) {
-                            for (Entry<String, String> entry : envVariable.entrySet()) {
-                                env.add(String.format(EVN, entry.getKey(), entry.getValue()));
-                            }
-                            createContainerCmd.withEnv(env);
-                        }
-                        // Create container
-                        CreateContainerResponse ccr = createContainerCmd.exec();
-                        // Connect network
-                        client.connectToNetworkCmd().withContainerId(ccr.getId())
-                            .withNetworkId(containerSetting.getNetWorkId()).exec();
-                        // Start container
-                        client.startContainerCmd(ccr.getId()).exec();
-                        messageService.dockerMessage(containerInfo.getDestination(),
-                            Payload.createPayload(true,
-                                String.format("Starting: %s success!", containerInfo.getContainerName()),
-                                3));
-                    } catch (NotFoundException e) {
-                        log.error("No such image", e);
-                        messageService.dockerMessage(containerInfo.getDestination(),
-                            Payload.fail(String.format(NO_SUCH_IMAGE_ERROR.getMessage(), image)));
-                    } catch (ConflictException e) {
-                        log.error("The container already existed!", e);
-                        messageService.dockerMessage(containerInfo.getDestination(),
-                            Payload.fail(String.format(THE_CONTAINER_ALREADY_EXISTED_ERROR.getMessage(),
-                                containerInfo.getContainerName())));
-                    } catch (Exception e) {
-                        log.error("Create container error!", e);
-                        messageService.dockerMessage(containerInfo.getDestination(),
-                            Payload.fail(String.format("Starting: %s error!", containerInfo.getContainerName())));
+                        initContainer(containerInfo, image, containerSetting.getNetWorkId());
                     } finally {
                         super.onComplete();
                     }
@@ -154,7 +132,6 @@ public class DockerServiceImpl implements DockerService {
             log.error("Pull image error!", e);
             throw ExceptionUtils.mpe(PULL_IMAGE_ERROR, image);
         }
-
 
     }
 
@@ -227,4 +204,66 @@ public class DockerServiceImpl implements DockerService {
         containerSettingRepository.save(containerSettingEntity);
         return Boolean.TRUE;
     }
+
+    private void initContainer(ContainerInfo containerInfo, String image, String netWorkId) {
+        try {
+            log.info("Create engine:{}", containerInfo);
+            CreateContainerCmd createContainerCmd = client
+                .createContainerCmd(image)
+                .withName(containerInfo.getContainerName());
+
+            // Add port bing
+            addPortBinding(containerInfo.getPortMappings(), createContainerCmd);
+            // Add env
+            addEnv(containerInfo, createContainerCmd);
+            // Create container
+            CreateContainerResponse ccr = createContainerCmd.exec();
+            // Connect network
+            client.connectToNetworkCmd().withContainerId(ccr.getId())
+                .withNetworkId(netWorkId).exec();
+            // Start container
+            client.startContainerCmd(ccr.getId()).exec();
+            messageService.dockerMessage(containerInfo.getDestination(),
+                Payload.createPayload(true,
+                    String.format("Starting: %s success!", containerInfo.getContainerName()),
+                    3));
+        } catch (NotFoundException e) {
+            log.error("No such image", e);
+            messageService.dockerMessage(containerInfo.getDestination(),
+                Payload.fail(String.format(NO_SUCH_IMAGE_ERROR.getMessage(), image)));
+        } catch (ConflictException e) {
+            log.error("The container already existed!", e);
+            messageService.dockerMessage(containerInfo.getDestination(),
+                Payload.fail(String.format(THE_CONTAINER_ALREADY_EXISTED_ERROR.getMessage(),
+                    containerInfo.getContainerName())));
+        } catch (Exception e) {
+            log.error("Create container error!", e);
+            messageService.dockerMessage(containerInfo.getDestination(),
+                Payload.fail(String.format("Starting: %s error!", containerInfo.getContainerName())));
+        }
+    }
+
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+    private void addPortBinding(List<PortMapping> portMappings, CreateContainerCmd createContainerCmd) {
+        if (CollectionUtils.isNotEmpty(portMappings)) {
+            List<PortBinding> portBindings = portMappings.stream().map((portMapping -> {
+                return new PortBinding(Binding.bindPort(portMapping.getBindPort()), ExposedPort.tcp(
+                    portMapping.getExposedPort()));
+            })).collect(Collectors.toList());
+            createContainerCmd.getHostConfig().withPortBindings(portBindings);
+        }
+    }
+
+    private void addEnv(ContainerInfo containerInfo, CreateContainerCmd createContainerCmd) {
+        Map<String, String> envVariable = containerInfo.getEnvVariable();
+        List<String> env = new ArrayList<>();
+        env.add(String.format(EVN, "CONTAINER_NAME", containerInfo.getContainerName()));
+        if (MapUtils.isNotEmpty(envVariable)) {
+            for (Entry<String, String> entry : envVariable.entrySet()) {
+                env.add(String.format(EVN, entry.getKey(), entry.getValue()));
+            }
+        }
+        createContainerCmd.withEnv(env);
+    }
+
 }
