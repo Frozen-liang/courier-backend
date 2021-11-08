@@ -12,7 +12,7 @@ import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.common.listener.event.ScheduleJobRecordEvent;
-import com.sms.courier.common.listener.event.ScheduleTestReportEvent;
+import com.sms.courier.common.listener.event.TestReportEvent;
 import com.sms.courier.engine.service.CaseDispatcherService;
 import com.sms.courier.entity.datacollection.DataCollectionEntity;
 import com.sms.courier.entity.datacollection.TestData;
@@ -99,7 +99,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
             // Send email
             applicationEventPublisher
                 .publishEvent(
-                    ScheduleTestReportEvent.create(scheduleCaseJob.getScheduleRecordId(), sceneCaseJobReport,
+                    TestReportEvent.createScheduleEvent(scheduleCaseJob.getScheduleRecordId(), sceneCaseJobReport,
                         scheduleCaseJob.getApiTestCase().size(), scheduleCaseJob.getName(),
                         Objects.nonNull(job.getDataCollection()) ? job.getDataCollection().getTestData().getDataName()
                             : null));
