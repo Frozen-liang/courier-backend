@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import org.springframework.stereotype.Component;
@@ -43,9 +44,8 @@ public class SuspiciousEngineManagementImpl implements SuspiciousEngineManagemen
     public void remove(String engineId) {
         engineIndexMapping.compute(engineId, (key, value) -> {
             if (Objects.nonNull(value)) {
-                suspiciousEngineQueue.get(value).remove(engineId);
+                Optional.ofNullable(suspiciousEngineQueue.get(value)).ifPresent(queue -> queue.remove(engineId));
             }
-
             // equals remove operation.
             return null;
         });

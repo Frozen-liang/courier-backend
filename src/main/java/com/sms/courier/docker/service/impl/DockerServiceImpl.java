@@ -22,6 +22,7 @@ import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.AuthConfig;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Frame;
+import com.github.dockerjava.api.model.HealthCheck;
 import com.github.dockerjava.api.model.Image;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports.Binding;
@@ -43,6 +44,7 @@ import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.websocket.Payload;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.Closeable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +67,7 @@ public class DockerServiceImpl implements DockerService {
     private static final String EVN = "%s=%s";
     private static final String IMAGE = "%s:%s";
     private static final String CONTAINER_SETTING_ID = "6180d7090cce7b6d7ceca27a";
+    private static final List<String> HEALTH_CHECK_TEST = List.of("CMD", "nc", "-zv", "localhost", "5555");
 
     public DockerServiceImpl(DockerClient client, MessageService messageService,
         ContainerSettingRepository containerSettingRepository,
@@ -208,9 +211,19 @@ public class DockerServiceImpl implements DockerService {
     private void initContainer(ContainerInfo containerInfo, String image, String netWorkId) {
         try {
             log.info("Create engine:{}", containerInfo);
+
+            HealthCheck healthCheck = new HealthCheck();
+
+            healthCheck = healthCheck.withTest(HEALTH_CHECK_TEST)
+                .withInterval(Duration.ofSeconds(5L).toNanos())
+                .withRetries(20)
+                .withTimeout(Duration.ofSeconds(10L).toNanos());
+
             CreateContainerCmd createContainerCmd = client
                 .createContainerCmd(image)
-                .withName(containerInfo.getContainerName());
+                .withName(containerInfo.getContainerName())
+                .withLabels(containerInfo.getLabelType().createLabel())
+                .withHealthcheck(healthCheck);
 
             // Add port bing
             addPortBinding(containerInfo.getPortMappings(), createContainerCmd);
