@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
@@ -19,6 +20,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @EqualsAndHashCode(callSuper = true)
 public class AbstractSceneCaseJobEntity extends JobEntity {
 
+    @Indexed(background = true)
     @Field(targetType = FieldType.OBJECT_ID)
     private String sceneCaseId;
 
