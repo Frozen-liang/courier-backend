@@ -32,6 +32,7 @@ import com.sms.courier.entity.system.UserEntity;
 import com.sms.courier.entity.system.UserGroupEntity;
 import com.sms.courier.entity.tag.ApiTagEntity;
 import com.sms.courier.entity.workspace.WorkspaceEntity;
+import com.sms.courier.webhook.model.WebhookEntity;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -71,7 +72,8 @@ public enum OperationModule implements EnumCommon {
     ENGINE_MEMBER(28, EngineMemberEntity.class),
     ENGINE_SETTING(29, EngineSettingEntity.class),
     CONTAINER_SETTING(30, ContainerSettingEntity.class),
-    EMAIL_SETTING(31, EmailServiceEntity.class);
+    EMAIL_SETTING(31, EmailServiceEntity.class),
+    WEBHOOK(32, WebhookEntity.class);
 
     private static final Map<Integer, OperationModule> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationModule::getCode, Function.identity()));

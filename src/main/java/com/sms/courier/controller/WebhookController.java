@@ -10,6 +10,7 @@ import com.sms.courier.dto.response.WebhookResponse;
 import com.sms.courier.service.WebhookService;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,21 +31,25 @@ public class WebhookController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody WebhookRequest webhookRequest) {
         return webhookService.add(webhookRequest);
     }
 
     @PutMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean edit(@Validated(UpdateGroup.class) @RequestBody WebhookRequest webhookRequest) {
         return webhookService.edit(webhookRequest);
     }
 
     @PostMapping("/page")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Page<WebhookResponse> page(WebhookPageRequest request) {
         return webhookService.page(request);
     }
 
     @DeleteMapping("/{ids}")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean delete(@PathVariable List<String> ids) {
         return webhookService.delete(ids);
     }

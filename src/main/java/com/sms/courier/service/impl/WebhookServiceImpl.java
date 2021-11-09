@@ -1,5 +1,9 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.enums.OperationModule.WEBHOOK;
+import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.DELETE;
+import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.exception.ErrorCode.ADD_WEBHOOK_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_WEBHOOK_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
@@ -8,6 +12,8 @@ import static com.sms.courier.common.exception.ErrorCode.GET_WEBHOOK_PAGE_ERROR;
 import static com.sms.courier.common.field.WebhookField.URL;
 import static com.sms.courier.common.field.WebhookField.WEBHOOK_TYPE;
 
+import com.sms.courier.common.aspect.annotation.Enhance;
+import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.WebhookPageRequest;
 import com.sms.courier.dto.request.WebhookRequest;
@@ -58,6 +64,7 @@ public class WebhookServiceImpl implements WebhookService {
 
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = WEBHOOK, template = "#{{webhookRequest.url}}")
     public Boolean add(WebhookRequest webhookRequest) {
         log.info("WebhookService-add()-params: [Webhook]={}", webhookRequest.toString());
         try {
@@ -71,6 +78,7 @@ public class WebhookServiceImpl implements WebhookService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = WEBHOOK, template = "#{{webhookRequest.url}}")
     public Boolean edit(WebhookRequest webhookRequest) {
         log.info("WebhookService-edit()-params: [Webhook]={}", webhookRequest.toString());
         try {
@@ -91,6 +99,8 @@ public class WebhookServiceImpl implements WebhookService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = WEBHOOK,
+        template = "{{#result?.![#this.url]}}", enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
             webhookRepository.deleteByIdIn(ids);
