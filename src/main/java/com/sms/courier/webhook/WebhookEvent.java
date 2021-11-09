@@ -1,6 +1,6 @@
 package com.sms.courier.webhook;
 
-import com.sms.courier.webhook.enums.WebHookType;
+import com.sms.courier.webhook.enums.WebhookType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +14,7 @@ public class WebhookEvent<T> implements Comparable<WebhookEvent<?>> {
 
     private String hookId;
     private String workspaceId;
-    private WebHookType webHookType;
+    private WebhookType webhookType;
     private T data;
     private Long timestamp;
 

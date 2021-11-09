@@ -1,0 +1,51 @@
+package com.sms.courier.controller;
+
+import static com.sms.courier.common.constant.Constants.WEBHOOK_PATH;
+
+import com.sms.courier.common.validate.InsertGroup;
+import com.sms.courier.common.validate.UpdateGroup;
+import com.sms.courier.dto.request.WebhookPageRequest;
+import com.sms.courier.dto.request.WebhookRequest;
+import com.sms.courier.dto.response.WebhookResponse;
+import com.sms.courier.service.WebhookService;
+import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping(WEBHOOK_PATH)
+public class WebhookController {
+
+    private final WebhookService webhookService;
+
+    public WebhookController(WebhookService webhookService) {
+        this.webhookService = webhookService;
+    }
+
+    @PostMapping
+    public Boolean add(@Validated(InsertGroup.class) @RequestBody WebhookRequest webhookRequest) {
+        return webhookService.add(webhookRequest);
+    }
+
+    @PutMapping
+    public Boolean edit(@Validated(UpdateGroup.class) @RequestBody WebhookRequest webhookRequest) {
+        return webhookService.edit(webhookRequest);
+    }
+
+    @PostMapping("/page")
+    public Page<WebhookResponse> page(WebhookPageRequest request) {
+        return webhookService.page(request);
+    }
+
+    @DeleteMapping("/{ids}")
+    public Boolean delete(@PathVariable List<String> ids) {
+        return webhookService.delete(ids);
+    }
+}
