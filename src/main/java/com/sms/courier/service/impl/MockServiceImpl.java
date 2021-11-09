@@ -49,7 +49,6 @@ public class MockServiceImpl implements MockService {
             if (Objects.isNull(mockSettingEntity.getContainerStatus())
                 || Objects.equals(mockSettingEntity.getContainerStatus(), ContainerStatus.DESTROY)) {
                 dockerService.startContainer(mockSettingMapper.toContainerSetting(mockSettingEntity));
-                mockSettingEntity.setContainerStatus(ContainerStatus.START);
                 mockSettingRepository.save(mockSettingEntity);
                 return Boolean.TRUE;
             }
@@ -76,7 +75,6 @@ public class MockServiceImpl implements MockService {
                 return Boolean.FALSE;
             }
             dockerService.restartContainer(mockSettingEntity.getContainerName());
-            mockSettingEntity.setContainerStatus(ContainerStatus.START);
             mockSettingRepository.save(mockSettingEntity);
             return Boolean.TRUE;
 
@@ -101,7 +99,6 @@ public class MockServiceImpl implements MockService {
                 return Boolean.FALSE;
             }
             dockerService.deleteContainer(mockSettingEntity.getContainerName());
-            mockSettingEntity.setContainerStatus(ContainerStatus.DESTROY);
             mockSettingRepository.save(mockSettingEntity);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
