@@ -12,7 +12,7 @@ public enum ContainerStatus implements EnumCommon {
     DIE("die", 1),
     DESTROY("destroy", 2);
 
-    private String status;
+    private final String status;
     private final int code;
 
     ContainerStatus(String status, int code) {
@@ -32,8 +32,17 @@ public enum ContainerStatus implements EnumCommon {
     private static final Map<Integer, ContainerStatus> MAPPINGS = Arrays.stream(values()).sequential().collect(
         Collectors.toMap(ContainerStatus::getCode, Function.identity()));
 
+    private static final Map<String, ContainerStatus> CONTAINER_STATUS_MAP = Arrays.stream(values()).sequential()
+        .collect(Collectors.toMap(ContainerStatus::getName, Function.identity()));
+
     @Nullable
     public static ContainerStatus getType(@Nullable Integer code) {
         return (code != null ? MAPPINGS.get(code) : null);
     }
+
+    @Nullable
+    public static ContainerStatus resolverByName(@Nullable String name) {
+        return CONTAINER_STATUS_MAP.get(name);
+    }
+
 }

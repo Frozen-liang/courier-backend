@@ -24,4 +24,6 @@ public interface ScheduleService {
     Boolean handle(String id);
 
     Boolean open(String id, boolean enable);
+
+    Boolean removeCaseIds(List<String> caseIds);
 }

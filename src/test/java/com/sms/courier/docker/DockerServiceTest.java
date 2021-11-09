@@ -27,6 +27,7 @@ import com.github.dockerjava.api.command.RestartContainerCmd;
 import com.github.dockerjava.api.exception.NotFoundException;
 import com.github.dockerjava.api.model.PullResponseItem;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.docker.enmu.LabelType;
 import com.sms.courier.docker.entity.ContainerInfo;
 import com.sms.courier.docker.entity.ContainerSettingEntity;
 import com.sms.courier.docker.service.DockerService;
@@ -53,7 +54,7 @@ public class DockerServiceTest {
     private final ContainerSettingRepository containerSettingRepository = mock(ContainerSettingRepository.class);
     private final DockerContainerMapper dockerContainerMapper = new DockerContainerMapperImpl();
     private final ContainerInfo containerInfo = new ContainerInfo("netWorkId", "imageName", "containerName",
-        "1.0.0", null, Map.of("key", "value"));
+        "1.0.0", null, LabelType.ENGINE, Map.of("key", "value"));
     private final DockerService dockerService = new DockerServiceImpl(dockerClient, messageService,
         containerSettingRepository, dockerContainerMapper);
 

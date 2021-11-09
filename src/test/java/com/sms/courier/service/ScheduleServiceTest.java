@@ -9,6 +9,7 @@ import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_LIST_ERROR
 import static com.sms.courier.common.exception.ErrorCode.SYSTEM_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -29,6 +30,8 @@ import com.sms.courier.entity.schedule.ScheduleEntity;
 import com.sms.courier.mapper.ScheduleMapper;
 import com.sms.courier.mapper.ScheduleMapperImpl;
 import com.sms.courier.repository.CommonRepository;
+import com.sms.courier.repository.CustomizedScheduleRepository;
+import com.sms.courier.repository.CustomizedScheduleRepositoryTest;
 import com.sms.courier.repository.ScheduleRepository;
 import com.sms.courier.service.impl.ScheduleServiceImpl;
 import java.util.Collections;
@@ -37,6 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
+import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,8 +55,9 @@ class ScheduleServiceTest {
     private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final ScheduleCaseJobService scheduleCaseJobService = mock(ScheduleCaseJobService.class);
     private final ScheduleSceneCaseJobService scheduleSceneCaseJobService = mock(ScheduleSceneCaseJobService.class);
+    private final CustomizedScheduleRepository customizedScheduleRepository = mock(CustomizedScheduleRepository.class);
     private final ScheduleService scheduleService = new ScheduleServiceImpl(scheduleRepository, commonRepository,
-        scheduleMapper, scheduleCaseJobService, scheduleSceneCaseJobService);
+        scheduleMapper, scheduleCaseJobService, scheduleSceneCaseJobService, customizedScheduleRepository);
     private static final String ID = ObjectId.get().toString();
     private final ScheduleEntity schedule =
         ScheduleEntity.builder().id(ID).cycle(CycleType.DAY).time(Set.of("11:40")).build();
@@ -156,14 +161,14 @@ class ScheduleServiceTest {
     @DisplayName("Test the open method in the Schedule service")
     public void open_test() {
         when(commonRepository.updateFieldById(any(), any(Map.class), any())).thenReturn(true);
-        assertThat(scheduleService.open(ID,true)).isTrue();
+        assertThat(scheduleService.open(ID, true)).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while open Schedule")
     public void open_exception_test() {
         doThrow(new RuntimeException()).when(commonRepository).updateFieldById(any(), any(Map.class), any());
-        assertThatThrownBy(() -> scheduleService.open(ID,true))
+        assertThatThrownBy(() -> scheduleService.open(ID, true))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(EDIT_SCHEDULE_ERROR.getCode());
     }
@@ -206,7 +211,24 @@ class ScheduleServiceTest {
     @DisplayName("Test the deleteByGroupId method in the Schedule service")
     public void deleteByGroupId_test() {
         when(scheduleRepository.findByGroupId(any())).thenReturn(Stream.empty());
-       scheduleService.deleteByGroupId(ID);
-       verify(commonRepository,never()).updateFieldByIds(any(List.class), any(Map.class), any());
+        scheduleService.deleteByGroupId(ID);
+        verify(commonRepository, never()).updateFieldByIds(any(List.class), any(Map.class), any());
     }
+
+    @Test
+    @DisplayName("Test the removeCaseIds method in the Schedule service")
+    public void removeCaseIds_test() {
+        when(customizedScheduleRepository.removeCaseIds(any())).thenReturn(Boolean.TRUE);
+        Boolean isSuccess = scheduleService.removeCaseIds(Lists.newArrayList(ID));
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("An custom exception while removeCaseIds Schedule")
+    public void removeCaseIds_exception_test() {
+        when(customizedScheduleRepository.removeCaseIds(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> scheduleService.removeCaseIds(Lists.newArrayList(ID)))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
 }

@@ -138,6 +138,11 @@ public class CommonRepositoryImpl implements CommonRepository {
     }
 
     @Override
+    public <T> Optional<T> findOne(Query query, Class<T> entityClass) {
+        return Optional.ofNullable(mongoTemplate.findOne(query, entityClass));
+    }
+
+    @Override
     public <T> List<T> listLookupUser(String collectionName, List<Optional<Criteria>> criteriaList,
         Class<T> responseClass) {
         List<LookupField> lookupFields = List.of(
