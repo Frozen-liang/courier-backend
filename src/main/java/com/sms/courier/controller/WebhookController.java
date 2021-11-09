@@ -44,7 +44,7 @@ public class WebhookController {
 
     @PostMapping("/page")
     @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
-    public Page<WebhookResponse> page(WebhookPageRequest request) {
+    public Page<WebhookResponse> page(@RequestBody WebhookPageRequest request) {
         return webhookService.page(request);
     }
 

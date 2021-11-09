@@ -52,7 +52,7 @@ public class WebhookServiceImpl implements WebhookService {
     public Page<WebhookResponse> page(WebhookPageRequest request) {
         try {
             QueryVo queryVo = new QueryVo();
-            queryVo.setCriteriaList(List.of(URL.is(request.getUrl()), WEBHOOK_TYPE.in(request.getWebhookType())));
+            queryVo.setCriteriaList(List.of(URL.like(request.getUrl()), WEBHOOK_TYPE.in(request.getWebhookType())));
             queryVo.setLookupVo(List.of(LookupVo.createLookupUser()));
             queryVo.setCollectionName("Webhook");
             return commonRepository.page(queryVo, request, WebhookResponse.class);
