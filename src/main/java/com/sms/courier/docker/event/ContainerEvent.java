@@ -5,6 +5,7 @@ import com.github.dockerjava.api.model.Event;
 import com.sms.courier.common.enums.ContainerStatus;
 import com.sms.courier.docker.enmu.LabelType;
 import com.sms.courier.repository.CommonRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -30,6 +31,7 @@ public class ContainerEvent extends ResultCallbackTemplate<ContainerEvent, Event
     }
 
     @Override
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public void onNext(Event event) {
         try {
             log.info("Event: {}", event);
