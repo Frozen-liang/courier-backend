@@ -1,5 +1,21 @@
 package com.sms.courier.service;
 
+import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.RECOVER_SCENE_CASE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
+
 import com.google.common.collect.Lists;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.AddCaseTemplateApi;
@@ -28,7 +44,6 @@ import com.sms.courier.mapper.CaseTemplateApiMapper;
 import com.sms.courier.mapper.MatchParamInfoMapper;
 import com.sms.courier.mapper.SceneCaseApiMapper;
 import com.sms.courier.mapper.SceneCaseMapper;
-import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.ApiTestCaseRepository;
 import com.sms.courier.repository.CustomizedSceneCaseApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseRepository;
@@ -47,22 +62,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.RECOVER_SCENE_CASE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.wildfly.common.Assert.assertTrue;
-
 @DisplayName("Test cases for SceneCaseServiceTest")
 class SceneCaseServiceTest {
 
@@ -73,7 +72,6 @@ class SceneCaseServiceTest {
     private SceneCaseApiService sceneCaseApiService;
     private CaseTemplateApiService caseTemplateApiService;
     private ApiTestCaseRepository apiTestCaseRepository;
-    private ApiRepository apiRepository;
     private ApiTestCaseMapper apiTestCaseMapper;
     private SceneCaseApiRepository sceneCaseApiRepository;
     private CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository;
@@ -81,6 +79,7 @@ class SceneCaseServiceTest {
     private CaseTemplateApiMapper caseTemplateApiMapper;
     private CaseApiCountHandler caseApiCountHandler;
     private MatchParamInfoMapper matchParamInfoMapper;
+    private ScheduleService scheduleService;
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -99,7 +98,6 @@ class SceneCaseServiceTest {
         sceneCaseApiService = mock(SceneCaseApiService.class);
         caseTemplateApiService = mock(CaseTemplateApiService.class);
         apiTestCaseRepository = mock(ApiTestCaseRepository.class);
-        apiRepository = mock(ApiRepository.class);
         apiTestCaseMapper = mock(ApiTestCaseMapper.class);
         sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
         customizedSceneCaseApiRepository = mock(CustomizedSceneCaseApiRepository.class);
@@ -107,10 +105,17 @@ class SceneCaseServiceTest {
         caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
         caseApiCountHandler = mock(CaseApiCountHandler.class);
         matchParamInfoMapper = mock(MatchParamInfoMapper.class);
-        sceneCaseService = new SceneCaseServiceImpl(sceneCaseRepository, customizedSceneCaseRepository,
-            sceneCaseMapper, sceneCaseApiService, caseTemplateApiService, apiTestCaseRepository,
-            apiRepository, apiTestCaseMapper, sceneCaseApiRepository, customizedSceneCaseApiRepository,
-            sceneCaseApiMapper, caseTemplateApiMapper, caseApiCountHandler, matchParamInfoMapper);
+        scheduleService = mock(ScheduleService.class);
+        sceneCaseService = new SceneCaseServiceImpl(sceneCaseRepository,
+            customizedSceneCaseRepository,
+            sceneCaseMapper, sceneCaseApiService,
+            caseTemplateApiService,
+            apiTestCaseRepository,
+            apiTestCaseMapper, sceneCaseApiRepository,
+            customizedSceneCaseApiRepository,
+            sceneCaseApiMapper, caseTemplateApiMapper,
+            caseApiCountHandler, matchParamInfoMapper,
+            scheduleService);
     }
 
     @Test
@@ -348,7 +353,6 @@ class SceneCaseServiceTest {
         when(sceneCaseApiRepository.insert(any(SceneCaseApiEntity.class)))
             .thenReturn(SceneCaseApiEntity.builder().build());
         Optional<ApiEntity> apiEntity = Optional.ofNullable(ApiEntity.builder().build());
-        when(apiRepository.findById(any())).thenReturn(apiEntity);
         ApiTestCaseEntity testCase = ApiTestCaseEntity.builder().id(MOCK_ID).build();
         when(apiTestCaseMapper.toEntityByApiEntity(any())).thenReturn(testCase);
         when(sceneCaseApiRepository.insert(any(SceneCaseApiEntity.class)))

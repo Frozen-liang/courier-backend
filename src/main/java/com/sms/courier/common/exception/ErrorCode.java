@@ -260,6 +260,7 @@ public enum ErrorCode {
     CREATE_MOCK_ERROR("4240", "Failed to create mock!"),
     RESTART_MOCK_ERROR("4241", "Failed to restart mock!"),
     DELETE_MOCK_ERROR("4242", "Failed to delete mock!"),
+    DELETE_SCHEDULE_CASE_ID_ERROR("4243", "Failed to delete the Schedule case id!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),
