@@ -22,7 +22,7 @@ public interface EngineMapper {
 
     List<EngineResponse> toResponseList(List<EngineMemberEntity> entityList);
 
-    @Mapping(target = "destination", expression = "java(\"/user/engine/message/\" + SecurityUtil.getCurrUserId())")
+    @Mapping(target = "destination", constant = "engine")
     @Mapping(target = "labelType", expression = "java(LabelType.ENGINE)")
     ContainerInfo toContainerSetting(EngineSettingResponse engineSettingResponse);
 }

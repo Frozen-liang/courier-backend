@@ -21,7 +21,7 @@ public interface MockSettingMapper {
 
     MockSettingResponse toResponse(MockSettingEntity mockSettingEntity);
 
-    @Mapping(target = "destination", expression = "java(\"/user/mock/message/\" + SecurityUtil.getCurrUserId())")
+    @Mapping(target = "destination", constant = "mock")
     @Mapping(target = "labelType", expression = "java(LabelType.MOCK)")
     ContainerInfo toContainerSetting(MockSettingEntity mockSettingEntity);
 }
