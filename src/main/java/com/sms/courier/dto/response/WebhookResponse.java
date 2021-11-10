@@ -16,5 +16,7 @@ public class WebhookResponse extends LookupUserResponse {
 
     private String url;
 
+    private String description;
+
     private List<Integer> webhookType;
 }

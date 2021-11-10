@@ -24,5 +24,7 @@ public class WebhookRequest {
     @NotBlank(groups = {UpdateGroup.class, InsertGroup.class}, message = "The url cannot be empty.")
     private String url;
 
+    private String description;
+
     private List<WebhookType> webhookType;
 }

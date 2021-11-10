@@ -18,5 +18,7 @@ public class WebhookPageRequest extends PageDto {
 
     private String url;
 
+    private String description;
+
     private List<WebhookType> webhookType;
 }

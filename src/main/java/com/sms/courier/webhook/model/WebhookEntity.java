@@ -19,5 +19,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class WebhookEntity extends BaseEntity {
 
     private String url;
+    private String description;
     private List<WebhookType> webhookType;
 }
