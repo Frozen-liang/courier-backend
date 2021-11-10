@@ -1,5 +1,6 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.utils.UserDestinationUtil.getDockerDest;
 import static com.sms.courier.utils.UserDestinationUtil.getLogDest;
 import static com.sms.courier.utils.UserDestinationUtil.getProjectDest;
 
@@ -47,6 +48,6 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public void dockerMessage(String destination, Payload<?> payload) {
-        simpMessagingTemplate.convertAndSend(destination, payload);
+        simpMessagingTemplate.convertAndSend(getDockerDest(destination), payload);
     }
 }

@@ -68,6 +68,9 @@ public class DockerServiceImpl implements DockerService {
     private static final String IMAGE = "%s:%s";
     private static final String CONTAINER_SETTING_ID = "6180d7090cce7b6d7ceca27a";
     private static final List<String> HEALTH_CHECK_TEST = List.of("CMD", "nc", "-zv", "localhost", "5555");
+    private static final int RETRIES = 10;
+    private static final long INTERVAL = 5L;
+    private static final long TIME_OUT = 5L;
 
     public DockerServiceImpl(DockerClient client, MessageService messageService,
         ContainerSettingRepository containerSettingRepository,
@@ -105,7 +108,7 @@ public class DockerServiceImpl implements DockerService {
                 public void onStart(Closeable stream) {
                     log.info("Pull image: {} start!", image);
                     messageService.dockerMessage(containerInfo.getDestination(),
-                        Payload.createPayload(true, String.format("Pull image: %s start!", image), 1));
+                        Payload.createPayload(true, String.format("Pull image: %s start!", image)));
                     super.onStart(stream);
                 }
 
@@ -122,7 +125,7 @@ public class DockerServiceImpl implements DockerService {
                     try {
                         log.info("Pull image: {} complete!", image);
                         messageService.dockerMessage(containerInfo.getDestination(),
-                            Payload.createPayload(true, String.format("Pull image: %s complete!", image), 2));
+                            Payload.createPayload(true, String.format("Pull image: %s complete!", image)));
                         initContainer(containerInfo, image, containerSetting.getNetWorkId());
                     } finally {
                         super.onComplete();
@@ -210,14 +213,18 @@ public class DockerServiceImpl implements DockerService {
 
     private void initContainer(ContainerInfo containerInfo, String image, String netWorkId) {
         try {
-            log.info("Create engine:{}", containerInfo);
+            log.info("Create container:{}", containerInfo);
+
+            messageService.dockerMessage(containerInfo.getDestination(),
+                Payload.createPayload(true,
+                    String.format("Starting: %s!", containerInfo.getContainerName())));
 
             HealthCheck healthCheck = new HealthCheck();
 
             healthCheck = healthCheck.withTest(HEALTH_CHECK_TEST)
-                .withInterval(Duration.ofSeconds(5L).toNanos())
-                .withRetries(20)
-                .withTimeout(Duration.ofSeconds(10L).toNanos());
+                .withInterval(Duration.ofSeconds(INTERVAL).toNanos())
+                .withRetries(RETRIES)
+                .withTimeout(Duration.ofSeconds(TIME_OUT).toNanos());
 
             CreateContainerCmd createContainerCmd = client
                 .createContainerCmd(image)
@@ -238,8 +245,7 @@ public class DockerServiceImpl implements DockerService {
             client.startContainerCmd(ccr.getId()).exec();
             messageService.dockerMessage(containerInfo.getDestination(),
                 Payload.createPayload(true,
-                    String.format("Starting: %s success!", containerInfo.getContainerName()),
-                    3));
+                    String.format("Started: %s success!", containerInfo.getContainerName()), "End"));
         } catch (NotFoundException e) {
             log.error("No such image", e);
             messageService.dockerMessage(containerInfo.getDestination(),

@@ -260,7 +260,12 @@ public enum ErrorCode {
     CREATE_MOCK_ERROR("4240", "Failed to create mock!"),
     RESTART_MOCK_ERROR("4241", "Failed to restart mock!"),
     DELETE_MOCK_ERROR("4242", "Failed to delete mock!"),
-    DELETE_SCHEDULE_CASE_ID_ERROR("4243", "Failed to delete the Schedule case id!"),
+    ADD_WEBHOOK_ERROR("4243", "Failed to add the Webhook!"),
+    GET_WEBHOOK_PAGE_ERROR("4244", "Failed to get the Webhook page!"),
+    GET_WEBHOOK_BY_ID_ERROR("4245", "The Webhook not exist!"),
+    DELETE_WEBHOOK_BY_ID_ERROR("4246", "Failed to delete the Webhook!"),
+    EDIT_WEBHOOK_ERROR("4247", "Failed to edit the Webhook!"),
+    DELETE_SCHEDULE_CASE_ID_ERROR("4248", "Failed to delete the Schedule case id!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),

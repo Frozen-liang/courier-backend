@@ -35,5 +35,9 @@ public class Payload<T> {
         return new Payload<>(success, message, data);
     }
 
+    public static <T> Payload<T> createPayload(boolean success, String message) {
+        return new Payload<>(success, message, null);
+    }
+
 
 }
