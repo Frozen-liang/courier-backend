@@ -143,8 +143,7 @@ public class ProjectServiceImpl implements ProjectService {
             LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
             List<TestCaseCountStatisticsResponse> responses = apiTestCaseService
                 .getCaseGroupDayCount(Lists.newArrayList(projectId), dateTime);
-            handleResponses(responses);
-            return responses;
+            return handleResponses(responses);
         } catch (ApiTestPlatformException exception) {
             log.error(exception.getMessage());
             throw exception;
@@ -154,7 +153,9 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-    private void handleResponses(List<TestCaseCountStatisticsResponse> responses) {
+    private List<TestCaseCountStatisticsResponse> handleResponses(
+        List<TestCaseCountStatisticsResponse> testCaseCountStatisticsResponses) {
+        List<TestCaseCountStatisticsResponse> responses = Lists.newArrayList(testCaseCountStatisticsResponses);
         Map<LocalDate, Integer> map = responses.stream().collect(
             Collectors.toMap(TestCaseCountStatisticsResponse::getDay, TestCaseCountStatisticsResponse::getCount));
         for (int i = 0; i < Constants.CASE_DAY; i++) {
@@ -164,6 +165,7 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
         responses.sort(Comparator.comparing(TestCaseCountStatisticsResponse::getDay));
+        return responses;
     }
 
 }

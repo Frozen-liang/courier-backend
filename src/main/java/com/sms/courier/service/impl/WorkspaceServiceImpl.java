@@ -189,12 +189,10 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                 LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
                 List<TestCaseCountStatisticsResponse> responses = apiTestCaseService.getCaseGroupDayCount(projectIds,
                     dateTime);
-                handleResponses(responses);
-                return responses;
+                return handleResponses(responses);
             }
             List<TestCaseCountStatisticsResponse> responses = Lists.newArrayList();
-            handleResponses(responses);
-            return responses;
+            return handleResponses(responses);
         } catch (ApiTestPlatformException exception) {
             log.error(exception.getMessage());
             throw exception;
@@ -204,7 +202,9 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         }
     }
 
-    private void handleResponses(List<TestCaseCountStatisticsResponse> responses) {
+    private List<TestCaseCountStatisticsResponse> handleResponses(
+        List<TestCaseCountStatisticsResponse> testCaseCountStatisticsResponses) {
+        List<TestCaseCountStatisticsResponse> responses = Lists.newArrayList(testCaseCountStatisticsResponses);
         Map<LocalDate, Integer> map = responses.stream()
             .collect(
                 Collectors.toMap(TestCaseCountStatisticsResponse::getDay, TestCaseCountStatisticsResponse::getCount));
@@ -215,6 +215,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             }
         }
         responses.sort(Comparator.comparing(TestCaseCountStatisticsResponse::getDay));
+        return responses;
     }
 
 }
