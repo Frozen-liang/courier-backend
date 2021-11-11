@@ -62,6 +62,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -79,6 +80,7 @@ class SceneCaseJobServiceTest {
         mock(CustomizedCaseTemplateApiRepository.class);
 
     private final CaseTemplateRepository caseTemplateRepository = mock(CaseTemplateRepository.class);
+    private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final CaseTemplateApiRepository caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
     private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final SceneCaseApiRepository sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
@@ -92,7 +94,7 @@ class SceneCaseJobServiceTest {
         caseDispatcherService,
         customizedCaseTemplateApiRepository,
         caseTemplateRepository,
-        caseTemplateApiRepository, sceneCaseApiRepository, commonRepository);
+        caseTemplateApiRepository, sceneCaseApiRepository, commonRepository, applicationEventPublisher);
 
     private final static String MOCK_ID = "1";
     private final static Integer MOCK_NUM = 1;

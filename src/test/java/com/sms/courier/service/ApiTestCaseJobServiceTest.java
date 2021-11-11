@@ -56,6 +56,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageImpl;
 
 @DisplayName("Tests for ApiTestCaseJobService")
@@ -66,6 +67,7 @@ class ApiTestCaseJobServiceTest {
     private final ProjectEnvironmentService projectEnvironmentService = mock(ProjectEnvironmentService.class);
     private final ApiTestCaseService apiTestCaseService = mock(ApiTestCaseService.class);
     private final CommonRepository commonRepository = mock(CommonRepository.class);
+    private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository = mock(
         CustomizedApiTestCaseJobRepository.class);
     private final ApiTestRequest apiTestRequest =
@@ -75,7 +77,7 @@ class ApiTestCaseJobServiceTest {
         new ResponseResultVerificationMapperImpl(new MatchParamInfoMapperImpl()));
     private final ApiTestCaseJobService apiTestCaseJobService = new ApiTestCaseJobServiceImpl(
         apiTestCaseJobRepository, customizedApiTestCaseJobRepository, caseDispatcherService, projectEnvironmentService
-        , apiTestCaseService, commonRepository, jobMapper);
+        , apiTestCaseService, commonRepository, jobMapper, applicationEventPublisher);
     private final ApiTestCaseJobEntity apiTestCaseJob =
         ApiTestCaseJobEntity.builder().id(ID).createUserId(ObjectId.get().toString())
             .apiTestCase(JobCaseApi.builder().jobApiTestCase(JobApiTestCase.builder().build()).build()).build();

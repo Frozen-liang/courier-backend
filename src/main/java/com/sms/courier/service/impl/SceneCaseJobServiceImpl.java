@@ -44,6 +44,8 @@ import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.SceneCaseJobService;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
+import com.sms.courier.webhook.WebhookEvent;
+import com.sms.courier.webhook.enums.WebhookType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -54,6 +56,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +71,7 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
     private final CaseTemplateApiRepository caseTemplateApiRepository;
     private final SceneCaseApiRepository sceneCaseApiRepository;
     private final CommonRepository commonRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public SceneCaseJobServiceImpl(
         ProjectEnvironmentService projectEnvironmentService,
@@ -79,7 +83,8 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
         CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository,
         CaseTemplateRepository caseTemplateRepository,
         CaseTemplateApiRepository caseTemplateApiRepository,
-        SceneCaseApiRepository sceneCaseApiRepository, CommonRepository commonRepository) {
+        SceneCaseApiRepository sceneCaseApiRepository, CommonRepository commonRepository,
+        ApplicationEventPublisher applicationEventPublisher) {
         super(sceneCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService, commonRepository);
         this.sceneCaseRepository = sceneCaseRepository;
         this.customizedSceneCaseJobRepository = customizedSceneCaseJobRepository;
@@ -88,6 +93,7 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
         this.caseTemplateApiRepository = caseTemplateApiRepository;
         this.sceneCaseApiRepository = sceneCaseApiRepository;
         this.commonRepository = commonRepository;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -286,6 +292,8 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
             caseDispatcherService
                 .sendJobReport(sceneCaseJobEntity.getCreateUserId(),
                     jobMapper.toSceneCaseJobReportResponse(sceneCaseJobReport));
+            applicationEventPublisher.publishEvent(WebhookEvent.create(WebhookType.CASE_REPORT,
+                jobMapper.toWebhookSceneCaseJobResponse(sceneCaseJobReport)));
         } catch (Exception e) {
             log.error("Save scene case job error!", e);
             caseDispatcherService
