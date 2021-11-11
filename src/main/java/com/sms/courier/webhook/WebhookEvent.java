@@ -7,11 +7,11 @@ import lombok.Data;
 @Data
 public class WebhookEvent<T> implements Comparable<WebhookEvent<?>> {
 
-    private WebhookType webhookType;
+    private Integer webhookType;
     private T data;
     private Long timestamp;
 
-    private WebhookEvent(WebhookType webhookType, T data, Long timestamp) {
+    private WebhookEvent(Integer webhookType, T data, Long timestamp) {
         this.webhookType = webhookType;
         this.data = data;
         this.timestamp = timestamp;
@@ -24,6 +24,6 @@ public class WebhookEvent<T> implements Comparable<WebhookEvent<?>> {
     }
 
     public static <R> WebhookEvent<R> create(WebhookType webhookType, R data) {
-        return new WebhookEvent<>(webhookType, data, new Date().getTime());
+        return new WebhookEvent<>(webhookType.getCode(), data, new Date().getTime());
     }
 }

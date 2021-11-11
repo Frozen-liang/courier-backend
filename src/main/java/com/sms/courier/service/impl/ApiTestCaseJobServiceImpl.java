@@ -43,6 +43,8 @@ import com.sms.courier.service.ApiTestCaseService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
+import com.sms.courier.webhook.WebhookEvent;
+import com.sms.courier.webhook.enums.WebhookType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -54,6 +56,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -66,17 +69,20 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
     private final ApiTestCaseService apiTestCaseService;
     private final CommonRepository commonRepository;
     private final JobMapper jobMapper;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public ApiTestCaseJobServiceImpl(ApiTestCaseJobRepository apiTestCaseJobRepository,
         CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository,
         CaseDispatcherService caseDispatcherService,
         ProjectEnvironmentService projectEnvironmentService, ApiTestCaseService apiTestCaseService,
-        CommonRepository commonRepository, JobMapper jobMapper) {
+        CommonRepository commonRepository, JobMapper jobMapper,
+        ApplicationEventPublisher applicationEventPublisher) {
         super(apiTestCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService, commonRepository);
         this.customizedApiTestCaseJobRepository = customizedApiTestCaseJobRepository;
         this.apiTestCaseService = apiTestCaseService;
         this.commonRepository = commonRepository;
         this.jobMapper = jobMapper;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -259,6 +265,8 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
             caseDispatcherService
                 .sendJobReport(apiTestCaseJob.getCreateUserId(),
                     jobMapper.toApiTestCaseJobReportResponse(apiTestCaseJobReport));
+            applicationEventPublisher.publishEvent(WebhookEvent.create(WebhookType.CASE_REPORT,
+                jobMapper.toWebhookCaseJobResponse(apiTestCaseJobReport)));
         } catch (Exception e) {
             log.error("Save case job error!", e);
             caseDispatcherService

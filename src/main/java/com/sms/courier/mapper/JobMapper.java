@@ -29,6 +29,8 @@ import com.sms.courier.entity.job.common.JobEnvironment;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.utils.EnumCommonUtils;
+import com.sms.courier.webhook.response.WebhookCaseJobResponse;
+import com.sms.courier.webhook.response.WebhookSceneCaseJobResponse;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
@@ -132,5 +134,9 @@ public interface JobMapper {
     TestResult toTestResult(CaseReport caseReport);
 
     List<SceneCaseJobResponse> toSceneCaseJobResponseList(List<SceneCaseJobEntity> jobEntityList);
+
+    WebhookCaseJobResponse toWebhookCaseJobResponse(ApiTestCaseJobReport jobReport);
+
+    WebhookSceneCaseJobResponse toWebhookSceneCaseJobResponse(SceneCaseJobReport jobReport);
 
 }

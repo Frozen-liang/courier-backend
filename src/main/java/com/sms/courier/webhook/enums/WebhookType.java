@@ -10,15 +10,8 @@ public enum WebhookType implements EnumCommon {
     API_ADD(0),
     API_UPDATE(1),
     API_DELETE(2),
-    CASE_ADD(3),
-    CASE_UPDATE(4),
-    CASE_DELETE(5),
-    SCENE_CASE_ADD(6),
-    SCENE_CASE_UPDATE(7),
-    SCENE_CASE_DELETE(8),
-    CASE_REPORT(9),
-    SCENE_CASE_REPORT(10);
-
+    CASE_REPORT(3),
+    SCENE_CASE_REPORT(4);
 
     private final Integer code;
     private static final Map<Integer, WebhookType> MAPPINGS =

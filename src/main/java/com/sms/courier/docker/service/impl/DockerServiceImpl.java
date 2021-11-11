@@ -27,6 +27,7 @@ import com.github.dockerjava.api.model.Image;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports.Binding;
 import com.github.dockerjava.api.model.PullResponseItem;
+import com.github.dockerjava.api.model.RestartPolicy;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.docker.entity.ContainerInfo;
@@ -234,6 +235,9 @@ public class DockerServiceImpl implements DockerService {
 
             // Add port bing
             addPortBinding(containerInfo.getPortMappings(), createContainerCmd);
+
+            addHostConfig(createContainerCmd);
+
             // Add env
             addEnv(containerInfo, createContainerCmd);
             // Create container
@@ -260,6 +264,11 @@ public class DockerServiceImpl implements DockerService {
             messageService.dockerMessage(containerInfo.getDestination(),
                 Payload.fail(String.format("Starting: %s error!", containerInfo.getContainerName())));
         }
+    }
+
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+    private void addHostConfig(CreateContainerCmd createContainerCmd) {
+        createContainerCmd.getHostConfig().withRestartPolicy(RestartPolicy.unlessStoppedRestart());
     }
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
