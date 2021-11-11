@@ -266,6 +266,8 @@ public enum ErrorCode {
     DELETE_WEBHOOK_BY_ID_ERROR("4246", "Failed to delete the Webhook!"),
     EDIT_WEBHOOK_ERROR("4247", "Failed to edit the Webhook!"),
     DELETE_SCHEDULE_CASE_ID_ERROR("4248", "Failed to delete the Schedule case id!"),
+    GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR("4249", "Failed to get the Workspace case group by day!"),
+    GET_PROJECT_CASE_GROUP_BY_DAY_ERROR("4250", "Failed to get the Project case group by day!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),
