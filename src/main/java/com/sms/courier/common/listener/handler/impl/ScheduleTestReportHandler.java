@@ -32,7 +32,6 @@ public class ScheduleTestReportHandler extends AbstractTestReportHandler {
     @Override
     public void handle(TestReportEvent event) {
         try {
-            JobReport jobReport = event.getJobReport();
             ScheduleRecordEntity scheduleRecord = commonRepository.findById(event.getId(), ScheduleRecordEntity.class)
                 .orElseThrow(() -> ExceptionUtils.mpe("The ScheduleRecord not exist! id = %s", event.getId()));
             ScheduleEntity scheduleEntity = commonRepository
@@ -43,6 +42,7 @@ public class ScheduleTestReportHandler extends AbstractTestReportHandler {
             TestReportEmailModel testReportEmailModel = buildTestReportEmailModel(event);
             testReportEmailModel.setScheduleName(scheduleEntity.getName());
             testReportEmailModel.setProjectId(scheduleEntity.getProjectId());
+            JobReport jobReport = event.getJobReport();
             if (noticeType == NoticeType.ALL) {
                 sendEmail(scheduleEntity.getEmails(), testReportEmailModel);
             }

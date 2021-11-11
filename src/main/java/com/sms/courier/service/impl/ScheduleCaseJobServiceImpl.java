@@ -88,8 +88,9 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
             applicationEventPublisher
                 .publishEvent(
                     TestReportEvent.createScheduleEvent(scheduleCaseJob.getScheduleRecordId(), apiTestCaseJobReport, 1,
-                        scheduleCaseJob.getName(), Objects.nonNull(scheduleCaseJob.getDataCollection()) ?
-                            scheduleCaseJob.getDataCollection().getTestData().getDataName() : null));
+                        scheduleCaseJob.getName(),
+                        Objects.nonNull(scheduleCaseJob.getDataCollection()) ? scheduleCaseJob.getDataCollection()
+                            .getTestData().getDataName() : null));
         } catch (Exception e) {
             log.error("Save schedule case job report error. jobId={}", jobReport.getJobId(), e);
         }
