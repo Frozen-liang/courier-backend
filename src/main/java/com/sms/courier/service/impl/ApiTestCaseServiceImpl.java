@@ -22,6 +22,7 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
+import com.sms.courier.dto.response.TestCaseCountStatisticsResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.apitestcase.TestResult;
 import com.sms.courier.mapper.ApiTestCaseMapper;
@@ -208,6 +209,11 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
     public Page<ApiTestCaseResponse> getCasePageByProjectIdsAndCreateDate(List<String> projectIds,
         LocalDateTime dateTime, PageDto pageDto) {
         return customizedApiTestCaseRepository.getCasePageByProjectIdsAndCreateDate(projectIds, dateTime, pageDto);
+    }
+
+    @Override
+    public List<TestCaseCountStatisticsResponse> getCaseGroupDayCount(List<String> projectIds, LocalDateTime dateTime) {
+        return customizedApiTestCaseRepository.getCaseGroupDayCount(projectIds, dateTime);
     }
 
 }

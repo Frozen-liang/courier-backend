@@ -6,6 +6,7 @@ import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.request.ProjectRequest;
 import com.sms.courier.dto.response.ProjectResponse;
+import com.sms.courier.dto.response.TestCaseCountStatisticsResponse;
 import com.sms.courier.service.ProjectService;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -57,4 +58,10 @@ public class ProjectController {
     public Boolean delete(@PathVariable List<String> ids) {
         return projectService.delete(ids);
     }
+
+    @GetMapping("/case/group-day/count/{projectId}")
+    public List<TestCaseCountStatisticsResponse> caseGroupDayCount(@PathVariable String projectId) {
+        return projectService.caseGroupDayCount(projectId);
+    }
+
 }

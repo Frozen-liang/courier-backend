@@ -2,6 +2,7 @@ package com.sms.courier.service;
 
 import com.sms.courier.dto.request.ProjectRequest;
 import com.sms.courier.dto.response.ProjectResponse;
+import com.sms.courier.dto.response.TestCaseCountStatisticsResponse;
 import java.util.List;
 
 public interface ProjectService {
@@ -17,4 +18,6 @@ public interface ProjectService {
     Boolean delete(List<String> ids);
 
     boolean existsByWorkspaceId(String workspaceId);
+
+    List<TestCaseCountStatisticsResponse> caseGroupDayCount(String projectId);
 }

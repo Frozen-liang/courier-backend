@@ -9,23 +9,33 @@ import static com.sms.courier.common.exception.ErrorCode.DELETE_PROJECT_BY_ID_ER
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_PROJECT_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_PROJECT_BY_ID_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_PROJECT_CASE_GROUP_BY_DAY_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_PROJECT_LIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.THE_PROJECT_EXIST_ERROR;
 import static com.sms.courier.utils.Assert.isTrue;
 
+import com.google.common.collect.Lists;
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
+import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.ProjectRequest;
 import com.sms.courier.dto.response.ProjectResponse;
+import com.sms.courier.dto.response.TestCaseCountStatisticsResponse;
 import com.sms.courier.entity.project.ProjectEntity;
 import com.sms.courier.mapper.ProjectMapper;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.ProjectRepository;
+import com.sms.courier.service.ApiTestCaseService;
 import com.sms.courier.service.ProjectService;
 import com.sms.courier.utils.ExceptionUtils;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
@@ -37,13 +47,15 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final CommonRepository commonRepository;
     private final ProjectMapper projectMapper;
+    private final ApiTestCaseService apiTestCaseService;
 
     public ProjectServiceImpl(ProjectRepository projectRepository,
         CommonRepository commonRepository,
-        ProjectMapper projectMapper) {
+        ProjectMapper projectMapper, ApiTestCaseService apiTestCaseService) {
         this.projectRepository = projectRepository;
         this.commonRepository = commonRepository;
         this.projectMapper = projectMapper;
+        this.apiTestCaseService = apiTestCaseService;
     }
 
     @Override
@@ -123,6 +135,35 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public boolean existsByWorkspaceId(String workspaceId) {
         return projectRepository.existsByWorkspaceIdAndRemovedIsFalse(workspaceId);
+    }
+
+    @Override
+    public List<TestCaseCountStatisticsResponse> caseGroupDayCount(String projectId) {
+        try {
+            LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
+            List<TestCaseCountStatisticsResponse> responses = apiTestCaseService
+                .getCaseGroupDayCount(Lists.newArrayList(projectId), dateTime);
+            handleResponses(responses);
+            return responses;
+        } catch (ApiTestPlatformException exception) {
+            log.error(exception.getMessage());
+            throw exception;
+        } catch (Exception e) {
+            log.error("Failed to get the Project case group by day!", e);
+            throw new ApiTestPlatformException(GET_PROJECT_CASE_GROUP_BY_DAY_ERROR);
+        }
+    }
+
+    private void handleResponses(List<TestCaseCountStatisticsResponse> responses) {
+        Map<LocalDate, Integer> map = responses.stream().collect(
+            Collectors.toMap(TestCaseCountStatisticsResponse::getDay, TestCaseCountStatisticsResponse::getCount));
+        for (int i = 0; i < Constants.CASE_DAY; i++) {
+            LocalDate date = LocalDate.now().minusDays(i);
+            if (!map.containsKey(date)) {
+                responses.add(TestCaseCountStatisticsResponse.builder().day(date).count(0).build());
+            }
+        }
+        responses.sort(Comparator.comparing(TestCaseCountStatisticsResponse::getDay));
     }
 
 }

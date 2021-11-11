@@ -17,7 +17,7 @@ public class HookEventHandler {
     private final ExecutorService executorService = Executors.newFixedThreadPool(1,
         new CustomizableThreadFactory("web-hook-thread"));
 
-//    @PostConstruct
+    //@PostConstruct
     public void init() {
         log.info("WebHOOK event post initialization >>>>>>>>");
         executorService.execute(this::post);

@@ -1,10 +1,13 @@
 package com.sms.courier.service;
 
+import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.WorkspaceRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.dto.response.ProjectResponse;
+import com.sms.courier.dto.response.TestCaseCountStatisticsResponse;
 import com.sms.courier.dto.response.WorkspaceResponse;
 import com.sms.courier.entity.workspace.WorkspaceEntity;
 import com.sms.courier.mapper.WorkspaceMapper;
@@ -179,8 +182,8 @@ class WorkspaceServiceTest {
             workspaceResponseList.add(WorkspaceResponse.builder().build());
         }
         when(commonRepository.listLookupUser(anyString(), any(), any(Class.class)))
-           .thenThrow(new RuntimeException());
-        assertThatThrownBy(()->workspaceService.findByUserId()).isInstanceOf(ApiTestPlatformException.class);
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceService.findByUserId()).isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test
@@ -229,4 +232,40 @@ class WorkspaceServiceTest {
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
+    @Test
+    @DisplayName("Test the caseGroupDayCount method in the Workspace service")
+    public void caseGroupDayCount_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        List<TestCaseCountStatisticsResponse> testCaseCountStatisticsResponses = Lists.newArrayList();
+        when(apiTestCaseService.getCaseGroupDayCount(any(), any())).thenReturn(testCaseCountStatisticsResponses);
+        List<TestCaseCountStatisticsResponse> responses = workspaceService.caseGroupDayCount(ID);
+        assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
+    }
+
+    @Test
+    @DisplayName("Test the caseGroupDayCount method in the Workspace service")
+    public void caseGroupDayCount_projectIsNull_test() {
+        when(projectService.list(any())).thenReturn(Lists.newArrayList());
+        List<TestCaseCountStatisticsResponse> testCaseCountStatisticsResponses = Lists.newArrayList();
+        when(apiTestCaseService.getCaseGroupDayCount(any(), any())).thenReturn(testCaseCountStatisticsResponses);
+        List<TestCaseCountStatisticsResponse> responses = workspaceService.caseGroupDayCount(ID);
+        assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while caseGroupDayCount Workspace")
+    public void caseGroupDayCount_smsException_test() {
+        when(projectService.list(any()))
+            .thenThrow(new ApiTestPlatformException(ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR));
+        assertThatThrownBy(() -> workspaceService.caseGroupDayCount(ID)).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while caseGroupDayCount Workspace")
+    public void caseGroupDayCount_exception_test() {
+        when(projectService.list(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceService.caseGroupDayCount(ID)).isInstanceOf(ApiTestPlatformException.class);
+    }
 }
