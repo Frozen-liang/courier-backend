@@ -104,6 +104,7 @@ public interface JobMapper {
         source = "apiTestCaseJob.apiTestCase.jobApiTestCase.responseResultVerification")
     @Mapping(target = "responseTimeVerification",
         source = "apiTestCaseJob.apiTestCase.jobApiTestCase.responseTimeVerification")
+    @Mapping(target = "envName", source = "environment.envName")
     ApiTestCaseJobPageResponse toApiTestCaseJobPageResponse(ApiTestCaseJobEntity apiTestCaseJob);
 
     List<JobSceneCaseApi> toJobSceneCaseApiList(List<SceneCaseApiEntity> sceneCaseApiList);
