@@ -10,7 +10,8 @@ public enum SceneCaseJobField implements Field {
     PARAMS_TOTAL_TIME_COST("paramsTotalTimeCost"),
     DELAY_TIME_TOTAL_TIME_COST("delayTimeTotalTimeCost"),
     INFO_LIST("infoList"),
-    MESSAGE("message");
+    MESSAGE("message"),
+    ENVIRONMENT("environment");
 
     private final String name;
 
