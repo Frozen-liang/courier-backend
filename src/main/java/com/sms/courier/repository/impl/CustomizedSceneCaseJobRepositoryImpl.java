@@ -2,6 +2,7 @@ package com.sms.courier.repository.impl;
 
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
 import static com.sms.courier.common.field.SceneCaseJobField.DELAY_TIME_TOTAL_TIME_COST;
+import static com.sms.courier.common.field.SceneCaseJobField.ENVIRONMENT;
 import static com.sms.courier.common.field.SceneCaseJobField.INFO_LIST;
 import static com.sms.courier.common.field.SceneCaseJobField.PARAMS_TOTAL_TIME_COST;
 import static com.sms.courier.common.field.SceneCaseJobField.TOTAL_TIME_COST;
@@ -49,6 +50,7 @@ public class CustomizedSceneCaseJobRepositoryImpl implements CustomizedSceneCase
         document.put(PARAMS_TOTAL_TIME_COST.getName(), true);
         document.put(DELAY_TIME_TOTAL_TIME_COST.getName(), true);
         document.put(INFO_LIST.getName(), true);
+        document.put(ENVIRONMENT.getName(), true);
         BasicQuery query = new BasicQuery(new Document(), document);
         CommonField.CREATE_USER_ID.in(sceneCaseJobRequest.getUserIds()).ifPresent(query::addCriteria);
         SceneField.SCENE_CASE_ID.is(sceneCaseJobRequest.getSceneCaseId()).ifPresent(query::addCriteria);
