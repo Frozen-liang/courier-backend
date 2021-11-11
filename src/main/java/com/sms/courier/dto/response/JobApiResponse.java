@@ -1,9 +1,6 @@
 package com.sms.courier.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.sms.courier.common.constant.TimePatternConstant;
 import com.sms.courier.common.enums.RawType;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,15 +45,9 @@ public class JobApiResponse {
 
     private List<ParamInfoResponse> responseParams;
 
-    private Integer apiStatus;
-
     private String preInject;
 
     private String postInject;
-
-    private String swaggerId;
-
-    private String md5;
 
     private Integer apiResponseJsonType;
 
@@ -67,9 +58,4 @@ public class JobApiResponse {
     private String responseRaw;
 
     private RawType responseRawType;
-
-    private String modifyUserId;
-
-    @JsonFormat(pattern = TimePatternConstant.DEFAULT_PATTERN)
-    private LocalDateTime modifyDateTime;
 }
