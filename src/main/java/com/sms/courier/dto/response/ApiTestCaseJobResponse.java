@@ -1,7 +1,5 @@
 package com.sms.courier.dto.response;
 
-import com.sms.courier.common.enums.JobType;
-import com.sms.courier.entity.job.common.JobDataCollection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,28 +11,16 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class ApiTestCaseJobResponse extends BaseResponse {
+public class ApiTestCaseJobResponse extends JobResponse {
 
     private JobCaseApiResponse apiTestCase;
 
-    private String workspaceId;
 
-    private String projectId;
-
-    private JobEnvironmentResponse environment;
-
-    private JobDataCollection dataCollection;
-
-    private Integer jobStatus;
-
-    private String message;
     /**
      * 测试人员.
      */
     private String createUserName;
 
     private Integer time;
-
-    private JobType jobType;
 
 }

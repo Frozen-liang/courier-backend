@@ -7,14 +7,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public enum WebhookType implements EnumCommon {
-    WORKSPACE(0),
-    PROJECT(1),
-    TEST_CASE(2),
-    API(3),
-    SCENE_CASE(4),
-    TEST_CASE_REPORT(5),
-    SCENE_CASE_REPORT(6),
-    JOB(7);
+    API_ADD(0),
+    API_UPDATE(1),
+    API_DELETE(2),
+    CASE_ADD(3),
+    CASE_UPDATE(4),
+    CASE_DELETE(5),
+    SCENE_CASE_ADD(6),
+    SCENE_CASE_UPDATE(7),
+    SCENE_CASE_DELETE(8),
+    CASE_REPORT(9),
+    SCENE_CASE_REPORT(10);
 
 
     private final Integer code;

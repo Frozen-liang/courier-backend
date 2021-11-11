@@ -40,6 +40,7 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
         + ".responseHeadersVerification";
     private static final String RESPONSE_RESULT_VERIFICATION = "apiTestCase.jobApiTestCase.responseResultVerification";
     private static final String RESPONSE_TIME_VERIFICATION = "apiTestCase.jobApiTestCase.responseTimeVerification";
+    private static final String EVN_NAME = "environment.envName";
     private static final String CREATE_USER_NAME = "createUserName";
     private static final String MESSAGE = "message";
     private static final List<JobStatus> JOB_STATUSES = List.of(JobStatus.SUCCESS, JobStatus.FAIL);
@@ -65,6 +66,7 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
         document.put(RESPONSE_HEADERS_VERIFICATION, true);
         document.put(RESPONSE_RESULT_VERIFICATION, true);
         document.put(RESPONSE_TIME_VERIFICATION, true);
+        document.put(EVN_NAME, true);
         BasicQuery query = new BasicQuery(new Document(), document);
         API_TEST_CASE_ID.is(apiTestCaseJobPageRequest.getApiTestCaseId()).ifPresent(query::addCriteria);
         CREATE_USER_ID.in(apiTestCaseJobPageRequest.getUserIds()).ifPresent(query::addCriteria);
