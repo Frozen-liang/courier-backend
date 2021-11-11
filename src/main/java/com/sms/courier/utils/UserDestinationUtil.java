@@ -7,6 +7,7 @@ public abstract class UserDestinationUtil {
     private static final String SCENE_CASE = PREFIX + "/scene/case/";
     private static final String PROJECT = PREFIX + "/project/";
     private static final String LOG = PREFIX + "/log/";
+    private static final String DOCKER = PREFIX + "/%s/message/%s";
 
     public static String getCaseDest(String userId) {
         return CASE + userId;
@@ -22,5 +23,9 @@ public abstract class UserDestinationUtil {
 
     public static String getLogDest(String id) {
         return LOG + SecurityUtil.getCurrUserId() + "/" + id;
+    }
+
+    public static String getDockerDest(String description) {
+        return String.format(DOCKER, description, SecurityUtil.getCurrUserId());
     }
 }

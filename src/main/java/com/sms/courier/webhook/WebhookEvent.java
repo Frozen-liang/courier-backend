@@ -1,26 +1,29 @@
 package com.sms.courier.webhook;
 
-import com.sms.courier.webhook.enums.WebHookType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.sms.courier.webhook.enums.WebhookType;
+import java.util.Date;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 public class WebhookEvent<T> implements Comparable<WebhookEvent<?>> {
 
-    private String hookId;
-    private String workspaceId;
-    private WebHookType webHookType;
+    private WebhookType webhookType;
     private T data;
     private Long timestamp;
+
+    private WebhookEvent(WebhookType webhookType, T data, Long timestamp) {
+        this.webhookType = webhookType;
+        this.data = data;
+        this.timestamp = timestamp;
+    }
 
     @Override
     public int compareTo(WebhookEvent<?> o) {
 
         return this.getTimestamp().compareTo(o.getTimestamp());
+    }
+
+    public static <R> WebhookEvent<R> create(WebhookType webhookType, R data) {
+        return new WebhookEvent<>(webhookType, data, new Date().getTime());
     }
 }

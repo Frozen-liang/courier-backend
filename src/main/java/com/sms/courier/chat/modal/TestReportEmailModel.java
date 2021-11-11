@@ -7,7 +7,11 @@ import lombok.Data;
 @Builder
 public class TestReportEmailModel {
 
-    private String name;
+    private String caseName;
+
+    private String scheduleName;
+
+    private String dataName;
 
     private String projectId;
 
@@ -17,7 +21,7 @@ public class TestReportEmailModel {
 
     private Integer delayTimeTotalTimeCost;
 
-    private Integer success;
+    private Long success;
 
-    private Integer fail;
+    private Long fail;
 }

@@ -15,7 +15,9 @@ public enum NotificationTemplateType {
 
     private static List<TemplateField> testReportFiled() {
         return List.of(
-            TemplateField.builder().name("name").description("Name").build(),
+            TemplateField.builder().name("caseName").description("Case name").build(),
+            TemplateField.builder().name("dataName").description("Data name").build(),
+            TemplateField.builder().name("scheduleName").description("Schedule name").build(),
             TemplateField.builder().name("projectId").description("Project Id").build(),
             TemplateField.builder().name("totalTimeCost").description("Execution time").build(),
             TemplateField.builder().name("paramsTotalTimeCost").description("Parameter conversion time").build(),

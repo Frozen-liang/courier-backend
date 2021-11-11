@@ -28,6 +28,8 @@ import com.sms.courier.service.AsyncService;
 import com.sms.courier.service.ProjectImportSourceService;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.MD5Util;
+import com.sms.courier.webhook.WebhookEvent;
+import com.sms.courier.webhook.enums.WebhookType;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -56,13 +59,15 @@ public class ApiServiceImpl implements ApiService {
     private final ApiDataStructureRefRecordRepository apiDataStructureRefRecordRepository;
     private final AsyncService asyncService;
     private final ProjectImportSourceService projectImportSourceService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
 
     public ApiServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository, ApiMapper apiMapper,
         ApiHistoryMapper apiHistoryMapper, CustomizedApiRepository customizedApiRepository,
         ApiDataStructureRefRecordRepository apiDataStructureRefRecordRepository,
         AsyncService asyncService,
-        ProjectImportSourceService projectImportSourceService) {
+        ProjectImportSourceService projectImportSourceService,
+        ApplicationEventPublisher applicationEventPublisher) {
         this.apiRepository = apiRepository;
         this.apiHistoryRepository = apiHistoryRepository;
         this.apiMapper = apiMapper;
@@ -71,6 +76,7 @@ public class ApiServiceImpl implements ApiService {
         this.apiDataStructureRefRecordRepository = apiDataStructureRefRecordRepository;
         this.asyncService = asyncService;
         this.projectImportSourceService = projectImportSourceService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @SneakyThrows
@@ -125,6 +131,7 @@ public class ApiServiceImpl implements ApiService {
                     apiRequest.getRemoveStructIds());
             }
             apiHistoryRepository.insert(apiHistoryEntity);
+            publishWebhookEvent(WebhookType.API_ADD, newApiEntity);
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
             throw new ApiTestPlatformException(ErrorCode.ADD_API_ERROR);
@@ -155,6 +162,7 @@ public class ApiServiceImpl implements ApiService {
             saveRef(newApiEntity.getId(), newApiEntity.getApiName(), apiRequest.getAddStructIds(),
                 apiRequest.getRemoveStructIds());
             apiHistoryRepository.insert(apiHistoryEntity);
+            publishWebhookEvent(WebhookType.API_UPDATE, newApiEntity);
         } catch (ApiTestPlatformException courierException) {
             log.error(courierException.getMessage());
             throw courierException;
@@ -184,6 +192,7 @@ public class ApiServiceImpl implements ApiService {
         log.info("Delete api ids:{}.", ids);
         apiDataStructureRefRecordRepository.deleteAllByIdIn(ids);
         apiRepository.deleteAllByIdIn(ids);
+        applicationEventPublisher.publishEvent(WebhookEvent.create(WebhookType.API_DELETE, ids));
         return Boolean.TRUE;
     }
 
@@ -194,6 +203,7 @@ public class ApiServiceImpl implements ApiService {
         List<ApiEntity> apiEntities = apiRepository.deleteAllByProjectIdAndRemovedIsTrue(projectId);
         List<String> ids = apiEntities.stream().map(ApiEntity::getId).collect(Collectors.toList());
         apiDataStructureRefRecordRepository.deleteAllByIdIn(ids);
+        applicationEventPublisher.publishEvent(WebhookEvent.create(WebhookType.API_DELETE, ids));
         return Boolean.TRUE;
     }
 
@@ -257,6 +267,7 @@ public class ApiServiceImpl implements ApiService {
                 newApiEntity.setSceneCaseCount(oldApiEntity.getSceneCaseCount());
                 newApiEntity.setOtherProjectSceneCaseCount(oldApiEntity.getOtherProjectSceneCaseCount());
                 apiRepository.save(newApiEntity);
+                publishWebhookEvent(WebhookType.API_UPDATE, newApiEntity);
                 return Boolean.TRUE;
             }
             return Boolean.FALSE;
@@ -280,5 +291,7 @@ public class ApiServiceImpl implements ApiService {
         apiDataStructureRefRecordRepository.save(apiStructureRefRecordEntity);
     }
 
-
+    private void publishWebhookEvent(WebhookType webhookType, ApiEntity newApiEntity) {
+        applicationEventPublisher.publishEvent(WebhookEvent.create(webhookType, apiMapper.toDto(newApiEntity)));
+    }
 }

@@ -1,5 +1,6 @@
 package com.sms.courier.docker.entity;
 
+import com.sms.courier.docker.enmu.LabelType;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -19,5 +20,6 @@ public class ContainerInfo {
     private String containerName;
     private String version;
     private List<PortMapping> portMappings;
+    private LabelType labelType;
     private Map<String, String> envVariable;
 }

@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -46,6 +45,7 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -59,11 +59,12 @@ class ApiServiceTest {
     private final ProjectImportSourceService projectImportSourceService = mock(ProjectImportSourceService.class);
     private final ApiHistoryMapper apiHistoryMapper = mock(ApiHistoryMapper.class);
     private final AsyncService asyncService = mock(AsyncService.class);
+    private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final ApiDataStructureRefRecordRepository apiDataStructureRefRecordRepository = mock(
         ApiDataStructureRefRecordRepository.class);
     private final ApiService apiService = new ApiServiceImpl(
         apiRepository, apiHistoryRepository, apiMapper, apiHistoryMapper, customizedApiRepository,
-        apiDataStructureRefRecordRepository, asyncService, projectImportSourceService);
+        apiDataStructureRefRecordRepository, asyncService, projectImportSourceService, applicationEventPublisher);
     private final ApiEntity api = ApiEntity.builder().id(ID).build();
     private final ApiResponse apiResponseDto = ApiResponse.builder().id(ID).build();
     private final ApiRequest apiRequestDto = ApiRequest.builder().id(ID).build();

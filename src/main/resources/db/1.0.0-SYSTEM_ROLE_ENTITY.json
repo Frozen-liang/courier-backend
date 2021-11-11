@@ -38,7 +38,7 @@
   {
     "id": "610126d056617f032835a956",
     "name": "User_Group_Create_Update_Delete",
-    "description": "用户分组增加修改删除,删除分组时需要Api删除权限",
+    "description": "用户分组增加修改删除",
     "roleType": 0
   },
   {
@@ -194,7 +194,7 @@
   {
     "id": "610126d056617f032835a96c",
     "name": "Api_Group_Create_Update_Delete",
-    "description": "Api分组增加修改删除",
+    "description": "Api分组增加修改删除,删除分组时需要Api删除权限",
     "roleType": 0
   },
   {
