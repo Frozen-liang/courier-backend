@@ -50,6 +50,9 @@ public class Constants {
     public static final String API_COMMENT_PATE = SDK_VERSION + "/api-comment";
     public static final String SYSTEM_VERSION_PATE = SDK_VERSION + "/system-version";
     public static final String ENGINE_SETTING_PATE = SDK_VERSION + "/engine-setting";
+    public static final String CONTAINER_SETTING_PATE = SDK_VERSION + "/container-setting";
+    public static final String MOCK_PATH = SDK_VERSION + "/mock";
+    public static final String WEBHOOK_PATH = SDK_VERSION + "/webhook";
 
     public static final int MAX_DEPTH = 3;
     public static final String HTTP_DEFAULT_STATUS_CODE = "200";
@@ -58,5 +61,7 @@ public class Constants {
     public static final String SCHEDULE_CASE_SERVICE = "scheduleCaseJobService";
     public static final String SCENE_CASE_SERVICE = "sceneCaseJobService";
     public static final String SCHEDULE_SCENE_CASE_SERVICE = "scheduleSceneCaseJobService";
+    public static final String API_TOKEN = "API_TOKEN";
+    public static final String MOCK_CONTAINER_NAME = "courier-mock";
 
 }

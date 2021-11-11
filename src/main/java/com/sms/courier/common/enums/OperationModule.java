@@ -1,7 +1,9 @@
 package com.sms.courier.common.enums;
 
+import com.sms.courier.docker.entity.ContainerSettingEntity;
 import com.sms.courier.dto.response.FileInfoResponse;
 import com.sms.courier.engine.model.EngineMemberEntity;
+import com.sms.courier.engine.model.EngineSettingEntity;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.datacollection.DataCollectionEntity;
@@ -16,6 +18,7 @@ import com.sms.courier.entity.group.SceneCaseGroupEntity;
 import com.sms.courier.entity.group.ScheduleGroupEntity;
 import com.sms.courier.entity.mock.MockApiEntity;
 import com.sms.courier.entity.mock.MockSettingEntity;
+import com.sms.courier.entity.notification.EmailServiceEntity;
 import com.sms.courier.entity.project.ProjectEntity;
 import com.sms.courier.entity.project.ProjectImportSourceEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
@@ -29,6 +32,7 @@ import com.sms.courier.entity.system.UserEntity;
 import com.sms.courier.entity.system.UserGroupEntity;
 import com.sms.courier.entity.tag.ApiTagEntity;
 import com.sms.courier.entity.workspace.WorkspaceEntity;
+import com.sms.courier.webhook.model.WebhookEntity;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -65,7 +69,11 @@ public enum OperationModule implements EnumCommon {
     MOCK_SETTING(25, MockSettingEntity.class),
     PROJECT_IMPORT_SOURCE(26, ProjectImportSourceEntity.class),
     SCHEDULE_GROUP(27, ScheduleGroupEntity.class),
-    ENGINE_MEMBER(28, EngineMemberEntity.class);
+    ENGINE_MEMBER(28, EngineMemberEntity.class),
+    ENGINE_SETTING(29, EngineSettingEntity.class),
+    CONTAINER_SETTING(30, ContainerSettingEntity.class),
+    EMAIL_SETTING(31, EmailServiceEntity.class),
+    WEBHOOK(32, WebhookEntity.class);
 
     private static final Map<Integer, OperationModule> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationModule::getCode, Function.identity()));

@@ -10,6 +10,7 @@ import com.sms.courier.common.enums.ApiTagType;
 import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.enums.CaseFilter;
 import com.sms.courier.common.enums.CaseType;
+import com.sms.courier.common.enums.ContainerStatus;
 import com.sms.courier.common.enums.CycleType;
 import com.sms.courier.common.enums.DocumentType;
 import com.sms.courier.common.enums.DocumentUrlType;
@@ -39,6 +40,7 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.security.pojo.CustomUser;
+import com.sms.courier.webhook.enums.WebhookType;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -124,7 +126,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToTaskStatusConverter.INSTANCE, DurationToLongConverter.INSTANCE,
                 LongToDurationConverter.INSTANCE, IntegerToMockApiResponseParamTypeConverter.INSTANCE,
                 IntegerToApiEncodingTypeConverter.INSTANCE, IntegerToMockApiJsonLocateTypeConverter.INSTANCE,
-                IntegerToCaseTypeConverter.INSTANCE);
+                IntegerToCaseTypeConverter.INSTANCE, IntegerToContainerStatusConverter.INSTANCE,
+                IntegerToWebhookTypeConverter.INSTANCE);
 
         return new MongoCustomConversions(converters);
     }
@@ -494,5 +497,24 @@ public class MongoCustomConverterConfiguration {
             return CaseType.getType(code);
         }
     }
+
+    @ReadingConverter
+    enum IntegerToContainerStatusConverter implements Converter<Integer, ContainerStatus> {
+        INSTANCE;
+
+        public ContainerStatus convert(@NonNull Integer code) {
+            return ContainerStatus.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToWebhookTypeConverter implements Converter<Integer, WebhookType> {
+        INSTANCE;
+
+        public WebhookType convert(@NonNull Integer code) {
+            return WebhookType.getType(code);
+        }
+    }
+
 }
 

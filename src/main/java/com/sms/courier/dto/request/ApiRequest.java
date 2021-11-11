@@ -104,4 +104,6 @@ public class ApiRequest {
     private List<String> addStructIds;
 
     private List<String> removeStructIds;
+
+    private String editDescription;
 }

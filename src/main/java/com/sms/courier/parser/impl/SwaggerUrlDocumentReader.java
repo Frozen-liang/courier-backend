@@ -8,6 +8,7 @@ import com.sms.courier.utils.ExceptionUtils;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.parser.core.models.ParseOptions;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -28,6 +29,10 @@ public class SwaggerUrlDocumentReader implements DocumentReader {
                     PARSE_OPTIONS).getOpenAPI();
         } catch (Exception e) {
             log.error("Parse the swagger url error. message:{}", e.getMessage());
+            throw ExceptionUtils.mpe(PARSE_SWAGGER_URL_ERROR);
+        }
+        if (Objects.isNull(openApi)) {
+            log.error("The open api is null");
             throw ExceptionUtils.mpe(PARSE_SWAGGER_URL_ERROR);
         }
         return DocumentDefinition.builder().document(openApi).build();

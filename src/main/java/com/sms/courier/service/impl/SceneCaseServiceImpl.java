@@ -18,7 +18,6 @@ import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_COUNT_ER
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.RECOVER_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.THE_API_ENTITY_NOT_EXITS_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.THE_API_TEST_CASE_NOT_EXITS_ERROR;
 
 import com.google.common.collect.Lists;
@@ -44,7 +43,6 @@ import com.sms.courier.dto.request.UpdateSceneCaseRequest;
 import com.sms.courier.dto.response.SceneCaseApiConnResponse;
 import com.sms.courier.dto.response.SceneCaseResponse;
 import com.sms.courier.dto.response.SceneTemplateResponse;
-import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.api.common.HttpStatusVerification;
 import com.sms.courier.entity.api.common.ResponseResultVerification;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
@@ -57,7 +55,6 @@ import com.sms.courier.mapper.CaseTemplateApiMapper;
 import com.sms.courier.mapper.MatchParamInfoMapper;
 import com.sms.courier.mapper.SceneCaseApiMapper;
 import com.sms.courier.mapper.SceneCaseMapper;
-import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.ApiTestCaseRepository;
 import com.sms.courier.repository.CustomizedSceneCaseApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseRepository;
@@ -67,6 +64,7 @@ import com.sms.courier.service.CaseApiCountHandler;
 import com.sms.courier.service.CaseTemplateApiService;
 import com.sms.courier.service.SceneCaseApiService;
 import com.sms.courier.service.SceneCaseService;
+import com.sms.courier.service.ScheduleService;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +91,6 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private final SceneCaseApiService sceneCaseApiService;
     private final CaseTemplateApiService caseTemplateApiService;
     private final ApiTestCaseRepository apiTestCaseRepository;
-    private final ApiRepository apiRepository;
     private final ApiTestCaseMapper apiTestCaseMapper;
     private final SceneCaseApiRepository sceneCaseApiRepository;
     private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository;
@@ -101,30 +98,32 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private final CaseTemplateApiMapper caseTemplateApiMapper;
     private final CaseApiCountHandler caseApiCountHandler;
     private final MatchParamInfoMapper matchParamInfoMapper;
+    private final ScheduleService scheduleService;
 
     public SceneCaseServiceImpl(SceneCaseRepository sceneCaseRepository,
         CustomizedSceneCaseRepository customizedSceneCaseRepository,
         SceneCaseMapper sceneCaseMapper, SceneCaseApiService sceneCaseApiService,
         CaseTemplateApiService caseTemplateApiService,
-        ApiTestCaseRepository apiTestCaseRepository, ApiRepository apiRepository,
+        ApiTestCaseRepository apiTestCaseRepository,
         ApiTestCaseMapper apiTestCaseMapper, SceneCaseApiRepository sceneCaseApiRepository,
         CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository,
         SceneCaseApiMapper sceneCaseApiMapper, CaseTemplateApiMapper caseTemplateApiMapper,
-        CaseApiCountHandler sceneCaseApiCountHandler, MatchParamInfoMapper matchParamInfoMapper) {
+        CaseApiCountHandler caseApiCountHandler, MatchParamInfoMapper matchParamInfoMapper,
+        ScheduleService scheduleService) {
         this.sceneCaseRepository = sceneCaseRepository;
         this.customizedSceneCaseRepository = customizedSceneCaseRepository;
         this.sceneCaseMapper = sceneCaseMapper;
         this.sceneCaseApiService = sceneCaseApiService;
         this.caseTemplateApiService = caseTemplateApiService;
         this.apiTestCaseRepository = apiTestCaseRepository;
-        this.apiRepository = apiRepository;
         this.apiTestCaseMapper = apiTestCaseMapper;
         this.sceneCaseApiRepository = sceneCaseApiRepository;
         this.customizedSceneCaseApiRepository = customizedSceneCaseApiRepository;
         this.sceneCaseApiMapper = sceneCaseApiMapper;
         this.caseTemplateApiMapper = caseTemplateApiMapper;
-        this.caseApiCountHandler = sceneCaseApiCountHandler;
+        this.caseApiCountHandler = caseApiCountHandler;
         this.matchParamInfoMapper = matchParamInfoMapper;
+        this.scheduleService = scheduleService;
     }
 
     @Override
@@ -330,6 +329,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             customizedSceneCaseRepository.deleteByIds(ids);
             List<String> sceneCaseApiIds = customizedSceneCaseApiRepository
                 .findSceneCaseApiIdsBySceneCaseIds(ids);
+            scheduleService.removeCaseIds(ids);
             if (CollectionUtils.isNotEmpty(sceneCaseApiIds)) {
                 customizedSceneCaseApiRepository.deleteByIds(sceneCaseApiIds);
                 caseApiCountHandler.deleteSceneCaseBySceneCaseApiIds(sceneCaseApiIds);

@@ -8,6 +8,7 @@ import static com.sms.courier.common.enums.ScheduleStatusType.UPDATE;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCHEDULE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.CASE_TYPE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCHEDULE_BY_ID_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DELETE_SCHEDULE_CASE_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCHEDULE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCHEDULE_BY_ID_ERROR;
@@ -37,6 +38,7 @@ import com.sms.courier.dto.response.ScheduleResponse;
 import com.sms.courier.entity.schedule.ScheduleEntity;
 import com.sms.courier.mapper.ScheduleMapper;
 import com.sms.courier.repository.CommonRepository;
+import com.sms.courier.repository.CustomizedScheduleRepository;
 import com.sms.courier.repository.ScheduleRepository;
 import com.sms.courier.service.ScheduleCaseJobService;
 import com.sms.courier.service.ScheduleSceneCaseJobService;
@@ -62,16 +64,19 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleMapper scheduleMapper;
     private final ScheduleCaseJobService scheduleCaseJobService;
     private final ScheduleSceneCaseJobService scheduleSceneCaseJobService;
+    private final CustomizedScheduleRepository customizedScheduleRepository;
 
     public ScheduleServiceImpl(ScheduleRepository scheduleRepository,
         CommonRepository commonRepository, ScheduleMapper scheduleMapper,
         ScheduleCaseJobService scheduleCaseJobService,
-        ScheduleSceneCaseJobService scheduleSceneCaseJobService) {
+        ScheduleSceneCaseJobService scheduleSceneCaseJobService,
+        CustomizedScheduleRepository customizedScheduleRepository) {
         this.scheduleRepository = scheduleRepository;
         this.commonRepository = commonRepository;
         this.scheduleMapper = scheduleMapper;
         this.scheduleCaseJobService = scheduleCaseJobService;
         this.scheduleSceneCaseJobService = scheduleSceneCaseJobService;
+        this.customizedScheduleRepository = customizedScheduleRepository;
     }
 
     @Override
@@ -198,6 +203,16 @@ public class ScheduleServiceImpl implements ScheduleService {
         } catch (Exception e) {
             log.error("Failed to update Schedule status.", e);
             throw ExceptionUtils.mpe(EDIT_SCHEDULE_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean removeCaseIds(List<String> caseIds) {
+        try {
+            return customizedScheduleRepository.removeCaseIds(caseIds);
+        } catch (Exception e) {
+            log.error("Failed to delete the Schedule case id.", e);
+            throw ExceptionUtils.mpe(DELETE_SCHEDULE_CASE_ID_ERROR);
         }
     }
 

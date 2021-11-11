@@ -32,11 +32,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -115,6 +117,7 @@ public class ApiServiceImpl implements ApiService {
             apiEntity.setMd5(MD5Util.getMD5(apiEntity));
             ApiEntity newApiEntity = apiRepository.insert(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
+                .description("First create api!")
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             // 如果没用引用数据结构 则不需要保存引用关系
             if (CollectionUtils.isNotEmpty(apiRequest.getAddStructIds())) {
@@ -146,6 +149,8 @@ public class ApiServiceImpl implements ApiService {
             apiEntity.setMd5(MD5Util.getMD5(apiEntity));
             ApiEntity newApiEntity = apiRepository.save(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
+                .description(StringUtils.isNotBlank(apiRequest.getEditDescription()) ? apiRequest.getEditDescription()
+                    : "Edit api!")
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             saveRef(newApiEntity.getId(), newApiEntity.getApiName(), apiRequest.getAddStructIds(),
                 apiRequest.getRemoveStructIds());
@@ -235,6 +240,29 @@ public class ApiServiceImpl implements ApiService {
         } catch (Exception e) {
             log.error("Failed to query case count the Api!", e);
             throw new ApiTestPlatformException(ErrorCode.GET_CASE_COUNT_BY_API_ERROR);
+        }
+    }
+
+    @Override
+    public Boolean resetApiVersion(String historyId) {
+        try {
+            ApiHistoryEntity apiHistoryEntity = apiHistoryRepository.findById(historyId)
+                .orElseThrow(() -> ExceptionUtils.mpe(ErrorCode.GET_INTERFACE_HISTORY_BY_ID_ERROR));
+            Optional<ApiEntity> optional = apiRepository.findById(apiHistoryEntity.getRecord().getId());
+            if (optional.isPresent()) {
+                ApiEntity oldApiEntity = optional.get();
+                ApiEntity newApiEntity = apiMapper.toEntityByHistory(apiHistoryEntity.getRecord());
+                newApiEntity.setHistoryId(apiHistoryEntity.getId());
+                newApiEntity.setCaseCount(oldApiEntity.getCaseCount());
+                newApiEntity.setSceneCaseCount(oldApiEntity.getSceneCaseCount());
+                newApiEntity.setOtherProjectSceneCaseCount(oldApiEntity.getOtherProjectSceneCaseCount());
+                apiRepository.save(newApiEntity);
+                return Boolean.TRUE;
+            }
+            return Boolean.FALSE;
+        } catch (Exception e) {
+            log.error("Failed to reset api version!", e);
+            throw ExceptionUtils.mpe(ErrorCode.RESET_API_VERSION_ERROR);
         }
     }
 

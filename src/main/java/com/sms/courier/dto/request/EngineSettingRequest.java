@@ -14,5 +14,7 @@ public class EngineSettingRequest {
     @NotBlank(message = "The id must not be empty!")
     private String id;
     private String version;
+    @NotBlank(message = "The imageName must not be empty!")
+    private String imageName;
     private Map<String, String> envVariable;
 }

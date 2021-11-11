@@ -72,10 +72,14 @@ public class LogAspect {
             log.warn("The operationDesc is empty,please check the method: {} template:{}",
                 method, logRecord.template());
         }
-        LogEntity logEntity = LogEntity.builder().operationType(operationType).operationModule(operationModule)
-            .operationDesc(operationDesc).operator(SecurityUtil.getCurrentUser().getUsername()).refId(projectId)
-            .build();
-        logService.add(logEntity);
+        try {
+            LogEntity logEntity = LogEntity.builder().operationType(operationType).operationModule(operationModule)
+                .operationDesc(operationDesc).operator(SecurityUtil.getCurrentUser().getUsername()).refId(projectId)
+                .build();
+            logService.add(logEntity);
+        } catch (Exception e) {
+            log.error("Insert log error!", e);
+        }
         return result;
     }
 
@@ -85,16 +89,20 @@ public class LogAspect {
     }
 
     private void enhance(Enhance enhance, EvaluationContext context, OperationModule operationModule, Method method) {
-        if (enhance.enable()) {
-            Object value = context.lookupVariable(enhance.primaryKey());
-            if (Objects.nonNull(value)) {
-                Object queryByIdResult;
-                queryByIdResult = getQueryResult(operationModule, value);
-                context.setVariable(enhance.queryResultKey(), queryByIdResult);
-            } else {
-                log.error("The method:{} parameterNames not exist the primaryKey:{}.",
-                    method, enhance.primaryKey());
+        try {
+            if (enhance.enable()) {
+                Object value = context.lookupVariable(enhance.primaryKey());
+                if (Objects.nonNull(value)) {
+                    Object queryByIdResult;
+                    queryByIdResult = getQueryResult(operationModule, value);
+                    context.setVariable(enhance.queryResultKey(), queryByIdResult);
+                } else {
+                    log.error("The method:{} parameterNames not exist the primaryKey:{}.",
+                        method, enhance.primaryKey());
+                }
             }
+        } catch (Exception e) {
+            log.error("Log enhance error!", e);
         }
     }
 

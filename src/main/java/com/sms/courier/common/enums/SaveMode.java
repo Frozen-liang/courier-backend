@@ -1,9 +1,9 @@
 package com.sms.courier.common.enums;
 
-import com.sms.courier.parser.DiffApiEntitiesFactory;
-import com.sms.courier.parser.impl.CoverApiEntitiesFactory;
-import com.sms.courier.parser.impl.IncrementApiEntitiesFactory;
-import com.sms.courier.parser.impl.RemainApiEntitiesFactory;
+import com.sms.courier.parser.ApiImportHandler;
+import com.sms.courier.parser.impl.CoverApiImportHandler;
+import com.sms.courier.parser.impl.IncrementApiImportHandler;
+import com.sms.courier.parser.impl.RemainApiImportHandler;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
@@ -11,20 +11,20 @@ import java.util.stream.Collectors;
 import org.springframework.lang.Nullable;
 
 public enum SaveMode implements EnumCommon {
-    COVER(1, new CoverApiEntitiesFactory()),
-    REMAIN(2, new RemainApiEntitiesFactory()),
-    INCREMENT(3, new IncrementApiEntitiesFactory());
+    COVER(1, new CoverApiImportHandler()),
+    REMAIN(2, new RemainApiImportHandler()),
+    INCREMENT(3, new IncrementApiImportHandler());
 
     private static final Map<Integer, SaveMode> MAPPINGS = Arrays.stream(values()).sequential().collect(
         Collectors.toMap(SaveMode::getCode, Function.identity()));
 
 
     private final int code;
-    private final DiffApiEntitiesFactory diffApiEntitiesFactory;
+    private final ApiImportHandler apiImportHandler;
 
-    SaveMode(int code, DiffApiEntitiesFactory diffApiEntitiesFactory) {
+    SaveMode(int code, ApiImportHandler apiImportHandler) {
         this.code = code;
-        this.diffApiEntitiesFactory = diffApiEntitiesFactory;
+        this.apiImportHandler = apiImportHandler;
     }
 
     @Override
@@ -32,8 +32,8 @@ public enum SaveMode implements EnumCommon {
         return code;
     }
 
-    public DiffApiEntitiesFactory getBuildDiffApiEntities() {
-        return diffApiEntitiesFactory;
+    public ApiImportHandler getApiImportHandler() {
+        return apiImportHandler;
     }
 
     @Nullable

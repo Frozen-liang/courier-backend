@@ -1,8 +1,11 @@
 package com.sms.courier.engine.impl;
 
+import static com.sms.courier.common.enums.OperationModule.ENGINE_SETTING;
+import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_ENGINE_SETTING_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_ENGINE_SETTING_ERROR;
 
+import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.EngineSettingRequest;
 import com.sms.courier.dto.response.EngineSettingResponse;
@@ -34,12 +37,14 @@ public class EngineSettingServiceImpl implements EngineSettingService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = ENGINE_SETTING)
     public Boolean edit(EngineSettingRequest request) {
         try {
             EngineSettingEntity engineSettingEntity = engineSettingRepository.findById(request.getId())
                 .orElseThrow(() -> ExceptionUtils.mpe(EDIT_ENGINE_SETTING_ERROR));
             engineSettingEntity.setEnvVariable(request.getEnvVariable());
             engineSettingEntity.setVersion(request.getVersion());
+            engineSettingEntity.setImageName(request.getImageName());
             engineSettingRepository.save(engineSettingEntity);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {

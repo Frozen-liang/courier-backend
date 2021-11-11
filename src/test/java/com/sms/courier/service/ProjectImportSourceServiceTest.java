@@ -6,9 +6,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.enums.ImportStatus;
+import com.sms.courier.dto.request.ProjectImportFlowPageRequest;
 import com.sms.courier.dto.request.ProjectImportSourceRequest;
 import com.sms.courier.dto.response.ProjectImportFlowResponse;
 import com.sms.courier.dto.response.ProjectImportSourceResponse;
+import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.entity.project.ProjectImportFlowEntity;
 import com.sms.courier.entity.project.ProjectImportSourceEntity;
 import com.sms.courier.mapper.ProjectImportSourceMapper;
@@ -22,15 +24,7 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.springframework.data.domain.Page;
 
 /**
  * @author zixi.gao
@@ -124,4 +118,13 @@ public class ProjectImportSourceServiceTest {
         assertThat(result.getId()).isEqualTo(ID);
     }
 
+    @Test
+    @DisplayName("Test the pageProjectImportFlow method in the ProjectImportSource Service")
+    public void pageProjectImportFlow_test() {
+        ProjectImportFlowPageRequest request = ProjectImportFlowPageRequest.builder().build();
+        when(commonRepository.page(any(QueryVo.class),any(),any())).thenReturn(Page.empty());
+        Page<ProjectImportFlowResponse> page = projectImportSourceService
+            .pageProjectImportFlow(request);
+        assertThat(page).isEmpty();
+    }
 }

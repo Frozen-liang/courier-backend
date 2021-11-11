@@ -10,6 +10,7 @@ import com.sms.courier.engine.request.EngineRegistrationRequest;
 import com.sms.courier.security.jwt.JwtTokenManager;
 import com.sms.courier.security.pojo.CustomUser;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,26 +48,31 @@ public class EngineController {
     }
 
     @PutMapping("/open")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean openEngine(String id) {
         return engineMemberManagement.openEngine(id);
     }
 
     @PutMapping("/close")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean closeEngine(String id) {
         return engineMemberManagement.closeEngine(id);
     }
 
     @PostMapping("/create")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean createEngine() {
         return engineMemberManagement.createEngine();
     }
 
     @PostMapping("/restart")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean restartEngine(String name) {
         return engineMemberManagement.restartEngine(name);
     }
 
     @DeleteMapping("/delete")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean deleteEngine(String name) {
         return engineMemberManagement.deleteEngine(name);
     }

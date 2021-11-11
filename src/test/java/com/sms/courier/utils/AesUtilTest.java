@@ -21,12 +21,12 @@ import org.springframework.util.Base64Utils;
 public class AesUtilTest {
 
     private static final Key key;
-    private static final String KEY_STR = "sms-stap";
+    private static final String KEY_STR = "courier/09.16.2020";
     private static final String KEY_ALGORITHM = "AES";
     private static final String CIPHER_ALGORITHM = "AES/ECB/PKCS5Padding";
     private static final String RANDOM_ALGORITHM = "SHA1PRNG";
     private static final String PASSWORD = "test";
-    private static final String CIPHERTEXT = "FAXz/0V+jL/JWnoIG3J8BQ==";
+    private static final String CIPHERTEXT = "DRKFZPy1E1M3zcZSFLVorg==";
 
     static {
         try {
@@ -49,6 +49,7 @@ public class AesUtilTest {
         cipher.init(Cipher.ENCRYPT_MODE, key);
         byte[] doFinal = cipher.doFinal(bytes);
         String result = Base64Utils.encodeToString(doFinal);
+        System.out.println(AesUtil.encrypt(PASSWORD));
         assertThat(AesUtil.encrypt(PASSWORD)).isEqualTo(result);
     }
 

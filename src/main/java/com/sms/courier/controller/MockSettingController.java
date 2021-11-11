@@ -8,6 +8,7 @@ import com.sms.courier.service.MockSettingService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,16 +24,22 @@ public class MockSettingController {
         this.mockSettingService = mockSettingService;
     }
 
-    @PutMapping("/url")
-    @PreAuthorize("hasRoleOrAdmin(@role.MOCK_SETTING_GRE_UPD_DEL)")
-    public Boolean editUrl(@Validated(UpdateGroup.class) @RequestBody MockSettingRequest mockSettingRequest) {
-        return mockSettingService.editUrl(mockSettingRequest);
+    @PutMapping
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
+    public Boolean edit(@Validated(UpdateGroup.class) @RequestBody MockSettingRequest mockSettingRequest) {
+        return mockSettingService.edit(mockSettingRequest);
     }
 
-    @GetMapping
-    @PreAuthorize("hasRoleOrAdmin(@role.MOCK_SETTING_QUERY_ALL)")
-    public MockSettingResponse get() {
-        return mockSettingService.get();
+    @GetMapping("/findOne")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
+    public MockSettingResponse findOne() {
+        return mockSettingService.findOne();
+    }
+
+    @PutMapping("/reset-token/{id}")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
+    public Boolean resetToken(@PathVariable String id) {
+        return mockSettingService.resetToken(id);
     }
 
 }

@@ -12,7 +12,8 @@ public enum CollectionName {
     SCHEDULE("Schedule"),
     USER_GROUP("UserGroup"),
     DATA_STRUCTURE("DataStructure"),
-    WORKSPACE("Workspace");
+    WORKSPACE("Workspace"),
+    API_HISTORY("ApiHistory");
 
     private final String name;
 

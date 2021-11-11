@@ -1,5 +1,6 @@
 package com.sms.courier.service;
 
+import static com.mongodb.internal.connection.tlschannel.util.Util.assertTrue;
 import static com.sms.courier.common.exception.ErrorCode.ADD_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.BATCH_UPDATE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_API_BY_ID_ERROR;
@@ -8,7 +9,9 @@ import static com.sms.courier.common.exception.ErrorCode.GET_API_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_API_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -25,6 +28,7 @@ import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.api.ApiHistoryEntity;
+import com.sms.courier.entity.api.common.ApiHistoryDetail;
 import com.sms.courier.entity.project.ProjectImportSourceEntity;
 import com.sms.courier.mapper.ApiHistoryMapper;
 import com.sms.courier.mapper.ApiMapper;
@@ -63,6 +67,7 @@ class ApiServiceTest {
     private final ApiEntity api = ApiEntity.builder().id(ID).build();
     private final ApiResponse apiResponseDto = ApiResponse.builder().id(ID).build();
     private final ApiRequest apiRequestDto = ApiRequest.builder().id(ID).build();
+    private final ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private final BatchUpdateByIdRequest<Object> batchUpdateRequest = new BatchUpdateByIdRequest<>(List.of(ID),
         new UpdateRequest<>());
@@ -245,6 +250,37 @@ class ApiServiceTest {
     public void caseCount_exception_test() {
         when(customizedApiRepository.caseCount(any())).thenThrow(new RuntimeException());
         assertThatThrownBy(() -> apiService.caseCount(new ObjectId())).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test for resetApiVersion in ApiService")
+    public void resetApiVersion_test() {
+        ApiHistoryEntity apiHistoryEntity =
+            ApiHistoryEntity.builder().id(ID).record(ApiHistoryDetail.builder().build()).build();
+        when(apiHistoryRepository.findById(any())).thenReturn(Optional.of(apiHistoryEntity));
+        ApiEntity apiEntity = ApiEntity.builder().id(ID).build();
+        when(apiRepository.findById(any())).thenReturn(Optional.of(apiEntity));
+        when(apiRepository.save(any(ApiEntity.class))).thenReturn(apiEntity);
+        Boolean isSuccess = apiService.resetApiVersion(ID);
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test for resetApiVersion in ApiService")
+    public void resetApiVersion_test_thenFalse() {
+        ApiHistoryEntity apiHistoryEntity =
+            ApiHistoryEntity.builder().id(ID).record(ApiHistoryDetail.builder().build()).build();
+        when(apiHistoryRepository.findById(any())).thenReturn(Optional.of(apiHistoryEntity));
+        when(apiRepository.findById(any())).thenReturn(Optional.empty());
+        Boolean isSuccess = apiService.resetApiVersion(ID);
+        assertFalse(isSuccess);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while test resetApiVersion in ApiService")
+    public void resetApiVersion_exception_test() {
+        when(apiHistoryRepository.findById(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(()->apiService.resetApiVersion(ID)).isInstanceOf(ApiTestPlatformException.class);
     }
 
 }

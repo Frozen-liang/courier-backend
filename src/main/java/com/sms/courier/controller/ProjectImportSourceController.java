@@ -3,11 +3,13 @@ package com.sms.courier.controller;
 import static com.sms.courier.common.constant.Constants.PROJECT_IMPORT_SOURCE;
 
 import com.sms.courier.common.validate.UpdateGroup;
+import com.sms.courier.dto.request.ProjectImportFlowPageRequest;
 import com.sms.courier.dto.request.ProjectImportSourceRequest;
 import com.sms.courier.dto.response.ProjectImportFlowResponse;
 import com.sms.courier.dto.response.ProjectImportSourceResponse;
 import com.sms.courier.service.ProjectImportSourceService;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -61,6 +63,11 @@ public class ProjectImportSourceController {
     @GetMapping("/flow/pid/{projectId}")
     public ProjectImportFlowResponse getProjectImportFlow(@PathVariable String projectId) {
         return projectImportSourceService.getProjectImportFlow(projectId);
+    }
+
+    @PostMapping("/flow/page")
+    public Page<ProjectImportFlowResponse> getProjectImportFlow(ProjectImportFlowPageRequest request) {
+        return projectImportSourceService.pageProjectImportFlow(request);
     }
 
 }
