@@ -12,6 +12,7 @@ import com.sms.courier.entity.api.common.ApiHistoryDetail;
 import com.sms.courier.entity.project.ImportSourceVo;
 import com.sms.courier.entity.project.ProjectImportSourceEntity;
 import com.sms.courier.utils.EnumCommonUtils;
+import com.sms.courier.webhook.response.WebhookApiResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -51,4 +52,6 @@ public interface ApiMapper {
     @Mapping(target = "sceneCaseCount", ignore = true)
     @Mapping(target = "otherProjectSceneCaseCount", ignore = true)
     ApiEntity toEntityByHistory(ApiHistoryDetail record);
+
+    WebhookApiResponse toWebhookResponse(ApiEntity apiEntity);
 }
