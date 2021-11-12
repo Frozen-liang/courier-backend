@@ -292,6 +292,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     private void publishWebhookEvent(WebhookType webhookType, ApiEntity newApiEntity) {
-        applicationEventPublisher.publishEvent(WebhookEvent.create(webhookType, apiMapper.toDto(newApiEntity)));
+        applicationEventPublisher
+            .publishEvent(WebhookEvent.create(webhookType, apiMapper.toWebhookResponse(newApiEntity)));
     }
 }
