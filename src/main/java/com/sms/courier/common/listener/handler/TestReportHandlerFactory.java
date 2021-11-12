@@ -35,7 +35,7 @@ public class TestReportHandlerFactory implements ApplicationContextAware, Initia
     }
 
     public TestReportHandler getHandler(TestReportType testReportType) {
-        if (testReportHandlerMap.containsKey(testReportType)) {
+        if (!testReportHandlerMap.containsKey(testReportType)) {
             throw new IllegalArgumentException(String.format("The test report type [%s] is not supported.",
                 testReportType));
         }
