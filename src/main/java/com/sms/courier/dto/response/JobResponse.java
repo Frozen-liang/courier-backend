@@ -2,7 +2,6 @@ package com.sms.courier.dto.response;
 
 import com.sms.courier.common.enums.JobType;
 import com.sms.courier.entity.job.common.JobDataCollection;
-import com.sms.courier.entity.job.common.JobEnvironment;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +19,7 @@ public class JobResponse extends BaseResponse {
     private String engineId;
     private String workspaceId;
     private String projectId;
-    private JobEnvironment environment;
+    private JobEnvironmentResponse environment;
     private JobDataCollection dataCollection;
     private Integer jobStatus;
     private String errCode;
