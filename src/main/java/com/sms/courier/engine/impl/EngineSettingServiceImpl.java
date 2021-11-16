@@ -45,6 +45,7 @@ public class EngineSettingServiceImpl implements EngineSettingService {
             engineSettingEntity.setEnvVariable(request.getEnvVariable());
             engineSettingEntity.setVersion(request.getVersion());
             engineSettingEntity.setImageName(request.getImageName());
+            engineSettingEntity.setTaskSizeLimit(request.getTaskSizeLimit());
             engineSettingRepository.save(engineSettingEntity);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {

@@ -28,6 +28,7 @@ public class EngineResponse {
     private Integer sceneCaseTask;
     private Integer taskCount;
     private Integer status;
+    private Integer containerStatus;
     @JsonFormat(pattern = TimePatternConstant.DEFAULT_PATTERN)
     private LocalDateTime createDateTime;
     @JsonProperty("isOpen")

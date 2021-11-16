@@ -60,6 +60,7 @@ public class EngineMemberManagementTest {
         when(engineMemberRepository.findById(any())).thenReturn(Optional.empty());
         when(engineMemberRepository.save(engineMember)).thenReturn(engineMember);
         EngineRegistrationRequest engineRegistrationRequest = new EngineRegistrationRequest();
+        when(engineSettingService.findOne()).thenReturn(new EngineSettingResponse());
         String result = engineMemberManagement.bind(engineRegistrationRequest);
         assertThat(result).isNotBlank();
     }
@@ -69,6 +70,7 @@ public class EngineMemberManagementTest {
     public void bind_is_not_empty_test() {
         when(engineMemberRepository.findById(any())).thenReturn(Optional.of(engineMember));
         when(engineMemberRepository.save(engineMember)).thenReturn(engineMember);
+        when(engineSettingService.findOne()).thenReturn(new EngineSettingResponse());
         EngineRegistrationRequest engineRegistrationRequest = new EngineRegistrationRequest();
         String result = engineMemberManagement.bind(engineRegistrationRequest);
         assertThat(result).isNotBlank();

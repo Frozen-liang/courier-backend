@@ -17,5 +17,6 @@ public class EngineSettingResponse extends BaseResponse {
     private String imageName;
     private String containerName;
     private String version;
+    private Integer taskSizeLimit;
     private Map<String, String> envVariable;
 }

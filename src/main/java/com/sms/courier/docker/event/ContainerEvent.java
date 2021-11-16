@@ -1,5 +1,9 @@
 package com.sms.courier.docker.event;
 
+import static com.sms.courier.docker.enmu.ContainerField.CONTAINER_NAME;
+import static com.sms.courier.docker.enmu.ContainerField.CONTAINER_STATUS;
+import static com.sms.courier.docker.enmu.ContainerField.NAME;
+
 import com.github.dockerjava.api.async.ResultCallbackTemplate;
 import com.github.dockerjava.api.model.Event;
 import com.sms.courier.common.enums.ContainerStatus;
@@ -21,9 +25,6 @@ import org.springframework.stereotype.Component;
 public class ContainerEvent extends ResultCallbackTemplate<ContainerEvent, Event> {
 
     private final CommonRepository commonRepository;
-    private static final String CONTAINER_NAME = "containerName";
-    private static final String CONTAINER_STATUS = "containerStatus";
-    private static final String NAME = "name";
     private static final String TYPE = "type";
 
     public ContainerEvent(CommonRepository commonRepository) {
@@ -40,7 +41,7 @@ public class ContainerEvent extends ResultCallbackTemplate<ContainerEvent, Event
             Optional.ofNullable(event.getActor()).ifPresent(eventActor -> {
                 Map<String, String> attributes = Objects.requireNonNullElse(eventActor.getAttributes(),
                     new HashMap<>());
-                String containerName = attributes.get(NAME);
+                String containerName = attributes.get(NAME.getName());
                 String type = attributes.get(TYPE);
                 log.info("ContainerName: {}, type: {}", containerName, type);
                 LabelType labelType = LabelType.resolverByName(type);
@@ -56,9 +57,12 @@ public class ContainerEvent extends ResultCallbackTemplate<ContainerEvent, Event
 
     private void updateStatus(String containerName, LabelType labelType, ContainerStatus containerStatus) {
         Query query = new Query();
-        query.addCriteria(Criteria.where(CONTAINER_NAME).is(containerName));
+        Criteria criteria = new Criteria();
+        criteria.orOperator(Criteria.where(CONTAINER_NAME.getName()).is(containerName),
+            Criteria.where(NAME.getName()).is(containerName));
+        query.addCriteria(criteria);
         Update update = new Update();
-        update.set(CONTAINER_STATUS, containerStatus);
+        update.set(CONTAINER_STATUS.getName(), containerStatus);
         commonRepository.updateField(query, update, labelType.getEntityClass());
     }
 }
