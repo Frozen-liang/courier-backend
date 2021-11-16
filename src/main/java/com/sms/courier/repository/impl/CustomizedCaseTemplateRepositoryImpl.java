@@ -19,14 +19,18 @@ import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.field.CommonField;
 import com.sms.courier.dto.request.CaseTemplateSearchRequest;
 import com.sms.courier.dto.response.CaseTemplateResponse;
+import com.sms.courier.entity.group.CaseTemplateGroupEntity;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
+import com.sms.courier.repository.CaseTemplateGroupRepository;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedCaseTemplateRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -39,11 +43,14 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
 
     private final MongoTemplate mongoTemplate;
     private final CommonRepository commonRepository;
+    private final CaseTemplateGroupRepository caseTemplateGroupRepository;
 
     public CustomizedCaseTemplateRepositoryImpl(MongoTemplate mongoTemplate,
-        CommonRepository commonRepository) {
+        CommonRepository commonRepository,
+        CaseTemplateGroupRepository caseTemplateGroupRepository) {
         this.mongoTemplate = mongoTemplate;
         this.commonRepository = commonRepository;
+        this.caseTemplateGroupRepository = caseTemplateGroupRepository;
     }
 
     @Override
@@ -117,12 +124,24 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
             PROJECT_ID.is(projectId),
             REMOVE.is(searchRequest.isRemoved()),
             NAME.like(searchRequest.getName()),
-            GROUP_ID.is(searchRequest.getGroupId()),
+            GROUP_ID.in(getApiGroupId(searchRequest.getGroupId())),
             TEST_STATUS.in(searchRequest.getTestStatus()),
             TAG_ID.in(searchRequest.getTagId()),
             PRIORITY.in(searchRequest.getPriority()),
             CREATE_USER_NAME.in(searchRequest.getCreateUserName())
         );
+    }
+
+    private List<ObjectId> getApiGroupId(ObjectId groupId) {
+        return Optional.ofNullable(groupId).map(ObjectId::toString)
+            .map(caseTemplateGroupRepository::findById)
+            .map((Optional::get))
+            .map(CaseTemplateGroupEntity::getRealGroupId)
+            .map(caseTemplateGroupRepository::findAllByPathContains)
+            .orElse(Stream.empty())
+            .map(CaseTemplateGroupEntity::getId)
+            .map(ObjectId::new)
+            .collect(Collectors.toList());
     }
 
 }

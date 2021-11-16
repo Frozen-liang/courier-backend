@@ -298,7 +298,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
 
     @Override
     @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE,
-        template = "{{#result?.![#this.caseName]}}",
+        template = "{{#res?.![#this.name]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
@@ -324,7 +324,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
 
     @Override
     @LogRecord(operationType = RECOVER, operationModule = CASE_TEMPLATE,
-        template = "{{#result?.![#this.caseName]}}",
+        template = "{{#result?.![#this.name]}}",
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean recover(List<String> ids) {
         try {
