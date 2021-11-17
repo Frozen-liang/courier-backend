@@ -5,7 +5,6 @@ import static com.sms.courier.common.constant.Constants.API_PATH;
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.request.ApiImportRequest;
-import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.BatchUpdateByIdRequest;
@@ -120,16 +119,6 @@ public class ApiController {
     @PreAuthorize("hasRoleOrAdmin(@role.API_CRE_UPD_DEL)")
     public Boolean resetApiVersion(@PathVariable String historyId) {
         return apiService.resetApiVersion(historyId);
-    }
-
-    @PostMapping("/scene/count/page")
-    public Page<ApiPageResponse> sceneCountPage(@Validated @RequestBody ApiIncludeCaseRequest request) {
-        return apiService.sceneCountPage(request);
-    }
-
-    @PostMapping("/case/count/page")
-    public Page<ApiPageResponse> caseCountPage(@Validated @RequestBody ApiIncludeCaseRequest request) {
-        return apiService.caseCountPage(request);
     }
 
 }

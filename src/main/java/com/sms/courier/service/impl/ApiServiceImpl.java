@@ -7,7 +7,6 @@ import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.request.ApiImportRequest;
-import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.BatchUpdateByIdRequest;
@@ -275,26 +274,6 @@ public class ApiServiceImpl implements ApiService {
         } catch (Exception e) {
             log.error("Failed to reset api version!", e);
             throw ExceptionUtils.mpe(ErrorCode.RESET_API_VERSION_ERROR);
-        }
-    }
-
-    @Override
-    public Page<ApiPageResponse> sceneCountPage(ApiIncludeCaseRequest request) {
-        try {
-            return customizedApiRepository.sceneCountPage(request);
-        } catch (Exception e) {
-            log.error("Failed to get scene count api page!", e);
-            throw ExceptionUtils.mpe(ErrorCode.GET_SCENE_COUNT_API_PAGE_ERROR);
-        }
-    }
-
-    @Override
-    public Page<ApiPageResponse> caseCountPage(ApiIncludeCaseRequest request) {
-        try {
-            return customizedApiRepository.caseCountPage(request);
-        } catch (Exception e) {
-            log.error("Failed to get case count api page!", e);
-            throw ExceptionUtils.mpe(ErrorCode.GET_CASE_COUNT_API_PAGE_ERROR);
         }
     }
 
