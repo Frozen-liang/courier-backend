@@ -1,6 +1,7 @@
 package com.sms.courier.service;
 
 import com.sms.courier.dto.request.ApiImportRequest;
+import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.BatchUpdateByIdRequest;
@@ -44,4 +45,7 @@ public interface ApiService {
 
     Boolean resetApiVersion(String historyId);
 
+    Page<ApiPageResponse> sceneCountPage(ApiIncludeCaseRequest request);
+
+    Page<ApiPageResponse> caseCountPage(ApiIncludeCaseRequest request);
 }

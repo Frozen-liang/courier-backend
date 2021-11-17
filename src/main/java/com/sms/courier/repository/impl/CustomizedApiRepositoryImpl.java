@@ -20,7 +20,9 @@ import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.common.field.UserField.NICKNAME;
 import static com.sms.courier.common.field.UserField.USERNAME;
 
+import com.google.common.collect.Lists;
 import com.sms.courier.common.enums.CollectionName;
+import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
@@ -30,6 +32,7 @@ import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
+import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.entity.tag.ApiTagEntity;
 import com.sms.courier.repository.ApiGroupRepository;
 import com.sms.courier.repository.ApiTagRepository;
@@ -197,6 +200,32 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
         CASE_COUNT.gt(0).ifPresent(query::addCriteria);
         return mongoTemplate.count(query, "Api");
+    }
+
+    @Override
+    public Page<ApiPageResponse> sceneCountPage(ApiIncludeCaseRequest request) {
+        Optional<Criteria> criteria = request.isInclude() ? SCENE_CASE_COUNT.gt(0) :
+            Optional.of(new Criteria().orOperator(Criteria.where(SCENE_CASE_COUNT.getName()).lte(0),
+                Criteria.where(SCENE_CASE_COUNT.getName()).exists(Boolean.FALSE)));
+        QueryVo queryVo = QueryVo.builder()
+            .collectionName("Api")
+            .lookupVo(Lists.newArrayList())
+            .criteriaList(Lists.newArrayList(criteria, PROJECT_ID.is(request.getProjectId()), REMOVE.is(Boolean.FALSE)))
+            .build();
+        return commonRepository.page(queryVo, request, ApiPageResponse.class);
+    }
+
+    @Override
+    public Page<ApiPageResponse> caseCountPage(ApiIncludeCaseRequest request) {
+        Optional<Criteria> criteria = request.isInclude() ? CASE_COUNT.gt(0) :
+            Optional.of(new Criteria().orOperator(Criteria.where(CASE_COUNT.getName()).lte(0),
+                Criteria.where(CASE_COUNT.getName()).exists(Boolean.FALSE)));
+        QueryVo queryVo = QueryVo.builder()
+            .collectionName("Api")
+            .lookupVo(Lists.newArrayList())
+            .criteriaList(Lists.newArrayList(criteria, PROJECT_ID.is(request.getProjectId()), REMOVE.is(Boolean.FALSE)))
+            .build();
+        return commonRepository.page(queryVo, request, ApiPageResponse.class);
     }
 
     private void addCriteria(ApiPageRequest apiPageRequest, Query query) {

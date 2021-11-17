@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.enums.DocumentUrlType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.request.ApiImportRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
@@ -42,6 +43,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -281,7 +283,43 @@ class ApiServiceTest {
     @DisplayName("An exception occurred while test resetApiVersion in ApiService")
     public void resetApiVersion_exception_test() {
         when(apiHistoryRepository.findById(any())).thenThrow(new RuntimeException());
-        assertThatThrownBy(()->apiService.resetApiVersion(ID)).isInstanceOf(ApiTestPlatformException.class);
+        assertThatThrownBy(() -> apiService.resetApiVersion(ID)).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test for sceneCountPage in ApiService")
+    public void sceneCountPage_test() {
+        Page<ApiPageResponse> page = mock(Page.class);
+        when(page.getContent()).thenReturn(Lists.newArrayList(ApiPageResponse.builder().id(ID).build()));
+        when(customizedApiRepository.sceneCountPage(any())).thenReturn(page);
+        Page<ApiPageResponse> dtoPage = apiService.sceneCountPage(ApiIncludeCaseRequest.builder().build());
+        assertThat(dtoPage.getContent()).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Test for sceneCountPage in ApiService")
+    public void sceneCountPage_exception_test() {
+        when(customizedApiRepository.sceneCountPage(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> apiService.sceneCountPage(ApiIncludeCaseRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test for caseCountPage in ApiService")
+    public void caseCountPage_test() {
+        Page<ApiPageResponse> page = mock(Page.class);
+        when(page.getContent()).thenReturn(Lists.newArrayList(ApiPageResponse.builder().id(ID).build()));
+        when(customizedApiRepository.caseCountPage(any())).thenReturn(page);
+        Page<ApiPageResponse> dtoPage = apiService.caseCountPage(ApiIncludeCaseRequest.builder().build());
+        assertThat(dtoPage.getContent()).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Test for caseCountPage in ApiService")
+    public void caseCountPage_exception_test() {
+        when(customizedApiRepository.caseCountPage(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> apiService.caseCountPage(ApiIncludeCaseRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
 }
