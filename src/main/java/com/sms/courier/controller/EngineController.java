@@ -6,6 +6,7 @@ import com.sms.courier.dto.request.DockerLogRequest;
 import com.sms.courier.dto.response.EngineRegistrationResponse;
 import com.sms.courier.dto.response.EngineResponse;
 import com.sms.courier.engine.EngineMemberManagement;
+import com.sms.courier.engine.request.EngineMemberRequest;
 import com.sms.courier.engine.request.EngineRegistrationRequest;
 import com.sms.courier.security.jwt.JwtTokenManager;
 import com.sms.courier.security.pojo.CustomUser;
@@ -45,6 +46,11 @@ public class EngineController {
         return EngineRegistrationResponse.builder().subscribeAddress(destination)
             .token(jwtTokenManager.generateAccessToken(engine))
             .build();
+    }
+
+    @PostMapping("/edit")
+    public Boolean edit(@Validated @RequestBody EngineMemberRequest request) {
+        return engineMemberManagement.edit(request);
     }
 
     @PutMapping("/open")

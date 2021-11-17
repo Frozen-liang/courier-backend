@@ -1,5 +1,6 @@
 package com.sms.courier.repository;
 
+import com.sms.courier.common.enums.ContainerStatus;
 import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.engine.model.EngineMemberEntity;
 import java.util.List;
@@ -14,6 +15,9 @@ public interface EngineMemberRepository extends MongoRepository<EngineMemberEnti
     Optional<EngineMemberEntity> findFirstByDestination(String destination);
 
     Stream<EngineMemberEntity> findAllByStatus(EngineStatus status);
+
+    List<EngineMemberEntity> findAllByContainerStatusInOrderByCreateDateTimeDesc(
+        List<ContainerStatus> containerStatuses);
 
     Stream<EngineMemberEntity> findAllByStatusAndOpenIsTrue(EngineStatus status);
 

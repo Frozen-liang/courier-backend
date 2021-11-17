@@ -4,6 +4,7 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.CaseRecordRequest;
 import com.sms.courier.dto.request.DockerLogRequest;
 import com.sms.courier.dto.response.EngineResponse;
+import com.sms.courier.engine.request.EngineMemberRequest;
 import com.sms.courier.engine.request.EngineRegistrationRequest;
 import java.util.List;
 
@@ -34,4 +35,6 @@ public interface EngineMemberManagement {
     Boolean deleteEngine(String name);
 
     Boolean queryLog(DockerLogRequest request);
+
+    Boolean edit(EngineMemberRequest request);
 }

@@ -20,5 +20,6 @@ public class EngineSettingEntity extends BaseEntity {
     private String imageName;
     private String containerName;
     private String version;
+    private Integer taskSizeLimit;
     private Map<String, String> envVariable;
 }
