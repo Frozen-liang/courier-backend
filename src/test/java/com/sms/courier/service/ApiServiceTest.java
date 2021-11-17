@@ -224,36 +224,6 @@ class ApiServiceTest {
     }
 
     @Test
-    @DisplayName("Test for sceneCount in ApiService")
-    public void sceneCount_test() {
-        when(customizedApiRepository.sceneCount(any())).thenReturn(1L);
-        Long count = apiService.sceneCount(new ObjectId());
-        assertThat(count).isEqualTo(1L);
-    }
-
-    @Test
-    @DisplayName("An exception occurred while test sceneCount in ApiService.")
-    public void sceneCount_exception_test() {
-        when(customizedApiRepository.sceneCount(any())).thenThrow(new RuntimeException());
-        assertThatThrownBy(() -> apiService.sceneCount(new ObjectId())).isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
-    @DisplayName("Test for caseCount in ApiService")
-    public void caseCount_test() {
-        when(customizedApiRepository.caseCount(any())).thenReturn(1L);
-        Long count = apiService.caseCount(new ObjectId());
-        assertThat(count).isEqualTo(1L);
-    }
-
-    @Test
-    @DisplayName("An exception occurred while test caseCount in ApiService.")
-    public void caseCount_exception_test() {
-        when(customizedApiRepository.caseCount(any())).thenThrow(new RuntimeException());
-        assertThatThrownBy(() -> apiService.caseCount(new ObjectId())).isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
     @DisplayName("Test for resetApiVersion in ApiService")
     public void resetApiVersion_test() {
         ApiHistoryEntity apiHistoryEntity =

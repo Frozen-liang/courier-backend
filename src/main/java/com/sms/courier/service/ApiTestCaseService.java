@@ -4,7 +4,6 @@ import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
-import com.sms.courier.dto.response.TestCaseCountStatisticsResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.apitestcase.TestResult;
 import java.time.LocalDateTime;
@@ -43,5 +42,4 @@ public interface ApiTestCaseService {
     Page<ApiTestCaseResponse> getCasePageByProjectIdsAndCreateDate(List<String> projectIds, LocalDateTime dateTime,
         PageDto pageDto);
 
-    List<TestCaseCountStatisticsResponse> getCaseGroupDayCount(List<String> projectIds, LocalDateTime dateTime);
 }

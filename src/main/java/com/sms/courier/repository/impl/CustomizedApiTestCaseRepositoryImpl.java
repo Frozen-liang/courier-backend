@@ -13,11 +13,12 @@ import static com.sms.courier.common.field.SceneField.TAG_ID;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 
 import com.google.common.collect.Lists;
+import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
-import com.sms.courier.dto.response.TestCaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
@@ -126,7 +127,7 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
     }
 
     @Override
-    public List<TestCaseCountStatisticsResponse> getCaseGroupDayCount(List<String> projectIds, LocalDateTime dateTime) {
+    public List<CaseCountStatisticsResponse> getCaseGroupDayCount(List<String> projectIds, LocalDateTime dateTime) {
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(projectIds)) {
             aggregationOperations.add(Aggregation.match(Criteria.where(PROJECT_ID.getName()).in(projectIds)));
@@ -134,14 +135,16 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
         aggregationOperations.add(Aggregation.match(Criteria.where(REMOVE.getName()).is(Boolean.FALSE)));
         aggregationOperations.add(Aggregation.match(Criteria.where(CREATE_DATE_TIME.getName()).gt(dateTime)));
         aggregationOperations
-            .add(project().and(CREATE_DATE_TIME.getName()).dateAsFormattedString("%Y-%m-%d").as("day"));
-        aggregationOperations.add(Aggregation.group("day").count().as("count"));
-        aggregationOperations.add(project().and("_id").as("day").and("count").as("count"));
-        aggregationOperations.add(Aggregation.sort(Direction.DESC, "day"));
+            .add(project().and(CREATE_DATE_TIME.getName()).dateAsFormattedString(Constants.GROUP_DAY_FORMATTER)
+                .as(Constants.DAY));
+        aggregationOperations.add(Aggregation.group(Constants.DAY).count().as(Constants.COUNT));
+        aggregationOperations
+            .add(project().and(ID.getName()).as(Constants.DAY).and(Constants.COUNT).as(Constants.COUNT));
+        aggregationOperations.add(Aggregation.sort(Direction.DESC, Constants.DAY));
 
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
         return mongoTemplate.aggregate(aggregation, ApiTestCaseEntity.class,
-            TestCaseCountStatisticsResponse.class).getMappedResults();
+            CaseCountStatisticsResponse.class).getMappedResults();
     }
 
     private List<LookupVo> getLookupVoList() {

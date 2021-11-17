@@ -78,8 +78,4 @@ public class ApiTestCaseController {
         return apiTestCaseService.recover(ids);
     }
 
-    @GetMapping("/count/pid/{projectId}")
-    public Long count(@PathVariable String projectId) {
-        return apiTestCaseService.count(projectId);
-    }
 }

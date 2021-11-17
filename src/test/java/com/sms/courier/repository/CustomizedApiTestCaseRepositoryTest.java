@@ -3,11 +3,10 @@ package com.sms.courier.repository;
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
-import com.sms.courier.dto.response.TestCaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.mongo.QueryVo;
-import com.sms.courier.initialize.ApiCaseCount;
 import com.sms.courier.repository.impl.CustomizedApiTestCaseRepositoryImpl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -99,13 +98,13 @@ class CustomizedApiTestCaseRepositoryTest {
     @Test
     @DisplayName("Test the getCaseGroupDayCount method in the CustomizedApiTestCaseRepository")
     public void getCaseGroupDayCount() {
-        AggregationResults<TestCaseCountStatisticsResponse> results = mock(AggregationResults.class);
-        List<TestCaseCountStatisticsResponse> testCaseCountStatisticsResponses =
-            Lists.newArrayList(TestCaseCountStatisticsResponse.builder().day(LocalDate.now()).count(0).build());
-        when(results.getMappedResults()).thenReturn(testCaseCountStatisticsResponses);
-        when(mongoTemplate.aggregate(any(), eq(ApiTestCaseEntity.class), eq(TestCaseCountStatisticsResponse.class)))
+        AggregationResults<CaseCountStatisticsResponse> results = mock(AggregationResults.class);
+        List<CaseCountStatisticsResponse> caseCountStatisticsRespons =
+            Lists.newArrayList(CaseCountStatisticsResponse.builder().day(LocalDate.now()).count(0).build());
+        when(results.getMappedResults()).thenReturn(caseCountStatisticsRespons);
+        when(mongoTemplate.aggregate(any(), eq(ApiTestCaseEntity.class), eq(CaseCountStatisticsResponse.class)))
             .thenReturn(results);
-        List<TestCaseCountStatisticsResponse> responses =
+        List<CaseCountStatisticsResponse> responses =
             customizedApiTestCaseRepository.getCaseGroupDayCount(Lists.newArrayList(ID), LocalDateTime.now());
         assertThat(responses).isNotEmpty();
     }
