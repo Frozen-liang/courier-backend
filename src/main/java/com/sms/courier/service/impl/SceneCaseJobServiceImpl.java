@@ -199,6 +199,9 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
             SceneCaseJobEntity sceneCaseJob = getSceneCaseJobEntity(request, currentUser, jobEnvironment,
                 caseList);
             sceneCaseJob.setNext(next);
+            sceneCaseJob.setEmails(request.getEmails());
+            sceneCaseJob.setNoticeType(request.getNoticeType());
+            sceneCaseJob.setName(Objects.nonNull(sceneCase) ? sceneCase.getName() : caseTemplate.getName());
             jobEntityList.add(sceneCaseJob);
         } else {
             for (TestDataRequest testData : request.getDataCollectionRequest().getDataList()) {
@@ -208,7 +211,10 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
                 SceneCaseJobEntity sceneCaseJob = getSceneCaseJobEntity(request, currentUser, jobEnvironment,
                     caseList);
                 sceneCaseJob.setDataCollection(jobDataCollection);
+                sceneCaseJob.setName(Objects.nonNull(sceneCase) ? sceneCase.getName() : caseTemplate.getName());
                 sceneCaseJob.setNext(next);
+                sceneCaseJob.setEmails(request.getEmails());
+                sceneCaseJob.setNoticeType(request.getNoticeType());
                 jobEntityList.add(sceneCaseJob);
             }
         }
@@ -294,6 +300,8 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
                     jobMapper.toSceneCaseJobReportResponse(sceneCaseJobReport));
             applicationEventPublisher.publishEvent(WebhookEvent.create(WebhookType.CASE_REPORT,
                 jobMapper.toWebhookSceneCaseJobResponse(sceneCaseJobReport)));
+            applicationEventPublisher
+                .publishEvent(jobMapper.toTestReportEvent(sceneCaseJobEntity, sceneCaseJobReport.getCaseReportList()));
         } catch (Exception e) {
             log.error("Save scene case job error!", e);
             caseDispatcherService

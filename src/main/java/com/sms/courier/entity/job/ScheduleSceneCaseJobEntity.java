@@ -18,7 +18,6 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 @Document(collection = "ScheduleSceneCaseJob")
 public class ScheduleSceneCaseJobEntity extends AbstractSceneCaseJobEntity {
 
-    private String name;
     @Field(targetType = FieldType.OBJECT_ID)
     private String scheduleRecordId;
 }

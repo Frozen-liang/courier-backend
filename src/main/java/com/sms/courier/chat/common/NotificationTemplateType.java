@@ -11,13 +11,25 @@ import lombok.Getter;
 public enum NotificationTemplateType {
 
     ACCOUNT_PWD_RESET(1, "Password-Reset-Template", accountPwdResetFiled()),
-    TEST_REPORT(2, "Test-Report-Template", testReportFiled());
+    TEST_REPORT(2, "Test-Report-Template", testReportFiled()),
+    SCHEDULE_TEST_REPORT(3, "Schedule-Test-Report-Template", scheduleTestReportFiled());
+
+    private static List<TemplateField> scheduleTestReportFiled() {
+        return List.of(
+            TemplateField.builder().name("name").description("Schedule name").build(),
+            TemplateField.builder().name("dataName").description("Data name").build(),
+            TemplateField.builder().name("projectId").description("Project Id").build(),
+            TemplateField.builder().name("testCompletionTime").description("Test Completion Time").build(),
+            TemplateField.builder().name("testStartTime").description("Test Start Time").build(),
+            TemplateField.builder().name("success").description("Success count").build(),
+            TemplateField.builder().name("fail").description("Fail count").build()
+        );
+    }
 
     private static List<TemplateField> testReportFiled() {
         return List.of(
-            TemplateField.builder().name("caseName").description("Case name").build(),
+            TemplateField.builder().name("name").description("Case name").build(),
             TemplateField.builder().name("dataName").description("Data name").build(),
-            TemplateField.builder().name("scheduleName").description("Schedule name").build(),
             TemplateField.builder().name("projectId").description("Project Id").build(),
             TemplateField.builder().name("totalTimeCost").description("Execution time").build(),
             TemplateField.builder().name("paramsTotalTimeCost").description("Parameter conversion time").build(),

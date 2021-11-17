@@ -9,6 +9,7 @@ import static com.sms.courier.utils.EmailUtil.applyProperties;
 import static com.sms.courier.utils.EmailUtil.invokeExtension;
 import static com.sms.courier.utils.EmailUtil.splitAddress;
 
+import com.sms.courier.chat.common.NotificationTemplateType;
 import com.sms.courier.chat.modal.NotificationPayload;
 import com.sms.courier.entity.notification.EmailServiceEntity;
 import com.sms.courier.entity.notification.NotificationTemplateEntity;
@@ -79,9 +80,9 @@ public class EmailSender extends AbstractSender implements InitializingBean {
     }
 
     @Override
-    public boolean sendTestReportNotification(NotificationPayload notificationPayload) {
+    public boolean sendTestReportNotification(NotificationTemplateType type, NotificationPayload notificationPayload) {
         isTrue(enabled, MAIL_SERVICE_IS_DISABLE);
-        NotificationTemplateEntity template = notificationTemplateService.findTemplateByType(TEST_REPORT);
+        NotificationTemplateEntity template = notificationTemplateService.findTemplateByType(type);
         isTrue(Objects.nonNull(template), NOTIFICATION_TEMPLATE_NOT_EXIST, TEST_REPORT.getName());
         String title = handleVariable(template.getTitle(), template.getTitleVariableKey(),
             notificationPayload.getTitleVariable());

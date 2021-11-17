@@ -5,24 +5,25 @@ import static com.sms.courier.common.field.ScheduleField.LAST_TASK_COMPLETE_TIME
 import static com.sms.courier.common.field.ScheduleField.TASK_STATUS;
 import static com.sms.courier.common.field.ScheduleRecordField.FAIL;
 import static com.sms.courier.common.field.ScheduleRecordField.JOB_IDS;
-import static com.sms.courier.common.field.ScheduleRecordField.JOB_RECORDS;
 import static com.sms.courier.common.field.ScheduleRecordField.SUCCESS;
 import static com.sms.courier.common.field.ScheduleRecordField.TEST_COMPLETION_TIME;
-import static com.sms.courier.common.field.ScheduleRecordField.VERSION;
 
+import com.sms.courier.chat.common.NotificationTemplateType;
 import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.field.CommonField;
 import com.sms.courier.common.listener.event.ScheduleJobRecordEvent;
-import com.sms.courier.entity.schedule.JobRecord;
+import com.sms.courier.common.listener.event.TestReportEvent;
 import com.sms.courier.entity.schedule.ScheduleEntity;
 import com.sms.courier.entity.schedule.ScheduleRecordEntity;
-import com.sms.courier.repository.CommonRepository;
-import com.sms.courier.repository.ScheduleRecordRepository;
+import com.sms.courier.utils.DateUtil;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -32,74 +33,64 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class ScheduleJobRecordListener {
 
-    private final ScheduleRecordRepository scheduleRecordRepository;
-    private final CommonRepository commonRepository;
+    private final MongoTemplate mongoTemplate;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private static final String CASE_ID = "jobRecords.caseId";
+    private static final String JOB_RECORD_SUCCESS = "jobRecords.$.success";
+    private static final String JOB_RECORD_FAIL = "jobRecords.$.fail";
 
-    public ScheduleJobRecordListener(ScheduleRecordRepository scheduleRecordRepository,
-        CommonRepository commonRepository) {
-        this.scheduleRecordRepository = scheduleRecordRepository;
-        this.commonRepository = commonRepository;
+    public ScheduleJobRecordListener(MongoTemplate mongoTemplate,
+        ApplicationEventPublisher applicationEventPublisher) {
+
+        this.mongoTemplate = mongoTemplate;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @EventListener
     public void doProcess(ScheduleJobRecordEvent event) {
         try {
-            String id = event.getId();
-            scheduleRecordRepository.findById(id).ifPresent(scheduleRecord -> {
-                while (true) {
-                    log.info("Update schedule record. id={} name={}",
-                        scheduleRecord.getScheduleId(), scheduleRecord.getScheduleName());
-                    Boolean res = updateJobIds(event, scheduleRecord);
-                    if (res) {
-                        break;
-                    } else {
-                        scheduleRecord = scheduleRecordRepository.findById(id).orElseThrow();
-                    }
-                }
-                if (scheduleRecord.getJobIds().isEmpty()) {
-                    log.info("Update schedule task status is complete");
-                    commonRepository.updateFieldById(scheduleRecord.getScheduleId(), Map.of(TASK_STATUS, COMPLETE,
-                        LAST_TASK_COMPLETE_TIME, LocalDateTime.now()), ScheduleEntity.class);
-                }
-            });
+            Query query = new Query();
+            query.addCriteria(Criteria.where(CommonField.ID.getName()).is(event.getId()));
+            query.addCriteria(Criteria.where(CASE_ID).is(event.getCaseId()));
+            Update update = new Update();
+            update.pull(JOB_IDS.getName(), event.getJobId());
+            update.set(TEST_COMPLETION_TIME.getName(), LocalDateTime.now());
+            if (event.getJobStatus() == JobStatus.SUCCESS) {
+                update.inc(JOB_RECORD_SUCCESS);
+                update.inc(SUCCESS.getName());
+            } else {
+                update.inc(JOB_RECORD_FAIL);
+                update.inc(FAIL.getName());
+            }
+            ScheduleRecordEntity scheduleRecord = mongoTemplate
+                .findAndModify(query, update, new FindAndModifyOptions().returnNew(true), ScheduleRecordEntity.class);
+            updateScheduleAndSendEmail(scheduleRecord);
         } catch (Exception e) {
             log.error("Update schedule job record error.", e);
         }
     }
 
-    private Boolean updateJobIds(ScheduleJobRecordEvent event, ScheduleRecordEntity scheduleRecord) {
-        String jobId = event.getJobId();
-        List<String> jobIds = scheduleRecord.getJobIds();
-        jobIds.remove(jobId);
-        List<JobRecord> jobRecords = scheduleRecord.getJobRecords();
-        jobRecords.stream().filter(jobRecord -> event.getCaseId().equals(jobRecord.getCaseId())).findFirst()
-            .ifPresent(jobRecord -> {
-                if (event.getJobStatus() == JobStatus.SUCCESS) {
-                    // 成功记录加1
-                    scheduleRecord.setSuccess((scheduleRecord.getSuccess() + 1));
-                    jobRecord.setSuccess(jobRecord.getSuccess() + 1);
-                    return;
-                }
-                // 失败记录加1
-                scheduleRecord.setFail(scheduleRecord.getFail() + 1);
-                jobRecord.setFail(jobRecord.getFail() + 1);
-
-            });
-        Query query = new Query();
-        query.addCriteria(Criteria.where(CommonField.ID.getName()).is(scheduleRecord.getId()));
-        query.addCriteria(Criteria.where(VERSION.getName()).is(scheduleRecord.getVersion()));
-        Update update = new Update();
-        // version加1
-        update.inc(VERSION.getName());
-        if (jobIds.isEmpty()) {
-            update.unset(JOB_IDS.getName());
-            update.set(TEST_COMPLETION_TIME.getName(), LocalDateTime.now());
-        } else {
-            update.set(JOB_IDS.getName(), jobIds);
+    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
+    private void updateScheduleAndSendEmail(ScheduleRecordEntity scheduleRecord) {
+        if (Objects.nonNull(scheduleRecord) && scheduleRecord.getJobIds().isEmpty()) {
+            log.info("Update schedule task status is complete");
+            Query query =
+                Query.query(Criteria.where(CommonField.ID.getName()).is(scheduleRecord.getScheduleId()));
+            Update update = new Update();
+            update.set(TASK_STATUS.getName(), COMPLETE);
+            update.set(LAST_TASK_COMPLETE_TIME.getName(), LocalDateTime.now());
+            ScheduleEntity scheduleEntity = mongoTemplate.findAndModify(query, update, ScheduleEntity.class);
+            TestReportEvent testReportEvent = TestReportEvent.builder()
+                .type(NotificationTemplateType.SCHEDULE_TEST_REPORT)
+                .noticeType(scheduleEntity.getNoticeType())
+                .emails(scheduleEntity.getEmails())
+                .name(scheduleEntity.getName())
+                .fail(scheduleRecord.getFail())
+                .success(scheduleRecord.getSuccess())
+                .testStartTime(DateUtil.toString(scheduleRecord.getCreateDateTime()))
+                .testCompletionTime(DateUtil.toString(scheduleRecord.getTestCompletionTime()))
+                .build();
+            applicationEventPublisher.publishEvent(testReportEvent);
         }
-        update.set(JOB_RECORDS.getName(), jobRecords);
-        update.set(SUCCESS.getName(), scheduleRecord.getSuccess());
-        update.set(FAIL.getName(), scheduleRecord.getFail());
-        return commonRepository.updateField(query, update, ScheduleRecordEntity.class);
     }
 }

@@ -1,6 +1,8 @@
 package com.sms.courier.entity.job;
 
+import com.sms.courier.common.enums.NoticeType;
 import com.sms.courier.entity.job.common.AbstractCaseJobEntity;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,4 +32,8 @@ public class ApiTestCaseJobEntity extends AbstractCaseJobEntity {
      * 测试人员.
      */
     private String createUserName;
+
+    private NoticeType noticeType;
+
+    private List<String> emails;
 }

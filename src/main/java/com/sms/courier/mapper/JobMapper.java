@@ -2,6 +2,10 @@ package com.sms.courier.mapper;
 
 import static com.sms.courier.common.constant.TimePatternConstant.DEFAULT_PATTERN;
 
+import com.sms.courier.chat.common.NotificationTemplateType;
+import com.sms.courier.common.enums.JobStatus;
+import com.sms.courier.common.enums.ResultType;
+import com.sms.courier.common.listener.event.TestReportEvent;
 import com.sms.courier.dto.request.ApiTestRequest;
 import com.sms.courier.dto.request.DataCollectionRequest;
 import com.sms.courier.dto.request.TestDataRequest;
@@ -25,6 +29,7 @@ import com.sms.courier.entity.job.ScheduleSceneCaseJobEntity;
 import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.JobDataCollection;
+import com.sms.courier.entity.job.common.JobEntity;
 import com.sms.courier.entity.job.common.JobEnvironment;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
@@ -32,6 +37,7 @@ import com.sms.courier.utils.EnumCommonUtils;
 import com.sms.courier.webhook.response.WebhookCaseJobResponse;
 import com.sms.courier.webhook.response.WebhookSceneCaseJobResponse;
 import java.util.List;
+import java.util.Objects;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -40,7 +46,8 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR,
     unmappedTargetPolicy = ReportingPolicy.IGNORE,
     uses = {EnumCommonUtils.class, ParamInfoMapper.class, MatchParamInfoMapper.class,
-        ResponseResultVerificationMapper.class})
+        ResponseResultVerificationMapper.class},
+    imports = {JobStatus.class, NotificationTemplateType.class, ResultType.class, Objects.class})
 public interface JobMapper {
 
     JobEnvironment toJobEnvironment(ProjectEnvironmentEntity projectEnvironment);
@@ -137,6 +144,41 @@ public interface JobMapper {
 
     WebhookCaseJobResponse toWebhookCaseJobResponse(ApiTestCaseJobReport jobReport);
 
+    @Mapping(target = "success", expression = "java(jobEntity.getJobStatus() == JobStatus.SUCCESS ? 1 : 0)")
+    @Mapping(target = "fail", expression = "java(jobEntity.getJobStatus() == JobStatus.FAIL ? 1 : 0)")
+    @Mapping(target = "name", expression = "java(jobEntity.getApiTestCase().getJobApiTestCase().getCaseName())")
+    @Mapping(target = "dataName", expression = "java(this.getDataName(jobEntity))")
+    @Mapping(target = "type", expression = "java(NotificationTemplateType.TEST_REPORT)")
+    TestReportEvent toTestReportEvent(ApiTestCaseJobEntity jobEntity);
+
+
+    @Mapping(target = "success",
+        expression = "java(this.count(ResultType.SUCCESS,caseReports,jobEntity))")
+    @Mapping(target = "fail",
+        expression = "java(this.count(ResultType.FAIL,caseReports,jobEntity))")
+    @Mapping(target = "name", expression = "java(Objects.nonNull(jobEntity) ? jobEntity.getName() : null)")
+    @Mapping(target = "dataName", expression = "java(this.getDataName(jobEntity))")
+    @Mapping(target = "type", expression = "java(NotificationTemplateType.TEST_REPORT)")
+    TestReportEvent toTestReportEvent(SceneCaseJobEntity jobEntity, List<CaseReport> caseReports);
+
     WebhookSceneCaseJobResponse toWebhookSceneCaseJobResponse(SceneCaseJobReport jobReport);
+
+    default String getDataName(JobEntity jobEntity) {
+        if (Objects.nonNull(jobEntity) && Objects.nonNull(jobEntity.getDataCollection())) {
+            return jobEntity.getDataCollection().getTestData().getDataName();
+        }
+        return "";
+    }
+
+    default long count(ResultType resultType, List<CaseReport> caseReports, SceneCaseJobEntity jobEntity) {
+        if (Objects.isNull(caseReports)) {
+            if (resultType == ResultType.FAIL) {
+                return jobEntity.getApiTestCase().size();
+            } else {
+                return 0L;
+            }
+        }
+        return caseReports.stream().filter(caseReport -> caseReport.getIsSuccess() == resultType).count();
+    }
 
 }

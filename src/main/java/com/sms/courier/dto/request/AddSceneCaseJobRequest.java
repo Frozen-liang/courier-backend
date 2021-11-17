@@ -1,5 +1,7 @@
 package com.sms.courier.dto.request;
 
+import com.sms.courier.common.enums.NoticeType;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,4 +24,8 @@ public class AddSceneCaseJobRequest {
     private DataCollectionRequest dataCollectionRequest;
 
     private String envId;
+
+    private NoticeType noticeType;
+
+    private List<String> emails;
 }

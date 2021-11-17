@@ -1,5 +1,6 @@
 package com.sms.courier.chat.sender;
 
+import com.sms.courier.chat.common.NotificationTemplateType;
 import com.sms.courier.chat.modal.NotificationPayload;
 
 public interface Sender {
@@ -10,6 +11,6 @@ public interface Sender {
 
     boolean sendResetPwdNotification(NotificationPayload notificationPayload);
 
-    boolean sendTestReportNotification(NotificationPayload notificationPayload);
+    boolean sendTestReportNotification(NotificationTemplateType type, NotificationPayload notificationPayload);
 
 }
