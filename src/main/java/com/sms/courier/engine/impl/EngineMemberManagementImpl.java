@@ -86,7 +86,8 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
             engineMember = EngineMemberEntity.builder()
                 .destination(EngineId.generate())
                 .host(request.getHost())
-                .taskSizeLimit(Objects.isNull(engineSetting.getTaskSizeLimit()) ? -1 : engineSetting.getTaskSizeLimit())
+                .taskSizeLimit(Objects.isNull(engineSetting.getTaskSizeLimit()) ? Integer.valueOf(-1) :
+                    engineSetting.getTaskSizeLimit())
                 .status(EngineStatus.PENDING)
                 .name(request.getName())
                 .version(request.getVersion())
