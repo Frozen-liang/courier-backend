@@ -27,8 +27,10 @@ class CustomizedCaseTemplateRepositoryTest {
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
     private final CommonRepository commonRepository = mock(CommonRepository.class);
+    private final ApiGroupRepository apiGroupRepository = mock(ApiGroupRepository.class);
+    private final CaseTemplateGroupRepository caseTemplateGroupRepository = mock(CaseTemplateGroupRepository.class);
     private final CustomizedCaseTemplateRepository customizedCaseTemplateRepository =
-        new CustomizedCaseTemplateRepositoryImpl(mongoTemplate, commonRepository);
+        new CustomizedCaseTemplateRepositoryImpl(mongoTemplate, commonRepository, caseTemplateGroupRepository);
 
     private final static String MOCK_ID = "1";
     private final static String NAME = "test";
@@ -43,7 +45,6 @@ class CustomizedCaseTemplateRepositoryTest {
         }
         CaseTemplateSearchRequest request = new CaseTemplateSearchRequest();
         request.setTagId(Lists.newArrayList(new ObjectId()));
-        request.setGroupId(new ObjectId());
         request.setName(NAME);
         request.setCreateUserName(Lists.newArrayList(NAME));
         request.setTestStatus(Lists.newArrayList(MOCK_ID));

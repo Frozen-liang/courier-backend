@@ -28,8 +28,9 @@ class CustomizedSceneCaseRepositoryTest {
 
     private final MongoTemplate mongoTemplate = mock(MongoTemplate.class);
     private final CommonRepository commonRepository = mock(CommonRepository.class);
+    private final SceneCaseGroupRepository sceneCaseGroupRepository = mock(SceneCaseGroupRepository.class);
     private final CustomizedSceneCaseRepository customizedSceneCaseRepository =
-        new CustomizedSceneCaseRepositoryImpl(mongoTemplate, commonRepository);
+        new CustomizedSceneCaseRepositoryImpl(mongoTemplate, commonRepository, sceneCaseGroupRepository);
 
     private final static String MOCK_ID = "1";
     private final static String NAME = "test";
@@ -44,7 +45,6 @@ class CustomizedSceneCaseRepositoryTest {
         }
         SearchSceneCaseRequest request = new SearchSceneCaseRequest();
         request.setTagId(Lists.newArrayList(new ObjectId()));
-        request.setGroupId(new ObjectId());
         request.setName(NAME);
         request.setCreateUserName(Lists.newArrayList(NAME));
         request.setTestStatus(Lists.newArrayList(MOCK_ID));

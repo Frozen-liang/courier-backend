@@ -19,14 +19,18 @@ import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.field.CommonField;
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.response.SceneCaseResponse;
+import com.sms.courier.entity.group.SceneCaseGroupEntity;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedSceneCaseRepository;
+import com.sms.courier.repository.SceneCaseGroupRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -39,11 +43,13 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
 
     private final MongoTemplate mongoTemplate;
     private final CommonRepository commonRepository;
+    private final SceneCaseGroupRepository sceneCaseGroupRepository;
 
     public CustomizedSceneCaseRepositoryImpl(MongoTemplate mongoTemplate,
-        CommonRepository commonRepository) {
+        CommonRepository commonRepository, SceneCaseGroupRepository sceneCaseGroupRepository) {
         this.mongoTemplate = mongoTemplate;
         this.commonRepository = commonRepository;
+        this.sceneCaseGroupRepository = sceneCaseGroupRepository;
     }
 
     @Override
@@ -117,7 +123,7 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
             PROJECT_ID.is(projectId),
             REMOVE.is(searchSceneCaseRequest.isRemoved()),
             NAME.like(searchSceneCaseRequest.getName()),
-            GROUP_ID.is(searchSceneCaseRequest.getGroupId()),
+            GROUP_ID.in(getApiGroupId(searchSceneCaseRequest.getGroupId())),
             TEST_STATUS.in(searchSceneCaseRequest.getTestStatus()),
             TAG_ID.in(searchSceneCaseRequest.getTagId()),
             PRIORITY.in(searchSceneCaseRequest.getPriority()),
@@ -125,4 +131,15 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
         );
     }
 
+    private List<ObjectId> getApiGroupId(ObjectId groupId) {
+        return Optional.ofNullable(groupId).map(ObjectId::toString)
+            .map(sceneCaseGroupRepository::findById)
+            .map((Optional::get))
+            .map(SceneCaseGroupEntity::getRealGroupId)
+            .map(sceneCaseGroupRepository::findAllByPathContains)
+            .orElse(Stream.empty())
+            .map(SceneCaseGroupEntity::getId)
+            .map(ObjectId::new)
+            .collect(Collectors.toList());
+    }
 }
