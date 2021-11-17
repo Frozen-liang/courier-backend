@@ -21,8 +21,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
@@ -153,15 +153,15 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
     private List<CaseCountStatisticsResponse> handleResponses(
         List<CaseCountStatisticsResponse> caseCountStatisticsResponses) {
         List<CaseCountStatisticsResponse> responses = Lists.newArrayList(caseCountStatisticsResponses);
-        Map<LocalDate, Integer> map = responses.stream().collect(
-            Collectors.toMap(CaseCountStatisticsResponse::getDay, CaseCountStatisticsResponse::getCount));
-        for (int i = 0; i < Constants.CASE_DAY; i++) {
-            LocalDate date = LocalDate.now().minusDays(i);
-            if (!map.containsKey(date)) {
-                responses.add(CaseCountStatisticsResponse.builder().day(date).count(0).build());
-            }
-        }
+        List<LocalDate> localDateList = responses.stream().map(CaseCountStatisticsResponse::getDay)
+            .collect(Collectors.toList());
+        responses.addAll(IntStream.range(0, 7)
+                .mapToObj(i -> LocalDate.now().minusDays(i))
+                .filter(i -> !localDateList.contains(i))
+                .map(data -> CaseCountStatisticsResponse.builder().day(data).count(0).build())
+                .collect(Collectors.toList()));
         responses.sort(Comparator.comparing(CaseCountStatisticsResponse::getDay));
         return responses;
     }
+
 }
