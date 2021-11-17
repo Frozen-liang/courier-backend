@@ -53,6 +53,7 @@ public class Constants {
     public static final String CONTAINER_SETTING_PATE = SDK_VERSION + "/container-setting";
     public static final String MOCK_PATH = SDK_VERSION + "/mock";
     public static final String WEBHOOK_PATH = SDK_VERSION + "/webhook";
+    public static final String PROJECT_STATISTICS = SDK_VERSION + "/project-statistics";
 
     public static final int MAX_DEPTH = 3;
     public static final String HTTP_DEFAULT_STATUS_CODE = "200";

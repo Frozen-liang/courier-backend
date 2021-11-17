@@ -281,7 +281,7 @@ class ApiServiceTest {
     @DisplayName("An exception occurred while test resetApiVersion in ApiService")
     public void resetApiVersion_exception_test() {
         when(apiHistoryRepository.findById(any())).thenThrow(new RuntimeException());
-        assertThatThrownBy(()->apiService.resetApiVersion(ID)).isInstanceOf(ApiTestPlatformException.class);
+        assertThatThrownBy(() -> apiService.resetApiVersion(ID)).isInstanceOf(ApiTestPlatformException.class);
     }
 
 }

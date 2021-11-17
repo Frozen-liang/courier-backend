@@ -56,6 +56,11 @@ public interface Field {
             : Optional.of(Criteria.where(getName()).gt(value));
     }
 
+    default Optional<Criteria> lt(Object value) {
+        return Objects.isNull(value) ? Optional.empty()
+            : Optional.of(Criteria.where(getName()).lt(value));
+    }
+
     default Optional<Criteria> lteAndGte(Object ltValue, Object gtValue) {
         if (Objects.isNull(ltValue) && Objects.isNull(gtValue)) {
             return Optional.empty();

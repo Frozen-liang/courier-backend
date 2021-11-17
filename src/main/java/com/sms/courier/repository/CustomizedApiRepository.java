@@ -1,5 +1,6 @@
 package com.sms.courier.repository;
 
+import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.UpdateRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
@@ -30,4 +31,8 @@ public interface CustomizedApiRepository {
     Long sceneCount(ObjectId projectId);
 
     Long caseCount(ObjectId projectId);
+
+    Page<ApiPageResponse> sceneCountPage(ApiIncludeCaseRequest request);
+
+    Page<ApiPageResponse> caseCountPage(ApiIncludeCaseRequest request);
 }
