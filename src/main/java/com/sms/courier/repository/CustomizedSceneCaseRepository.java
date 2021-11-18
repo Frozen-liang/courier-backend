@@ -24,5 +24,4 @@ public interface CustomizedSceneCaseRepository {
 
     Optional<SceneCaseResponse> findById(String id);
 
-    List<CaseCountStatisticsResponse> getSceneCaseGroupDayCount(List<String> projectIds, LocalDateTime dateTime);
 }

@@ -3,12 +3,10 @@ package com.sms.courier.repository;
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.repository.impl.CustomizedApiTestCaseRepositoryImpl;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +16,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -93,20 +90,6 @@ class CustomizedApiTestCaseRepositoryTest {
             customizedApiTestCaseRepository.getCasePageByProjectIdsAndCreateDate(ID_LIST, LocalDateTime.now(),
                 new PageDto());
         assertThat(pageDto.getContent().size()).isEqualTo(1);
-    }
-
-    @Test
-    @DisplayName("Test the getCaseGroupDayCount method in the CustomizedApiTestCaseRepository")
-    public void getCaseGroupDayCount() {
-        AggregationResults<CaseCountStatisticsResponse> results = mock(AggregationResults.class);
-        List<CaseCountStatisticsResponse> caseCountStatisticsRespons =
-            Lists.newArrayList(CaseCountStatisticsResponse.builder().day(LocalDate.now()).count(0).build());
-        when(results.getMappedResults()).thenReturn(caseCountStatisticsRespons);
-        when(mongoTemplate.aggregate(any(), eq(ApiTestCaseEntity.class), eq(CaseCountStatisticsResponse.class)))
-            .thenReturn(results);
-        List<CaseCountStatisticsResponse> responses =
-            customizedApiTestCaseRepository.getCaseGroupDayCount(Lists.newArrayList(ID), LocalDateTime.now());
-        assertThat(responses).isNotEmpty();
     }
 
 }

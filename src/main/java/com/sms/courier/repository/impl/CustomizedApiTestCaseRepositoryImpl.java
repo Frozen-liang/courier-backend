@@ -126,27 +126,6 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
         return commonRepository.page(queryVo, pageDto, ApiTestCaseResponse.class);
     }
 
-    @Override
-    public List<CaseCountStatisticsResponse> getCaseGroupDayCount(List<String> projectIds, LocalDateTime dateTime) {
-        List<AggregationOperation> aggregationOperations = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(projectIds)) {
-            aggregationOperations.add(Aggregation.match(Criteria.where(PROJECT_ID.getName()).in(projectIds)));
-        }
-        aggregationOperations.add(Aggregation.match(Criteria.where(REMOVE.getName()).is(Boolean.FALSE)));
-        aggregationOperations.add(Aggregation.match(Criteria.where(CREATE_DATE_TIME.getName()).gt(dateTime)));
-        aggregationOperations
-            .add(project().and(CREATE_DATE_TIME.getName()).dateAsFormattedString(Constants.GROUP_DAY_FORMATTER)
-                .as(Constants.DAY));
-        aggregationOperations.add(Aggregation.group(Constants.DAY).count().as(Constants.COUNT));
-        aggregationOperations
-            .add(project().and(ID.getName()).as(Constants.DAY).and(Constants.COUNT).as(Constants.COUNT));
-        aggregationOperations.add(Aggregation.sort(Direction.DESC, Constants.DAY));
-
-        Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
-        return mongoTemplate.aggregate(aggregation, ApiTestCaseEntity.class,
-            CaseCountStatisticsResponse.class).getMappedResults();
-    }
-
     private List<LookupVo> getLookupVoList() {
         return Lists.newArrayList(
             LookupVo.builder()

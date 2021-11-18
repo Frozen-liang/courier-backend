@@ -73,9 +73,4 @@ public class WorkspaceController {
         return workspaceService.getCase(id, pageDto);
     }
 
-    @GetMapping("/case/group-day/count/{workspaceId}")
-    public List<CaseCountStatisticsResponse> caseGroupDayCount(@PathVariable String workspaceId) {
-        return workspaceService.caseGroupDayCount(workspaceId);
-    }
-
 }

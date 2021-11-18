@@ -1,18 +1,14 @@
 package com.sms.courier.service;
 
-import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.exception.ApiTestPlatformException;
-import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.WorkspaceRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.dto.response.ProjectResponse;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.WorkspaceResponse;
 import com.sms.courier.entity.workspace.WorkspaceEntity;
 import com.sms.courier.mapper.WorkspaceMapper;
 import com.sms.courier.repository.CommonRepository;
-import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.repository.WorkspaceRepository;
 import com.sms.courier.service.impl.WorkspaceServiceImpl;
 import com.sms.courier.utils.SecurityUtil;
@@ -51,10 +47,8 @@ class WorkspaceServiceTest {
     private final WorkspaceMapper workspaceMapper = mock(WorkspaceMapper.class);
     private final ProjectService projectService = mock(ProjectService.class);
     private final ApiTestCaseService apiTestCaseService = mock(ApiTestCaseService.class);
-    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository =
-        mock(CustomizedApiTestCaseRepository.class);
     private final WorkspaceService workspaceService = new WorkspaceServiceImpl(projectService,
-        workspaceRepository, commonRepository, workspaceMapper, apiTestCaseService, customizedApiTestCaseRepository);
+        workspaceRepository, commonRepository, workspaceMapper, apiTestCaseService);
     private final WorkspaceEntity workspace = WorkspaceEntity.builder().id(ID).build();
     private final WorkspaceResponse workspaceResponse = WorkspaceResponse.builder()
         .id(ID).build();
@@ -235,40 +229,4 @@ class WorkspaceServiceTest {
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
-    @Test
-    @DisplayName("Test the caseGroupDayCount method in the Workspace service")
-    public void caseGroupDayCount_test() {
-        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
-        when(projectService.list(any())).thenReturn(projectResponses);
-        List<CaseCountStatisticsResponse> caseCountStatisticsRespons = Lists.newArrayList();
-        when(customizedApiTestCaseRepository.getCaseGroupDayCount(any(), any())).thenReturn(caseCountStatisticsRespons);
-        List<CaseCountStatisticsResponse> responses = workspaceService.caseGroupDayCount(ID);
-        assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
-    }
-
-    @Test
-    @DisplayName("Test the caseGroupDayCount method in the Workspace service")
-    public void caseGroupDayCount_projectIsNull_test() {
-        when(projectService.list(any())).thenReturn(Lists.newArrayList());
-        List<CaseCountStatisticsResponse> caseCountStatisticsRespons = Lists.newArrayList();
-        when(customizedApiTestCaseRepository.getCaseGroupDayCount(any(), any())).thenReturn(caseCountStatisticsRespons);
-        List<CaseCountStatisticsResponse> responses = workspaceService.caseGroupDayCount(ID);
-        assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
-    }
-
-    @Test
-    @DisplayName("An exception occurred while caseGroupDayCount Workspace")
-    public void caseGroupDayCount_smsException_test() {
-        when(projectService.list(any()))
-            .thenThrow(new ApiTestPlatformException(ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR));
-        assertThatThrownBy(() -> workspaceService.caseGroupDayCount(ID)).isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
-    @DisplayName("An exception occurred while caseGroupDayCount Workspace")
-    public void caseGroupDayCount_exception_test() {
-        when(projectService.list(any()))
-            .thenThrow(new RuntimeException());
-        assertThatThrownBy(() -> workspaceService.caseGroupDayCount(ID)).isInstanceOf(ApiTestPlatformException.class);
-    }
 }
