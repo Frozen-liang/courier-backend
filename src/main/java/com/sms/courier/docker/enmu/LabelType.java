@@ -2,6 +2,7 @@ package com.sms.courier.docker.enmu;
 
 import com.sms.courier.engine.model.EngineMemberEntity;
 import com.sms.courier.entity.mock.MockSettingEntity;
+import com.sms.courier.entity.schedule.CourierSchedulerEntity;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +11,8 @@ import java.util.stream.Collectors;
 
 public enum LabelType {
     ENGINE("engine", EngineMemberEntity.class),
-    MOCK("mock", MockSettingEntity.class);
+    MOCK("mock", MockSettingEntity.class),
+    COURIER_SCHEDULER("scheduler", CourierSchedulerEntity.class);
 
     private final String name;
     private final Class<?> entityClass;

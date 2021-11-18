@@ -5,6 +5,7 @@ import static com.sms.courier.common.enums.OperationModule.ENGINE_MEMBER;
 import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
+import static com.sms.courier.common.enums.OperationType.RESTART;
 import static com.sms.courier.common.exception.ErrorCode.CREATE_ENGINE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_ENGINE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.NO_SUCH_CONTAINER_ERROR;
@@ -176,7 +177,7 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = ENGINE_MEMBER, template = "{{#name}}")
+    @LogRecord(operationType = RESTART, operationModule = ENGINE_MEMBER, template = "{{#name}}")
     public Boolean restartEngine(String name) {
         try {
             dockerService.restartContainer(name);

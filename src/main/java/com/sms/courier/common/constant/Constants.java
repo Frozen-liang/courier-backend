@@ -53,6 +53,7 @@ public class Constants {
     public static final String MOCK_PATH = SDK_VERSION + "/mock";
     public static final String WEBHOOK_PATH = SDK_VERSION + "/webhook";
     public static final String PROJECT_STATISTICS = SDK_VERSION + "/project-statistics";
+    public static final String COURIER_SCHEDULER_PATH = SDK_VERSION + "/courier-scheduler";
 
     public static final int MAX_DEPTH = 3;
     public static final String HTTP_DEFAULT_STATUS_CODE = "200";
@@ -63,6 +64,7 @@ public class Constants {
     public static final String SCHEDULE_SCENE_CASE_SERVICE = "scheduleSceneCaseJobService";
     public static final String API_TOKEN = "API_TOKEN";
     public static final String MOCK_CONTAINER_NAME = "courier-mock";
+    public static final String COURIER_SCHEDULE_CONTAINER_NAME = "courier-scheduler";
     public static final String GROUP_DAY_FORMATTER = "%Y-%m-%d";
     public static final String DAY = "day";
     public static final String COUNT = "count";

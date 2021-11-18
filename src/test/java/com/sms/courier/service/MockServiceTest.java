@@ -1,18 +1,6 @@
 package com.sms.courier.service;
 
-import com.sms.courier.common.enums.ContainerStatus;
-import com.sms.courier.common.exception.ApiTestPlatformException;
-import com.sms.courier.common.exception.ErrorCode;
-import com.sms.courier.docker.service.DockerService;
-import com.sms.courier.entity.mock.MockSettingEntity;
-import com.sms.courier.mapper.MockSettingMapper;
-import com.sms.courier.repository.MockSettingRepository;
-import com.sms.courier.service.impl.MockServiceImpl;
-import java.util.Optional;
-import org.bson.types.ObjectId;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -21,6 +9,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertFalse;
 import static org.wildfly.common.Assert.assertTrue;
+
+import com.sms.courier.common.enums.ContainerStatus;
+import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.exception.ErrorCode;
+import com.sms.courier.docker.service.DockerService;
+import com.sms.courier.dto.request.DockerLogRequest;
+import com.sms.courier.entity.mock.MockSettingEntity;
+import com.sms.courier.mapper.MockSettingMapper;
+import com.sms.courier.repository.MockSettingRepository;
+import com.sms.courier.service.impl.MockServiceImpl;
+import java.util.Optional;
+import org.bson.types.ObjectId;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Test cases for MockService")
 public class MockServiceTest {
@@ -178,5 +180,14 @@ public class MockServiceTest {
         doThrow(new RuntimeException()).when(dockerService).deleteContainer(any());
         when(mockSettingRepository.save(any())).thenReturn(mockSettingEntity);
         assertThatThrownBy(mockService::deleteMock).isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test for queryLog in MockService")
+    public void queryLog_test() {
+        DockerLogRequest request = DockerLogRequest.builder().build();
+        doNothing().when(dockerService).queryLog(request);
+        Boolean result = mockService.queryLog(request);
+        assertThat(result).isTrue();
     }
 }

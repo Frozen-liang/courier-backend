@@ -2,9 +2,12 @@ package com.sms.courier.controller;
 
 import static com.sms.courier.common.constant.Constants.MOCK_PATH;
 
+import com.sms.courier.dto.request.DockerLogRequest;
 import com.sms.courier.service.MockService;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,6 +38,12 @@ public class MockController {
     @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean deleteMock() {
         return mockService.deleteMock();
+    }
+
+    @GetMapping("/queryLog")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
+    public Boolean queryLog(@Validated DockerLogRequest request) {
+        return mockService.queryLog(request);
     }
 
 }
