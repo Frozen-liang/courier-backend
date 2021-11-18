@@ -1,5 +1,7 @@
 package com.sms.courier.service;
 
+import com.sms.courier.dto.request.DockerLogRequest;
+
 public interface MockService {
 
     Boolean createMock();
@@ -8,4 +10,5 @@ public interface MockService {
 
     Boolean deleteMock();
 
+    Boolean queryLog(DockerLogRequest request);
 }

@@ -13,6 +13,7 @@ import com.sms.courier.common.enums.ContainerStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.docker.service.DockerService;
+import com.sms.courier.dto.request.DockerLogRequest;
 import com.sms.courier.entity.mock.MockSettingEntity;
 import com.sms.courier.mapper.MockSettingMapper;
 import com.sms.courier.repository.MockSettingRepository;
@@ -107,6 +108,12 @@ public class MockServiceImpl implements MockService {
             log.error("Delete mock error!", e);
             throw ExceptionUtils.mpe(DELETE_MOCK_ERROR);
         }
+    }
+
+    @Override
+    public Boolean queryLog(DockerLogRequest request) {
+        dockerService.queryLog(request);
+        return true;
     }
 
 }

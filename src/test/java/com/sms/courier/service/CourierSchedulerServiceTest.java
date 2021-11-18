@@ -12,6 +12,7 @@ import static org.wildfly.common.Assert.assertTrue;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.docker.service.DockerService;
 import com.sms.courier.dto.request.CourierSchedulerRequest;
+import com.sms.courier.dto.request.DockerLogRequest;
 import com.sms.courier.dto.response.CourierSchedulerResponse;
 import com.sms.courier.entity.schedule.CourierSchedulerEntity;
 import com.sms.courier.mapper.CourierSchedulerMapper;
@@ -89,5 +90,14 @@ public class CourierSchedulerServiceTest {
         doNothing().when(dockerService).deleteContainer(any());
         Boolean isSuccess = courierSchedulerService.deleteCourierScheduler();
         assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test for queryLog in CourierSchedulerService")
+    public void queryLog_test() {
+        DockerLogRequest request = DockerLogRequest.builder().build();
+        doNothing().when(dockerService).queryLog(request);
+        Boolean result = courierSchedulerService.queryLog(request);
+        assertThat(result).isTrue();
     }
 }

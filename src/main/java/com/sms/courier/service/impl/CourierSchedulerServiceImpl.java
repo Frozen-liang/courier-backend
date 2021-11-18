@@ -12,6 +12,7 @@ import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.docker.service.DockerService;
 import com.sms.courier.dto.request.CourierSchedulerRequest;
+import com.sms.courier.dto.request.DockerLogRequest;
 import com.sms.courier.dto.response.CourierSchedulerResponse;
 import com.sms.courier.entity.schedule.CourierSchedulerEntity;
 import com.sms.courier.mapper.CourierSchedulerMapper;
@@ -82,6 +83,12 @@ public class CourierSchedulerServiceImpl implements CourierSchedulerService {
     @LogRecord(operationType = DELETE, operationModule = COURIER_SCHEDULER)
     public Boolean deleteCourierScheduler() {
         dockerService.deleteContainer(Constants.COURIER_SCHEDULE_CONTAINER_NAME);
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public Boolean queryLog(DockerLogRequest request) {
+        dockerService.queryLog(request);
         return Boolean.TRUE;
     }
 
