@@ -19,7 +19,7 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.request.ProjectRequest;
 import com.sms.courier.dto.response.ProjectResponse;
-import com.sms.courier.dto.response.TestCaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.entity.project.ProjectEntity;
 import com.sms.courier.mapper.ProjectMapper;
 import com.sms.courier.repository.CommonRepository;
@@ -41,9 +41,8 @@ class ProjectServiceTest {
     private final CommonRepository commonRepository = mock(
         CommonRepository.class);
     private final ProjectMapper projectMapper = mock(ProjectMapper.class);
-    private final ApiTestCaseService apiTestCaseService = mock(ApiTestCaseService.class);
     private final ProjectService projectService = new ProjectServiceImpl(
-        projectRepository, commonRepository, projectMapper, apiTestCaseService);
+        projectRepository, commonRepository, projectMapper);
     private final ProjectEntity project = ProjectEntity.builder().id(ID).build();
     private final ProjectResponse projectResponse = ProjectResponse.builder()
         .id(ID).build();
@@ -178,29 +177,4 @@ class ProjectServiceTest {
             .extracting("code").isEqualTo(DELETE_PROJECT_BY_ID_ERROR.getCode());
     }
 
-    @Test
-    @DisplayName("Test the caseGroupDayCount method in the Project service")
-    public void caseGroupDayCount_test() {
-        List<TestCaseCountStatisticsResponse> testCaseCountStatisticsResponses = Lists.newArrayList();
-        when(apiTestCaseService.getCaseGroupDayCount(any(), any())).thenReturn(testCaseCountStatisticsResponses);
-        List<TestCaseCountStatisticsResponse> responses = projectService.caseGroupDayCount(ID);
-        assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
-    }
-
-
-    @Test
-    @DisplayName("An exception occurred while caseGroupDayCount Project")
-    public void caseGroupDayCount_smsException_test() {
-        when(apiTestCaseService.getCaseGroupDayCount(any(), any()))
-            .thenThrow(new ApiTestPlatformException(ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR));
-        assertThatThrownBy(() -> projectService.caseGroupDayCount(ID)).isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
-    @DisplayName("An exception occurred while caseGroupDayCount Project")
-    public void caseGroupDayCount_exception_test() {
-        when(apiTestCaseService.getCaseGroupDayCount(any(), any()))
-            .thenThrow(new RuntimeException());
-        assertThatThrownBy(() -> projectService.caseGroupDayCount(ID)).isInstanceOf(ApiTestPlatformException.class);
-    }
 }

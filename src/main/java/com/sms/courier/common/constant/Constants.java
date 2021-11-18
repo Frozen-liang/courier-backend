@@ -17,7 +17,6 @@ public class Constants {
     public static final String DATA_COLLECTION_PATH = SDK_VERSION + "/data-collection";
     public static final String CASE_TEMPLATE_PATH = SDK_VERSION + "/case-template";
     public static final String CASE_TEMPLATE_API_PATH = SDK_VERSION + "/case-template-api";
-    public static final String CASE_TEMPLATE_CONN_PATH = SDK_VERSION + "/case-template-conn";
     public static final String API_PATH = SDK_VERSION + "/api";
     public static final String PROJECT_IMPORT_SOURCE = SDK_VERSION + "/project/import/source";
     public static final String LOG_PATH = SDK_VERSION + "/log";
@@ -64,5 +63,9 @@ public class Constants {
     public static final String SCHEDULE_SCENE_CASE_SERVICE = "scheduleSceneCaseJobService";
     public static final String API_TOKEN = "API_TOKEN";
     public static final String MOCK_CONTAINER_NAME = "courier-mock";
+    public static final String GROUP_DAY_FORMATTER = "%Y-%m-%d";
+    public static final String DAY = "day";
+    public static final String COUNT = "count";
+
 
 }

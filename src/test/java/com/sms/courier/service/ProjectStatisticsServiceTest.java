@@ -1,10 +1,16 @@
 package com.sms.courier.service;
 
+import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
+import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.repository.CustomizedApiRepository;
+import com.sms.courier.repository.CustomizedApiTestCaseRepository;
+import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.service.impl.ProjectStatisticsServiceImpl;
+import java.util.List;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
@@ -21,13 +27,21 @@ import static org.mockito.Mockito.when;
 public class ProjectStatisticsServiceTest {
 
     private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
+    private final CustomizedSceneCaseRepository customizedSceneCaseRepository = mock(
+        CustomizedSceneCaseRepository.class);
+    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository =
+        mock(CustomizedApiTestCaseRepository.class);
+    private final ApiService apiService = mock(ApiService.class);
+    private final SceneCaseService sceneCaseService = mock(SceneCaseService.class);
+    private final ApiTestCaseService apiTestCaseService = mock(ApiTestCaseService.class);
     private final ProjectStatisticsService projectStatisticsService =
-        new ProjectStatisticsServiceImpl(customizedApiRepository);
+        new ProjectStatisticsServiceImpl(customizedApiRepository, customizedSceneCaseRepository,
+            customizedApiTestCaseRepository, apiService, sceneCaseService, apiTestCaseService);
 
     private static final String ID = ObjectId.get().toString();
 
     @Test
-    @DisplayName("Test for sceneCountPage in ApiService")
+    @DisplayName("Test for sceneCountPage in ProjectStatisticsService")
     public void sceneCountPage_test() {
         Page<ApiPageResponse> page = mock(Page.class);
         when(page.getContent()).thenReturn(Lists.newArrayList(ApiPageResponse.builder().id(ID).build()));
@@ -38,7 +52,7 @@ public class ProjectStatisticsServiceTest {
     }
 
     @Test
-    @DisplayName("Test for sceneCountPage in ApiService")
+    @DisplayName("Test for sceneCountPage in ProjectStatisticsService")
     public void sceneCountPage_exception_test() {
         when(customizedApiRepository.sceneCountPage(any())).thenThrow(new RuntimeException());
         assertThatThrownBy(() -> projectStatisticsService.sceneCountPage(ApiIncludeCaseRequest.builder().build()))
@@ -46,7 +60,7 @@ public class ProjectStatisticsServiceTest {
     }
 
     @Test
-    @DisplayName("Test for caseCountPage in ApiService")
+    @DisplayName("Test for caseCountPage in ProjectStatisticsService")
     public void caseCountPage_test() {
         Page<ApiPageResponse> page = mock(Page.class);
         when(page.getContent()).thenReturn(Lists.newArrayList(ApiPageResponse.builder().id(ID).build()));
@@ -56,10 +70,135 @@ public class ProjectStatisticsServiceTest {
     }
 
     @Test
-    @DisplayName("Test for caseCountPage in ApiService")
+    @DisplayName("Test for caseCountPage in ProjectStatisticsService")
     public void caseCountPage_exception_test() {
         when(customizedApiRepository.caseCountPage(any())).thenThrow(new RuntimeException());
         assertThatThrownBy(() -> projectStatisticsService.caseCountPage(ApiIncludeCaseRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the caseGroupDayCount method in the ProjectStatisticsService")
+    public void caseGroupDayCount_test() {
+        List<CaseCountStatisticsResponse> caseCountStatisticsRespons = Lists.newArrayList();
+        when(customizedApiTestCaseRepository.getCaseGroupDayCount(any(), any())).thenReturn(caseCountStatisticsRespons);
+        List<CaseCountStatisticsResponse> responses = projectStatisticsService.caseGroupDayCount(ID);
+        assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
+    }
+
+
+    @Test
+    @DisplayName("An exception occurred while caseGroupDayCount ProjectStatisticsService")
+    public void caseGroupDayCount_smsException_test() {
+        when(customizedApiTestCaseRepository.getCaseGroupDayCount(any(), any()))
+            .thenThrow(new ApiTestPlatformException(ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR));
+        assertThatThrownBy(() -> projectStatisticsService.caseGroupDayCount(ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while caseGroupDayCount ProjectStatisticsService")
+    public void caseGroupDayCount_exception_test() {
+        when(customizedApiTestCaseRepository.getCaseGroupDayCount(any(), any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> projectStatisticsService.caseGroupDayCount(ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test for sceneCount in ProjectStatisticsService")
+    public void sceneCount_test() {
+        when(customizedApiRepository.sceneCount(any())).thenReturn(1L);
+        Long count = projectStatisticsService.sceneCount(new ObjectId());
+        assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while test sceneCount in ProjectStatisticsService.")
+    public void sceneCount_exception_test() {
+        when(customizedApiRepository.sceneCount(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> projectStatisticsService.sceneCount(new ObjectId()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test for caseCount in ProjectStatisticsService")
+    public void caseCount_test() {
+        when(customizedApiRepository.caseCount(any())).thenReturn(1L);
+        Long count = projectStatisticsService.caseCount(new ObjectId());
+        assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while test caseCount in ProjectStatisticsService.")
+    public void caseCount_exception_test() {
+        when(customizedApiRepository.caseCount(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> projectStatisticsService.caseCount(new ObjectId()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test for apiAllCount in ProjectStatisticsService")
+    public void apiAllCount_test() {
+        when(apiService.count(any())).thenReturn(1L);
+        Long count = projectStatisticsService.apiAllCount(ID);
+        assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while test apiAllCount in ProjectStatisticsService.")
+    public void apiAllCount_exception_test() {
+        when((apiService.count(any()))).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> projectStatisticsService.apiAllCount(ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test for sceneAllCount in ProjectStatisticsService")
+    public void sceneAllCount_test() {
+        when(sceneCaseService.count(any())).thenReturn(1L);
+        Long count = projectStatisticsService.sceneAllCount(ID);
+        assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while test sceneAllCount in ProjectStatisticsService.")
+    public void sceneAllCount_exception_test() {
+        when((sceneCaseService.count(any()))).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> projectStatisticsService.sceneAllCount(ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test for caseAllCount in ProjectStatisticsService")
+    public void caseAllCount_test() {
+        when(apiTestCaseService.count(any())).thenReturn(1L);
+        Long count = projectStatisticsService.caseAllCount(ID);
+        assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while test caseAllCount in ProjectStatisticsService.")
+    public void caseAllCount_exception_test() {
+        when((apiTestCaseService.count(any()))).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> projectStatisticsService.caseAllCount(ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test for sceneCaseGroupDayCount in ProjectStatisticsService")
+    public void sceneCaseGroupDayCount_test() {
+        List<CaseCountStatisticsResponse> responses = Lists.newArrayList();
+        when(customizedSceneCaseRepository.getSceneCaseGroupDayCount(any(), any())).thenReturn(responses);
+        List<CaseCountStatisticsResponse> dto = projectStatisticsService.sceneCaseGroupDayCount(ID);
+        assertThat(dto).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while test sceneCaseGroupDayCount in ProjectStatisticsService")
+    public void sceneCaseGroupDayCount_exception_test() {
+        when(customizedSceneCaseRepository.getSceneCaseGroupDayCount(any(), any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> projectStatisticsService.sceneCaseGroupDayCount(ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 

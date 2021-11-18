@@ -7,7 +7,7 @@ import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.WorkspaceRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
-import com.sms.courier.dto.response.TestCaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.WorkspaceResponse;
 import com.sms.courier.service.WorkspaceService;
 import java.util.List;
@@ -74,7 +74,7 @@ public class WorkspaceController {
     }
 
     @GetMapping("/case/group-day/count/{workspaceId}")
-    public List<TestCaseCountStatisticsResponse> caseGroupDayCount(@PathVariable String workspaceId) {
+    public List<CaseCountStatisticsResponse> caseGroupDayCount(@PathVariable String workspaceId) {
         return workspaceService.caseGroupDayCount(workspaceId);
     }
 

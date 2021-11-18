@@ -26,12 +26,13 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.WorkspaceRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
+import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.ProjectResponse;
-import com.sms.courier.dto.response.TestCaseCountStatisticsResponse;
 import com.sms.courier.dto.response.WorkspaceResponse;
 import com.sms.courier.entity.workspace.WorkspaceEntity;
 import com.sms.courier.mapper.WorkspaceMapper;
 import com.sms.courier.repository.CommonRepository;
+import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.repository.WorkspaceRepository;
 import com.sms.courier.service.ApiTestCaseService;
 import com.sms.courier.service.ProjectService;
@@ -59,16 +60,19 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     private final CommonRepository commonRepository;
     private final WorkspaceMapper workspaceMapper;
     private final ApiTestCaseService apiTestCaseService;
+    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository;
 
     public WorkspaceServiceImpl(ProjectService projectService,
         WorkspaceRepository workspaceRepository,
         CommonRepository commonRepository,
-        WorkspaceMapper workspaceMapper, ApiTestCaseService apiTestCaseService) {
+        WorkspaceMapper workspaceMapper, ApiTestCaseService apiTestCaseService,
+        CustomizedApiTestCaseRepository customizedApiTestCaseRepository) {
         this.projectService = projectService;
         this.workspaceRepository = workspaceRepository;
         this.commonRepository = commonRepository;
         this.workspaceMapper = workspaceMapper;
         this.apiTestCaseService = apiTestCaseService;
+        this.customizedApiTestCaseRepository = customizedApiTestCaseRepository;
     }
 
     @Override
@@ -180,18 +184,18 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public List<TestCaseCountStatisticsResponse> caseGroupDayCount(String workspaceId) {
+    public List<CaseCountStatisticsResponse> caseGroupDayCount(String workspaceId) {
         try {
             List<ProjectResponse> projectResponses = projectService.list(workspaceId);
             if (CollectionUtils.isNotEmpty(projectResponses)) {
                 List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
                     .collect(Collectors.toList());
                 LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
-                List<TestCaseCountStatisticsResponse> responses = apiTestCaseService.getCaseGroupDayCount(projectIds,
-                    dateTime);
+                List<CaseCountStatisticsResponse> responses = customizedApiTestCaseRepository
+                    .getCaseGroupDayCount(projectIds, dateTime);
                 return handleResponses(responses);
             }
-            List<TestCaseCountStatisticsResponse> responses = Lists.newArrayList();
+            List<CaseCountStatisticsResponse> responses = Lists.newArrayList();
             return handleResponses(responses);
         } catch (ApiTestPlatformException exception) {
             log.error(exception.getMessage());
@@ -202,19 +206,19 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         }
     }
 
-    private List<TestCaseCountStatisticsResponse> handleResponses(
-        List<TestCaseCountStatisticsResponse> testCaseCountStatisticsResponses) {
-        List<TestCaseCountStatisticsResponse> responses = Lists.newArrayList(testCaseCountStatisticsResponses);
+    private List<CaseCountStatisticsResponse> handleResponses(
+        List<CaseCountStatisticsResponse> caseCountStatisticsRespons) {
+        List<CaseCountStatisticsResponse> responses = Lists.newArrayList(caseCountStatisticsRespons);
         Map<LocalDate, Integer> map = responses.stream()
             .collect(
-                Collectors.toMap(TestCaseCountStatisticsResponse::getDay, TestCaseCountStatisticsResponse::getCount));
+                Collectors.toMap(CaseCountStatisticsResponse::getDay, CaseCountStatisticsResponse::getCount));
         for (int i = 0; i < Constants.CASE_DAY; i++) {
             LocalDate date = LocalDate.now().minusDays(i);
             if (!map.containsKey(date)) {
-                responses.add(TestCaseCountStatisticsResponse.builder().day(date).count(0).build());
+                responses.add(CaseCountStatisticsResponse.builder().day(date).count(0).build());
             }
         }
-        responses.sort(Comparator.comparing(TestCaseCountStatisticsResponse::getDay));
+        responses.sort(Comparator.comparing(CaseCountStatisticsResponse::getDay));
         return responses;
     }
 

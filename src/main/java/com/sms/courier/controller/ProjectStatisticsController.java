@@ -4,9 +4,14 @@ import static com.sms.courier.common.constant.Constants.PROJECT_STATISTICS;
 
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
+import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.service.ProjectStatisticsService;
+import java.util.List;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,4 +37,38 @@ public class ProjectStatisticsController {
         return projectStatisticsService.caseCountPage(request);
     }
 
+    @GetMapping("/case/group-day/count/{projectId}")
+    public List<CaseCountStatisticsResponse> caseGroupDayCount(@PathVariable String projectId) {
+        return projectStatisticsService.caseGroupDayCount(projectId);
+    }
+
+    @GetMapping("/scene/case/group-day/count/{projectId}")
+    public List<CaseCountStatisticsResponse> sceneCaseGroupDayCount(@PathVariable String projectId) {
+        return projectStatisticsService.sceneCaseGroupDayCount(projectId);
+    }
+
+    @GetMapping("/api/all/count/pid/{projectId}")
+    public Long apiAllCount(@PathVariable String projectId) {
+        return projectStatisticsService.apiAllCount(projectId);
+    }
+
+    @GetMapping("/scene/all/count/pid/{projectId}")
+    public Long sceneAllCount(@PathVariable String projectId) {
+        return projectStatisticsService.sceneAllCount(projectId);
+    }
+
+    @GetMapping("/case/all/count/pid/{projectId}")
+    public Long caseAllCount(@PathVariable String projectId) {
+        return projectStatisticsService.caseAllCount(projectId);
+    }
+
+    @GetMapping("/api/scene/count/pid/{projectId}")
+    public Long sceneCount(@PathVariable ObjectId projectId) {
+        return projectStatisticsService.sceneCount(projectId);
+    }
+
+    @GetMapping("/api/case/count/pid/{projectId}")
+    public Long caseCount(@PathVariable ObjectId projectId) {
+        return projectStatisticsService.caseCount(projectId);
+    }
 }

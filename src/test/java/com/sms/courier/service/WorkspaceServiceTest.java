@@ -7,11 +7,12 @@ import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.WorkspaceRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.dto.response.ProjectResponse;
-import com.sms.courier.dto.response.TestCaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.WorkspaceResponse;
 import com.sms.courier.entity.workspace.WorkspaceEntity;
 import com.sms.courier.mapper.WorkspaceMapper;
 import com.sms.courier.repository.CommonRepository;
+import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.repository.WorkspaceRepository;
 import com.sms.courier.service.impl.WorkspaceServiceImpl;
 import com.sms.courier.utils.SecurityUtil;
@@ -50,8 +51,10 @@ class WorkspaceServiceTest {
     private final WorkspaceMapper workspaceMapper = mock(WorkspaceMapper.class);
     private final ProjectService projectService = mock(ProjectService.class);
     private final ApiTestCaseService apiTestCaseService = mock(ApiTestCaseService.class);
+    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository =
+        mock(CustomizedApiTestCaseRepository.class);
     private final WorkspaceService workspaceService = new WorkspaceServiceImpl(projectService,
-        workspaceRepository, commonRepository, workspaceMapper, apiTestCaseService);
+        workspaceRepository, commonRepository, workspaceMapper, apiTestCaseService, customizedApiTestCaseRepository);
     private final WorkspaceEntity workspace = WorkspaceEntity.builder().id(ID).build();
     private final WorkspaceResponse workspaceResponse = WorkspaceResponse.builder()
         .id(ID).build();
@@ -237,9 +240,9 @@ class WorkspaceServiceTest {
     public void caseGroupDayCount_test() {
         List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
         when(projectService.list(any())).thenReturn(projectResponses);
-        List<TestCaseCountStatisticsResponse> testCaseCountStatisticsResponses = Lists.newArrayList();
-        when(apiTestCaseService.getCaseGroupDayCount(any(), any())).thenReturn(testCaseCountStatisticsResponses);
-        List<TestCaseCountStatisticsResponse> responses = workspaceService.caseGroupDayCount(ID);
+        List<CaseCountStatisticsResponse> caseCountStatisticsRespons = Lists.newArrayList();
+        when(customizedApiTestCaseRepository.getCaseGroupDayCount(any(), any())).thenReturn(caseCountStatisticsRespons);
+        List<CaseCountStatisticsResponse> responses = workspaceService.caseGroupDayCount(ID);
         assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
     }
 
@@ -247,9 +250,9 @@ class WorkspaceServiceTest {
     @DisplayName("Test the caseGroupDayCount method in the Workspace service")
     public void caseGroupDayCount_projectIsNull_test() {
         when(projectService.list(any())).thenReturn(Lists.newArrayList());
-        List<TestCaseCountStatisticsResponse> testCaseCountStatisticsResponses = Lists.newArrayList();
-        when(apiTestCaseService.getCaseGroupDayCount(any(), any())).thenReturn(testCaseCountStatisticsResponses);
-        List<TestCaseCountStatisticsResponse> responses = workspaceService.caseGroupDayCount(ID);
+        List<CaseCountStatisticsResponse> caseCountStatisticsRespons = Lists.newArrayList();
+        when(customizedApiTestCaseRepository.getCaseGroupDayCount(any(), any())).thenReturn(caseCountStatisticsRespons);
+        List<CaseCountStatisticsResponse> responses = workspaceService.caseGroupDayCount(ID);
         assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
     }
 

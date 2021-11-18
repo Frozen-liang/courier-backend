@@ -234,26 +234,6 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Long sceneCount(ObjectId projectId) {
-        try {
-            return customizedApiRepository.sceneCount(projectId);
-        } catch (Exception e) {
-            log.error("Failed to query scene count the Api!", e);
-            throw new ApiTestPlatformException(ErrorCode.GET_SCENE_COUNT_BY_API_ERROR);
-        }
-    }
-
-    @Override
-    public Long caseCount(ObjectId projectId) {
-        try {
-            return customizedApiRepository.caseCount(projectId);
-        } catch (Exception e) {
-            log.error("Failed to query case count the Api!", e);
-            throw new ApiTestPlatformException(ErrorCode.GET_CASE_COUNT_BY_API_ERROR);
-        }
-    }
-
-    @Override
     public Boolean resetApiVersion(String historyId) {
         try {
             ApiHistoryEntity apiHistoryEntity = apiHistoryRepository.findById(historyId)
