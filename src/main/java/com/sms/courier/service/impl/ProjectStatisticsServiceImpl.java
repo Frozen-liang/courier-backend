@@ -9,20 +9,19 @@ import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
+import com.sms.courier.entity.job.ApiTestCaseJobEntity;
+import com.sms.courier.entity.job.SceneCaseJobEntity;
+import com.sms.courier.entity.scenetest.SceneCaseEntity;
+import com.sms.courier.repository.CommonStatisticsRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
-import com.sms.courier.repository.CustomizedApiTestCaseRepository;
-import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.service.ApiService;
 import com.sms.courier.service.ApiTestCaseService;
 import com.sms.courier.service.ProjectStatisticsService;
 import com.sms.courier.service.SceneCaseService;
 import com.sms.courier.utils.ExceptionUtils;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
@@ -30,25 +29,23 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
+public class ProjectStatisticsServiceImpl extends AbstractStatisticsService implements ProjectStatisticsService {
 
     private final CustomizedApiRepository customizedApiRepository;
-    private final CustomizedSceneCaseRepository customizedSceneCaseRepository;
-    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository;
     private final ApiService apiService;
     private final SceneCaseService sceneCaseService;
     private final ApiTestCaseService apiTestCaseService;
+    private final CommonStatisticsRepository commonStatisticsRepository;
 
     public ProjectStatisticsServiceImpl(CustomizedApiRepository customizedApiRepository,
-        CustomizedSceneCaseRepository customizedSceneCaseRepository,
-        CustomizedApiTestCaseRepository customizedApiTestCaseRepository, ApiService apiService,
-        SceneCaseService sceneCaseService, ApiTestCaseService apiTestCaseService) {
+        ApiService apiService,
+        SceneCaseService sceneCaseService, ApiTestCaseService apiTestCaseService,
+        CommonStatisticsRepository commonStatisticsRepository) {
         this.customizedApiRepository = customizedApiRepository;
-        this.customizedSceneCaseRepository = customizedSceneCaseRepository;
-        this.customizedApiTestCaseRepository = customizedApiTestCaseRepository;
         this.apiService = apiService;
         this.sceneCaseService = sceneCaseService;
         this.apiTestCaseService = apiTestCaseService;
+        this.commonStatisticsRepository = commonStatisticsRepository;
     }
 
     @Override
@@ -75,12 +72,9 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
     public List<CaseCountStatisticsResponse> caseGroupDayCount(String projectId) {
         try {
             LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
-            List<CaseCountStatisticsResponse> responses = customizedApiTestCaseRepository
-                .getCaseGroupDayCount(Lists.newArrayList(projectId), dateTime);
-            return handleResponses(responses);
-        } catch (ApiTestPlatformException exception) {
-            log.error(exception.getMessage());
-            throw exception;
+            List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
+                .getGroupDayCount(Lists.newArrayList(projectId), dateTime, ApiTestCaseEntity.class);
+            return handleResponses(responses, Constants.CASE_DAY);
         } catch (Exception e) {
             log.error("Failed to get the Project case group by day!", e);
             throw new ApiTestPlatformException(GET_PROJECT_CASE_GROUP_BY_DAY_ERROR);
@@ -91,9 +85,9 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
     public List<CaseCountStatisticsResponse> sceneCaseGroupDayCount(String projectId) {
         try {
             LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
-            List<CaseCountStatisticsResponse> responses = customizedSceneCaseRepository
-                .getSceneCaseGroupDayCount(Lists.newArrayList(projectId), dateTime);
-            return handleResponses(responses);
+            List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
+                .getGroupDayCount(Lists.newArrayList(projectId), dateTime, SceneCaseEntity.class);
+            return handleResponses(responses, Constants.CASE_DAY);
         } catch (Exception e) {
             log.error("Failed to get the Project case group by day!", e);
             throw ExceptionUtils.mpe(ErrorCode.GET_PROJECT_SCENE_CASE_GROUP_BY_DAY_ERROR);
@@ -150,18 +144,30 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
         }
     }
 
-    private List<CaseCountStatisticsResponse> handleResponses(
-        List<CaseCountStatisticsResponse> caseCountStatisticsResponses) {
-        List<CaseCountStatisticsResponse> responses = Lists.newArrayList(caseCountStatisticsResponses);
-        List<LocalDate> localDateList = responses.stream().map(CaseCountStatisticsResponse::getDay)
-            .collect(Collectors.toList());
-        responses.addAll(IntStream.range(0, 7)
-                .mapToObj(i -> LocalDate.now().minusDays(i))
-                .filter(i -> !localDateList.contains(i))
-                .map(data -> CaseCountStatisticsResponse.builder().day(data).count(0).build())
-                .collect(Collectors.toList()));
-        responses.sort(Comparator.comparing(CaseCountStatisticsResponse::getDay));
-        return responses;
+    @Override
+    public List<CaseCountStatisticsResponse> caseJobGroupDayCount(String projectId, Integer day) {
+        try {
+            LocalDateTime dateTime = LocalDateTime.now().minusDays(day);
+            List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
+                .getGroupDayCount(Lists.newArrayList(projectId), dateTime, ApiTestCaseJobEntity.class);
+            return handleResponses(responses, day);
+        } catch (Exception e) {
+            log.error("Failed to get case job count!", e);
+            throw ExceptionUtils.mpe(ErrorCode.GET_CASE_JOB_COUNT_ERROR);
+        }
+    }
+
+    @Override
+    public List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(String projectId, Integer day) {
+        try {
+            LocalDateTime dateTime = LocalDateTime.now().minusDays(day);
+            List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
+                .getGroupDayCount(Lists.newArrayList(projectId), dateTime, SceneCaseJobEntity.class);
+            return handleResponses(responses, day);
+        } catch (Exception e) {
+            log.error("Failed to get scene case job count!", e);
+            throw ExceptionUtils.mpe(ErrorCode.GET_SCENE_CASE_JOB_COUNT_ERROR);
+        }
     }
 
 }

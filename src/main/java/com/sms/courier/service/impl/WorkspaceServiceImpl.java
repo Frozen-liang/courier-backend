@@ -10,14 +10,12 @@ import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_WORKSPACE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_LIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.THE_WORKSPACE_CANNOT_DELETE_ERROR;
 import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.common.field.WorkspaceField.USER_IDS;
 import static com.sms.courier.utils.Assert.isFalse;
 
-import com.google.common.collect.Lists;
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.constant.Constants;
@@ -26,24 +24,19 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.WorkspaceRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.ProjectResponse;
 import com.sms.courier.dto.response.WorkspaceResponse;
 import com.sms.courier.entity.workspace.WorkspaceEntity;
 import com.sms.courier.mapper.WorkspaceMapper;
 import com.sms.courier.repository.CommonRepository;
-import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.repository.WorkspaceRepository;
 import com.sms.courier.service.ApiTestCaseService;
 import com.sms.courier.service.ProjectService;
 import com.sms.courier.service.WorkspaceService;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -60,19 +53,16 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     private final CommonRepository commonRepository;
     private final WorkspaceMapper workspaceMapper;
     private final ApiTestCaseService apiTestCaseService;
-    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository;
 
     public WorkspaceServiceImpl(ProjectService projectService,
         WorkspaceRepository workspaceRepository,
         CommonRepository commonRepository,
-        WorkspaceMapper workspaceMapper, ApiTestCaseService apiTestCaseService,
-        CustomizedApiTestCaseRepository customizedApiTestCaseRepository) {
+        WorkspaceMapper workspaceMapper, ApiTestCaseService apiTestCaseService) {
         this.projectService = projectService;
         this.workspaceRepository = workspaceRepository;
         this.commonRepository = commonRepository;
         this.workspaceMapper = workspaceMapper;
         this.apiTestCaseService = apiTestCaseService;
-        this.customizedApiTestCaseRepository = customizedApiTestCaseRepository;
     }
 
     @Override
@@ -181,45 +171,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             log.error("Failed to get the Workspace case!", e);
             throw new ApiTestPlatformException(GET_WORKSPACE_CASE_ERROR);
         }
-    }
-
-    @Override
-    public List<CaseCountStatisticsResponse> caseGroupDayCount(String workspaceId) {
-        try {
-            List<ProjectResponse> projectResponses = projectService.list(workspaceId);
-            if (CollectionUtils.isNotEmpty(projectResponses)) {
-                List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
-                    .collect(Collectors.toList());
-                LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
-                List<CaseCountStatisticsResponse> responses = customizedApiTestCaseRepository
-                    .getCaseGroupDayCount(projectIds, dateTime);
-                return handleResponses(responses);
-            }
-            List<CaseCountStatisticsResponse> responses = Lists.newArrayList();
-            return handleResponses(responses);
-        } catch (ApiTestPlatformException exception) {
-            log.error(exception.getMessage());
-            throw exception;
-        } catch (Exception e) {
-            log.error("Failed to get the Workspace case group by day!", e);
-            throw new ApiTestPlatformException(GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR);
-        }
-    }
-
-    private List<CaseCountStatisticsResponse> handleResponses(
-        List<CaseCountStatisticsResponse> caseCountStatisticsRespons) {
-        List<CaseCountStatisticsResponse> responses = Lists.newArrayList(caseCountStatisticsRespons);
-        Map<LocalDate, Integer> map = responses.stream()
-            .collect(
-                Collectors.toMap(CaseCountStatisticsResponse::getDay, CaseCountStatisticsResponse::getCount));
-        for (int i = 0; i < Constants.CASE_DAY; i++) {
-            LocalDate date = LocalDate.now().minusDays(i);
-            if (!map.containsKey(date)) {
-                responses.add(CaseCountStatisticsResponse.builder().day(date).count(0).build());
-            }
-        }
-        responses.sort(Comparator.comparing(CaseCountStatisticsResponse::getDay));
-        return responses;
     }
 
 }

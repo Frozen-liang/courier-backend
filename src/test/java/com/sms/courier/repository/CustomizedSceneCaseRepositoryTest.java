@@ -106,18 +106,4 @@ class CustomizedSceneCaseRepositoryTest {
         assertThat(response).isNotEmpty();
     }
 
-    @Test
-    @DisplayName("Test the getSceneCaseGroupDayCount method in the CustomizedSceneCaseRepository")
-    void getSceneCaseGroupDayCount_test() {
-        AggregationResults<CaseCountStatisticsResponse> results = mock(AggregationResults.class);
-        List<CaseCountStatisticsResponse> caseCountStatisticsResponses =
-            Lists.newArrayList(CaseCountStatisticsResponse.builder().day(LocalDate.now()).count(0).build());
-        when(results.getMappedResults()).thenReturn(caseCountStatisticsResponses);
-        when(mongoTemplate.aggregate(any(), eq(SceneCaseEntity.class), eq(CaseCountStatisticsResponse.class)))
-            .thenReturn(results);
-        List<CaseCountStatisticsResponse> responses =
-            customizedSceneCaseRepository.getSceneCaseGroupDayCount(Lists.newArrayList(MOCK_ID), LocalDateTime.now());
-        assertThat(responses).isNotEmpty();
-    }
-
 }
