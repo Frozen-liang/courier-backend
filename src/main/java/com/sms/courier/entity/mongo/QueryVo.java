@@ -20,8 +20,12 @@ public class QueryVo {
     // 查询的表
     private String collectionName;
 
-    // 关联的表
-    private List<LookupVo> lookupVo;
+    // v1.0.9增加查询的实体 建议查询使用实体 因为使用collectionName会存在String和ObjectId查询不匹配问题
+    private Class<?> entityClass;
+
+    // 关联的表 不关联则为空
+    @Default
+    private List<LookupVo> lookupVo = new ArrayList<>();
 
     // 查询条件
     @Default

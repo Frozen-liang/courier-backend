@@ -19,6 +19,7 @@ import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.repository.CommonRepository;
+import com.sms.courier.utils.Assert;
 import com.sms.courier.utils.PageDtoConverter;
 import com.sms.courier.utils.SecurityUtil;
 import java.time.LocalDateTime;
@@ -188,6 +189,10 @@ public class CommonRepositoryImpl implements CommonRepository {
 
     @Override
     public <T> Page<T> page(QueryVo queryVo, PageDto pageRequest, Class<T> responseClass) {
+
+        Assert.isFalse(StringUtils.isEmpty(queryVo.getCollectionName()) &&
+            Objects.isNull(queryVo.getEntityClass()), "The collectionName and entityClass is null!");
+
         PageDtoConverter.frontMapping(pageRequest);
 
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
@@ -207,14 +212,23 @@ public class CommonRepositoryImpl implements CommonRepository {
 
         aggregationOperations.add(projectionOperation);
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
+        long count;
 
-        long count = mongoTemplate.count(query, queryVo.getCollectionName());
+        count = getCount(queryVo, query);
+
         if (count == 0L || skipRecord >= count) {
             return Page.empty();
         }
 
-        List<T> records = mongoTemplate.aggregate(aggregation, queryVo.getCollectionName(), responseClass)
-            .getMappedResults();
+        List<T> records;
+
+        if (Objects.nonNull(queryVo.getEntityClass())) {
+            records = mongoTemplate.aggregate(aggregation, queryVo.getEntityClass(), responseClass)
+                .getMappedResults();
+        } else {
+            records = mongoTemplate.aggregate(aggregation, queryVo.getCollectionName(), responseClass)
+                .getMappedResults();
+        }
 
         return new PageImpl<>(records,
             PageRequest.of(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort), count);
@@ -347,6 +361,14 @@ public class CommonRepositoryImpl implements CommonRepository {
         Query query = new Query(Criteria.where(ID.getName()).in(ids));
         UpdateResult updateResult = mongoTemplate.updateMulti(query, update, entityClass);
         return updateResult.getModifiedCount() > 0;
+    }
+
+    private long getCount(QueryVo queryVo, Query query) {
+        if (Objects.nonNull(queryVo.getEntityClass())) {
+            return mongoTemplate.count(query, queryVo.getEntityClass());
+        }
+        return mongoTemplate.count(query, queryVo.getCollectionName());
+
     }
 
 }
