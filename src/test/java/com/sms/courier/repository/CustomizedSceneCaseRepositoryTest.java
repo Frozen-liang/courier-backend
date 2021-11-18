@@ -8,11 +8,15 @@ import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
 
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
+import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.SceneCaseResponse;
+import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.repository.impl.CustomizedSceneCaseRepositoryImpl;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +26,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 
 @DisplayName("Tests for CustomizedSceneCaseRepositoryTest")
 class CustomizedSceneCaseRepositoryTest {
@@ -99,6 +104,20 @@ class CustomizedSceneCaseRepositoryTest {
             .thenReturn(optional);
         Optional<SceneCaseResponse> response = customizedSceneCaseRepository.findById(MOCK_ID);
         assertThat(response).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Test the getSceneCaseGroupDayCount method in the CustomizedSceneCaseRepository")
+    void getSceneCaseGroupDayCount_test() {
+        AggregationResults<CaseCountStatisticsResponse> results = mock(AggregationResults.class);
+        List<CaseCountStatisticsResponse> caseCountStatisticsResponses =
+            Lists.newArrayList(CaseCountStatisticsResponse.builder().day(LocalDate.now()).count(0).build());
+        when(results.getMappedResults()).thenReturn(caseCountStatisticsResponses);
+        when(mongoTemplate.aggregate(any(), eq(SceneCaseEntity.class), eq(CaseCountStatisticsResponse.class)))
+            .thenReturn(results);
+        List<CaseCountStatisticsResponse> responses =
+            customizedSceneCaseRepository.getSceneCaseGroupDayCount(Lists.newArrayList(MOCK_ID), LocalDateTime.now());
+        assertThat(responses).isNotEmpty();
     }
 
 }

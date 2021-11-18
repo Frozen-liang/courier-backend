@@ -24,7 +24,7 @@ import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
-import com.sms.courier.dto.response.TestCaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.apitestcase.TestResult;
@@ -263,17 +263,6 @@ class ApiTestCaseServiceTest {
             apiTestCaseService.getCasePageByProjectIdsAndCreateDate(Lists.newArrayList(ID), LocalDateTime.now(),
                 new PageDto());
         assertThat(pageDto.getContent().size()).isEqualTo(1);
-    }
-
-    @Test
-    @DisplayName("Test the getCaseGroupDayCount method in the ApiTestCase service")
-    public void getCaseGroupDayCount_test() {
-        List<TestCaseCountStatisticsResponse> testCaseCountStatisticsResponses = Lists.newArrayList();
-        when(customizedApiTestCaseRepository.getCaseGroupDayCount(any(), any()))
-            .thenReturn(testCaseCountStatisticsResponses);
-        List<TestCaseCountStatisticsResponse> responses =
-            apiTestCaseService.getCaseGroupDayCount(Lists.newArrayList(ID), LocalDateTime.now());
-        assertThat(responses).isEmpty();
     }
 
 }

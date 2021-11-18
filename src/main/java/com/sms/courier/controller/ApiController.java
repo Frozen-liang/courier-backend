@@ -94,25 +94,10 @@ public class ApiController {
         return apiService.recover(ids);
     }
 
-    @GetMapping("/count/pid/{projectId}")
-    public Long count(@PathVariable String projectId) {
-        return apiService.count(projectId);
-    }
-
     @PutMapping("/batch/updateByIds")
     @PreAuthorize("hasRoleOrAdmin(@role.API_CRE_UPD_DEL)")
     public Boolean batchUpdateByIds(@RequestBody BatchUpdateByIdRequest<Object> batchUpdateRequest) {
         return apiService.batchUpdateByIds(batchUpdateRequest);
-    }
-
-    @GetMapping("/scene/count/pid/{projectId}")
-    public Long sceneCount(@PathVariable ObjectId projectId) {
-        return apiService.sceneCount(projectId);
-    }
-
-    @GetMapping("/case/count/pid/{projectId}")
-    public Long caseCount(@PathVariable ObjectId projectId) {
-        return apiService.caseCount(projectId);
     }
 
     @PutMapping("/reset/version/{historyId}")
