@@ -190,8 +190,8 @@ public class CommonRepositoryImpl implements CommonRepository {
     @Override
     public <T> Page<T> page(QueryVo queryVo, PageDto pageRequest, Class<T> responseClass) {
 
-        Assert.isFalse(StringUtils.isEmpty(queryVo.getCollectionName()) &&
-            Objects.isNull(queryVo.getEntityClass()), "The collectionName and entityClass is null!");
+        Assert.isFalse(StringUtils.isEmpty(queryVo.getCollectionName()) && Objects.isNull(queryVo.getEntityClass()),
+            "The collectionName and entityClass is null!");
 
         PageDtoConverter.frontMapping(pageRequest);
 
