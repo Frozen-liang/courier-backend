@@ -24,6 +24,8 @@ public class AbstractSceneCaseJobEntity extends JobEntity {
     @Field(targetType = FieldType.OBJECT_ID)
     private String sceneCaseId;
 
+    private String name;
+
     private List<JobSceneCaseApi> apiTestCase;
 
     /**

@@ -137,7 +137,7 @@ public class EmailSenderTest {
 
         NotificationPayload payload = NotificationPayload.builder().additionalParam(additionalParam).build();
 
-        assertThat(emailSender.sendTestReportNotification(payload)).isTrue();
+        assertThat(emailSender.sendTestReportNotification(NotificationTemplateType.TEST_REPORT, payload)).isTrue();
     }
 
     @Test

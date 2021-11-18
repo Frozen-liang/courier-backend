@@ -1,5 +1,6 @@
 package com.sms.courier.dto.request;
 
+import com.sms.courier.common.enums.NoticeType;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,4 +21,7 @@ public class ApiTestCaseJobRunRequest {
 
     private DataCollectionRequest dataCollectionRequest;
 
+    private NoticeType noticeType;
+
+    private List<String> emails;
 }

@@ -234,6 +234,8 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
             ApiTestCaseJobEntity apiTestCaseJob = createApiTestCaseJob(jobEnv, jobApiTestCase, currentUser);
             apiTestCaseJob.setWorkspaceId(apiTestCaseJobRunRequest.getWorkspaceId());
             apiTestCaseJob.setProjectId(apiTestCase.getProjectId());
+            apiTestCaseJob.setEmails(apiTestCaseJobRunRequest.getEmails());
+            apiTestCaseJob.setNoticeType(apiTestCaseJobRunRequest.getNoticeType());
             // Multiple job are sent if a data collection exists.
             if (Objects.nonNull(dataCollectionRequest) && CollectionUtils
                 .isNotEmpty(dataCollectionRequest.getDataList())) {
@@ -267,6 +269,7 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
                     jobMapper.toApiTestCaseJobReportResponse(apiTestCaseJobReport));
             applicationEventPublisher.publishEvent(WebhookEvent.create(WebhookType.CASE_REPORT,
                 jobMapper.toWebhookCaseJobResponse(apiTestCaseJobReport)));
+            applicationEventPublisher.publishEvent(jobMapper.toTestReportEvent(apiTestCaseJob));
         } catch (Exception e) {
             log.error("Save case job error!", e);
             caseDispatcherService

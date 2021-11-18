@@ -1,7 +1,9 @@
 package com.sms.courier.entity.job;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sms.courier.common.enums.NoticeType;
 import com.sms.courier.entity.job.common.AbstractSceneCaseJobEntity;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,5 +40,7 @@ public class SceneCaseJobEntity extends AbstractSceneCaseJobEntity {
      */
     private String createUserName;
 
+    private NoticeType noticeType;
 
+    private List<String> emails;
 }
