@@ -10,7 +10,6 @@ import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.repository.CommonStatisticsRepository;
 import com.sms.courier.service.ProjectService;
 import com.sms.courier.service.WorkspaceStatisticsService;
-import com.sms.courier.utils.StatisticsUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class WorkspaceStatisticsServiceImpl implements WorkspaceStatisticsService {
+public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService implements WorkspaceStatisticsService {
 
     private final ProjectService projectService;
     private final CommonStatisticsRepository commonStatisticsRepository;
@@ -41,10 +40,10 @@ public class WorkspaceStatisticsServiceImpl implements WorkspaceStatisticsServic
                 LocalDateTime dateTime = LocalDateTime.now().minusDays(day);
                 List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
                     .getGroupDayCount(projectIds, dateTime, ApiTestCaseEntity.class);
-                return StatisticsUtil.handleResponses(responses, day);
+                return handleResponses(responses, day);
             }
             List<CaseCountStatisticsResponse> responses = Lists.newArrayList();
-            return StatisticsUtil.handleResponses(responses, day);
+            return handleResponses(responses, day);
         } catch (ApiTestPlatformException exception) {
             log.error(exception.getMessage());
             throw exception;

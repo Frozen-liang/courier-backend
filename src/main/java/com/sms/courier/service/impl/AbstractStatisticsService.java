@@ -1,4 +1,4 @@
-package com.sms.courier.utils;
+package com.sms.courier.service.impl;
 
 import com.google.common.collect.Lists;
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
@@ -8,12 +8,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class StatisticsUtil {
+public abstract class AbstractStatisticsService {
 
-    private StatisticsUtil() {
-    }
-
-    public static List<CaseCountStatisticsResponse> handleResponses(
+    public List<CaseCountStatisticsResponse> handleResponses(
         List<CaseCountStatisticsResponse> caseCountStatisticsResponses, Integer day) {
         List<CaseCountStatisticsResponse> responses = Lists.newArrayList(caseCountStatisticsResponses);
         List<LocalDate> localDateList = responses.stream().map(CaseCountStatisticsResponse::getDay)

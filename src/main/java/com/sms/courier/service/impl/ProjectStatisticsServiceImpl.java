@@ -20,7 +20,6 @@ import com.sms.courier.service.ApiTestCaseService;
 import com.sms.courier.service.ProjectStatisticsService;
 import com.sms.courier.service.SceneCaseService;
 import com.sms.courier.utils.ExceptionUtils;
-import com.sms.courier.utils.StatisticsUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
+public class ProjectStatisticsServiceImpl extends AbstractStatisticsService implements ProjectStatisticsService {
 
     private final CustomizedApiRepository customizedApiRepository;
     private final ApiService apiService;
@@ -75,7 +74,7 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
             LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
             List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
                 .getGroupDayCount(Lists.newArrayList(projectId), dateTime, ApiTestCaseEntity.class);
-            return StatisticsUtil.handleResponses(responses, Constants.CASE_DAY);
+            return handleResponses(responses, Constants.CASE_DAY);
         } catch (Exception e) {
             log.error("Failed to get the Project case group by day!", e);
             throw new ApiTestPlatformException(GET_PROJECT_CASE_GROUP_BY_DAY_ERROR);
@@ -88,7 +87,7 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
             LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
             List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
                 .getGroupDayCount(Lists.newArrayList(projectId), dateTime, SceneCaseEntity.class);
-            return StatisticsUtil.handleResponses(responses, Constants.CASE_DAY);
+            return handleResponses(responses, Constants.CASE_DAY);
         } catch (Exception e) {
             log.error("Failed to get the Project case group by day!", e);
             throw ExceptionUtils.mpe(ErrorCode.GET_PROJECT_SCENE_CASE_GROUP_BY_DAY_ERROR);
@@ -151,7 +150,7 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
             LocalDateTime dateTime = LocalDateTime.now().minusDays(day);
             List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
                 .getGroupDayCount(Lists.newArrayList(projectId), dateTime, ApiTestCaseJobEntity.class);
-            return StatisticsUtil.handleResponses(responses, day);
+            return handleResponses(responses, day);
         } catch (Exception e) {
             log.error("Failed to get case job count!", e);
             throw ExceptionUtils.mpe(ErrorCode.GET_CASE_JOB_COUNT_ERROR);
@@ -164,7 +163,7 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
             LocalDateTime dateTime = LocalDateTime.now().minusDays(day);
             List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
                 .getGroupDayCount(Lists.newArrayList(projectId), dateTime, SceneCaseJobEntity.class);
-            return StatisticsUtil.handleResponses(responses, day);
+            return handleResponses(responses, day);
         } catch (Exception e) {
             log.error("Failed to get scene case job count!", e);
             throw ExceptionUtils.mpe(ErrorCode.GET_SCENE_CASE_JOB_COUNT_ERROR);
