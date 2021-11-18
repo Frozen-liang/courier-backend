@@ -276,6 +276,8 @@ public enum ErrorCode {
     GET_PROJECT_API_CASE_COUNT_ERROR("4256", "Failed to get the Project api case count!"),
     EDIT_COURIER_SCHEDULER_ERROR("4257", "Failed to edit the Courier scheduler!"),
     GET_COURIER_SCHEDULER_ERROR("4258", "The courier scheduler setting not exist, please configure it!"),
+    GET_CASE_JOB_COUNT_ERROR("4259", "Failed to get case job count!"),
+    GET_SCENE_CASE_JOB_COUNT_ERROR("4260", "Failed to get scene case job count!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),

@@ -1,6 +1,6 @@
 package com.sms.courier.controller;
 
-import static com.sms.courier.common.constant.Constants.PROJECT_STATISTICS;
+import static com.sms.courier.common.constant.Constants.PROJECT_STATISTICS_PATH;
 
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(PROJECT_STATISTICS)
+@RequestMapping(PROJECT_STATISTICS_PATH)
 public class ProjectStatisticsController {
 
     private final ProjectStatisticsService projectStatisticsService;
@@ -71,4 +71,17 @@ public class ProjectStatisticsController {
     public Long caseCount(@PathVariable ObjectId projectId) {
         return projectStatisticsService.caseCount(projectId);
     }
+
+    @GetMapping("/case/job/group-day/{day}/count/{projectId}")
+    public List<CaseCountStatisticsResponse> caseJobGroupDayCount(@PathVariable String projectId,
+        @PathVariable Integer day) {
+        return projectStatisticsService.caseJobGroupDayCount(projectId, day);
+    }
+
+    @GetMapping("/scene/case/job/group-day/{day}/count/{projectId}")
+    public List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(@PathVariable String projectId,
+        @PathVariable Integer day) {
+        return projectStatisticsService.sceneCaseJobGroupDayCount(projectId, day);
+    }
+
 }

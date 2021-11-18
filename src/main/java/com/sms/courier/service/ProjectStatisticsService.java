@@ -26,4 +26,8 @@ public interface ProjectStatisticsService {
     Long sceneCount(ObjectId projectId);
 
     Long caseCount(ObjectId projectId);
+
+    List<CaseCountStatisticsResponse> caseJobGroupDayCount(String projectId, Integer day);
+
+    List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(String projectId, Integer day);
 }

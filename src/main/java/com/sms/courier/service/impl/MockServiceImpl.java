@@ -51,7 +51,6 @@ public class MockServiceImpl implements MockService {
             if (Objects.isNull(mockSettingEntity.getContainerStatus())
                 || Objects.equals(mockSettingEntity.getContainerStatus(), ContainerStatus.DESTROY)) {
                 dockerService.startContainer(mockSettingMapper.toContainerSetting(mockSettingEntity));
-                mockSettingRepository.save(mockSettingEntity);
                 return Boolean.TRUE;
             }
             return Boolean.FALSE;

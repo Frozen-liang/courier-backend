@@ -28,5 +28,4 @@ public interface CustomizedApiTestCaseRepository {
     Page<ApiTestCaseResponse> getCasePageByProjectIdsAndCreateDate(List<String> projectIds, LocalDateTime dateTime,
         PageDto pageDto);
 
-    List<CaseCountStatisticsResponse> getCaseGroupDayCount(List<String> projectIds, LocalDateTime dateTime);
 }
