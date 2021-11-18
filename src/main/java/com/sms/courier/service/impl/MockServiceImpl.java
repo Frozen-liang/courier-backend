@@ -3,6 +3,7 @@ package com.sms.courier.service.impl;
 import static com.sms.courier.common.enums.OperationModule.MOCK_SETTING;
 import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.DELETE;
+import static com.sms.courier.common.enums.OperationType.RESTART;
 import static com.sms.courier.common.exception.ErrorCode.CREATE_MOCK_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_MOCK_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.RESTART_MOCK_ERROR;
@@ -63,7 +64,7 @@ public class MockServiceImpl implements MockService {
     }
 
     @Override
-    @LogRecord(operationType = DELETE, operationModule = MOCK_SETTING)
+    @LogRecord(operationType = RESTART, operationModule = MOCK_SETTING)
     public Boolean restartMock() {
         try {
             Example<MockSettingEntity> example = Example.of(MockSettingEntity.builder().removed(Boolean.FALSE).build(),
@@ -75,7 +76,6 @@ public class MockServiceImpl implements MockService {
                 return Boolean.FALSE;
             }
             dockerService.restartContainer(mockSettingEntity.getContainerName());
-            mockSettingRepository.save(mockSettingEntity);
             return Boolean.TRUE;
 
         } catch (ApiTestPlatformException e) {
@@ -99,7 +99,6 @@ public class MockServiceImpl implements MockService {
                 return Boolean.FALSE;
             }
             dockerService.deleteContainer(mockSettingEntity.getContainerName());
-            mockSettingRepository.save(mockSettingEntity);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());

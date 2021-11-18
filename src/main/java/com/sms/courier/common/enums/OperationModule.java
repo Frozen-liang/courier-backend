@@ -25,6 +25,7 @@ import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
+import com.sms.courier.entity.schedule.CourierSchedulerEntity;
 import com.sms.courier.entity.schedule.ScheduleEntity;
 import com.sms.courier.entity.structure.StructureEntity;
 import com.sms.courier.entity.system.LoginSettingEntity;
@@ -73,7 +74,8 @@ public enum OperationModule implements EnumCommon {
     ENGINE_SETTING(29, EngineSettingEntity.class),
     CONTAINER_SETTING(30, ContainerSettingEntity.class),
     EMAIL_SETTING(31, EmailServiceEntity.class),
-    WEBHOOK(32, WebhookEntity.class);
+    WEBHOOK(32, WebhookEntity.class),
+    COURIER_SCHEDULER(33, CourierSchedulerEntity.class);
 
     private static final Map<Integer, OperationModule> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationModule::getCode, Function.identity()));

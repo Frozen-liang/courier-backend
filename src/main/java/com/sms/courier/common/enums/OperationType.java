@@ -32,7 +32,9 @@ public enum OperationType implements EnumCommon {
     // 登出
     LOGOUT(11),
     // 重置
-    RESET(12);
+    RESET(12),
+    //重启
+    RESTART(13);
 
     private static final Map<Integer, OperationType> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationType::getCode, Function.identity()));
