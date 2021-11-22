@@ -81,6 +81,7 @@ public class ApiServiceImpl implements ApiService {
 
     @SneakyThrows
     @Override
+    @LogRecord(operationType = OperationType.SYNC, operationModule = OperationModule.API)
     public boolean importDocumentByFile(ApiImportRequest apiImportRequest) {
         String content = IOUtils.toString(apiImportRequest.getFile().getInputStream(), StandardCharsets.UTF_8);
         asyncService.importApi(apiMapper.toImportSource(apiImportRequest, content));
@@ -88,6 +89,7 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
+    @LogRecord(operationType = OperationType.SYNC, operationModule = OperationModule.API)
     public Boolean syncApiByProImpSourceIds(List<String> proImpSourceIds) {
         Iterable<ProjectImportSourceEntity> projectImportSources = projectImportSourceService
             .findByIds(proImpSourceIds);

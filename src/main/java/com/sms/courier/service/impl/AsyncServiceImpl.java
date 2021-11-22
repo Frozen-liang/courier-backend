@@ -68,7 +68,6 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
     }
 
     @Override
-    @LogRecord(operationType = OperationType.SYNC, operationModule = OperationModule.API)
     @Async
     public void importApi(ImportSourceVo importSource) {
         String projectId = importSource.getProjectId();

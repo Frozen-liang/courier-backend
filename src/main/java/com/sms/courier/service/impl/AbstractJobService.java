@@ -180,15 +180,17 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
             sceneCaseApi.getCaseTemplateApiConnList().stream().collect(
                 Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::isLock));
         for (CaseTemplateApiEntity caseTemplateApi : templateApiList) {
-            caseTemplateApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : caseTemplateApi.getOrder());
-            caseTemplateApi.setCaseTemplateId(null);
-            caseTemplateApi.getApiTestCase()
-                .setExecute(isExecuteMap.getOrDefault(caseTemplateApi.getId(), Boolean.TRUE));
-            caseTemplateApi.setLock(isLockMap.getOrDefault(caseTemplateApi.getId(), Boolean.FALSE));
-            JobSceneCaseApi jobSceneCaseApi = jobMapper.toJobSceneCaseApiByTemplate(caseTemplateApi);
-            jobSceneCaseApi.setSceneCaseId(sceneCaseApi.getSceneCaseId());
-            caseList.add(jobSceneCaseApi);
-            index = caseTemplateApi.getOrder();
+            boolean execute = isExecuteMap.getOrDefault(caseTemplateApi.getId(), Boolean.TRUE);
+            if (execute) {
+                caseTemplateApi.setOrder(index > 0 ? Integer.valueOf(index + 1) : caseTemplateApi.getOrder());
+                caseTemplateApi.setCaseTemplateId(null);
+                caseTemplateApi.getApiTestCase().setExecute(true);
+                caseTemplateApi.setLock(isLockMap.getOrDefault(caseTemplateApi.getId(), Boolean.FALSE));
+                JobSceneCaseApi jobSceneCaseApi = jobMapper.toJobSceneCaseApiByTemplate(caseTemplateApi);
+                jobSceneCaseApi.setSceneCaseId(sceneCaseApi.getSceneCaseId());
+                caseList.add(jobSceneCaseApi);
+                index = caseTemplateApi.getOrder();
+            }
         }
         return index;
     }
