@@ -22,6 +22,7 @@ public class TestReportEvent {
     private final Integer delayTimeTotalTimeCost;
     private final String testCompletionTime;
     private final String testStartTime;
+    private final String projectId;
 }
 
 

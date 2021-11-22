@@ -7,10 +7,10 @@ import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
-import com.sms.courier.entity.job.SceneCaseJobEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.repository.CommonStatisticsRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
+import com.sms.courier.repository.CustomizedSceneCaseJobRepository;
 import com.sms.courier.service.impl.ProjectStatisticsServiceImpl;
 import java.util.List;
 import org.assertj.core.util.Lists;
@@ -34,9 +34,11 @@ public class ProjectStatisticsServiceTest {
     private final SceneCaseService sceneCaseService = mock(SceneCaseService.class);
     private final ApiTestCaseService apiTestCaseService = mock(ApiTestCaseService.class);
     private final CommonStatisticsRepository commonStatisticsRepository = mock(CommonStatisticsRepository.class);
+    private final CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository =
+        mock(CustomizedSceneCaseJobRepository.class);
     private final ProjectStatisticsService projectStatisticsService =
         new ProjectStatisticsServiceImpl(customizedApiRepository, apiService, sceneCaseService, apiTestCaseService,
-            commonStatisticsRepository);
+            commonStatisticsRepository, customizedSceneCaseJobRepository);
 
     private static final String ID = ObjectId.get().toString();
     private static final Integer MOCK_DAY = 7;
@@ -220,7 +222,7 @@ public class ProjectStatisticsServiceTest {
     @DisplayName("Test the sceneCaseJobGroupDayCount method in the ProjectStatisticsService")
     public void sceneCaseJobGroupDayCount_test() {
         List<CaseCountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
-        when(commonStatisticsRepository.getGroupDayCount(any(), any(), eq(SceneCaseJobEntity.class)))
+        when(customizedSceneCaseJobRepository.getGroupDayCount(any(), any()))
             .thenReturn(caseCountStatisticsResponses);
         List<CaseCountStatisticsResponse> responses = projectStatisticsService.sceneCaseJobGroupDayCount(ID, MOCK_DAY);
         assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
@@ -229,7 +231,7 @@ public class ProjectStatisticsServiceTest {
     @Test
     @DisplayName("An exception occurred while sceneCaseJobGroupDayCount ProjectStatisticsService")
     public void sceneCaseJobGroupDayCount_exception_test() {
-        when(commonStatisticsRepository.getGroupDayCount(any(), any(), eq(SceneCaseJobEntity.class)))
+        when(customizedSceneCaseJobRepository.getGroupDayCount(any(), any()))
             .thenThrow(new RuntimeException());
         assertThatThrownBy(() -> projectStatisticsService.sceneCaseJobGroupDayCount(ID, MOCK_DAY))
             .isInstanceOf(ApiTestPlatformException.class);

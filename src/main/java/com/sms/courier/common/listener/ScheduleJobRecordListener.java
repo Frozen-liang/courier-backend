@@ -89,6 +89,7 @@ public class ScheduleJobRecordListener {
                 .success(scheduleRecord.getSuccess())
                 .testStartTime(DateUtil.toString(scheduleRecord.getCreateDateTime()))
                 .testCompletionTime(DateUtil.toString(scheduleRecord.getTestCompletionTime()))
+                .projectId(scheduleEntity.getProjectId())
                 .build();
             applicationEventPublisher.publishEvent(testReportEvent);
         }

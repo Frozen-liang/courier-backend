@@ -1,6 +1,5 @@
 package com.sms.courier.entity.job;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sms.courier.common.enums.NoticeType;
 import com.sms.courier.entity.job.common.AbstractSceneCaseJobEntity;
 import java.util.List;
@@ -25,7 +24,7 @@ import org.springframework.data.mongodb.core.mapping.FieldType;
 public class SceneCaseJobEntity extends AbstractSceneCaseJobEntity {
 
     @Builder.Default
-    @JsonIgnore
+    @Field("isRemoved")
     private Boolean removed = false;
     @Field(targetType = FieldType.OBJECT_ID)
     private String createUserId;
