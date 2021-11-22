@@ -43,6 +43,7 @@ public class TestReportListener {
 
     private TestReportEmailModel buildTestReportEmailModel(TestReportEvent event) {
         return TestReportEmailModel.builder()
+            .projectId(event.getProjectId())
             .delayTimeTotalTimeCost(event.getTotalTimeCost())
             .paramsTotalTimeCost(event.getParamsTotalTimeCost())
             .totalTimeCost(event.getTotalTimeCost())

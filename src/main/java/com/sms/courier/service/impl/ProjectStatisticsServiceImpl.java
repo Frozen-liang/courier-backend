@@ -15,6 +15,7 @@ import com.sms.courier.entity.job.SceneCaseJobEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.repository.CommonStatisticsRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
+import com.sms.courier.repository.CustomizedSceneCaseJobRepository;
 import com.sms.courier.service.ApiService;
 import com.sms.courier.service.ApiTestCaseService;
 import com.sms.courier.service.ProjectStatisticsService;
@@ -36,16 +37,19 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
     private final SceneCaseService sceneCaseService;
     private final ApiTestCaseService apiTestCaseService;
     private final CommonStatisticsRepository commonStatisticsRepository;
+    private final CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository;
 
     public ProjectStatisticsServiceImpl(CustomizedApiRepository customizedApiRepository,
         ApiService apiService,
         SceneCaseService sceneCaseService, ApiTestCaseService apiTestCaseService,
-        CommonStatisticsRepository commonStatisticsRepository) {
+        CommonStatisticsRepository commonStatisticsRepository,
+        CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository) {
         this.customizedApiRepository = customizedApiRepository;
         this.apiService = apiService;
         this.sceneCaseService = sceneCaseService;
         this.apiTestCaseService = apiTestCaseService;
         this.commonStatisticsRepository = commonStatisticsRepository;
+        this.customizedSceneCaseJobRepository = customizedSceneCaseJobRepository;
     }
 
     @Override
@@ -161,8 +165,8 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
     public List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(String projectId, Integer day) {
         try {
             LocalDateTime dateTime = LocalDateTime.now().minusDays(day);
-            List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
-                .getGroupDayCount(Lists.newArrayList(projectId), dateTime, SceneCaseJobEntity.class);
+            List<CaseCountStatisticsResponse> responses = customizedSceneCaseJobRepository
+                .getGroupDayCount(Lists.newArrayList(projectId), dateTime);
             return handleResponses(responses, day);
         } catch (Exception e) {
             log.error("Failed to get scene case job count!", e);
