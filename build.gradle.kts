@@ -114,6 +114,7 @@ dependencies {
     implementation("org.apache.commons:commons-collections4:4.4")
     implementation("io.vavr:vavr:0.10.4")
     implementation("org.codehaus.groovy:groovy:3.0.8")
+    implementation("com.google.guava:guava:31.0.1-jre")
     compileOnly("com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}")
     spotbugs("com.github.spotbugs:spotbugs:${spotbugs.toolVersion.get()}")
     implementation("io.jsonwebtoken:jjwt-api:$versionJjwt")
