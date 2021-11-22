@@ -3,6 +3,8 @@ package com.sms.courier.parser.impl;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.sms.courier.common.enums.ApiJsonType;
 import com.sms.courier.common.enums.ApiProtocol;
@@ -175,7 +177,8 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
     }
 
     private String generateSwaggerId(String apiPath, RequestMethod requestMethod) {
-        return (String.join(DELIMITER, apiPath.split(SPLIT)) + DELIMITER + requestMethod).toLowerCase(Locale.US);
+        return Joiner.on(DELIMITER).join(Splitter.on(SPLIT).omitEmptyStrings().split(apiPath)) + DELIMITER
+            + requestMethod.name().toLowerCase(Locale.US);
     }
 
     private void ifRequestOrResponseEqualArray(MediaType mediaType, Consumer<ApiJsonType> callback) {
