@@ -4,8 +4,10 @@ import com.sms.courier.common.enums.ApiStatus;
 import com.sms.courier.common.enums.DocumentFileType;
 import com.sms.courier.common.enums.GroupImportType;
 import com.sms.courier.common.enums.SaveMode;
+import com.sms.courier.dto.request.ApiCaseRequest;
 import com.sms.courier.dto.request.ApiImportRequest;
 import com.sms.courier.dto.request.ApiRequest;
+import com.sms.courier.dto.response.ApiAndCaseResponse.ApiTestCaseResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.api.common.ApiHistoryDetail;
@@ -54,4 +56,6 @@ public interface ApiMapper {
     ApiEntity toEntityByHistory(ApiHistoryDetail record);
 
     WebhookApiResponse toWebhookResponse(ApiEntity apiEntity);
+
+    List<ApiTestCaseResponse> toApiTestCaseResponse(List<ApiCaseRequest> requests);
 }

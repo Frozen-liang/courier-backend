@@ -4,15 +4,16 @@ import static com.sms.courier.common.constant.Constants.API_PATH;
 
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
+import com.sms.courier.dto.request.ApiCaseRequest;
 import com.sms.courier.dto.request.ApiImportRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.BatchUpdateByIdRequest;
+import com.sms.courier.dto.response.ApiAndCaseResponse;
 import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.service.ApiService;
 import java.util.List;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -106,4 +107,9 @@ public class ApiController {
         return apiService.resetApiVersion(historyId);
     }
 
+    @PostMapping("/queryByApiPathAndRequestMethod/{projectId}")
+    public List<ApiAndCaseResponse> queryByApiPathAndRequestMethod(@PathVariable String projectId,
+        @RequestBody @Validated List<ApiCaseRequest> requests) {
+        return apiService.queryByApiPathAndRequestMethod(projectId,requests);
+    }
 }

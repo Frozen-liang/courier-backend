@@ -6,11 +6,14 @@ import com.sms.courier.common.enums.OperationModule;
 import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
+import com.sms.courier.common.listener.event.ApiDeleteEvent;
+import com.sms.courier.dto.request.ApiCaseRequest;
 import com.sms.courier.dto.request.ApiImportRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.BatchUpdateByIdRequest;
 import com.sms.courier.dto.request.UpdateRequest;
+import com.sms.courier.dto.response.ApiAndCaseResponse;
 import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
@@ -33,15 +36,17 @@ import com.sms.courier.webhook.enums.WebhookType;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -194,6 +199,8 @@ public class ApiServiceImpl implements ApiService {
         log.info("Delete api ids:{}.", ids);
         apiDataStructureRefRecordRepository.deleteAllByIdIn(ids);
         apiRepository.deleteAllByIdIn(ids);
+        ApiDeleteEvent apiDeleteEvent = new ApiDeleteEvent(ids);
+        applicationEventPublisher.publishEvent(apiDeleteEvent);
         applicationEventPublisher.publishEvent(WebhookEvent.create(WebhookType.API_DELETE, ids));
         return Boolean.TRUE;
     }
@@ -205,6 +212,8 @@ public class ApiServiceImpl implements ApiService {
         List<ApiEntity> apiEntities = apiRepository.deleteAllByProjectIdAndRemovedIsTrue(projectId);
         List<String> ids = apiEntities.stream().map(ApiEntity::getId).collect(Collectors.toList());
         apiDataStructureRefRecordRepository.deleteAllByIdIn(ids);
+        ApiDeleteEvent apiDeleteEvent = new ApiDeleteEvent(ids);
+        applicationEventPublisher.publishEvent(apiDeleteEvent);
         applicationEventPublisher.publishEvent(WebhookEvent.create(WebhookType.API_DELETE, ids));
         return Boolean.TRUE;
     }
@@ -257,6 +266,25 @@ public class ApiServiceImpl implements ApiService {
             log.error("Failed to reset api version!", e);
             throw ExceptionUtils.mpe(ErrorCode.RESET_API_VERSION_ERROR);
         }
+    }
+
+    @Override
+    public List<ApiAndCaseResponse> queryByApiPathAndRequestMethod(String projectId, List<ApiCaseRequest> requests) {
+        List<String> apiPaths = requests.stream().map(ApiCaseRequest::getApiPath).collect(Collectors.toList());
+        List<Integer> requestMethods = requests.stream().map(ApiCaseRequest::getRequestMethod)
+            .collect(Collectors.toList());
+        Map<String, List<ApiCaseRequest>> apiCaseRequestMap = requests.stream().collect(
+            Collectors.groupingBy(apiCaseRequest -> apiCaseRequest.getApiPath() + apiCaseRequest.getRequestMethod()));
+        Map<String, ApiResponse> apiResponseMap = apiRepository
+            .findByProjectIdAndApiPathInAndRequestMethodIn(projectId, apiPaths, requestMethods)
+            .collect(Collectors.toMap((api) -> api.getApiPath() + api.getRequestMethod(), Function.identity()));
+        List<ApiAndCaseResponse> responses = new ArrayList<>();
+        for (Entry<String, List<ApiCaseRequest>> entry : apiCaseRequestMap.entrySet()) {
+            Optional.ofNullable(apiResponseMap.get(entry.getKey()))
+                .ifPresent((api) -> responses.add(ApiAndCaseResponse.builder().apiResponse(api)
+                    .apiTestCase(apiMapper.toApiTestCaseResponse(entry.getValue())).build()));
+        }
+        return responses;
     }
 
     private void saveRef(String id, String name, List<String> addStructIds, List<String> removeStructIds) {

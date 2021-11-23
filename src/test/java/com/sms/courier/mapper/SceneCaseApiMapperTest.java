@@ -28,14 +28,12 @@ import org.junit.jupiter.api.Test;
 class SceneCaseApiMapperTest {
 
     private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
-    private final ParamInfoMapper paramInfoMapper = mock(ParamInfoMapper.class);
     private final ResponseHeadersVerificationMapper headersVerificationMapper =
         mock(ResponseHeadersVerificationMapper.class);
     private final ResponseResultVerificationMapper resultVerificationMapper =
         mock(ResponseResultVerificationMapper.class);;
     private final SceneCaseApiMapper sceneCaseApiMapper = new SceneCaseApiMapperImpl(apiTestCaseMapper,
-        headersVerificationMapper,resultVerificationMapper,
-        paramInfoMapper);
+        headersVerificationMapper,resultVerificationMapper);
     private static final String MOCK_ID = "1";
 
     @Test

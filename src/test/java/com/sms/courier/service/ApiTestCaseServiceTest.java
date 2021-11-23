@@ -6,6 +6,7 @@ import static com.sms.courier.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERRO
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_LIST_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.UPDATE_CASE_BY_API_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,9 +23,12 @@ import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.ApiRequest;
+import com.sms.courier.dto.request.ApiTestCasePageRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
+import com.sms.courier.dto.request.UpdateCaseByApiRequest;
+import com.sms.courier.dto.request.UpdateCaseByApiRequest.CaseRequest;
+import com.sms.courier.dto.response.ApiTestCasePageResponse;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.apitestcase.TestResult;
@@ -39,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
@@ -263,6 +268,42 @@ class ApiTestCaseServiceTest {
             apiTestCaseService.getCasePageByProjectIdsAndCreateDate(Lists.newArrayList(ID), LocalDateTime.now(),
                 new PageDto());
         assertThat(pageDto.getContent().size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Test the page method in the ApiTestCase service")
+    public void page_test() {
+        when(customizedApiTestCaseRepository.page(any())).thenReturn(Page.empty());
+        Page<ApiTestCasePageResponse> page = apiTestCaseService.page(new ApiTestCasePageRequest());
+        assertThat(page).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Test the updateCaseByApi method in the ApiTestCase service")
+    public void updateCaseByApi_test() {
+        List<UpdateCaseByApiRequest> requests = getUpdateCaseByApiRequests();
+        when(apiTestCaseRepository.findByIdIn(any(Set.class))).thenReturn(List.of(ApiTestCaseEntity.builder().build()));
+        Boolean result = apiTestCaseService.updateCaseByApi(requests);
+        assert result;
+    }
+
+    @Test
+    @DisplayName("An exception occurred while update case by api")
+    public void updateCaseByApi_exception_test() {
+        List<UpdateCaseByApiRequest> requests = getUpdateCaseByApiRequests();
+        when(apiTestCaseRepository.findByIdIn(any(Set.class))).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> apiTestCaseService.updateCaseByApi(requests))
+            .isInstanceOf(ApiTestPlatformException.class).extracting("code")
+            .isEqualTo(UPDATE_CASE_BY_API_ERROR.getCode());
+    }
+
+
+    private List<UpdateCaseByApiRequest> getUpdateCaseByApiRequests() {
+        UpdateCaseByApiRequest updateCaseByApiRequest = new UpdateCaseByApiRequest();
+        updateCaseByApiRequest.setApi(ApiRequest.builder().build());
+        updateCaseByApiRequest.setCaseList(List.of(new CaseRequest()));
+        List<UpdateCaseByApiRequest> requests = List.of(updateCaseByApiRequest);
+        return requests;
     }
 
 }

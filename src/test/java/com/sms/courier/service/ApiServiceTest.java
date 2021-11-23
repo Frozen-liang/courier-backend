@@ -18,11 +18,13 @@ import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.enums.DocumentUrlType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.dto.request.ApiCaseRequest;
 import com.sms.courier.dto.request.ApiImportRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.BatchUpdateByIdRequest;
 import com.sms.courier.dto.request.UpdateRequest;
+import com.sms.courier.dto.response.ApiAndCaseResponse;
 import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
@@ -42,6 +44,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -254,4 +257,25 @@ class ApiServiceTest {
         assertThatThrownBy(() -> apiService.resetApiVersion(ID)).isInstanceOf(ApiTestPlatformException.class);
     }
 
+    @Test
+    @DisplayName("Test for queryByApiPathAndRequestMethod in ApiService")
+    public void queryByApiPathAndRequestMethod_test() {
+        String projectId = ObjectId.get().toString();
+        ApiCaseRequest apiCaseRequest = getApiCaseRequest();
+        List<ApiCaseRequest> requests = List.of(apiCaseRequest);
+        when(apiRepository.findByProjectIdAndApiPathInAndRequestMethodIn(any(), any(), any()))
+            .thenReturn(Stream.of(ApiResponse.builder().apiPath("/v1/test").requestMethod(1).build()));
+        List<ApiAndCaseResponse> result = apiService.queryByApiPathAndRequestMethod(projectId, requests);
+        assertThat(result).hasSize(1);
+    }
+
+    private ApiCaseRequest getApiCaseRequest() {
+        ApiCaseRequest apiCaseRequest = new ApiCaseRequest();
+        apiCaseRequest.setId(ObjectId.get().toString());
+        apiCaseRequest.setCaseName("test");
+        apiCaseRequest.setCreateUsername("admin");
+        apiCaseRequest.setRequestMethod(1);
+        apiCaseRequest.setApiPath("/v1/test");
+        return apiCaseRequest;
+    }
 }
