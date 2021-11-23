@@ -41,9 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -214,11 +212,6 @@ public class ApiServiceImpl implements ApiService {
         template = "{{#result?.![#this.apiName]}}", enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean recover(List<String> ids) {
         return customizedApiRepository.recover(ids);
-    }
-
-    @Override
-    public Long count(String projectId) {
-        return apiRepository.count(Example.of(ApiEntity.builder().projectId(projectId).build()));
     }
 
     @Override

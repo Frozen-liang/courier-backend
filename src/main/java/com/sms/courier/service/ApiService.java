@@ -34,8 +34,6 @@ public interface ApiService {
 
     Boolean recover(List<String> ids);
 
-    Long count(String projectId);
-
     Boolean batchUpdateByIds(BatchUpdateByIdRequest<Object> batchUpdateRequest);
 
     Boolean resetApiVersion(String historyId);

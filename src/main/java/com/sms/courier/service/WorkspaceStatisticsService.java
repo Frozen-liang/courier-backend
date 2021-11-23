@@ -6,4 +6,6 @@ import java.util.List;
 public interface WorkspaceStatisticsService {
 
     List<CaseCountStatisticsResponse> caseGroupDayCount(String workspaceId, Integer day);
+
+    Long apiAllCount(String workspaceId);
 }

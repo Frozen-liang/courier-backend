@@ -30,14 +30,13 @@ import static org.mockito.Mockito.when;
 public class ProjectStatisticsServiceTest {
 
     private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
-    private final ApiService apiService = mock(ApiService.class);
     private final SceneCaseService sceneCaseService = mock(SceneCaseService.class);
     private final ApiTestCaseService apiTestCaseService = mock(ApiTestCaseService.class);
     private final CommonStatisticsRepository commonStatisticsRepository = mock(CommonStatisticsRepository.class);
     private final CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository =
         mock(CustomizedSceneCaseJobRepository.class);
     private final ProjectStatisticsService projectStatisticsService =
-        new ProjectStatisticsServiceImpl(customizedApiRepository, apiService, sceneCaseService, apiTestCaseService,
+        new ProjectStatisticsServiceImpl(customizedApiRepository, sceneCaseService, apiTestCaseService,
             commonStatisticsRepository, customizedSceneCaseJobRepository);
 
     private static final String ID = ObjectId.get().toString();
@@ -135,7 +134,7 @@ public class ProjectStatisticsServiceTest {
     @Test
     @DisplayName("Test for apiAllCount in ProjectStatisticsService")
     public void apiAllCount_test() {
-        when(apiService.count(any())).thenReturn(1L);
+        when(customizedApiRepository.count(any())).thenReturn(1L);
         Long count = projectStatisticsService.apiAllCount(ID);
         assertThat(count).isEqualTo(1L);
     }
@@ -143,7 +142,7 @@ public class ProjectStatisticsServiceTest {
     @Test
     @DisplayName("An exception occurred while test apiAllCount in ProjectStatisticsService.")
     public void apiAllCount_exception_test() {
-        when((apiService.count(any()))).thenThrow(new RuntimeException());
+        when((customizedApiRepository.count(any()))).thenThrow(new RuntimeException());
         assertThatThrownBy(() -> projectStatisticsService.apiAllCount(ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
