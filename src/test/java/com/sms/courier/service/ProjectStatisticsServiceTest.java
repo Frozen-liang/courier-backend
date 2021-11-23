@@ -33,7 +33,6 @@ public class ProjectStatisticsServiceTest {
 
     private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
     private final ApiService apiService = mock(ApiService.class);
-    private final SceneCaseService sceneCaseService = mock(SceneCaseService.class);
     private final CommonStatisticsRepository commonStatisticsRepository = mock(CommonStatisticsRepository.class);
     private final CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository =
         mock(CustomizedSceneCaseJobRepository.class);
@@ -42,9 +41,10 @@ public class ProjectStatisticsServiceTest {
     private final CustomizedSceneCaseRepository customizedSceneCaseRepository = mock(
         CustomizedSceneCaseRepository.class);
     private final ProjectStatisticsService projectStatisticsService =
-        new ProjectStatisticsServiceImpl(customizedApiRepository, apiService, sceneCaseService,
-            commonStatisticsRepository, customizedSceneCaseJobRepository,customizedSceneCaseRepository,
-            customizedApiTestCaseRepository);
+        new ProjectStatisticsServiceImpl( customizedApiRepository,
+             apiService, commonStatisticsRepository,
+             customizedSceneCaseJobRepository, customizedApiTestCaseRepository,
+             customizedSceneCaseRepository);
 
 
     private static final String ID = ObjectId.get().toString();
