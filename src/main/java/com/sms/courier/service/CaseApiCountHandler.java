@@ -14,7 +14,7 @@ public interface CaseApiCountHandler {
 
     void addSceneCaseByApiIds(List<String> apiIds, boolean isNowObject);
 
-    void addTestCaseByApiIds(List<String> apiIds);
+    void addTestCaseByApiIds(List<String> apiIds,Integer count);
 
     void deleteTestCaseByApiIds(List<String> apiIds);
 }

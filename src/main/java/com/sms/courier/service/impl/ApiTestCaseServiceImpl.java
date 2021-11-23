@@ -38,6 +38,7 @@ import com.sms.courier.service.ApiTestCaseService;
 import com.sms.courier.service.CaseApiCountHandler;
 import com.sms.courier.utils.ExceptionUtils;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +101,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         try {
             ApiTestCaseEntity apiTestCase = apiTestCaseMapper.toEntity(apiTestCaseRequest);
             apiTestCaseRepository.insert(apiTestCase);
-            caseApiCountHandler.addTestCaseByApiIds(List.of(apiTestCase.getApiEntity().getId()));
+            caseApiCountHandler.addTestCaseByApiIds(List.of(apiTestCase.getApiEntity().getId()), 1);
         } catch (Exception e) {
             log.error("Failed to add the ApiTestCase!", e);
             throw new ApiTestPlatformException(ADD_API_TEST_CASE_ERROR);
@@ -180,7 +181,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         Boolean isSuccess = customizedApiTestCaseRepository.recover(ids);
         if (isSuccess) {
             List<String> apiIds = customizedApiTestCaseRepository.findApiIdsByTestIds(ids);
-            caseApiCountHandler.addTestCaseByApiIds(apiIds);
+            caseApiCountHandler.addTestCaseByApiIds(apiIds, 1);
         }
         return isSuccess;
     }
@@ -230,6 +231,7 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         try {
             Map<String, ApiRequest> apiRequestMap = new HashMap<>();
             Map<String, Boolean> isReplaceMap = new HashMap<>();
+            Map<Integer, List<String>> caseCountMap = new HashMap<>();
             requests.forEach(request -> {
                 List<CaseRequest> caseList = request.getCaseList();
                 caseList.forEach(e -> {
@@ -237,10 +239,18 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
                         isReplaceMap.put(e.getId(), e.isReplace());
                     }
                 );
+                caseCountMap.compute(caseList.size(), (key, value) -> {
+                    List<String> apiIds = Objects.requireNonNullElse(value, new ArrayList<>());
+                    apiIds.add(request.getApi().getId());
+                    return apiIds;
+                });
             });
             List<ApiTestCaseEntity> apiTestCaseEntities = apiTestCaseRepository.findByIdIn(apiRequestMap.keySet());
             apiTestCaseEntities.forEach(apiTestCase -> updateCaseEntity(apiTestCase, isReplaceMap, apiRequestMap));
             apiTestCaseRepository.saveAll(apiTestCaseEntities);
+            caseCountMap.forEach((key, value) -> {
+                caseApiCountHandler.addTestCaseByApiIds(value, key);
+            });
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Update case by api error!", e);
