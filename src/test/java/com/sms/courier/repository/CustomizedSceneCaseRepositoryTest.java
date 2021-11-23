@@ -1,22 +1,11 @@
 package com.sms.courier.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.wildfly.common.Assert.assertTrue;
-
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.SceneCaseResponse;
-import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.repository.impl.CustomizedSceneCaseRepositoryImpl;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +15,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Tests for CustomizedSceneCaseRepositoryTest")
 class CustomizedSceneCaseRepositoryTest {
@@ -106,4 +101,11 @@ class CustomizedSceneCaseRepositoryTest {
         assertThat(response).isNotEmpty();
     }
 
+    @Test
+    @DisplayName("Test the count method in the CustomizedSceneCaseRepository")
+    void count_thenRight() {
+        when(mongoTemplate.count(any(), eq(SceneCaseEntity.class))).thenReturn(1L);
+        Long count = customizedSceneCaseRepository.count(Lists.newArrayList(MOCK_ID));
+        assertThat(count).isEqualTo(1L);
+    }
 }

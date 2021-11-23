@@ -473,21 +473,6 @@ class SceneCaseServiceTest {
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
-    @Test
-    @DisplayName("Test the count method in the SceneCase service")
-    void count_thenRight() {
-        when(sceneCaseRepository.count(any())).thenReturn(1L);
-        Long count = sceneCaseService.count(MOCK_PROJECT_ID);
-        assertThat(count).isEqualTo(1L);
-    }
-
-    @Test
-    @DisplayName("Test the count method in the SceneCase service thrown exception")
-    void count_then_Exception() {
-        when(sceneCaseRepository.count(any())).thenThrow(new RuntimeException());
-        assertThatThrownBy(() -> sceneCaseService.count(MOCK_PROJECT_ID)).isInstanceOf(ApiTestPlatformException.class);
-    }
-
     private AddCaseTemplateConnRequest getAddConnRequest() {
         return AddCaseTemplateConnRequest.builder()
             .sceneCaseId(MOCK_ID)
