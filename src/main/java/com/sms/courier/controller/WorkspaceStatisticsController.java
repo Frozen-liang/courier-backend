@@ -26,7 +26,7 @@ public class WorkspaceStatisticsController {
         return workspaceStatisticsService.caseGroupDayCount(workspaceId, day);
     }
 
-    @GetMapping("/scene/all/count/pid/{workspaceId}")
+    @GetMapping("/scene/all/count/{workspaceId}")
     public Long sceneAllCount(@PathVariable String workspaceId) {
         return workspaceStatisticsService.sceneAllCount(workspaceId);
     }
