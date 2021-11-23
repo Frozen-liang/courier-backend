@@ -98,6 +98,7 @@ class ApiServiceTest {
     @DisplayName("Test the add method in the Api service")
     public void add_test() {
         when(apiRepository.insert(any(ApiEntity.class))).thenReturn(api);
+        when(apiRepository.existsByProjectIdAndApiPathAndRequestMethod(any(),any(),any())).thenReturn(false);
         when(apiHistoryRepository.insert(any(ApiHistoryEntity.class))).thenReturn(ApiHistoryEntity.builder().build());
         Boolean bool = apiService.add(apiRequestDto);
         assertThat(bool).isTrue();
@@ -116,6 +117,7 @@ class ApiServiceTest {
     @DisplayName("Test the edit method in the Api service")
     public void edit_test() {
         when(apiRepository.findById(any())).thenReturn(Optional.of(api));
+        when(apiRepository.existsByProjectIdAndApiPathAndRequestMethod(any(),any(),any())).thenReturn(false);
         when(apiRepository.save(any(ApiEntity.class))).thenReturn(api);
         when(apiHistoryRepository.insert(any(ApiHistoryEntity.class))).thenReturn(ApiHistoryEntity.builder().build());
         Boolean bool = apiService.edit(apiRequestDto);

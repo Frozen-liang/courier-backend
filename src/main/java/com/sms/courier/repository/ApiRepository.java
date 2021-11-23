@@ -1,5 +1,6 @@
 package com.sms.courier.repository;
 
+import com.sms.courier.common.enums.RequestMethod;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import java.util.List;
@@ -19,4 +20,6 @@ public interface ApiRepository extends MongoRepository<ApiEntity, String> {
 
     Stream<ApiResponse> findByProjectIdAndApiPathInAndRequestMethodIn(String projectId, List<String> apiPaths,
         List<Integer> requestMethods);
+
+    boolean existsByProjectIdAndApiPathAndRequestMethod(String projectId,String apiPath, RequestMethod requestMethod);
 }

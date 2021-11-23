@@ -1,5 +1,7 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.utils.Assert.isFalse;
+
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.enums.OperationModule;
@@ -128,9 +130,12 @@ public class ApiServiceImpl implements ApiService {
         try {
             ApiEntity apiEntity = apiMapper.toEntity(apiRequest);
             apiEntity.setMd5(MD5Util.getMD5(apiEntity));
+            isFalse(apiRepository.existsByProjectIdAndApiPathAndRequestMethod(apiRequest.getProjectId(),
+                apiRequest.getApiPath(), apiRequest.getRequestMethod()), "The same path and request method exist!");
             ApiEntity newApiEntity = apiRepository.insert(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
-                .description("First create api!")
+                .description(StringUtils.isNotBlank(apiRequest.getEditDescription()) ? apiRequest.getEditDescription()
+                    : "First create api!")
                 .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
             // 如果没用引用数据结构 则不需要保存引用关系
             if (CollectionUtils.isNotEmpty(apiRequest.getAddStructIds())) {
@@ -139,6 +144,9 @@ public class ApiServiceImpl implements ApiService {
             }
             apiHistoryRepository.insert(apiHistoryEntity);
             publishWebhookEvent(WebhookType.API_ADD, newApiEntity);
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
             throw new ApiTestPlatformException(ErrorCode.ADD_API_ERROR);
@@ -161,6 +169,10 @@ public class ApiServiceImpl implements ApiService {
             apiEntity.setSceneCaseCount(oldApiEntity.getSceneCaseCount());
             apiEntity.setOtherProjectSceneCaseCount(oldApiEntity.getOtherProjectSceneCaseCount());
             apiEntity.setMd5(MD5Util.getMD5(apiEntity));
+            isFalse(!StringUtils.equals(apiRequest.getApiPath() + apiRequest.getRequestMethod(),
+                oldApiEntity.getApiPath() + oldApiEntity.getRequestMethod()) && apiRepository
+                .existsByProjectIdAndApiPathAndRequestMethod(apiRequest.getProjectId(),
+                    apiRequest.getApiPath(), apiRequest.getRequestMethod()), "The same path and request method exist!");
             ApiEntity newApiEntity = apiRepository.save(apiEntity);
             ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
                 .description(StringUtils.isNotBlank(apiRequest.getEditDescription()) ? apiRequest.getEditDescription()
