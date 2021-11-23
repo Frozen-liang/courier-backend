@@ -110,6 +110,6 @@ public class ApiController {
     @PostMapping("/queryByApiPathAndRequestMethod/{projectId}")
     public List<ApiAndCaseResponse> queryByApiPathAndRequestMethod(@PathVariable String projectId,
         @RequestBody @Validated List<ApiCaseRequest> requests) {
-        return apiService.queryByApiPathAndRequestMethod(projectId,requests);
+        return apiService.queryByApiPathAndRequestMethod(projectId, requests);
     }
 }
