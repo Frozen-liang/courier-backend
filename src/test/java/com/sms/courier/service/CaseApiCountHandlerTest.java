@@ -1,5 +1,13 @@
 package com.sms.courier.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.listener.event.AddCaseEvent;
 import com.sms.courier.common.listener.event.DeleteCaseEvent;
@@ -17,14 +25,6 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @DisplayName("Tests for CaseApiCountHandler")
 public class CaseApiCountHandlerTest {
@@ -125,7 +125,7 @@ public class CaseApiCountHandlerTest {
     @Test
     @DisplayName("Test the addTestCaseByApiIds method in the CaseApiCountHandler service")
     void addTestCaseByApiIds_test() {
-        caseApiCountHandler.addTestCaseByApiIds(List.of(MOCK_ID.toString()));
+        caseApiCountHandler.addTestCaseByApiIds(List.of(MOCK_ID.toString()),null);
         verify(applicationEventPublisher, times(1)).publishEvent(any(AddCaseEvent.class));
     }
 

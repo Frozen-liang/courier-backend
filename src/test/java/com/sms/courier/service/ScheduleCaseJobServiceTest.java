@@ -137,7 +137,7 @@ class ScheduleCaseJobServiceTest {
             .caseFilter(CaseFilter.valueOf(caseFilter))
             .caseCondition(CaseCondition.builder().build()).caseType(CaseType.CASE).build();
         List<ApiTestCaseEntity> apiTestCaseEntities = Collections.singletonList(apiTestCaseEntity);
-        when(apiTestCaseRepository.findByIdIn(any())).thenReturn(apiTestCaseEntities);
+        when(apiTestCaseRepository.findByIdIn(any(List.class))).thenReturn(apiTestCaseEntities);
         when(apiTestCaseRepository.findByProjectIdIsAndRemovedIsFalse(any())).thenReturn(apiTestCaseEntities);
         when(apiTestCaseRepository.findByTagIdInAndProjectId(any(),any())).thenReturn(apiTestCaseEntities);
         when(projectEnvironmentService.findOne(anyString())).thenReturn(ProjectEnvironmentEntity.builder().build());
@@ -159,7 +159,7 @@ class ScheduleCaseJobServiceTest {
             .caseFilter(CaseFilter.valueOf(caseFilter))
             .caseCondition(CaseCondition.builder().build()).caseType(CaseType.CASE).build();
         List<ApiTestCaseEntity> apiTestCaseEntities = Collections.singletonList(apiTestCaseEntity);
-        when(apiTestCaseRepository.findByIdIn(any())).thenReturn(apiTestCaseEntities);
+        when(apiTestCaseRepository.findByIdIn(any(List.class))).thenReturn(apiTestCaseEntities);
         when(apiTestCaseRepository.findByProjectIdIsAndRemovedIsFalse(any())).thenReturn(apiTestCaseEntities);
         when(apiTestCaseRepository.findByTagIdInAndProjectId(any(),any())).thenReturn(apiTestCaseEntities);
         when(projectEnvironmentService.findOne(anyString())).thenReturn(ProjectEnvironmentEntity.builder().build());
@@ -177,7 +177,7 @@ class ScheduleCaseJobServiceTest {
         ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envId(ObjectId.get().toString())
             .caseFilter(CaseFilter.CUSTOM)
             .caseCondition(CaseCondition.builder().build()).caseType(CaseType.CASE).build();
-        when(apiTestCaseRepository.findByIdIn(any())).thenReturn(Collections.emptyList());
+        when(apiTestCaseRepository.findByIdIn(any(List.class))).thenReturn(Collections.emptyList());
         when(projectEnvironmentService.findOne(anyString())).thenReturn(ProjectEnvironmentEntity.builder().build());
         when(commonRepository.findById(ID, DataCollectionEntity.class)).thenReturn(Optional.empty());
         when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);

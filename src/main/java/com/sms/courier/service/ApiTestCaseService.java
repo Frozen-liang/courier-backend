@@ -2,7 +2,10 @@ package com.sms.courier.service;
 
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.dto.PageDto;
+import com.sms.courier.dto.request.ApiTestCasePageRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
+import com.sms.courier.dto.request.UpdateCaseByApiRequest;
+import com.sms.courier.dto.response.ApiTestCasePageResponse;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.apitestcase.TestResult;
@@ -40,4 +43,7 @@ public interface ApiTestCaseService {
     Page<ApiTestCaseResponse> getCasePageByProjectIdsAndCreateDate(List<String> projectIds, LocalDateTime dateTime,
         PageDto pageDto);
 
+    Page<ApiTestCasePageResponse> page(ApiTestCasePageRequest request);
+
+    Boolean updateCaseByApi(List<UpdateCaseByApiRequest> requests);
 }
