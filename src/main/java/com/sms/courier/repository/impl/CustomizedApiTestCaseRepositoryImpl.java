@@ -1,6 +1,9 @@
 package com.sms.courier.repository.impl;
 
 import static com.sms.courier.common.field.ApiTagField.TAG_NAME;
+import static com.sms.courier.common.field.ApiTestCaseField.CASE_API_ID;
+import static com.sms.courier.common.field.ApiTestCaseField.CASE_NAME;
+import static com.sms.courier.common.field.ApiTestCaseField.STATUS;
 import static com.sms.courier.common.field.CommonField.API_ID;
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
 import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
@@ -10,15 +13,14 @@ import static com.sms.courier.common.field.CommonField.PROJECT_ID;
 import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.common.field.CommonField.USERNAME;
 import static com.sms.courier.common.field.SceneField.TAG_ID;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 
 import com.google.common.collect.Lists;
-import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.dto.PageDto;
+import com.sms.courier.dto.request.ApiTestCasePageRequest;
+import com.sms.courier.dto.response.ApiTestCasePageResponse;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
@@ -30,13 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -47,7 +45,6 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
 
     private final MongoTemplate mongoTemplate;
     private final CommonRepository commonRepository;
-    private static final String STATUS = "status";
 
     public CustomizedApiTestCaseRepositoryImpl(MongoTemplate mongoTemplate,
         CommonRepository commonRepository) {
@@ -61,7 +58,7 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
         Query query = new Query();
         API_ID.in(apiIds).ifPresent(query::addCriteria);
         Update update = new Update();
-        update.set(STATUS, status.getCode());
+        update.set(STATUS.getName(), status.getCode());
         update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
         mongoTemplate.updateMulti(query, update, ApiTestCaseEntity.class);
     }
@@ -124,6 +121,21 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
             .lookupVo(lookupVoList)
             .build();
         return commonRepository.page(queryVo, pageDto, ApiTestCaseResponse.class);
+    }
+
+    @Override
+    public Page<ApiTestCasePageResponse> page(ApiTestCasePageRequest request) {
+        QueryVo query = new QueryVo();
+        query.setEntityClass(ApiTestCaseEntity.class);
+        query.setLookupVo(List.of(LookupVo.createLookupUser()));
+        List<Optional<Criteria>> list = new ArrayList<>();
+        list.add(CASE_NAME.like(request.getCaseName()));
+        list.add(TAG_ID.in(request.getTagId()));
+        list.add(CASE_API_ID.is(request.getApiId()));
+        list.add(PROJECT_ID.is(request.getProjectId()));
+        list.add(STATUS.is(request.getStatus()));
+        query.setCriteriaList(list);
+        return commonRepository.page(query, request, ApiTestCasePageResponse.class);
     }
 
     private List<LookupVo> getLookupVoList() {
