@@ -33,8 +33,6 @@ public interface ApiTestCaseService {
 
     Boolean recover(List<String> ids);
 
-    Long count(String projectId);
-
     void insertTestResult(String id, TestResult testResult);
 
     Long countByProjectIds(List<String> projectIds, LocalDateTime dateTime);

@@ -11,10 +11,10 @@ import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
-import com.sms.courier.entity.job.SceneCaseJobEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.repository.CommonStatisticsRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
+import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.repository.CustomizedSceneCaseJobRepository;
 import com.sms.courier.service.ApiService;
 import com.sms.courier.service.ApiTestCaseService;
@@ -35,21 +35,22 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
     private final CustomizedApiRepository customizedApiRepository;
     private final ApiService apiService;
     private final SceneCaseService sceneCaseService;
-    private final ApiTestCaseService apiTestCaseService;
     private final CommonStatisticsRepository commonStatisticsRepository;
     private final CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository;
+    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository;
 
     public ProjectStatisticsServiceImpl(CustomizedApiRepository customizedApiRepository,
         ApiService apiService,
-        SceneCaseService sceneCaseService, ApiTestCaseService apiTestCaseService,
+        SceneCaseService sceneCaseService,
         CommonStatisticsRepository commonStatisticsRepository,
-        CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository) {
+        CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository,
+        CustomizedApiTestCaseRepository customizedApiTestCaseRepository) {
         this.customizedApiRepository = customizedApiRepository;
         this.apiService = apiService;
         this.sceneCaseService = sceneCaseService;
-        this.apiTestCaseService = apiTestCaseService;
         this.commonStatisticsRepository = commonStatisticsRepository;
         this.customizedSceneCaseJobRepository = customizedSceneCaseJobRepository;
+        this.customizedApiTestCaseRepository = customizedApiTestCaseRepository;
     }
 
     @Override
@@ -121,7 +122,7 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
     @Override
     public Long caseAllCount(String projectId) {
         try {
-            return apiTestCaseService.count(projectId);
+            return customizedApiTestCaseRepository.count(Lists.newArrayList(projectId));
         } catch (Exception e) {
             log.error("Failed to get the Project api case count!", e);
             throw ExceptionUtils.mpe(ErrorCode.GET_PROJECT_API_CASE_COUNT_ERROR);

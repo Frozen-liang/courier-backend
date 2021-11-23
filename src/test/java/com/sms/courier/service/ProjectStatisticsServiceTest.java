@@ -10,6 +10,7 @@ import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.repository.CommonStatisticsRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
+import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.repository.CustomizedSceneCaseJobRepository;
 import com.sms.courier.service.impl.ProjectStatisticsServiceImpl;
 import java.util.List;
@@ -32,13 +33,14 @@ public class ProjectStatisticsServiceTest {
     private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
     private final ApiService apiService = mock(ApiService.class);
     private final SceneCaseService sceneCaseService = mock(SceneCaseService.class);
-    private final ApiTestCaseService apiTestCaseService = mock(ApiTestCaseService.class);
     private final CommonStatisticsRepository commonStatisticsRepository = mock(CommonStatisticsRepository.class);
     private final CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository =
         mock(CustomizedSceneCaseJobRepository.class);
+    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository =
+        mock(CustomizedApiTestCaseRepository.class);
     private final ProjectStatisticsService projectStatisticsService =
-        new ProjectStatisticsServiceImpl(customizedApiRepository, apiService, sceneCaseService, apiTestCaseService,
-            commonStatisticsRepository, customizedSceneCaseJobRepository);
+        new ProjectStatisticsServiceImpl(customizedApiRepository, apiService, sceneCaseService,
+            commonStatisticsRepository, customizedSceneCaseJobRepository, customizedApiTestCaseRepository);
 
     private static final String ID = ObjectId.get().toString();
     private static final Integer MOCK_DAY = 7;
@@ -167,7 +169,7 @@ public class ProjectStatisticsServiceTest {
     @Test
     @DisplayName("Test for caseAllCount in ProjectStatisticsService")
     public void caseAllCount_test() {
-        when(apiTestCaseService.count(any())).thenReturn(1L);
+        when(customizedApiTestCaseRepository.count(any())).thenReturn(1L);
         Long count = projectStatisticsService.caseAllCount(ID);
         assertThat(count).isEqualTo(1L);
     }
@@ -175,7 +177,7 @@ public class ProjectStatisticsServiceTest {
     @Test
     @DisplayName("An exception occurred while test caseAllCount in ProjectStatisticsService.")
     public void caseAllCount_exception_test() {
-        when((apiTestCaseService.count(any()))).thenThrow(new RuntimeException());
+        when((customizedApiTestCaseRepository.count(any()))).thenThrow(new RuntimeException());
         assertThatThrownBy(() -> projectStatisticsService.caseAllCount(ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }

@@ -278,6 +278,7 @@ public enum ErrorCode {
     GET_COURIER_SCHEDULER_ERROR("4258", "The courier scheduler setting not exist, please configure it!"),
     GET_CASE_JOB_COUNT_ERROR("4259", "Failed to get case job count!"),
     GET_SCENE_CASE_JOB_COUNT_ERROR("4260", "Failed to get scene case job count!"),
+    GET_WORKSPACE_API_CASE_COUNT_ERROR("4262", "Failed to get the Workspace api case count!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),
