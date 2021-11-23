@@ -1,10 +1,8 @@
 package com.sms.courier.repository;
 
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.SceneCaseResponse;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
@@ -23,5 +21,7 @@ public interface CustomizedSceneCaseRepository {
     Boolean deleteGroupIdByIds(List<String> ids);
 
     Optional<SceneCaseResponse> findById(String id);
+
+    Long count(List<String> projectIds);
 
 }

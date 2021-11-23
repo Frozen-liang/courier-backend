@@ -1,6 +1,7 @@
 package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_SCENE_COUNT_ERROR;
 
 import com.google.common.collect.Lists;
 import com.sms.courier.common.exception.ApiTestPlatformException;
@@ -9,6 +10,7 @@ import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.ProjectResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.repository.CommonStatisticsRepository;
+import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.service.ProjectService;
 import com.sms.courier.service.WorkspaceStatisticsService;
@@ -26,13 +28,16 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
 
     private final ProjectService projectService;
     private final CommonStatisticsRepository commonStatisticsRepository;
+    private final CustomizedSceneCaseRepository customizedSceneCaseRepository;
     private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository;
 
     public WorkspaceStatisticsServiceImpl(ProjectService projectService,
         CommonStatisticsRepository commonStatisticsRepository,
+        CustomizedSceneCaseRepository customizedSceneCaseRepository,
         CustomizedApiTestCaseRepository customizedApiTestCaseRepository) {
         this.projectService = projectService;
         this.commonStatisticsRepository = commonStatisticsRepository;
+        this.customizedSceneCaseRepository = customizedSceneCaseRepository;
         this.customizedApiTestCaseRepository = customizedApiTestCaseRepository;
     }
 
@@ -60,6 +65,22 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
     }
 
     @Override
+    public Long sceneAllCount(String workspaceId) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(workspaceId);
+            if (CollectionUtils.isNotEmpty(projectResponses)) {
+                List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                    .collect(Collectors.toList());
+                return customizedSceneCaseRepository.count(projectIds);
+            }
+            return 0L;
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace scene count!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_SCENE_COUNT_ERROR);
+        }
+    }
+
+    @Override
     public Long caseAllCount(String workspaceId) {
         try {
             List<ProjectResponse> projectResponses = projectService.list(workspaceId);
@@ -74,6 +95,5 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
             throw ExceptionUtils.mpe(ErrorCode.GET_WORKSPACE_API_CASE_COUNT_ERROR);
         }
     }
-
 
 }

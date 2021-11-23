@@ -26,10 +26,14 @@ public class WorkspaceStatisticsController {
         return workspaceStatisticsService.caseGroupDayCount(workspaceId, day);
     }
 
+    @GetMapping("/scene/all/count/{workspaceId}")
+    public Long sceneAllCount(@PathVariable String workspaceId) {
+        return workspaceStatisticsService.sceneAllCount(workspaceId);
+    }
+
     @GetMapping("/case/all/count/{workspaceId}")
     public Long caseAllCount(@PathVariable String workspaceId) {
         return workspaceStatisticsService.caseAllCount(workspaceId);
     }
-
 
 }

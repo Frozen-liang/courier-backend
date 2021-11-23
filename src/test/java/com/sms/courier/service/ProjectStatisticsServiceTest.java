@@ -12,6 +12,7 @@ import com.sms.courier.repository.CommonStatisticsRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.repository.CustomizedSceneCaseJobRepository;
+import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.service.impl.ProjectStatisticsServiceImpl;
 import java.util.List;
 import org.assertj.core.util.Lists;
@@ -38,9 +39,13 @@ public class ProjectStatisticsServiceTest {
         mock(CustomizedSceneCaseJobRepository.class);
     private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository =
         mock(CustomizedApiTestCaseRepository.class);
+    private final CustomizedSceneCaseRepository customizedSceneCaseRepository = mock(
+        CustomizedSceneCaseRepository.class);
     private final ProjectStatisticsService projectStatisticsService =
         new ProjectStatisticsServiceImpl(customizedApiRepository, apiService, sceneCaseService,
-            commonStatisticsRepository, customizedSceneCaseJobRepository, customizedApiTestCaseRepository);
+            commonStatisticsRepository, customizedSceneCaseJobRepository,customizedSceneCaseRepository,
+            customizedApiTestCaseRepository);
+
 
     private static final String ID = ObjectId.get().toString();
     private static final Integer MOCK_DAY = 7;
@@ -153,7 +158,7 @@ public class ProjectStatisticsServiceTest {
     @Test
     @DisplayName("Test for sceneAllCount in ProjectStatisticsService")
     public void sceneAllCount_test() {
-        when(sceneCaseService.count(any())).thenReturn(1L);
+        when(customizedSceneCaseRepository.count(any())).thenReturn(1L);
         Long count = projectStatisticsService.sceneAllCount(ID);
         assertThat(count).isEqualTo(1L);
     }
@@ -161,7 +166,7 @@ public class ProjectStatisticsServiceTest {
     @Test
     @DisplayName("An exception occurred while test sceneAllCount in ProjectStatisticsService.")
     public void sceneAllCount_exception_test() {
-        when((sceneCaseService.count(any()))).thenThrow(new RuntimeException());
+        when((customizedSceneCaseRepository.count(any()))).thenThrow(new RuntimeException());
         assertThatThrownBy(() -> projectStatisticsService.sceneAllCount(ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
