@@ -20,12 +20,6 @@ public class WorkspaceStatisticsController {
         this.workspaceStatisticsService = workspaceStatisticsService;
     }
 
-    @GetMapping("/case/group-day/{day}/count/{workspaceId}")
-    public List<CaseCountStatisticsResponse> caseGroupDayCount(@PathVariable String workspaceId,
-        @PathVariable Integer day) {
-        return workspaceStatisticsService.caseGroupDayCount(workspaceId, day);
-    }
-
     @GetMapping("/scene/all/count/{workspaceId}")
     public Long sceneAllCount(@PathVariable String workspaceId) {
         return workspaceStatisticsService.sceneAllCount(workspaceId);
@@ -39,6 +33,18 @@ public class WorkspaceStatisticsController {
     @GetMapping("/api/all/count/{workspaceId}")
     public Long apiAllCount(@PathVariable String workspaceId) {
         return workspaceStatisticsService.apiAllCount(workspaceId);
+    }
+
+    @GetMapping("/case/group-day/{day}/count/{workspaceId}")
+    public List<CaseCountStatisticsResponse> caseGroupDayCount(@PathVariable String workspaceId,
+        @PathVariable Integer day) {
+        return workspaceStatisticsService.caseGroupDayCount(workspaceId, day);
+    }
+
+    @GetMapping("/scene/case/group-day/{day}/count/{workspaceId}")
+    public List<CaseCountStatisticsResponse> sceneCaseGroupDayCount(@PathVariable String workspaceId,
+        @PathVariable Integer day) {
+        return workspaceStatisticsService.sceneCaseGroupDayCount(workspaceId, day);
     }
 
 }
