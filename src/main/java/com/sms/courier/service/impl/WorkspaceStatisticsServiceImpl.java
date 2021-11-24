@@ -49,15 +49,12 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
     public List<CaseCountStatisticsResponse> caseGroupDayCount(String workspaceId, Integer day) {
         try {
             List<ProjectResponse> projectResponses = projectService.list(workspaceId);
-            if (CollectionUtils.isNotEmpty(projectResponses)) {
-                List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
-                    .collect(Collectors.toList());
-                LocalDateTime dateTime = LocalDateTime.now().minusDays(day);
-                List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
-                    .getGroupDayCount(projectIds, dateTime, ApiTestCaseEntity.class);
-                return handleResponses(responses, day);
-            }
-            List<CaseCountStatisticsResponse> responses = Lists.newArrayList();
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            LocalDateTime dateTime = LocalDateTime.now().minusDays(day);
+            List<CaseCountStatisticsResponse> responses = CollectionUtils.isNotEmpty(projectResponses)
+                ? commonStatisticsRepository.getGroupDayCount(projectIds, dateTime, ApiTestCaseEntity.class)
+                : Lists.newArrayList();
             return handleResponses(responses, day);
         } catch (ApiTestPlatformException exception) {
             log.error(exception.getMessage());
@@ -72,12 +69,9 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
     public Long sceneAllCount(String workspaceId) {
         try {
             List<ProjectResponse> projectResponses = projectService.list(workspaceId);
-            if (CollectionUtils.isNotEmpty(projectResponses)) {
-                List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
-                    .collect(Collectors.toList());
-                return customizedSceneCaseRepository.count(projectIds);
-            }
-            return 0L;
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return CollectionUtils.isNotEmpty(projectResponses) ? customizedSceneCaseRepository.count(projectIds) : 0L;
         } catch (Exception e) {
             log.error("Failed to get the Workspace scene count!", e);
             throw new ApiTestPlatformException(GET_WORKSPACE_SCENE_COUNT_ERROR);
@@ -88,12 +82,10 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
     public Long caseAllCount(String workspaceId) {
         try {
             List<ProjectResponse> projectResponses = projectService.list(workspaceId);
-            if (CollectionUtils.isNotEmpty(projectResponses)) {
-                List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
-                    .collect(Collectors.toList());
-                return customizedApiTestCaseRepository.count(projectIds);
-            }
-            return 0L;
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return CollectionUtils.isNotEmpty(projectResponses) ? customizedApiTestCaseRepository.count(projectIds)
+                : 0L;
         } catch (Exception e) {
             log.error("Failed to get the Workspace api case count!", e);
             throw ExceptionUtils.mpe(ErrorCode.GET_WORKSPACE_API_CASE_COUNT_ERROR);
@@ -104,12 +96,9 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
     public Long apiAllCount(String workspaceId) {
         try {
             List<ProjectResponse> projectResponses = projectService.list(workspaceId);
-            if (CollectionUtils.isNotEmpty(projectResponses)) {
-                List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
-                    .collect(Collectors.toList());
-                return customizedApiRepository.count(projectIds);
-            }
-            return 0L;
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return CollectionUtils.isNotEmpty(projectIds) ? customizedApiRepository.count(projectIds) : 0L;
         } catch (Exception e) {
             log.error("Failed to get the Workspace api count!", e);
             throw ExceptionUtils.mpe(ErrorCode.GET_WORKSPACE_API_COUNT_ERROR);
