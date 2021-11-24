@@ -1,13 +1,14 @@
 package com.sms.courier.service;
 
+import com.sms.courier.dto.request.ApiCaseRequest;
 import com.sms.courier.dto.request.ApiImportRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.BatchUpdateByIdRequest;
+import com.sms.courier.dto.response.ApiAndCaseResponse;
 import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import java.util.List;
-import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -38,4 +39,5 @@ public interface ApiService {
 
     Boolean resetApiVersion(String historyId);
 
+    List<ApiAndCaseResponse> queryByApiPathAndRequestMethod(String projectId, List<ApiCaseRequest> requests);
 }

@@ -92,6 +92,14 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
         return commonRepository.findById(id, "SceneCase", lookupVoList, SceneCaseResponse.class);
     }
 
+    @Override
+    public Long count(List<String> projectIds) {
+        Query query = new Query();
+        REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
+        PROJECT_ID.in(projectIds).ifPresent(query::addCriteria);
+        return mongoTemplate.count(query, SceneCaseEntity.class);
+    }
+
     private List<LookupVo> getLookupVoList() {
         return Lists.newArrayList(
             LookupVo.builder()

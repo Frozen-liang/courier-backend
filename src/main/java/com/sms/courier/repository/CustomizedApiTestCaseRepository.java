@@ -2,8 +2,9 @@ package com.sms.courier.repository;
 
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.dto.PageDto;
+import com.sms.courier.dto.request.ApiTestCasePageRequest;
+import com.sms.courier.dto.response.ApiTestCasePageResponse;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.bson.types.ObjectId;
@@ -28,4 +29,7 @@ public interface CustomizedApiTestCaseRepository {
     Page<ApiTestCaseResponse> getCasePageByProjectIdsAndCreateDate(List<String> projectIds, LocalDateTime dateTime,
         PageDto pageDto);
 
+    Page<ApiTestCasePageResponse> page(ApiTestCasePageRequest request);
+
+    Long count(List<String> projectIds);
 }

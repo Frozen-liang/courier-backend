@@ -140,7 +140,7 @@ public class CaseApiCountHandlerImpl implements CaseApiCountHandler {
 
     //增加单个用例时，发送事件
     @Override
-    public void addTestCaseByApiIds(List<String> apiIds) {
+    public void addTestCaseByApiIds(List<String> apiIds, Integer count) {
         AddCaseEvent addCaseEvent = new AddCaseEvent(apiIds, CASE, null);
         applicationEventPublisher.publishEvent(addCaseEvent);
     }

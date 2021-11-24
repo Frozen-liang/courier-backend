@@ -7,6 +7,8 @@ import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.ProjectResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.repository.CommonStatisticsRepository;
+import com.sms.courier.repository.CustomizedSceneCaseRepository;
+import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
 import com.sms.courier.service.impl.WorkspaceStatisticsServiceImpl;
 import java.util.List;
@@ -22,13 +24,19 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@DisplayName("Tests for WorkspaceStatisticsService")
 public class WorkspaceStatisticsServiceTest {
 
     private final ProjectService projectService = mock(ProjectService.class);
     private final CommonStatisticsRepository commonStatisticsRepository = mock(CommonStatisticsRepository.class);
+    private final CustomizedSceneCaseRepository customizedSceneCaseRepository = mock(
+        CustomizedSceneCaseRepository.class);
+    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository =
+        mock(CustomizedApiTestCaseRepository.class);
     private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
     private final WorkspaceStatisticsService workspaceStatisticsService =
-        new WorkspaceStatisticsServiceImpl(projectService, commonStatisticsRepository, customizedApiRepository);
+        new WorkspaceStatisticsServiceImpl(projectService, commonStatisticsRepository, customizedSceneCaseRepository,
+            customizedApiTestCaseRepository,customizedApiRepository);
     private static final String ID = ObjectId.get().toString();
     private static final Integer MOCK_DAY = 7;
     private static final Long MOCK_COUNT = 1L;
@@ -71,6 +79,44 @@ public class WorkspaceStatisticsServiceTest {
         when(projectService.list(any()))
             .thenThrow(new RuntimeException());
         assertThatThrownBy(() -> workspaceStatisticsService.caseGroupDayCount(ID, MOCK_DAY))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the sceneAllCount method in the Workspace service")
+    public void sceneAllCount_projectIsNull_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        when(customizedSceneCaseRepository.count(any())).thenReturn(MOCK_COUNT);
+        Long dto = workspaceStatisticsService.sceneAllCount(ID);
+        assertThat(dto).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sceneAllCount Workspace")
+    public void sceneAllCount_exception_test() {
+        when(projectService.list(any()))
+            .thenThrow(new ApiTestPlatformException(ErrorCode.GET_WORKSPACE_SCENE_COUNT_ERROR));
+        assertThatThrownBy(() -> workspaceStatisticsService.sceneAllCount(ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the caseAllCount method in the Workspace service")
+    public void caseAllCount_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        when(customizedApiTestCaseRepository.count(any())).thenReturn(MOCK_COUNT);
+        Long dto = workspaceStatisticsService.caseAllCount(ID);
+        assertThat(dto).isEqualTo(MOCK_COUNT);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while caseAllCount Workspace")
+    public void caseAllCount_exception_test() {
+        when(projectService.list(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceStatisticsService.caseAllCount(ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
