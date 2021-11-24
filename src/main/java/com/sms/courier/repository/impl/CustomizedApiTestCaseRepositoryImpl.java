@@ -138,6 +138,14 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
         return commonRepository.page(query, request, ApiTestCasePageResponse.class);
     }
 
+    @Override
+    public Long count(List<String> projectIds) {
+        Query query = new Query();
+        PROJECT_ID.in(projectIds).ifPresent(query::addCriteria);
+        REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
+        return mongoTemplate.count(query, ApiTestCaseEntity.class);
+    }
+
     private List<LookupVo> getLookupVoList() {
         return Lists.newArrayList(
             LookupVo.builder()

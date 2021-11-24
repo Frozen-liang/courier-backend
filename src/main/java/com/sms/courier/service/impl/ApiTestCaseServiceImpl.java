@@ -47,8 +47,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -184,15 +182,6 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
             caseApiCountHandler.addTestCaseByApiIds(apiIds, 1);
         }
         return isSuccess;
-    }
-
-    @Override
-    public Long count(String projectId) {
-        ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-            .withIgnorePaths("isExecute")
-            .withIgnorePaths("advancedSetting.isEnableRedirect");
-        return apiTestCaseRepository
-            .count(Example.of(ApiTestCaseEntity.builder().projectId(projectId).build(), exampleMatcher));
     }
 
     @Override

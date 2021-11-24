@@ -30,4 +30,6 @@ public interface CustomizedApiTestCaseRepository {
         PageDto pageDto);
 
     Page<ApiTestCasePageResponse> page(ApiTestCasePageRequest request);
+
+    Long count(List<String> projectIds);
 }

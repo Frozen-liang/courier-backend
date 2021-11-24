@@ -227,14 +227,6 @@ class ApiTestCaseServiceTest {
     }
 
     @Test
-    @DisplayName("Test the count method in the ApiTestCase service")
-    public void count_test() {
-        when(apiTestCaseRepository.count(any())).thenReturn(1L);
-        Long count = apiTestCaseService.count(ID);
-        assertThat(count).isEqualTo(1L);
-    }
-
-    @Test
     @DisplayName("Test the insertTestResult method in the ApiTestCase service")
     public void insertTestResult_test() {
         when(apiTestCaseRepository.findById(any())).thenReturn(Optional.of(ApiTestCaseEntity.builder().build()));

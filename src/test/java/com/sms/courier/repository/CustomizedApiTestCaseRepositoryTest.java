@@ -92,4 +92,12 @@ class CustomizedApiTestCaseRepositoryTest {
         assertThat(pageDto.getContent().size()).isEqualTo(1);
     }
 
+    @Test
+    @DisplayName("Test the count method in the ApiTestCase service")
+    public void count_test() {
+        when(mongoTemplate.count(any(),eq(ApiTestCaseEntity.class))).thenReturn(1L);
+        Long count = customizedApiTestCaseRepository.count(Lists.newArrayList(ID));
+        assertThat(count).isEqualTo(1L);
+    }
+
 }
