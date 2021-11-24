@@ -112,4 +112,11 @@ public class ApiController {
         @RequestBody @Validated List<ApiCaseRequest> requests) {
         return apiService.queryByApiPathAndRequestMethod(projectId, requests);
     }
+
+    @PutMapping("/importFlow/rollback/{importFlowId}")
+    @PreAuthorize("hasRoleOrAdmin(@role.API_IMPORT_ROLLBACK)")
+    public Boolean rollback(@PathVariable String importFlowId) {
+        return apiService.rollback(importFlowId);
+    }
+
 }

@@ -4,6 +4,7 @@ import static com.sms.courier.utils.Assert.isFalse;
 
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
+import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.OperationModule;
 import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
@@ -20,6 +21,9 @@ import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.api.ApiHistoryEntity;
+import com.sms.courier.entity.project.ApiImportRollbackRecord;
+import com.sms.courier.entity.project.ApiRecord;
+import com.sms.courier.entity.project.ProjectImportFlowEntity;
 import com.sms.courier.entity.project.ProjectImportSourceEntity;
 import com.sms.courier.entity.structure.ApiStructureRefRecordEntity;
 import com.sms.courier.mapper.ApiHistoryMapper;
@@ -28,15 +32,19 @@ import com.sms.courier.repository.ApiDataStructureRefRecordRepository;
 import com.sms.courier.repository.ApiHistoryRepository;
 import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
+import com.sms.courier.repository.ProjectImportFlowRepository;
+import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.ApiService;
 import com.sms.courier.service.AsyncService;
 import com.sms.courier.service.ProjectImportSourceService;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.MD5Util;
+import com.sms.courier.utils.SecurityUtil;
 import com.sms.courier.webhook.WebhookEvent;
 import com.sms.courier.webhook.enums.WebhookType;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -49,6 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -66,6 +75,7 @@ public class ApiServiceImpl implements ApiService {
     private final AsyncService asyncService;
     private final ProjectImportSourceService projectImportSourceService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ProjectImportFlowRepository projectImportFlowRepository;
 
 
     public ApiServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository, ApiMapper apiMapper,
@@ -73,7 +83,8 @@ public class ApiServiceImpl implements ApiService {
         ApiDataStructureRefRecordRepository apiDataStructureRefRecordRepository,
         AsyncService asyncService,
         ProjectImportSourceService projectImportSourceService,
-        ApplicationEventPublisher applicationEventPublisher) {
+        ApplicationEventPublisher applicationEventPublisher,
+        ProjectImportFlowRepository projectImportFlowRepository) {
         this.apiRepository = apiRepository;
         this.apiHistoryRepository = apiHistoryRepository;
         this.apiMapper = apiMapper;
@@ -83,6 +94,7 @@ public class ApiServiceImpl implements ApiService {
         this.asyncService = asyncService;
         this.projectImportSourceService = projectImportSourceService;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.projectImportFlowRepository = projectImportFlowRepository;
     }
 
     @SneakyThrows
@@ -127,15 +139,15 @@ public class ApiServiceImpl implements ApiService {
     public Boolean add(ApiRequest apiRequest) {
         log.info("ApiService-add()-params: [Api]={}", apiRequest.toString());
         try {
+            String apiHistoryId = ObjectId.get().toString();
             ApiEntity apiEntity = apiMapper.toEntity(apiRequest);
             apiEntity.setMd5(MD5Util.getMD5(apiEntity));
+            apiEntity.setHistoryId(apiHistoryId);
             isFalse(apiRepository.existsByProjectIdAndApiPathAndRequestMethod(apiRequest.getProjectId(),
                 apiRequest.getApiPath(), apiRequest.getRequestMethod()), "The same path and request method exist!");
             ApiEntity newApiEntity = apiRepository.insert(apiEntity);
-            ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
-                .description(StringUtils.isNotBlank(apiRequest.getEditDescription()) ? apiRequest.getEditDescription()
-                    : "First create api!")
-                .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
+            ApiHistoryEntity apiHistoryEntity = createApiHistory(apiHistoryId,
+                StringUtils.defaultIfBlank(apiRequest.getEditDescription(), "First create api!"), newApiEntity);
             // 如果没用引用数据结构 则不需要保存引用关系
             if (CollectionUtils.isNotEmpty(apiRequest.getAddStructIds())) {
                 saveRef(newApiEntity.getId(), newApiEntity.getApiName(), apiRequest.getAddStructIds(),
@@ -153,6 +165,13 @@ public class ApiServiceImpl implements ApiService {
         return true;
     }
 
+    private ApiHistoryEntity createApiHistory(String id, String description, ApiEntity apiEntity) {
+        return ApiHistoryEntity.builder()
+            .id(id)
+            .description(description)
+            .record(apiHistoryMapper.toApiHistoryDetail(apiEntity)).build();
+    }
+
 
     @Override
     @LogRecord(operationType = OperationType.EDIT, operationModule = OperationModule.API,
@@ -162,21 +181,21 @@ public class ApiServiceImpl implements ApiService {
         try {
             ApiEntity oldApiEntity = apiRepository.findById(apiRequest.getId())
                 .orElseThrow(() -> ExceptionUtils.mpe(ErrorCode.EDIT_NOT_EXIST_ERROR, "Api", apiRequest.getId()));
+            isFalse(!StringUtils.equals(apiRequest.getApiPath() + apiRequest.getRequestMethod(),
+                oldApiEntity.getApiPath() + oldApiEntity.getRequestMethod()) && apiRepository
+                .existsByProjectIdAndApiPathAndRequestMethod(apiRequest.getProjectId(),
+                    apiRequest.getApiPath(), apiRequest.getRequestMethod()), "The same path and request method exist!");
             ApiEntity apiEntity = apiMapper.toEntity(apiRequest);
             apiEntity.setSwaggerId(oldApiEntity.getSwaggerId());
             apiEntity.setCaseCount(oldApiEntity.getCaseCount());
             apiEntity.setSceneCaseCount(oldApiEntity.getSceneCaseCount());
             apiEntity.setOtherProjectSceneCaseCount(oldApiEntity.getOtherProjectSceneCaseCount());
             apiEntity.setMd5(MD5Util.getMD5(apiEntity));
-            isFalse(!StringUtils.equals(apiRequest.getApiPath() + apiRequest.getRequestMethod(),
-                oldApiEntity.getApiPath() + oldApiEntity.getRequestMethod()) && apiRepository
-                .existsByProjectIdAndApiPathAndRequestMethod(apiRequest.getProjectId(),
-                    apiRequest.getApiPath(), apiRequest.getRequestMethod()), "The same path and request method exist!");
+            String apiHistoryId = ObjectId.get().toString();
+            apiEntity.setHistoryId(apiHistoryId);
             ApiEntity newApiEntity = apiRepository.save(apiEntity);
-            ApiHistoryEntity apiHistoryEntity = ApiHistoryEntity.builder()
-                .description(StringUtils.isNotBlank(apiRequest.getEditDescription()) ? apiRequest.getEditDescription()
-                    : "Edit api!")
-                .record(apiHistoryMapper.toApiHistoryDetail(newApiEntity)).build();
+            ApiHistoryEntity apiHistoryEntity = createApiHistory(apiHistoryId,
+                StringUtils.defaultIfBlank(apiRequest.getEditDescription(), "Edit api!"), apiEntity);
             saveRef(newApiEntity.getId(), newApiEntity.getApiName(), apiRequest.getAddStructIds(),
                 apiRequest.getRemoveStructIds());
             apiHistoryRepository.insert(apiHistoryEntity);
@@ -208,6 +227,9 @@ public class ApiServiceImpl implements ApiService {
         template = "{{#result?.![#this.apiName]}}", enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean deleteByIds(List<String> ids) {
         log.info("Delete api ids:{}.", ids);
+        if (CollectionUtils.isEmpty(ids)) {
+            return Boolean.FALSE;
+        }
         apiDataStructureRefRecordRepository.deleteAllByIdIn(ids);
         apiRepository.deleteAllByIdIn(ids);
         ApiDeleteEvent apiDeleteEvent = new ApiDeleteEvent(ids);
@@ -241,7 +263,8 @@ public class ApiServiceImpl implements ApiService {
         UpdateRequest<Object> updateRequest = batchUpdateRequest.getUpdateRequest();
         List<String> ids = batchUpdateRequest.getIds();
         try {
-            return customizedApiRepository.updateFieldByIds(batchUpdateRequest.getIds(), updateRequest);
+            return customizedApiRepository
+                .updateFieldByIds(batchUpdateRequest.getIds(), updateRequest, ApiEntity.class);
         } catch (Exception e) {
             log.error("Batch update {} error. ids:{} key:{} value:{} message:{}",
                 ids, "Api", updateRequest.getKey(), updateRequest.getValue(), e.getMessage());
@@ -291,6 +314,58 @@ public class ApiServiceImpl implements ApiService {
                     .apiTestCase(apiMapper.toApiTestCaseResponse(entry.getValue())).build()));
         }
         return responses;
+    }
+
+    @Override
+    public Boolean rollback(String importFlowId) {
+        ProjectImportFlowEntity importFlow = projectImportFlowRepository.findById(importFlowId)
+            .orElseThrow(() -> ExceptionUtils.mpe("The import record not exits"));
+        rollbackDeletedApi(importFlow);
+        rollbackUpdatedApi(importFlow);
+        rollbackAddedApi(importFlow);
+        saveRollbackRecord(importFlow);
+        return Boolean.TRUE;
+    }
+
+    private void rollbackUpdatedApi(ProjectImportFlowEntity importFlow) {
+        importFlow.getUpdatedApi().forEach(apiRecord -> this.resetApiVersion(apiRecord.getHistoryId()));
+    }
+
+    private void rollbackDeletedApi(ProjectImportFlowEntity importFlow) {
+        List<String> deleteApiHistoryIds = importFlow.getDeletedApi().stream().map(ApiRecord::getHistoryId)
+            .collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(deleteApiHistoryIds)) {
+            List<String> deleteApiId = importFlow.getDeletedApi().stream().map(ApiRecord::getId)
+                .collect(Collectors.toList());
+            List<ApiEntity> apiEntities = apiHistoryRepository.findAllByIdIn(deleteApiHistoryIds)
+                .map(apiHistoryEntity -> {
+                    ApiEntity apiEntity = apiMapper.toEntityByHistory(apiHistoryEntity.getRecord());
+                    apiEntity.setHistoryId(apiHistoryEntity.getId());
+                    return apiEntity;
+                })
+                .collect(Collectors.toList());
+            apiRepository.saveAll(apiEntities);
+            customizedApiRepository.updateCaseStatus(deleteApiId, ApiBindingStatus.BINDING);
+        }
+    }
+
+    private void rollbackAddedApi(ProjectImportFlowEntity importFlow) {
+        List<String> addedApi = importFlow.getAddedApi().stream().map(ApiRecord::getId).collect(Collectors.toList());
+        this.deleteByIds(addedApi);
+    }
+
+    private void saveRollbackRecord(ProjectImportFlowEntity importFlow) {
+        LinkedList<ApiImportRollbackRecord> rollbackRecord = importFlow.getRollbackRecords();
+        CustomUser currentUser = SecurityUtil.getCurrentUser();
+        rollbackRecord.addFirst(ApiImportRollbackRecord.builder()
+            .userId(currentUser.getId())
+            .username(currentUser.getUsername())
+            .build());
+        UpdateRequest<List<ApiImportRollbackRecord>> updateRequest = new UpdateRequest<>();
+        updateRequest.setKey("rollbackRecords");
+        updateRequest.setValue(rollbackRecord);
+        customizedApiRepository.updateFieldByIds(List.of(importFlow.getId()), updateRequest,
+            ProjectImportFlowEntity.class);
     }
 
     private void saveRef(String id, String name, List<String> addStructIds, List<String> removeStructIds) {

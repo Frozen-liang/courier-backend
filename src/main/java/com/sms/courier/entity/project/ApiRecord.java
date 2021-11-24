@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiRecord {
+
     private String id;
+    private String historyId;
     private String name;
 }

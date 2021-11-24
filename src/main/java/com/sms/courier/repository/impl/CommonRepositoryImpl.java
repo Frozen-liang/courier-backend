@@ -1,5 +1,7 @@
 package com.sms.courier.repository.impl;
 
+import static com.sms.courier.common.field.ApiTestCaseField.STATUS;
+import static com.sms.courier.common.field.CommonField.API_ID;
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
 import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
 import static com.sms.courier.common.field.CommonField.ID;
@@ -10,10 +12,12 @@ import static com.sms.courier.common.field.UserField.NICKNAME;
 import static com.sms.courier.common.field.UserField.USERNAME;
 
 import com.mongodb.client.result.UpdateResult;
+import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.UpdateRequest;
+import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.mongo.CustomQuery;
 import com.sms.courier.entity.mongo.LookupField;
 import com.sms.courier.entity.mongo.LookupVo;
@@ -320,6 +324,16 @@ public class CommonRepositoryImpl implements CommonRepository {
         BasicQuery query = new BasicQuery(new Document(), document);
         ID.in(ids).ifPresent(query::addCriteria);
         return mongoTemplate.find(query, responseClass);
+    }
+
+    @Override
+    public void updateApiTestCaseStatusByApiId(List<String> apiId, ApiBindingStatus status) {
+        Query query = new Query();
+        API_ID.in(apiId).ifPresent(query::addCriteria);
+        Update update = new Update();
+        update.set(STATUS.getName(), status.getCode());
+        update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
+        mongoTemplate.updateMulti(query, update, ApiTestCaseEntity.class);
     }
 
     private <T> ProjectionOperation getProjectionOperation(Class<T> responseClass) {

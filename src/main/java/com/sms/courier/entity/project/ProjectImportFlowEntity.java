@@ -4,6 +4,7 @@ import com.sms.courier.common.enums.ImportStatus;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,4 +46,6 @@ public class ProjectImportFlowEntity {
     private List<ApiRecord> deletedApi = new ArrayList<>();
     @Default
     private List<ApiRecord> updatedApi = new ArrayList<>();
+    @Default
+    private LinkedList<ApiImportRollbackRecord> rollbackRecords = new LinkedList<>();
 }

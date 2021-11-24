@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
+import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationContext;
 
 @Slf4j
@@ -79,6 +80,7 @@ public class IncrementApiImportHandler extends AbstractApiImportHandler {
             apiEntity.setApiManagerId(oldApiEntity.getApiManagerId());
             apiEntity.setMarkdown(oldApiEntity.getMarkdown());
             apiEntity.setRichText(oldApiEntity.getRichText());
+            apiEntity.setHistoryId(ObjectId.get().toString());
             // Record update api
             recordUpdateApi(oldApiEntity, projectImportFlowEntity);
         } else {

@@ -32,6 +32,7 @@ public abstract class AbstractApiImportHandler implements ApiImportHandler {
         List<ApiHistoryEntity> apiHistoryEntities = apiRepository.saveAll(diffApiList).stream()
             .map(apiEntity -> ApiHistoryEntity.builder()
                 .description("Sync api!")
+                .id(apiEntity.getHistoryId())
                 .record(apiHistoryMapper.toApiHistoryDetail(apiEntity)).build())
             .collect(Collectors.toList());
         apiHistoryRepository.insert(apiHistoryEntities);
@@ -53,6 +54,7 @@ public abstract class AbstractApiImportHandler implements ApiImportHandler {
     protected void recordAddApi(ApiEntity apiEntity, ProjectImportFlowEntity projectImportFlowEntity) {
         apiEntity.setId(ObjectId.get().toString());
         apiEntity.setCreateDateTime(LocalDateTime.now());
+        apiEntity.setHistoryId(ObjectId.get().toString());
         String currUserId = null;
         try {
             currUserId = SecurityUtil.getCurrUserId();
@@ -60,14 +62,16 @@ public abstract class AbstractApiImportHandler implements ApiImportHandler {
             log.info("The currUserId is empty in sync api");
         }
         apiEntity.setCreateUserId(currUserId);
-        projectImportFlowEntity.getAddedApi().add(new ApiRecord(apiEntity.getId(), apiEntity.getApiName()));
+        projectImportFlowEntity.getAddedApi().add(new ApiRecord(apiEntity.getId(), null, apiEntity.getApiName()));
     }
 
     protected void recordDeleteApi(ApiEntity apiEntity, ProjectImportFlowEntity projectImportFlowEntity) {
-        projectImportFlowEntity.getDeletedApi().add(new ApiRecord(apiEntity.getId(), apiEntity.getApiName()));
+        projectImportFlowEntity.getDeletedApi().add(new ApiRecord(apiEntity.getId(),
+            apiEntity.getHistoryId(), apiEntity.getApiName()));
     }
 
     protected void recordUpdateApi(ApiEntity apiEntity, ProjectImportFlowEntity projectImportFlowEntity) {
-        projectImportFlowEntity.getUpdatedApi().add(new ApiRecord(apiEntity.getId(), apiEntity.getApiName()));
+        projectImportFlowEntity.getUpdatedApi().add(new ApiRecord(apiEntity.getId(),
+            apiEntity.getHistoryId(), apiEntity.getApiName()));
     }
 }

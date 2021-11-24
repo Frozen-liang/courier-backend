@@ -2,6 +2,7 @@ package com.sms.courier.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sms.courier.common.constant.TimePatternConstant;
+import com.sms.courier.entity.project.ApiImportRollbackRecord;
 import com.sms.courier.entity.project.ApiRecord;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,4 +32,5 @@ public class ProjectImportFlowResponse {
     private List<ApiRecord> addedApi;
     private List<ApiRecord> deletedApi;
     private List<ApiRecord> updatedApi;
+    private List<ApiImportRollbackRecord> rollbackRecords;
 }
