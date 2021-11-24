@@ -228,6 +228,14 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         return commonRepository.page(queryVo, request, ApiPageResponse.class);
     }
 
+    @Override
+    public Long count(List<String> projectId) {
+        Query query = new Query();
+        PROJECT_ID.in(projectId).ifPresent(query::addCriteria);
+        REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
+        return mongoTemplate.count(query, ApiEntity.class);
+    }
+
     private void addCriteria(ApiPageRequest apiPageRequest, Query query) {
         REMOVE.is(apiPageRequest.isRemoved()).ifPresent(query::addCriteria);
         PROJECT_ID.is(apiPageRequest.getProjectId()).ifPresent(query::addCriteria);

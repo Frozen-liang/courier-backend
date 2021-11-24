@@ -281,6 +281,7 @@ public enum ErrorCode {
     UPDATE_CASE_BY_API_ERROR("4261", "Failed to update case by api error!"),
     GET_WORKSPACE_SCENE_COUNT_ERROR("4262", "Failed to get the Workspace scene count!"),
     GET_WORKSPACE_API_CASE_COUNT_ERROR("4263", "Failed to get the Workspace api case count!"),
+    GET_WORKSPACE_API_COUNT_ERROR("4264", "Failed to get the Workspace api count!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),

@@ -9,6 +9,7 @@ import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.repository.CommonStatisticsRepository;
 import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseRepository;
+import com.sms.courier.repository.CustomizedApiRepository;
 import com.sms.courier.service.impl.WorkspaceStatisticsServiceImpl;
 import java.util.List;
 import org.assertj.core.util.Lists;
@@ -32,9 +33,10 @@ public class WorkspaceStatisticsServiceTest {
         CustomizedSceneCaseRepository.class);
     private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository =
         mock(CustomizedApiTestCaseRepository.class);
+    private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
     private final WorkspaceStatisticsService workspaceStatisticsService =
         new WorkspaceStatisticsServiceImpl(projectService, commonStatisticsRepository, customizedSceneCaseRepository,
-            customizedApiTestCaseRepository);
+            customizedApiTestCaseRepository,customizedApiRepository);
     private static final String ID = ObjectId.get().toString();
     private static final Integer MOCK_DAY = 7;
     private static final Long MOCK_COUNT = 1L;
@@ -115,6 +117,24 @@ public class WorkspaceStatisticsServiceTest {
         when(projectService.list(any()))
             .thenThrow(new RuntimeException());
         assertThatThrownBy(() -> workspaceStatisticsService.caseAllCount(ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the apiAllCount method in the Workspace service")
+    public void apiAllCount_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        when(customizedApiRepository.count(any())).thenReturn(MOCK_COUNT);
+        Long dto = workspaceStatisticsService.apiAllCount(ID);
+        assertThat(dto).isEqualTo(MOCK_COUNT);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while apiAllCount Workspace")
+    public void apiAllCount_exception_test() {
+        when(projectService.list(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceStatisticsService.apiAllCount(ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 

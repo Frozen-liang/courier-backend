@@ -45,6 +45,7 @@ class CustomizedApiRepositoryTest {
     private final CustomizedApiRepository customizedApiRepository = new CustomizedApiRepositoryImpl(mongoTemplate,
         commonRepository, apiGroupRepository, apiTagRepository, userRepository);
     private static final String ID = ObjectId.get().toString();
+    private static final Long MOCK_COUNT = 1L;
     private static final List<String> ID_LIST = Collections.singletonList(ID);
 
     @Test
@@ -155,6 +156,14 @@ class CustomizedApiRepositoryTest {
         when(commonRepository.page(any(QueryVo.class),any(),eq(ApiPageResponse.class))).thenReturn(page);
         Page<ApiPageResponse> dtoPage = customizedApiRepository.caseCountPage(ApiIncludeCaseRequest.builder().build());
         assertThat(dtoPage.getContent()).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Test for count in CustomizedApiRepository")
+    public void count_test() {
+        when(mongoTemplate.count(any(),eq(ApiEntity.class))).thenReturn(MOCK_COUNT);
+        Long dto = customizedApiRepository.count(Lists.newArrayList(ID));
+        assertThat(dto).isEqualTo(MOCK_COUNT);
     }
 
 }

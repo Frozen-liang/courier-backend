@@ -35,4 +35,6 @@ public interface CustomizedApiRepository {
     Page<ApiPageResponse> sceneCountPage(ApiIncludeCaseRequest request);
 
     Page<ApiPageResponse> caseCountPage(ApiIncludeCaseRequest request);
+
+    Long count(List<String> projectId);
 }

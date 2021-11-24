@@ -36,4 +36,9 @@ public class WorkspaceStatisticsController {
         return workspaceStatisticsService.caseAllCount(workspaceId);
     }
 
+    @GetMapping("/api/all/count/{workspaceId}")
+    public Long apiAllCount(@PathVariable String workspaceId) {
+        return workspaceStatisticsService.apiAllCount(workspaceId);
+    }
+
 }

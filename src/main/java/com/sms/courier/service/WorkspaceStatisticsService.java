@@ -10,4 +10,6 @@ public interface WorkspaceStatisticsService {
     Long sceneAllCount(String workspaceId);
 
     Long caseAllCount(String workspaceId);
+
+    Long apiAllCount(String workspaceId);
 }
