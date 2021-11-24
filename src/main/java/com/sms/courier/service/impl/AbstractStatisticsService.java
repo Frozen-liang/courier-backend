@@ -2,7 +2,6 @@ package com.sms.courier.service.impl;
 
 import com.google.common.collect.Lists;
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
-import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.repository.CommonStatisticsRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -47,4 +47,16 @@ public class WorkspaceStatisticsController {
         return workspaceStatisticsService.sceneCaseGroupDayCount(workspaceId, day);
     }
 
+    @GetMapping("/case/job/group-day/{day}/count/{workspaceId}")
+    public List<CaseCountStatisticsResponse> caseJobGroupDayCount(@PathVariable String workspaceId,
+        @PathVariable Integer day) {
+        return workspaceStatisticsService.caseJobGroupDayCount(workspaceId, day);
+    }
+
+    @GetMapping("/scene/case/job/group-day/{day}/count/{workspaceId}")
+    public List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(@PathVariable String workspaceId,
+        @PathVariable Integer day) {
+        return workspaceStatisticsService.sceneCaseJobGroupDayCount(workspaceId, day);
+    }
+
 }

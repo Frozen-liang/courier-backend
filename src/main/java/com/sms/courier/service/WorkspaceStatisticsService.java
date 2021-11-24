@@ -14,4 +14,8 @@ public interface WorkspaceStatisticsService {
     Long apiAllCount(String workspaceId);
 
     List<CaseCountStatisticsResponse> sceneCaseGroupDayCount(String workspaceId, Integer day);
+
+    List<CaseCountStatisticsResponse> caseJobGroupDayCount(String workspaceId, Integer day);
+
+    List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(String workspaceId, Integer day);
 }

@@ -283,6 +283,8 @@ public enum ErrorCode {
     GET_WORKSPACE_API_CASE_COUNT_ERROR("4263", "Failed to get the Workspace api case count!"),
     GET_WORKSPACE_API_COUNT_ERROR("4264", "Failed to get the Workspace api count!"),
     GET_WORKSPACE_SCENE_CASE_GROUP_BY_DAY_ERROR("4265", "Failed to get the Workspace scene case group by day!"),
+    GET_WORKSPACE_CASE_JOB_GROUP_BY_DAY_ERROR("4266", "Failed to get the Workspace case job group by day!"),
+    GET_WORKSPACE_SCENE_CASE_JOB_GROUP_BY_DAY_ERROR("4267", "Failed to get the Workspace scene case job group by day!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),
