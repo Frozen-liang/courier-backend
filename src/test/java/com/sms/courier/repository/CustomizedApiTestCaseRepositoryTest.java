@@ -1,5 +1,14 @@
 package com.sms.courier.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
@@ -17,15 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @DisplayName("Tests for CustomizedApiTestCaseRepository")
 class CustomizedApiTestCaseRepositoryTest {
 
@@ -40,11 +40,9 @@ class CustomizedApiTestCaseRepositoryTest {
     @Test
     @DisplayName("Test the updateApiTestCaseStatusByApiId method in the CustomizedApiTestCaseRepository")
     public void updateApiTestCaseStatusByApiId_test() {
-        when(mongoTemplate.updateMulti(any(), any(), any(Class.class))).thenReturn(null);
-        customizedApiTestCaseRepository
-            .updateApiTestCaseStatusByApiId(Collections.singletonList(ObjectId.get().toString()),
-                ApiBindingStatus.BINDING);
-        verify(mongoTemplate, times(1)).updateMulti(any(), any(), any(Class.class));
+       customizedApiTestCaseRepository.updateApiTestCaseStatusByApiId(Collections.singletonList(ObjectId.get().toString()),
+            ApiBindingStatus.BINDING);
+       verify(commonRepository,times(1)).updateApiTestCaseStatusByApiId(any(),any());
     }
 
     @Test
