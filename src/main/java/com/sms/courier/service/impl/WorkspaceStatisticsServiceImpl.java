@@ -1,14 +1,19 @@
 package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_USER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_JOB_GROUP_BY_DAY_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_JOB_GROUP_BY_USER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_SCENE_CASE_GROUP_BY_DAY_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_SCENE_CASE_GROUP_BY_USER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_SCENE_CASE_JOB_GROUP_BY_DAY_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_SCENE_CASE_JOB_GROUP_BY_USER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_SCENE_COUNT_ERROR;
 
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CaseCountUserStatisticsResponse;
 import com.sms.courier.dto.response.ProjectResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
@@ -149,6 +154,70 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
         } catch (Exception e) {
             log.error("Failed to get the Workspace scene case job group by day!", e);
             throw new ApiTestPlatformException(GET_WORKSPACE_SCENE_CASE_JOB_GROUP_BY_DAY_ERROR);
+        }
+    }
+
+    @Override
+    public List<CaseCountUserStatisticsResponse> caseGroupUserCount(Integer day, String workspaceId) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(workspaceId);
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return groupUser(projectIds, day, ApiTestCaseEntity.class);
+        } catch (ApiTestPlatformException exception) {
+            log.error(exception.getMessage());
+            throw exception;
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace case group by user!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_CASE_GROUP_BY_USER_ERROR);
+        }
+    }
+
+    @Override
+    public List<CaseCountUserStatisticsResponse> sceneCaseGroupUserCount(Integer day, String workspaceId) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(workspaceId);
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return groupUser(projectIds, day, SceneCaseEntity.class);
+        } catch (ApiTestPlatformException exception) {
+            log.error(exception.getMessage());
+            throw exception;
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace scene case group by user!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_SCENE_CASE_GROUP_BY_USER_ERROR);
+        }
+    }
+
+    @Override
+    public List<CaseCountUserStatisticsResponse> caseJobGroupUserCount(Integer day, String workspaceId) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(workspaceId);
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return groupUserByJob(projectIds, day, ApiTestCaseJobEntity.class);
+        } catch (ApiTestPlatformException exception) {
+            log.error(exception.getMessage());
+            throw exception;
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace case job group by user!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_CASE_JOB_GROUP_BY_USER_ERROR);
+        }
+    }
+
+    @Override
+    public List<CaseCountUserStatisticsResponse> sceneCaseJobGroupUserCount(Integer day, String workspaceId) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(workspaceId);
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return groupUserByJob(projectIds, day, SceneCaseJobEntity.class);
+        } catch (ApiTestPlatformException exception) {
+            log.error(exception.getMessage());
+            throw exception;
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace scene case job group by user!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_SCENE_CASE_JOB_GROUP_BY_USER_ERROR);
         }
     }
 

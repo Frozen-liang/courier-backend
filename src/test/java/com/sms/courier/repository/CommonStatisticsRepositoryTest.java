@@ -1,6 +1,7 @@
 package com.sms.courier.repository;
 
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CaseCountUserStatisticsResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.repository.impl.CommonStatisticsRepositoryImpl;
 import java.time.LocalDate;
@@ -43,4 +44,33 @@ public class CommonStatisticsRepositoryTest {
         assertThat(responses).isNotEmpty();
     }
 
+    @Test
+    @DisplayName("Test the getGroupUserCount method in the CommonStatisticsRepositoryTest")
+    public void getGroupUserCount_test() {
+        AggregationResults<CaseCountUserStatisticsResponse> results = mock(AggregationResults.class);
+        List<CaseCountUserStatisticsResponse> caseCountStatisticsResponses =
+            Lists.newArrayList(CaseCountUserStatisticsResponse.builder().count(0).build());
+        when(results.getMappedResults()).thenReturn(caseCountStatisticsResponses);
+        when(mongoTemplate.aggregate(any(), eq(ApiTestCaseEntity.class), eq(CaseCountUserStatisticsResponse.class)))
+            .thenReturn(results);
+        List<CaseCountUserStatisticsResponse> responses =
+            commonStatisticsRepository.getGroupUserCount(Lists.newArrayList(ID), LocalDateTime.now(),
+                ApiTestCaseEntity.class);
+        assertThat(responses).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("Test the getGroupUserCountByJob method in the CommonStatisticsRepositoryTest")
+    public void getGroupUserCountByJob_test() {
+        AggregationResults<CaseCountUserStatisticsResponse> results = mock(AggregationResults.class);
+        List<CaseCountUserStatisticsResponse> caseCountStatisticsResponses =
+            Lists.newArrayList(CaseCountUserStatisticsResponse.builder().count(0).build());
+        when(results.getMappedResults()).thenReturn(caseCountStatisticsResponses);
+        when(mongoTemplate.aggregate(any(), eq(ApiTestCaseEntity.class), eq(CaseCountUserStatisticsResponse.class)))
+            .thenReturn(results);
+        List<CaseCountUserStatisticsResponse> responses =
+            commonStatisticsRepository.getGroupUserCountByJob(Lists.newArrayList(ID), LocalDateTime.now(),
+                ApiTestCaseEntity.class);
+        assertThat(responses).isNotEmpty();
+    }
 }
