@@ -73,6 +73,7 @@ public class Role {
     public static final String API_QUERY_OWN = "Api" + QUERY_OWN;
     public static final String API_SYNC = "Api_Sync";
     public static final String API_IMPORT_BY_FILE = "Api_Import_By_File";
+    public static final String API_IMPORT_ROLLBACK = "Api_Import_Rollback";
 
     // ApiGroup
     public static final String API_GROUP_CRE_UPD_DEL = "Api_Group" + CRE_UPD_DEL;

@@ -29,10 +29,8 @@ public class ApiHistoryDetail {
     @Field(name = "isRemove")
     private boolean remove;
 
-    @Field(targetType = FieldType.OBJECT_ID)
     private String createUserId;
 
-    @Field(targetType = FieldType.OBJECT_ID)
     private String modifyUserId;
 
     private LocalDateTime createDateTime;
@@ -106,4 +104,10 @@ public class ApiHistoryDetail {
     private ApiNodeType apiNodeType;
 
     private ApiEncodingType apiEncodingType;
+
+    private Integer caseCount;
+
+    private Integer sceneCaseCount;
+
+    private Integer otherProjectSceneCaseCount;
 }

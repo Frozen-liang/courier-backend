@@ -14,6 +14,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.enums.DocumentUrlType;
@@ -30,6 +31,8 @@ import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.api.ApiHistoryEntity;
 import com.sms.courier.entity.api.common.ApiHistoryDetail;
+import com.sms.courier.entity.project.ApiRecord;
+import com.sms.courier.entity.project.ProjectImportFlowEntity;
 import com.sms.courier.entity.project.ProjectImportSourceEntity;
 import com.sms.courier.mapper.ApiHistoryMapper;
 import com.sms.courier.mapper.ApiMapper;
@@ -39,15 +42,22 @@ import com.sms.courier.repository.ApiDataStructureRefRecordRepository;
 import com.sms.courier.repository.ApiHistoryRepository;
 import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
+import com.sms.courier.repository.ProjectImportFlowRepository;
+import com.sms.courier.security.TokenType;
+import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.impl.ApiServiceImpl;
+import com.sms.courier.utils.SecurityUtil;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.mock.web.MockMultipartFile;
@@ -62,12 +72,14 @@ class ApiServiceTest {
     private final ProjectImportSourceService projectImportSourceService = mock(ProjectImportSourceService.class);
     private final ApiHistoryMapper apiHistoryMapper = mock(ApiHistoryMapper.class);
     private final AsyncService asyncService = mock(AsyncService.class);
+    private final ProjectImportFlowRepository projectImportFlowRepository = mock(ProjectImportFlowRepository.class);
     private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final ApiDataStructureRefRecordRepository apiDataStructureRefRecordRepository = mock(
         ApiDataStructureRefRecordRepository.class);
     private final ApiService apiService = new ApiServiceImpl(
         apiRepository, apiHistoryRepository, apiMapper, apiHistoryMapper, customizedApiRepository,
-        apiDataStructureRefRecordRepository, asyncService, projectImportSourceService, applicationEventPublisher);
+        apiDataStructureRefRecordRepository, asyncService, projectImportSourceService, applicationEventPublisher,
+        projectImportFlowRepository);
     private final ApiEntity api = ApiEntity.builder().id(ID).build();
     private final ApiResponse apiResponseDto = ApiResponse.builder().id(ID).build();
     private final ApiRequest apiRequestDto = ApiRequest.builder().id(ID).build();
@@ -75,6 +87,19 @@ class ApiServiceTest {
     private static final String ID = ObjectId.get().toString();
     private final BatchUpdateByIdRequest<Object> batchUpdateRequest = new BatchUpdateByIdRequest<>(List.of(ID),
         new UpdateRequest<>());
+    private final static MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
+
+
+    static {
+        SECURITY_UTIL_MOCKED_STATIC = mockStatic(SecurityUtil.class);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrentUser).thenReturn(new CustomUser("username", "password",
+            Collections.emptyList(), "", "username@qq.com", "nickname", TokenType.USER, LocalDate.now()));
+    }
+
+    @AfterAll
+    public static void close() {
+        SECURITY_UTIL_MOCKED_STATIC.close();
+    }
 
     @Test
     @DisplayName("Test the findById method in the Api service")
@@ -98,7 +123,7 @@ class ApiServiceTest {
     @DisplayName("Test the add method in the Api service")
     public void add_test() {
         when(apiRepository.insert(any(ApiEntity.class))).thenReturn(api);
-        when(apiRepository.existsByProjectIdAndApiPathAndRequestMethod(any(),any(),any())).thenReturn(false);
+        when(apiRepository.existsByProjectIdAndApiPathAndRequestMethod(any(), any(), any())).thenReturn(false);
         when(apiHistoryRepository.insert(any(ApiHistoryEntity.class))).thenReturn(ApiHistoryEntity.builder().build());
         Boolean bool = apiService.add(apiRequestDto);
         assertThat(bool).isTrue();
@@ -117,7 +142,7 @@ class ApiServiceTest {
     @DisplayName("Test the edit method in the Api service")
     public void edit_test() {
         when(apiRepository.findById(any())).thenReturn(Optional.of(api));
-        when(apiRepository.existsByProjectIdAndApiPathAndRequestMethod(any(),any(),any())).thenReturn(false);
+        when(apiRepository.existsByProjectIdAndApiPathAndRequestMethod(any(), any(), any())).thenReturn(false);
         when(apiRepository.save(any(ApiEntity.class))).thenReturn(api);
         when(apiHistoryRepository.insert(any(ApiHistoryEntity.class))).thenReturn(ApiHistoryEntity.builder().build());
         Boolean bool = apiService.edit(apiRequestDto);
@@ -214,7 +239,7 @@ class ApiServiceTest {
     @Test
     @DisplayName("Test for batchUpdateByIds in ApiService")
     public void batchUpdateByIds_test() {
-        when(customizedApiRepository.updateFieldByIds(any(), any())).thenReturn(true);
+        when(customizedApiRepository.updateFieldByIds(any(), any(), any(Class.class))).thenReturn(true);
         Boolean result = apiService.batchUpdateByIds(batchUpdateRequest);
         assertThat(result).isTrue();
     }
@@ -222,7 +247,7 @@ class ApiServiceTest {
     @Test
     @DisplayName("An exception occurred while test batchUpdateByIds in ApiService.")
     public void batchUpdateByIds_exception_test() {
-        when(customizedApiRepository.updateFieldByIds(any(), any()))
+        when(customizedApiRepository.updateFieldByIds(any(), any(), any(Class.class)))
             .thenThrow(new RuntimeException());
         assertThatThrownBy(() -> apiService.batchUpdateByIds(batchUpdateRequest))
             .isInstanceOf(ApiTestPlatformException.class).extracting("code").isEqualTo(BATCH_UPDATE_ERROR.getCode());
@@ -269,6 +294,20 @@ class ApiServiceTest {
             .thenReturn(Stream.of(ApiResponse.builder().apiPath("/v1/test").requestMethod(1).build()));
         List<ApiAndCaseResponse> result = apiService.queryByApiPathAndRequestMethod(projectId, requests);
         assertThat(result).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("Test for rollback in ApiService")
+    public void rollback_test() {
+        String id = ObjectId.get().toString();
+        when(projectImportFlowRepository.findById(id))
+            .thenReturn(Optional
+                .of(ProjectImportFlowEntity.builder().id(id).deletedApi(List.of(
+                    ApiRecord.builder().id(ObjectId.get().toString()).historyId(ObjectId.get().toString()).build()))
+                    .build()));
+        when(apiHistoryRepository.findAllByIdIn(any()))
+            .thenReturn(Stream.of(ApiHistoryEntity.builder().record(new ApiHistoryDetail()).build()));
+        assert apiService.rollback(id);
     }
 
     private ApiCaseRequest getApiCaseRequest() {

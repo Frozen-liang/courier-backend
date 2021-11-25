@@ -40,4 +40,6 @@ public interface ApiService {
     Boolean resetApiVersion(String historyId);
 
     List<ApiAndCaseResponse> queryByApiPathAndRequestMethod(String projectId, List<ApiCaseRequest> requests);
+
+    Boolean rollback(String importFlowId);
 }

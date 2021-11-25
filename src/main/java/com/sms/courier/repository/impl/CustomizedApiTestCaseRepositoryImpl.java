@@ -8,7 +8,6 @@ import static com.sms.courier.common.field.CommonField.API_ID;
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
 import static com.sms.courier.common.field.CommonField.CREATE_USER_ID;
 import static com.sms.courier.common.field.CommonField.ID;
-import static com.sms.courier.common.field.CommonField.MODIFY_DATE_TIME;
 import static com.sms.courier.common.field.CommonField.PROJECT_ID;
 import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.common.field.CommonField.USERNAME;
@@ -37,7 +36,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -55,12 +53,7 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
 
     @Override
     public void updateApiTestCaseStatusByApiId(List<String> apiIds, ApiBindingStatus status) {
-        Query query = new Query();
-        API_ID.in(apiIds).ifPresent(query::addCriteria);
-        Update update = new Update();
-        update.set(STATUS.getName(), status.getCode());
-        update.set(MODIFY_DATE_TIME.getName(), LocalDateTime.now());
-        mongoTemplate.updateMulti(query, update, ApiTestCaseEntity.class);
+        commonRepository.updateApiTestCaseStatusByApiId(apiIds, status);
     }
 
     @Override
@@ -134,6 +127,7 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
         list.add(CASE_API_ID.is(request.getApiId()));
         list.add(PROJECT_ID.is(request.getProjectId()));
         list.add(STATUS.is(request.getStatus()));
+        list.add(REMOVE.is(false));
         query.setCriteriaList(list);
         return commonRepository.page(query, request, ApiTestCasePageResponse.class);
     }

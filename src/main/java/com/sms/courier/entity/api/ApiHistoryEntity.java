@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
@@ -33,10 +33,10 @@ public class ApiHistoryEntity {
      */
     private String description;
 
-    @CreatedDate
+    @LastModifiedDate
     private LocalDateTime createDateTime;
 
-    @CreatedBy
+    @LastModifiedBy
     @Field(targetType = FieldType.OBJECT_ID)
     private String createUserId;
 }

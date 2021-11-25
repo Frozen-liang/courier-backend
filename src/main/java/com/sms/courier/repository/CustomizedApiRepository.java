@@ -1,5 +1,6 @@
 package com.sms.courier.repository;
 
+import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
 import com.sms.courier.dto.request.UpdateRequest;
@@ -24,7 +25,7 @@ public interface CustomizedApiRepository {
 
     void deleteByGroupIds(List<String> groupIds);
 
-    Boolean updateFieldByIds(List<String> ids, UpdateRequest<Object> updateRequest);
+    Boolean updateFieldByIds(List<String> ids, UpdateRequest<?> updateRequest, Class<?> entityClass);
 
     Boolean update(String json);
 
@@ -37,4 +38,6 @@ public interface CustomizedApiRepository {
     Page<ApiPageResponse> caseCountPage(ApiIncludeCaseRequest request);
 
     Long count(List<String> projectId);
+
+    void updateCaseStatus(List<String> apiId, ApiBindingStatus binding);
 }

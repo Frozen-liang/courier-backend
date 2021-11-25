@@ -50,9 +50,6 @@ public interface ApiMapper {
     @Mapping(target = "source", source = "documentUrl")
     ImportSourceVo toImportSource(ProjectImportSourceEntity projectImportSourceEntity);
 
-    @Mapping(target = "caseCount", ignore = true)
-    @Mapping(target = "sceneCaseCount", ignore = true)
-    @Mapping(target = "otherProjectSceneCaseCount", ignore = true)
     ApiEntity toEntityByHistory(ApiHistoryDetail record);
 
     WebhookApiResponse toWebhookResponse(ApiEntity apiEntity);

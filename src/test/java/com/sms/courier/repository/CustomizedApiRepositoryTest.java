@@ -118,7 +118,7 @@ class CustomizedApiRepositoryTest {
     @DisplayName("Test for batchUpdateByIds in CustomizedApiRepository")
     public void batchUpdateByIds_test() {
         when(commonRepository.updateFieldByIds(any(), any(UpdateRequest.class), any())).thenReturn(true);
-        Boolean result = customizedApiRepository.updateFieldByIds(List.of(ID), new UpdateRequest<>());
+        Boolean result = customizedApiRepository.updateFieldByIds(List.of(ID), new UpdateRequest<>(),ApiEntity.class);
         assertThat(result).isTrue();
     }
 

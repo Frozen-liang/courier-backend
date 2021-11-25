@@ -1,5 +1,6 @@
 package com.sms.courier.repository;
 
+import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.UpdateRequest;
@@ -61,4 +62,6 @@ public interface CommonRepository {
 
     <T> List<T> findIncludeFieldByIds(List<String> ids, String collectionName, List<String> filedList,
         Class<T> responseClass);
+
+    void updateApiTestCaseStatusByApiId(List<String> apiId, ApiBindingStatus status);
 }

@@ -21,6 +21,7 @@ import static com.sms.courier.common.field.UserField.NICKNAME;
 import static com.sms.courier.common.field.UserField.USERNAME;
 
 import com.google.common.collect.Lists;
+import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.CollectionName;
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.request.ApiPageRequest;
@@ -168,8 +169,8 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
     }
 
     @Override
-    public Boolean updateFieldByIds(List<String> ids, UpdateRequest<Object> updateRequest) {
-        return commonRepository.updateFieldByIds(ids, updateRequest, ApiEntity.class);
+    public Boolean updateFieldByIds(List<String> ids, UpdateRequest<?> updateRequest, Class<?> entityClass) {
+        return commonRepository.updateFieldByIds(ids, updateRequest, entityClass);
     }
 
     @Override
@@ -234,6 +235,11 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         PROJECT_ID.in(projectId).ifPresent(query::addCriteria);
         REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
         return mongoTemplate.count(query, ApiEntity.class);
+    }
+
+    @Override
+    public void updateCaseStatus(List<String> apiId, ApiBindingStatus status) {
+        commonRepository.updateApiTestCaseStatusByApiId(apiId, status);
     }
 
     private void addCriteria(ApiPageRequest apiPageRequest, Query query) {
