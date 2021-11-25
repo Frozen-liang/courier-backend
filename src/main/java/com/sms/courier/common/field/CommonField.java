@@ -19,7 +19,8 @@ public enum CommonField implements Field {
     USERNAME("username"),
     REF_ID("refId"),
     JOB_STATUS("jobStatus"),
-    API_ID_GROUP_SEARCH("apiEntity.id");
+    API_ID_GROUP_SEARCH("apiEntity.id"),
+    CREATE_USER_NAME("createUserName");
 
     private final String name;
 

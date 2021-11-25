@@ -3,6 +3,7 @@ package com.sms.courier.controller;
 import static com.sms.courier.common.constant.Constants.WORKSPACE_STATISTICS_PATH;
 
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CaseCountUserStatisticsResponse;
 import com.sms.courier.service.WorkspaceStatisticsService;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,6 +58,30 @@ public class WorkspaceStatisticsController {
     public List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(@PathVariable String workspaceId,
         @PathVariable Integer day) {
         return workspaceStatisticsService.sceneCaseJobGroupDayCount(workspaceId, day);
+    }
+
+    @GetMapping("/case/group-user/{day}/count/{workspaceId}")
+    public List<CaseCountUserStatisticsResponse> caseGroupUserCount(@PathVariable Integer day,
+        @PathVariable String workspaceId) {
+        return workspaceStatisticsService.caseGroupUserCount(day, workspaceId);
+    }
+
+    @GetMapping("/scene/case/group-user/{day}/count/{workspaceId}")
+    public List<CaseCountUserStatisticsResponse> sceneCaseGroupUserCount(@PathVariable Integer day,
+        @PathVariable String workspaceId) {
+        return workspaceStatisticsService.sceneCaseGroupUserCount(day, workspaceId);
+    }
+
+    @GetMapping("/case/job/group-user/{day}/count/{workspaceId}")
+    public List<CaseCountUserStatisticsResponse> caseJobGroupUserCount(@PathVariable Integer day,
+        @PathVariable String workspaceId) {
+        return workspaceStatisticsService.caseJobGroupUserCount(day, workspaceId);
+    }
+
+    @GetMapping("/scene/case/job/group-user/{day}/count/{workspaceId}")
+    public List<CaseCountUserStatisticsResponse> sceneCaseJobGroupUserCount(@PathVariable Integer day,
+        @PathVariable String workspaceId) {
+        return workspaceStatisticsService.sceneCaseJobGroupUserCount(day, workspaceId);
     }
 
 }
