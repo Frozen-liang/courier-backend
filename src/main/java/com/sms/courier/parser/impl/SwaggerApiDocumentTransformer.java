@@ -269,15 +269,7 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
                     .required(ifRequired(schema, key))
                     .build();
                 if (List.of(SchemaType.JSON, SchemaType.OBJECT, SchemaType.ARRAY).contains(childSchemaType)) {
-                    if (childSchemaType == SchemaType.ARRAY) {
-                        List<ParamInfo> arrayChildParam = toComplexParams(paths, childSchema, components, currentIndex);
-                        if (CollectionUtils.isNotEmpty(arrayChildParam)) {
-                            childParam.setChildParam(List.of(
-                                ParamInfo.builder().paramType(ParamType.OBJECT).childParam(arrayChildParam).build()));
-                        }
-                    } else {
-                        childParam.setChildParam(toComplexParams(paths, childSchema, components, currentIndex));
-                    }
+                    childParam.setChildParam(toComplexParams(paths, childSchema, components, currentIndex));
                 }
                 paramInfos.add(childParam);
             }
@@ -286,6 +278,7 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
             paramInfos = toComplexParams(paths, schema,
                 components, currentIndex);
         }
+        // 如果是数组则用Object包一层
         return ifArrayIncludeObjectElement(parentSchema, paramInfos);
     }
 
@@ -306,10 +299,12 @@ public class SwaggerApiDocumentTransformer implements ApiDocumentTransformer<Ope
     private List<ParamInfo> toComplexParams(List<List<String>> paths,
         Schema schema, Map<String, Schema> components, int currentIndex) {
         String componentKey = getComponentKey(schema);
+
         if (StringUtils.isBlank(componentKey)) {
             return Collections.emptyList();
         }
         if (currentIndex > 0) {
+            //判断从0层到上一层是否引用过该对象 有则直接返回空 防止循环引用
             boolean exist = IntStream.range(0, currentIndex - 1)
                 .anyMatch(index -> paths.get(index).contains(componentKey));
             if (exist) {

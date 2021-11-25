@@ -32,5 +32,5 @@ public class ProjectImportFlowResponse {
     private List<ApiRecord> addedApi;
     private List<ApiRecord> deletedApi;
     private List<ApiRecord> updatedApi;
-    private List<ApiImportRollbackRecord> rollbackRecords;
+    private ApiImportRollbackRecord rollbackRecord;
 }
