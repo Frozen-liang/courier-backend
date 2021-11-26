@@ -3,6 +3,7 @@ package com.sms.courier.dto.request;
 import com.sms.courier.common.constant.TimePatternConstant;
 import com.sms.courier.dto.PageDto;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,9 +24,9 @@ public class LogPageRequest extends PageDto {
     @DateTimeFormat(pattern = TimePatternConstant.DEFAULT_PATTERN)
     private LocalDateTime queryEndTime;
 
-    private Integer operationType;
+    private List<Integer> operationType;
 
-    private Integer operationModule;
+    private List<Integer> operationModule;
 
     private String operationDesc;
 

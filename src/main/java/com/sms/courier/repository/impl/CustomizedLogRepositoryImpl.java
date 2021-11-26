@@ -37,8 +37,8 @@ public class CustomizedLogRepositoryImpl implements CustomizedLogRepository {
             .ifPresent(query::addCriteria);
         REF_ID.projectIdIs(logPageRequest.getProjectId()).ifPresent(query::addCriteria);
         OPERATION_DESC.is(logPageRequest.getOperationDesc()).ifPresent(query::addCriteria);
-        OPERATION_TYPE.is(logPageRequest.getOperationType()).ifPresent(query::addCriteria);
-        OPERATION_MODULE.is(logPageRequest.getOperationModule()).ifPresent(query::addCriteria);
+        OPERATION_TYPE.in(logPageRequest.getOperationType()).ifPresent(query::addCriteria);
+        OPERATION_MODULE.in(logPageRequest.getOperationModule()).ifPresent(query::addCriteria);
         OPERATOR.is(logPageRequest.getOperator()).ifPresent(query::addCriteria);
         OPERATOR_ID.is(logPageRequest.getOperatorId()).ifPresent(query::addCriteria);
         long count = mongoTemplate.count(query, LogEntity.class);

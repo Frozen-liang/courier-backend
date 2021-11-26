@@ -1,6 +1,5 @@
 package com.sms.courier.entity.api.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sms.courier.common.enums.ApiEncodingType;
 import com.sms.courier.common.enums.ApiJsonType;
 import com.sms.courier.common.enums.ApiNodeType;
@@ -29,8 +28,10 @@ public class ApiHistoryDetail {
     @Field(name = "isRemove")
     private boolean remove;
 
+    @Field(targetType = FieldType.OBJECT_ID)
     private String createUserId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
     private String modifyUserId;
 
     private LocalDateTime createDateTime;
@@ -94,7 +95,6 @@ public class ApiHistoryDetail {
     private RawType responseRawType;
 
     @Field(targetType = FieldType.OBJECT_ID)
-    @JsonIgnore
     private String apiManagerId;
 
     private String richText;
