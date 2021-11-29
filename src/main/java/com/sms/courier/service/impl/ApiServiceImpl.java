@@ -31,6 +31,7 @@ import com.sms.courier.entity.structure.ApiStructureRefRecordEntity;
 import com.sms.courier.mapper.ApiHistoryMapper;
 import com.sms.courier.mapper.ApiMapper;
 import com.sms.courier.repository.ApiDataStructureRefRecordRepository;
+import com.sms.courier.repository.ApiGroupRepository;
 import com.sms.courier.repository.ApiHistoryRepository;
 import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
@@ -47,6 +48,7 @@ import com.sms.courier.webhook.WebhookEvent;
 import com.sms.courier.webhook.enums.WebhookType;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -78,6 +80,7 @@ public class ApiServiceImpl implements ApiService {
     private final ProjectImportSourceService projectImportSourceService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ProjectImportFlowRepository projectImportFlowRepository;
+    private final ApiGroupRepository apiGroupRepository;
 
 
     public ApiServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository, ApiMapper apiMapper,
@@ -86,7 +89,8 @@ public class ApiServiceImpl implements ApiService {
         AsyncService asyncService,
         ProjectImportSourceService projectImportSourceService,
         ApplicationEventPublisher applicationEventPublisher,
-        ProjectImportFlowRepository projectImportFlowRepository) {
+        ProjectImportFlowRepository projectImportFlowRepository,
+        ApiGroupRepository apiGroupRepository) {
         this.apiRepository = apiRepository;
         this.apiHistoryRepository = apiHistoryRepository;
         this.apiMapper = apiMapper;
@@ -97,6 +101,7 @@ public class ApiServiceImpl implements ApiService {
         this.projectImportSourceService = projectImportSourceService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.projectImportFlowRepository = projectImportFlowRepository;
+        this.apiGroupRepository = apiGroupRepository;
     }
 
     @SneakyThrows
@@ -337,6 +342,7 @@ public class ApiServiceImpl implements ApiService {
         rollbackDeletedApi(deletedApi);
         rollbackUpdatedApi(updatedApi);
         rollbackAddedApi(addedApi);
+        rollbackAddedGroup(importFlow.getAddedGroup(), projectId);
         saveRollbackRecord(importFlow);
         return Boolean.TRUE;
     }
@@ -365,6 +371,14 @@ public class ApiServiceImpl implements ApiService {
 
     private void rollbackAddedApi(List<ApiRecord> addedApi) {
         this.deleteByIds(addedApi.stream().map(ApiRecord::getId).collect(Collectors.toList()));
+    }
+
+    private void rollbackAddedGroup(List<String> addedGroup, String projectId) {
+        if (CollectionUtils.isNotEmpty(addedGroup)) {
+            List<String> allGroupId = customizedApiRepository.findAllGroupId(projectId);
+            Collection<String> deleteGroupId = CollectionUtils.subtract(addedGroup, allGroupId);
+            apiGroupRepository.deleteAllByIdIn(deleteGroupId);
+        }
     }
 
     private void saveRollbackRecord(ProjectImportFlowEntity importFlow) {

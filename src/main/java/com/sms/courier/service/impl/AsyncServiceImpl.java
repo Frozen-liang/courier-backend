@@ -121,6 +121,8 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
             // Save api
             saveMode.getApiImportHandler().handle(apiEntities, oldApiEntities,
                 applicationContext, importSource.getApiChangeStatus(), projectImportFlowEntity);
+            projectImportFlowEntity
+                .setAddedGroup(incrementApiGroup.stream().map(ApiGroupEntity::getId).collect(Collectors.toList()));
             projectImportFlowEntity.setImportStatus(ImportStatus.SUCCESS);
             projectImportFlowEntity.setEndTime(LocalDateTime.now());
 

@@ -57,6 +57,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.GroupOperation;
+import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -240,6 +244,18 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
     @Override
     public void updateCaseStatus(List<String> apiId, ApiBindingStatus status) {
         commonRepository.updateApiTestCaseStatusByApiId(apiId, status);
+    }
+
+    @Override
+    public List<String> findAllGroupId(String projectId) {
+        MatchOperation match = Aggregation.match(Criteria.where(PROJECT_ID.getName()).is(projectId));
+        GroupOperation group = Aggregation.group(GROUP_ID.getName()).count().as("count");
+        Aggregation aggregation = Aggregation.newAggregation(match, group);
+        AggregationResults<Document> aggregate = mongoTemplate
+            .aggregate(aggregation, ApiEntity.class, Document.class);
+        return aggregate.getMappedResults().stream()
+            .map(document -> document.get(ID.getName(), ObjectId.class).toString())
+            .collect(Collectors.toList());
     }
 
     private void addCriteria(ApiPageRequest apiPageRequest, Query query) {

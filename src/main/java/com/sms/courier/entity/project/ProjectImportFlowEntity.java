@@ -45,6 +45,7 @@ public class ProjectImportFlowEntity {
     private List<ApiRecord> deletedApi = new ArrayList<>();
     @Default
     private List<ApiRecord> updatedApi = new ArrayList<>();
-
+    @Default
+    private List<String> addedGroup = new ArrayList<>();
     private ApiImportRollbackRecord rollbackRecord;
 }
