@@ -10,6 +10,7 @@ import com.sms.courier.entity.log.LogEntity;
 import com.sms.courier.repository.impl.CustomizedLogRepositoryImpl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,8 +37,8 @@ class CustomizedLogRepositoryTest {
         logPageRequest.setQueryEndTime(LocalDateTime.now());
         logPageRequest.setProjectId(ObjectId.get().toString());
         logPageRequest.setOperationDesc("desc");
-        logPageRequest.setOperationType(0);
-        logPageRequest.setOperationModule(0);
+        logPageRequest.setOperationType(List.of(0));
+        logPageRequest.setOperationModule(List.of(1));
         logPageRequest.setOperator("test");
         logPageRequest.setOperatorId(2L);
         when(mongoTemplate.count(any(Query.class), any(Class.class))).thenReturn(TOTAL_ELEMENTS);

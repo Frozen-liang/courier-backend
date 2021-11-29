@@ -51,7 +51,7 @@ public class ProjectImportSourceController {
     @GetMapping("/pid/{projectId}")
     @PreAuthorize("hasRoleOrAdmin(@role.PRO_IMP_SOU_QUERY_ALL)")
     public List<ProjectImportSourceResponse> findByProjectId(@PathVariable String projectId) {
-        return projectImportSourceService.findByProjectId(projectId);
+        return List.of(projectImportSourceService.findByProjectId(projectId));
     }
 
     @DeleteMapping("/{ids}")

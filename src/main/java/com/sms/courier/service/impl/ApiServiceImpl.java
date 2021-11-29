@@ -317,12 +317,10 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Boolean rollback(String importFlowId) {
-        ProjectImportFlowEntity importFlowEntity = projectImportFlowRepository.findById(importFlowId)
-            .orElseThrow();
+    public Boolean rollback(String projectId) {
         ProjectImportFlowEntity importFlow = projectImportFlowRepository
-            .findFirstByProjectIdOrderByCreateDateTimeDesc(importFlowEntity.getProjectId())
-            .orElseThrow(() -> ExceptionUtils.mpe("The import record not exits"));
+            .findFirstByProjectIdOrderByCreateDateTimeDesc(projectId)
+            .orElseThrow(() -> ExceptionUtils.mpe("The import record not exits!"));
         ApiImportRollbackRecord rollbackRecord = importFlow.getRollbackRecord();
         if (Objects.nonNull(rollbackRecord)) {
             throw ExceptionUtils.mpe("%s has been rolled back on %s!",
@@ -356,7 +354,7 @@ public class ApiServiceImpl implements ApiService {
                     return apiEntity;
                 })
                 .collect(Collectors.toList());
-            apiRepository.saveAll(apiEntities);
+            apiRepository.insert(apiEntities);
             customizedApiRepository.updateCaseStatus(deleteApiId, ApiBindingStatus.BINDING);
         }
     }

@@ -18,6 +18,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.enums.DocumentUrlType;
+import com.sms.courier.common.enums.ImportStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.ApiCaseRequest;
 import com.sms.courier.dto.request.ApiImportRequest;
@@ -300,9 +301,9 @@ class ApiServiceTest {
     @DisplayName("Test for rollback in ApiService")
     public void rollback_test() {
         String id = ObjectId.get().toString();
-        when(projectImportFlowRepository.findById(id))
+        when(projectImportFlowRepository.findFirstByProjectIdOrderByCreateDateTimeDesc(id))
             .thenReturn(Optional
-                .of(ProjectImportFlowEntity.builder().id(id).deletedApi(List.of(
+                .of(ProjectImportFlowEntity.builder().importStatus(ImportStatus.SUCCESS).id(id).deletedApi(List.of(
                     ApiRecord.builder().id(ObjectId.get().toString()).historyId(ObjectId.get().toString()).build()))
                     .build()));
         when(apiHistoryRepository.findAllByIdIn(any()))

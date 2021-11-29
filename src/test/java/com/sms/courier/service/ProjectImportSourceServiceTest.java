@@ -84,14 +84,12 @@ public class ProjectImportSourceServiceTest {
     @Test
     @DisplayName("Test the findByProjectId method in the ProjectImportSource Service")
     public void findByProjectId_test() {
-        when(projectImportSourceRepository.findByProjectIdAndRemovedIsFalse(ID))
-            .thenReturn(List.of(ProjectImportSourceResponse.builder().build()));
+        when(projectImportSourceRepository.findFirstByProjectIdAndRemovedIsFalseOrderByCreateDateTimeDesc(ID))
+            .thenReturn(ProjectImportSourceResponse.builder().build());
         when(projectImportFlowRepository.findFirstByImportSourceIdOrderByCreateDateTimeDesc(any()))
             .thenReturn(ProjectImportFlowEntity.builder().importStatus(ImportStatus.SUCCESS).build());
-        List<ProjectImportSourceResponse> result = projectImportSourceService.findByProjectId(ID);
-        assertThat(result).allMatch(
-            (projectImportSourceResponse) -> ImportStatus.SUCCESS.getCode() == projectImportSourceResponse
-                .getImportStatus());
+        ProjectImportSourceResponse result = projectImportSourceService.findByProjectId(ID);
+        assertThat(result.getImportStatus()).isEqualTo(ImportStatus.SUCCESS.getCode());
     }
 
     @Test

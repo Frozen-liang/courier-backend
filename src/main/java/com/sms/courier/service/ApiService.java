@@ -41,5 +41,5 @@ public interface ApiService {
 
     List<ApiAndCaseResponse> queryByApiPathAndRequestMethod(String projectId, List<ApiCaseRequest> requests);
 
-    Boolean rollback(String importFlowId);
+    Boolean rollback(String projectId);
 }

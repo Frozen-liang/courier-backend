@@ -16,7 +16,7 @@ public interface ProjectImportSourceService {
 
     ProjectImportSourceResponse findById(String id);
 
-    List<ProjectImportSourceResponse> findByProjectId(String projectId);
+    ProjectImportSourceResponse findByProjectId(String projectId);
 
     Boolean delete(List<String> ids);
 

@@ -76,16 +76,15 @@ public class ProjectImportSourceServiceImpl implements ProjectImportSourceServic
     }
 
     @Override
-    public List<ProjectImportSourceResponse> findByProjectId(String projectId) {
-        List<ProjectImportSourceResponse> result = this.projectImportSourceRepository
-            .findByProjectIdAndRemovedIsFalse(projectId);
-        result.forEach((projectImportSourceResponse -> {
+    public ProjectImportSourceResponse findByProjectId(String projectId) {
+        ProjectImportSourceResponse result = this.projectImportSourceRepository
+            .findFirstByProjectIdAndRemovedIsFalseOrderByCreateDateTimeDesc(projectId);
+        if (Objects.nonNull(result)) {
             ProjectImportFlowEntity projectImportFlowEntity = projectImportFlowRepository
-                .findFirstByImportSourceIdOrderByCreateDateTimeDesc(projectImportSourceResponse.getId());
-            projectImportSourceResponse.setImportStatus(
-                Objects.nonNull(projectImportFlowEntity) ? projectImportFlowEntity.getImportStatus().getCode() : null
-            );
-        }));
+                .findFirstByImportSourceIdOrderByCreateDateTimeDesc(result.getId());
+            result.setImportStatus(
+                Objects.nonNull(projectImportFlowEntity) ? projectImportFlowEntity.getImportStatus().getCode() : null);
+        }
         return result;
     }
 
