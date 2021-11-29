@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 @SuperBuilder
 @AllArgsConstructor
@@ -24,8 +25,10 @@ public class ApiTestCaseJobEntity extends AbstractCaseJobEntity {
     @Field("isRemoved")
     private boolean removed = false;
 
+    @Field(targetType = FieldType.OBJECT_ID)
     private String createUserId;
 
+    @Field(targetType = FieldType.OBJECT_ID)
     private String modifyUserId;
 
     /**

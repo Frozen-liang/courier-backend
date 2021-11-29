@@ -1,14 +1,24 @@
 package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_USER_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_JOB_GROUP_BY_DAY_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_CASE_JOB_GROUP_BY_USER_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_SCENE_CASE_GROUP_BY_DAY_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_SCENE_CASE_GROUP_BY_USER_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_SCENE_CASE_JOB_GROUP_BY_DAY_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_SCENE_CASE_JOB_GROUP_BY_USER_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_SCENE_COUNT_ERROR;
 
-import com.google.common.collect.Lists;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CaseCountUserStatisticsResponse;
 import com.sms.courier.dto.response.ProjectResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
+import com.sms.courier.entity.job.ApiTestCaseJobEntity;
+import com.sms.courier.entity.job.SceneCaseJobEntity;
+import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.repository.CommonStatisticsRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseRepository;
@@ -16,7 +26,6 @@ import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.service.ProjectService;
 import com.sms.courier.service.WorkspaceStatisticsService;
 import com.sms.courier.utils.ExceptionUtils;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +37,6 @@ import org.springframework.stereotype.Service;
 public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService implements WorkspaceStatisticsService {
 
     private final ProjectService projectService;
-    private final CommonStatisticsRepository commonStatisticsRepository;
     private final CustomizedSceneCaseRepository customizedSceneCaseRepository;
     private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository;
     private final CustomizedApiRepository customizedApiRepository;
@@ -38,8 +46,8 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
         CustomizedSceneCaseRepository customizedSceneCaseRepository,
         CustomizedApiTestCaseRepository customizedApiTestCaseRepository,
         CustomizedApiRepository customizedApiRepository) {
+        super(commonStatisticsRepository);
         this.projectService = projectService;
-        this.commonStatisticsRepository = commonStatisticsRepository;
         this.customizedSceneCaseRepository = customizedSceneCaseRepository;
         this.customizedApiTestCaseRepository = customizedApiTestCaseRepository;
         this.customizedApiRepository = customizedApiRepository;
@@ -51,11 +59,7 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
             List<ProjectResponse> projectResponses = projectService.list(workspaceId);
             List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
                 .collect(Collectors.toList());
-            LocalDateTime dateTime = LocalDateTime.now().minusDays(day);
-            List<CaseCountStatisticsResponse> responses = CollectionUtils.isNotEmpty(projectResponses)
-                ? commonStatisticsRepository.getGroupDayCount(projectIds, dateTime, ApiTestCaseEntity.class)
-                : Lists.newArrayList();
-            return handleResponses(responses, day);
+            return groupDay(projectIds, day, ApiTestCaseEntity.class);
         } catch (ApiTestPlatformException exception) {
             log.error(exception.getMessage());
             throw exception;
@@ -102,6 +106,118 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
         } catch (Exception e) {
             log.error("Failed to get the Workspace api count!", e);
             throw ExceptionUtils.mpe(ErrorCode.GET_WORKSPACE_API_COUNT_ERROR);
+        }
+    }
+
+    @Override
+    public List<CaseCountStatisticsResponse> sceneCaseGroupDayCount(String workspaceId, Integer day) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(workspaceId);
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return groupDay(projectIds, day, SceneCaseEntity.class);
+        } catch (ApiTestPlatformException exception) {
+            log.error(exception.getMessage());
+            throw exception;
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace scene case group by day!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_SCENE_CASE_GROUP_BY_DAY_ERROR);
+        }
+    }
+
+    @Override
+    public List<CaseCountStatisticsResponse> caseJobGroupDayCount(String workspaceId, Integer day) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(workspaceId);
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return groupDay(projectIds, day, ApiTestCaseJobEntity.class);
+        } catch (ApiTestPlatformException exception) {
+            log.error(exception.getMessage());
+            throw exception;
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace case job group by day!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_CASE_JOB_GROUP_BY_DAY_ERROR);
+        }
+    }
+
+    @Override
+    public List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(String workspaceId, Integer day) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(workspaceId);
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return groupDay(projectIds, day, SceneCaseJobEntity.class);
+        } catch (ApiTestPlatformException exception) {
+            log.error(exception.getMessage());
+            throw exception;
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace scene case job group by day!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_SCENE_CASE_JOB_GROUP_BY_DAY_ERROR);
+        }
+    }
+
+    @Override
+    public List<CaseCountUserStatisticsResponse> caseGroupUserCount(Integer day, String workspaceId) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(workspaceId);
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return groupUser(projectIds, day, ApiTestCaseEntity.class);
+        } catch (ApiTestPlatformException exception) {
+            log.error(exception.getMessage());
+            throw exception;
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace case group by user!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_CASE_GROUP_BY_USER_ERROR);
+        }
+    }
+
+    @Override
+    public List<CaseCountUserStatisticsResponse> sceneCaseGroupUserCount(Integer day, String workspaceId) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(workspaceId);
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return groupUser(projectIds, day, SceneCaseEntity.class);
+        } catch (ApiTestPlatformException exception) {
+            log.error(exception.getMessage());
+            throw exception;
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace scene case group by user!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_SCENE_CASE_GROUP_BY_USER_ERROR);
+        }
+    }
+
+    @Override
+    public List<CaseCountUserStatisticsResponse> caseJobGroupUserCount(Integer day, String workspaceId) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(workspaceId);
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return groupUserByJob(projectIds, day, ApiTestCaseJobEntity.class);
+        } catch (ApiTestPlatformException exception) {
+            log.error(exception.getMessage());
+            throw exception;
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace case job group by user!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_CASE_JOB_GROUP_BY_USER_ERROR);
+        }
+    }
+
+    @Override
+    public List<CaseCountUserStatisticsResponse> sceneCaseJobGroupUserCount(Integer day, String workspaceId) {
+        try {
+            List<ProjectResponse> projectResponses = projectService.list(workspaceId);
+            List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
+                .collect(Collectors.toList());
+            return groupUserByJob(projectIds, day, SceneCaseJobEntity.class);
+        } catch (ApiTestPlatformException exception) {
+            log.error(exception.getMessage());
+            throw exception;
+        } catch (Exception e) {
+            log.error("Failed to get the Workspace scene case job group by user!", e);
+            throw new ApiTestPlatformException(GET_WORKSPACE_SCENE_CASE_JOB_GROUP_BY_USER_ERROR);
         }
     }
 

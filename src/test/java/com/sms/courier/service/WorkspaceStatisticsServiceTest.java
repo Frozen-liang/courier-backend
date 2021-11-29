@@ -4,8 +4,12 @@ import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CaseCountUserStatisticsResponse;
 import com.sms.courier.dto.response.ProjectResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
+import com.sms.courier.entity.job.ApiTestCaseJobEntity;
+import com.sms.courier.entity.job.SceneCaseJobEntity;
+import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.repository.CommonStatisticsRepository;
 import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseRepository;
@@ -36,7 +40,7 @@ public class WorkspaceStatisticsServiceTest {
     private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
     private final WorkspaceStatisticsService workspaceStatisticsService =
         new WorkspaceStatisticsServiceImpl(projectService, commonStatisticsRepository, customizedSceneCaseRepository,
-            customizedApiTestCaseRepository,customizedApiRepository);
+            customizedApiTestCaseRepository, customizedApiRepository);
     private static final String ID = ObjectId.get().toString();
     private static final Integer MOCK_DAY = 7;
     private static final Long MOCK_COUNT = 1L;
@@ -135,6 +139,235 @@ public class WorkspaceStatisticsServiceTest {
     public void apiAllCount_exception_test() {
         when(projectService.list(any())).thenThrow(new RuntimeException());
         assertThatThrownBy(() -> workspaceStatisticsService.apiAllCount(ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the sceneCaseGroupDayCount method in the Workspace service")
+    public void sceneCaseGroupDayCount_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        List<CaseCountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
+        when(commonStatisticsRepository.getGroupDayCount(any(), any(), eq(SceneCaseEntity.class)))
+            .thenReturn(caseCountStatisticsResponses);
+        List<CaseCountStatisticsResponse> responses = workspaceStatisticsService.sceneCaseGroupDayCount(ID, MOCK_DAY);
+        assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
+    }
+
+    @Test
+    @DisplayName("Test the sceneCaseGroupDayCount method in the Workspace service")
+    public void sceneCaseGroupDayCount_projectIsNull_test() {
+        when(projectService.list(any())).thenReturn(Lists.newArrayList());
+        List<CaseCountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
+        when(commonStatisticsRepository.getGroupDayCount(any(), any(), eq(SceneCaseEntity.class)))
+            .thenReturn(caseCountStatisticsResponses);
+        List<CaseCountStatisticsResponse> responses = workspaceStatisticsService.sceneCaseGroupDayCount(ID, MOCK_DAY);
+        assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sceneCaseGroupDayCount Workspace")
+    public void sceneCaseGroupDayCount_smsException_test() {
+        when(projectService.list(any()))
+            .thenThrow(new ApiTestPlatformException(ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR));
+        assertThatThrownBy(() -> workspaceStatisticsService.sceneCaseGroupDayCount(ID, MOCK_DAY))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sceneCaseGroupDayCount Workspace")
+    public void sceneCaseGroupDayCount_exception_test() {
+        when(projectService.list(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceStatisticsService.sceneCaseGroupDayCount(ID, MOCK_DAY))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the caseJobGroupDayCount method in the Workspace service")
+    public void caseJobGroupDayCount_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        List<CaseCountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
+        when(commonStatisticsRepository.getGroupDayCount(any(), any(), eq(SceneCaseEntity.class)))
+            .thenReturn(caseCountStatisticsResponses);
+        List<CaseCountStatisticsResponse> responses = workspaceStatisticsService.caseJobGroupDayCount(ID, MOCK_DAY);
+        assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while caseJobGroupDayCount Workspace")
+    public void caseJobGroupDayCount_smsException_test() {
+        when(projectService.list(any()))
+            .thenThrow(new ApiTestPlatformException(ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR));
+        assertThatThrownBy(() -> workspaceStatisticsService.caseJobGroupDayCount(ID, MOCK_DAY))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while caseJobGroupDayCount Workspace")
+    public void caseJobGroupDayCount_exception_test() {
+        when(projectService.list(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceStatisticsService.caseJobGroupDayCount(ID, MOCK_DAY))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the sceneCaseJobGroupDayCount method in the Workspace service")
+    public void sceneCaseJobGroupDayCount_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        List<CaseCountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
+        when(commonStatisticsRepository.getGroupDayCount(any(), any(), eq(SceneCaseEntity.class)))
+            .thenReturn(caseCountStatisticsResponses);
+        List<CaseCountStatisticsResponse> responses = workspaceStatisticsService
+            .sceneCaseJobGroupDayCount(ID, MOCK_DAY);
+        assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sceneCaseJobGroupDayCount Workspace")
+    public void sceneCaseJobGroupDayCount_smsException_test() {
+        when(projectService.list(any()))
+            .thenThrow(new ApiTestPlatformException(ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR));
+        assertThatThrownBy(() -> workspaceStatisticsService.sceneCaseJobGroupDayCount(ID, MOCK_DAY))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sceneCaseJobGroupDayCount Workspace")
+    public void sceneCaseJobGroupDayCount_exception_test() {
+        when(projectService.list(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceStatisticsService.sceneCaseJobGroupDayCount(ID, MOCK_DAY))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the caseGroupUserCount method in the Workspace service")
+    public void caseGroupUserCount_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        List<CaseCountUserStatisticsResponse> caseCountStatisticsResponses =
+            Lists.newArrayList(CaseCountUserStatisticsResponse.builder().build());
+        when(commonStatisticsRepository.getGroupUserCount(any(), any(), eq(ApiTestCaseEntity.class)))
+            .thenReturn(caseCountStatisticsResponses);
+        List<CaseCountUserStatisticsResponse> responses = workspaceStatisticsService.caseGroupUserCount(MOCK_DAY, ID);
+        assertThat(responses).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while caseGroupUserCount Workspace")
+    public void caseGroupUserCount_smsException_test() {
+        when(projectService.list(any()))
+            .thenThrow(new ApiTestPlatformException(ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR));
+        assertThatThrownBy(() -> workspaceStatisticsService.caseGroupUserCount(MOCK_DAY, ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while caseGroupUserCount Workspace")
+    public void caseGroupUserCount_exception_test() {
+        when(projectService.list(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceStatisticsService.caseGroupUserCount(MOCK_DAY, ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the sceneCaseGroupUserCount method in the Workspace service")
+    public void sceneCaseGroupUserCount_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        List<CaseCountUserStatisticsResponse> caseCountStatisticsResponses =
+            Lists.newArrayList(CaseCountUserStatisticsResponse.builder().build());
+        when(commonStatisticsRepository.getGroupUserCount(any(), any(), eq(SceneCaseEntity.class)))
+            .thenReturn(caseCountStatisticsResponses);
+        List<CaseCountUserStatisticsResponse> responses = workspaceStatisticsService
+            .sceneCaseGroupUserCount(MOCK_DAY, ID);
+        assertThat(responses).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sceneCaseGroupUserCount Workspace")
+    public void sceneCaseGroupUserCount_smsException_test() {
+        when(projectService.list(any()))
+            .thenThrow(new ApiTestPlatformException(ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR));
+        assertThatThrownBy(() -> workspaceStatisticsService.sceneCaseGroupUserCount(MOCK_DAY, ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sceneCaseGroupUserCount Workspace")
+    public void sceneCaseGroupUserCount_exception_test() {
+        when(projectService.list(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceStatisticsService.sceneCaseGroupUserCount(MOCK_DAY, ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the caseJobGroupUserCount method in the Workspace service")
+    public void caseJobGroupUserCount_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        List<CaseCountUserStatisticsResponse> caseCountStatisticsResponses =
+            Lists.newArrayList(CaseCountUserStatisticsResponse.builder().build());
+        when(commonStatisticsRepository.getGroupUserCountByJob(any(), any(), eq(ApiTestCaseJobEntity.class)))
+            .thenReturn(caseCountStatisticsResponses);
+        List<CaseCountUserStatisticsResponse> responses = workspaceStatisticsService
+            .caseJobGroupUserCount(MOCK_DAY, ID);
+        assertThat(responses).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while caseJobGroupUserCount Workspace")
+    public void caseJobGroupUserCount_smsException_test() {
+        when(projectService.list(any()))
+            .thenThrow(new ApiTestPlatformException(ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR));
+        assertThatThrownBy(() -> workspaceStatisticsService.caseJobGroupUserCount(MOCK_DAY, ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while caseJobGroupUserCount Workspace")
+    public void caseJobGroupUserCount_exception_test() {
+        when(projectService.list(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceStatisticsService.caseJobGroupUserCount(MOCK_DAY, ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the sceneCaseJobGroupUserCount method in the Workspace service")
+    public void sceneCaseJobGroupUserCount_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        List<CaseCountUserStatisticsResponse> caseCountStatisticsResponses =
+            Lists.newArrayList(CaseCountUserStatisticsResponse.builder().build());
+        when(commonStatisticsRepository.getGroupUserCountByJob(any(), any(), eq(SceneCaseJobEntity.class)))
+            .thenReturn(caseCountStatisticsResponses);
+        List<CaseCountUserStatisticsResponse> responses = workspaceStatisticsService
+            .sceneCaseJobGroupUserCount(MOCK_DAY, ID);
+        assertThat(responses).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sceneCaseJobGroupUserCount Workspace")
+    public void sceneCaseJobGroupUserCount_smsException_test() {
+        when(projectService.list(any()))
+            .thenThrow(new ApiTestPlatformException(ErrorCode.GET_WORKSPACE_CASE_GROUP_BY_DAY_ERROR));
+        assertThatThrownBy(() -> workspaceStatisticsService.sceneCaseJobGroupUserCount(MOCK_DAY, ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sceneCaseJobGroupUserCount Workspace")
+    public void sceneCaseJobGroupUserCount_exception_test() {
+        when(projectService.list(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceStatisticsService.sceneCaseJobGroupUserCount(MOCK_DAY, ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 

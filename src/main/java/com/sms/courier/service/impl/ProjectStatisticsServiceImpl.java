@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 public class ProjectStatisticsServiceImpl extends AbstractStatisticsService implements ProjectStatisticsService {
 
     private final CustomizedApiRepository customizedApiRepository;
-    private final CommonStatisticsRepository commonStatisticsRepository;
     private final CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository;
     private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository;
     private final CustomizedSceneCaseRepository customizedSceneCaseRepository;
@@ -41,8 +40,8 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
         CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository,
         CustomizedApiTestCaseRepository customizedApiTestCaseRepository,
         CustomizedSceneCaseRepository customizedSceneCaseRepository) {
+        super(commonStatisticsRepository);
         this.customizedApiRepository = customizedApiRepository;
-        this.commonStatisticsRepository = commonStatisticsRepository;
         this.customizedSceneCaseJobRepository = customizedSceneCaseJobRepository;
         this.customizedApiTestCaseRepository = customizedApiTestCaseRepository;
         this.customizedSceneCaseRepository = customizedSceneCaseRepository;
@@ -71,10 +70,7 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
     @Override
     public List<CaseCountStatisticsResponse> caseGroupDayCount(String projectId) {
         try {
-            LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
-            List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
-                .getGroupDayCount(Lists.newArrayList(projectId), dateTime, ApiTestCaseEntity.class);
-            return handleResponses(responses, Constants.CASE_DAY);
+            return groupDay(Lists.newArrayList(projectId), Constants.CASE_DAY, ApiTestCaseEntity.class);
         } catch (Exception e) {
             log.error("Failed to get the Project case group by day!", e);
             throw new ApiTestPlatformException(GET_PROJECT_CASE_GROUP_BY_DAY_ERROR);
@@ -84,10 +80,7 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
     @Override
     public List<CaseCountStatisticsResponse> sceneCaseGroupDayCount(String projectId) {
         try {
-            LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
-            List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
-                .getGroupDayCount(Lists.newArrayList(projectId), dateTime, SceneCaseEntity.class);
-            return handleResponses(responses, Constants.CASE_DAY);
+            return groupDay(Lists.newArrayList(projectId), Constants.CASE_DAY, SceneCaseEntity.class);
         } catch (Exception e) {
             log.error("Failed to get the Project case group by day!", e);
             throw ExceptionUtils.mpe(ErrorCode.GET_PROJECT_SCENE_CASE_GROUP_BY_DAY_ERROR);
@@ -147,10 +140,7 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
     @Override
     public List<CaseCountStatisticsResponse> caseJobGroupDayCount(String projectId, Integer day) {
         try {
-            LocalDateTime dateTime = LocalDateTime.now().minusDays(day);
-            List<CaseCountStatisticsResponse> responses = commonStatisticsRepository
-                .getGroupDayCount(Lists.newArrayList(projectId), dateTime, ApiTestCaseJobEntity.class);
-            return handleResponses(responses, day);
+            return groupDay(Lists.newArrayList(projectId), day, ApiTestCaseJobEntity.class);
         } catch (Exception e) {
             log.error("Failed to get case job count!", e);
             throw ExceptionUtils.mpe(ErrorCode.GET_CASE_JOB_COUNT_ERROR);
