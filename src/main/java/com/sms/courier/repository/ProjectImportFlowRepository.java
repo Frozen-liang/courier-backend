@@ -2,6 +2,7 @@ package com.sms.courier.repository;
 
 import com.sms.courier.dto.response.ProjectImportFlowResponse;
 import com.sms.courier.entity.project.ProjectImportFlowEntity;
+import java.util.Optional;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ProjectImportFlowRepository extends MongoRepository<ProjectImportFlowEntity, String> {
@@ -11,4 +12,6 @@ public interface ProjectImportFlowRepository extends MongoRepository<ProjectImpo
     ProjectImportFlowResponse findFirstByProjectId(String projectId);
 
     boolean existsByIdAndImportStatus(String id, int code);
+
+    Optional<ProjectImportFlowEntity> findFirstByProjectIdOrderByCreateDateTimeDesc(String projectId);
 }

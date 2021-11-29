@@ -1,6 +1,7 @@
 package com.sms.courier.repository;
 
 import com.sms.courier.entity.group.ApiGroupEntity;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -10,7 +11,7 @@ public interface ApiGroupRepository extends MongoRepository<ApiGroupEntity, Stri
 
     Stream<ApiGroupEntity> findAllByPathContains(Long realGroupId);
 
-    void deleteAllByIdIn(List<String> ids);
+    void deleteAllByIdIn(Collection<String> ids);
 
     List<ApiGroupEntity> findByProjectIdOrderByNameAscCreateDateTimeDesc(String projectId);
 

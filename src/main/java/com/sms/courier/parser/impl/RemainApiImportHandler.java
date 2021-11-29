@@ -19,14 +19,14 @@ public class RemainApiImportHandler extends AbstractApiImportHandler {
         ProjectImportFlowEntity projectImportFlowEntity) {
         newApiEntities = Objects.requireNonNullElse(newApiEntities, Collections.emptyList());
         if (MapUtils.isEmpty(oldApiEntities)) {
-            List<ApiEntity> newApiList = newApiEntities.parallelStream()
+            List<ApiEntity> newApiList = newApiEntities.stream()
                 // Record new api
                 .peek(apiEntity -> recordAddApi(apiEntity, projectImportFlowEntity))
                 .collect(Collectors.toList());
             saveDiffApiEntities(newApiList, applicationContext);
             return;
         }
-        List<ApiEntity> newApiList = newApiEntities.parallelStream()
+        List<ApiEntity> newApiList = newApiEntities.stream()
             .filter(apiEntity -> !oldApiEntities.containsKey(apiEntity.getSwaggerId()))
             // Record new api
             .peek(apiEntity -> recordAddApi(apiEntity, projectImportFlowEntity))

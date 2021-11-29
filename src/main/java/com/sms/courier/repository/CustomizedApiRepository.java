@@ -40,4 +40,6 @@ public interface CustomizedApiRepository {
     Long count(List<String> projectId);
 
     void updateCaseStatus(List<String> apiId, ApiBindingStatus binding);
+
+    List<String> findAllGroupId(String projectId);
 }

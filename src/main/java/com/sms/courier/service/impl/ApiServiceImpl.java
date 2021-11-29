@@ -1,10 +1,12 @@
 package com.sms.courier.service.impl;
 
 import static com.sms.courier.utils.Assert.isFalse;
+import static com.sms.courier.utils.Assert.isTrue;
 
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.enums.ApiBindingStatus;
+import com.sms.courier.common.enums.ImportStatus;
 import com.sms.courier.common.enums.OperationModule;
 import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
@@ -29,6 +31,7 @@ import com.sms.courier.entity.structure.ApiStructureRefRecordEntity;
 import com.sms.courier.mapper.ApiHistoryMapper;
 import com.sms.courier.mapper.ApiMapper;
 import com.sms.courier.repository.ApiDataStructureRefRecordRepository;
+import com.sms.courier.repository.ApiGroupRepository;
 import com.sms.courier.repository.ApiHistoryRepository;
 import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
@@ -37,6 +40,7 @@ import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.ApiService;
 import com.sms.courier.service.AsyncService;
 import com.sms.courier.service.ProjectImportSourceService;
+import com.sms.courier.utils.DateUtil;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.MD5Util;
 import com.sms.courier.utils.SecurityUtil;
@@ -44,7 +48,7 @@ import com.sms.courier.webhook.WebhookEvent;
 import com.sms.courier.webhook.enums.WebhookType;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -76,6 +80,7 @@ public class ApiServiceImpl implements ApiService {
     private final ProjectImportSourceService projectImportSourceService;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ProjectImportFlowRepository projectImportFlowRepository;
+    private final ApiGroupRepository apiGroupRepository;
 
 
     public ApiServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository, ApiMapper apiMapper,
@@ -84,7 +89,8 @@ public class ApiServiceImpl implements ApiService {
         AsyncService asyncService,
         ProjectImportSourceService projectImportSourceService,
         ApplicationEventPublisher applicationEventPublisher,
-        ProjectImportFlowRepository projectImportFlowRepository) {
+        ProjectImportFlowRepository projectImportFlowRepository,
+        ApiGroupRepository apiGroupRepository) {
         this.apiRepository = apiRepository;
         this.apiHistoryRepository = apiHistoryRepository;
         this.apiMapper = apiMapper;
@@ -95,11 +101,11 @@ public class ApiServiceImpl implements ApiService {
         this.projectImportSourceService = projectImportSourceService;
         this.applicationEventPublisher = applicationEventPublisher;
         this.projectImportFlowRepository = projectImportFlowRepository;
+        this.apiGroupRepository = apiGroupRepository;
     }
 
     @SneakyThrows
     @Override
-    @LogRecord(operationType = OperationType.SYNC, operationModule = OperationModule.API)
     public boolean importDocumentByFile(ApiImportRequest apiImportRequest) {
         String content = IOUtils.toString(apiImportRequest.getFile().getInputStream(), StandardCharsets.UTF_8);
         asyncService.importApi(apiMapper.toImportSource(apiImportRequest, content));
@@ -107,7 +113,6 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    @LogRecord(operationType = OperationType.SYNC, operationModule = OperationModule.API)
     public Boolean syncApiByProImpSourceIds(List<String> proImpSourceIds) {
         Iterable<ProjectImportSourceEntity> projectImportSources = projectImportSourceService
             .findByIds(proImpSourceIds);
@@ -317,25 +322,36 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Boolean rollback(String importFlowId) {
-        ProjectImportFlowEntity importFlow = projectImportFlowRepository.findById(importFlowId)
-            .orElseThrow(() -> ExceptionUtils.mpe("The import record not exits"));
-        rollbackDeletedApi(importFlow);
-        rollbackUpdatedApi(importFlow);
-        rollbackAddedApi(importFlow);
+    public Boolean rollback(String projectId) {
+        ProjectImportFlowEntity importFlow = projectImportFlowRepository
+            .findFirstByProjectIdOrderByCreateDateTimeDesc(projectId)
+            .orElseThrow(() -> ExceptionUtils.mpe("The import record not exits!"));
+        ApiImportRollbackRecord rollbackRecord = importFlow.getRollbackRecord();
+        if (Objects.nonNull(rollbackRecord)) {
+            throw ExceptionUtils.mpe("%s has been rolled back on %s!",
+                rollbackRecord.getUsername(), DateUtil.toString(rollbackRecord.getRollbackTime()));
+        }
+        isTrue(ImportStatus.SUCCESS == importFlow.getImportStatus(),
+            "Only the latest import record can be rolled back if it is in a successful!");
+        List<ApiRecord> deletedApi = importFlow.getDeletedApi();
+        List<ApiRecord> updatedApi = importFlow.getUpdatedApi();
+        List<ApiRecord> addedApi = importFlow.getAddedApi();
+        if (deletedApi.isEmpty() && updatedApi.isEmpty() && addedApi.isEmpty()) {
+            return false;
+        }
+        rollbackDeletedApi(deletedApi);
+        rollbackUpdatedApi(updatedApi);
+        rollbackAddedApi(addedApi);
+        rollbackAddedGroup(importFlow.getAddedGroup(), projectId);
         saveRollbackRecord(importFlow);
         return Boolean.TRUE;
     }
 
-    private void rollbackUpdatedApi(ProjectImportFlowEntity importFlow) {
-        importFlow.getUpdatedApi().forEach(apiRecord -> this.resetApiVersion(apiRecord.getHistoryId()));
-    }
-
-    private void rollbackDeletedApi(ProjectImportFlowEntity importFlow) {
-        List<String> deleteApiHistoryIds = importFlow.getDeletedApi().stream().map(ApiRecord::getHistoryId)
+    private void rollbackDeletedApi(List<ApiRecord> deletedApi) {
+        List<String> deleteApiHistoryIds = deletedApi.stream().map(ApiRecord::getHistoryId)
             .collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(deleteApiHistoryIds)) {
-            List<String> deleteApiId = importFlow.getDeletedApi().stream().map(ApiRecord::getId)
+            List<String> deleteApiId = deletedApi.stream().map(ApiRecord::getId)
                 .collect(Collectors.toList());
             List<ApiEntity> apiEntities = apiHistoryRepository.findAllByIdIn(deleteApiHistoryIds)
                 .map(apiHistoryEntity -> {
@@ -344,28 +360,38 @@ public class ApiServiceImpl implements ApiService {
                     return apiEntity;
                 })
                 .collect(Collectors.toList());
-            apiRepository.saveAll(apiEntities);
+            apiRepository.insert(apiEntities);
             customizedApiRepository.updateCaseStatus(deleteApiId, ApiBindingStatus.BINDING);
         }
     }
 
-    private void rollbackAddedApi(ProjectImportFlowEntity importFlow) {
-        List<String> addedApi = importFlow.getAddedApi().stream().map(ApiRecord::getId).collect(Collectors.toList());
-        this.deleteByIds(addedApi);
+    private void rollbackUpdatedApi(List<ApiRecord> updatedApi) {
+        updatedApi.forEach(apiRecord -> this.resetApiVersion(apiRecord.getHistoryId()));
+    }
+
+    private void rollbackAddedApi(List<ApiRecord> addedApi) {
+        this.deleteByIds(addedApi.stream().map(ApiRecord::getId).collect(Collectors.toList()));
+    }
+
+    private void rollbackAddedGroup(List<String> addedGroup, String projectId) {
+        if (CollectionUtils.isNotEmpty(addedGroup)) {
+            List<String> allGroupId = customizedApiRepository.findAllGroupId(projectId);
+            Collection<String> deleteGroupId = CollectionUtils.subtract(addedGroup, allGroupId);
+            apiGroupRepository.deleteAllByIdIn(deleteGroupId);
+        }
     }
 
     private void saveRollbackRecord(ProjectImportFlowEntity importFlow) {
-        LinkedList<ApiImportRollbackRecord> rollbackRecord = importFlow.getRollbackRecords();
         CustomUser currentUser = SecurityUtil.getCurrentUser();
-        rollbackRecord.addFirst(ApiImportRollbackRecord.builder()
+        ApiImportRollbackRecord rollbackRecord = ApiImportRollbackRecord.builder()
             .userId(currentUser.getId())
             .username(currentUser.getUsername())
-            .build());
-        UpdateRequest<List<ApiImportRollbackRecord>> updateRequest = new UpdateRequest<>();
-        updateRequest.setKey("rollbackRecords");
+            .build();
+        UpdateRequest<ApiImportRollbackRecord> updateRequest = new UpdateRequest<>();
+        updateRequest.setKey("rollbackRecord");
         updateRequest.setValue(rollbackRecord);
-        customizedApiRepository.updateFieldByIds(List.of(importFlow.getId()), updateRequest,
-            ProjectImportFlowEntity.class);
+        customizedApiRepository
+            .updateFieldByIds(List.of(importFlow.getId()), updateRequest, ProjectImportFlowEntity.class);
     }
 
     private void saveRef(String id, String name, List<String> addStructIds, List<String> removeStructIds) {

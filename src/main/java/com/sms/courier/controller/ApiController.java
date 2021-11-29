@@ -113,10 +113,10 @@ public class ApiController {
         return apiService.queryByApiPathAndRequestMethod(projectId, requests);
     }
 
-    @PutMapping("/importFlow/rollback/{importFlowId}")
+    @PutMapping("/importFlow/rollback/{projectId}")
     @PreAuthorize("hasRoleOrAdmin(@role.API_IMPORT_ROLLBACK)")
-    public Boolean rollback(@PathVariable String importFlowId) {
-        return apiService.rollback(importFlowId);
+    public Boolean rollback(@PathVariable String projectId) {
+        return apiService.rollback(projectId);
     }
 
 }

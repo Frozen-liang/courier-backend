@@ -69,6 +69,8 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
 
     @Override
     @Async
+    @LogRecord(operationType = OperationType.SYNC, operationModule = OperationModule.API,
+        template = "{{#importSource.name}}")
     public void importApi(ImportSourceVo importSource) {
         String projectId = importSource.getProjectId();
         DocumentType documentType = importSource.getDocumentType();
@@ -119,6 +121,8 @@ public class AsyncServiceImpl implements AsyncService, ApplicationContextAware {
             // Save api
             saveMode.getApiImportHandler().handle(apiEntities, oldApiEntities,
                 applicationContext, importSource.getApiChangeStatus(), projectImportFlowEntity);
+            projectImportFlowEntity
+                .setAddedGroup(incrementApiGroup.stream().map(ApiGroupEntity::getId).collect(Collectors.toList()));
             projectImportFlowEntity.setImportStatus(ImportStatus.SUCCESS);
             projectImportFlowEntity.setEndTime(LocalDateTime.now());
 
