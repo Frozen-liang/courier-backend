@@ -20,4 +20,6 @@ public class SceneCaseJobRequest extends PageDto {
     private String sceneCaseId;
 
     private String caseTemplateId;
+
+    private String envId;
 }

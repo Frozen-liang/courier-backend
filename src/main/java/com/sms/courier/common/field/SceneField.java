@@ -18,6 +18,7 @@ public enum SceneField implements Field {
     CASE_TEMPLATE_API_CONN_LIST("caseTemplateApiConnList"),
     IS_LOCK("isLock"),
     API_ID_GROUP_SEARCH("apiTestCase.apiEntity.id"),
+    JOB_ENV_ID("environment.id"),
     API_TYPE("apiType"),
     API_TEST_CASE_PROJECT_ID("apiTestCase.projectId");
 
