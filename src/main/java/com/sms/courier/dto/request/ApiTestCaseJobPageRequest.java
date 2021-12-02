@@ -22,4 +22,5 @@ public class ApiTestCaseJobPageRequest extends PageDto {
 
     private ObjectId apiId;
 
+    private ObjectId envId;
 }

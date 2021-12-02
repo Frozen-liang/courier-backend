@@ -9,6 +9,7 @@ public enum ApiTestCaseJobField implements Field {
     PARAMS_TOTAL_TIME_COST("paramsTotalTimeCost"),
     DELAY_TIME_TOTAL_TIME_COST("delayTimeTotalTimeCost"),
     INFO_LIST("infoList"),
+    JOB_ENV_ID("environment.id"),
     JOB_API_ID("apiTestCase.jobApiTestCase.jobApi.id");
 
 

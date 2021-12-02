@@ -51,6 +51,23 @@ public class CustomizedSceneCaseJobRepositoryImpl implements CustomizedSceneCase
     @Override
     public Page<SceneCaseJobEntity> page(SceneCaseJobRequest sceneCaseJobRequest) {
         PageDtoConverter.frontMapping(sceneCaseJobRequest);
+        BasicQuery query = buildQueryFiled();
+        CommonField.CREATE_USER_ID.in(sceneCaseJobRequest.getUserIds()).ifPresent(query::addCriteria);
+        SceneField.SCENE_CASE_ID.is(sceneCaseJobRequest.getSceneCaseId()).ifPresent(query::addCriteria);
+        SceneField.CASE_TEMPLATE_ID.is(sceneCaseJobRequest.getCaseTemplateId()).ifPresent(query::addCriteria);
+        SceneField.JOB_ENV_ID.is(sceneCaseJobRequest.getEnvId()).ifPresent(query::addCriteria);
+        CommonField.JOB_STATUS.in(Lists.newArrayList(JobStatus.SUCCESS.getCode(), JobStatus.FAIL.getCode()))
+            .ifPresent(query::addCriteria);
+
+        long total = mongoTemplate.count(query, SceneCaseJobEntity.class);
+        Sort sort = Sort.by(Direction.fromString(sceneCaseJobRequest.getOrder()), sceneCaseJobRequest.getSort());
+        Pageable pageable = PageRequest
+            .of(sceneCaseJobRequest.getPageNumber(), sceneCaseJobRequest.getPageSize(), sort);
+        List<SceneCaseJobEntity> sceneCaseJobList = mongoTemplate.find(query.with(pageable), SceneCaseJobEntity.class);
+        return new PageImpl<>(sceneCaseJobList, pageable, total);
+    }
+
+    private BasicQuery buildQueryFiled() {
         Document document = new Document();
         document.put(SceneCaseJobField.API_TEST_CASE.getName(), true);
         document.put(SceneCaseJobField.JOB_STATUS.getName(), true);
@@ -62,19 +79,7 @@ public class CustomizedSceneCaseJobRepositoryImpl implements CustomizedSceneCase
         document.put(DELAY_TIME_TOTAL_TIME_COST.getName(), true);
         document.put(INFO_LIST.getName(), true);
         document.put(ENVIRONMENT.getName(), true);
-        BasicQuery query = new BasicQuery(new Document(), document);
-        CommonField.CREATE_USER_ID.in(sceneCaseJobRequest.getUserIds()).ifPresent(query::addCriteria);
-        SceneField.SCENE_CASE_ID.is(sceneCaseJobRequest.getSceneCaseId()).ifPresent(query::addCriteria);
-        SceneField.CASE_TEMPLATE_ID.is(sceneCaseJobRequest.getCaseTemplateId()).ifPresent(query::addCriteria);
-        CommonField.JOB_STATUS.in(Lists.newArrayList(JobStatus.SUCCESS.getCode(), JobStatus.FAIL.getCode()))
-            .ifPresent(query::addCriteria);
-
-        long total = mongoTemplate.count(query, SceneCaseJobEntity.class);
-        Sort sort = Sort.by(Direction.fromString(sceneCaseJobRequest.getOrder()), sceneCaseJobRequest.getSort());
-        Pageable pageable = PageRequest
-            .of(sceneCaseJobRequest.getPageNumber(), sceneCaseJobRequest.getPageSize(), sort);
-        List<SceneCaseJobEntity> sceneCaseJobList = mongoTemplate.find(query.with(pageable), SceneCaseJobEntity.class);
-        return new PageImpl<>(sceneCaseJobList, pageable, total);
+        return new BasicQuery(new Document(), document);
     }
 
     @Override

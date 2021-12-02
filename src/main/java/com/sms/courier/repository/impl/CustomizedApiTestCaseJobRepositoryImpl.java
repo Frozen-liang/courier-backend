@@ -5,6 +5,7 @@ import static com.sms.courier.common.field.ApiTestCaseJobField.DELAY_TIME_TOTAL_
 import static com.sms.courier.common.field.ApiTestCaseJobField.ENGINE_ID;
 import static com.sms.courier.common.field.ApiTestCaseJobField.INFO_LIST;
 import static com.sms.courier.common.field.ApiTestCaseJobField.JOB_API_ID;
+import static com.sms.courier.common.field.ApiTestCaseJobField.JOB_ENV_ID;
 import static com.sms.courier.common.field.ApiTestCaseJobField.JOB_STATUS;
 import static com.sms.courier.common.field.ApiTestCaseJobField.PARAMS_TOTAL_TIME_COST;
 import static com.sms.courier.common.field.ApiTestCaseJobField.TOTAL_TIME_COST;
@@ -51,6 +52,24 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
 
     @Override
     public Page<ApiTestCaseJobEntity> page(ApiTestCaseJobPageRequest apiTestCaseJobPageRequest) {
+        BasicQuery query = buildQueryField();
+        API_TEST_CASE_ID.is(apiTestCaseJobPageRequest.getApiTestCaseId()).ifPresent(query::addCriteria);
+        CREATE_USER_ID.in(apiTestCaseJobPageRequest.getUserIds()).ifPresent(query::addCriteria);
+        JOB_API_ID.is((apiTestCaseJobPageRequest.getApiId())).ifPresent(query::addCriteria);
+        JOB_ENV_ID.is(apiTestCaseJobPageRequest.getEnvId()).ifPresent(query::addCriteria);
+        JOB_STATUS.in(JOB_STATUSES).ifPresent(query::addCriteria);
+        long count = mongoTemplate.count(query, ApiTestCaseJobEntity.class);
+        if (count <= 0) {
+            return new PageImpl<>(Collections.emptyList());
+        }
+        PageDtoConverter.frontMapping(apiTestCaseJobPageRequest);
+        Pageable pageable = PageDtoConverter.createPageable(apiTestCaseJobPageRequest);
+        List<ApiTestCaseJobEntity> apiTestCaseJobs = mongoTemplate.find(query.with(pageable),
+            ApiTestCaseJobEntity.class);
+        return new PageImpl<>(apiTestCaseJobs, pageable, count);
+    }
+
+    private BasicQuery buildQueryField() {
         Document document = new Document();
         document.put(CASE_REPORT, true);
         document.put(ID.getName(), true);
@@ -67,20 +86,7 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
         document.put(RESPONSE_RESULT_VERIFICATION, true);
         document.put(RESPONSE_TIME_VERIFICATION, true);
         document.put(EVN_NAME, true);
-        BasicQuery query = new BasicQuery(new Document(), document);
-        API_TEST_CASE_ID.is(apiTestCaseJobPageRequest.getApiTestCaseId()).ifPresent(query::addCriteria);
-        CREATE_USER_ID.in(apiTestCaseJobPageRequest.getUserIds()).ifPresent(query::addCriteria);
-        JOB_API_ID.is((apiTestCaseJobPageRequest.getApiId())).ifPresent(query::addCriteria);
-        JOB_STATUS.in(JOB_STATUSES).ifPresent(query::addCriteria);
-        long count = mongoTemplate.count(query, ApiTestCaseJobEntity.class);
-        if (count <= 0) {
-            return new PageImpl<>(Collections.emptyList());
-        }
-        PageDtoConverter.frontMapping(apiTestCaseJobPageRequest);
-        Pageable pageable = PageDtoConverter.createPageable(apiTestCaseJobPageRequest);
-        List<ApiTestCaseJobEntity> apiTestCaseJobs = mongoTemplate.find(query.with(pageable),
-            ApiTestCaseJobEntity.class);
-        return new PageImpl<>(apiTestCaseJobs, pageable, count);
+        return new BasicQuery(new Document(), document);
     }
 
     @Override
