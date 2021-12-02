@@ -21,5 +21,5 @@ public class SceneCaseJobRequest extends PageDto {
 
     private String caseTemplateId;
 
-    private String envId;
+    private List<String> envId;
 }

@@ -32,6 +32,8 @@ public class ApiTestCaseEntity extends BaseEntity {
 
     private String caseName;
 
+    private String description;
+
     @Field(targetType = FieldType.OBJECT_ID)
     private String dataCollId;
 

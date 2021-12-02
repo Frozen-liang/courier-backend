@@ -7,7 +7,6 @@ import static com.sms.courier.common.field.CommonField.ID;
 import static com.sms.courier.common.field.CommonField.PROJECT_ID;
 import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.common.field.CommonField.USERNAME;
-import static com.sms.courier.common.field.SceneField.CREATE_USER_NAME;
 import static com.sms.courier.common.field.SceneField.GROUP_ID;
 import static com.sms.courier.common.field.SceneField.NAME;
 import static com.sms.courier.common.field.SceneField.PRIORITY;
@@ -128,7 +127,7 @@ public class CustomizedCaseTemplateRepositoryImpl implements CustomizedCaseTempl
             TEST_STATUS.in(searchRequest.getTestStatus()),
             TAG_ID.in(searchRequest.getTagId()),
             PRIORITY.in(searchRequest.getPriority()),
-            CREATE_USER_NAME.in(searchRequest.getCreateUserName())
+            CREATE_USER_ID.in(searchRequest.getCreateUserId())
         );
     }
 

@@ -55,7 +55,7 @@ public class CustomizedSceneCaseJobRepositoryImpl implements CustomizedSceneCase
         CommonField.CREATE_USER_ID.in(sceneCaseJobRequest.getUserIds()).ifPresent(query::addCriteria);
         SceneField.SCENE_CASE_ID.is(sceneCaseJobRequest.getSceneCaseId()).ifPresent(query::addCriteria);
         SceneField.CASE_TEMPLATE_ID.is(sceneCaseJobRequest.getCaseTemplateId()).ifPresent(query::addCriteria);
-        SceneField.JOB_ENV_ID.is(sceneCaseJobRequest.getEnvId()).ifPresent(query::addCriteria);
+        SceneField.JOB_ENV_ID.in(sceneCaseJobRequest.getEnvId()).ifPresent(query::addCriteria);
         CommonField.JOB_STATUS.in(Lists.newArrayList(JobStatus.SUCCESS.getCode(), JobStatus.FAIL.getCode()))
             .ifPresent(query::addCriteria);
 

@@ -7,7 +7,6 @@ import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.WorkspaceRequest;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.WorkspaceResponse;
 import com.sms.courier.service.WorkspaceService;
 import java.util.List;
@@ -33,9 +32,9 @@ public class WorkspaceController {
         this.workspaceService = workspaceService;
     }
 
-    @GetMapping("/{id}")
-    public WorkspaceResponse getById(@PathVariable("id") String id) {
-        return workspaceService.findById(id);
+    @GetMapping("/userCount/{id}")
+    public int userCount(@PathVariable("id") String id) {
+        return workspaceService.userCount(id);
     }
 
     @PostMapping

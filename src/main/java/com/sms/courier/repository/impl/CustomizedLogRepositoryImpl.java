@@ -5,7 +5,6 @@ import static com.sms.courier.common.field.CommonField.REF_ID;
 import static com.sms.courier.common.field.LogField.OPERATION_DESC;
 import static com.sms.courier.common.field.LogField.OPERATION_MODULE;
 import static com.sms.courier.common.field.LogField.OPERATION_TYPE;
-import static com.sms.courier.common.field.LogField.OPERATOR;
 import static com.sms.courier.common.field.LogField.OPERATOR_ID;
 
 import com.sms.courier.dto.request.LogPageRequest;
@@ -35,12 +34,11 @@ public class CustomizedLogRepositoryImpl implements CustomizedLogRepository {
         Query query = new Query();
         CREATE_DATE_TIME.lteAndGte(logPageRequest.getQueryBeginTime(), logPageRequest.getQueryEndTime())
             .ifPresent(query::addCriteria);
-        REF_ID.projectIdIs(logPageRequest.getProjectId()).ifPresent(query::addCriteria);
-        OPERATION_DESC.is(logPageRequest.getOperationDesc()).ifPresent(query::addCriteria);
+        REF_ID.isOrNotExist(logPageRequest.getRefId()).ifPresent(query::addCriteria);
+        OPERATION_DESC.like(logPageRequest.getOperationDesc()).ifPresent(query::addCriteria);
         OPERATION_TYPE.in(logPageRequest.getOperationType()).ifPresent(query::addCriteria);
         OPERATION_MODULE.in(logPageRequest.getOperationModule()).ifPresent(query::addCriteria);
-        OPERATOR.is(logPageRequest.getOperator()).ifPresent(query::addCriteria);
-        OPERATOR_ID.is(logPageRequest.getOperatorId()).ifPresent(query::addCriteria);
+        OPERATOR_ID.in(logPageRequest.getOperatorId()).ifPresent(query::addCriteria);
         long count = mongoTemplate.count(query, LogEntity.class);
         Pageable pageable = PageDtoConverter.createPageable(logPageRequest);
         List<LogEntity> logList = mongoTemplate.find(query.with(pageable), LogEntity.class);

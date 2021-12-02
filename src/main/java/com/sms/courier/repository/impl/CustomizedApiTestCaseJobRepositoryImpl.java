@@ -56,7 +56,7 @@ public class CustomizedApiTestCaseJobRepositoryImpl implements CustomizedApiTest
         API_TEST_CASE_ID.is(apiTestCaseJobPageRequest.getApiTestCaseId()).ifPresent(query::addCriteria);
         CREATE_USER_ID.in(apiTestCaseJobPageRequest.getUserIds()).ifPresent(query::addCriteria);
         JOB_API_ID.is((apiTestCaseJobPageRequest.getApiId())).ifPresent(query::addCriteria);
-        JOB_ENV_ID.is(apiTestCaseJobPageRequest.getEnvId()).ifPresent(query::addCriteria);
+        JOB_ENV_ID.in(apiTestCaseJobPageRequest.getEnvId()).ifPresent(query::addCriteria);
         JOB_STATUS.in(JOB_STATUSES).ifPresent(query::addCriteria);
         long count = mongoTemplate.count(query, ApiTestCaseJobEntity.class);
         if (count <= 0) {

@@ -78,8 +78,13 @@ public interface Field {
         return Optional.of(Criteria.where(getName()).exists(isExists));
     }
 
+    default Optional<Criteria> isOrNotExist(String value) {
+        return StringUtils.isBlank(value) ? Optional.of(Criteria.where(getName()).exists(false)) :
+            Optional.of(Criteria.where(getName()).is(value));
+    }
+
     default Optional<Criteria> like(String value) {
-        if (Objects.isNull(value)) {
+        if (StringUtils.isBlank(value)) {
             return Optional.empty();
         }
         Pattern pattern = Pattern.compile("^.*" + converterSpecialChar(value) + ".*$", Pattern.CASE_INSENSITIVE);

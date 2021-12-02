@@ -23,4 +23,5 @@ public interface WorkspaceService {
 
     Page<ApiTestCaseResponse> getCase(String id, PageDto pageDto);
 
+    int userCount(String id);
 }

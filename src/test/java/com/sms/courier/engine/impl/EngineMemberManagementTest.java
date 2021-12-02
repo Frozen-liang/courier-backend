@@ -31,6 +31,7 @@ import com.sms.courier.mapper.EngineMapper;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.EngineMemberRepository;
 import com.sms.courier.utils.ExceptionUtils;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.bson.types.ObjectId;
@@ -256,6 +257,34 @@ public class EngineMemberManagementTest {
         DockerLogRequest request = DockerLogRequest.builder().build();
         doNothing().when(dockerService).queryLog(request);
         Boolean result = engineMemberManagement.queryLog(request);
+        assertThat(result).isTrue();
+    }
+
+
+    @Test
+    @DisplayName("Test for batchDeleteEngine in EngineMemberManagement")
+    public void batchDeleteEngine_test() {
+        List<String> names = List.of("courier-engine-1");
+        doNothing().when(dockerService).deleteContainer(anyString());
+        Boolean result = engineMemberManagement.batchDeleteEngine(names);
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("An custom exception occurred while batch delete engine.")
+    public void batchDeleteEngine_custom_exception_test() {
+        List<String> names = List.of("courier-engine-1");
+        doThrow(ExceptionUtils.mpe(NO_SUCH_CONTAINER_ERROR, "name")).when(dockerService).deleteContainer(anyString());
+        Boolean result = engineMemberManagement.batchDeleteEngine(names);
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("An system exception occurred while batch delete engine.")
+    public void batchDeleteEngine_system_exception_test() {
+        List<String> names = List.of("courier-engine-1");
+        doThrow(new RuntimeException()).when(dockerService).deleteContainer(anyString());
+        Boolean result = engineMemberManagement.batchDeleteEngine(names);
         assertThat(result).isTrue();
     }
 }

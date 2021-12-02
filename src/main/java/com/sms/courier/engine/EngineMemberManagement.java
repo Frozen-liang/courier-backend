@@ -37,4 +37,6 @@ public interface EngineMemberManagement {
     Boolean queryLog(DockerLogRequest request);
 
     Boolean edit(EngineMemberRequest request);
+
+    Boolean batchDeleteEngine(List<String> names);
 }

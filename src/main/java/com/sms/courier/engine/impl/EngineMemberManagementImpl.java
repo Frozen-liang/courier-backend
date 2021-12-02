@@ -232,6 +232,25 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = ENGINE_MEMBER, template = "{{#names}}")
+    public Boolean batchDeleteEngine(List<String> names) {
+        for (String name : names) {
+            try {
+                dockerService.deleteContainer(name);
+            } catch (ApiTestPlatformException e) {
+                log.error(e.getMessage());
+                if (NO_SUCH_CONTAINER_ERROR.getCode().equals(e.getCode())) {
+                    updateEngineStatus(name);
+                }
+            } catch (Exception e) {
+                log.error("Batch delete engine error!", e);
+            }
+
+        }
+        return Boolean.TRUE;
+    }
+
+    @Override
     public void unBind(String sessionId) {
         Optional<EngineMemberEntity> engineMemberOptional = engineMemberRepository.findFirstBySessionId(sessionId);
         engineMemberOptional.ifPresent((engineMember -> {

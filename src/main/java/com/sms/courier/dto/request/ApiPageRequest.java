@@ -38,4 +38,10 @@ public class ApiPageRequest extends PageDto {
 
     private List<Integer> apiStatus;
 
+    private Integer caseCount;
+
+    private Integer sceneCaseCount;
+
+    private Integer otherProjectSceneCaseCount;
+
 }
