@@ -28,6 +28,7 @@ public class ApiTestCaseRequest {
     private String id;
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The caseName can not be empty.")
     private String caseName;
+    private String description;
     private String dataCollId;
     private List<String> tagId;
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId can not be empty.")

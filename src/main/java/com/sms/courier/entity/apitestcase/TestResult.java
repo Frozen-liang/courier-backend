@@ -15,13 +15,7 @@ public class TestResult {
 
     private String jobId;
 
-    private Integer status;
-
     private ResultType isSuccess;
-
-    private String errCode;
-
-    private String failMessage;
 
     // Test time.
     private LocalDateTime testTime;

@@ -26,7 +26,6 @@ import com.sms.courier.entity.apitestcase.TestResult;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobReport;
 import com.sms.courier.entity.job.JobCaseApi;
-import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.JobDataCollection;
 import com.sms.courier.entity.job.common.JobEntity;
@@ -282,12 +281,8 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
         if (StringUtils.isBlank(caseId)) {
             return;
         }
-        CaseReport caseReport = jobReport.getCaseReport();
-        caseReport = Objects
-            .requireNonNullElse(caseReport, CaseReport.builder().errCode(jobReport.getErrCode())
-                .failMessage(jobReport.getMessage()).isSuccess(
-                    ResultType.FAIL).build());
-        TestResult testResult = jobMapper.toTestResult(caseReport);
+        TestResult testResult = new TestResult();
+        testResult.setIsSuccess(JobStatus.SUCCESS == jobReport.getJobStatus() ? ResultType.SUCCESS : ResultType.FAIL);
         testResult.setJobId(apiTestCaseJob.getId());
         testResult.setTestUsername(apiTestCaseJob.getCreateUserName());
         testResult.setTestTime(apiTestCaseJob.getCreateDateTime());

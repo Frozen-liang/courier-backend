@@ -7,6 +7,7 @@ import static com.sms.courier.common.field.ApiField.API_PROTOCOL;
 import static com.sms.courier.common.field.ApiField.API_STATUS;
 import static com.sms.courier.common.field.ApiField.CASE_COUNT;
 import static com.sms.courier.common.field.ApiField.GROUP_ID;
+import static com.sms.courier.common.field.ApiField.OTHER_PROJECT_SCENE_CASE_COUNT;
 import static com.sms.courier.common.field.ApiField.REQUEST_METHOD;
 import static com.sms.courier.common.field.ApiField.SCENE_CASE_COUNT;
 import static com.sms.courier.common.field.ApiField.TAG_ID;
@@ -214,8 +215,8 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
                 Criteria.where(SCENE_CASE_COUNT.getName()).exists(Boolean.FALSE)));
         QueryVo queryVo = QueryVo.builder()
             .collectionName("Api")
-            .lookupVo(Lists.newArrayList())
-            .criteriaList(Lists.newArrayList(criteria, PROJECT_ID.is(request.getProjectId()), REMOVE.is(Boolean.FALSE)))
+            .criteriaList(Lists.newArrayList(criteria, API_NAME.like(request.getApiName()),
+                PROJECT_ID.is(request.getProjectId()), REMOVE.is(Boolean.FALSE)))
             .build();
         return commonRepository.page(queryVo, request, ApiPageResponse.class);
     }
@@ -227,8 +228,9 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
                 Criteria.where(CASE_COUNT.getName()).exists(Boolean.FALSE)));
         QueryVo queryVo = QueryVo.builder()
             .collectionName("Api")
-            .lookupVo(Lists.newArrayList())
-            .criteriaList(Lists.newArrayList(criteria, PROJECT_ID.is(request.getProjectId()), REMOVE.is(Boolean.FALSE)))
+            .criteriaList(Lists.newArrayList(criteria, API_NAME.like(request.getApiName()),
+                PROJECT_ID.is(request.getProjectId()),
+                REMOVE.is(Boolean.FALSE)))
             .build();
         return commonRepository.page(queryVo, request, ApiPageResponse.class);
     }
@@ -269,6 +271,9 @@ public class CustomizedApiRepositoryImpl implements CustomizedApiRepository {
         REQUEST_METHOD.in(apiPageRequest.getRequestMethod()).ifPresent(query::addCriteria);
         TAG_ID.in(apiPageRequest.getTagId()).ifPresent(query::addCriteria);
         API_MANAGER_ID.in(apiPageRequest.getApiManagerId()).ifPresent(query::addCriteria);
+        CASE_COUNT.is(apiPageRequest.getCaseCount()).ifPresent(query::addCriteria);
+        SCENE_CASE_COUNT.is(apiPageRequest.getSceneCaseCount()).ifPresent(query::addCriteria);
+        OTHER_PROJECT_SCENE_CASE_COUNT.is(apiPageRequest.getOtherProjectSceneCaseCount()).ifPresent(query::addCriteria);
     }
 
     private List<ObjectId> getApiGroupId(ObjectId groupId) {

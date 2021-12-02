@@ -1,9 +1,5 @@
 package com.sms.courier.common.field;
 
-import java.util.Optional;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.mongodb.core.query.Criteria;
-
 public enum CommonField implements Field {
 
     ID("_id"),
@@ -32,8 +28,4 @@ public enum CommonField implements Field {
         return name;
     }
 
-    public Optional<Criteria> projectIdIs(String projectId) {
-        return StringUtils.isEmpty(projectId) ? Optional.of(Criteria.where(getName()).exists(false)) :
-            Optional.of(Criteria.where(getName()).is(projectId));
-    }
 }

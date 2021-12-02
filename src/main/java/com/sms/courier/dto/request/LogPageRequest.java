@@ -16,7 +16,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Data
 public class LogPageRequest extends PageDto {
 
-    private String projectId;
+    private String refId;
 
     @DateTimeFormat(pattern = TimePatternConstant.DEFAULT_PATTERN)
     private LocalDateTime queryBeginTime;
@@ -30,7 +30,5 @@ public class LogPageRequest extends PageDto {
 
     private String operationDesc;
 
-    private String operator;
-
-    private Long operatorId;
+    private List<String> operatorId;
 }

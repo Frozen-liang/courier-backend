@@ -35,12 +35,11 @@ class CustomizedLogRepositoryTest {
         LogPageRequest logPageRequest = new LogPageRequest();
         logPageRequest.setQueryBeginTime(LocalDateTime.now());
         logPageRequest.setQueryEndTime(LocalDateTime.now());
-        logPageRequest.setProjectId(ObjectId.get().toString());
+        logPageRequest.setRefId(ObjectId.get().toString());
         logPageRequest.setOperationDesc("desc");
         logPageRequest.setOperationType(List.of(0));
         logPageRequest.setOperationModule(List.of(1));
-        logPageRequest.setOperator("test");
-        logPageRequest.setOperatorId(2L);
+        logPageRequest.setOperatorId(List.of(ObjectId.get().toString()));
         when(mongoTemplate.count(any(Query.class), any(Class.class))).thenReturn(TOTAL_ELEMENTS);
         when(mongoTemplate.find(any(Query.class), any())).thenReturn(logList);
         Page<LogEntity> page = customizedLogRepository.page(logPageRequest);

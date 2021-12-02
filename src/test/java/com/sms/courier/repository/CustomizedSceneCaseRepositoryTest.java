@@ -1,5 +1,12 @@
 package com.sms.courier.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
+
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.response.SceneCaseResponse;
 import com.sms.courier.entity.mongo.QueryVo;
@@ -15,13 +22,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.MongoTemplate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Tests for CustomizedSceneCaseRepositoryTest")
 class CustomizedSceneCaseRepositoryTest {
@@ -46,7 +46,7 @@ class CustomizedSceneCaseRepositoryTest {
         SearchSceneCaseRequest request = new SearchSceneCaseRequest();
         request.setTagId(Lists.newArrayList(new ObjectId()));
         request.setName(NAME);
-        request.setCreateUserName(Lists.newArrayList(NAME));
+        request.setCreateUserId(Lists.newArrayList(ObjectId.get()));
         request.setTestStatus(Lists.newArrayList(MOCK_ID));
         request.setRemoved(Boolean.FALSE);
         request.setPageNumber(1);

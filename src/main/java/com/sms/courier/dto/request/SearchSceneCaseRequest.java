@@ -21,9 +21,10 @@ public class SearchSceneCaseRequest extends PageDto {
     private ObjectId groupId;
     @JsonProperty("isRemoved")
     private boolean removed;
+    private ObjectId apiId;
     private List<String> testStatus;
     private List<ObjectId> tagId;
     private List<Integer> priority;
-    private List<String> createUserName;
+    private List<ObjectId> createUserId;
 
 }

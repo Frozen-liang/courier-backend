@@ -20,4 +20,6 @@ public class ApiIncludeCaseRequest extends PageDto {
 
     @NotNull(message = "The projectId must be null.")
     private ObjectId projectId;
+
+    private String apiName;
 }

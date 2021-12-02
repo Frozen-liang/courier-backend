@@ -37,6 +37,7 @@ import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -171,6 +172,13 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             log.error("Failed to get the Workspace case!", e);
             throw new ApiTestPlatformException(GET_WORKSPACE_CASE_ERROR);
         }
+    }
+
+    @Override
+    public int userCount(String id) {
+        WorkspaceEntity workspace = workspaceRepository.findById(id)
+            .orElseThrow(() -> ExceptionUtils.mpe(GET_WORKSPACE_BY_ID_ERROR));
+        return Objects.nonNull(workspace.getUserIds()) ? workspace.getUserIds().size() : 0;
     }
 
 }

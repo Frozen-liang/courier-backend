@@ -46,7 +46,7 @@ class CustomizedCaseTemplateRepositoryTest {
         CaseTemplateSearchRequest request = new CaseTemplateSearchRequest();
         request.setTagId(Lists.newArrayList(new ObjectId()));
         request.setName(NAME);
-        request.setCreateUserName(Lists.newArrayList(NAME));
+        request.setCreateUserId(Lists.newArrayList(NAME));
         request.setTestStatus(Lists.newArrayList(MOCK_ID));
         request.setRemoved(Boolean.FALSE);
         request.setPageNumber(1);

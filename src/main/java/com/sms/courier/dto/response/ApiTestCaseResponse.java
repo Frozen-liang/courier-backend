@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class ApiTestCaseResponse extends LookupUserResponse {
 
     private String caseName;
+    private String description;
     private String projectId;
     private Integer priority;
     private List<String> tagName;

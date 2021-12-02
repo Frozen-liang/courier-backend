@@ -7,7 +7,6 @@ import static com.sms.courier.common.field.CommonField.ID;
 import static com.sms.courier.common.field.CommonField.PROJECT_ID;
 import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.common.field.CommonField.USERNAME;
-import static com.sms.courier.common.field.SceneField.CREATE_USER_NAME;
 import static com.sms.courier.common.field.SceneField.GROUP_ID;
 import static com.sms.courier.common.field.SceneField.NAME;
 import static com.sms.courier.common.field.SceneField.PRIORITY;
@@ -135,7 +134,7 @@ public class CustomizedSceneCaseRepositoryImpl implements CustomizedSceneCaseRep
             TEST_STATUS.in(searchSceneCaseRequest.getTestStatus()),
             TAG_ID.in(searchSceneCaseRequest.getTagId()),
             PRIORITY.in(searchSceneCaseRequest.getPriority()),
-            CREATE_USER_NAME.in(searchSceneCaseRequest.getCreateUserName())
+            CREATE_USER_ID.in(searchSceneCaseRequest.getCreateUserId())
         );
     }
 
