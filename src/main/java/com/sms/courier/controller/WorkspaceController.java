@@ -37,6 +37,11 @@ public class WorkspaceController {
         return workspaceService.userCount(id);
     }
 
+    @GetMapping("/{id}")
+    public WorkspaceResponse getById(@PathVariable("id") String id) {
+        return workspaceService.findById(id);
+    }
+
     @PostMapping
     @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean add(@Validated(InsertGroup.class) @RequestBody WorkspaceRequest workspaceRequest) {
