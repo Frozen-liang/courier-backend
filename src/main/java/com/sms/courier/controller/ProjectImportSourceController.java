@@ -2,13 +2,17 @@ package com.sms.courier.controller;
 
 import static com.sms.courier.common.constant.Constants.PROJECT_IMPORT_SOURCE;
 
+import com.google.common.collect.Lists;
 import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.request.ProjectImportFlowPageRequest;
 import com.sms.courier.dto.request.ProjectImportSourceRequest;
 import com.sms.courier.dto.response.ProjectImportFlowResponse;
 import com.sms.courier.dto.response.ProjectImportSourceResponse;
 import com.sms.courier.service.ProjectImportSourceService;
+import io.undertow.util.ConnectionUtils;
 import java.util.List;
+import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -51,7 +55,11 @@ public class ProjectImportSourceController {
     @GetMapping("/pid/{projectId}")
     @PreAuthorize("hasRoleOrAdmin(@role.PRO_IMP_SOU_QUERY_ALL)")
     public List<ProjectImportSourceResponse> findByProjectId(@PathVariable String projectId) {
-        return List.of(projectImportSourceService.findByProjectId(projectId));
+        ProjectImportSourceResponse response = projectImportSourceService.findByProjectId(projectId);
+        if (Objects.isNull(response)) {
+            return Lists.newArrayList();
+        }
+        return List.of(response);
     }
 
     @DeleteMapping("/{ids}")
