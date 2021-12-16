@@ -31,7 +31,7 @@ public class MockSettingController {
     }
 
     @GetMapping("/findOne")
-    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
+    @PreAuthorize("hasRoleOrAdmin(@role.MOCK_SETTING_QUERY_ALL)")
     public MockSettingResponse findOne() {
         return mockSettingService.findOne();
     }

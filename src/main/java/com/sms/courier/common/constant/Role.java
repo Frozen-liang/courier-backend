@@ -172,4 +172,7 @@ public class Role {
     public static final String API_COMMENT_QUERY_ALL = "Api_Comment" + QUERY_ALL;
     public static final String API_COMMENT_QUERY_OWN = "Api_Comment" + QUERY_OWN;
 
+    // MOCK Setting
+    public static final String MOCK_SETTING_QUERY_ALL = "Mock_Setting" + QUERY_ALL;
+
 }
