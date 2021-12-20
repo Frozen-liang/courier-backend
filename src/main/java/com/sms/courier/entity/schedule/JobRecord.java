@@ -22,6 +22,9 @@ public class JobRecord {
     @Default
     private int sceneCount = 1;
 
+    //环境数量
+    private int envCount;
+
     // 成功数量
     private int success;
 

@@ -30,6 +30,7 @@ import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.RunningJobAck;
 import com.sms.courier.entity.scenetest.CaseTemplateApiConn;
+import com.sms.courier.entity.scenetest.EnvDataCollConn;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.entity.schedule.CaseCondition;
@@ -93,7 +94,7 @@ class ScheduleSceneCaseJobServiceTest {
             .jobType(JobType.SCHEDULER_SCENE_CASE)
             .caseReportList(List.of(CaseReport.builder().build()))
             .jobId(ObjectId.get().toString()).build();
-    private final SceneCaseEntity sceneCaseEntity = SceneCaseEntity.builder().id(ID).dataCollId(ID).build();
+    private final SceneCaseEntity sceneCaseEntity = SceneCaseEntity.builder().id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final String ENGINE_ID = "/engine/13/invoke";
     private static final List<String> ENGINE_ID_LIST = Collections.singletonList(ENGINE_ID);
@@ -150,16 +151,23 @@ class ScheduleSceneCaseJobServiceTest {
     @DisplayName("Test the schedule method in the ScheduleSceneCaseJob service")
     @ValueSource(strings = {"ALL", "PRIORITY_AND_TAG", "CUSTOM"})
     public void schedule_test_when_data_collection_is_not_empty(String caseFilter) {
-        ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envId(ObjectId.get().toString())
+        ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envIds(
+            com.google.common.collect.Lists.newArrayList(ObjectId.get().toString()))
             .caseFilter(CaseFilter.valueOf(caseFilter))
             .caseCondition(CaseCondition.builder().tag(Collections.singletonList(ID)).build())
             .caseType(CaseType.SCENE_CASE).build();
-        List<SceneCaseEntity> apiTestCaseEntities = Collections.singletonList(sceneCaseEntity);
+        List<SceneCaseEntity> apiTestCaseEntities =
+            Collections.singletonList(
+                SceneCaseEntity.builder().id(ID)
+                    .envDataCollConnList(Lists.newArrayList(EnvDataCollConn.builder().envId(ID).dataCollId(ID).build()))
+                    .build());
         when(sceneCaseRepository.findByIdIn(any())).thenReturn(apiTestCaseEntities);
         when(sceneCaseRepository.findByProjectIdAndRemovedIsFalse(any())).thenReturn(apiTestCaseEntities);
         when(sceneCaseRepository.findByProjectIdAndTagIdIn(any(), any())).thenReturn(apiTestCaseEntities);
-        when(sceneCaseRepository.findByProjectIdAndTagIdInAndPriorityIn(any(), any(), any())).thenReturn(apiTestCaseEntities);
-        when(projectEnvironmentService.findOne(anyString())).thenReturn(ProjectEnvironmentEntity.builder().build());
+        when(sceneCaseRepository.findByProjectIdAndTagIdInAndPriorityIn(any(), any(), any()))
+            .thenReturn(apiTestCaseEntities);
+        when(projectEnvironmentService.findAll(any()))
+            .thenReturn(Lists.newArrayList(ProjectEnvironmentEntity.builder().id(ID).build()));
         List<SceneCaseApiEntity> sceneCaseApiList1 = getSceneCaseApiList();
         when(sceneCaseApiRepository.findSceneCaseApiEntitiesBySceneCaseIdAndRemovedOrderByOrder(any(), anyBoolean()))
             .thenReturn(sceneCaseApiList1);
@@ -179,15 +187,21 @@ class ScheduleSceneCaseJobServiceTest {
     @DisplayName("Test the schedule method in the ScheduleSceneCaseJob service")
     @ValueSource(strings = {"ALL", "PRIORITY_AND_TAG", "CUSTOM"})
     public void schedule_test_when_data_collection_is_empty(String caseFilter) {
-        ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envId(ObjectId.get().toString())
+        ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envIds(
+            com.google.common.collect.Lists.newArrayList(ObjectId.get().toString()))
             .caseFilter(CaseFilter.valueOf(caseFilter))
             .caseCondition(CaseCondition.builder().priority(List.of(1)).build()).caseType(CaseType.SCENE_CASE).build();
-        List<SceneCaseEntity> apiTestCaseEntities = Collections.singletonList(sceneCaseEntity);
+        List<SceneCaseEntity> apiTestCaseEntities = Collections.singletonList(
+            SceneCaseEntity.builder().id(ID)
+                .envDataCollConnList(Lists.newArrayList(EnvDataCollConn.builder().envId(ID).dataCollId(ID).build()))
+                .build());
         when(sceneCaseRepository.findByIdIn(any())).thenReturn(apiTestCaseEntities);
         when(sceneCaseRepository.findByProjectIdAndRemovedIsFalse(any())).thenReturn(apiTestCaseEntities);
         when(sceneCaseRepository.findByProjectIdAndPriorityIn(any(), any())).thenReturn(apiTestCaseEntities);
-        when(sceneCaseRepository.findByProjectIdAndTagIdInAndPriorityIn(any(), any(), any())).thenReturn(apiTestCaseEntities);
-        when(projectEnvironmentService.findOne(anyString())).thenReturn(ProjectEnvironmentEntity.builder().build());
+        when(sceneCaseRepository.findByProjectIdAndTagIdInAndPriorityIn(any(), any(), any()))
+            .thenReturn(apiTestCaseEntities);
+        when(projectEnvironmentService.findAll(any()))
+            .thenReturn(Lists.newArrayList(ProjectEnvironmentEntity.builder().id(ID).build()));
         when(commonRepository.findById(ID, DataCollectionEntity.class)).thenReturn(Optional.empty());
         when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());
@@ -199,11 +213,13 @@ class ScheduleSceneCaseJobServiceTest {
     @Test
     @DisplayName("Test the schedule method in the ScheduleSceneCaseJob service")
     public void schedule_test_when_scene_case_is_empty() {
-        ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envId(ObjectId.get().toString())
+        ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envIds(
+            com.google.common.collect.Lists.newArrayList(ObjectId.get().toString()))
             .caseFilter(CaseFilter.CUSTOM)
             .caseCondition(CaseCondition.builder().build()).caseType(CaseType.CASE).build();
         when(apiTestCaseRepository.findByIdIn(any(List.class))).thenReturn(Collections.emptyList());
-        when(projectEnvironmentService.findOne(anyString())).thenReturn(ProjectEnvironmentEntity.builder().build());
+        when(projectEnvironmentService.findAll(any()))
+            .thenReturn(Lists.newArrayList(ProjectEnvironmentEntity.builder().build()));
         when(commonRepository.findById(ID, DataCollectionEntity.class)).thenReturn(Optional.empty());
         when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());

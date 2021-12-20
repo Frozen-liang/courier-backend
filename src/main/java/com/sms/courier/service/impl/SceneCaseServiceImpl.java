@@ -12,6 +12,7 @@ import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_CONN_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.ENV_CANNOT_REPEATED;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_ERROR;
@@ -35,11 +36,17 @@ import com.sms.courier.dto.request.AddSceneCaseApi;
 import com.sms.courier.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.courier.dto.request.AddSceneCaseRequest;
 import com.sms.courier.dto.request.ApiRequest;
+import com.sms.courier.dto.request.EnvDataCollConnRequest;
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseApiConnRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseConnRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseRequest;
+import com.sms.courier.dto.response.DataCollectionResponse;
+import com.sms.courier.dto.response.EnvDataCollConnResponse;
+import com.sms.courier.dto.response.EnvDataCollResponse;
+import com.sms.courier.dto.response.ProjectEnvironmentResponse;
 import com.sms.courier.dto.response.SceneCaseApiConnResponse;
+import com.sms.courier.dto.response.SceneCaseConnResponse;
 import com.sms.courier.dto.response.SceneCaseResponse;
 import com.sms.courier.dto.response.SceneTemplateResponse;
 import com.sms.courier.entity.api.common.HttpStatusVerification;
@@ -51,7 +58,9 @@ import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
 import com.sms.courier.mapper.CaseTemplateApiMapper;
+import com.sms.courier.mapper.DataCollectionMapper;
 import com.sms.courier.mapper.MatchParamInfoMapper;
+import com.sms.courier.mapper.ProjectEnvironmentMapper;
 import com.sms.courier.mapper.SceneCaseApiMapper;
 import com.sms.courier.mapper.SceneCaseMapper;
 import com.sms.courier.repository.ApiTestCaseRepository;
@@ -61,6 +70,8 @@ import com.sms.courier.repository.SceneCaseApiRepository;
 import com.sms.courier.repository.SceneCaseRepository;
 import com.sms.courier.service.CaseApiCountHandler;
 import com.sms.courier.service.CaseTemplateApiService;
+import com.sms.courier.service.DataCollectionService;
+import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.SceneCaseApiService;
 import com.sms.courier.service.SceneCaseService;
 import com.sms.courier.service.ScheduleService;
@@ -98,6 +109,10 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private final CaseApiCountHandler caseApiCountHandler;
     private final MatchParamInfoMapper matchParamInfoMapper;
     private final ScheduleService scheduleService;
+    private final ProjectEnvironmentService projectEnvironmentService;
+    private final ProjectEnvironmentMapper projectEnvironmentMapper;
+    private final DataCollectionService dataCollectionService;
+    private final DataCollectionMapper dataCollectionMapper;
 
     public SceneCaseServiceImpl(SceneCaseRepository sceneCaseRepository,
         CustomizedSceneCaseRepository customizedSceneCaseRepository,
@@ -108,7 +123,9 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository,
         SceneCaseApiMapper sceneCaseApiMapper, CaseTemplateApiMapper caseTemplateApiMapper,
         CaseApiCountHandler caseApiCountHandler, MatchParamInfoMapper matchParamInfoMapper,
-        ScheduleService scheduleService) {
+        ScheduleService scheduleService, ProjectEnvironmentService projectEnvironmentService,
+        ProjectEnvironmentMapper projectEnvironmentMapper,
+        DataCollectionService dataCollectionService, DataCollectionMapper dataCollectionMapper) {
         this.sceneCaseRepository = sceneCaseRepository;
         this.customizedSceneCaseRepository = customizedSceneCaseRepository;
         this.sceneCaseMapper = sceneCaseMapper;
@@ -123,6 +140,10 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         this.caseApiCountHandler = caseApiCountHandler;
         this.matchParamInfoMapper = matchParamInfoMapper;
         this.scheduleService = scheduleService;
+        this.projectEnvironmentService = projectEnvironmentService;
+        this.projectEnvironmentMapper = projectEnvironmentMapper;
+        this.dataCollectionService = dataCollectionService;
+        this.dataCollectionMapper = dataCollectionMapper;
     }
 
     @Override
@@ -163,6 +184,15 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         log.info("SceneCaseService-edit()-params: [SceneCase]={}", updateSceneCaseRequest.toString());
         try {
             SceneCaseEntity sceneCase = sceneCaseMapper.toUpdateSceneCase(updateSceneCaseRequest);
+            try {
+                if (CollectionUtils.isNotEmpty(updateSceneCaseRequest.getEnvDataCollConnList())) {
+                    updateSceneCaseRequest.getEnvDataCollConnList().stream().collect(
+                        Collectors.toMap(EnvDataCollConnRequest::getEnvId, EnvDataCollConnRequest::getDataCollId));
+                }
+            } catch (Exception e) {
+                log.error("The environment cannot be repeated!", e);
+                throw ExceptionUtils.mpe(ENV_CANNOT_REPEATED);
+            }
             sceneCaseRepository.save(sceneCase);
             return Boolean.TRUE;
         } catch (Exception e) {
@@ -184,7 +214,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     @Override
     public SceneTemplateResponse getConn(String id) {
         try {
-            SceneCaseResponse dto = customizedSceneCaseRepository.findById(id).orElse(null);
+            SceneCaseResponse sceneCaseResponse = customizedSceneCaseRepository.findById(id).orElse(null);
+            SceneCaseConnResponse dto = setSceneCaseConnDto(sceneCaseResponse);
             List<SceneCaseApiConnResponse> responsesList = Lists.newArrayList();
             List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiService.listBySceneCaseId(id);
             for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
@@ -363,6 +394,26 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             log.error("Failed to recover the SceneCase!", e);
             throw ExceptionUtils.mpe(RECOVER_SCENE_CASE_ERROR);
         }
+    }
+
+    private SceneCaseConnResponse setSceneCaseConnDto(SceneCaseResponse sceneCaseResponse) {
+        SceneCaseConnResponse dto = sceneCaseMapper.toConnResponse(sceneCaseResponse);
+        List<EnvDataCollConnResponse> connResponses = Lists.newArrayList();
+        if (CollectionUtils.isNotEmpty(sceneCaseResponse.getEnvDataCollConnList())) {
+            for (EnvDataCollResponse response : sceneCaseResponse.getEnvDataCollConnList()) {
+                ProjectEnvironmentResponse envResponse = Objects.nonNull(response.getEnvId())
+                    ? projectEnvironmentMapper.toDto(projectEnvironmentService.findOne(response.getEnvId())) : null;
+                DataCollectionResponse dataResponse = Objects.nonNull(response.getDataCollId())
+                    ? dataCollectionMapper.toDto(dataCollectionService.findOne(response.getDataCollId())) : null;
+                EnvDataCollConnResponse collConnResponse = EnvDataCollConnResponse.builder()
+                    .environment(envResponse)
+                    .dataCollection(dataResponse)
+                    .build();
+                connResponses.add(collConnResponse);
+            }
+        }
+        dto.setEnvDataCollConnList(connResponses);
+        return dto;
     }
 
     private void addSceneCaseApi(SceneCaseEntity sceneCase, AddSceneCaseApi addSceneCaseApi) {

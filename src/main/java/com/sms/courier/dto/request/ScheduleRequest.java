@@ -41,8 +41,8 @@ public class ScheduleRequest {
 
     private String description;
 
-    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The envId must not be empty.")
-    private String envId;
+    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The envIds must not be empty.")
+    private List<String> envIds;
 
     @JsonProperty("isLoop")
     private boolean loop;

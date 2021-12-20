@@ -145,41 +145,46 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
             CaseFilter caseFilter = scheduleEntity.getCaseFilter();
             List<SceneCaseEntity> sceneCaseEntities = getSceneCaseEntity(scheduleEntity.getProjectId(), caseFilter,
                 scheduleEntity.getCaseCondition(), scheduleEntity.getCaseIds());
-            JobEnvironment jobEnv = getJobEnv(scheduleEntity.getEnvId());
+            List<JobEnvironment> jobEnvList = getJobEnvList(scheduleEntity.getEnvIds());
             ScheduleRecordEntity scheduleRecordEntity = createScheduleRecord(scheduleEntity);
             List<ScheduleSceneCaseJobEntity> scheduleSceneCaseJobEntities = new ArrayList<>();
+
             for (SceneCaseEntity sceneCaseEntity : sceneCaseEntities) {
                 String sceneCaseId = sceneCaseEntity.getId();
                 List<JobSceneCaseApi> apiCaseList = getApiCaseList(sceneCaseId);
-                JobRecord jobRecord = createJobRecord(sceneCaseId, sceneCaseEntity.getName());
-                DataCollectionEntity dataCollectionEntity = super.getDataCollection(sceneCaseEntity.getDataCollId());
+                JobRecord jobRecord = createSceneCaseJobRecord(sceneCaseId, sceneCaseEntity.getName());
+                jobRecord.setEnvCount(jobEnvList.size());
                 scheduleRecordEntity.getJobRecords().add(jobRecord);
-                if (Objects.nonNull(dataCollectionEntity) && CollectionUtils
-                    .isNotEmpty(dataCollectionEntity.getDataList())) {
-                    List<TestData> dataList = dataCollectionEntity.getDataList();
-                    jobRecord.setSceneCount(dataList.size());
-                    for (TestData testData : dataList) {
-                        JobDataCollection jobDataCollection = JobDataCollection.builder()
-                            .collectionName(dataCollectionEntity.getCollectionName()).id(dataCollectionEntity.getId())
-                            .testData(testData).projectId(dataCollectionEntity.getProjectId()).build();
+                for (JobEnvironment jobEnv : jobEnvList) {
+                    DataCollectionEntity dataCollectionEntity = super
+                        .getDataCollection(sceneCaseEntity, jobEnv.getId());
+                    if (Objects.nonNull(dataCollectionEntity) && CollectionUtils
+                        .isNotEmpty(dataCollectionEntity.getDataList())) {
+                        List<TestData> dataList = dataCollectionEntity.getDataList();
+                        jobRecord.setSceneCount(dataList.size());
+                        for (TestData testData : dataList) {
+                            JobDataCollection jobDataCollection = JobDataCollection.builder()
+                                .collectionName(dataCollectionEntity.getCollectionName())
+                                .id(dataCollectionEntity.getId())
+                                .testData(testData).projectId(dataCollectionEntity.getProjectId()).build();
+                            ScheduleSceneCaseJobEntity scheduleSceneCaseJobEntity =
+                                getSceneCaseJobEntity(sceneCaseId, scheduleRecordEntity, jobEnv, apiCaseList);
+                            scheduleSceneCaseJobEntity.setNext(sceneCaseEntity.isNext());
+                            scheduleSceneCaseJobEntity.setDataCollection(jobDataCollection);
+                            scheduleSceneCaseJobEntity.setName(sceneCaseEntity.getName());
+                            scheduleRecordEntity.getJobIds().add(scheduleSceneCaseJobEntity.getId());
+                            scheduleSceneCaseJobEntities.add(scheduleSceneCaseJobEntity);
+                        }
+
+                    } else {
                         ScheduleSceneCaseJobEntity scheduleSceneCaseJobEntity =
                             getSceneCaseJobEntity(sceneCaseId, scheduleRecordEntity, jobEnv, apiCaseList);
                         scheduleSceneCaseJobEntity.setNext(sceneCaseEntity.isNext());
-                        scheduleSceneCaseJobEntity.setDataCollection(jobDataCollection);
                         scheduleSceneCaseJobEntity.setName(sceneCaseEntity.getName());
                         scheduleRecordEntity.getJobIds().add(scheduleSceneCaseJobEntity.getId());
                         scheduleSceneCaseJobEntities.add(scheduleSceneCaseJobEntity);
                     }
-
-                } else {
-                    ScheduleSceneCaseJobEntity scheduleSceneCaseJobEntity =
-                        getSceneCaseJobEntity(sceneCaseId, scheduleRecordEntity, jobEnv, apiCaseList);
-                    scheduleSceneCaseJobEntity.setNext(sceneCaseEntity.isNext());
-                    scheduleSceneCaseJobEntity.setName(sceneCaseEntity.getName());
-                    scheduleRecordEntity.getJobIds().add(scheduleSceneCaseJobEntity.getId());
-                    scheduleSceneCaseJobEntities.add(scheduleSceneCaseJobEntity);
                 }
-
             }
             scheduleRecordRepository.save(scheduleRecordEntity);
             if (CollectionUtils.isEmpty(sceneCaseEntities)) {
