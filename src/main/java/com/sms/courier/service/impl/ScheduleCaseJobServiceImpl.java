@@ -133,13 +133,14 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
             CaseFilter caseFilter = scheduleEntity.getCaseFilter();
             List<ApiTestCaseEntity> apiTestCaseEntities = getApiTestCaseEntity(scheduleEntity.getProjectId(),
                 caseFilter, scheduleEntity.getCaseCondition(), scheduleEntity.getCaseIds());
-            final JobEnvironment jobEnv = getJobEnv(scheduleEntity.getEnvId());
+            final JobEnvironment jobEnv = getJobEnv(scheduleEntity.getEnvIds().get(0));
             ScheduleRecordEntity scheduleRecordEntity = createScheduleRecord(scheduleEntity);
             List<ScheduleCaseJobEntity> scheduleCaseJobEntities = new ArrayList<>();
             for (ApiTestCaseEntity apiTestCaseEntity : apiTestCaseEntities) {
                 final JobApiTestCase jobApiTestCase = jobMapper.toJobApiTestCase(apiTestCaseEntity);
                 DataCollectionEntity dataCollectionEntity = getDataCollection(apiTestCaseEntity.getDataCollId());
-                JobRecord jobRecord = createJobRecord(apiTestCaseEntity.getId(), apiTestCaseEntity.getCaseName());
+                JobRecord jobRecord = createSceneCaseJobRecord(apiTestCaseEntity.getId(),
+                    apiTestCaseEntity.getCaseName());
                 scheduleRecordEntity.getJobRecords().add(jobRecord);
                 if (Objects.nonNull(dataCollectionEntity) && CollectionUtils
                     .isNotEmpty(dataCollectionEntity.getDataList())) {

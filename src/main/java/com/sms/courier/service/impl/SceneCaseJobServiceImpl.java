@@ -5,8 +5,10 @@ import static com.sms.courier.common.exception.ErrorCode.GET_PROJECT_ENVIRONMENT
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.THE_DATA_IS_NOT_BINDING_THE_ENV;
 import static com.sms.courier.common.field.SceneCaseJobField.ENGINE_ID;
 import static com.sms.courier.common.field.SceneCaseJobField.JOB_STATUS;
+import static com.sms.courier.utils.Assert.isTrue;
 
 import com.google.common.collect.Lists;
 import com.sms.courier.common.constant.Constants;
@@ -17,6 +19,7 @@ import com.sms.courier.dto.request.SceneCaseJobRequest;
 import com.sms.courier.dto.request.TestDataRequest;
 import com.sms.courier.dto.response.SceneCaseJobResponse;
 import com.sms.courier.engine.service.CaseDispatcherService;
+import com.sms.courier.entity.datacollection.DataCollectionEntity;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
 import com.sms.courier.entity.job.JobSceneCaseApi;
 import com.sms.courier.entity.job.SceneCaseJobEntity;
@@ -42,6 +45,7 @@ import com.sms.courier.repository.SceneCaseRepository;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.SceneCaseJobService;
+import com.sms.courier.utils.Assert;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
 import com.sms.courier.webhook.WebhookEvent;
@@ -177,9 +181,9 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
 
     private List<SceneCaseJobEntity> getSceneCaseJobEntityList(AddSceneCaseJobRequest request, CustomUser currentUser) {
         ProjectEnvironmentEntity projectEnvironment = projectEnvironmentService.findOne(request.getEnvId());
-        if (Objects.isNull(projectEnvironment)) {
-            throw new ApiTestPlatformException(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR);
-        }
+
+        Assert.isTrue(Objects.nonNull(projectEnvironment), GET_PROJECT_ENVIRONMENT_BY_ID_ERROR);
+
         JobEnvironment jobEnvironment = jobMapper.toJobEnvironment(projectEnvironment);
         SceneCaseEntity sceneCase = null;
         CaseTemplateEntity caseTemplate = null;
@@ -189,9 +193,8 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
         if (Objects.nonNull(request.getCaseTemplateId())) {
             caseTemplate = caseTemplateRepository.findById(request.getCaseTemplateId()).orElse(null);
         }
-        if (Objects.isNull(sceneCase) && Objects.isNull(caseTemplate)) {
-            throw new ApiTestPlatformException(GET_SCENE_CASE_BY_ID_ERROR);
-        }
+        Assert.isTrue(Objects.nonNull(sceneCase) || Objects.nonNull(caseTemplate), GET_SCENE_CASE_BY_ID_ERROR);
+
         boolean next = Objects.isNull(sceneCase) ? caseTemplate.isNext() : sceneCase.isNext();
         List<JobSceneCaseApi> caseList = getApiCaseList(request);
         List<SceneCaseJobEntity> jobEntityList = Lists.newArrayList();
@@ -204,6 +207,13 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
             sceneCaseJob.setName(Objects.nonNull(sceneCase) ? sceneCase.getName() : caseTemplate.getName());
             jobEntityList.add(sceneCaseJob);
         } else {
+            DataCollectionEntity dataCollectionEntity =
+                commonRepository.findById(request.getDataCollectionRequest().getId(),
+                    DataCollectionEntity.class).orElse(null);
+            if (Objects.nonNull(dataCollectionEntity) && Objects.nonNull(dataCollectionEntity.getEnvId())) {
+                isTrue(Objects.equals(dataCollectionEntity.getEnvId(), request.getEnvId()),
+                    THE_DATA_IS_NOT_BINDING_THE_ENV);
+            }
             for (TestDataRequest testData : request.getDataCollectionRequest().getDataList()) {
                 JobDataCollection jobDataCollection = jobMapper
                     .toJobDataCollection(request.getDataCollectionRequest());

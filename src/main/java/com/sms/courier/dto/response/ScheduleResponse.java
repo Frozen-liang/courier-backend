@@ -29,7 +29,7 @@ public class ScheduleResponse extends BaseResponse {
 
     private String description;
 
-    private String envId;
+    private List<String> envIds;
 
     @JsonProperty("isLoop")
     @Field("isLoop")

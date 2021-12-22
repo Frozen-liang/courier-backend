@@ -20,11 +20,12 @@ public class UpdateSceneCaseRequest {
     private String name;
     @NotNull(message = "The projectId can not be empty")
     private String projectId;
-    private String dataCollId;
     private String groupId;
     private String testStatus;
     private List<String> tagId;
     private Integer priority;
     @JsonProperty("isNext")
     private boolean next;
+    @NotNull(message = "The envDataCollConnList can not be empty")
+    private List<EnvDataCollConnRequest> envDataCollConnList;
 }

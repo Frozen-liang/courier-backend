@@ -31,4 +31,6 @@ public class DataCollectionRequest {
 
     @Valid
     private List<TestDataRequest> dataList;
+
+    private String envId;
 }

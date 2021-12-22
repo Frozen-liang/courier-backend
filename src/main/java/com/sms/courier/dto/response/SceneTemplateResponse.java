@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SceneTemplateResponse {
 
-    private SceneCaseResponse sceneCaseDto;
+    private SceneCaseConnResponse sceneCaseDto;
 
     private List<SceneCaseApiConnResponse> sceneCaseApiDtoList;
 }

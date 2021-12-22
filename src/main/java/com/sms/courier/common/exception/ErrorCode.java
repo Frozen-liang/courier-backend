@@ -290,6 +290,8 @@ public enum ErrorCode {
     GET_WORKSPACE_CASE_JOB_GROUP_BY_USER_ERROR("4270", "Failed to get the Workspace case job group by user!"),
     GET_WORKSPACE_SCENE_CASE_JOB_GROUP_BY_USER_ERROR("4271", "Failed to get the Workspace scene case job group by "
         + "user!"),
+    ENV_CANNOT_REPEATED("4272", "The environment cannot be repeated!"),
+
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),
@@ -300,7 +302,8 @@ public enum ErrorCode {
 
     // 61001  describes the test exception
     THE_CASE_NOT_EXIST("61001", "The case must not be empty."),
-    THE_ENV_NOT_EXIST("61002", "The Env not exist");
+    THE_ENV_NOT_EXIST("61002", "The Env not exist"),
+    THE_DATA_IS_NOT_BINDING_THE_ENV("61003", "The dataCollection is not binding the env.");
 
     private final String code;
     private final String message;
