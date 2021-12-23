@@ -13,6 +13,7 @@ import com.sms.courier.entity.BaseEntity;
 import com.sms.courier.entity.api.common.ParamInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.EqualsAndHashCode.Include;
@@ -124,13 +125,16 @@ public class ApiEntity extends BaseEntity {
     private ApiEncodingType apiEncodingType;
 
     @JsonIgnore
-    private Integer caseCount;
+    @Default
+    private Integer caseCount = 0;
 
     @JsonIgnore
-    private Integer sceneCaseCount;
+    @Default
+    private Integer sceneCaseCount = 0;
 
     @JsonIgnore
-    private Integer otherProjectSceneCaseCount;
+    @Default
+    private Integer otherProjectSceneCaseCount = 0;
 
     @Field(targetType = FieldType.OBJECT_ID)
     @JsonIgnore
