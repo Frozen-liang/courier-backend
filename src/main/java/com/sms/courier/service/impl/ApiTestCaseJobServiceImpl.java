@@ -73,7 +73,7 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
         ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement,
         DatabaseService dataBaseService) {
         super(apiTestCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService,
-            engineJobManagement, commonRepository,dataBaseService);
+            engineJobManagement, commonRepository, dataBaseService);
         this.customizedApiTestCaseJobRepository = customizedApiTestCaseJobRepository;
         this.apiTestCaseService = apiTestCaseService;
         this.jobMapper = jobMapper;
