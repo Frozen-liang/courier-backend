@@ -31,7 +31,7 @@ public class EngineJobManagementImpl implements EngineJobManagement {
     private final GrpcMapper grpcMapper;
 
     public EngineJobManagementImpl(ApplicationContext applicationContext,
-        org.springframework.context.ApplicationEventPublisher applicationEventPublisher,
+        ApplicationEventPublisher applicationEventPublisher,
         GrpcMapper grpcMapper) {
         this.applicationContext = applicationContext;
         this.applicationEventPublisher = applicationEventPublisher;
