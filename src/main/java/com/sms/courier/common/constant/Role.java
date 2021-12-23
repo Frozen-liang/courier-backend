@@ -34,8 +34,8 @@ public class Role {
     public static final String PROJECT_DELETE = "Project" + DELETE;
     public static final String PROJECT_QUERY_ALL = "Project" + QUERY_ALL;
     public static final String PROJECT_QUERY_OWN = "Project" + QUERY_OWN;
-    
-    
+
+
     // DataStructure
     public static final String DATA_STRUCTURE_CREATE = "Data_Structure" + CREATE;
     public static final String DATA_STRUCTURE_UPDATE = "Data_Structure" + UPDATE;
@@ -134,6 +134,7 @@ public class Role {
     public static final String SCENE_CASE_API_CRE_UPD_DEL = "Scene_Case_Api" + CRE_UPD_DEL;
     public static final String SCENE_CASE_API_QUERY_ALL = "Scene_Case_Api" + QUERY_ALL;
     public static final String SCENE_CASE_API_QUERY_OWN = "Scene_Case_Api" + QUERY_OWN;
+    public static final String SCENE_CASE_API_SQL_CRE_UPD_DEL = "Scene_Case_Api_Sql" + CRE_UPD_DEL;
 
     // SceneCaseGroup
     public static final String SCENE_CASE_GROUP_CRE_UPD_DEL = "Scene_Case_Group" + CRE_UPD_DEL;
@@ -174,5 +175,9 @@ public class Role {
 
     // MOCK Setting
     public static final String MOCK_SETTING_QUERY_ALL = "Mock_Setting" + QUERY_ALL;
+
+    // DATABASE
+    public static final String DATABASE_QUERY_ALL = "Database" + QUERY_ALL;
+    public static final String DATABASE_CRE_UPD_DEL = "Database" + CRE_UPD_DEL;
 
 }

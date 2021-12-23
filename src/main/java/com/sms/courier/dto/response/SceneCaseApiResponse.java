@@ -18,6 +18,10 @@ public class SceneCaseApiResponse extends BaseResponse {
     private String projectId;
     private Integer apiType;
     private String shell;
+    private String databaseId;
+    private String sql;
+    @JsonProperty("isSqlResult")
+    private boolean sqlResult;
     private Integer order;
     @JsonProperty("isLock")
     private boolean lock;

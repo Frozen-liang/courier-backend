@@ -29,6 +29,16 @@ public class JobSceneCaseApi {
 
     private String shell;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String databaseId;
+
+    private String sql;
+
+    @Field(name = "isSqlResult")
+    private boolean sqlResult;
+
+    private JobDatabase jobDatabase;
+
     private Integer order;
 
     /**

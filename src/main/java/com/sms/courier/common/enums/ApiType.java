@@ -5,7 +5,7 @@ import java.util.Map;
 
 public enum ApiType implements EnumCommon {
 
-    API(0), SHELL(1);
+    API(0), SHELL(1), SQL(2);
 
     private static final Map<Integer, ApiType> mappings = new HashMap<>(16);
 

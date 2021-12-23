@@ -79,10 +79,11 @@ class ScheduleSceneCaseJobServiceTest {
     private final ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
     private final JobMapper jobMapper = new JobMapperImpl(paramInfoMapper, new MatchParamInfoMapperImpl(),
         new ResponseResultVerificationMapperImpl(new MatchParamInfoMapperImpl()));
+    private final DatabaseService dataBaseService = mock(DatabaseService.class);
     private final ScheduleSceneCaseJobService scheduleSceneCaseJobService =
         new ScheduleSceneCaseJobServiceImpl(scheduleSceneCaseJobRepository, jobMapper, caseDispatcherService,
             projectEnvironmentService, commonRepository, sceneCaseRepository, sceneCaseApiRepository,
-            caseTemplateApiRepository, scheduleRecordRepository, applicationEventPublisher);
+            caseTemplateApiRepository, scheduleRecordRepository, applicationEventPublisher, dataBaseService);
     private final ScheduleSceneCaseJobEntity scheduleCaseJob =
         ScheduleSceneCaseJobEntity.builder().id(ID)
             .apiTestCase(List.of(JobSceneCaseApi.builder().jobApiTestCase(JobApiTestCase.builder().build()).build()))
@@ -158,7 +159,8 @@ class ScheduleSceneCaseJobServiceTest {
         when(sceneCaseRepository.findByIdIn(any())).thenReturn(apiTestCaseEntities);
         when(sceneCaseRepository.findByProjectIdAndRemovedIsFalse(any())).thenReturn(apiTestCaseEntities);
         when(sceneCaseRepository.findByProjectIdAndTagIdIn(any(), any())).thenReturn(apiTestCaseEntities);
-        when(sceneCaseRepository.findByProjectIdAndTagIdInAndPriorityIn(any(), any(), any())).thenReturn(apiTestCaseEntities);
+        when(sceneCaseRepository.findByProjectIdAndTagIdInAndPriorityIn(any(), any(), any()))
+            .thenReturn(apiTestCaseEntities);
         when(projectEnvironmentService.findOne(anyString())).thenReturn(ProjectEnvironmentEntity.builder().build());
         List<SceneCaseApiEntity> sceneCaseApiList1 = getSceneCaseApiList();
         when(sceneCaseApiRepository.findSceneCaseApiEntitiesBySceneCaseIdAndRemovedOrderByOrder(any(), anyBoolean()))
@@ -186,7 +188,8 @@ class ScheduleSceneCaseJobServiceTest {
         when(sceneCaseRepository.findByIdIn(any())).thenReturn(apiTestCaseEntities);
         when(sceneCaseRepository.findByProjectIdAndRemovedIsFalse(any())).thenReturn(apiTestCaseEntities);
         when(sceneCaseRepository.findByProjectIdAndPriorityIn(any(), any())).thenReturn(apiTestCaseEntities);
-        when(sceneCaseRepository.findByProjectIdAndTagIdInAndPriorityIn(any(), any(), any())).thenReturn(apiTestCaseEntities);
+        when(sceneCaseRepository.findByProjectIdAndTagIdInAndPriorityIn(any(), any(), any()))
+            .thenReturn(apiTestCaseEntities);
         when(projectEnvironmentService.findOne(anyString())).thenReturn(ProjectEnvironmentEntity.builder().build());
         when(commonRepository.findById(ID, DataCollectionEntity.class)).thenReturn(Optional.empty());
         when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);

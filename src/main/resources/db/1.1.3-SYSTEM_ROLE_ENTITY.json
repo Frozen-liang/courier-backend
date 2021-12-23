@@ -1,0 +1,20 @@
+[
+  {
+    "id": "61c049df7dde23110c414947",
+    "name": "Database_Query_All",
+    "description": "数据库链接查询",
+    "roleType": 0
+  },
+  {
+    "id": "61c1417d39d5d225a45afb76",
+    "name": "Database_Create_Update_Delete",
+    "description": "数据库链接增加修改删除",
+    "roleType": 0
+  },
+  {
+    "id": "61c049f28565ab5f5d18ba8e",
+    "name": "Scene_Case_Api_Sql_Create_Update_Delete",
+    "description": "流程用例SQL增加修改删除",
+    "roleType": 0
+  }
+]

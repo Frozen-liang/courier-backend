@@ -36,6 +36,14 @@ public class SceneCaseApiEntity extends BaseEntity {
 
     private String shell;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String databaseId;
+
+    private String sql;
+
+    @Field(name = "isSqlResult")
+    private boolean sqlResult;
+
     private Integer order;
 
     /**
