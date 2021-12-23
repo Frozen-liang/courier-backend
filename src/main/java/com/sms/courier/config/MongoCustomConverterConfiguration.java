@@ -12,6 +12,7 @@ import com.sms.courier.common.enums.CaseFilter;
 import com.sms.courier.common.enums.CaseType;
 import com.sms.courier.common.enums.ContainerStatus;
 import com.sms.courier.common.enums.CycleType;
+import com.sms.courier.common.enums.DatabaseType;
 import com.sms.courier.common.enums.DocumentType;
 import com.sms.courier.common.enums.DocumentUrlType;
 import com.sms.courier.common.enums.EnumCommon;
@@ -127,7 +128,7 @@ public class MongoCustomConverterConfiguration {
                 LongToDurationConverter.INSTANCE, IntegerToMockApiResponseParamTypeConverter.INSTANCE,
                 IntegerToApiEncodingTypeConverter.INSTANCE, IntegerToMockApiJsonLocateTypeConverter.INSTANCE,
                 IntegerToCaseTypeConverter.INSTANCE, IntegerToContainerStatusConverter.INSTANCE,
-                IntegerToWebhookTypeConverter.INSTANCE);
+                IntegerToWebhookTypeConverter.INSTANCE, IntegerToDataBaseTypeConverter.INSTANCE);
 
         return new MongoCustomConversions(converters);
     }
@@ -513,6 +514,15 @@ public class MongoCustomConverterConfiguration {
 
         public WebhookType convert(@NonNull Integer code) {
             return WebhookType.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToDataBaseTypeConverter implements Converter<Integer, DatabaseType> {
+        INSTANCE;
+
+        public DatabaseType convert(@NonNull Integer code) {
+            return DatabaseType.getDatabaseType(code);
         }
     }
 

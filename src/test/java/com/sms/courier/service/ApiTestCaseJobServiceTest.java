@@ -68,6 +68,7 @@ class ApiTestCaseJobServiceTest {
     private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository = mock(
         CustomizedApiTestCaseJobRepository.class);
+    private final DatabaseService dataBaseService = mock(DatabaseService.class);
     private final ApiTestRequest apiTestRequest =
         ApiTestRequest.builder().envId(ObjectId.get().toString()).apiPath("3Httt").build();
     private final ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
@@ -75,7 +76,7 @@ class ApiTestCaseJobServiceTest {
         new ResponseResultVerificationMapperImpl(new MatchParamInfoMapperImpl()));
     private final ApiTestCaseJobService apiTestCaseJobService = new ApiTestCaseJobServiceImpl(
         apiTestCaseJobRepository, customizedApiTestCaseJobRepository, caseDispatcherService, projectEnvironmentService
-        , apiTestCaseService, commonRepository, jobMapper, applicationEventPublisher, engineJobManagement);
+        , apiTestCaseService, commonRepository, jobMapper, applicationEventPublisher, engineJobManagement,dataBaseService);
     private final ApiTestCaseJobEntity apiTestCaseJob =
         ApiTestCaseJobEntity.builder().id(ID).createUserId(ObjectId.get().toString())
             .apiTestCase(JobCaseApi.builder().jobApiTestCase(JobApiTestCase.builder().build()).build()).build();

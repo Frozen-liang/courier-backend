@@ -20,7 +20,8 @@ public enum SceneField implements Field {
     API_ID_GROUP_SEARCH("apiTestCase.apiEntity.id"),
     JOB_ENV_ID("environment.id"),
     API_TYPE("apiType"),
-    API_TEST_CASE_PROJECT_ID("apiTestCase.projectId");
+    API_TEST_CASE_PROJECT_ID("apiTestCase.projectId"),
+    IS_SQL_RESULT("isSqlResult");
 
     private final String name;
 

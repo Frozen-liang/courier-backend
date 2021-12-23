@@ -36,6 +36,7 @@ import com.sms.courier.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.ApiTestCaseJobService;
 import com.sms.courier.service.ApiTestCaseService;
+import com.sms.courier.service.DatabaseService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
@@ -69,9 +70,10 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
         CaseDispatcherService caseDispatcherService,
         ProjectEnvironmentService projectEnvironmentService, ApiTestCaseService apiTestCaseService,
         CommonRepository commonRepository, JobMapper jobMapper,
-        ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement) {
+        ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement,
+        DataBaseService dataBaseService) {
         super(apiTestCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService,
-            engineJobManagement, commonRepository);
+            engineJobManagement, commonRepository,dataBaseService);
         this.customizedApiTestCaseJobRepository = customizedApiTestCaseJobRepository;
         this.apiTestCaseService = apiTestCaseService;
         this.jobMapper = jobMapper;

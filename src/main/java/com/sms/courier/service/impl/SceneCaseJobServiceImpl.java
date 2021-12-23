@@ -41,6 +41,7 @@ import com.sms.courier.repository.SceneCaseApiRepository;
 import com.sms.courier.repository.SceneCaseJobRepository;
 import com.sms.courier.repository.SceneCaseRepository;
 import com.sms.courier.security.pojo.CustomUser;
+import com.sms.courier.service.DatabaseService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.SceneCaseJobService;
 import com.sms.courier.utils.Assert;
@@ -84,9 +85,10 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
         CaseTemplateRepository caseTemplateRepository,
         CaseTemplateApiRepository caseTemplateApiRepository,
         SceneCaseApiRepository sceneCaseApiRepository, CommonRepository commonRepository,
-        ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement) {
+        ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement,
+        DatabaseService dataBaseService) {
         super(sceneCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService, engineJobManagement,
-            commonRepository);
+            commonRepository, dataBaseService);
         this.sceneCaseRepository = sceneCaseRepository;
         this.customizedSceneCaseJobRepository = customizedSceneCaseJobRepository;
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
@@ -119,7 +121,7 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
             List<SceneCaseJobEntity> jobEntityList = getSceneCaseJobEntityList(request, currentUser);
             for (SceneCaseJobEntity sceneCaseJob : jobEntityList) {
                 repository.save(sceneCaseJob);
-                engineJobManagement.dispatcherJob(sceneCaseJob);
+                this.dispatcherJob(sceneCaseJob);
             }
         } catch (ApiTestPlatformException courierException) {
             log.error("Execute the SceneCaseJob error.", courierException);

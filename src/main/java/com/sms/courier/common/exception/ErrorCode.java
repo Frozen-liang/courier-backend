@@ -292,6 +292,10 @@ public enum ErrorCode {
         + "user!"),
     ENV_CANNOT_REPEATED("4272", "The environment cannot be repeated!"),
 
+    GET_DATABASE_BY_ID_ERROR("4273", "Failed to get the Database by id!"),
+    ADD_DATABASE_ERROR("4274", "Failed to add the database!"),
+    EDIT_DATABASE_ERROR("4275", "Failed to edit the database!"),
+    DELETE_DATABASE_BY_IDS_ERROR("4276", "Failed to delete database by ids!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),

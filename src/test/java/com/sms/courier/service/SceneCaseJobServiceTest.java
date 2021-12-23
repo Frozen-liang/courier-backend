@@ -84,6 +84,7 @@ class SceneCaseJobServiceTest {
     private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final EngineJobManagement engineJobManagement = mock(EngineJobManagement.class);
     private final SceneCaseApiRepository sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
+    private final DatabaseService dataBaseService = mock(DatabaseService.class);
 
     private final SceneCaseJobService sceneCaseJobService = new SceneCaseJobServiceImpl(
         projectEnvironmentService,
@@ -95,7 +96,7 @@ class SceneCaseJobServiceTest {
         customizedCaseTemplateApiRepository,
         caseTemplateRepository,
         caseTemplateApiRepository, sceneCaseApiRepository, commonRepository, applicationEventPublisher,
-        engineJobManagement);
+        engineJobManagement, dataBaseService);
 
     private final static String MOCK_ID = "1";
     private final static Integer MOCK_NUM = 1;

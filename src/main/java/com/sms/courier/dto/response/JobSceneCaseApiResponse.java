@@ -24,6 +24,15 @@ public class JobSceneCaseApiResponse {
 
     private String shell;
 
+    private String databaseId;
+
+    private String sql;
+
+    @JsonProperty("isSqlResult")
+    private boolean sqlResult;
+
+    private JobDatabaseResponse jobDatabase;
+
     private Integer order;
 
     @JsonProperty("isLock")

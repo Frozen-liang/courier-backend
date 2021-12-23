@@ -30,6 +30,7 @@ import com.sms.courier.repository.ApiTestCaseRepository;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.ScheduleCaseJobRepository;
 import com.sms.courier.repository.ScheduleRecordRepository;
+import com.sms.courier.service.DatabaseService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.ScheduleCaseJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -58,9 +59,10 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
         CommonRepository commonRepository,
         ApiTestCaseRepository apiTestCaseRepository,
         ScheduleRecordRepository scheduleRecordRepository,
-        ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement) {
+        ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement,
+        DatabaseService dataBaseService) {
         super(repository, jobMapper, caseDispatcherService, projectEnvironmentService, engineJobManagement,
-            commonRepository);
+            commonRepository, dataBaseService);
         this.apiTestCaseRepository = apiTestCaseRepository;
         this.scheduleRecordRepository = scheduleRecordRepository;
         this.applicationEventPublisher = applicationEventPublisher;
@@ -93,7 +95,6 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
             .jobId(jobEntity.getId()).message("No engine available!").build();
         this.saveJobReport(caseJobReport, jobEntity);
     }
-
 
     @Override
     @Async
@@ -187,4 +188,3 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
         return apiTestCaseEntities;
     }
 }
-

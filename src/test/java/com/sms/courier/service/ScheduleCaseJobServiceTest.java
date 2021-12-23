@@ -60,13 +60,14 @@ class ScheduleCaseJobServiceTest {
     private final ApiTestCaseRepository apiTestCaseRepository = mock(ApiTestCaseRepository.class);
     private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final EngineJobManagement engineJobManagement = mock(EngineJobManagement.class);
+    private final DatabaseService dataBaseService = mock(DatabaseService.class);
     private final ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
     private final JobMapper jobMapper = new JobMapperImpl(paramInfoMapper, new MatchParamInfoMapperImpl(),
         new ResponseResultVerificationMapperImpl(new MatchParamInfoMapperImpl()));
     private final ScheduleCaseJobService scheduleCaseJobService =
         new ScheduleCaseJobServiceImpl(scheduleCaseJobRepository, jobMapper, caseDispatcherService,
             projectEnvironmentService, commonRepository, apiTestCaseRepository, scheduleRecordRepository,
-            applicationEventPublisher, engineJobManagement);
+            applicationEventPublisher, engineJobManagement, dataBaseService);
     private final ScheduleCaseJobEntity scheduleCaseJob =
         ScheduleCaseJobEntity.builder().id(ID)
             .apiTestCase(JobCaseApi.builder().jobApiTestCase(JobApiTestCase.builder().build()).build()).build();

@@ -8,6 +8,7 @@ import static com.sms.courier.utils.Assert.isTrue;
 import static com.sms.courier.utils.Assert.notEmpty;
 import static com.sms.courier.utils.Assert.notNull;
 
+import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.enums.TaskStatus;
 import com.sms.courier.common.field.CommonField;
 import com.sms.courier.engine.EngineJobManagement;
@@ -38,6 +39,7 @@ import com.sms.courier.entity.schedule.ScheduleEntity;
 import com.sms.courier.entity.schedule.ScheduleRecordEntity;
 import com.sms.courier.mapper.JobMapper;
 import com.sms.courier.repository.CommonRepository;
+import com.sms.courier.service.DatabaseService;
 import com.sms.courier.service.JobService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.utils.ExceptionUtils;
@@ -69,17 +71,19 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
     protected final ProjectEnvironmentService projectEnvironmentService;
     protected final EngineJobManagement engineJobManagement;
     protected final CommonRepository commonRepository;
+    protected final DatabaseService dataBaseService;
 
     public AbstractJobService(T repository, JobMapper jobMapper,
         CaseDispatcherService caseDispatcherService,
         ProjectEnvironmentService projectEnvironmentService,
-        EngineJobManagement engineJobManagement, CommonRepository commonRepository) {
+        EngineJobManagement engineJobManagement, CommonRepository commonRepository, DatabaseService dataBaseService) {
         this.repository = repository;
         this.jobMapper = jobMapper;
         this.caseDispatcherService = caseDispatcherService;
         this.projectEnvironmentService = projectEnvironmentService;
         this.engineJobManagement = engineJobManagement;
         this.commonRepository = commonRepository;
+        this.dataBaseService = dataBaseService;
     }
 
     @Override
@@ -256,4 +260,15 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
         }
         return index;
     }
+
+    protected void setJobDatabase(List<JobSceneCaseApi> caseList) {
+        if (CollectionUtils.isNotEmpty(caseList)) {
+            for (JobSceneCaseApi jobSceneCaseApi : caseList) {
+                if (Objects.equals(ApiType.SQL, jobSceneCaseApi.getApiType())) {
+                    jobSceneCaseApi.setJobDatabase(dataBaseService.findJobById(jobSceneCaseApi.getDatabaseId()));
+                }
+            }
+        }
+    }
+
 }
