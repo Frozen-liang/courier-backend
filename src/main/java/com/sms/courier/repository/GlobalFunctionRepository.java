@@ -8,9 +8,11 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface GlobalFunctionRepository extends MongoRepository<GlobalFunctionEntity, String> {
 
-    Stream<GlobalFunctionResponse> findAllByRemovedIsFalse();
+    Stream<GlobalFunctionEntity> findAllByRemovedIsFalse();
 
     List<GlobalFunctionResponse> findAllByIdIn(List<String> ids);
+
+    List<GlobalFunctionEntity> findByIdIn(List<String> ids);
 
     boolean existsByFunctionKeyAndWorkspaceIdAndRemovedIsFalse(String functionName, String workspaceId);
 }

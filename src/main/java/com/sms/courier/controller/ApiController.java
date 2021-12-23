@@ -36,6 +36,11 @@ public class ApiController {
         this.apiService = apiService;
     }
 
+    @GetMapping("/test")
+    public String test() {
+        return "test";
+    }
+
     @PostMapping("/import-by-file")
     @PreAuthorize("hasRoleOrAdmin(@role.API_IMPORT_BY_FILE)")
     public Boolean importDocumentByFile(@Validated ApiImportRequest apiImportRequest) {

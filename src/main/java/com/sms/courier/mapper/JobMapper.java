@@ -183,4 +183,5 @@ public interface JobMapper {
         return caseReports.stream().filter(caseReport -> caseReport.getIsSuccess() == resultType).count();
     }
 
+
 }

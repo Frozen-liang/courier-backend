@@ -1,0 +1,45 @@
+syntax = "proto3";
+import "Engine.proto";
+option java_package = "com.sms.courier.engine.grpc.api.v1";
+option java_multiple_files = true;
+
+service EngineRegister{
+  rpc register(GrpcEngineRegisterRequest) returns(stream
+    GrpcFunctionResponse);
+
+}
+
+message GrpcEngineRegisterRequest {
+  int32 port = 1;
+  string name = 2;
+  string version = 3;
+}
+
+// function
+message GrpcFunctionResponse {
+  int32 operationType = 1;
+  GrpcFunction function = 2;
+}
+
+message GrpcFunction {
+  string id = 1;
+  string projectId = 2;
+  string workspaceId = 3;
+  bool isGlobal = 4;
+  string functionKey = 5;
+  string functionName = 6;
+  repeated GrpcParamInfo functionParams = 7;
+  string functionCode = 8;
+}
+
+
+
+
+
+
+
+
+
+
+
+

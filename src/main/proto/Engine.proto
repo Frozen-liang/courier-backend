@@ -1,0 +1,234 @@
+syntax = "proto3";
+
+option java_package = "com.sms.courier.engine.grpc.api.v1";
+option java_multiple_files = true;
+
+service Engine{
+  rpc sendCaseJob(GrpcCaseJobRequest) returns (stream GrpcCaseJobReport);
+  rpc sendSceneCaseJob(GrpcSceneCaseJobRequest) returns (stream
+    GrpcSceneCaseJobReport);
+}
+
+message GrpcParamInfo {
+  string key = 1;
+  string value = 2;
+  int32 paramType = 3;
+  bool isRequired = 4;
+  bool isExtract = 5;
+  repeated GrpcParamInfo childParam = 6;
+  string mockRule = 7;
+}
+
+message GrpcEnvironment {
+  string id = 1;
+  string projectId = 2;
+  string envName = 3;
+  string envDesc = 4;
+  string frontUri = 5;
+  string beforeInject = 6;
+  string afterInject = 7;
+  string globalBeforeProcess = 8;
+  string globalAfterProcess = 9;
+  repeated GrpcParamInfo headers = 10;
+  repeated GrpcParamInfo envVariable = 11;
+  repeated GrpcParamInfo urlParams = 12;
+  repeated GrpcParamInfo requestParams = 13;
+  int32 requestParamType = 14;
+}
+
+message GrpcDataParam {
+  string key = 1;
+  string value = 2;
+}
+
+message GrpcTestData {
+  string dataName = 1;
+  repeated GrpcDataParam data = 2;
+}
+
+message JobDataCollection {
+  string id = 1;
+  string projectId = 2;
+  string collectionName = 3;
+  GrpcTestData testData = 4;
+}
+
+message GrpcHttpStatusVerification {
+  bool isCheckStatus = 1;
+  string statusCode = 2;
+}
+
+message GrpcMatchParamInfo {
+  string key = 1;
+  string value = 2;
+  int32 matchType = 3;
+  int32 paramType = 4;
+  bool isVerificationParamType = 5;
+  bool isVerificationArrayElement = 6;
+  bool isVerify = 7;
+  repeated GrpcMatchParamInfo childParam = 8;
+}
+
+message GrpcResponseHeadersVerification {
+  bool isCheckStatus = 1;
+  repeated GrpcMatchParamInfo params = 2;
+}
+
+message GrpcResponseResultVerification {
+  bool isCheckStatus = 1;
+  int32 resultVerificationType = 2;
+  int32 apiResponseJsonType = 3;
+  int32 verificationElementType = 4;
+  repeated GrpcMatchParamInfo params = 5;
+}
+
+message GrpcResponseTimeVerification {
+  bool isCheckStatus = 1;
+  string timeoutLimit = 2;
+}
+
+message GrpcAdvancedSetting {
+  string delayTime = 1;
+  bool isEnableRedirect = 2;
+}
+
+message GrpcCaseReport {
+  string caseId = 1;
+  int32 status = 2;
+  int32 requestMethod = 3;
+  string requestUrl = 4;
+  map<string, string> requestHeader = 5;
+  map<string, string> responseHeader = 6;
+  string responseData = 7;
+  string requestData = 8;
+  int32 isSuccess = 9;
+  string errCode = 10;
+  string failMessage = 11;
+  int64 timeCost = 12;
+  int32 paramsTimeCost = 13;
+  int32 preInjectTimeCost = 14;
+  int32 postInjectTimeCost = 15;
+  repeated string infoList = 16;
+}
+
+message GrpcJobApi {
+  string caseId = 1;
+  string projectId = 2;
+  string apiName = 3;
+  string description = 4;
+  string apiPath = 5;
+  int32 apiProtocol = 6;
+  int32 requestMethod = 7;
+  int32 apiRequestParamType = 8;
+  string requestRaw = 9;
+  int32 requestRawType = 10;
+  repeated GrpcParamInfo requestHeaders = 11;
+  repeated GrpcParamInfo responseHeaders = 12;
+  repeated GrpcParamInfo pathParams = 13;
+  repeated GrpcParamInfo restfulParams = 14;
+  repeated GrpcParamInfo requestParams = 15;
+  repeated GrpcParamInfo responseParams = 16;
+  string preInject = 17;
+  string postInject = 18;
+  int32 apiResponseJsonType = 19;
+  int32 apiRequestJsonType = 20;
+  int32 apiResponseParamType = 21;
+  string responseRaw = 22;
+  int32 responseRawType = 23;
+}
+
+message GrpcJobApiTestCase {
+  string id = 1;
+  string caseName = 2;
+  int32 responseParamsExtractionType = 3;
+  GrpcHttpStatusVerification httpStatusVerification = 4;
+  GrpcResponseHeadersVerification responseHeadersVerification = 5;
+  GrpcResponseResultVerification responseResultVerification = 6;
+  GrpcResponseTimeVerification responseTimeVerification = 7;
+  string dataCollId = 8;
+  int32 isSuccess = 9;
+  string testTime = 10;
+  bool isExecute = 11;
+  GrpcAdvancedSetting advancedSetting = 12;
+  GrpcJobApi jobApi = 13;
+}
+
+message GrpcJobSceneCaseApi {
+  string caseId = 1;
+  string id = 2;
+  string sceneCaseId = 3;
+  string caseTemplateId = 4;
+  int32 apiType = 5;
+  string shell = 6;
+  int32 order = 7;
+  bool isLock = 8;
+  GrpcJobApiTestCase jobApiTestCase = 9;
+}
+
+message GrpcCaseJobRequest{
+  string id = 1;
+  string createDateTime = 2;
+  string modifyDateTime = 3;
+  string createUserId = 4;
+  string modifyUserId = 5;
+  string isRemoved = 6;
+  string engineId = 7;
+  string workspaceId = 8;
+  string projectId = 9;
+  GrpcEnvironment environment = 10;
+  JobDataCollection dataCollection = 11;
+  bool next = 12;
+  GrpcJobSceneCaseApi apiTestCase = 13;
+  string createUserName = 14;
+}
+
+message GrpcSceneCaseJobRequest{
+  string id = 1;
+  string createDateTime = 2;
+  string modifyDateTime = 3;
+  string createUserId = 4;
+  string modifyUserId = 5;
+  string isRemoved = 6;
+  string engineId = 7;
+  string workspaceId = 8;
+  string projectId = 9;
+  GrpcEnvironment environment = 10;
+  JobDataCollection dataCollection = 11;
+  bool next = 12;
+  repeated GrpcJobSceneCaseApi apiTestCase = 13;
+  string createUserName = 14;
+}
+
+
+message GrpcSceneCaseJobReport {
+  string jobId = 1;
+  int32 jobStatus = 2;
+  string message = 3;
+  string errCode = 4;
+  int32 totalTimeCost = 5;
+  int32 paramsTotalTimeCost = 6;
+  int32 delayTimeTotalTimeCost = 7;
+  repeated string infoList = 8;
+  repeated GrpcCaseReport caseReportList = 9;
+}
+
+message GrpcCaseJobReport {
+  string jobId = 1;
+  int32 jobStatus = 2;
+  string message = 3;
+  string errCode = 4;
+  int32 totalTimeCost = 5;
+  int32 paramsTotalTimeCost = 6;
+  int32 delayTimeTotalTimeCost = 7;
+  repeated string infoList = 8;
+  GrpcCaseReport caseReport = 9;
+}
+
+
+
+
+
+
+
+
+

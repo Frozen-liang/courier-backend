@@ -10,7 +10,6 @@ import static com.sms.courier.common.exception.ErrorCode.THE_FUNCTION_KEY_EXIST_
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -30,12 +29,11 @@ import com.sms.courier.service.impl.GlobalFunctionServiceImpl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 
 @DisplayName("Tests for GlobalFunctionService")
@@ -44,11 +42,11 @@ class GlobalFunctionServiceTest {
     private final GlobalFunctionRepository globalFunctionRepository = mock(GlobalFunctionRepository.class);
     private final GlobalFunctionMapper globalFunctionMapper = mock(GlobalFunctionMapper.class);
     private final CommonRepository commonRepository = mock(CommonRepository.class);
-    private final MessageService messageService = mock(MessageService.class);
+    private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final CustomizedFunctionRepository customizedFunctionRepository = mock(CustomizedFunctionRepository.class);
     private final GlobalFunctionService globalFunctionService = new GlobalFunctionServiceImpl(
         globalFunctionRepository,
-        globalFunctionMapper, commonRepository, customizedFunctionRepository, messageService);
+        globalFunctionMapper, commonRepository, customizedFunctionRepository, applicationEventPublisher);
     private final GlobalFunctionEntity globalFunction =
         GlobalFunctionEntity.builder().functionKey("name").id(ID).build();
     private final GlobalFunctionResponse globalFunctionResponse = GlobalFunctionResponse.builder().id(ID).build();
@@ -87,7 +85,6 @@ class GlobalFunctionServiceTest {
         when(globalFunctionRepository.existsByFunctionKeyAndWorkspaceIdAndRemovedIsFalse(any(), any()))
             .thenReturn(false);
         when(globalFunctionRepository.insert(any(GlobalFunctionEntity.class))).thenReturn(globalFunction);
-        doNothing().when(messageService).enginePullFunctionMessage(any());
         Boolean result = globalFunctionService.add(globalFunctionRequest);
         verify(globalFunctionRepository, times(1)).insert(any(GlobalFunctionEntity.class));
         assertThat(result).isTrue();
@@ -100,7 +97,6 @@ class GlobalFunctionServiceTest {
         when(globalFunctionMapper.toEntity(any())).thenReturn(GlobalFunctionEntity.builder().build());
         when(globalFunctionRepository.existsByFunctionKeyAndWorkspaceIdAndRemovedIsFalse(any(), any()))
             .thenReturn(true);
-        doNothing().when(messageService).enginePullFunctionMessage(any());
         assertThatThrownBy(() -> globalFunctionService.add(globalFunctionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(THE_FUNCTION_KEY_EXIST_ERROR.getCode());
@@ -111,7 +107,6 @@ class GlobalFunctionServiceTest {
     public void add_exception_test() {
         doThrow(new RuntimeException()).when(globalFunctionRepository).insert(any(GlobalFunctionEntity.class));
         when(globalFunctionMapper.toEntity(any())).thenReturn(GlobalFunctionEntity.builder().build());
-        doNothing().when(messageService).enginePullFunctionMessage(any());
         assertThatThrownBy(() -> globalFunctionService.add(globalFunctionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(ADD_GLOBAL_FUNCTION_ERROR.getCode());
@@ -125,7 +120,6 @@ class GlobalFunctionServiceTest {
         when(globalFunctionRepository.existsByFunctionKeyAndWorkspaceIdAndRemovedIsFalse(any(), any()))
             .thenReturn(false);
         when(globalFunctionRepository.save(any(GlobalFunctionEntity.class))).thenReturn(globalFunction);
-        doNothing().when(messageService).enginePullFunctionMessage(any());
         assertThat(globalFunctionService.edit(globalFunctionRequest)).isTrue();
     }
 
@@ -133,7 +127,6 @@ class GlobalFunctionServiceTest {
     @DisplayName("An exception occurred while edit GlobalFunction")
     public void edit_exception_test() {
         when(globalFunctionMapper.toEntity(globalFunctionRequest)).thenReturn(globalFunction);
-        doNothing().when(messageService).enginePullFunctionMessage(any());
         when(globalFunctionRepository.findById(any())).thenReturn(Optional.of(globalFunction));
         when(globalFunctionRepository.existsByFunctionKeyAndWorkspaceIdAndRemovedIsFalse(any(), any()))
             .thenReturn(false);
@@ -147,7 +140,6 @@ class GlobalFunctionServiceTest {
     @DisplayName("An not exist exception occurred while edit GlobalFunction")
     public void edit_not_exist_exception_test() {
         when(globalFunctionMapper.toEntity(globalFunctionRequest)).thenReturn(globalFunction);
-        doNothing().when(messageService).enginePullFunctionMessage(any());
         when(globalFunctionRepository.findById(any())).thenReturn(Optional.empty());
         assertThatThrownBy(() -> globalFunctionService.edit(globalFunctionRequest))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -184,7 +176,6 @@ class GlobalFunctionServiceTest {
     @Test
     @DisplayName("Test the delete method in the GlobalFunction service")
     public void delete_test() {
-        doNothing().when(messageService).enginePullFunctionMessage(any());
         when(globalFunctionRepository.findById(any())).thenReturn(Optional.of(globalFunction));
         when(commonRepository.deleteByIds(ID_LIST, GlobalFunctionEntity.class)).thenReturn(Boolean.TRUE);
         assertThat(globalFunctionService.delete(Collections.singletonList(ID))).isTrue();
@@ -201,15 +192,6 @@ class GlobalFunctionServiceTest {
             .extracting("code").isEqualTo(DELETE_GLOBAL_FUNCTION_BY_ID_ERROR.getCode());
     }
 
-    @Test
-    @DisplayName("An exception occurred while delete GlobalFunction")
-    public void findAll_test() {
-        Stream<GlobalFunctionResponse> globalFunctionResponses =
-            Stream.of(GlobalFunctionResponse.builder().workspaceId(ID).build());
-        when(globalFunctionRepository.findAllByRemovedIsFalse()).thenReturn(globalFunctionResponses);
-        Map<String, List<GlobalFunctionResponse>> result = globalFunctionService.findAll();
-        assertThat(result).isNotNull();
-    }
 
     @Test
     @DisplayName("An exception occurred while delete GlobalFunction")

@@ -22,6 +22,7 @@ import com.sms.courier.dto.request.SceneCaseJobRequest;
 import com.sms.courier.dto.request.TestDataRequest;
 import com.sms.courier.dto.response.ApiTestCaseJobReportResponse;
 import com.sms.courier.dto.response.SceneCaseJobResponse;
+import com.sms.courier.engine.EngineJobManagement;
 import com.sms.courier.engine.service.CaseDispatcherService;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
@@ -31,7 +32,6 @@ import com.sms.courier.entity.job.SceneCaseJobReport;
 import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.JobDataCollection;
-import com.sms.courier.entity.job.common.RunningJobAck;
 import com.sms.courier.entity.scenetest.CaseTemplateApiConn;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
@@ -49,7 +49,6 @@ import com.sms.courier.repository.SceneCaseRepository;
 import com.sms.courier.security.TokenType;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.service.impl.SceneCaseJobServiceImpl;
-import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
 import java.time.LocalDate;
 import java.util.Collections;
@@ -83,6 +82,7 @@ class SceneCaseJobServiceTest {
     private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final CaseTemplateApiRepository caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
     private final CommonRepository commonRepository = mock(CommonRepository.class);
+    private final EngineJobManagement engineJobManagement = mock(EngineJobManagement.class);
     private final SceneCaseApiRepository sceneCaseApiRepository = mock(SceneCaseApiRepository.class);
 
     private final SceneCaseJobService sceneCaseJobService = new SceneCaseJobServiceImpl(
@@ -94,7 +94,8 @@ class SceneCaseJobServiceTest {
         caseDispatcherService,
         customizedCaseTemplateApiRepository,
         caseTemplateRepository,
-        caseTemplateApiRepository, sceneCaseApiRepository, commonRepository, applicationEventPublisher);
+        caseTemplateApiRepository, sceneCaseApiRepository, commonRepository, applicationEventPublisher,
+        engineJobManagement);
 
     private final static String MOCK_ID = "1";
     private final static Integer MOCK_NUM = 1;
@@ -264,39 +265,6 @@ class SceneCaseJobServiceTest {
         assertThatThrownBy(() -> sceneCaseJobService.get(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
     }
 
-    @Test
-    @DisplayName("Test the reallocateJob method in the SceneCaseJob service")
-    public void reallocateJob_test() {
-        when(sceneCaseJobRepository.removeByEngineIdInAndJobStatus(ENGINE_ID_LIST, JobStatus.RUNNING))
-            .thenReturn(Collections.singletonList(sceneCasejobEntity));
-        when(caseDispatcherService.dispatch(any(SceneCaseJobResponse.class))).thenReturn(ENGINE_ID);
-        sceneCaseJobService.reallocateJob(ENGINE_ID_LIST);
-        verify(sceneCaseJobRepository, times(1)).save(any(SceneCaseJobEntity.class));
-    }
-
-    @Test
-    @DisplayName("An apiTestPlatformException occurred while run reallocateJob in SceneCaseJob service")
-    public void reallocateJob_ApiTestPlatformException_test() {
-        when(sceneCaseJobRepository.removeByEngineIdInAndJobStatus(ENGINE_ID_LIST, JobStatus.RUNNING))
-            .thenReturn(Collections.singletonList(sceneCasejobEntity));
-        when(jobMapper.toSceneCaseJobResponse(sceneCasejobEntity)).thenReturn(SceneCaseJobResponse.builder().build());
-        when(caseDispatcherService.dispatch(any(SceneCaseJobResponse.class)))
-            .thenThrow(ExceptionUtils.mpe(""));
-        sceneCaseJobService.reallocateJob(ENGINE_ID_LIST);
-        verify(caseDispatcherService, times(1)).sendSceneCaseErrorMessage(anyString(), anyString());
-    }
-
-    @Test
-    @DisplayName("An exception occurred while run reallocateJob in SceneCaseJob service")
-    public void reallocateJob_Exception_test() {
-        when(sceneCaseJobRepository.removeByEngineIdInAndJobStatus(ENGINE_ID_LIST, JobStatus.RUNNING))
-            .thenReturn(List.of(sceneCasejobEntity));
-        when(jobMapper.toSceneCaseJobResponse(sceneCasejobEntity)).thenReturn(SceneCaseJobResponse.builder().build());
-        when(caseDispatcherService.dispatch(any(SceneCaseJobResponse.class)))
-            .thenThrow(new RuntimeException());
-        sceneCaseJobService.reallocateJob(ENGINE_ID_LIST);
-        verify(caseDispatcherService, times(1)).sendSceneCaseErrorMessage(anyString(), anyString());
-    }
 
     @Test
     @DisplayName("An exception occurred while build job in SceneCaseJob service")
@@ -332,16 +300,6 @@ class SceneCaseJobServiceTest {
         assertTrue(isSuccess);
     }
 
-    @Test
-    @DisplayName("Test the runningJobAck method in the SceneCaseJob service")
-    public void runningJobAck_test() {
-        when(commonRepository.updateFieldById(anyString(), any(), any())).thenReturn(true);
-        RunningJobAck runningJobAck = new RunningJobAck();
-        runningJobAck.setDestination(ENGINE_ID);
-        runningJobAck.setJobId(ObjectId.get().toString());
-        sceneCaseJobService.runningJobAck(runningJobAck);
-        verify(commonRepository, times(1)).updateFieldById(anyString(), any(), any());
-    }
 
     private AddSceneCaseJobRequest getAddRequest() {
         return AddSceneCaseJobRequest.builder()

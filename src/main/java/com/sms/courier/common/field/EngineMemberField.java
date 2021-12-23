@@ -5,6 +5,7 @@ public enum EngineMemberField implements Field {
     OPEN("isOpen"),
     DESTINATION("destination"),
     NAME("name"),
+    HOST("host"),
     TASK_COUNT("taskCount"),
     CASE_TASK("caseTask"),
     SCENE_CASE_TASK("sceneCaseTask"),

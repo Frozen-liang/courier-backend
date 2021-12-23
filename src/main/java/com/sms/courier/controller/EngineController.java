@@ -3,13 +3,10 @@ package com.sms.courier.controller;
 import static com.sms.courier.common.constant.Constants.ENGINE_PATH;
 
 import com.sms.courier.dto.request.DockerLogRequest;
-import com.sms.courier.dto.response.EngineRegistrationResponse;
 import com.sms.courier.dto.response.EngineResponse;
 import com.sms.courier.engine.EngineMemberManagement;
+import com.sms.courier.engine.model.EngineAddress;
 import com.sms.courier.engine.request.EngineMemberRequest;
-import com.sms.courier.engine.request.EngineRegistrationRequest;
-import com.sms.courier.security.jwt.JwtTokenManager;
-import com.sms.courier.security.pojo.CustomUser;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -27,12 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class EngineController {
 
     private final EngineMemberManagement engineMemberManagement;
-    private final JwtTokenManager jwtTokenManager;
 
-    public EngineController(EngineMemberManagement engineMemberManagement,
-        JwtTokenManager jwtTokenManager) {
+    public EngineController(EngineMemberManagement engineMemberManagement) {
         this.engineMemberManagement = engineMemberManagement;
-        this.jwtTokenManager = jwtTokenManager;
     }
 
     @GetMapping("/get")
@@ -40,13 +34,9 @@ public class EngineController {
         return engineMemberManagement.getRunningEngine();
     }
 
-    @PostMapping("/bind")
-    public EngineRegistrationResponse bind(@Validated @RequestBody EngineRegistrationRequest request) {
-        String destination = engineMemberManagement.bind(request);
-        CustomUser engine = CustomUser.createEngine(destination);
-        return EngineRegistrationResponse.builder().subscribeAddress(destination)
-            .token(jwtTokenManager.generateAccessToken(engine))
-            .build();
+    @GetMapping("/getAvailableEngine")
+    public List<EngineAddress> getAvailableEngine() {
+        return engineMemberManagement.getAvailableEngine();
     }
 
     @PostMapping("/edit")

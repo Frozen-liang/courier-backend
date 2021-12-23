@@ -8,9 +8,11 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ProjectFunctionRepository extends MongoRepository<ProjectFunctionEntity, String> {
 
-    Stream<ProjectFunctionResponse> findAllByRemovedIsFalse();
+    Stream<ProjectFunctionEntity> findAllByRemovedIsFalse();
 
     List<ProjectFunctionResponse> findAllByIdIn(List<String> ids);
+
+    List<ProjectFunctionEntity> findByIdIn(List<String> ids);
 
     boolean existsByFunctionKeyAndProjectIdAndRemovedIsFalse(String functionName, String projectId);
 

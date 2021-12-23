@@ -10,7 +10,6 @@ import static com.sms.courier.common.exception.ErrorCode.THE_FUNCTION_KEY_EXIST_
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -32,12 +31,11 @@ import com.sms.courier.service.impl.ProjectFunctionServiceImpl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 
 @DisplayName("Tests for ProjectFunctionService")
@@ -47,11 +45,11 @@ class ProjectFunctionServiceTest {
     private final ProjectFunctionMapper projectFunctionMapper = mock(ProjectFunctionMapper.class);
     private final GlobalFunctionService globalFunctionService = mock(GlobalFunctionService.class);
     private final CommonRepository commonRepository = mock(CommonRepository.class);
-    private final MessageService messageService = mock(MessageService.class);
+    private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
     private final CustomizedFunctionRepository customizedFunctionRepository = mock(CustomizedFunctionRepository.class);
     private final ProjectFunctionService projectFunctionService = new ProjectFunctionServiceImpl(
-        projectFunctionRepository, projectFunctionMapper, globalFunctionService, messageService, commonRepository,
-        customizedFunctionRepository);
+        projectFunctionRepository, projectFunctionMapper, globalFunctionService, commonRepository,
+        customizedFunctionRepository, applicationEventPublisher);
     private final ProjectFunctionEntity projectFunction =
         ProjectFunctionEntity.builder().functionKey("name").id(ID).build();
     private final ProjectFunctionResponse projectFunctionResponse = ProjectFunctionResponse
@@ -87,7 +85,6 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("Test the add method in the ProjectFunction service")
     public void add_test() {
-        doNothing().when(messageService).enginePullFunctionMessage(any());
         when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
         when(projectFunctionRepository.existsByFunctionKeyAndProjectIdAndRemovedIsFalse(any(), any()))
             .thenReturn(false);
@@ -100,7 +97,6 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("An api test platform exception occurred while adding ProjectFunction")
     public void add_ApiTestPlatformException_test() {
-        doNothing().when(messageService).enginePullFunctionMessage(any());
         when(projectFunctionMapper.toEntity(any())).thenReturn(ProjectFunctionEntity.builder().build());
         when(projectFunctionRepository.existsByFunctionKeyAndProjectIdAndRemovedIsFalse(any(), any()))
             .thenReturn(true);
@@ -112,7 +108,6 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("An exception occurred while adding ProjectFunction")
     public void add_exception_test() {
-        doNothing().when(messageService).enginePullFunctionMessage(any());
         when(projectFunctionMapper.toEntity(any())).thenReturn(ProjectFunctionEntity.builder().build());
         doThrow(new RuntimeException()).when(projectFunctionRepository).insert(any(ProjectFunctionEntity.class));
         assertThatThrownBy(() -> projectFunctionService.add(projectFunctionRequest))
@@ -123,7 +118,6 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("Test the edit method in the ProjectFunction service")
     public void edit_test() {
-        doNothing().when(messageService).enginePullFunctionMessage(any());
         when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
         when(projectFunctionRepository.findById(any())).thenReturn(Optional.of(projectFunction));
         when(projectFunctionRepository.existsByFunctionKeyAndProjectIdAndRemovedIsFalse(any(), any()))
@@ -135,7 +129,6 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("An exception occurred while edit ProjectFunction")
     public void edit_exception_test() {
-        doNothing().when(messageService).enginePullFunctionMessage(any());
         when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
         when(projectFunctionRepository.findById(any())).thenReturn(Optional.of(projectFunction));
         when(projectFunctionRepository.existsByFunctionKeyAndProjectIdAndRemovedIsFalse(any(), any()))
@@ -149,7 +142,6 @@ class ProjectFunctionServiceTest {
     @Test
     @DisplayName("An not exist exception occurred while edit ProjectFunction")
     public void edit_not_exist_exception_test() {
-        doNothing().when(messageService).enginePullFunctionMessage(any());
         when(projectFunctionMapper.toEntity(projectFunctionRequest)).thenReturn(projectFunction);
         when(projectFunctionRepository.findById(any())).thenReturn(Optional.empty());
         assertThatThrownBy(() -> projectFunctionService.edit(projectFunctionRequest))
@@ -203,15 +195,6 @@ class ProjectFunctionServiceTest {
             .extracting("code").isEqualTo(DELETE_PROJECT_FUNCTION_BY_ID_ERROR.getCode());
     }
 
-    @Test
-    @DisplayName("An exception occurred while delete GlobalFunction")
-    public void findAll_test() {
-        Stream<ProjectFunctionResponse> projectFunctionResponse =
-            Stream.of(ProjectFunctionResponse.builder().projectId(ID).build());
-        when(projectFunctionRepository.findAllByRemovedIsFalse()).thenReturn(projectFunctionResponse);
-        Map<String, List<ProjectFunctionResponse>> result = projectFunctionService.findAll();
-        assertThat(result).isNotNull();
-    }
 
     @Test
     @DisplayName("An exception occurred while delete GlobalFunction")
