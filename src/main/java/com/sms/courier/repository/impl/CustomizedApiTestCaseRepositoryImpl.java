@@ -137,6 +137,7 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
         Query query = new Query();
         PROJECT_ID.in(projectIds).ifPresent(query::addCriteria);
         REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
+        STATUS.ne(ApiBindingStatus.EXPIRED).ifPresent(query::addCriteria);
         return mongoTemplate.count(query, ApiTestCaseEntity.class);
     }
 
