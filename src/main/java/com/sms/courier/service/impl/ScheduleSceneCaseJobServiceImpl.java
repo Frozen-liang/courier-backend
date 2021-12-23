@@ -37,6 +37,7 @@ import com.sms.courier.repository.SceneCaseApiRepository;
 import com.sms.courier.repository.SceneCaseRepository;
 import com.sms.courier.repository.ScheduleRecordRepository;
 import com.sms.courier.repository.ScheduleSceneCaseJobRepository;
+import com.sms.courier.service.DatabaseService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.ScheduleSceneCaseJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -73,8 +74,10 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
         SceneCaseApiRepository sceneCaseApiRepository,
         CaseTemplateApiRepository caseTemplateApiRepository,
         ScheduleRecordRepository scheduleRecordRepository,
-        ApplicationEventPublisher applicationEventPublisher) {
-        super(repository, jobMapper, caseDispatcherService, projectEnvironmentService, commonRepository);
+        ApplicationEventPublisher applicationEventPublisher,
+        DatabaseService dataBaseService) {
+        super(repository, jobMapper, caseDispatcherService, projectEnvironmentService, commonRepository,
+            dataBaseService);
         this.commonRepository = commonRepository;
         this.sceneCaseRepository = sceneCaseRepository;
         this.sceneCaseApiRepository = sceneCaseApiRepository;
@@ -248,8 +251,10 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
             } else {
                 index = setCaseTemplateApiData(sceneCaseApi, caseList, index);
             }
-
         }
+
+        setJobDatabase(caseList);
+
         if (CollectionUtils.isNotEmpty(caseList)) {
             caseList.sort(Comparator.comparingInt(JobSceneCaseApi::getOrder));
         }

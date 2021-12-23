@@ -43,6 +43,7 @@ import com.sms.courier.repository.SceneCaseApiRepository;
 import com.sms.courier.repository.SceneCaseJobRepository;
 import com.sms.courier.repository.SceneCaseRepository;
 import com.sms.courier.security.pojo.CustomUser;
+import com.sms.courier.service.DatabaseService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.SceneCaseJobService;
 import com.sms.courier.utils.Assert;
@@ -88,8 +89,10 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
         CaseTemplateRepository caseTemplateRepository,
         CaseTemplateApiRepository caseTemplateApiRepository,
         SceneCaseApiRepository sceneCaseApiRepository, CommonRepository commonRepository,
-        ApplicationEventPublisher applicationEventPublisher) {
-        super(sceneCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService, commonRepository);
+        ApplicationEventPublisher applicationEventPublisher,
+        DatabaseService dataBaseService) {
+        super(sceneCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService, commonRepository,
+            dataBaseService);
         this.sceneCaseRepository = sceneCaseRepository;
         this.customizedSceneCaseJobRepository = customizedSceneCaseJobRepository;
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
@@ -270,6 +273,8 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
                 .findByCaseTemplateIdAndIsExecuteAndIsRemove(request.getCaseTemplateId(), Boolean.TRUE, Boolean.FALSE);
             caseList.addAll(jobMapper.toJobSceneCaseApiListByTemplate(caseTemplateApiList));
         }
+
+        setJobDatabase(caseList);
 
         if (CollectionUtils.isNotEmpty(caseList)) {
             caseList.sort(Comparator.comparingInt(JobSceneCaseApi::getOrder));

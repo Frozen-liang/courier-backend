@@ -12,6 +12,7 @@ import com.sms.courier.dto.request.TestDataRequest;
 import com.sms.courier.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.courier.dto.response.ApiTestCaseJobReportResponse;
 import com.sms.courier.dto.response.ApiTestCaseJobResponse;
+import com.sms.courier.dto.response.JobDatabaseResponse;
 import com.sms.courier.dto.response.SceneCaseJobReportResponse;
 import com.sms.courier.dto.response.SceneCaseJobResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
@@ -21,6 +22,7 @@ import com.sms.courier.entity.env.GlobalEnvironmentEntity;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobReport;
+import com.sms.courier.entity.job.JobDatabase;
 import com.sms.courier.entity.job.JobSceneCaseApi;
 import com.sms.courier.entity.job.SceneCaseJobEntity;
 import com.sms.courier.entity.job.SceneCaseJobReport;
@@ -141,6 +143,8 @@ public interface JobMapper {
     SceneCaseJobReportResponse toSceneCaseJobReportResponse(SceneCaseJobReport caseJobReport);
 
     TestResult toTestResult(CaseReport caseReport);
+
+    JobDatabaseResponse toJobDatabaseResponse(JobDatabase jobDatabase);
 
     List<SceneCaseJobResponse> toSceneCaseJobResponseList(List<SceneCaseJobEntity> jobEntityList);
 

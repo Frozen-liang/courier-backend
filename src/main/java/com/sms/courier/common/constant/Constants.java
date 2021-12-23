@@ -55,6 +55,7 @@ public class Constants {
     public static final String PROJECT_STATISTICS_PATH = SDK_VERSION + "/project-statistics";
     public static final String COURIER_SCHEDULER_PATH = SDK_VERSION + "/courier-scheduler";
     public static final String WORKSPACE_STATISTICS_PATH = SDK_VERSION + "/workspace-statistics";
+    public static final String DATABASE = SDK_VERSION + "/database";
 
     public static final int MAX_DEPTH = 3;
     public static final String HTTP_DEFAULT_STATUS_CODE = "200";

@@ -80,10 +80,11 @@ class ScheduleSceneCaseJobServiceTest {
     private final ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
     private final JobMapper jobMapper = new JobMapperImpl(paramInfoMapper, new MatchParamInfoMapperImpl(),
         new ResponseResultVerificationMapperImpl(new MatchParamInfoMapperImpl()));
+    private final DatabaseService dataBaseService = mock(DatabaseService.class);
     private final ScheduleSceneCaseJobService scheduleSceneCaseJobService =
         new ScheduleSceneCaseJobServiceImpl(scheduleSceneCaseJobRepository, jobMapper, caseDispatcherService,
             projectEnvironmentService, commonRepository, sceneCaseRepository, sceneCaseApiRepository,
-            caseTemplateApiRepository, scheduleRecordRepository, applicationEventPublisher);
+            caseTemplateApiRepository, scheduleRecordRepository, applicationEventPublisher, dataBaseService);
     private final ScheduleSceneCaseJobEntity scheduleCaseJob =
         ScheduleSceneCaseJobEntity.builder().id(ID)
             .apiTestCase(List.of(JobSceneCaseApi.builder().jobApiTestCase(JobApiTestCase.builder().build()).build()))

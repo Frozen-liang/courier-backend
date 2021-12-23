@@ -266,13 +266,13 @@
   {
     "id": "610126d056617f032835a976",
     "name": "Data_Collection_Create_Update_Delete",
-    "description": "数据连接增加修改删除",
+    "description": "数据集增加修改删除",
     "roleType": 0
   },
   {
     "id": "610126d056617f032835a977",
     "name": "Data_Collection_Query_All",
-    "description": "查询所有的数据连接",
+    "description": "查询所有的数据集",
     "roleType": 0
   },
   {

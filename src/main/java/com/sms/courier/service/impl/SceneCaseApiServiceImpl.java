@@ -143,7 +143,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
                 SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(removed).build(),
-                ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName()));
+                ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName(), SceneField.IS_SQL_RESULT
+                    .getName()));
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
             return sceneCaseApiList.stream().map(sceneCaseApiMapper::toSceneCaseApiDto).collect(Collectors.toList());
@@ -158,7 +159,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
                 SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).build(),
-                ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName()));
+                ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName(), SceneField.IS_SQL_RESULT
+                    .getName()));
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {
@@ -172,7 +174,8 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
                 SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(remove).build(),
-                ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName()));
+                ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName(), SceneField.IS_SQL_RESULT
+                    .getName()));
             Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
             return sceneCaseApiRepository.findAll(example, sort);
         } catch (Exception e) {
