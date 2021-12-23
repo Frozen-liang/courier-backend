@@ -37,7 +37,6 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,8 +47,9 @@ class DataCollectionServiceTest {
     private final DataCollectionMapper dataCollectionMapper = mock(DataCollectionMapper.class);
     private final CustomizedDataCollectionRepository customizedDataCollectionRepository = mock(
         CustomizedDataCollectionRepository.class);
+    private final ProjectEnvironmentService projectEnvironmentService = mock(ProjectEnvironmentService.class);
     private final DataCollectionService dataCollectionService = new DataCollectionServiceImpl(
-        dataCollectionRepository, dataCollectionMapper, customizedDataCollectionRepository);
+        dataCollectionRepository, dataCollectionMapper, customizedDataCollectionRepository, projectEnvironmentService);
     private final DataCollectionEntity dataCollection = DataCollectionEntity.builder().id(ID).build();
     private final DataCollectionResponse dataCollectionResponse = DataCollectionResponse.builder().id(ID).build();
     private final DataCollectionRequest dataCollectionRequest = DataCollectionRequest.builder().id(ID).build();
