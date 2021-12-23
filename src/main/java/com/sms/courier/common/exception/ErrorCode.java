@@ -303,7 +303,8 @@ public enum ErrorCode {
     // 61001  describes the test exception
     THE_CASE_NOT_EXIST("61001", "The case must not be empty."),
     THE_ENV_NOT_EXIST("61002", "The Env not exist"),
-    THE_DATA_IS_NOT_BINDING_THE_ENV("61003", "The dataCollection is not binding the env.");
+    THE_DATA_IS_NOT_BINDING_THE_ENV("61003", "This dataset is bound to other environments,"
+        + " please go to the Dataset Settings page to view");
 
     private final String code;
     private final String message;

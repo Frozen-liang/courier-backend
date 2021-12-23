@@ -155,23 +155,22 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
         boolean isExist = sceneCaseEntity.getEnvDataCollConnList().stream().anyMatch(envData -> Objects.equals(envId,
             envData.getEnvId()));
         if (isExist) {
-            dataCollIds = sceneCaseEntity.getEnvDataCollConnList().stream().filter(envData -> Objects.equals(envId,
-                envData.getEnvId())).map(EnvDataCollConn::getDataCollId).collect(Collectors.toList());
-            if (CollectionUtils.isNotEmpty(dataCollIds)) {
-                return commonRepository.findById(dataCollIds.get(0), DataCollectionEntity.class).orElse(null);
-            }
+            dataCollIds = sceneCaseEntity.getEnvDataCollConnList().stream()
+                .filter(envData -> Objects.equals(envId, envData.getEnvId()))
+                .map(EnvDataCollConn::getDataCollId).collect(Collectors.toList());
         } else {
             dataCollIds = sceneCaseEntity.getEnvDataCollConnList().stream()
-                .filter(envData -> Objects.isNull(envData.getEnvId())).map(EnvDataCollConn::getDataCollId)
-                .collect(Collectors.toList());
-            if (CollectionUtils.isNotEmpty(dataCollIds)) {
-                DataCollectionEntity dataCollectionEntity = commonRepository.findById(dataCollIds.get(0),
-                    DataCollectionEntity.class).orElse(null);
-                if (Objects.nonNull(dataCollectionEntity) && Objects.nonNull(dataCollectionEntity.getEnvId())) {
-                    isTrue(Objects.equals(dataCollectionEntity.getEnvId(), envId), THE_DATA_IS_NOT_BINDING_THE_ENV);
-                }
-                return dataCollectionEntity;
+                .filter(envData -> Objects.isNull(envData.getEnvId()))
+                .map(EnvDataCollConn::getDataCollId).collect(Collectors.toList());
+        }
+
+        if (CollectionUtils.isNotEmpty(dataCollIds)) {
+            DataCollectionEntity dataCollectionEntity = commonRepository.findById(dataCollIds.get(0),
+                DataCollectionEntity.class).orElse(null);
+            if (Objects.nonNull(dataCollectionEntity) && Objects.nonNull(dataCollectionEntity.getEnvId())) {
+                isTrue(Objects.equals(dataCollectionEntity.getEnvId(), envId), THE_DATA_IS_NOT_BINDING_THE_ENV);
             }
+            return dataCollectionEntity;
         }
         return null;
     }

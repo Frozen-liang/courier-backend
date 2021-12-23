@@ -26,6 +26,5 @@ public class UpdateSceneCaseRequest {
     private Integer priority;
     @JsonProperty("isNext")
     private boolean next;
-    @NotNull(message = "The envDataCollConnList can not be empty")
     private List<EnvDataCollConnRequest> envDataCollConnList;
 }
