@@ -89,7 +89,7 @@ dependencies {
     implementation("io.grpc:grpc-stub:$grpcVersion")
     implementation("io.grpc:grpc-protobuf:$grpcVersion")
     implementation("io.grpc:grpc-netty-shaded:$grpcVersion")
-    implementation ("io.grpc:grpc-services:${grpcVersion}")
+    implementation("io.grpc:grpc-services:${grpcVersion}")
     implementation(platform(SpringBootPlugin.BOM_COORDINATES))
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("org.springframework.boot:spring-boot-starter-web") {
@@ -173,17 +173,19 @@ tasks.spotbugsMain {
 tasks.jacocoTestReport {
     classDirectories.setFrom(sourceSets.main.get().output.asFileTree.matching {
         exclude(
-            "com/sms/courier/security/SecurityConfig.class",
-            "com/sms/courier/utils/**",
-            "com/sms/courier/engine/**",
-            "com/sms/courier/parser/converter/**.class",
-            "com/sms/courier/common/**",
-            "**/entity/**/**.class",
-            "**/courierApplication.class",
-            "com/sms/courier/infrastructure/**",
-            "com/sms/courier/websocket/**.class",
-            "com/sms/courier/config/**.class",
-            "com/sms/courier/controller/**"
+                "com/sms/courier/security/SecurityConfig.class",
+                "com/sms/courier/utils/**",
+                "com/sms/courier/engine/**",
+                "com/sms/courier/parser/converter/**.class",
+                "com/sms/courier/common/**",
+                "**/entity/**/**.class",
+                "**/courierApplication.class",
+                "com/sms/courier/infrastructure/**",
+                "com/sms/courier/websocket/**.class",
+                "com/sms/courier/config/**.class",
+                "com/sms/courier/controller/**",
+                "com/sms/courier/dto/**",
+                "com/sms/courier/engine/grpc/api/v1/**"
         )
     })
     dependsOn(tasks.test)
@@ -246,10 +248,10 @@ tasks.test {
                 logger.lifecycle("----")
                 logger.lifecycle("Test result: ${result.resultType}")
                 logger.lifecycle(
-                    "Test summary: ${result.testCount} tests, " +
-                            "${result.successfulTestCount} succeeded, " +
-                            "${result.failedTestCount} failed, " +
-                            "${result.skippedTestCount} skipped"
+                        "Test summary: ${result.testCount} tests, " +
+                                "${result.successfulTestCount} succeeded, " +
+                                "${result.failedTestCount} failed, " +
+                                "${result.skippedTestCount} skipped"
                 )
                 failedTests.takeIf { it.isNotEmpty() }?.prefixedSummary("\tFailed Tests")
                 skippedTests.takeIf { it.isNotEmpty() }?.prefixedSummary("\tSkipped Tests:")
