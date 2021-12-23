@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.collect.Lists;
 import com.sms.courier.common.enums.CaseFilter;
 import com.sms.courier.common.enums.CaseType;
 import com.sms.courier.common.enums.JobStatus;
@@ -134,7 +135,8 @@ class ScheduleCaseJobServiceTest {
     @DisplayName("Test the schedule method in the ScheduleCaseJob service")
     @ValueSource(strings = {"ALL", "PRIORITY_AND_TAG", "CUSTOM"})
     public void schedule_test_when_data_collection_is_not_empty(String caseFilter) {
-        ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envId(ObjectId.get().toString())
+        ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envIds(
+            Lists.newArrayList(ObjectId.get().toString()))
             .caseFilter(CaseFilter.valueOf(caseFilter))
             .caseCondition(CaseCondition.builder().build()).caseType(CaseType.CASE).build();
         List<ApiTestCaseEntity> apiTestCaseEntities = Collections.singletonList(apiTestCaseEntity);
@@ -156,7 +158,8 @@ class ScheduleCaseJobServiceTest {
     @DisplayName("Test the schedule method in the ScheduleCaseJob service")
     @ValueSource(strings = {"ALL", "PRIORITY_AND_TAG", "CUSTOM"})
     public void schedule_test_when_data_collection_is_empty(String caseFilter) {
-        ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envId(ObjectId.get().toString())
+        ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envIds(
+            Lists.newArrayList(ObjectId.get().toString()))
             .caseFilter(CaseFilter.valueOf(caseFilter))
             .caseCondition(CaseCondition.builder().build()).caseType(CaseType.CASE).build();
         List<ApiTestCaseEntity> apiTestCaseEntities = Collections.singletonList(apiTestCaseEntity);
@@ -175,7 +178,8 @@ class ScheduleCaseJobServiceTest {
     @Test
     @DisplayName("Test the schedule method in the ScheduleCaseJob service")
     public void schedule_test_when_api_test_case_is_empty() {
-        ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envId(ObjectId.get().toString())
+        ScheduleEntity schedule = ScheduleEntity.builder().caseIds(List.of(ID)).envIds(
+            Lists.newArrayList(ObjectId.get().toString()))
             .caseFilter(CaseFilter.CUSTOM)
             .caseCondition(CaseCondition.builder().build()).caseType(CaseType.CASE).build();
         when(apiTestCaseRepository.findByIdIn(any(List.class))).thenReturn(Collections.emptyList());

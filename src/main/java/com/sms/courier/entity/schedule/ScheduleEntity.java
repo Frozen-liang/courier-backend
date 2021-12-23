@@ -43,7 +43,7 @@ public class ScheduleEntity extends BaseEntity {
     private String description;
 
     @Field(targetType = FieldType.OBJECT_ID)
-    private String envId;
+    private List<String> envIds;
 
     @Field(name = "isLoop")
     private boolean loop;

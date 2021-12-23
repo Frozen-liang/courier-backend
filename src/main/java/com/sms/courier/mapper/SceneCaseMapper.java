@@ -3,6 +3,7 @@ package com.sms.courier.mapper;
 import com.sms.courier.dto.request.AddSceneCaseRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseRequest;
 import com.sms.courier.dto.response.CaseTemplateApiResponse;
+import com.sms.courier.dto.response.SceneCaseConnResponse;
 import com.sms.courier.dto.response.SceneCaseResponse;
 import com.sms.courier.entity.scenetest.CaseTemplateApiConn;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
@@ -35,4 +36,8 @@ public interface SceneCaseMapper {
     @Mapping(target = "caseTemplateApiId", source = "id")
     @Mapping(target = "execute", source = "apiTestCase.execute")
     CaseTemplateApiConn toCaseTemplateApiConnByResponse(CaseTemplateApiResponse caseTemplateApi);
+
+    @Mapping(target = "envDataCollConnList", ignore = true)
+    SceneCaseConnResponse toConnResponse(SceneCaseResponse sceneCaseResponse);
+
 }

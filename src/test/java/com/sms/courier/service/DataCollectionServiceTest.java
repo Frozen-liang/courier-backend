@@ -1,5 +1,6 @@
 package com.sms.courier.service;
 
+import static com.mongodb.client.model.Filters.eq;
 import static com.sms.courier.common.exception.ErrorCode.ADD_DATA_COLLECTION_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
@@ -31,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,8 +47,9 @@ class DataCollectionServiceTest {
     private final DataCollectionMapper dataCollectionMapper = mock(DataCollectionMapper.class);
     private final CustomizedDataCollectionRepository customizedDataCollectionRepository = mock(
         CustomizedDataCollectionRepository.class);
+    private final ProjectEnvironmentService projectEnvironmentService = mock(ProjectEnvironmentService.class);
     private final DataCollectionService dataCollectionService = new DataCollectionServiceImpl(
-        dataCollectionRepository, dataCollectionMapper, customizedDataCollectionRepository);
+        dataCollectionRepository, dataCollectionMapper, customizedDataCollectionRepository, projectEnvironmentService);
     private final DataCollectionEntity dataCollection = DataCollectionEntity.builder().id(ID).build();
     private final DataCollectionResponse dataCollectionResponse = DataCollectionResponse.builder().id(ID).build();
     private final DataCollectionRequest dataCollectionRequest = DataCollectionRequest.builder().id(ID).build();
@@ -208,4 +211,26 @@ class DataCollectionServiceTest {
         when(dataCollectionRepository.save(any())).thenReturn(null);
         assertThat(dataCollectionService.importDataCollection(dataCollectionImportRequest)).isTrue();
     }
+
+    @Test
+    @DisplayName("Test the listByEnvId method in the DataCollection service")
+    public void listByEnvId_test() {
+        List<DataCollectionEntity> entityList =
+            Lists.newArrayList(DataCollectionEntity.builder().envId(ID).build());
+        when(dataCollectionRepository.findAll(any(), any(Sort.class))).thenReturn(entityList);
+        List<DataCollectionResponse> responseList =
+            Lists.newArrayList(DataCollectionResponse.builder().envId(ID).build());
+        when(dataCollectionMapper.toDtoList(any())).thenReturn(responseList);
+        List<DataCollectionResponse> dto = dataCollectionService.listByEnvIdAndEnvIdIsNull(ID, ID);
+        assertThat(dto).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while listByEnvId method in the DataCollection service")
+    public void listByEnvId_exception_test() {
+        when(dataCollectionRepository.findAll(any(), any(Sort.class))).thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> dataCollectionService.listByEnvIdAndEnvIdIsNull(ID, ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
 }

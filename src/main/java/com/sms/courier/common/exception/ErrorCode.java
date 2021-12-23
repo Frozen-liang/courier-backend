@@ -290,10 +290,12 @@ public enum ErrorCode {
     GET_WORKSPACE_CASE_JOB_GROUP_BY_USER_ERROR("4270", "Failed to get the Workspace case job group by user!"),
     GET_WORKSPACE_SCENE_CASE_JOB_GROUP_BY_USER_ERROR("4271", "Failed to get the Workspace scene case job group by "
         + "user!"),
-    GET_DATABASE_BY_ID_ERROR("4272", "Failed to get the Database by id!"),
-    ADD_DATABASE_ERROR("4273", "Failed to add the database!"),
-    EDIT_DATABASE_ERROR("4274", "Failed to edit the database!"),
-    DELETE_DATABASE_BY_IDS_ERROR("4275", "Failed to delete database by ids!"),
+    ENV_CANNOT_REPEATED("4272", "The environment cannot be repeated!"),
+
+    GET_DATABASE_BY_ID_ERROR("4273", "Failed to get the Database by id!"),
+    ADD_DATABASE_ERROR("4274", "Failed to add the database!"),
+    EDIT_DATABASE_ERROR("4275", "Failed to edit the database!"),
+    DELETE_DATABASE_BY_IDS_ERROR("4276", "Failed to delete database by ids!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),
@@ -304,7 +306,9 @@ public enum ErrorCode {
 
     // 61001  describes the test exception
     THE_CASE_NOT_EXIST("61001", "The case must not be empty."),
-    THE_ENV_NOT_EXIST("61002", "The Env not exist");
+    THE_ENV_NOT_EXIST("61002", "The Env not exist"),
+    THE_DATA_IS_NOT_BINDING_THE_ENV("61003", "This dataset is bound to other environments,"
+        + " please go to the Dataset Settings page to view");
 
     private final String code;
     private final String message;

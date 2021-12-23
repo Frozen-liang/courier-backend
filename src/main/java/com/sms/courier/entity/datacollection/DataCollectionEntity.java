@@ -26,4 +26,6 @@ public class DataCollectionEntity extends BaseEntity {
     private String collectionName;
     private List<String> paramList;
     private List<TestData> dataList;
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String envId;
 }

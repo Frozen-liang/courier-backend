@@ -56,6 +56,8 @@ public interface JobMapper {
 
     JobEnvironment toJobEnvironment(GlobalEnvironmentEntity globalEnvironmentEntity);
 
+    List<JobEnvironment> toJobEnvironmentList(List<ProjectEnvironmentEntity> projectEnvironmentList);
+
     @Mapping(target = "jobApi", source = "apiEntity")
     JobApiTestCase toJobApiTestCase(ApiTestCaseEntity apiTestCaseEntity);
 

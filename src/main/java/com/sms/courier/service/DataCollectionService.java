@@ -23,4 +23,6 @@ public interface DataCollectionService {
     List<String> getParamListById(String id);
 
     Boolean importDataCollection(DataCollectionImportRequest request);
+
+    List<DataCollectionResponse> listByEnvIdAndEnvIdIsNull(String envId, String projectId);
 }

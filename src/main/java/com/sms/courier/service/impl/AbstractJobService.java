@@ -1,8 +1,10 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.exception.ErrorCode.THE_DATA_IS_NOT_BINDING_THE_ENV;
 import static com.sms.courier.common.exception.ErrorCode.THE_ENV_NOT_EXIST;
 import static com.sms.courier.common.field.ScheduleField.LAST_TASK_COMPLETE_TIME;
 import static com.sms.courier.common.field.ScheduleField.TASK_STATUS;
+import static com.sms.courier.utils.Assert.isTrue;
 import static com.sms.courier.utils.Assert.notEmpty;
 import static com.sms.courier.utils.Assert.notNull;
 
@@ -24,7 +26,9 @@ import com.sms.courier.entity.job.common.JobEnvironment;
 import com.sms.courier.entity.job.common.JobReport;
 import com.sms.courier.entity.scenetest.CaseTemplateApiConn;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
+import com.sms.courier.entity.scenetest.EnvDataCollConn;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
+import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.entity.schedule.JobRecord;
 import com.sms.courier.entity.schedule.ScheduleEntity;
 import com.sms.courier.entity.schedule.ScheduleRecordEntity;
@@ -127,6 +131,14 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
         return jobMapper.toJobEnvironment(projectEnvironment);
     }
 
+    protected List<JobEnvironment> getJobEnvList(List<String> envIds) {
+        notEmpty(envIds, THE_ENV_NOT_EXIST);
+        List<ProjectEnvironmentEntity> projectEnvironmentEntityList = projectEnvironmentService.findAll(envIds);
+        notEmpty(projectEnvironmentEntityList, THE_ENV_NOT_EXIST);
+        return jobMapper.toJobEnvironmentList(projectEnvironmentEntityList);
+    }
+
+
     protected void updateScheduleTaskStatus(String scheduleId) {
         Query query = Query.query(Criteria.where(CommonField.ID.getName()).is(scheduleId));
         Update update = new Update();
@@ -142,7 +154,32 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
         return null;
     }
 
-    protected JobRecord createJobRecord(String caseId, String name) {
+    protected DataCollectionEntity getDataCollection(SceneCaseEntity sceneCaseEntity, String envId) {
+        List<String> dataCollIds;
+        boolean isExist = sceneCaseEntity.getEnvDataCollConnList().stream().anyMatch(envData -> Objects.equals(envId,
+            envData.getEnvId()));
+        if (isExist) {
+            dataCollIds = sceneCaseEntity.getEnvDataCollConnList().stream()
+                .filter(envData -> Objects.equals(envId, envData.getEnvId()))
+                .map(EnvDataCollConn::getDataCollId).collect(Collectors.toList());
+        } else {
+            dataCollIds = sceneCaseEntity.getEnvDataCollConnList().stream()
+                .filter(envData -> Objects.isNull(envData.getEnvId()))
+                .map(EnvDataCollConn::getDataCollId).collect(Collectors.toList());
+        }
+
+        if (CollectionUtils.isNotEmpty(dataCollIds)) {
+            DataCollectionEntity dataCollectionEntity = commonRepository.findById(dataCollIds.get(0),
+                DataCollectionEntity.class).orElse(null);
+            if (Objects.nonNull(dataCollectionEntity) && Objects.nonNull(dataCollectionEntity.getEnvId())) {
+                isTrue(Objects.equals(dataCollectionEntity.getEnvId(), envId), THE_DATA_IS_NOT_BINDING_THE_ENV);
+            }
+            return dataCollectionEntity;
+        }
+        return null;
+    }
+
+    protected JobRecord createSceneCaseJobRecord(String caseId, String name) {
         return JobRecord.builder()
             .caseId(caseId)
             .caseName(name)

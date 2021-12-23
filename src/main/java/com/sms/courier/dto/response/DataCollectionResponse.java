@@ -18,4 +18,6 @@ public class DataCollectionResponse extends BaseResponse {
     private String collectionName;
     private List<String> paramList;
     private List<TestDataResponse> dataList;
+    private String envId;
+    private String envName;
 }

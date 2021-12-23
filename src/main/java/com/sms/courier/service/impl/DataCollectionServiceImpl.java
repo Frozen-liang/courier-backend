@@ -28,10 +28,12 @@ import com.sms.courier.dto.response.DataCollectionResponse;
 import com.sms.courier.entity.datacollection.DataCollectionEntity;
 import com.sms.courier.entity.datacollection.DataParam;
 import com.sms.courier.entity.datacollection.TestData;
+import com.sms.courier.entity.env.ProjectEnvironmentEntity;
 import com.sms.courier.mapper.DataCollectionMapper;
 import com.sms.courier.repository.CustomizedDataCollectionRepository;
 import com.sms.courier.repository.DataCollectionRepository;
 import com.sms.courier.service.DataCollectionService;
+import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.utils.ExceptionUtils;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -57,13 +59,16 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     private final DataCollectionRepository dataCollectionRepository;
     private final DataCollectionMapper dataCollectionMapper;
     private final CustomizedDataCollectionRepository customizedDataCollectionRepository;
+    private final ProjectEnvironmentService projectEnvironmentService;
 
     public DataCollectionServiceImpl(DataCollectionRepository dataCollectionRepository,
         DataCollectionMapper dataCollectionMapper,
-        CustomizedDataCollectionRepository customizedDataCollectionRepository) {
+        CustomizedDataCollectionRepository customizedDataCollectionRepository,
+        ProjectEnvironmentService projectEnvironmentService) {
         this.dataCollectionRepository = dataCollectionRepository;
         this.dataCollectionMapper = dataCollectionMapper;
         this.customizedDataCollectionRepository = customizedDataCollectionRepository;
+        this.projectEnvironmentService = projectEnvironmentService;
     }
 
     @Override
@@ -89,7 +94,15 @@ public class DataCollectionServiceImpl implements DataCollectionService {
                 .withMatcher(REMOVE.getName(), GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING);
             Example<DataCollectionEntity> example = Example.of(dataCollection, exampleMatcher);
-            return dataCollectionMapper.toDtoList(dataCollectionRepository.findAll(example, sort));
+            List<DataCollectionResponse> responseList = dataCollectionMapper
+                .toDtoList(dataCollectionRepository.findAll(example, sort));
+            for (DataCollectionResponse response : responseList) {
+                if (Objects.nonNull(response.getEnvId())) {
+                    ProjectEnvironmentEntity entity = projectEnvironmentService.findOne(response.getEnvId());
+                    response.setEnvName(Objects.nonNull(entity) ? entity.getEnvName() : null);
+                }
+            }
+            return responseList;
         } catch (Exception e) {
             log.error("Failed to get the DataCollection list!", e);
             throw new ApiTestPlatformException(GET_DATA_COLLECTION_LIST_ERROR);
@@ -193,6 +206,28 @@ public class DataCollectionServiceImpl implements DataCollectionService {
         } catch (Exception e) {
             log.error("Failed to import the DataCollection!", e);
             throw new ApiTestPlatformException(IMPORT_DATA_COLLECTION_ERROR);
+        }
+    }
+
+    @Override
+    public List<DataCollectionResponse> listByEnvIdAndEnvIdIsNull(String envId, String projectId) {
+        try {
+            Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
+            DataCollectionEntity dataCollection = DataCollectionEntity.builder().envId(envId)
+                .build();
+            ExampleMatcher exampleMatcher = ExampleMatcher.matching()
+                .withMatcher(REMOVE.getName(), GenericPropertyMatchers.exact())
+                .withStringMatcher(StringMatcher.CONTAINING);
+            Example<DataCollectionEntity> example = Example.of(dataCollection, exampleMatcher);
+            List<DataCollectionEntity> dataCollectionEntityList = dataCollectionRepository.findAll(example, sort);
+            List<DataCollectionEntity> entityList =
+                dataCollectionRepository
+                    .findAllByEnvIdExistsAndRemovedAndProjectId(Boolean.FALSE, Boolean.FALSE, projectId);
+            dataCollectionEntityList.addAll(entityList);
+            return dataCollectionMapper.toDtoList(dataCollectionEntityList);
+        } catch (Exception e) {
+            log.error("Failed to get the DataCollection list!", e);
+            throw new ApiTestPlatformException(GET_DATA_COLLECTION_LIST_ERROR);
         }
     }
 

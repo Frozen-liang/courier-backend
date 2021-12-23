@@ -69,4 +69,10 @@ public class DataCollectionController {
         return dataCollectionService.importDataCollection(request);
     }
 
+    @GetMapping("/list/env/{envId}/{projectId}")
+    @PreAuthorize("hasRoleOrAdmin(@role.DATA_COLLECTION_QUERY_ALL)")
+    public List<DataCollectionResponse> listByEnvId(@PathVariable String envId, @PathVariable String projectId) {
+        return dataCollectionService.listByEnvIdAndEnvIdIsNull(envId, projectId);
+    }
+
 }
