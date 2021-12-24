@@ -11,12 +11,17 @@ import static com.sms.courier.utils.Assert.notNull;
 import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.enums.TaskStatus;
 import com.sms.courier.common.field.CommonField;
+import com.sms.courier.engine.EngineJobManagement;
 import com.sms.courier.engine.service.CaseDispatcherService;
 import com.sms.courier.entity.datacollection.DataCollectionEntity;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
+import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobReport;
 import com.sms.courier.entity.job.JobSceneCaseApi;
+import com.sms.courier.entity.job.SceneCaseJobEntity;
 import com.sms.courier.entity.job.SceneCaseJobReport;
+import com.sms.courier.entity.job.ScheduleCaseJobEntity;
+import com.sms.courier.entity.job.ScheduleSceneCaseJobEntity;
 import com.sms.courier.entity.job.common.AbstractCaseJobEntity;
 import com.sms.courier.entity.job.common.AbstractSceneCaseJobEntity;
 import com.sms.courier.entity.job.common.CaseReport;
@@ -37,6 +42,7 @@ import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.service.DatabaseService;
 import com.sms.courier.service.JobService;
 import com.sms.courier.service.ProjectEnvironmentService;
+import com.sms.courier.utils.ExceptionUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,17 +69,19 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
     protected final JobMapper jobMapper;
     protected final CaseDispatcherService caseDispatcherService;
     protected final ProjectEnvironmentService projectEnvironmentService;
+    protected final EngineJobManagement engineJobManagement;
     protected final CommonRepository commonRepository;
     protected final DatabaseService dataBaseService;
 
     public AbstractJobService(T repository, JobMapper jobMapper,
         CaseDispatcherService caseDispatcherService,
         ProjectEnvironmentService projectEnvironmentService,
-        CommonRepository commonRepository, DatabaseService dataBaseService) {
+        EngineJobManagement engineJobManagement, CommonRepository commonRepository, DatabaseService dataBaseService) {
         this.repository = repository;
         this.jobMapper = jobMapper;
         this.caseDispatcherService = caseDispatcherService;
         this.projectEnvironmentService = projectEnvironmentService;
+        this.engineJobManagement = engineJobManagement;
         this.commonRepository = commonRepository;
         this.dataBaseService = dataBaseService;
     }
@@ -84,6 +92,22 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
             log.info("Handle job report. jobReport:{}", jobReport);
             saveJobReport(jobReport, job);
         });
+    }
+
+
+    @Override
+    public void dispatcherJob(JobEntity jobEntity) {
+        if (jobEntity instanceof ApiTestCaseJobEntity) {
+            engineJobManagement.dispatcherJob((ApiTestCaseJobEntity) jobEntity);
+        } else if (jobEntity instanceof SceneCaseJobEntity) {
+            engineJobManagement.dispatcherJob((SceneCaseJobEntity) jobEntity);
+        } else if (jobEntity instanceof ScheduleCaseJobEntity) {
+            engineJobManagement.dispatcherJob((ScheduleCaseJobEntity) jobEntity);
+        } else if (jobEntity instanceof ScheduleSceneCaseJobEntity) {
+            engineJobManagement.dispatcherJob((ScheduleSceneCaseJobEntity) jobEntity);
+        } else {
+            throw ExceptionUtils.mpe("No support the job class type! clz : {}", jobEntity.getClass());
+        }
     }
 
 

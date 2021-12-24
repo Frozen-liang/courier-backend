@@ -1,4 +1,4 @@
-package com.sms.courier.initialize;
+package com.sms.courier.engine.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,11 +7,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class ApiCaseCount {
+@AllArgsConstructor
+public class EngineAddress {
 
-    private Long count;
-
-    private String apiId;
+    private String host;
+    private int port;
 }

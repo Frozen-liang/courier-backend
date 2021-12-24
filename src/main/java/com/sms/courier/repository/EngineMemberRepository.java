@@ -10,18 +10,14 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface EngineMemberRepository extends MongoRepository<EngineMemberEntity, String> {
 
-    Optional<EngineMemberEntity> findFirstBySessionId(String sessionId);
-
-    Optional<EngineMemberEntity> findFirstByDestination(String destination);
-
     Stream<EngineMemberEntity> findAllByStatus(EngineStatus status);
 
     List<EngineMemberEntity> findAllByContainerStatusInOrderByCreateDateTimeDesc(
         List<ContainerStatus> containerStatuses);
 
-    Stream<EngineMemberEntity> findAllByStatusAndOpenIsTrue(EngineStatus status);
+    Stream<EngineMemberEntity> findAllByContainerStatusAndOpenIsTrue(ContainerStatus status);
 
-    List<EngineMemberEntity> findAllByDestinationIn(List<String> destinations);
+    List<EngineMemberEntity> findAllByContainerStatus(ContainerStatus status);
 
     Optional<EngineMemberEntity> findFirstByName(String name);
 }

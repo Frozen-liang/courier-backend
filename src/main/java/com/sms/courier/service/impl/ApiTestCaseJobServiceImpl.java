@@ -1,18 +1,15 @@
 package com.sms.courier.service.impl;
 
-import static com.sms.courier.common.enums.JobStatus.RUNNING;
 import static com.sms.courier.common.exception.ErrorCode.BUILD_CASE_JOB_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_JOB_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.THE_CASE_NOT_EXIST;
-import static com.sms.courier.common.field.ApiTestCaseJobField.ENGINE_ID;
-import static com.sms.courier.common.field.ApiTestCaseJobField.JOB_STATUS;
 import static com.sms.courier.utils.Assert.notEmpty;
 
-import com.sms.courier.common.constant.Constants;
+import com.sms.courier.common.annotation.JobServiceType;
 import com.sms.courier.common.enums.JobStatus;
+import com.sms.courier.common.enums.JobType;
 import com.sms.courier.common.enums.ResultType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
-import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.request.ApiTestCaseJobPageRequest;
 import com.sms.courier.dto.request.ApiTestCaseJobRunRequest;
 import com.sms.courier.dto.request.ApiTestRequest;
@@ -20,6 +17,7 @@ import com.sms.courier.dto.request.DataCollectionRequest;
 import com.sms.courier.dto.request.TestDataRequest;
 import com.sms.courier.dto.response.ApiTestCaseJobPageResponse;
 import com.sms.courier.dto.response.ApiTestCaseJobResponse;
+import com.sms.courier.engine.EngineJobManagement;
 import com.sms.courier.engine.service.CaseDispatcherService;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.apitestcase.TestResult;
@@ -31,7 +29,6 @@ import com.sms.courier.entity.job.common.JobDataCollection;
 import com.sms.courier.entity.job.common.JobEntity;
 import com.sms.courier.entity.job.common.JobEnvironment;
 import com.sms.courier.entity.job.common.JobReport;
-import com.sms.courier.entity.job.common.RunningJobAck;
 import com.sms.courier.mapper.JobMapper;
 import com.sms.courier.repository.ApiTestCaseJobRepository;
 import com.sms.courier.repository.CommonRepository;
@@ -49,7 +46,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
@@ -58,16 +54,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
 
 @Slf4j
-@Service(Constants.CASE_SERVICE)
+@JobServiceType(type = JobType.CASE)
 public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJobRepository> implements
     ApiTestCaseJobService {
 
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository;
     private final ApiTestCaseService apiTestCaseService;
-    private final CommonRepository commonRepository;
     private final JobMapper jobMapper;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -76,13 +70,12 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
         CaseDispatcherService caseDispatcherService,
         ProjectEnvironmentService projectEnvironmentService, ApiTestCaseService apiTestCaseService,
         CommonRepository commonRepository, JobMapper jobMapper,
-        ApplicationEventPublisher applicationEventPublisher,
+        ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement,
         DatabaseService dataBaseService) {
-        super(apiTestCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService, commonRepository,
-            dataBaseService);
+        super(apiTestCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService,
+            engineJobManagement, commonRepository, dataBaseService);
         this.customizedApiTestCaseJobRepository = customizedApiTestCaseJobRepository;
         this.apiTestCaseService = apiTestCaseService;
-        this.commonRepository = commonRepository;
         this.jobMapper = jobMapper;
         this.applicationEventPublisher = applicationEventPublisher;
     }
@@ -127,30 +120,6 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
         }
     }
 
-    @Override
-    public void reallocateJob(List<String> engineIds) {
-        String userId = null;
-        List<ApiTestCaseJobEntity> apiTestCaseJobList = repository
-            .removeByEngineIdInAndJobStatus(engineIds, JobStatus.RUNNING);
-        try {
-            if (CollectionUtils.isEmpty(apiTestCaseJobList)) {
-                return;
-            }
-            for (ApiTestCaseJobEntity apiTestCaseJobEntity : apiTestCaseJobList) {
-                apiTestCaseJobEntity.setId(ObjectId.get().toString());
-                apiTestCaseJobEntity.setCreateDateTime(LocalDateTime.now());
-                userId = apiTestCaseJobEntity.getCreateUserId();
-                repository.save(apiTestCaseJobEntity);
-                this.dispatcherJob(apiTestCaseJobEntity);
-            }
-        } catch (ApiTestPlatformException courierException) {
-            log.error(courierException.getMessage());
-            caseDispatcherService.sendCaseErrorMessage(userId, courierException.getMessage());
-        } catch (Exception e) {
-            log.error("Reallocate job error!", e);
-            caseDispatcherService.sendCaseErrorMessage(userId, "Execute the ApiTestCase error.");
-        }
-    }
 
     @Override
     public ApiTestCaseJobResponse buildJob(ApiTestRequest request) {
@@ -192,13 +161,6 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
             saveTestResult(jobReport, job);
         });
         return true;
-    }
-
-    @Override
-    public void runningJobAck(RunningJobAck runningJobAck) {
-        Map<Field, Object> updateField = Map.of(JOB_STATUS, RUNNING, ENGINE_ID, runningJobAck.getDestination());
-        commonRepository
-            .updateFieldById(runningJobAck.getJobId(), updateField, ApiTestCaseJobEntity.class);
     }
 
     private ApiTestCaseJobEntity getApiTestCaseJobEntity(ApiTestRequest apiTestRequest, CustomUser currentUser) {
@@ -294,12 +256,16 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
     }
 
     @Override
-    public void dispatcherJob(JobEntity jobEntity) {
-        try {
-            caseDispatcherService.dispatch(jobMapper.toApiTestCaseJobResponse((ApiTestCaseJobEntity) jobEntity));
-        } catch (ApiTestPlatformException e) {
-            repository.deleteById(jobEntity.getId());
-            throw e;
+    public void onError(JobEntity jobEntity, boolean resend) {
+        ApiTestCaseJobEntity job = (ApiTestCaseJobEntity) jobEntity;
+        repository.deleteById(jobEntity.getId());
+        if (resend) {
+            log.error("Resend case job! {}", job);
+            job.setId(ObjectId.get().toString());
+            repository.save(job);
+            engineJobManagement.dispatcherJob(job);
+            return;
         }
+        caseDispatcherService.sendCaseErrorMessage(job.getCreateUserId(), "No engine available!");
     }
 }

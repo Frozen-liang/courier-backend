@@ -25,7 +25,7 @@ import com.sms.courier.dto.response.FunctionResponse;
 import com.sms.courier.dto.response.GlobalFunctionResponse;
 import com.sms.courier.dto.response.LoadFunctionResponse;
 import com.sms.courier.dto.response.ProjectFunctionResponse;
-import com.sms.courier.entity.function.FunctionMessage;
+import com.sms.courier.engine.listener.event.EngineProjectFunctionEvent;
 import com.sms.courier.entity.function.GlobalFunctionEntity;
 import com.sms.courier.entity.function.ProjectFunctionEntity;
 import com.sms.courier.mapper.ProjectFunctionMapper;
@@ -33,14 +33,13 @@ import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedFunctionRepository;
 import com.sms.courier.repository.ProjectFunctionRepository;
 import com.sms.courier.service.GlobalFunctionService;
-import com.sms.courier.service.MessageService;
 import com.sms.courier.service.ProjectFunctionService;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
@@ -55,21 +54,22 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     private final ProjectFunctionRepository projectFunctionRepository;
     private final ProjectFunctionMapper projectFunctionMapper;
     private final GlobalFunctionService globalFunctionService;
-    private final MessageService messageService;
     private final CommonRepository commonRepository;
     private final CustomizedFunctionRepository customizedFunctionRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private static final String FUNCTION_KEY = "functionKey";
 
     public ProjectFunctionServiceImpl(ProjectFunctionRepository projectFunctionRepository,
         ProjectFunctionMapper projectFunctionMapper, GlobalFunctionService globalFunctionService,
-        MessageService messageService, CommonRepository commonRepository,
-        CustomizedFunctionRepository customizedFunctionRepository) {
+        CommonRepository commonRepository,
+        CustomizedFunctionRepository customizedFunctionRepository,
+        ApplicationEventPublisher applicationEventPublisher) {
         this.projectFunctionRepository = projectFunctionRepository;
         this.projectFunctionMapper = projectFunctionMapper;
         this.globalFunctionService = globalFunctionService;
-        this.messageService = messageService;
         this.commonRepository = commonRepository;
         this.customizedFunctionRepository = customizedFunctionRepository;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -116,7 +116,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
                 .existsByFunctionKeyAndProjectIdAndRemovedIsFalse(functionKey, projectFunction.getProjectId());
             isFalse(exists, THE_FUNCTION_KEY_EXIST_ERROR, functionKey, "ProjectFunction");
             projectFunctionRepository.insert(projectFunction);
-            sendMessageToEngine(List.of(projectFunction.getId()), ADD, projectFunction.getProjectId());
+            publishEvent(ADD, Collections.singletonList(projectFunction));
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
             throw e;
@@ -144,7 +144,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
                     .existsByFunctionKeyAndProjectIdAndRemovedIsFalse(functionKey, projectFunction.getProjectId()),
                 THE_FUNCTION_KEY_EXIST_ERROR, functionKey, "ProjectFunction");
             projectFunctionRepository.save(projectFunction);
-            sendMessageToEngine(List.of(projectFunction.getId()), EDIT, projectFunction.getProjectId());
+            publishEvent(EDIT, Collections.singletonList(projectFunction));
         } catch (ApiTestPlatformException courierException) {
             log.error(courierException.getMessage());
             throw courierException;
@@ -161,10 +161,8 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         enhance = @Enhance(enable = true, primaryKey = "ids"))
     public Boolean delete(List<String> ids) {
         try {
-            String projectId = projectFunctionRepository.findById(ids.get(0)).map(ProjectFunctionEntity::getProjectId)
-                .orElse(null);
             Boolean result = commonRepository.deleteByIds(ids, ProjectFunctionEntity.class);
-            sendMessageToEngine(ids, DELETE, projectId);
+            publishEvent(DELETE, projectFunctionRepository.findByIdIn(ids));
             return result;
         } catch (Exception e) {
             log.error("Failed to delete the ProjectFunction!", e);
@@ -172,11 +170,6 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         }
     }
 
-    @Override
-    public Map<String, List<ProjectFunctionResponse>> findAll() {
-        return projectFunctionRepository.findAllByRemovedIsFalse()
-            .collect(Collectors.groupingBy(ProjectFunctionResponse::getProjectId));
-    }
 
     @Override
     public List<ProjectFunctionResponse> pullFunction(List<String> ids) {
@@ -193,14 +186,8 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
         return results;
     }
 
-    private void sendMessageToEngine(List<String> ids, OperationType operationType, String projectId) {
-        FunctionMessage functionMessage = FunctionMessage.builder()
-            .ids(ids)
-            .global(false)
-            .key(projectId)
-            .operationType(operationType.getCode())
-            .build();
-        messageService.enginePullFunctionMessage(functionMessage);
+    private void publishEvent(OperationType type, List<ProjectFunctionEntity> entityList) {
+        applicationEventPublisher.publishEvent(new EngineProjectFunctionEvent(entityList, type));
     }
 
 }
