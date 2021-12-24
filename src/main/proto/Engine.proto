@@ -163,6 +163,9 @@ message GrpcJobSceneCaseApi {
   int32 order = 7;
   bool isLock = 8;
   GrpcJobApiTestCase jobApiTestCase = 9;
+  string sql = 10;
+  bool isSqlResult = 11;
+  GrpcCaseJobDatabase jobDatabase = 12;
 }
 
 message GrpcCaseJobRequest{
@@ -224,11 +227,13 @@ message GrpcCaseJobReport {
   GrpcCaseReport caseReport = 9;
 }
 
-
-
-
-
-
-
+message GrpcCaseJobDatabase {
+  string url = 1;
+  string port = 2;
+  string username = 3;
+  string password = 4;
+  string dataBaseName = 5;
+  int32 databaseType = 6;
+}
 
 
