@@ -70,6 +70,7 @@ public interface GrpcMapper {
     @Mapping(target = "isVerify", source = "verify")
     GrpcMatchParamInfo toGrpcMatchParamInfo(MatchParamInfo matchParamInfo);
 
+    @Mapping(target = "isSqlResult", source = "sqlResult")
     @Mapping(target = "isLock", source = "lock")
     GrpcJobSceneCaseApi toGrpcJobSceneCaseApi(JobSceneCaseApi jobSceneCaseApi);
 
