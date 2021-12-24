@@ -21,10 +21,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = "EngineMember")
 public class EngineMemberEntity extends BaseEntity {
 
-    @Indexed(unique = true)
     private String destination;
     private String sessionId;
-    private String host;
+    private int port;
     @Indexed(unique = true)
     private String name;
     /**

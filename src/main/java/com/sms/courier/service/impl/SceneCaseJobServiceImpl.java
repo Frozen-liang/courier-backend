@@ -6,18 +6,17 @@ import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ER
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_JOB_PAGE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.THE_DATA_IS_NOT_BINDING_THE_ENV;
-import static com.sms.courier.common.field.SceneCaseJobField.ENGINE_ID;
-import static com.sms.courier.common.field.SceneCaseJobField.JOB_STATUS;
 import static com.sms.courier.utils.Assert.isTrue;
 
 import com.google.common.collect.Lists;
-import com.sms.courier.common.constant.Constants;
+import com.sms.courier.common.annotation.JobServiceType;
+import com.sms.courier.common.enums.JobType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
-import com.sms.courier.common.field.Field;
 import com.sms.courier.dto.request.AddSceneCaseJobRequest;
 import com.sms.courier.dto.request.SceneCaseJobRequest;
 import com.sms.courier.dto.request.TestDataRequest;
 import com.sms.courier.dto.response.SceneCaseJobResponse;
+import com.sms.courier.engine.EngineJobManagement;
 import com.sms.courier.engine.service.CaseDispatcherService;
 import com.sms.courier.entity.datacollection.DataCollectionEntity;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
@@ -28,7 +27,6 @@ import com.sms.courier.entity.job.common.JobDataCollection;
 import com.sms.courier.entity.job.common.JobEntity;
 import com.sms.courier.entity.job.common.JobEnvironment;
 import com.sms.courier.entity.job.common.JobReport;
-import com.sms.courier.entity.job.common.RunningJobAck;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
@@ -55,7 +53,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -63,10 +60,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
 
 @Slf4j
-@Service(Constants.SCENE_CASE_SERVICE)
+@JobServiceType(type = JobType.SCENE_CASE)
 public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepository> implements SceneCaseJobService {
 
     private final SceneCaseRepository sceneCaseRepository;
@@ -89,10 +85,10 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
         CaseTemplateRepository caseTemplateRepository,
         CaseTemplateApiRepository caseTemplateApiRepository,
         SceneCaseApiRepository sceneCaseApiRepository, CommonRepository commonRepository,
-        ApplicationEventPublisher applicationEventPublisher,
+        ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement,
         DatabaseService dataBaseService) {
-        super(sceneCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService, commonRepository,
-            dataBaseService);
+        super(sceneCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService, engineJobManagement,
+            commonRepository, dataBaseService);
         this.sceneCaseRepository = sceneCaseRepository;
         this.customizedSceneCaseJobRepository = customizedSceneCaseJobRepository;
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
@@ -136,27 +132,6 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
         }
     }
 
-    @Override
-    public void reallocateJob(List<String> engineIds) {
-        String userId = "";
-        try {
-            List<SceneCaseJobEntity> sceneCaseJobEntities = repository
-                .removeByEngineIdInAndJobStatus(engineIds, RUNNING);
-            for (SceneCaseJobEntity sceneCaseJobEntity : sceneCaseJobEntities) {
-                userId = sceneCaseJobEntity.getCreateUserId();
-                sceneCaseJobEntity.setId(ObjectId.get().toString());
-                sceneCaseJobEntity.setCreateDateTime(LocalDateTime.now());
-                repository.save(sceneCaseJobEntity);
-                this.dispatcherJob(sceneCaseJobEntity);
-            }
-        } catch (ApiTestPlatformException courierException) {
-            log.error("Reallocate SceneCaseJob error.", courierException);
-            caseDispatcherService.sendSceneCaseErrorMessage(userId, courierException.getMessage());
-        } catch (Exception e) {
-            log.error("Reallocate SceneCaseJob error.", e);
-            caseDispatcherService.sendSceneCaseErrorMessage(userId, "Execute the SceneCaseJob error.");
-        }
-    }
 
     @Override
     public List<SceneCaseJobResponse> buildJob(AddSceneCaseJobRequest sceneCaseJobRequest) {
@@ -175,12 +150,6 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
         return Boolean.TRUE;
     }
 
-    @Override
-    public void runningJobAck(RunningJobAck runningJobAck) {
-        Map<Field, Object> updateField = Map.of(JOB_STATUS, RUNNING, ENGINE_ID, runningJobAck.getDestination());
-        commonRepository
-            .updateFieldById(runningJobAck.getJobId(), updateField, SceneCaseJobEntity.class);
-    }
 
     private List<SceneCaseJobEntity> getSceneCaseJobEntityList(AddSceneCaseJobRequest request, CustomUser currentUser) {
         ProjectEnvironmentEntity projectEnvironment = projectEnvironmentService.findOne(request.getEnvId());
@@ -274,8 +243,6 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
             caseList.addAll(jobMapper.toJobSceneCaseApiListByTemplate(caseTemplateApiList));
         }
 
-        setJobDatabase(caseList);
-
         if (CollectionUtils.isNotEmpty(caseList)) {
             caseList.sort(Comparator.comparingInt(JobSceneCaseApi::getOrder));
         }
@@ -292,13 +259,17 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
     }
 
     @Override
-    public void dispatcherJob(JobEntity jobEntity) {
-        try {
-            caseDispatcherService.dispatch(jobMapper.toSceneCaseJobResponse((SceneCaseJobEntity) jobEntity));
-        } catch (ApiTestPlatformException e) {
-            repository.deleteById(jobEntity.getId());
-            throw e;
+    public void onError(JobEntity jobEntity, boolean resend) {
+        SceneCaseJobEntity job = (SceneCaseJobEntity) jobEntity;
+        repository.deleteById(jobEntity.getId());
+        if (resend) {
+            log.info("Resend scene case {}", jobEntity);
+            job.setId(ObjectId.get().toString());
+            repository.save(job);
+            engineJobManagement.dispatcherJob(job);
+            return;
         }
+        caseDispatcherService.sendSceneCaseErrorMessage(job.getCreateUserId(), "No engine available!");
     }
 
 

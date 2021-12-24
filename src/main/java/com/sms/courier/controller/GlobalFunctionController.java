@@ -8,7 +8,6 @@ import com.sms.courier.dto.response.GlobalFunctionResponse;
 import com.sms.courier.dto.response.LoadFunctionResponse;
 import com.sms.courier.service.GlobalFunctionService;
 import java.util.List;
-import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,13 +40,6 @@ public class GlobalFunctionController {
     public List<GlobalFunctionResponse> list(String workspaceId, String functionKey,
         String functionName) {
         return globalFunctionService.list(workspaceId, functionKey, functionName);
-    }
-
-    @GetMapping("/find-all")
-    @PreAuthorize("hasRole(@role.GLOBAL_FUN_FIND_ALL)")
-    public Map<String, List<GlobalFunctionResponse>> findAll() {
-        // Query all global function. Used for engine.
-        return globalFunctionService.findAll();
     }
 
     @PostMapping

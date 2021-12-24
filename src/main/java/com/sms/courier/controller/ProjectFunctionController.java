@@ -9,7 +9,6 @@ import com.sms.courier.dto.response.LoadFunctionResponse;
 import com.sms.courier.dto.response.ProjectFunctionResponse;
 import com.sms.courier.service.ProjectFunctionService;
 import java.util.List;
-import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -64,12 +63,6 @@ public class ProjectFunctionController {
         return projectFunctionService.delete(ids);
     }
 
-    @GetMapping("/find-all")
-    @PreAuthorize("hasRole(@role.PROJECT_FUN_FIND_ALL)")
-    public Map<String, List<ProjectFunctionResponse>> findAll() {
-        // Query all project function. Used for engine.
-        return projectFunctionService.findAll();
-    }
 
     @GetMapping("/pull/{ids}")
     @PreAuthorize("hasRole(@role.PROJECT_FUNCTION_PULL)")

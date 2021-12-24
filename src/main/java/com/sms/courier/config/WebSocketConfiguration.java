@@ -29,7 +29,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Override
     public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
         registry.setMessageSizeLimit(websocketProperties.getMessageSizeLimit())
-            .setSendBufferSizeLimit(50 * 1024 * 1024);
+            .setSendBufferSizeLimit(websocketProperties.getBufferSizeLimit());
     }
 
     @Override
@@ -41,14 +41,10 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/user").setAllowedOriginPatterns(websocketProperties.getUserAllowedOriginPatterns())
             .withSockJS();
-
-        registry.addEndpoint("/engine").setAllowedOriginPatterns(websocketProperties.getEngineAllowedOriginPatterns())
-            .withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.setUserDestinationPrefix("/engine");
         config.setApplicationDestinationPrefixes("/channel");
         config.enableSimpleBroker("/engine", "/user");
     }

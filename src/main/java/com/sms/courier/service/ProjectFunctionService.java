@@ -5,7 +5,6 @@ import com.sms.courier.dto.response.FunctionResponse;
 import com.sms.courier.dto.response.LoadFunctionResponse;
 import com.sms.courier.dto.response.ProjectFunctionResponse;
 import java.util.List;
-import java.util.Map;
 
 public interface ProjectFunctionService {
 
@@ -18,8 +17,6 @@ public interface ProjectFunctionService {
     Boolean edit(ProjectFunctionRequest projectFunctionRequest);
 
     Boolean delete(List<String> ids);
-
-    Map<String, List<ProjectFunctionResponse>> findAll();
 
     List<ProjectFunctionResponse> pullFunction(List<String> ids);
 

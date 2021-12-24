@@ -1,16 +1,14 @@
 package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.JobStatus.PENDING;
-import static com.sms.courier.common.enums.JobStatus.RUNNING;
-import static com.sms.courier.common.field.ApiTestCaseJobField.ENGINE_ID;
-import static com.sms.courier.common.field.ApiTestCaseJobField.JOB_STATUS;
 
-import com.sms.courier.common.constant.Constants;
+import com.sms.courier.common.annotation.JobServiceType;
 import com.sms.courier.common.enums.CaseFilter;
 import com.sms.courier.common.enums.JobStatus;
+import com.sms.courier.common.enums.JobType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
-import com.sms.courier.common.field.Field;
 import com.sms.courier.common.listener.event.ScheduleJobRecordEvent;
+import com.sms.courier.engine.EngineJobManagement;
 import com.sms.courier.engine.service.CaseDispatcherService;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.datacollection.DataCollectionEntity;
@@ -23,7 +21,6 @@ import com.sms.courier.entity.job.common.JobDataCollection;
 import com.sms.courier.entity.job.common.JobEntity;
 import com.sms.courier.entity.job.common.JobEnvironment;
 import com.sms.courier.entity.job.common.JobReport;
-import com.sms.courier.entity.job.common.RunningJobAck;
 import com.sms.courier.entity.schedule.CaseCondition;
 import com.sms.courier.entity.schedule.JobRecord;
 import com.sms.courier.entity.schedule.ScheduleEntity;
@@ -41,21 +38,18 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
 
-@Service(Constants.SCHEDULE_CASE_SERVICE)
+@JobServiceType(type = JobType.SCHEDULE_CATE)
 @Slf4j
 public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJobRepository> implements
     ScheduleCaseJobService {
 
-    private final CommonRepository commonRepository;
     private final ApiTestCaseRepository apiTestCaseRepository;
     private final ScheduleRecordRepository scheduleRecordRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -65,11 +59,10 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
         CommonRepository commonRepository,
         ApiTestCaseRepository apiTestCaseRepository,
         ScheduleRecordRepository scheduleRecordRepository,
-        ApplicationEventPublisher applicationEventPublisher,
+        ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement,
         DatabaseService dataBaseService) {
-        super(repository, jobMapper, caseDispatcherService, projectEnvironmentService, commonRepository,
-            dataBaseService);
-        this.commonRepository = commonRepository;
+        super(repository, jobMapper, caseDispatcherService, projectEnvironmentService, engineJobManagement,
+            commonRepository, dataBaseService);
         this.apiTestCaseRepository = apiTestCaseRepository;
         this.scheduleRecordRepository = scheduleRecordRepository;
         this.applicationEventPublisher = applicationEventPublisher;
@@ -92,41 +85,15 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
     }
 
     @Override
-    public void reallocateJob(List<String> engineIds) {
-        List<ScheduleCaseJobEntity> scheduleCaseJobEntityList = repository
-            .findByEngineIdInAndJobStatus(engineIds, JobStatus.RUNNING);
-        try {
-            if (CollectionUtils.isEmpty(scheduleCaseJobEntityList)) {
-                return;
-            }
-            for (ScheduleCaseJobEntity scheduleCaseJobEntity : scheduleCaseJobEntityList) {
-                this.dispatcherJob(scheduleCaseJobEntity);
-            }
-        } catch (ApiTestPlatformException courierException) {
-            log.error(courierException.getMessage());
-        } catch (Exception e) {
-            log.error("Reallocate schedule job error!", e);
+    public void onError(JobEntity jobEntity, boolean resend) {
+        ScheduleCaseJobEntity job = (ScheduleCaseJobEntity) jobEntity;
+        if (resend) {
+            engineJobManagement.dispatcherJob(job);
+            return;
         }
-    }
-
-    @Override
-    public void runningJobAck(RunningJobAck runningJobAck) {
-        Map<Field, Object> updateField = Map.of(JOB_STATUS, RUNNING, ENGINE_ID, runningJobAck.getDestination());
-        commonRepository
-            .updateFieldById(runningJobAck.getJobId(), updateField, ScheduleCaseJobEntity.class);
-    }
-
-    @Override
-    public void dispatcherJob(JobEntity jobEntity) {
-        try {
-            ScheduleCaseJobEntity scheduleCaseJobEntity = (ScheduleCaseJobEntity) jobEntity;
-            caseDispatcherService.dispatch(jobMapper.toScheduleCaseJobResponse(scheduleCaseJobEntity));
-        } catch (ApiTestPlatformException e) {
-            log.error("Dispatcher schedule case job error.", e);
-            ApiTestCaseJobReport caseJobReport = ApiTestCaseJobReport.builder().jobStatus(JobStatus.FAIL)
-                .jobId(jobEntity.getId()).message(e.getMessage()).build();
-            this.saveJobReport(caseJobReport, jobEntity);
-        }
+        ApiTestCaseJobReport caseJobReport = ApiTestCaseJobReport.builder().jobStatus(JobStatus.FAIL)
+            .jobId(jobEntity.getId()).message("No engine available!").build();
+        this.saveJobReport(caseJobReport, jobEntity);
     }
 
     @Override

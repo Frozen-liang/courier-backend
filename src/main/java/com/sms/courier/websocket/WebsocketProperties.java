@@ -12,4 +12,5 @@ public class WebsocketProperties {
     private String[] userAllowedOriginPatterns = {"*"};
     private String[] engineAllowedOriginPatterns = {"*"};
     private int messageSizeLimit = 655360;
+    private int bufferSizeLimit = 50 * 1024 * 1024;
 }

@@ -11,11 +11,9 @@ import static org.mockito.Mockito.when;
 import com.google.common.collect.Lists;
 import com.sms.courier.common.enums.CaseFilter;
 import com.sms.courier.common.enums.CaseType;
-import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.enums.JobType;
-import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.response.ApiTestCaseJobReportResponse;
-import com.sms.courier.dto.response.ApiTestCaseJobResponse;
+import com.sms.courier.engine.EngineJobManagement;
 import com.sms.courier.engine.service.CaseDispatcherService;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.datacollection.DataCollectionEntity;
@@ -26,7 +24,6 @@ import com.sms.courier.entity.job.ApiTestCaseJobReport;
 import com.sms.courier.entity.job.JobCaseApi;
 import com.sms.courier.entity.job.ScheduleCaseJobEntity;
 import com.sms.courier.entity.job.common.JobApiTestCase;
-import com.sms.courier.entity.job.common.RunningJobAck;
 import com.sms.courier.entity.schedule.CaseCondition;
 import com.sms.courier.entity.schedule.ScheduleEntity;
 import com.sms.courier.entity.schedule.ScheduleRecordEntity;
@@ -41,7 +38,6 @@ import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.ScheduleCaseJobRepository;
 import com.sms.courier.repository.ScheduleRecordRepository;
 import com.sms.courier.service.impl.ScheduleCaseJobServiceImpl;
-import com.sms.courier.utils.ExceptionUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -63,6 +59,7 @@ class ScheduleCaseJobServiceTest {
     private final ScheduleRecordRepository scheduleRecordRepository = mock(ScheduleRecordRepository.class);
     private final ApiTestCaseRepository apiTestCaseRepository = mock(ApiTestCaseRepository.class);
     private final ApplicationEventPublisher applicationEventPublisher = mock(ApplicationEventPublisher.class);
+    private final EngineJobManagement engineJobManagement = mock(EngineJobManagement.class);
     private final DatabaseService dataBaseService = mock(DatabaseService.class);
     private final ParamInfoMapper paramInfoMapper = new ParamInfoMapperImpl();
     private final JobMapper jobMapper = new JobMapperImpl(paramInfoMapper, new MatchParamInfoMapperImpl(),
@@ -70,7 +67,7 @@ class ScheduleCaseJobServiceTest {
     private final ScheduleCaseJobService scheduleCaseJobService =
         new ScheduleCaseJobServiceImpl(scheduleCaseJobRepository, jobMapper, caseDispatcherService,
             projectEnvironmentService, commonRepository, apiTestCaseRepository, scheduleRecordRepository,
-            applicationEventPublisher, dataBaseService);
+            applicationEventPublisher, engineJobManagement, dataBaseService);
     private final ScheduleCaseJobEntity scheduleCaseJob =
         ScheduleCaseJobEntity.builder().id(ID)
             .apiTestCase(JobCaseApi.builder().jobApiTestCase(JobApiTestCase.builder().build()).build()).build();
@@ -90,46 +87,13 @@ class ScheduleCaseJobServiceTest {
         when(scheduleCaseJobRepository.findById(any())).thenReturn(Optional.of(scheduleCaseJob));
         when(scheduleCaseJobRepository.save(any(ScheduleCaseJobEntity.class))).thenReturn(scheduleCaseJob);
         doNothing().when(caseDispatcherService).sendJobReport(anyString(), any(ApiTestCaseJobReportResponse.class));
-        when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);
+        doNothing().when(engineJobManagement).dispatcherJob(any(ScheduleCaseJobEntity.class));
         doNothing().when(apiTestCaseService).insertTestResult(anyString(), any());
         doNothing().when(applicationEventPublisher).publishEvent(any());
         scheduleCaseJobService.handleJobReport(caseJobReport);
         verify(scheduleCaseJobRepository, times(1)).save(any(ScheduleCaseJobEntity.class));
     }
 
-
-    @Test
-    @DisplayName("Test the reallocateJob method in the ScheduleCaseJob service")
-    public void reallocateJob_test() {
-        when(scheduleCaseJobRepository.findByEngineIdInAndJobStatus(ENGINE_ID_LIST, JobStatus.RUNNING))
-            .thenReturn(Collections.singletonList(scheduleCaseJob));
-        when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);
-        scheduleCaseJobService.reallocateJob(ENGINE_ID_LIST);
-        verify(caseDispatcherService, times(1)).dispatch(any(ApiTestCaseJobResponse.class));
-    }
-
-    @Test
-    @DisplayName("An apiTestPlatformException occurred while run reallocateJob in ScheduleCaseJob service")
-    public void reallocateJob_ApiTestPlatformException_test() {
-        when(scheduleCaseJobRepository.findByEngineIdInAndJobStatus(ENGINE_ID_LIST, JobStatus.RUNNING))
-            .thenReturn(Collections.singletonList(scheduleCaseJob));
-        doNothing().when(applicationEventPublisher).publishEvent(any());
-        when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class)))
-            .thenThrow(ExceptionUtils.mpe(ErrorCode.EXECUTE_API_TEST_CASE_ERROR));
-        scheduleCaseJobService.reallocateJob(ENGINE_ID_LIST);
-        verify(scheduleCaseJobRepository, times(1)).save(any(ScheduleCaseJobEntity.class));
-    }
-
-    @Test
-    @DisplayName("Test the runningJobAck method in the ScheduleCaseJob service")
-    public void runningJobAck_test() {
-        when(commonRepository.updateFieldById(anyString(), any(), any())).thenReturn(true);
-        RunningJobAck runningJobAck = new RunningJobAck();
-        runningJobAck.setDestination(ENGINE_ID);
-        runningJobAck.setJobId(ID);
-        scheduleCaseJobService.runningJobAck(runningJobAck);
-        verify(commonRepository, times(1)).updateFieldById(anyString(), any(), any());
-    }
 
     @ParameterizedTest
     @DisplayName("Test the schedule method in the ScheduleCaseJob service")
@@ -147,7 +111,7 @@ class ScheduleCaseJobServiceTest {
         when(commonRepository.findById(ID, DataCollectionEntity.class))
             .thenReturn(Optional.of(DataCollectionEntity.builder().dataList(List.of(
                 TestData.builder().dataName("name").data(List.of(DataParam.builder().build())).build())).build()));
-        when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);
+        doNothing().when(engineJobManagement).dispatcherJob(any(ScheduleCaseJobEntity.class));
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());
         when(scheduleCaseJobRepository.saveAll(any())).thenReturn(Collections.emptyList());
         scheduleCaseJobService.schedule(schedule);
@@ -168,7 +132,7 @@ class ScheduleCaseJobServiceTest {
         when(apiTestCaseRepository.findByTagIdInAndProjectId(any(), any())).thenReturn(apiTestCaseEntities);
         when(projectEnvironmentService.findOne(anyString())).thenReturn(ProjectEnvironmentEntity.builder().build());
         when(commonRepository.findById(ID, DataCollectionEntity.class)).thenReturn(Optional.empty());
-        when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);
+        doNothing().when(engineJobManagement).dispatcherJob(any(ScheduleCaseJobEntity.class));
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());
         when(scheduleCaseJobRepository.saveAll(any())).thenReturn(Collections.emptyList());
         scheduleCaseJobService.schedule(schedule);
@@ -185,7 +149,7 @@ class ScheduleCaseJobServiceTest {
         when(apiTestCaseRepository.findByIdIn(any(List.class))).thenReturn(Collections.emptyList());
         when(projectEnvironmentService.findOne(anyString())).thenReturn(ProjectEnvironmentEntity.builder().build());
         when(commonRepository.findById(ID, DataCollectionEntity.class)).thenReturn(Optional.empty());
-        when(caseDispatcherService.dispatch(any(ApiTestCaseJobResponse.class))).thenReturn(ENGINE_ID);
+        doNothing().when(engineJobManagement).dispatcherJob(any(ScheduleCaseJobEntity.class));
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());
         when(commonRepository.updateField(any(), any(), any())).thenReturn(true);
         scheduleCaseJobService.schedule(schedule);

@@ -22,19 +22,19 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.GlobalFunctionRequest;
 import com.sms.courier.dto.response.GlobalFunctionResponse;
 import com.sms.courier.dto.response.LoadFunctionResponse;
-import com.sms.courier.entity.function.FunctionMessage;
+import com.sms.courier.engine.listener.event.EngineGlobalFunctionEvent;
 import com.sms.courier.entity.function.GlobalFunctionEntity;
 import com.sms.courier.mapper.GlobalFunctionMapper;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedFunctionRepository;
 import com.sms.courier.repository.GlobalFunctionRepository;
 import com.sms.courier.service.GlobalFunctionService;
-import com.sms.courier.service.MessageService;
 import com.sms.courier.utils.ExceptionUtils;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
@@ -50,19 +50,19 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     private final GlobalFunctionMapper globalFunctionMapper;
     private final CommonRepository commonRepository;
     private final CustomizedFunctionRepository customizedFunctionRepository;
-    private final MessageService messageService;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private static final String FUNCTION_KEY = "functionKey";
 
     public GlobalFunctionServiceImpl(GlobalFunctionRepository globalFunctionRepository,
         GlobalFunctionMapper globalFunctionMapper,
         CommonRepository commonRepository,
         CustomizedFunctionRepository customizedFunctionRepository,
-        MessageService messageService) {
+        ApplicationEventPublisher applicationEventPublisher) {
         this.globalFunctionRepository = globalFunctionRepository;
         this.globalFunctionMapper = globalFunctionMapper;
         this.commonRepository = commonRepository;
         this.customizedFunctionRepository = customizedFunctionRepository;
-        this.messageService = messageService;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @Override
@@ -103,7 +103,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
                 .existsByFunctionKeyAndWorkspaceIdAndRemovedIsFalse(functionKey, globalFunction.getWorkspaceId());
             isFalse(exists, THE_FUNCTION_KEY_EXIST_ERROR, functionKey, "GlobalFunction");
             globalFunctionRepository.insert(globalFunction);
-            sendMessageToEngine(List.of(globalFunction.getId()), ADD, globalFunction.getWorkspaceId());
+            publishEvent(ADD, Collections.singletonList(globalFunction));
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
             throw e;
@@ -130,7 +130,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
                     .existsByFunctionKeyAndWorkspaceIdAndRemovedIsFalse(functionKey, globalFunction.getWorkspaceId()),
                 THE_FUNCTION_KEY_EXIST_ERROR, functionKey, "GlobalFunction");
             globalFunctionRepository.save(globalFunction);
-            sendMessageToEngine(List.of(globalFunction.getId()), EDIT, globalFunction.getWorkspaceId());
+            publishEvent(EDIT, Collections.singletonList(globalFunction));
         } catch (ApiTestPlatformException courierException) {
             log.error(courierException.getMessage());
             throw courierException;
@@ -147,10 +147,8 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
         enhance = @Enhance(enable = true, primaryKey = "ids"), refId = "workspaceId")
     public Boolean delete(List<String> ids) {
         try {
-            String workspaceId = globalFunctionRepository.findById(ids.get(0)).map(GlobalFunctionEntity::getWorkspaceId)
-                .orElse(null);
             Boolean result = commonRepository.deleteByIds(ids, GlobalFunctionEntity.class);
-            sendMessageToEngine(ids, DELETE, workspaceId);
+            publishEvent(ADD, globalFunctionRepository.findByIdIn(ids));
             return result;
         } catch (Exception e) {
             log.error("Failed to delete the GlobalFunction!", e);
@@ -160,8 +158,7 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
 
     @Override
     public Map<String, List<GlobalFunctionResponse>> findAll() {
-        return globalFunctionRepository.findAllByRemovedIsFalse()
-            .collect(Collectors.groupingBy(GlobalFunctionResponse::getWorkspaceId));
+        return null;
     }
 
     @Override
@@ -174,14 +171,8 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
         return customizedFunctionRepository.loadFunction(null, workspaceId, GlobalFunctionEntity.class);
     }
 
-    private void sendMessageToEngine(List<String> ids, OperationType operationType, String workspaceId) {
-        FunctionMessage functionMessage = FunctionMessage.builder()
-            .ids(ids)
-            .global(true)
-            .operationType(operationType.getCode())
-            .key(workspaceId)
-            .build();
-        messageService.enginePullFunctionMessage(functionMessage);
+    private void publishEvent(OperationType type, List<GlobalFunctionEntity> entityList) {
+        applicationEventPublisher.publishEvent(new EngineGlobalFunctionEvent(entityList, type));
     }
 
 }
