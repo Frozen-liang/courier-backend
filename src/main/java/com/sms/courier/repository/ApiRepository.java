@@ -22,4 +22,6 @@ public interface ApiRepository extends MongoRepository<ApiEntity, String> {
         List<Integer> requestMethods);
 
     boolean existsByProjectIdAndApiPathAndRequestMethod(String projectId, String apiPath, RequestMethod requestMethod);
+
+    Stream<ApiEntity> findAllByIdIsIn(List<String> ids);
 }
