@@ -1,5 +1,6 @@
 package com.sms.courier.utils;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
@@ -15,6 +16,7 @@ public class EnvUtils implements EnvironmentAware {
     }
 
     @Override
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     public void setEnvironment(Environment environment) {
         PORT = environment.getProperty("server.port", Integer.class);
     }

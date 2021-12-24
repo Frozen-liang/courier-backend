@@ -44,6 +44,7 @@ spotbugs {
     reportLevel.set(com.github.spotbugs.snom.Confidence.MEDIUM)
     omitVisitors.addAll(listOf("FindReturnRef", "RuntimeExceptionCapture"))
     maxHeapSize.set("1g")
+    excludeFilter.set(file("excludeFilter.xml"))
     sourceSets.add(sourceSets.main.get())
 }
 

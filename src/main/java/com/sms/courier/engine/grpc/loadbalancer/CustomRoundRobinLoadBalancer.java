@@ -34,6 +34,7 @@ import com.google.common.base.Preconditions;
 import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.engine.listener.event.EngineStatusEvent;
 import com.sms.courier.engine.listener.event.EngineTaskRecordEvent;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.Attributes;
 import io.grpc.ConnectivityState;
 import io.grpc.ConnectivityStateInfo;
@@ -62,6 +63,7 @@ import org.springframework.context.ApplicationContext;
  * {@link NameResolver}.
  */
 @Slf4j
+@SuppressFBWarnings("DMI_RANDOM_USED_ONLY_ONCE")
 final class CustomRoundRobinLoadBalancer extends LoadBalancer {
 
     @VisibleForTesting
@@ -71,7 +73,7 @@ final class CustomRoundRobinLoadBalancer extends LoadBalancer {
     private final Helper helper;
     private final Map<EquivalentAddressGroup, Subchannel> subchannels =
         new HashMap<>();
-    private final Random random;
+    private final Random random = new Random();
 
     private ConnectivityState currentState;
     private RoundRobinPicker currentPicker = new EmptyPicker(EMPTY_OK);
@@ -79,7 +81,6 @@ final class CustomRoundRobinLoadBalancer extends LoadBalancer {
 
     CustomRoundRobinLoadBalancer(Helper helper, ApplicationContext applicationContext) {
         this.helper = checkNotNull(helper, "helper");
-        this.random = new Random();
         this.applicationContext = applicationContext;
     }
 
