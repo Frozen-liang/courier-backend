@@ -195,6 +195,9 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             }
             sceneCaseRepository.save(sceneCase);
             return Boolean.TRUE;
+        } catch (ApiTestPlatformException e) {
+            log.error(e.getMessage());
+            throw e;
         } catch (Exception e) {
             log.error("Failed to edit the SceneCase!", e);
             throw ExceptionUtils.mpe(EDIT_SCENE_CASE_ERROR);

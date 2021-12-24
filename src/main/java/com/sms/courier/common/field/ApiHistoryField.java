@@ -6,7 +6,8 @@ public enum ApiHistoryField implements Field {
     TAG_ID("record.tagId"),
     API_MANAGER_ID("record.apiManagerId"),
     GROUP_ID("record.groupId"),
-    CREATE_USER_ID("record.createUserId");
+    CREATE_USER_ID("record.createUserId"),
+    RECORD_("record.");
 
     private final String name;
 
