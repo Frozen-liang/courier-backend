@@ -409,8 +409,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                     .distinct()
                     .collect(Collectors.toList());
             if (CollectionUtils.isNotEmpty(sceneCaseId)) {
-                return sceneCaseRepository.findByIdIn(sceneCaseId).stream()
-                    .filter(sceneCase -> Objects.equals(Boolean.FALSE, sceneCase.isRemoved()))
+                return sceneCaseRepository.findByIdInAndRemoved(sceneCaseId, Boolean.FALSE).stream()
                     .map(sceneCaseMapper::toDto).collect(
                         Collectors.toList());
             }

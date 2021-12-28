@@ -524,7 +524,7 @@ class SceneCaseServiceTest {
         List<SceneCaseApiEntity> entityList = Lists.newArrayList(SceneCaseApiEntity.builder().sceneCaseId(MOCK_ID).build());
         when(customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(any())).thenReturn(entityList);
         List<SceneCaseEntity> sceneCaseEntityList = Lists.newArrayList(SceneCaseEntity.builder().id(MOCK_ID).build());
-        when(sceneCaseRepository.findByIdIn(any())).thenReturn(sceneCaseEntityList);
+        when(sceneCaseRepository.findByIdInAndRemoved(any(),any(Boolean.class))).thenReturn(sceneCaseEntityList);
         SceneCaseResponse response = SceneCaseResponse.builder().id(MOCK_ID).build();
         when(sceneCaseMapper.toDto(any())).thenReturn(response);
         List<SceneCaseResponse> responses = sceneCaseService.getByApiId(MOCK_ID);
