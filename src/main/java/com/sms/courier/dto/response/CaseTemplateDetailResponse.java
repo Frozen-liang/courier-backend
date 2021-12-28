@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CaseTemplateDetailResponse {
 
-    private CaseTemplateResponse caseTemplateResponse;
+    private CaseTemplateConnResponse caseTemplateResponse;
 
     private List<CaseTemplateApiResponse> caseTemplateApiResponseList;
 }

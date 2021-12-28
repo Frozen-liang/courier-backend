@@ -23,8 +23,9 @@ import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
 import com.sms.courier.mapper.CaseTemplateApiMapper;
 import com.sms.courier.mapper.CaseTemplateMapper;
+import com.sms.courier.mapper.DataCollectionMapper;
 import com.sms.courier.mapper.MatchParamInfoMapper;
-import com.sms.courier.repository.ApiRepository;
+import com.sms.courier.mapper.ProjectEnvironmentMapper;
 import com.sms.courier.repository.ApiTestCaseRepository;
 import com.sms.courier.repository.CaseTemplateApiRepository;
 import com.sms.courier.repository.CaseTemplateRepository;
@@ -71,7 +72,6 @@ class CaseTemplateServiceTest {
     private final SceneCaseApiService sceneCaseApiService = mock(SceneCaseApiService.class);
     private final CaseTemplateApiMapper caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
     private final CaseTemplateApiRepository caseTemplateApiRepository = mock(CaseTemplateApiRepository.class);
-    private final ApiRepository apiRepository = mock(ApiRepository.class);
     private final ApiTestCaseMapper apiTestCaseMapper = mock(ApiTestCaseMapper.class);
     private final ApiTestCaseRepository apiTestCaseRepository = mock(ApiTestCaseRepository.class);
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository =
@@ -79,11 +79,16 @@ class CaseTemplateServiceTest {
     private final CaseApiCountHandler sceneCaseApiCountHandler = mock(CaseApiCountHandler.class);
     private final MatchParamInfoMapper matchParamInfoMapper = mock(MatchParamInfoMapper.class);
     private final ObjectMapper objectMapper = mock(ObjectMapper.class);
+    private final ProjectEnvironmentService projectEnvironmentService = mock(ProjectEnvironmentService.class);
+    private final ProjectEnvironmentMapper projectEnvironmentMapper = mock(ProjectEnvironmentMapper.class);
+    private final DataCollectionService dataCollectionService = mock(DataCollectionService.class);
+    private final DataCollectionMapper dataCollectionMapper = mock(DataCollectionMapper.class);
     private final CaseTemplateServiceImpl caseTemplateService = new CaseTemplateServiceImpl(caseTemplateRepository,
         customizedCaseTemplateRepository, caseTemplateMapper, caseTemplateApiService,
         sceneCaseRepository, sceneCaseApiService, caseTemplateApiMapper,
-        caseTemplateApiRepository, apiRepository, apiTestCaseMapper, apiTestCaseRepository,
-        customizedCaseTemplateApiRepository, sceneCaseApiCountHandler, matchParamInfoMapper, objectMapper);
+        caseTemplateApiRepository, apiTestCaseMapper, apiTestCaseRepository,
+        customizedCaseTemplateApiRepository, sceneCaseApiCountHandler, matchParamInfoMapper, objectMapper,
+        projectEnvironmentService, projectEnvironmentMapper, dataCollectionService, dataCollectionMapper);
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -315,8 +320,8 @@ class CaseTemplateServiceTest {
         when(apiTestCaseRepository.findById(any())).thenReturn(apiTestCase);
         when(caseTemplateApiRepository.insert(any(CaseTemplateApiEntity.class)))
             .thenReturn(CaseTemplateApiEntity.builder().build());
-        Optional<ApiEntity> apiEntity = Optional.ofNullable(ApiEntity.builder().id(MOCK_ID).build());
-        when(apiRepository.findById(any())).thenReturn(apiEntity);
+        Optional<ApiTestCaseEntity> apiTestCaseEntity = Optional.ofNullable(ApiTestCaseEntity.builder().id(MOCK_ID).build());
+        when(apiTestCaseRepository.findById(any())).thenReturn(apiTestCaseEntity);
         ApiTestCaseEntity testCase = ApiTestCaseEntity.builder().id(MOCK_ID).build();
         when(apiTestCaseMapper.toEntityByApiEntity(any())).thenReturn(testCase);
         when(caseTemplateApiRepository.insert(any(CaseTemplateApiEntity.class)))

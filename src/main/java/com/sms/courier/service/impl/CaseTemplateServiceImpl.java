@@ -36,9 +36,14 @@ import com.sms.courier.dto.request.CaseTemplateSearchRequest;
 import com.sms.courier.dto.request.ConvertCaseTemplateRequest;
 import com.sms.courier.dto.request.UpdateCaseTemplateRequest;
 import com.sms.courier.dto.response.CaseTemplateApiResponse;
+import com.sms.courier.dto.response.CaseTemplateConnResponse;
 import com.sms.courier.dto.response.CaseTemplateDetailResponse;
 import com.sms.courier.dto.response.CaseTemplateResponse;
+import com.sms.courier.dto.response.DataCollectionResponse;
+import com.sms.courier.dto.response.EnvDataCollConnResponse;
+import com.sms.courier.dto.response.EnvDataCollResponse;
 import com.sms.courier.dto.response.IdResponse;
+import com.sms.courier.dto.response.ProjectEnvironmentResponse;
 import com.sms.courier.entity.api.common.HttpStatusVerification;
 import com.sms.courier.entity.api.common.ResponseResultVerification;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
@@ -49,8 +54,9 @@ import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
 import com.sms.courier.mapper.CaseTemplateApiMapper;
 import com.sms.courier.mapper.CaseTemplateMapper;
+import com.sms.courier.mapper.DataCollectionMapper;
 import com.sms.courier.mapper.MatchParamInfoMapper;
-import com.sms.courier.repository.ApiRepository;
+import com.sms.courier.mapper.ProjectEnvironmentMapper;
 import com.sms.courier.repository.ApiTestCaseRepository;
 import com.sms.courier.repository.CaseTemplateApiRepository;
 import com.sms.courier.repository.CaseTemplateRepository;
@@ -60,6 +66,8 @@ import com.sms.courier.repository.SceneCaseRepository;
 import com.sms.courier.service.CaseApiCountHandler;
 import com.sms.courier.service.CaseTemplateApiService;
 import com.sms.courier.service.CaseTemplateService;
+import com.sms.courier.service.DataCollectionService;
+import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.SceneCaseApiService;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.Comparator;
@@ -92,13 +100,16 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     private final SceneCaseApiService sceneCaseApiService;
     private final CaseTemplateApiMapper caseTemplateApiMapper;
     private final CaseTemplateApiRepository caseTemplateApiRepository;
-    private final ApiRepository apiRepository;
     private final ApiTestCaseMapper apiTestCaseMapper;
     private final ApiTestCaseRepository apiTestCaseRepository;
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
     private final CaseApiCountHandler caseApiCountHandler;
     private final MatchParamInfoMapper matchParamInfoMapper;
     private final ObjectMapper objectMapper;
+    private final ProjectEnvironmentService projectEnvironmentService;
+    private final ProjectEnvironmentMapper projectEnvironmentMapper;
+    private final DataCollectionService dataCollectionService;
+    private final DataCollectionMapper dataCollectionMapper;
 
 
     public CaseTemplateServiceImpl(CaseTemplateRepository caseTemplateRepository,
@@ -106,11 +117,13 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         CaseTemplateMapper caseTemplateMapper, CaseTemplateApiService caseTemplateApiService,
         SceneCaseRepository sceneCaseRepository, SceneCaseApiService sceneCaseApiService,
         CaseTemplateApiMapper caseTemplateApiMapper,
-        CaseTemplateApiRepository caseTemplateApiRepository, ApiRepository apiRepository,
+        CaseTemplateApiRepository caseTemplateApiRepository,
         ApiTestCaseMapper apiTestCaseMapper, ApiTestCaseRepository apiTestCaseRepository,
         CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository,
         CaseApiCountHandler sceneCaseApiCountHandler, MatchParamInfoMapper matchParamInfoMapper,
-        ObjectMapper objectMapper) {
+        ObjectMapper objectMapper, ProjectEnvironmentService projectEnvironmentService,
+        ProjectEnvironmentMapper projectEnvironmentMapper,
+        DataCollectionService dataCollectionService, DataCollectionMapper dataCollectionMapper) {
         this.caseTemplateRepository = caseTemplateRepository;
         this.customizedCaseTemplateRepository = customizedCaseTemplateRepository;
         this.caseTemplateMapper = caseTemplateMapper;
@@ -119,13 +132,16 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         this.sceneCaseApiService = sceneCaseApiService;
         this.caseTemplateApiMapper = caseTemplateApiMapper;
         this.caseTemplateApiRepository = caseTemplateApiRepository;
-        this.apiRepository = apiRepository;
         this.apiTestCaseMapper = apiTestCaseMapper;
         this.apiTestCaseRepository = apiTestCaseRepository;
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
         this.caseApiCountHandler = sceneCaseApiCountHandler;
         this.matchParamInfoMapper = matchParamInfoMapper;
         this.objectMapper = objectMapper;
+        this.projectEnvironmentService = projectEnvironmentService;
+        this.projectEnvironmentMapper = projectEnvironmentMapper;
+        this.dataCollectionService = dataCollectionService;
+        this.dataCollectionMapper = dataCollectionMapper;
     }
 
     @Override
@@ -262,9 +278,10 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         try {
             CaseTemplateResponse caseTemplateResponse =
                 customizedCaseTemplateRepository.findById(caseTemplateId).orElse(null);
+            CaseTemplateConnResponse dto = setCaseTemplateConnDto(caseTemplateResponse);
             List<CaseTemplateApiResponse> caseTemplateApiResponseList =
                 caseTemplateApiService.listResponseByCaseTemplateId(caseTemplateId);
-            return CaseTemplateDetailResponse.builder().caseTemplateResponse(caseTemplateResponse)
+            return CaseTemplateDetailResponse.builder().caseTemplateResponse(dto)
                 .caseTemplateApiResponseList(caseTemplateApiResponseList).build();
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
@@ -346,6 +363,26 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             log.error("Failed to recover the CaseTemplate!", e);
             throw ExceptionUtils.mpe(RECOVER_CASE_TEMPLATE_ERROR);
         }
+    }
+
+    private CaseTemplateConnResponse setCaseTemplateConnDto(CaseTemplateResponse caseTemplateResponse) {
+        CaseTemplateConnResponse dto = caseTemplateMapper.toConnResponse(caseTemplateResponse);
+        List<EnvDataCollConnResponse> connResponses = Lists.newArrayList();
+        if (CollectionUtils.isNotEmpty(caseTemplateResponse.getEnvDataCollConnList())) {
+            for (EnvDataCollResponse response : caseTemplateResponse.getEnvDataCollConnList()) {
+                ProjectEnvironmentResponse envResponse = Objects.nonNull(response.getEnvId())
+                    ? projectEnvironmentMapper.toDto(projectEnvironmentService.findOne(response.getEnvId())) : null;
+                DataCollectionResponse dataResponse = Objects.nonNull(response.getDataCollId())
+                    ? dataCollectionMapper.toDto(dataCollectionService.findOne(response.getDataCollId())) : null;
+                EnvDataCollConnResponse collConnResponse = EnvDataCollConnResponse.builder()
+                    .environment(envResponse)
+                    .dataCollection(dataResponse)
+                    .build();
+                connResponses.add(collConnResponse);
+            }
+            dto.setEnvDataCollConnList(connResponses);
+        }
+        return dto;
     }
 
     private List<CaseTemplateApiEntity> setIdConvert(List<CaseTemplateApiEntity> caseTemplateApiList)
