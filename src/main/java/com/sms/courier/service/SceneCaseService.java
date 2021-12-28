@@ -37,4 +37,5 @@ public interface SceneCaseService {
 
     Boolean recover(List<String> ids);
 
+    List<SceneCaseResponse> getByApiId(String apiId);
 }
