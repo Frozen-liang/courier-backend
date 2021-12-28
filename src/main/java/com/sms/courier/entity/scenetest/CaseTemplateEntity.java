@@ -1,8 +1,10 @@
 package com.sms.courier.entity.scenetest;
 
 import com.sms.courier.entity.BaseEntity;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -27,9 +29,6 @@ public class CaseTemplateEntity extends BaseEntity {
     private String projectId;
 
     @Field(targetType = FieldType.OBJECT_ID)
-    private String dataCollId;
-
-    @Field(targetType = FieldType.OBJECT_ID)
     private String groupId;
 
     @Field(targetType = FieldType.OBJECT_ID)
@@ -42,4 +41,7 @@ public class CaseTemplateEntity extends BaseEntity {
      */
     @Field("isNext")
     private boolean next;
+
+    @Default
+    private List<EnvDataCollConn> envDataCollConnList = new ArrayList<>();
 }

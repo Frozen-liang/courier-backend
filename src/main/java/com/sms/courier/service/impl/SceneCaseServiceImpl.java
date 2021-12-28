@@ -414,8 +414,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                     .build();
                 connResponses.add(collConnResponse);
             }
+            dto.setEnvDataCollConnList(connResponses);
         }
-        dto.setEnvDataCollConnList(connResponses);
         return dto;
     }
 

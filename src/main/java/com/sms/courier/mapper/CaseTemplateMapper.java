@@ -2,6 +2,7 @@ package com.sms.courier.mapper;
 
 import com.sms.courier.dto.request.AddCaseTemplateRequest;
 import com.sms.courier.dto.request.UpdateCaseTemplateRequest;
+import com.sms.courier.dto.response.CaseTemplateConnResponse;
 import com.sms.courier.dto.response.CaseTemplateResponse;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
@@ -24,4 +25,7 @@ public interface CaseTemplateMapper {
 
     @Mapping(target = "id", ignore = true)
     CaseTemplateEntity toCaseTemplateBySceneCase(SceneCaseEntity sceneCase);
+
+    @Mapping(target = "envDataCollConnList", ignore = true)
+    CaseTemplateConnResponse toConnResponse(CaseTemplateResponse caseTemplateResponse);
 }

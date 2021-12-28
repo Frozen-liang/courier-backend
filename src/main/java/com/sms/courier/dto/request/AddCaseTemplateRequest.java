@@ -20,10 +20,10 @@ public class AddCaseTemplateRequest {
     private String projectId;
     @NotNull(message = "The groupId can not be empty")
     private String groupId;
-    private String dataCollId;
     private String testStatus;
     private List<String> tagId;
     private Integer priority;
     @JsonProperty("isNext")
     private boolean next;
+    private List<EnvDataCollConnRequest> envDataCollConnList;
 }
