@@ -406,6 +406,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             List<String> sceneCaseId =
                 customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(Lists.newArrayList(apiId)).stream()
                     .map(SceneCaseApiEntity::getSceneCaseId)
+                    .distinct()
                     .collect(Collectors.toList());
             if (CollectionUtils.isNotEmpty(sceneCaseId)) {
                 return sceneCaseRepository.findByIdIn(sceneCaseId).stream()
