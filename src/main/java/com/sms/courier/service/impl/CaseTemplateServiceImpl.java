@@ -380,8 +380,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
                     .build();
                 connResponses.add(collConnResponse);
             }
-            dto.setEnvDataCollConnList(connResponses);
         }
+        dto.setEnvDataCollConnList(connResponses);
         return dto;
     }
 

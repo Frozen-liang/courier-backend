@@ -11,6 +11,7 @@ import com.sms.courier.dto.request.CaseTemplateSearchRequest;
 import com.sms.courier.dto.request.ConvertCaseTemplateRequest;
 import com.sms.courier.dto.request.UpdateCaseTemplateRequest;
 import com.sms.courier.dto.response.CaseTemplateApiResponse;
+import com.sms.courier.dto.response.CaseTemplateConnResponse;
 import com.sms.courier.dto.response.CaseTemplateDetailResponse;
 import com.sms.courier.dto.response.CaseTemplateResponse;
 import com.sms.courier.dto.response.IdResponse;
@@ -285,10 +286,13 @@ class CaseTemplateServiceTest {
     @Test
     @DisplayName("Test the getApiList method in the CaseTemplate service")
     void getApiList_thenRight() {
-        Optional<CaseTemplateResponse> caseTemplate = Optional.ofNullable(CaseTemplateResponse.builder().build());
+        Optional<CaseTemplateResponse> caseTemplate =
+            Optional.ofNullable(CaseTemplateResponse.builder().envDataCollConnList(Lists.newArrayList()).build());
         when(customizedCaseTemplateRepository.findById(any())).thenReturn(caseTemplate);
         List<CaseTemplateApiResponse> caseTemplateApiResponseList =
             Lists.newArrayList(CaseTemplateApiResponse.builder().build());
+        CaseTemplateConnResponse dto = CaseTemplateConnResponse.builder().build();
+        when(caseTemplateMapper.toConnResponse(any())).thenReturn(dto);
         when(caseTemplateApiService.listResponseByCaseTemplateId(any())).thenReturn(caseTemplateApiResponseList);
         CaseTemplateDetailResponse response = caseTemplateService.getApiList(MOCK_ID);
         assertThat(response).isNotNull();
@@ -320,7 +324,8 @@ class CaseTemplateServiceTest {
         when(apiTestCaseRepository.findById(any())).thenReturn(apiTestCase);
         when(caseTemplateApiRepository.insert(any(CaseTemplateApiEntity.class)))
             .thenReturn(CaseTemplateApiEntity.builder().build());
-        Optional<ApiTestCaseEntity> apiTestCaseEntity = Optional.ofNullable(ApiTestCaseEntity.builder().id(MOCK_ID).build());
+        Optional<ApiTestCaseEntity> apiTestCaseEntity = Optional
+            .ofNullable(ApiTestCaseEntity.builder().id(MOCK_ID).build());
         when(apiTestCaseRepository.findById(any())).thenReturn(apiTestCaseEntity);
         ApiTestCaseEntity testCase = ApiTestCaseEntity.builder().id(MOCK_ID).build();
         when(apiTestCaseMapper.toEntityByApiEntity(any())).thenReturn(testCase);
