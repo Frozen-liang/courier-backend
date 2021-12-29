@@ -6,6 +6,7 @@ import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.CaseCountUserStatisticsResponse;
 import com.sms.courier.dto.response.ProjectResponse;
+import com.sms.courier.dto.response.WorkspaceProjectCaseStatisticsResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.entity.job.SceneCaseJobEntity;
@@ -21,6 +22,8 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_PROJECT_CASE_PERCENTAGE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_PROJECT_SCENE_CASE_PERCENTAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,9 +41,10 @@ public class WorkspaceStatisticsServiceTest {
     private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository =
         mock(CustomizedApiTestCaseRepository.class);
     private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
+    private final ProjectStatisticsService projectStatisticsService = mock(ProjectStatisticsService.class);
     private final WorkspaceStatisticsService workspaceStatisticsService =
         new WorkspaceStatisticsServiceImpl(projectService, commonStatisticsRepository, customizedSceneCaseRepository,
-            customizedApiTestCaseRepository, customizedApiRepository);
+            customizedApiTestCaseRepository, customizedApiRepository, projectStatisticsService);
     private static final String ID = ObjectId.get().toString();
     private static final Integer MOCK_DAY = 7;
     private static final Long MOCK_COUNT = 1L;
@@ -368,6 +372,64 @@ public class WorkspaceStatisticsServiceTest {
         when(projectService.list(any()))
             .thenThrow(new RuntimeException());
         assertThatThrownBy(() -> workspaceStatisticsService.sceneCaseJobGroupUserCount(MOCK_DAY, ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the projectCasePercentage method in the Workspace service")
+    public void projectCasePercentage_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        when(projectStatisticsService.caseCount(any())).thenReturn(MOCK_COUNT);
+        when(projectStatisticsService.apiAllCount(any())).thenReturn(MOCK_COUNT);
+        List<WorkspaceProjectCaseStatisticsResponse> dto = workspaceStatisticsService.projectCasePercentage(ID);
+        assertThat(dto).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sceneCaseJobGroupUserCount Workspace")
+    public void projectCasePercentage_smsException_test() {
+        when(projectService.list(any()))
+            .thenThrow(new ApiTestPlatformException(GET_WORKSPACE_PROJECT_CASE_PERCENTAGE_ERROR));
+        assertThatThrownBy(() -> workspaceStatisticsService.projectCasePercentage(ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sceneCaseJobGroupUserCount Workspace")
+    public void projectCasePercentage_exception_test() {
+        when(projectService.list(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceStatisticsService.projectCasePercentage(ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the projectSceneCasePercentage method in the Workspace service")
+    public void projectSceneCasePercentage_test() {
+        List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
+        when(projectService.list(any())).thenReturn(projectResponses);
+        when(projectStatisticsService.sceneCount(any())).thenReturn(MOCK_COUNT);
+        when(projectStatisticsService.apiAllCount(any())).thenReturn(MOCK_COUNT);
+        List<WorkspaceProjectCaseStatisticsResponse> dto = workspaceStatisticsService.projectCasePercentage(ID);
+        assertThat(dto).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sceneCaseJobGroupUserCount Workspace")
+    public void projectSceneCasePercentage_smsException_test() {
+        when(projectService.list(any()))
+            .thenThrow(new ApiTestPlatformException(GET_WORKSPACE_PROJECT_SCENE_CASE_PERCENTAGE_ERROR));
+        assertThatThrownBy(() -> workspaceStatisticsService.projectCasePercentage(ID))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sceneCaseJobGroupUserCount Workspace")
+    public void projectSceneCasePercentage_exception_test() {
+        when(projectService.list(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> workspaceStatisticsService.projectCasePercentage(ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
