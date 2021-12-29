@@ -4,6 +4,7 @@ import static com.sms.courier.common.constant.Constants.WORKSPACE_STATISTICS_PAT
 
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.CaseCountUserStatisticsResponse;
+import com.sms.courier.dto.response.WorkspaceProjectCaseStatisticsResponse;
 import com.sms.courier.service.WorkspaceStatisticsService;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -84,4 +85,13 @@ public class WorkspaceStatisticsController {
         return workspaceStatisticsService.sceneCaseJobGroupUserCount(day, workspaceId);
     }
 
+    @GetMapping("/project/case/percentage/{workspaceId}")
+    public List<WorkspaceProjectCaseStatisticsResponse> projectCasePercentage(@PathVariable String workspaceId) {
+        return workspaceStatisticsService.projectCasePercentage(workspaceId);
+    }
+
+    @GetMapping("/project/scene/case/percentage/{workspaceId}")
+    public List<WorkspaceProjectCaseStatisticsResponse> projectSceneCasePercentage(@PathVariable String workspaceId) {
+        return workspaceStatisticsService.projectSceneCasePercentage(workspaceId);
+    }
 }

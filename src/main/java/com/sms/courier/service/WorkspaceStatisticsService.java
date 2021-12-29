@@ -2,6 +2,7 @@ package com.sms.courier.service;
 
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.CaseCountUserStatisticsResponse;
+import com.sms.courier.dto.response.WorkspaceProjectCaseStatisticsResponse;
 import java.util.List;
 
 public interface WorkspaceStatisticsService {
@@ -27,4 +28,8 @@ public interface WorkspaceStatisticsService {
     List<CaseCountUserStatisticsResponse> caseJobGroupUserCount(Integer day, String workspaceId);
 
     List<CaseCountUserStatisticsResponse> sceneCaseJobGroupUserCount(Integer day, String workspaceId);
+
+    List<WorkspaceProjectCaseStatisticsResponse> projectCasePercentage(String workspaceId);
+
+    List<WorkspaceProjectCaseStatisticsResponse> projectSceneCasePercentage(String workspaceId);
 }
