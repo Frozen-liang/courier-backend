@@ -1,5 +1,7 @@
 package com.sms.courier.utils;
 
+import static com.sms.courier.common.constant.Constants.BEARER;
+
 import com.sms.courier.security.pojo.CustomUser;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.JwsHeader;
@@ -81,7 +83,7 @@ public final class JwtUtils {
 
     public static String getToken(HttpServletRequest request) {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.isNotBlank(header) && header.startsWith("Bearer ")) {
+        if (StringUtils.isNotBlank(header) && header.startsWith(BEARER)) {
             return header.split(" ")[1].trim();
         }
         return null;
