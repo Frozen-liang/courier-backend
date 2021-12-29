@@ -273,6 +273,7 @@ public class UserServiceImpl implements UserService {
         Optional<UserEntity> optional = findByEmail(email);
         optional.ifPresentOrElse(userEntity -> {
             userEntity.setPassword(passwordEncoder.encode(password));
+            userEntity.setExpiredDate(LocalDate.now().plusMonths(3));
             userRepository.save(userEntity);
         }, () -> {
             throw new ApiTestPlatformException(ACCOUNT_NOT_EXIST);
