@@ -75,6 +75,10 @@ public class CustomUser extends User {
         return new CustomUser(id, "engine", TokenType.ENGINE);
     }
 
+    public static CustomUser createUser(String id, String username) {
+        return new CustomUser(id, username, TokenType.USER);
+    }
+
     public static CustomUser createMock() {
         return new CustomUser("mock", TokenType.MOCK);
     }

@@ -295,7 +295,12 @@ public enum ErrorCode {
     ADD_DATABASE_ERROR("4274", "Failed to add the database!"),
     EDIT_DATABASE_ERROR("4275", "Failed to edit the database!"),
     DELETE_DATABASE_BY_IDS_ERROR("4276", "Failed to delete database by ids!"),
-    GET_SCENE_CASE_BY_API_ID_ERROR("4177", "Failed to get the SceneCase by apiId!"),
+    ADD_AUTH_SETTING_ERROR("4274", "Failed to add the AuthSetting!"),
+    GET_AUTH_SETTING_BY_ID_ERROR("4275", "The AuthSetting not exist!"),
+    DELETE_AUTH_SETTING_BY_ID_ERROR("4276", "Failed to delete the AuthSetting!"),
+    EDIT_AUTH_SETTING_ERROR("4277", "Failed to edit the AuthSetting!"),
+    GET_AUTH_SETTING_LIST_ERROR("4278", "Failed to get the AuthSetting page!"),
+    GET_SCENE_CASE_BY_API_ID_ERROR("4278", "Failed to get the SceneCase by apiId!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),

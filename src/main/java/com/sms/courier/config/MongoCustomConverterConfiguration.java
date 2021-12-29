@@ -40,6 +40,7 @@ import com.sms.courier.common.enums.VerificationElementType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.engine.enums.EngineStatus;
+import com.sms.courier.security.oauth.AuthType;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.webhook.enums.WebhookType;
 import java.time.Duration;
@@ -128,7 +129,8 @@ public class MongoCustomConverterConfiguration {
                 LongToDurationConverter.INSTANCE, IntegerToMockApiResponseParamTypeConverter.INSTANCE,
                 IntegerToApiEncodingTypeConverter.INSTANCE, IntegerToMockApiJsonLocateTypeConverter.INSTANCE,
                 IntegerToCaseTypeConverter.INSTANCE, IntegerToContainerStatusConverter.INSTANCE,
-                IntegerToWebhookTypeConverter.INSTANCE, IntegerToDataBaseTypeConverter.INSTANCE);
+                IntegerToWebhookTypeConverter.INSTANCE, IntegerToDataBaseTypeConverter.INSTANCE,
+                IntegerToAuthTypeConverter.INSTANCE);
 
         return new MongoCustomConversions(converters);
     }
@@ -523,6 +525,15 @@ public class MongoCustomConverterConfiguration {
 
         public DatabaseType convert(@NonNull Integer code) {
             return DatabaseType.getDatabaseType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToAuthTypeConverter implements Converter<Integer, AuthType> {
+        INSTANCE;
+
+        public AuthType convert(@NonNull Integer code) {
+            return AuthType.getType(code);
         }
     }
 
