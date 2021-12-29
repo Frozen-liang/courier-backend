@@ -95,4 +95,9 @@ public class SceneCaseController {
         return sceneCaseService.recover(ids);
     }
 
+    @GetMapping("/{apiId}")
+    public List<SceneCaseResponse> getByApiId(@PathVariable String apiId) {
+        return sceneCaseService.getByApiId(apiId);
+    }
+
 }

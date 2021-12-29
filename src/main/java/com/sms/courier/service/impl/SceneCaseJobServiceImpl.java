@@ -243,6 +243,8 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
             caseList.addAll(jobMapper.toJobSceneCaseApiListByTemplate(caseTemplateApiList));
         }
 
+        setJobDatabase(caseList);
+
         if (CollectionUtils.isNotEmpty(caseList)) {
             caseList.sort(Comparator.comparingInt(JobSceneCaseApi::getOrder));
         }

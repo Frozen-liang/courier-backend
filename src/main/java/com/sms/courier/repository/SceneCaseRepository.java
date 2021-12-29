@@ -18,4 +18,6 @@ public interface SceneCaseRepository extends MongoRepository<SceneCaseEntity, St
     List<SceneCaseEntity> findByProjectIdAndPriorityIn(String projectId, List<Integer> priority);
 
     List<SceneCaseEntity> findByIdIn(List<String> caseIds);
+
+    List<SceneCaseEntity> findByIdInAndRemoved(List<String> ids, boolean removed);
 }

@@ -13,6 +13,7 @@ import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_CONN_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.ENV_CANNOT_REPEATED;
+import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_BY_API_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_ERROR;
@@ -396,6 +397,26 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         } catch (Exception e) {
             log.error("Failed to recover the SceneCase!", e);
             throw ExceptionUtils.mpe(RECOVER_SCENE_CASE_ERROR);
+        }
+    }
+
+    @Override
+    public List<SceneCaseResponse> getByApiId(String apiId) {
+        try {
+            List<String> sceneCaseId =
+                customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(Lists.newArrayList(apiId)).stream()
+                    .map(SceneCaseApiEntity::getSceneCaseId)
+                    .distinct()
+                    .collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(sceneCaseId)) {
+                return sceneCaseRepository.findByIdInAndRemoved(sceneCaseId, Boolean.FALSE).stream()
+                    .map(sceneCaseMapper::toDto).collect(
+                        Collectors.toList());
+            }
+            return Lists.newArrayList();
+        } catch (Exception e) {
+            log.error("Failed to get the SceneCase by apiId!", e);
+            throw ExceptionUtils.mpe(GET_SCENE_CASE_BY_API_ID_ERROR);
         }
     }
 

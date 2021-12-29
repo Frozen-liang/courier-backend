@@ -40,7 +40,6 @@ import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateApiConn;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
-import com.sms.courier.entity.scenetest.EnvDataCollConn;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
@@ -517,6 +516,35 @@ class SceneCaseServiceTest {
             .thenThrow(new RuntimeException());
         assertThatThrownBy(() -> sceneCaseService.recover(Lists.newArrayList(MOCK_ID)))
             .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("Test the getByApiId method in the SceneCase service")
+    void getByApiId_thenRight() {
+        List<SceneCaseApiEntity> entityList = Lists.newArrayList(SceneCaseApiEntity.builder().sceneCaseId(MOCK_ID).build());
+        when(customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(any())).thenReturn(entityList);
+        List<SceneCaseEntity> sceneCaseEntityList = Lists.newArrayList(SceneCaseEntity.builder().id(MOCK_ID).build());
+        when(sceneCaseRepository.findByIdInAndRemoved(any(),any(Boolean.class))).thenReturn(sceneCaseEntityList);
+        SceneCaseResponse response = SceneCaseResponse.builder().id(MOCK_ID).build();
+        when(sceneCaseMapper.toDto(any())).thenReturn(response);
+        List<SceneCaseResponse> responses = sceneCaseService.getByApiId(MOCK_ID);
+        assertThat(responses.get(0).getId()).isEqualTo(sceneCaseEntityList.get(0).getId());
+    }
+
+    @Test
+    @DisplayName("Test the getByApiId method in the SceneCase service")
+    void getByApiId_thenNull() {
+        List<SceneCaseApiEntity> entityList = Lists.newArrayList();
+        when(customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(any())).thenReturn(entityList);
+        List<SceneCaseResponse> responses = sceneCaseService.getByApiId(MOCK_ID);
+        assertThat(responses).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Test the getByApiId method in the SceneCase service thrown exception")
+    void getByApiId_thenRight_thrownException() {
+        when(customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(any())).thenThrow(new RuntimeException());
+        assertThatThrownBy(()->sceneCaseService.getByApiId(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
     }
 
     private AddCaseTemplateConnRequest getAddConnRequest() {

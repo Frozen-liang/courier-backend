@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CaseTemplateResponse extends LookupUserResponse {
+public class CaseTemplateConnResponse extends LookupUserResponse {
 
     private String name;
     private String projectId;
@@ -27,5 +27,5 @@ public class CaseTemplateResponse extends LookupUserResponse {
     @Field("isNext")
     @JsonProperty("isNext")
     private boolean next;
-    private List<EnvDataCollResponse> envDataCollConnList;
+    private List<EnvDataCollConnResponse> envDataCollConnList;
 }

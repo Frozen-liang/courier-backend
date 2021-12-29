@@ -55,7 +55,7 @@ public class AesUtil {
             byte[] doFinal = cipher.doFinal(Base64Utils.decodeFromString(cipherText));
             return new String(doFinal, StandardCharsets.UTF_8);
         } catch (Exception e) {
-            log.error("Failed to decrypt the clipherText!", e);
+            log.error("Failed to decrypt the cipherText!", e);
             throw new RuntimeException(e);
         }
     }
