@@ -24,6 +24,7 @@ import com.sms.courier.dto.request.DataStructureRequest;
 import com.sms.courier.dto.response.DataStructureListResponse;
 import com.sms.courier.dto.response.DataStructureReferenceResponse;
 import com.sms.courier.dto.response.DataStructureResponse;
+import com.sms.courier.entity.mongo.CustomQuery;
 import com.sms.courier.entity.structure.StructureEntity;
 import com.sms.courier.entity.structure.StructureRefRecordEntity;
 import com.sms.courier.mapper.DataStructureMapper;
@@ -44,6 +45,8 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.mongodb.core.query.Query;
 
 
@@ -188,8 +191,9 @@ class DataStructureServiceTest {
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
             dataStructureList.add(StructureEntity.builder().build());
         }
-        when(commonRepository.list(any(Query.class), any())).thenReturn(dataStructureList);
-        List<DataStructureListResponse> result = dataStructureService
+        PageImpl<DataStructureListRequest> page = new PageImpl(dataStructureList);
+        when(commonRepository.page(any(CustomQuery.class), any(),any(Class.class))).thenReturn(page);
+        Page<DataStructureListResponse> result = dataStructureService
             .getDataStructureList(dataStructureListRequest);
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }

@@ -7,13 +7,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
-public enum AuthType implements EnumCommon {
+public enum OAuthType implements EnumCommon {
     NERKO(0);
     private final int code;
-    private static final Map<Integer, AuthType> MAPPINGS = Arrays.stream(values()).sequential().collect(
-        Collectors.toMap(AuthType::getCode, Function.identity()));
+    private static final Map<Integer, OAuthType> MAPPINGS = Arrays.stream(values()).sequential().collect(
+        Collectors.toMap(OAuthType::getCode, Function.identity()));
 
-    AuthType(int code) {
+    OAuthType(int code) {
         this.code = code;
     }
 
@@ -22,7 +22,7 @@ public enum AuthType implements EnumCommon {
         return code;
     }
 
-    public static AuthType getType(@Nullable Integer code) {
+    public static OAuthType getType(@Nullable Integer code) {
         return MAPPINGS.get(code);
     }
 }

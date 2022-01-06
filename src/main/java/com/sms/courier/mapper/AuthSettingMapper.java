@@ -1,8 +1,8 @@
 package com.sms.courier.mapper;
 
-import com.sms.courier.dto.request.AuthSettingRequest;
-import com.sms.courier.dto.response.AuthSettingResponse;
-import com.sms.courier.security.oauth.AuthSettingEntity;
+import com.sms.courier.dto.request.OAuthSettingRequest;
+import com.sms.courier.dto.response.OAuthSettingResponse;
+import com.sms.courier.security.oauth.OAuthSettingEntity;
 import com.sms.courier.utils.EnumCommonUtils;
 import java.util.List;
 import org.mapstruct.InjectionStrategy;
@@ -13,9 +13,9 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = EnumCommonUtils.class)
 public interface AuthSettingMapper {
 
-    AuthSettingResponse toDto(AuthSettingEntity authSetting);
+    OAuthSettingResponse toDto(OAuthSettingEntity authSetting);
 
-    List<AuthSettingResponse> toDtoList(List<AuthSettingEntity> authSettingList);
+    List<OAuthSettingResponse> toDtoList(List<OAuthSettingEntity> authSettingList);
 
-    AuthSettingEntity toEntity(AuthSettingRequest authSettingRequest);
+    OAuthSettingEntity toEntity(OAuthSettingRequest authSettingRequest);
 }

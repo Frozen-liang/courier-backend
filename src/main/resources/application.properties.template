@@ -10,10 +10,12 @@ logging.level.io.swagger.v3.parser.OpenAPIV3Parser=warn
 courier.security.access-token.user_secret_key=
 courier.security.access-token.engine_secret_key=
 courier.security.access-token.mock_secret_key=
-courier.security.ignore-path=/user/**,/engine/**,/v1/engine/bind,/v1/login-setting/list,/v1/file/stream/*
+courier.security.ignore-path=/user/**,/v1/login-setting/list,/v1/file/stream/*,/v1/check-health,/v1/schedule/handle,/v1/system/user/password/reset,
+/v1/system/user/password/reset/verify,/v1/engine/getAvailableEngine,/v1/oauth/callback,/v1/oauth/type
 courier.websocket.user_allowed_origin_patterns=*
 courier.websocket.engine_allowed_origin_patterns=*
 courier.websocket.message_size_limit=655360
 courier.admin.username=
 courier.admin.password=
 courier.api.count.reset.case_count=
+courier.oauth.redirectUri=http://192.168.24.42:3000/oauth/verify

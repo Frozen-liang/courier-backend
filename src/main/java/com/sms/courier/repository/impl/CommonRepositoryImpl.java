@@ -243,17 +243,17 @@ public class CommonRepositoryImpl implements CommonRepository {
         Query query = new Query();
         PageDtoConverter.frontMapping(pageRequest);
         Pageable pageable = PageDtoConverter.createPageable(pageRequest);
+        customQuery.getCriteriaList().forEach(criteria -> criteria.ifPresent(query::addCriteria));
+        long count = mongoTemplate.count(query, entityClass);
+        if (count == 0L) {
+            return Page.empty();
+        }
         query.with(pageable);
         if (CollectionUtils.isNotEmpty(customQuery.getIncludeFields())) {
             customQuery.getIncludeFields().forEach(field -> query.fields().include(field.getName()));
         }
         if (CollectionUtils.isNotEmpty(customQuery.getExcludeFields())) {
             customQuery.getExcludeFields().forEach(field -> query.fields().exclude(field.getName()));
-        }
-        customQuery.getCriteriaList().forEach(criteria -> criteria.ifPresent(query::addCriteria));
-        long count = mongoTemplate.count(query, entityClass);
-        if (count == 0L) {
-            return Page.empty();
         }
         List<T> records = mongoTemplate.find(query, entityClass);
         return new PageImpl<>(records, pageable, count);
