@@ -11,7 +11,7 @@ courier.security.access-token.user_secret_key=
 courier.security.access-token.engine_secret_key=
 courier.security.access-token.mock_secret_key=
 courier.security.ignore-path=/user/**,/v1/login-setting/list,/v1/file/stream/*,/v1/check-health,/v1/schedule/handle,/v1/system/user/password/reset,
-/v1/system/user/password/reset/verify,/v1/engine/getAvailableEngine,/v1/oauth/callback,/v1/oauth/type
+/v1/system/user/password/reset/verify,/v1/engine/getAvailableEngine,/v1/oauth/callback,/v1/oauth/url
 courier.websocket.user_allowed_origin_patterns=*
 courier.websocket.engine_allowed_origin_patterns=*
 courier.websocket.message_size_limit=655360

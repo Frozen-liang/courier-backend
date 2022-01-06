@@ -3,6 +3,7 @@ package com.sms.courier.engine.grpc.interceptor;
 import static com.sms.courier.common.constant.Constants.BEARER;
 import static com.sms.courier.engine.grpc.loadbalancer.Constants.AUTHORIZATION;
 
+import com.sms.courier.security.TokenType;
 import com.sms.courier.security.jwt.JwtTokenManager;
 import com.sms.courier.utils.Assert;
 import io.grpc.Metadata;
@@ -33,13 +34,14 @@ public class AuthorizationServerInterceptor implements ServerInterceptor {
             Assert.isTrue(value.startsWith(BEARER), "Unknown authorization type!");
             String token = value.split(" ")[1];
             Assert.isTrue(jwtTokenManager.validate(token), "Invalid JWT token!");
+            String tokenType = jwtTokenManager.getTokenType(token);
+            Assert.isTrue(TokenType.ENGINE.name().equals(tokenType), "The token type : %s is error!", tokenType);
             return next.startCall(call, headers);
         } catch (Exception e) {
             log.error("Engine grpc authorization error!");
             call.close(Status.UNAUTHENTICATED.withDescription(e.getMessage()), headers);
         }
         return new ServerCall.Listener<>() {
-
         };
     }
 }

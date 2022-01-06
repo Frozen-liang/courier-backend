@@ -22,11 +22,20 @@ public class OAuthSettingRequest {
     @Null(groups = InsertGroup.class, message = "The id must be null.")
     private String id;
 
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The icon cannot be empty.")
+    private String icon;
+
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The authType cannot be null.")
     private OAuthType authType;
 
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The authUri cannot be empty.")
     private String authUri;
+
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The tokenUri cannot be empty.")
+    private String tokenUri;
+
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The userInfoUri cannot be empty.")
+    private String userInfoUri;
 
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The clientId cannot be empty.")
     private String clientId;

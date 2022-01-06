@@ -4,6 +4,7 @@ import static com.sms.courier.common.constant.Constants.BEARER;
 
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
+import com.sms.courier.dto.response.OAuthUrlResponse;
 import com.sms.courier.entity.system.UserEntity;
 import com.sms.courier.repository.OAuthSettingRepository;
 import com.sms.courier.repository.UserRepository;
@@ -18,6 +19,8 @@ import com.sms.courier.security.pojo.LoginResult;
 import com.sms.courier.utils.AesUtil;
 import com.sms.courier.utils.ExceptionUtils;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -39,11 +42,11 @@ public abstract class AbstractOAuthService implements OAuthService {
     protected final UserRepository userRepository;
     protected final JwtTokenManager jwtTokenManager;
     protected final OAuthProperties oauthProperties;
-    private static final String TOKEN_URL = "%s/oauth2/token";
     private static final String GRANT_TYPE = "grant_type";
     private static final String REDIRECT_URI = "redirect_uri";
     private static final String CODE = "code";
     protected final LocalDate expiredDate = LocalDate.of(2222, 1, 1);
+    private static final String LOGIN_URL = "%s?response_type=code&client_id=%s&scope=%s&redirect_uri=%s";
 
     public AbstractOAuthService(RestTemplate restTemplate,
         OAuthSettingRepository oauthSettingRepository, UserRepository userRepository,
@@ -60,13 +63,12 @@ public abstract class AbstractOAuthService implements OAuthService {
     public LoginResult createLoginResult(OAuthType type, String code) {
         try {
             OAuthSettingEntity authSetting = getAuthSetting(type);
-            String url = String.format(TOKEN_URL, authSetting.getAuthUri());
             HttpEntity<LinkedMultiValueMap<String, String>> httpEntity = createHttpEntity(code, authSetting);
             ResponseEntity<TokenEndpointResponse> responseEntity = restTemplate
-                .postForEntity(url, httpEntity, TokenEndpointResponse.class);
+                .postForEntity(authSetting.getTokenUri(), httpEntity, TokenEndpointResponse.class);
             TokenEndpointResponse body = responseEntity.getBody();
             String accessToken = getAccessToken(body);
-            UserEntity userEntity = getUserInfo(authSetting.getAuthUri(), authSetting.getAuthType(), accessToken);
+            UserEntity userEntity = getUserInfo(authSetting.getUserInfoUri(), authSetting.getAuthType(), accessToken);
             CustomUser user = CustomUser.createUser(userEntity.getId(), userEntity.getUsername());
             String token = jwtTokenManager.generateAccessToken(user);
             return LoginResult.builder().token(token).build();
@@ -82,12 +84,29 @@ public abstract class AbstractOAuthService implements OAuthService {
         }
     }
 
+    @Override
+    public List<OAuthUrlResponse> getOAuthUrl() {
+        List<OAuthUrlResponse> responses = new ArrayList<>();
+        List<OAuthSettingEntity> list = oauthSettingRepository.findAll();
+        for (OAuthSettingEntity authSetting : list) {
+            OAuthUrlResponse oauthUrlResponse = new OAuthUrlResponse();
+            String url = String
+                .format(LOGIN_URL, authSetting.getAuthUri(), authSetting.getClientId(), authSetting.getScope(),
+                    oauthProperties.getRedirectUri(authSetting.getAuthType()));
+            oauthUrlResponse.setName(authSetting.getAuthType().getName());
+            oauthUrlResponse.setUrl(url);
+            oauthUrlResponse.setIcon(authSetting.getIcon());
+            responses.add(oauthUrlResponse);
+        }
+        return responses;
+    }
+
     protected OAuthSettingEntity getAuthSetting(OAuthType type) {
         return oauthSettingRepository.findByAuthType(type)
             .orElseThrow(() -> ExceptionUtils.mpe("Nonsupport %s login!", type));
     }
 
-    public abstract UserEntity getUserInfo(String authUri, OAuthType type, String accessToken);
+    public abstract UserEntity getUserInfo(String userInfoUri, OAuthType type, String accessToken);
 
     protected void verifyUser(UserEntity userEntity) {
         Optional<UserEntity> optional = userRepository.findByEmail(userEntity.getEmail());

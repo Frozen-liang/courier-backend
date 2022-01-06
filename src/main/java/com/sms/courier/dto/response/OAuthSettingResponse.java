@@ -16,7 +16,13 @@ public class OAuthSettingResponse extends BaseResponse {
 
     private Integer authType;
 
+    private String icon;
+
     private String authUri;
+
+    private String tokenUri;
+
+    private String userInfoUri;
 
     private String clientId;
 

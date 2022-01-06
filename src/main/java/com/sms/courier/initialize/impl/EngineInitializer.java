@@ -66,7 +66,7 @@ public class EngineInitializer implements DataInitializer {
         AuthorizationServerInterceptor interceptor) {
         Server server = ServerBuilder.forPort(grpcProperties.getPort())
             .addService(engineRegisterService)
-            /*.intercept(interceptor)*/
+            .intercept(interceptor)
             .build()
             .start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

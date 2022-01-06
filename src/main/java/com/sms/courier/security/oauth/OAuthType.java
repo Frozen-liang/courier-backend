@@ -8,18 +8,24 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 public enum OAuthType implements EnumCommon {
-    NERKO(0);
+    NERKO(0, "Nerko");
     private final int code;
+    private final String name;
     private static final Map<Integer, OAuthType> MAPPINGS = Arrays.stream(values()).sequential().collect(
         Collectors.toMap(OAuthType::getCode, Function.identity()));
 
-    OAuthType(int code) {
+    OAuthType(int code, String name) {
         this.code = code;
+        this.name = name;
     }
 
     @Override
     public int getCode() {
         return code;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public static OAuthType getType(@Nullable Integer code) {

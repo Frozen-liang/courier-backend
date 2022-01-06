@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.dto.response.OAuthUrlResponse;
 import com.sms.courier.entity.system.UserEntity;
 import com.sms.courier.repository.OAuthSettingRepository;
 import com.sms.courier.repository.UserRepository;
@@ -19,6 +20,7 @@ import com.sms.courier.security.oauth.OAuthType;
 import com.sms.courier.security.oauth.TokenEndpointResponse;
 import com.sms.courier.security.oauth.model.NerkoUser;
 import com.sms.courier.security.pojo.LoginResult;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +40,9 @@ public class NerkoOAuthServiceTest {
         userRepository, jwtTokenManager, oauthProperties);
     private final OAuthSettingEntity oAuthSettingEntity =
         OAuthSettingEntity.builder().authType(OAuthType.NERKO).authUri("http://test.com").clientId("courier")
-            .clientSecret("sD3Sq/kIawwsyujU3Tnq1NMLlY7P8Bh1rd628pOJHcU=").scope("scope").build();
+            .clientSecret("sD3Sq/kIawwsyujU3Tnq1NMLlY7P8Bh1rd628pOJHcU=").userInfoUri("http://test.com")
+            .tokenUri("http://test.com").scope(
+            "scope").build();
 
 
     @DisplayName("Test createLoginResult")
@@ -75,12 +79,12 @@ public class NerkoOAuthServiceTest {
             ApiTestPlatformException.class);
     }
 
-    @DisplayName("Test getLoginUrlByAuthType")
+    @DisplayName("Test getOAuthUrl")
     @Test
-    public void getLoginUrlByAuthType_test() {
-        when(oauthSettingRepository.findByAuthType(OAuthType.NERKO)).thenReturn(Optional.of(oAuthSettingEntity));
-        String loginUrl = oAuthService.getLoginUrlByAuthType(OAuthType.NERKO);
-        assertThat(loginUrl).isNotBlank();
+    public void getOAuthUrl_test() {
+        when(oauthSettingRepository.findAll()).thenReturn(List.of(oAuthSettingEntity));
+        List<OAuthUrlResponse> responses = oAuthService.getOAuthUrl();
+        assertThat(responses).hasSize(1);
     }
 
 }
