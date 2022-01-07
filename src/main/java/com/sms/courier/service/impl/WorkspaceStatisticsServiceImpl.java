@@ -255,6 +255,9 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
                     .build();
                 dto.add(response);
             }
+            if (CollectionUtils.isNotEmpty(dto)) {
+                dto.sort(Comparator.comparingDouble(WorkspaceProjectCaseStatisticsResponse::getPercentage).reversed());
+            }
             return dto;
         } catch (ApiTestPlatformException exception) {
             log.error(exception.getMessage());
@@ -284,6 +287,9 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
                     .percentage(percentage)
                     .build();
                 dto.add(response);
+            }
+            if (CollectionUtils.isNotEmpty(dto)) {
+                dto.sort(Comparator.comparingDouble(WorkspaceProjectCaseStatisticsResponse::getPercentage).reversed());
             }
             return dto;
         } catch (ApiTestPlatformException exception) {
