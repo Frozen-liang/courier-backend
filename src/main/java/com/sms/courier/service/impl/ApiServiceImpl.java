@@ -54,7 +54,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +80,7 @@ public class ApiServiceImpl implements ApiService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final ProjectImportFlowRepository projectImportFlowRepository;
     private final ApiGroupRepository apiGroupRepository;
+    private static final String KEY = "%s:%s";
 
 
     public ApiServiceImpl(ApiRepository apiRepository, ApiHistoryRepository apiHistoryRepository, ApiMapper apiMapper,
@@ -308,13 +308,15 @@ public class ApiServiceImpl implements ApiService {
         List<Integer> requestMethods = requests.stream().map(ApiCaseRequest::getRequestMethod)
             .collect(Collectors.toList());
         Map<String, List<ApiCaseRequest>> apiCaseRequestMap = requests.stream().collect(
-            Collectors.groupingBy(apiCaseRequest -> apiCaseRequest.getApiPath() + apiCaseRequest.getRequestMethod()));
-        Map<String, ApiResponse> apiResponseMap = apiRepository
-            .findByProjectIdAndApiPathInAndRequestMethodIn(projectId, apiPaths, requestMethods)
-            .collect(Collectors.toMap((api) -> api.getApiPath() + api.getRequestMethod(), Function.identity()));
+            Collectors.groupingBy(
+                apiCaseRequest -> String.format(KEY, apiCaseRequest.getApiPath(), apiCaseRequest.getRequestMethod())));
+        Map<String, List<ApiResponse>> apiResponseMap = apiRepository
+            .findByProjectIdAndApiPathInAndRequestMethodInAndRemovedIsFalse(projectId, apiPaths, requestMethods)
+            .collect(Collectors.groupingBy((api) -> String.format(KEY, api.getApiPath(), api.getRequestMethod())));
         List<ApiAndCaseResponse> responses = new ArrayList<>();
         for (Entry<String, List<ApiCaseRequest>> entry : apiCaseRequestMap.entrySet()) {
             Optional.ofNullable(apiResponseMap.get(entry.getKey()))
+                .map(value -> value.size() == 1 ? value.get(0) : null)
                 .ifPresent((api) -> responses.add(ApiAndCaseResponse.builder().apiResponse(api)
                     .apiTestCase(apiMapper.toApiTestCaseResponse(entry.getValue())).build()));
         }
