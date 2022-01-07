@@ -13,6 +13,7 @@ import com.sms.courier.dto.response.DataStructureResponse;
 import com.sms.courier.service.DataStructureService;
 import java.util.List;
 import java.util.Map;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,17 +54,17 @@ public class DataStructureController {
 
     @PostMapping("/list")
     @PreAuthorize("hasRoleOrAdmin(@role.DATA_STRUCTURE_QUERY_ALL)")
-    public List<DataStructureListResponse> list(@RequestBody DataStructureListRequest request) {
+    public Page<DataStructureListResponse> page(@RequestBody DataStructureListRequest request) {
         return dataStructureService.getDataStructureList(request);
     }
 
     @PostMapping("/data/list")
-    public List<DataStructureResponse> dataList(@RequestBody DataStructureListRequest request) {
+    public List<DataStructureResponse> dataPage(@RequestBody DataStructureListRequest request) {
         return dataStructureService.getDataStructureDataList(request);
     }
 
     @PostMapping("/ref/list")
-    public List<DataStructureResponse> refStructList(@RequestBody DataStructureListRequest request) {
+    public List<DataStructureResponse> refStructPage(@RequestBody DataStructureListRequest request) {
         return dataStructureService.getRefStructList(request);
     }
 

@@ -25,6 +25,7 @@ import com.sms.courier.engine.model.EngineMemberEntity;
 import com.sms.courier.mapper.EngineMapper;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.EngineMemberRepository;
+import com.sms.courier.security.jwt.JwtTokenManager;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.List;
 import org.bson.types.ObjectId;
@@ -39,9 +40,10 @@ public class EngineMemberManagementTest {
     private final EngineMapper engineMapper = mock(EngineMapper.class);
     private final DockerService dockerService = mock(DockerService.class);
     private final EngineSettingService engineSettingService = mock(EngineSettingService.class);
+    private final JwtTokenManager jwtTokenManager = mock(JwtTokenManager.class);
     private final EngineMemberManagement engineMemberManagement =
         new EngineMemberManagementImpl(engineMemberRepository, commonRepository,
-            engineMapper, dockerService, engineSettingService);
+            engineMapper, dockerService, engineSettingService, jwtTokenManager);
     private final EngineMemberEntity engineMember = EngineMemberEntity.builder().destination(EngineId.generate()).id(
         ObjectId.get().toString()).status(EngineStatus.RUNNING).build();
     private static final String DESTINATION = EngineId.generate();

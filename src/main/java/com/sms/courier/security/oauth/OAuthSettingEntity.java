@@ -11,13 +11,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Document(collection = "AuthSetting")
+@Document(collection = "OAuthSetting")
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
-public class AuthSettingEntity extends BaseEntity {
+public class OAuthSettingEntity extends BaseEntity {
 
-    private AuthType authType;
+    private OAuthType authType;
+    private String icon;
     private String authUri;
+    private String tokenUri;
+    private String userInfoUri;
     private String clientId;
     private String clientSecret;
     private String scope;

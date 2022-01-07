@@ -5,6 +5,7 @@ import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.engine.grpc.GrpcProperties;
 import com.sms.courier.engine.grpc.api.v1.EngineGrpc;
 import com.sms.courier.engine.grpc.api.v1.EngineGrpc.EngineStub;
+import com.sms.courier.engine.grpc.interceptor.AuthorizationServerInterceptor;
 import com.sms.courier.engine.grpc.loadbalancer.Constants;
 import com.sms.courier.engine.grpc.server.EngineRegisterServiceImpl;
 import com.sms.courier.initialize.DataInitializer;
@@ -33,7 +34,8 @@ public class EngineInitializer implements DataInitializer {
         ApplicationContextUtils.INSTANCE.setApplicationContext(applicationContext);
         EngineRegisterServiceImpl engineRegisterService = new EngineRegisterServiceImpl(applicationContext);
         GrpcProperties grpcProperties = applicationContext.getBean(GrpcProperties.class);
-        initServer(engineRegisterService, grpcProperties);
+        AuthorizationServerInterceptor interceptor = applicationContext.getBean(AuthorizationServerInterceptor.class);
+        initServer(engineRegisterService, grpcProperties, interceptor);
         GenericApplicationContext genericApplicationContext = (GenericApplicationContext) applicationContext;
         genericApplicationContext.registerBean(EngineRegisterServiceImpl.class, () -> engineRegisterService);
         genericApplicationContext.registerBean(EngineStub.class,
@@ -60,9 +62,11 @@ public class EngineInitializer implements DataInitializer {
     }
 
     @SneakyThrows
-    private void initServer(EngineRegisterServiceImpl engineRegisterService, GrpcProperties grpcProperties) {
+    private void initServer(EngineRegisterServiceImpl engineRegisterService, GrpcProperties grpcProperties,
+        AuthorizationServerInterceptor interceptor) {
         Server server = ServerBuilder.forPort(grpcProperties.getPort())
             .addService(engineRegisterService)
+            .intercept(interceptor)
             .build()
             .start();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

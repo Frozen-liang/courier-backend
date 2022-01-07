@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.data.mongodb.core.mapping.FieldType;
 
 @Data
 @NoArgsConstructor
@@ -18,11 +16,7 @@ public class DataStructureListResponse extends BaseResponse {
 
     private String name;
 
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String projectId;
-
-    @Field(targetType = FieldType.OBJECT_ID)
-    private String workspaceId;
+    private String refId;
 
     private boolean global;
 

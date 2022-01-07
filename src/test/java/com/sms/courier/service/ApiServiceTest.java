@@ -293,7 +293,7 @@ class ApiServiceTest {
         String projectId = ObjectId.get().toString();
         ApiCaseRequest apiCaseRequest = getApiCaseRequest();
         List<ApiCaseRequest> requests = List.of(apiCaseRequest);
-        when(apiRepository.findByProjectIdAndApiPathInAndRequestMethodIn(any(), any(), any()))
+        when(apiRepository.findByProjectIdAndApiPathInAndRequestMethodInAndRemovedIsFalse(any(), any(), any()))
             .thenReturn(Stream.of(ApiResponse.builder().apiPath("/v1/test").requestMethod(1).build()));
         List<ApiAndCaseResponse> result = apiService.queryByApiPathAndRequestMethod(projectId, requests);
         assertThat(result).hasSize(1);

@@ -1,6 +1,5 @@
 package com.sms.courier.entity.mongo;
 
-import com.sms.courier.common.field.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +29,4 @@ public class QueryVo {
     // 查询条件
     @Default
     private List<Optional<Criteria>> criteriaList = new ArrayList<>();
-
-    // 查询主表字段 此字段只有在不联表查询时生效 不设置则查所有
-    private List<Field> queryFields;
 }

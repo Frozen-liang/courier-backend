@@ -40,7 +40,7 @@ import com.sms.courier.common.enums.VerificationElementType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.engine.enums.EngineStatus;
-import com.sms.courier.security.oauth.AuthType;
+import com.sms.courier.security.oauth.OAuthType;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.webhook.enums.WebhookType;
 import java.time.Duration;
@@ -529,11 +529,11 @@ public class MongoCustomConverterConfiguration {
     }
 
     @ReadingConverter
-    enum IntegerToAuthTypeConverter implements Converter<Integer, AuthType> {
+    enum IntegerToAuthTypeConverter implements Converter<Integer, OAuthType> {
         INSTANCE;
 
-        public AuthType convert(@NonNull Integer code) {
-            return AuthType.getType(code);
+        public OAuthType convert(@NonNull Integer code) {
+            return OAuthType.getType(code);
         }
     }
 

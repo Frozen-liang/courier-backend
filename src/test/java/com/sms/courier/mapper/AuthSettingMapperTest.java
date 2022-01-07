@@ -2,9 +2,9 @@ package com.sms.courier.mapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sms.courier.dto.request.AuthSettingRequest;
-import com.sms.courier.dto.response.AuthSettingResponse;
-import com.sms.courier.security.oauth.AuthSettingEntity;
+import com.sms.courier.dto.request.OAuthSettingRequest;
+import com.sms.courier.dto.response.OAuthSettingResponse;
+import com.sms.courier.security.oauth.OAuthSettingEntity;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,23 +25,23 @@ class AuthSettingMapperTest {
     @Test
     @DisplayName("Test the method to convert the AuthSetting's entity object to a dto object")
     void entity_to_dto() {
-        AuthSettingEntity authSetting = AuthSettingEntity.builder()
+        OAuthSettingEntity authSetting = OAuthSettingEntity.builder()
             .scope(SCOPE)
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
             .build();
-        AuthSettingResponse authSettingResponse = authSettingMapper.toDto(authSetting);
+        OAuthSettingResponse authSettingResponse = authSettingMapper.toDto(authSetting);
         assertThat(authSettingResponse.getScope()).isEqualTo(SCOPE);
     }
 
     @Test
     @DisplayName("Test the method for converting an AuthSetting entity list object to a dto list object")
     void authSettingList_to_authSettingDtoList() {
-        List<AuthSettingEntity> authSettings = new ArrayList<>();
+        List<OAuthSettingEntity> authSettings = new ArrayList<>();
         for (int i = 0; i < SIZE; i++) {
-            authSettings.add(AuthSettingEntity.builder().scope(SCOPE).build());
+            authSettings.add(OAuthSettingEntity.builder().scope(SCOPE).build());
         }
-        List<AuthSettingResponse> authSettingResponseList = authSettingMapper.toDtoList(authSettings);
+        List<OAuthSettingResponse> authSettingResponseList = authSettingMapper.toDtoList(authSettings);
         assertThat(authSettingResponseList).hasSize(SIZE);
         assertThat(authSettingResponseList).allMatch(result -> StringUtils.equals(result.getScope(), SCOPE));
     }
@@ -49,10 +49,10 @@ class AuthSettingMapperTest {
     @Test
     @DisplayName("Test the method to convert the AuthSetting's dto object to a entity object")
     void dto_to_entity() {
-        AuthSettingRequest authSettingRequest = AuthSettingRequest.builder()
+        OAuthSettingRequest authSettingRequest = OAuthSettingRequest.builder()
             .scope(SCOPE)
             .build();
-        AuthSettingEntity authSetting = authSettingMapper.toEntity(authSettingRequest);
+        OAuthSettingEntity authSetting = authSettingMapper.toEntity(authSettingRequest);
         assertThat(authSetting.getScope()).isEqualTo(SCOPE);
     }
 

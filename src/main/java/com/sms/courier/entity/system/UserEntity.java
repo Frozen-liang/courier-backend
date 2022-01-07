@@ -34,4 +34,6 @@ public class UserEntity extends BaseEntity {
     private String groupId;
 
     private LocalDate expiredDate;
+
+    private String source;
 }

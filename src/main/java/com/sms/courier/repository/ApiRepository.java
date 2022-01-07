@@ -18,7 +18,8 @@ public interface ApiRepository extends MongoRepository<ApiEntity, String> {
 
     ApiEntity findApiEntityByIdAndRemoved(String id, boolean removed);
 
-    Stream<ApiResponse> findByProjectIdAndApiPathInAndRequestMethodIn(String projectId, List<String> apiPaths,
+    Stream<ApiResponse> findByProjectIdAndApiPathInAndRequestMethodInAndRemovedIsFalse(String projectId,
+        List<String> apiPaths,
         List<Integer> requestMethods);
 
     boolean existsByProjectIdAndApiPathAndRequestMethod(String projectId, String apiPath, RequestMethod requestMethod);

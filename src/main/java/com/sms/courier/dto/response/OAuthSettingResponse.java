@@ -12,15 +12,19 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class AuthSettingResponse extends BaseResponse {
+public class OAuthSettingResponse extends BaseResponse {
 
     private Integer authType;
 
+    private String icon;
+
     private String authUri;
 
-    private String clientId;
+    private String tokenUri;
 
-    private String clientSecret;
+    private String userInfoUri;
+
+    private String clientId;
 
     private String scope;
 

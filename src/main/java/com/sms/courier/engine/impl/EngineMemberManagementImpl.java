@@ -33,6 +33,8 @@ import com.sms.courier.engine.request.EngineMemberRequest;
 import com.sms.courier.mapper.EngineMapper;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.EngineMemberRepository;
+import com.sms.courier.security.jwt.JwtTokenManager;
+import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.List;
 import java.util.Map;
@@ -54,16 +56,19 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     private final EngineMapper engineMapper;
     private final DockerService dockerService;
     private final EngineSettingService engineSettingService;
+    private final JwtTokenManager jwtTokenManager;
 
     public EngineMemberManagementImpl(EngineMemberRepository engineMemberRepository,
         CommonRepository commonRepository,
         EngineMapper engineMapper,
-        DockerService dockerService, EngineSettingService engineSettingService) {
+        DockerService dockerService, EngineSettingService engineSettingService,
+        JwtTokenManager jwtTokenManager) {
         this.engineMemberRepository = engineMemberRepository;
         this.commonRepository = commonRepository;
         this.engineMapper = engineMapper;
         this.dockerService = dockerService;
         this.engineSettingService = engineSettingService;
+        this.jwtTokenManager = jwtTokenManager;
     }
 
     @Override
@@ -122,6 +127,8 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
             long count = engineMemberRepository.count();
             count++;
             engineSetting.setContainerName(engineSetting.getContainerName() + "-" + count);
+            engineSetting.getEnvVariable().put("TOKEN",
+                jwtTokenManager.generateAccessToken(CustomUser.createEngine(engineSetting.getContainerName())));
             dockerService.startContainer(engineMapper.toContainerSetting(engineSetting));
             return true;
         } catch (ApiTestPlatformException e) {
