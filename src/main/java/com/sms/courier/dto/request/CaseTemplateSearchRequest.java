@@ -24,5 +24,5 @@ public class CaseTemplateSearchRequest extends PageDto {
     private List<String> testStatus;
     private List<ObjectId> tagId;
     private List<Integer> priority;
-    private List<String> createUserId;
+    private List<ObjectId> createUserId;
 }
