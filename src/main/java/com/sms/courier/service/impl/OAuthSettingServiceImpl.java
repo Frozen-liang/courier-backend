@@ -57,8 +57,8 @@ public class OAuthSettingServiceImpl implements OAuthSettingService {
         log.info("AuthSettingService-add()-params: [AuthSetting]={}", authSettingRequest.toString());
         try {
             OAuthSettingEntity authSetting = authSettingMapper.toEntity(authSettingRequest);
-            Assert.isFalse(oauthSettingRepository.existsByAuthType(authSettingRequest.getAuthType()),
-                "The %s auth setting already exists!", authSettingRequest.getAuthType().name());
+            Assert.isFalse(oauthSettingRepository.existsByName(authSettingRequest.getName()),
+                "The %s already exists!", authSettingRequest.getName());
             authSetting.setClientSecret(AesUtil.encrypt(authSettingRequest.getClientSecret()));
             oauthSettingRepository.insert(authSetting);
         } catch (ApiTestPlatformException e) {
@@ -77,9 +77,9 @@ public class OAuthSettingServiceImpl implements OAuthSettingService {
         try {
             OAuthSettingEntity oldAuthSetting = oauthSettingRepository.findById(authSettingRequest.getId())
                 .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "AuthSetting", authSettingRequest.getId()));
-            Assert.isFalse(oldAuthSetting.getAuthType() != authSettingRequest.getAuthType() && oauthSettingRepository
-                    .existsByAuthType(authSettingRequest.getAuthType()),
-                "The %s auth setting already exists!", authSettingRequest.getAuthType().name());
+            Assert.isFalse(!authSettingRequest.getName().equals(oldAuthSetting.getName()) && oauthSettingRepository
+                    .existsByName(authSettingRequest.getName()),
+                "The %s already exists!", authSettingRequest.getName());
             OAuthSettingEntity authSetting = authSettingMapper.toEntity(authSettingRequest);
             if (StringUtils.isNotBlank(authSettingRequest.getClientSecret())) {
                 authSetting.setClientSecret(AesUtil.encrypt(authSettingRequest.getClientSecret()));

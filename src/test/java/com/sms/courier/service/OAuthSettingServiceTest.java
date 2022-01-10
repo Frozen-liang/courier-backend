@@ -21,7 +21,6 @@ import com.sms.courier.mapper.AuthSettingMapper;
 import com.sms.courier.mapper.AuthSettingMapperImpl;
 import com.sms.courier.repository.OAuthSettingRepository;
 import com.sms.courier.security.oauth.OAuthSettingEntity;
-import com.sms.courier.security.oauth.OAuthType;
 import com.sms.courier.service.impl.OAuthSettingServiceImpl;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,10 +36,10 @@ class OAuthSettingServiceTest {
     private final AuthSettingMapper authSettingMapper = new AuthSettingMapperImpl();
     private final OAuthSettingService oauthSettingService = new OAuthSettingServiceImpl(
         oauthSettingRepository, authSettingMapper);
-    private final OAuthSettingEntity authSetting = OAuthSettingEntity.builder().id(ID).authType(OAuthType.NERKO)
+    private final OAuthSettingEntity authSetting = OAuthSettingEntity.builder().id(ID).name("Nerko")
         .build();
     private final OAuthSettingRequest authSettingRequest = OAuthSettingRequest.builder().clientSecret("test")
-        .authType(OAuthType.NERKO)
+        .name("Nerko")
         .id(ID).build();
     private static final String ID = ObjectId.get().toString();
     private static final Integer TOTAL_ELEMENTS = 10;
@@ -66,14 +65,14 @@ class OAuthSettingServiceTest {
     @DisplayName("Test the add method in the AuthSetting service")
     public void add_test() {
         when(oauthSettingRepository.insert(any(OAuthSettingEntity.class))).thenReturn(authSetting);
-        when(oauthSettingRepository.existsByAuthType(any())).thenReturn(false);
+        when(oauthSettingRepository.existsByName(any())).thenReturn(false);
         assertThat(oauthSettingService.add(authSettingRequest)).isTrue();
     }
 
     @Test
     @DisplayName("An exception occurred while adding AuthSetting")
     public void add_exception_test() {
-        when(oauthSettingRepository.existsByAuthType(any())).thenReturn(false);
+        when(oauthSettingRepository.existsByName(any())).thenReturn(false);
         doThrow(new RuntimeException()).when(oauthSettingRepository).insert(any(OAuthSettingEntity.class));
         assertThatThrownBy(() -> oauthSettingService.add(authSettingRequest))
             .isInstanceOf(ApiTestPlatformException.class)
@@ -84,7 +83,7 @@ class OAuthSettingServiceTest {
     @DisplayName("Test the edit method in the AuthSetting service")
     public void edit_test() {
         when(oauthSettingRepository.findById(any())).thenReturn(Optional.of(authSetting));
-        when(oauthSettingRepository.existsByAuthType(any())).thenReturn(false);
+        when(oauthSettingRepository.existsByName(any())).thenReturn(false);
         when(oauthSettingRepository.save(any(OAuthSettingEntity.class))).thenReturn(authSetting);
         assertThat(oauthSettingService.edit(authSettingRequest)).isTrue();
     }
@@ -93,8 +92,7 @@ class OAuthSettingServiceTest {
     @DisplayName("An exception occurred while edit AuthSetting")
     public void edit_exception_test() {
         OAuthSettingRequest request = OAuthSettingRequest.builder().build();
-        when(oauthSettingRepository.findById(any())).thenReturn(Optional.of(OAuthSettingEntity.builder().authType(
-            OAuthType.NERKO).build()));
+        when(oauthSettingRepository.findById(any())).thenReturn(Optional.of(OAuthSettingEntity.builder().name("nerko").build()));
         doThrow(new RuntimeException()).when(oauthSettingRepository).save(any(OAuthSettingEntity.class));
         assertThatThrownBy(() -> oauthSettingService.edit(request))
             .isInstanceOf(ApiTestPlatformException.class)

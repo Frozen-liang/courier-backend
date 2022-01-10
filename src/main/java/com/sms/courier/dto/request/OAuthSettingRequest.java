@@ -2,9 +2,7 @@ package com.sms.courier.dto.request;
 
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
-import com.sms.courier.security.oauth.OAuthType;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,17 +23,20 @@ public class OAuthSettingRequest {
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The icon cannot be empty.")
     private String icon;
 
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The authType cannot be null.")
-    private OAuthType authType;
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The name cannot be empty.")
+    private String name;
 
-    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The authUri cannot be empty.")
-    private String authUri;
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The url cannot be empty.")
+    private String url;
 
-    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The tokenUri cannot be empty.")
-    private String tokenUri;
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The authPath cannot be empty.")
+    private String authPath;
 
-    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The userInfoUri cannot be empty.")
-    private String userInfoUri;
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The tokenPath cannot be empty.")
+    private String tokenPath;
+
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The userInfoPath cannot be empty.")
+    private String userInfoPath;
 
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The clientId cannot be empty.")
     private String clientId;
@@ -45,5 +46,9 @@ public class OAuthSettingRequest {
     private String clientSecret;
 
     private String scope;
+
+    private String emailKey = "email";
+
+    private String usernameKey = "username";
 
 }

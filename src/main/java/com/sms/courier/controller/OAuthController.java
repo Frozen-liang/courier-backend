@@ -4,7 +4,6 @@ import static com.sms.courier.common.constant.Constants.OAUTH;
 
 import com.sms.courier.dto.response.OAuthUrlResponse;
 import com.sms.courier.security.oauth.OAuthService;
-import com.sms.courier.security.oauth.OAuthType;
 import com.sms.courier.security.pojo.LoginResult;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,8 +21,8 @@ public class OAuthController {
     }
 
     @GetMapping("/callback")
-    public LoginResult callback(OAuthType type, String code) {
-        return oauthService.createLoginResult(type, code);
+    public LoginResult callback(String name, String code) {
+        return oauthService.createLoginResult(name, code);
     }
 
     @GetMapping("/url")

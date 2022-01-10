@@ -132,6 +132,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl:$versionJjwt")
     implementation("io.jsonwebtoken:jjwt-jackson:$versionJjwt")
     implementation("net.logstash.logback:logstash-logback-encoder:6.6")
+    implementation("com.jayway.jsonpath:json-path:2.4.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.mockito:mockito-inline:3.6.28")

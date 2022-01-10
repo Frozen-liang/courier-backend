@@ -14,19 +14,16 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class OAuthSettingResponse extends BaseResponse {
 
-    private Integer authType;
-
+    private String url;
+    private String name;
     private String icon;
-
-    private String authUri;
-
-    private String tokenUri;
-
-    private String userInfoUri;
-
+    private String authPath;
+    private String tokenPath;
+    private String userInfoPath;
     private String clientId;
-
     private String scope;
+    private String emailKey;
+    private String usernameKey;
 
 
 }
