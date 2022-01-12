@@ -21,6 +21,9 @@ import static com.sms.courier.common.exception.ErrorCode.RECOVER_SCENE_CASE_ERRO
 import static com.sms.courier.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.THE_API_TEST_CASE_NOT_EXITS_ERROR;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
@@ -42,6 +45,7 @@ import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseApiConnRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseConnRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseRequest;
+import com.sms.courier.dto.response.CaseTemplateApiResponse;
 import com.sms.courier.dto.response.DataCollectionResponse;
 import com.sms.courier.dto.response.EnvDataCollConnResponse;
 import com.sms.courier.dto.response.EnvDataCollResponse;
@@ -77,10 +81,16 @@ import com.sms.courier.service.SceneCaseApiService;
 import com.sms.courier.service.SceneCaseService;
 import com.sms.courier.service.ScheduleService;
 import com.sms.courier.utils.ExceptionUtils;
+import com.sms.courier.utils.SecurityUtil;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -114,6 +124,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private final ProjectEnvironmentMapper projectEnvironmentMapper;
     private final DataCollectionService dataCollectionService;
     private final DataCollectionMapper dataCollectionMapper;
+    private final ObjectMapper objectMapper;
 
     public SceneCaseServiceImpl(SceneCaseRepository sceneCaseRepository,
         CustomizedSceneCaseRepository customizedSceneCaseRepository,
@@ -126,7 +137,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         CaseApiCountHandler caseApiCountHandler, MatchParamInfoMapper matchParamInfoMapper,
         ScheduleService scheduleService, ProjectEnvironmentService projectEnvironmentService,
         ProjectEnvironmentMapper projectEnvironmentMapper,
-        DataCollectionService dataCollectionService, DataCollectionMapper dataCollectionMapper) {
+        DataCollectionService dataCollectionService, DataCollectionMapper dataCollectionMapper,
+        ObjectMapper objectMapper) {
         this.sceneCaseRepository = sceneCaseRepository;
         this.customizedSceneCaseRepository = customizedSceneCaseRepository;
         this.sceneCaseMapper = sceneCaseMapper;
@@ -145,6 +157,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         this.projectEnvironmentMapper = projectEnvironmentMapper;
         this.dataCollectionService = dataCollectionService;
         this.dataCollectionMapper = dataCollectionMapper;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -220,15 +233,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         try {
             SceneCaseResponse sceneCaseResponse = customizedSceneCaseRepository.findById(id).orElse(null);
             SceneCaseConnResponse dto = setSceneCaseConnDto(sceneCaseResponse);
-            List<SceneCaseApiConnResponse> responsesList = Lists.newArrayList();
-            List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiService.listBySceneCaseId(id);
-            for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
-                SceneCaseApiConnResponse response = sceneCaseApiMapper.toSceneCaseApiConnResponse(sceneCaseApi);
-                if (Objects.nonNull(sceneCaseApi.getCaseTemplateId())) {
-                    resetSceneCaseApiConn(response, sceneCaseApi);
-                }
-                responsesList.add(response);
-            }
+            List<SceneCaseApiConnResponse> responsesList = getSceneCaseApiConnResponses(id);
             return SceneTemplateResponse.builder().sceneCaseDto(dto).sceneCaseApiDtoList(responsesList).build();
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
@@ -237,6 +242,19 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             log.error("Failed to get the SceneCase conn!", e);
             throw ExceptionUtils.mpe(GET_SCENE_CASE_CONN_ERROR);
         }
+    }
+
+    private List<SceneCaseApiConnResponse> getSceneCaseApiConnResponses(String id) {
+        List<SceneCaseApiConnResponse> responsesList = Lists.newArrayList();
+        List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiService.listBySceneCaseId(id);
+        for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
+            SceneCaseApiConnResponse response = sceneCaseApiMapper.toSceneCaseApiConnResponse(sceneCaseApi);
+            if (Objects.nonNull(sceneCaseApi.getCaseTemplateId())) {
+                resetSceneCaseApiConn(response, sceneCaseApi);
+            }
+            responsesList.add(response);
+        }
+        return responsesList;
     }
 
     @Override
@@ -418,6 +436,70 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             log.error("Failed to get the SceneCase by apiId!", e);
             throw ExceptionUtils.mpe(GET_SCENE_CASE_BY_API_ID_ERROR);
         }
+    }
+
+    @Override
+    public List<SceneCaseApiConnResponse> removeRef(String id, String caseTemplateId, int order) {
+        List<SceneCaseApiEntity> sceneCaseApiEntities = sceneCaseApiRepository
+            .findBySceneCaseIdAndOrderIsGreaterThanEqualAndRemovedIsFalseOrderByOrder(id, order);
+        for (SceneCaseApiEntity sceneCaseApiEntity : sceneCaseApiEntities) {
+            if (caseTemplateId.equals(sceneCaseApiEntity.getCaseTemplateId())
+                && sceneCaseApiEntity.getOrder() == order) {
+                List<SceneCaseApiEntity> caseApiEntities = caseTemplateConvertToSceneCase(sceneCaseApiEntity);
+                order = order + caseApiEntities.size();
+                sceneCaseApiRepository.saveAll(caseApiEntities);
+                sceneCaseApiRepository.deleteById(sceneCaseApiEntity.getId());
+                continue;
+            }
+            if (order != sceneCaseApiEntity.getOrder()) {
+                sceneCaseApiEntity.setOrder(order);
+                sceneCaseApiRepository.save(sceneCaseApiEntity);
+            }
+            order++;
+        }
+        return getSceneCaseApiConnResponses(id);
+    }
+
+    private List<SceneCaseApiEntity> caseTemplateConvertToSceneCase(SceneCaseApiEntity sceneCaseApiEntity) {
+        Map<String, CaseTemplateApiConn> caseTemplateApiConnMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(sceneCaseApiEntity.getCaseTemplateApiConnList())) {
+            caseTemplateApiConnMap = sceneCaseApiEntity.getCaseTemplateApiConnList().stream()
+                .collect(Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, Function.identity()));
+        }
+
+        List<CaseTemplateApiResponse> caseTemplateApiEntities = caseTemplateApiService
+            .listResponseByCaseTemplateId(sceneCaseApiEntity.getCaseTemplateId());
+        Map<String, String> idMap = new HashMap<>();
+        int order = sceneCaseApiEntity.getOrder();
+        for (CaseTemplateApiResponse caseTemplateApiEntity : caseTemplateApiEntities) {
+            if (caseTemplateApiConnMap.containsKey(caseTemplateApiEntity.getId())) {
+                CaseTemplateApiConn caseTemplateApiConn = caseTemplateApiConnMap.get(caseTemplateApiEntity.getId());
+                caseTemplateApiEntity.setLock(caseTemplateApiConn.isLock());
+                caseTemplateApiEntity.getApiTestCase().setExecute(caseTemplateApiConn.isExecute());
+            }
+            caseTemplateApiEntity.setCaseTemplateId(sceneCaseApiEntity.getSceneCaseId());
+            caseTemplateApiEntity.setCreateUserId(SecurityUtil.getCurrUserId());
+            caseTemplateApiEntity.setCreateDateTime(LocalDateTime.now());
+            caseTemplateApiEntity.setOrder(order);
+            String newId = ObjectId.get().toString();
+            idMap.put(caseTemplateApiEntity.getId(), newId);
+            caseTemplateApiEntity.setId(newId);
+            order++;
+        }
+        try {
+            String json = objectMapper.writeValueAsString(caseTemplateApiEntities);
+            for (Entry<String, String> entry : idMap.entrySet()) {
+                json = json.replace(entry.getKey(), entry.getValue());
+            }
+            List<CaseTemplateApiResponse> caseTemplateApiResponses = objectMapper
+                .readValue(json, new TypeReference<>() {
+                });
+            return caseTemplateApiMapper
+                .toSceneCaseApiEntityByResponseList(caseTemplateApiResponses);
+        } catch (JsonProcessingException e) {
+            log.error("Convert case template api to scene case api error!", e);
+        }
+        return Collections.emptyList();
     }
 
     private SceneCaseConnResponse setSceneCaseConnDto(SceneCaseResponse sceneCaseResponse) {

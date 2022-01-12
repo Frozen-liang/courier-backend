@@ -7,6 +7,7 @@ import com.sms.courier.dto.request.AddSceneCaseRequest;
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseConnRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseRequest;
+import com.sms.courier.dto.response.SceneCaseApiConnResponse;
 import com.sms.courier.dto.response.SceneCaseResponse;
 import com.sms.courier.dto.response.SceneTemplateResponse;
 import com.sms.courier.service.SceneCaseService;
@@ -98,6 +99,12 @@ public class SceneCaseController {
     @GetMapping("/{apiId}")
     public List<SceneCaseResponse> getByApiId(@PathVariable String apiId) {
         return sceneCaseService.getByApiId(apiId);
+    }
+
+    @PutMapping("/removeRef")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_API_CRE_UPD_DEL)")
+    public List<SceneCaseApiConnResponse> removeRef(String id, String caseTemplateId, Integer order) {
+        return sceneCaseService.removeRef(id, caseTemplateId, order);
     }
 
 }

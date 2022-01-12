@@ -6,6 +6,7 @@ import com.sms.courier.dto.request.AddSceneCaseRequest;
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseConnRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseRequest;
+import com.sms.courier.dto.response.SceneCaseApiConnResponse;
 import com.sms.courier.dto.response.SceneCaseResponse;
 import com.sms.courier.dto.response.SceneTemplateResponse;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
@@ -38,4 +39,6 @@ public interface SceneCaseService {
     Boolean recover(List<String> ids);
 
     List<SceneCaseResponse> getByApiId(String apiId);
+
+    List<SceneCaseApiConnResponse> removeRef(String id, String caseTemplateId, int order);
 }

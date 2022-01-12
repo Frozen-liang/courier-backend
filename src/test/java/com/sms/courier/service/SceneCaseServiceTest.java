@@ -13,9 +13,12 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.AddCaseTemplateApi;
@@ -55,12 +58,16 @@ import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
 import com.sms.courier.repository.SceneCaseRepository;
 import com.sms.courier.service.impl.SceneCaseServiceImpl;
+import com.sms.courier.utils.SecurityUtil;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.bson.types.ObjectId;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -89,6 +96,7 @@ class SceneCaseServiceTest {
     private ProjectEnvironmentMapper projectEnvironmentMapper;
     private DataCollectionService dataCollectionService;
     private DataCollectionMapper dataCollectionMapper;
+    private ObjectMapper objectMapper = mock(ObjectMapper.class);
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -98,6 +106,7 @@ class SceneCaseServiceTest {
     private final static Integer MOCK_PAGE = 1;
     private final static Integer MOCK_SIZE = 1;
     private final static long MOCK_TOTAL = 1L;
+    private final static MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
 
     @BeforeEach
     void setBean() {
@@ -129,8 +138,19 @@ class SceneCaseServiceTest {
             sceneCaseApiMapper, caseTemplateApiMapper,
             caseApiCountHandler, matchParamInfoMapper,
             scheduleService, projectEnvironmentService, projectEnvironmentMapper, dataCollectionService,
-            dataCollectionMapper);
+            dataCollectionMapper, objectMapper);
     }
+
+    static {
+        SECURITY_UTIL_MOCKED_STATIC = mockStatic(SecurityUtil.class);
+        SECURITY_UTIL_MOCKED_STATIC.when(SecurityUtil::getCurrUserId).thenReturn(ObjectId.get().toString());
+    }
+
+    @AfterAll
+    public static void close() {
+        SECURITY_UTIL_MOCKED_STATIC.close();
+    }
+
 
     @Test
     @DisplayName("Test the add method in the SceneCase service")
@@ -521,10 +541,11 @@ class SceneCaseServiceTest {
     @Test
     @DisplayName("Test the getByApiId method in the SceneCase service")
     void getByApiId_thenRight() {
-        List<SceneCaseApiEntity> entityList = Lists.newArrayList(SceneCaseApiEntity.builder().sceneCaseId(MOCK_ID).build());
+        List<SceneCaseApiEntity> entityList = Lists
+            .newArrayList(SceneCaseApiEntity.builder().sceneCaseId(MOCK_ID).build());
         when(customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(any())).thenReturn(entityList);
         List<SceneCaseEntity> sceneCaseEntityList = Lists.newArrayList(SceneCaseEntity.builder().id(MOCK_ID).build());
-        when(sceneCaseRepository.findByIdInAndRemoved(any(),any(Boolean.class))).thenReturn(sceneCaseEntityList);
+        when(sceneCaseRepository.findByIdInAndRemoved(any(), any(Boolean.class))).thenReturn(sceneCaseEntityList);
         SceneCaseResponse response = SceneCaseResponse.builder().id(MOCK_ID).build();
         when(sceneCaseMapper.toDto(any())).thenReturn(response);
         List<SceneCaseResponse> responses = sceneCaseService.getByApiId(MOCK_ID);
@@ -544,8 +565,31 @@ class SceneCaseServiceTest {
     @DisplayName("Test the getByApiId method in the SceneCase service thrown exception")
     void getByApiId_thenRight_thrownException() {
         when(customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(any())).thenThrow(new RuntimeException());
-        assertThatThrownBy(()->sceneCaseService.getByApiId(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
+        assertThatThrownBy(() -> sceneCaseService.getByApiId(MOCK_ID)).isInstanceOf(ApiTestPlatformException.class);
     }
+
+    @Test
+    @DisplayName("Test the removeRef method in the SceneCase service")
+    void removeRef_thenRight() throws JsonProcessingException {
+        String sceneCaseId = ObjectId.get().toString();
+        String caseTemplateId = ObjectId.get().toString();
+        String id = ObjectId.get().toString();
+        int order = 1;
+        when(sceneCaseApiRepository
+            .findBySceneCaseIdAndOrderIsGreaterThanEqualAndRemovedIsFalseOrderByOrder(sceneCaseId, order))
+            .thenReturn(List.of(SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).order(1).caseTemplateId(caseTemplateId)
+                    .apiTestCase(ApiTestCaseEntity.builder().build())
+                    .caseTemplateApiConnList(List.of(CaseTemplateApiConn.builder().caseTemplateApiId(id).build())).build(),
+                SceneCaseApiEntity.builder().order(2).build()));
+        when(caseTemplateApiService.listResponseByCaseTemplateId(caseTemplateId))
+            .thenReturn(List.of(CaseTemplateApiResponse.builder().id(ObjectId.get().toString()).build()));
+        when(objectMapper.writeValueAsString(any())).thenReturn("[]");
+        when(sceneCaseApiService.listBySceneCaseId(sceneCaseId)).thenReturn(Collections.emptyList());
+        List<SceneCaseApiConnResponse> result = sceneCaseService
+            .removeRef(sceneCaseId, caseTemplateId, order);
+        assertThat(result).isEmpty();
+    }
+
 
     private AddCaseTemplateConnRequest getAddConnRequest() {
         return AddCaseTemplateConnRequest.builder()
