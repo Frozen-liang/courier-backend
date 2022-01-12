@@ -196,6 +196,11 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
+    public SceneCaseApiEntity findById(String id) {
+        return sceneCaseApiRepository.findById(id).orElse(null);
+    }
+
+    @Override
     public Boolean updateStatusByApiIds(List<String> ids, ApiBindingStatus apiBindingStatus) {
         try {
             List<SceneCaseApiEntity> sceneCaseApiList = customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(ids);
@@ -215,6 +220,11 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     @Override
     public Long deleteAllBySceneCaseIds(List<String> ids) {
         return sceneCaseApiRepository.deleteAllBySceneCaseIdIsIn(ids);
+    }
+
+    @Override
+    public boolean existsByCaseTemplateId(List<String> caseTemplateIds) {
+        return sceneCaseApiRepository.existsByCaseTemplateIdInAndRemovedIsFalse(caseTemplateIds);
     }
 
 }

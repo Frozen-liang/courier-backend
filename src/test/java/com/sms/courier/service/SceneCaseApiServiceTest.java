@@ -1,5 +1,21 @@
 package com.sms.courier.service;
 
+import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.BATCH_EDIT_SCENE_CASE_API_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_API_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_API_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_API_BY_ID_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
+
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.AddSceneCaseApiRequest;
@@ -19,25 +35,8 @@ import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
-
-import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.BATCH_EDIT_SCENE_CASE_API_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_API_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_API_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_API_BY_ID_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Test cases for SceneCaseApiServiceTest")
 class SceneCaseApiServiceTest {
@@ -241,6 +240,14 @@ class SceneCaseApiServiceTest {
         when(sceneCaseApiRepository.deleteAllBySceneCaseIdIsIn(any())).thenReturn(1L);
         sceneCaseApiService.deleteAllBySceneCaseIds(List.of(MOCK_ID));
         verify(sceneCaseApiRepository, times(1)).deleteAllBySceneCaseIdIsIn(any());
+    }
+
+    @Test
+    @DisplayName("Test the existsByCaseTemplateId method in the SceneCaseApi service")
+    void existsByCaseTemplateId_test() {
+        when(sceneCaseApiRepository.existsByCaseTemplateIdInAndRemovedIsFalse(any())).thenReturn(true);
+        boolean result = sceneCaseApiService.existsByCaseTemplateId(List.of(MOCK_ID));
+        assertThat(result).isTrue();
     }
 
     private BatchUpdateSceneCaseApiRequest getUpdateSortOrder() {

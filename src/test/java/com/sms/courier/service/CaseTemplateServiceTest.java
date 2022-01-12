@@ -1,5 +1,22 @@
 package com.sms.courier.service;
 
+import static com.sms.courier.common.exception.ErrorCode.ADD_CASE_TEMPLATE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.GET_CASE_TEMPLATE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.RECOVER_CASE_TEMPLATE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.wildfly.common.Assert.assertTrue;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.sms.courier.common.exception.ApiTestPlatformException;
@@ -15,7 +32,6 @@ import com.sms.courier.dto.response.CaseTemplateConnResponse;
 import com.sms.courier.dto.response.CaseTemplateDetailResponse;
 import com.sms.courier.dto.response.CaseTemplateResponse;
 import com.sms.courier.dto.response.IdResponse;
-import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
@@ -44,22 +60,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
-import static com.sms.courier.common.exception.ErrorCode.ADD_CASE_TEMPLATE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.DELETE_CASE_TEMPLATE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.EDIT_CASE_TEMPLATE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.GET_CASE_TEMPLATE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.RECOVER_CASE_TEMPLATE_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.SEARCH_CASE_TEMPLATE_ERROR;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.wildfly.common.Assert.assertTrue;
 
 @DisplayName("Test cases for CaseTemplateServiceTest")
 class CaseTemplateServiceTest {
@@ -146,10 +146,8 @@ class CaseTemplateServiceTest {
         CaseTemplateEntity caseTemplate = CaseTemplateEntity.builder().build();
         when(caseTemplateMapper.toCaseTemplateBySceneCase(any())).thenReturn(caseTemplate);
         when(caseTemplateRepository.insert(any(CaseTemplateEntity.class))).thenReturn(caseTemplate);
-        List<SceneCaseApiEntity> sceneCaseApiList =
-            Lists.newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).order(MOCK_SIZE).build(),
-                SceneCaseApiEntity.builder().id(MOCK_ID).order(MOCK_SIZE).caseTemplateId(MOCK_ID).build());
-        when(sceneCaseApiService.listBySceneCaseId(any())).thenReturn(sceneCaseApiList);
+        when(sceneCaseApiService.findById(anyString()))
+            .thenReturn(SceneCaseApiEntity.builder().id(MOCK_ID).order(MOCK_SIZE).build());
         CaseTemplateApiEntity caseTemplateApi = CaseTemplateApiEntity.builder().id(MOCK_ID).order(MOCK_PAGE).build();
         when(caseTemplateApiMapper.toCaseTemplateApiBySceneCaseApi(any())).thenReturn(caseTemplateApi);
         List<CaseTemplateApiEntity> templateApiList = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
@@ -157,7 +155,9 @@ class CaseTemplateServiceTest {
             .thenReturn(templateApiList);
         when(caseTemplateApiRepository.insert(any(List.class))).thenReturn(templateApiList);
         IdResponse response =
-            caseTemplateService.add(ConvertCaseTemplateRequest.builder().sceneCaseId(MOCK_ID).groupId(MOCK_ID).build());
+            caseTemplateService.add(
+                ConvertCaseTemplateRequest.builder().sceneCaseId(MOCK_ID).caseIds(List.of(ObjectId.get().toString()))
+                    .groupId(MOCK_ID).build());
         assertThat(response).isNotNull();
     }
 
@@ -356,6 +356,7 @@ class CaseTemplateServiceTest {
     @Test
     @DisplayName("Test the delete method in the CaseTemplate service")
     void delete_test() {
+        when(sceneCaseApiService.existsByCaseTemplateId(any())).thenReturn(false);
         when(customizedCaseTemplateRepository.deleteByIds(any())).thenReturn(Boolean.TRUE);
         List<CaseTemplateApiEntity> caseTemplateApiEntityList = Lists.newArrayList(getCaseTemplateApiEntity());
         when(customizedCaseTemplateApiRepository.findCaseTemplateApiIdsByCaseTemplateIds(any()))
@@ -368,6 +369,7 @@ class CaseTemplateServiceTest {
     @Test
     @DisplayName("Test the delete method in the CaseTemplate service thrown exception")
     void delete_test_throwApiException() {
+        when(sceneCaseApiService.existsByCaseTemplateId(any())).thenReturn(false);
         when(customizedCaseTemplateRepository.deleteByIds(any()))
             .thenThrow(new ApiTestPlatformException(DELETE_CASE_TEMPLATE_ERROR));
         assertThatThrownBy(() -> caseTemplateService.delete(Lists.newArrayList(MOCK_ID)))
@@ -377,6 +379,7 @@ class CaseTemplateServiceTest {
     @Test
     @DisplayName("Test the delete method in the CaseTemplate service thrown exception")
     void delete_test_throwException() {
+        when(sceneCaseApiService.existsByCaseTemplateId(any())).thenReturn(false);
         when(customizedCaseTemplateRepository.deleteByIds(any()))
             .thenThrow(new RuntimeException());
         assertThatThrownBy(() -> caseTemplateService.delete(Lists.newArrayList(MOCK_ID)))

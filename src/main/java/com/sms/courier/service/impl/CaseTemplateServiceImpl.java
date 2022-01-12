@@ -69,6 +69,7 @@ import com.sms.courier.service.CaseTemplateService;
 import com.sms.courier.service.DataCollectionService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.SceneCaseApiService;
+import com.sms.courier.utils.Assert;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -164,7 +165,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
 
     @Override
     @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE,
-        template = "{{#convertCaseTemplateRequest.sceneCaseName}}")
+        template = "{{#convertCaseTemplateRequest.templateName}}")
     public IdResponse add(ConvertCaseTemplateRequest convertCaseTemplateRequest) {
         try {
             SceneCaseEntity sceneCase =
@@ -172,13 +173,15 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
                     .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_BY_ID_ERROR));
             CaseTemplateEntity caseTemplate = caseTemplateMapper.toCaseTemplateBySceneCase(sceneCase);
             caseTemplate.setGroupId(convertCaseTemplateRequest.getGroupId());
+            caseTemplate.setName(convertCaseTemplateRequest.getTemplateName());
             caseTemplateRepository.insert(caseTemplate);
-            List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiService
-                .listBySceneCaseId(convertCaseTemplateRequest.getSceneCaseId());
-
             List<CaseTemplateApiEntity> caseTemplateApiList = Lists.newArrayList();
             Integer index = 0;
-            for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
+            for (String id : convertCaseTemplateRequest.getCaseIds()) {
+                SceneCaseApiEntity sceneCaseApi = sceneCaseApiService.findById(id);
+                if (Objects.isNull(sceneCaseApi)) {
+                    continue;
+                }
                 if (Objects.isNull(sceneCaseApi.getCaseTemplateId())) {
                     CaseTemplateApiEntity caseTemplateApi =
                         caseTemplateApiMapper.toCaseTemplateApiBySceneCaseApi(sceneCaseApi);
@@ -315,17 +318,18 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
 
     @Override
     @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE,
-        template = "{{#res?.![#this.name]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        template = "{{#result.name]}}",
+        enhance = @Enhance(enable = true))
     public Boolean delete(List<String> ids) {
         try {
+            Assert.isFalse(sceneCaseApiService.existsByCaseTemplateId(ids),
+                "The case template cannot be deleted when has reference! ");
             customizedCaseTemplateRepository.deleteByIds(ids);
             List<CaseTemplateApiEntity> caseTemplateApiEntityList = customizedCaseTemplateApiRepository
                 .findCaseTemplateApiIdsByCaseTemplateIds(ids);
             if (CollectionUtils.isNotEmpty(caseTemplateApiEntityList)) {
                 List<String> caseTemplateApiIds =
-                    caseTemplateApiEntityList.stream().map(CaseTemplateApiEntity::getId).collect(
-                        Collectors.toList());
+                    caseTemplateApiEntityList.stream().map(CaseTemplateApiEntity::getId).collect(Collectors.toList());
                 customizedCaseTemplateApiRepository.deleteByIds(caseTemplateApiIds);
                 caseApiCountHandler.deleteTemplateCaseByCaseTemplateApiIds(caseTemplateApiIds);
             }
