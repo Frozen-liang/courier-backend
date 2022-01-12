@@ -13,6 +13,11 @@ public interface SceneCaseApiRepository extends MongoRepository<SceneCaseApiEnti
     List<SceneCaseApiEntity> findSceneCaseApiEntitiesBySceneCaseIdAndRemovedOrderByOrder(String sceneCaseId,
         boolean removed);
 
+    List<SceneCaseApiEntity> findBySceneCaseIdAndOrderIsGreaterThanEqualAndRemovedIsFalseOrderByOrder(
+        String sceneCaseId, int order);
+
     Long deleteAllBySceneCaseIdIsIn(List<String> ids);
+
+    boolean existsByCaseTemplateIdInAndRemovedIsFalse(List<String> caseTemplateIds);
 
 }
