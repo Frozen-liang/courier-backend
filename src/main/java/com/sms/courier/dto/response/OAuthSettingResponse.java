@@ -25,5 +25,4 @@ public class OAuthSettingResponse extends BaseResponse {
     private String emailKey;
     private String usernameKey;
 
-
 }

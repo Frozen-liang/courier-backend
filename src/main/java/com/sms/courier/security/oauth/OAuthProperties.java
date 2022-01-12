@@ -12,6 +12,6 @@ public class OAuthProperties {
     private String redirectUri;
 
     public String getRedirectUri(String name) {
-        return redirectUri + "?type=" + name;
+        return redirectUri + "?name=" + name;
     }
 }
