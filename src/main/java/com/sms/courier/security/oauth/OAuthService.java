@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface OAuthService {
 
-    LoginResult createLoginResult(OAuthType type, String code);
+    LoginResult createLoginResult(String name, String code);
 
     List<OAuthUrlResponse> getOAuthUrl();
 }
