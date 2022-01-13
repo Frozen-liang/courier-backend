@@ -275,6 +275,7 @@ class CaseTemplateApiMapperTest {
     void toEntityByResponseList_Test_thenRight() {
         List<CaseTemplateApiEntity> entityList = caseTemplateApiMapper
             .toEntityByResponseList(Lists.newArrayList(response));
+        // 增加一行代码
         assertThat(entityList).isNotEmpty();
     }
 
