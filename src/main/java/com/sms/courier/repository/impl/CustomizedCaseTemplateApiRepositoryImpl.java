@@ -6,6 +6,7 @@ import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedCaseTemplateApiRepository;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -48,6 +49,17 @@ public class CustomizedCaseTemplateApiRepositoryImpl implements CustomizedCaseTe
     @Override
     public Boolean recover(List<String> caseTemplateApiIds) {
         return commonRepository.recover(caseTemplateApiIds, CaseTemplateApiEntity.class);
+    }
+
+    @Override
+    public List<String> findCaseTemplateIdByApiIds(List<String> apiIds) {
+        Query query = new Query();
+        query.fields().include(SceneField.CASE_TEMPLATE_ID.getName());
+        SceneField.API_ID.in(apiIds).ifPresent(query::addCriteria);
+        CommonField.REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
+        return mongoTemplate.find(query, CaseTemplateApiEntity.class).stream()
+            .map(CaseTemplateApiEntity::getCaseTemplateId).distinct().collect(
+                Collectors.toList());
     }
 
 }

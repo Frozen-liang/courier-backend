@@ -53,6 +53,7 @@ import com.sms.courier.mapper.ProjectEnvironmentMapper;
 import com.sms.courier.mapper.SceneCaseApiMapper;
 import com.sms.courier.mapper.SceneCaseMapper;
 import com.sms.courier.repository.ApiTestCaseRepository;
+import com.sms.courier.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
@@ -97,6 +98,7 @@ class SceneCaseServiceTest {
     private DataCollectionService dataCollectionService;
     private DataCollectionMapper dataCollectionMapper;
     private ObjectMapper objectMapper = mock(ObjectMapper.class);
+    private CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -128,6 +130,7 @@ class SceneCaseServiceTest {
         projectEnvironmentMapper = mock(ProjectEnvironmentMapper.class);
         dataCollectionService = mock(DataCollectionService.class);
         dataCollectionMapper = mock(DataCollectionMapper.class);
+        customizedCaseTemplateApiRepository = mock(CustomizedCaseTemplateApiRepository.class);
         sceneCaseService = new SceneCaseServiceImpl(sceneCaseRepository,
             customizedSceneCaseRepository,
             sceneCaseMapper, sceneCaseApiService,
@@ -138,7 +141,7 @@ class SceneCaseServiceTest {
             sceneCaseApiMapper, caseTemplateApiMapper,
             caseApiCountHandler, matchParamInfoMapper,
             scheduleService, projectEnvironmentService, projectEnvironmentMapper, dataCollectionService,
-            dataCollectionMapper, objectMapper);
+            dataCollectionMapper, objectMapper, customizedCaseTemplateApiRepository);
     }
 
     static {
