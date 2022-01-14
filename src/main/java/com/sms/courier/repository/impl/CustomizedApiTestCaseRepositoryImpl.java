@@ -128,6 +128,7 @@ public class CustomizedApiTestCaseRepositoryImpl implements CustomizedApiTestCas
         list.add(PROJECT_ID.is(request.getProjectId()));
         list.add(STATUS.is(request.getStatus()));
         list.add(REMOVE.is(false));
+        list.add(CREATE_USER_ID.in(request.getCreateUserId()));
         query.setCriteriaList(list);
         return commonRepository.page(query, request, ApiTestCasePageResponse.class);
     }
