@@ -69,6 +69,7 @@ import com.sms.courier.mapper.ProjectEnvironmentMapper;
 import com.sms.courier.mapper.SceneCaseApiMapper;
 import com.sms.courier.mapper.SceneCaseMapper;
 import com.sms.courier.repository.ApiTestCaseRepository;
+import com.sms.courier.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
@@ -125,6 +126,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private final DataCollectionService dataCollectionService;
     private final DataCollectionMapper dataCollectionMapper;
     private final ObjectMapper objectMapper;
+    private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
 
     public SceneCaseServiceImpl(SceneCaseRepository sceneCaseRepository,
         CustomizedSceneCaseRepository customizedSceneCaseRepository,
@@ -138,7 +140,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         ScheduleService scheduleService, ProjectEnvironmentService projectEnvironmentService,
         ProjectEnvironmentMapper projectEnvironmentMapper,
         DataCollectionService dataCollectionService, DataCollectionMapper dataCollectionMapper,
-        ObjectMapper objectMapper) {
+        ObjectMapper objectMapper,
+        CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository) {
         this.sceneCaseRepository = sceneCaseRepository;
         this.customizedSceneCaseRepository = customizedSceneCaseRepository;
         this.sceneCaseMapper = sceneCaseMapper;
@@ -158,6 +161,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         this.dataCollectionService = dataCollectionService;
         this.dataCollectionMapper = dataCollectionMapper;
         this.objectMapper = objectMapper;
+        this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
     }
 
     @Override
@@ -426,6 +430,11 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                     .map(SceneCaseApiEntity::getSceneCaseId)
                     .distinct()
                     .collect(Collectors.toList());
+            List<String> caseTemplateId =
+                customizedCaseTemplateApiRepository.findCaseTemplateIdByApiIds(Lists.newArrayList(apiId));
+            List<String> templateSceneId =
+                customizedSceneCaseApiRepository.findSceneCaseIdByCaseTemplateIds(caseTemplateId);
+            sceneCaseId.addAll(templateSceneId);
             if (CollectionUtils.isNotEmpty(sceneCaseId)) {
                 return sceneCaseRepository.findByIdInAndRemoved(sceneCaseId, Boolean.FALSE).stream()
                     .map(sceneCaseMapper::toDto).collect(

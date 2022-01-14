@@ -3,11 +3,13 @@ package com.sms.courier.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
 
 import com.mongodb.client.result.UpdateResult;
+import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.repository.impl.CustomizedSceneCaseApiRepositoryImpl;
@@ -82,6 +84,17 @@ class CustomizedSceneCaseApiRepositoryTest {
         long count = customizedSceneCaseApiRepository
             .findCountByCaseTemplateIdAndNowProjectId(new ObjectId(), new ObjectId(), Boolean.TRUE);
         assertThat(count).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("Test the findSceneCaseIdByCaseTemplateIds method in the CustomizedSceneCaseApiRepository")
+    void findSceneCaseIdByCaseTemplateIds() {
+        List<SceneCaseApiEntity> apiEntityList =
+            Lists.newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).caseTemplateId(MOCK_ID).build());
+        when(mongoTemplate.find(any(), eq(SceneCaseApiEntity.class))).thenReturn(apiEntityList);
+        List<String> ids = customizedSceneCaseApiRepository
+            .findSceneCaseIdByCaseTemplateIds(Lists.newArrayList(MOCK_ID));
+        assertThat(ids).isNotEmpty();
     }
 
 }

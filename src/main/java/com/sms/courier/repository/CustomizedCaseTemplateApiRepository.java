@@ -14,4 +14,5 @@ public interface CustomizedCaseTemplateApiRepository {
 
     Boolean recover(List<String> caseTemplateApiIds);
 
+    List<String> findCaseTemplateIdByApiIds(List<String> apiIds);
 }

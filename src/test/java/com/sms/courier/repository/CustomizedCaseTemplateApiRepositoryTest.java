@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
@@ -50,7 +51,7 @@ class CustomizedCaseTemplateApiRepositoryTest {
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedCaseTemplateApiRepository")
     void deleteByIds_test() {
-        when(commonRepository.deleteByIds(any(),any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.deleteByIds(any(), any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = customizedCaseTemplateApiRepository.deleteByIds(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
     }
@@ -58,9 +59,19 @@ class CustomizedCaseTemplateApiRepositoryTest {
     @Test
     @DisplayName("Test the deleteByIds method in the CustomizedCaseTemplateApiRepository")
     void recover_test() {
-        when(commonRepository.recover(any(),any())).thenReturn(Boolean.TRUE);
+        when(commonRepository.recover(any(), any())).thenReturn(Boolean.TRUE);
         Boolean isSuccess = customizedCaseTemplateApiRepository.recover(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the findCaseTemplateIdByApiIds method in the CustomizedCaseTemplateApiRepository")
+    void findCaseTemplateIdByApiIds_test() {
+        List<CaseTemplateApiEntity> apiEntityList =
+            Lists.newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID).caseTemplateId(MOCK_ID).build());
+        when(mongoTemplate.find(any(),eq(CaseTemplateApiEntity.class))).thenReturn(apiEntityList);
+        List<String> ids = customizedCaseTemplateApiRepository.findCaseTemplateIdByApiIds(Lists.newArrayList(MOCK_ID));
+        assertThat(ids).isNotEmpty();
     }
 
 }
