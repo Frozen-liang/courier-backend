@@ -88,4 +88,16 @@ public class CustomizedSceneCaseApiRepositoryImpl implements CustomizedSceneCase
         return mongoTemplate.count(query, "SceneCaseApi");
     }
 
+    @Override
+    public List<String> findSceneCaseIdByCaseTemplateIds(List<String> caseTemplateIds) {
+        Query query = new Query();
+        query.fields().include(SceneField.SCENE_CASE_ID.getName());
+        SceneField.CASE_TEMPLATE_ID.in(caseTemplateIds).ifPresent(query::addCriteria);
+        CommonField.REMOVE.is(Boolean.FALSE).ifPresent(query::addCriteria);
+        return mongoTemplate.find(query, SceneCaseApiEntity.class).stream()
+            .map(SceneCaseApiEntity::getSceneCaseId)
+            .distinct()
+            .collect(Collectors.toList());
+    }
+
 }

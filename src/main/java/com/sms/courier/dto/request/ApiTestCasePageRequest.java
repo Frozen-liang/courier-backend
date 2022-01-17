@@ -22,4 +22,5 @@ public class ApiTestCasePageRequest extends PageDto {
     private List<String> tagId;
     private ApiBindingStatus status;
     private ObjectId apiId;
+    private List<ObjectId> createUserId;
 }
