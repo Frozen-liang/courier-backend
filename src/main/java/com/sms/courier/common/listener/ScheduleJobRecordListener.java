@@ -16,6 +16,9 @@ import com.sms.courier.common.listener.event.TestReportEvent;
 import com.sms.courier.entity.schedule.ScheduleEntity;
 import com.sms.courier.entity.schedule.ScheduleRecordEntity;
 import com.sms.courier.utils.DateUtil;
+import com.sms.courier.webhook.WebhookEvent;
+import com.sms.courier.webhook.enums.WebhookType;
+import com.sms.courier.webhook.response.WebhookScheduleResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -92,6 +95,16 @@ public class ScheduleJobRecordListener {
                 .projectId(scheduleEntity.getProjectId())
                 .build();
             applicationEventPublisher.publishEvent(testReportEvent);
+            publisherWebhook(scheduleRecord);
         }
+    }
+
+    private void publisherWebhook(ScheduleRecordEntity scheduleRecord) {
+        WebhookScheduleResponse webhookScheduleResponse = WebhookScheduleResponse.builder()
+            .id(scheduleRecord.getScheduleId())
+            .name(scheduleRecord.getScheduleName()).success(scheduleRecord.getSuccess())
+            .fail(scheduleRecord.getFail()).build();
+        applicationEventPublisher
+            .publishEvent(WebhookEvent.create(WebhookType.SCHEDULE, webhookScheduleResponse));
     }
 }

@@ -2,6 +2,9 @@ package com.sms.courier.mapper;
 
 import static com.sms.courier.common.constant.TimePatternConstant.DEFAULT_PATTERN;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.courier.chat.common.NotificationTemplateType;
 import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.enums.ResultType;
@@ -37,7 +40,9 @@ import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.utils.EnumCommonUtils;
 import com.sms.courier.webhook.response.WebhookCaseJobResponse;
+import com.sms.courier.webhook.response.WebhookCaseReportResponse;
 import com.sms.courier.webhook.response.WebhookSceneCaseJobResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import org.mapstruct.InjectionStrategy;
@@ -167,11 +172,32 @@ public interface JobMapper {
     @Mapping(target = "type", expression = "java(NotificationTemplateType.TEST_REPORT)")
     TestReportEvent toTestReportEvent(SceneCaseJobEntity jobEntity, List<CaseReport> caseReports);
 
+    @Mapping(target = "caseReportList", expression = "java(this.toJsonString(jobReport.getCaseReportList()))")
     WebhookSceneCaseJobResponse toWebhookSceneCaseJobResponse(SceneCaseJobReport jobReport);
+
+    @Mapping(target = "requestHeader",
+        expression = "java(this.toJsonString(caseReport.getRequestHeader()))")
+    @Mapping(target = "responseHeader",
+        expression = "java(this.toJsonString(caseReport.getResponseHeader()))")
+    WebhookCaseReportResponse toWebhookCaseReportResponse(CaseReport caseReport) throws IOException;
 
     default String getDataName(JobEntity jobEntity) {
         if (Objects.nonNull(jobEntity) && Objects.nonNull(jobEntity.getDataCollection())) {
             return jobEntity.getDataCollection().getTestData().getDataName();
+        }
+        return "";
+    }
+
+    ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    default String toJsonString(Object obj) {
+        OBJECT_MAPPER.setSerializationInclusion(Include.NON_NULL);
+        try {
+            if (Objects.nonNull(obj)) {
+                return OBJECT_MAPPER.writeValueAsString(obj);
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
         return "";
     }

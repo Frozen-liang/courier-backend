@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface WebhookRepository extends MongoRepository<WebhookEntity, String> {
 
-    List<WebhookEntity> findByWebhookTypeContains(Integer webHookType);
+    List<WebhookEntity> findByWebhookType(Integer webHookType);
 
     void deleteByIdIn(List<String> ids);
 }

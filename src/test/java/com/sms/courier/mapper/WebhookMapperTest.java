@@ -3,7 +3,10 @@ package com.sms.courier.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.courier.dto.request.WebhookRequest;
+import com.sms.courier.dto.response.WebhookTypeResponse;
 import com.sms.courier.webhook.model.WebhookEntity;
+import com.sms.courier.webhook.model.WebhookTypeEntity;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -21,6 +24,15 @@ class WebhookMapperTest {
             .build();
         WebhookEntity webhook = webhookMapper.toEntity(webhookRequest);
         assertThat(webhook.getUrl()).isEqualTo(URL);
+    }
+
+    @Test
+    @DisplayName("Test the method to convert the WebhookType entity object to a dto object")
+    void toWebhookType_test() {
+        WebhookTypeEntity webhookTypeEntity = new WebhookTypeEntity();
+        webhookTypeEntity.setName("type");
+        List<WebhookTypeResponse> webhookTypeResponses = webhookMapper.toWebhookType(List.of(webhookTypeEntity));
+        assertThat(webhookTypeResponses).isNullOrEmpty();
     }
 
 }

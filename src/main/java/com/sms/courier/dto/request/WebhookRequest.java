@@ -3,7 +3,6 @@ package com.sms.courier.dto.request;
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.webhook.enums.WebhookType;
-import java.util.List;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Null;
 import lombok.AllArgsConstructor;
@@ -26,5 +25,5 @@ public class WebhookRequest {
 
     private String description;
 
-    private List<WebhookType> webhookType;
+    private WebhookType webhookType;
 }

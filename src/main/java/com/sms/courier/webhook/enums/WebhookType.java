@@ -7,11 +7,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public enum WebhookType implements EnumCommon {
-    API_ADD(0),
-    API_UPDATE(1),
-    API_DELETE(2),
-    CASE_REPORT(3),
-    SCENE_CASE_REPORT(4);
+    CASE_REPORT(0),
+    SCENE_CASE_REPORT(1),
+    SCHEDULE(2);
 
     private final Integer code;
     private static final Map<Integer, WebhookType> MAPPINGS =

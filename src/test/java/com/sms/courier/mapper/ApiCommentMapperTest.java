@@ -1,13 +1,18 @@
 package com.sms.courier.mapper;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.courier.dto.request.ApiCommentRequest;
 import com.sms.courier.dto.response.ApiCommentResponse;
 import com.sms.courier.entity.api.ApiCommentEntity;
+import com.sms.courier.utils.MustacheUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,14 +29,19 @@ class ApiCommentMapperTest {
 
     @Test
     @DisplayName("Test the method to convert the ApiComment's entity object to a dto object")
-    void entity_to_dto() throws InterruptedException {
-        ApiCommentEntity apiComment = ApiCommentEntity.builder()
+    void entity_to_dto() throws InterruptedException, JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(NON_NULL);
+        Map<String, String> map = Map.of("key", objectMapper.writeValueAsString(ApiCommentEntity.builder().comment(
+            "1").build()));
+        System.out.println(MustacheUtils.getContent("--- {{key}}  ---", map));
+        /*ApiCommentEntity apiComment = ApiCommentEntity.builder()
             .comment(COMMENT)
             .createDateTime(CREATE_TIME)
             .modifyDateTime(MODIFY_TIME)
             .build();
         ApiCommentResponse apiCommentResponse = apiCommentMapper.toDto(apiComment);
-        assertThat(apiCommentResponse.getComment()).isEqualTo(COMMENT);
+        assertThat(apiCommentResponse.getComment()).isEqualTo(COMMENT);*/
     }
 
     @Test

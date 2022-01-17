@@ -18,11 +18,13 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.WebhookPageRequest;
 import com.sms.courier.dto.request.WebhookRequest;
 import com.sms.courier.dto.response.WebhookResponse;
+import com.sms.courier.dto.response.WebhookTypeResponse;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.mapper.WebhookMapper;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.WebhookRepository;
+import com.sms.courier.repository.WebhookTypeRepository;
 import com.sms.courier.service.WebhookService;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.webhook.model.WebhookEntity;
@@ -37,13 +39,15 @@ public class WebhookServiceImpl implements WebhookService {
 
     private final WebhookRepository webhookRepository;
     private final CommonRepository commonRepository;
+    private final WebhookTypeRepository webhookTypeRepository;
     private final WebhookMapper webhookMapper;
 
     public WebhookServiceImpl(WebhookRepository webhookRepository,
         CommonRepository commonRepository,
-        WebhookMapper webhookMapper) {
+        WebhookTypeRepository webhookTypeRepository, WebhookMapper webhookMapper) {
         this.webhookRepository = webhookRepository;
         this.commonRepository = commonRepository;
+        this.webhookTypeRepository = webhookTypeRepository;
         this.webhookMapper = webhookMapper;
     }
 
@@ -109,6 +113,11 @@ public class WebhookServiceImpl implements WebhookService {
             log.error("Failed to delete the Webhook!", e);
             throw new ApiTestPlatformException(DELETE_WEBHOOK_BY_ID_ERROR);
         }
+    }
+
+    @Override
+    public List<WebhookTypeResponse> getAllType() {
+        return webhookMapper.toWebhookType(webhookTypeRepository.findAll());
     }
 
 }

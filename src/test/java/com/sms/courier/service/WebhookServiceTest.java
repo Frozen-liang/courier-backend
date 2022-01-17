@@ -16,11 +16,13 @@ import static org.mockito.Mockito.when;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.WebhookPageRequest;
 import com.sms.courier.dto.request.WebhookRequest;
+import com.sms.courier.dto.response.WebhookTypeResponse;
 import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.mapper.WebhookMapper;
 import com.sms.courier.mapper.WebhookMapperImpl;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.WebhookRepository;
+import com.sms.courier.repository.WebhookTypeRepository;
 import com.sms.courier.service.impl.WebhookServiceImpl;
 import com.sms.courier.webhook.model.WebhookEntity;
 import java.util.Collections;
@@ -34,11 +36,11 @@ import org.springframework.data.domain.Page;
 class WebhookServiceTest {
 
     private final WebhookRepository webhookRepository = mock(WebhookRepository.class);
-    private final CommonRepository commonRepository = mock(
-        CommonRepository.class);
+    private final WebhookTypeRepository webhookTypeRepository = mock(WebhookTypeRepository.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final WebhookMapper webhookMapper = new WebhookMapperImpl();
     private final WebhookService webhookService = new WebhookServiceImpl(
-        webhookRepository, commonRepository, webhookMapper);
+        webhookRepository, commonRepository, webhookTypeRepository, webhookMapper);
     private final WebhookEntity webhook = WebhookEntity.builder().id(ID).build();
     private final WebhookRequest webhookRequest = WebhookRequest.builder()
         .id(ID).build();
@@ -120,6 +122,14 @@ class WebhookServiceTest {
         assertThatThrownBy(() -> webhookService.delete(ids))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(DELETE_WEBHOOK_BY_ID_ERROR.getCode());
+    }
+
+    @Test
+    @DisplayName("Test the getAllType method in the Webhook service")
+    public void getAllType_test() {
+        when(webhookTypeRepository.findAll()).thenReturn(Collections.emptyList());
+        List<WebhookTypeResponse> result = webhookService.getAllType();
+        assertThat(result).isEmpty();
     }
 
 }

@@ -1,8 +1,6 @@
 package com.sms.courier.webhook.response;
 
 
-import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,9 +18,9 @@ public class WebhookCaseReportResponse {
 
     private String requestUrl;
 
-    private Map<String, Object> requestHeader;
+    private String requestHeader;
 
-    private Map<String, Object> responseHeader;
+    private String responseHeader;
 
     private Object responseData;
 
@@ -39,13 +37,5 @@ public class WebhookCaseReportResponse {
 
     // The time it takes to prepare parameters.
     private Integer paramsTimeCost;
-
-    private Integer delayTime;
-
-    private List<Object> infoList;
-
-    private Integer preInjectTimeCost;
-
-    private Integer postInjectTimeCost;
 
 }
