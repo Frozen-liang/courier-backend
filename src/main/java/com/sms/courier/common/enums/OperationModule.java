@@ -12,6 +12,7 @@ import com.sms.courier.entity.env.GlobalEnvironmentEntity;
 import com.sms.courier.entity.env.ProjectEnvironmentEntity;
 import com.sms.courier.entity.function.GlobalFunctionEntity;
 import com.sms.courier.entity.function.ProjectFunctionEntity;
+import com.sms.courier.entity.generator.GeneratorTemplateEntity;
 import com.sms.courier.entity.group.ApiGroupEntity;
 import com.sms.courier.entity.group.ApiTagGroupEntity;
 import com.sms.courier.entity.group.CaseTemplateGroupEntity;
@@ -77,7 +78,8 @@ public enum OperationModule implements EnumCommon {
     EMAIL_SETTING(31, EmailServiceEntity.class),
     WEBHOOK(32, WebhookEntity.class),
     COURIER_SCHEDULER(33, CourierSchedulerEntity.class),
-    DATABASE(34, DatabaseEntity.class);
+    DATABASE(34, DatabaseEntity.class),
+    GENERATOR_TEMPLATE(35, GeneratorTemplateEntity.class);
 
     private static final Map<Integer, OperationModule> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationModule::getCode, Function.identity()));
