@@ -23,6 +23,8 @@ public class DataCollectionEntity extends BaseEntity {
 
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String groupId;
     private String collectionName;
     private List<String> paramList;
     private List<TestData> dataList;

@@ -79,7 +79,11 @@ public class DataCollectionServiceImpl implements DataCollectionService {
 
     @Override
     public DataCollectionEntity findOne(String id) {
-        return dataCollectionRepository.findById(id).orElse(null);
+        Optional<DataCollectionEntity> optional = dataCollectionRepository.findById(id);
+        if (optional.isPresent() && !optional.get().isRemoved()) {
+            return optional.get();
+        }
+        return null;
     }
 
     @Override
