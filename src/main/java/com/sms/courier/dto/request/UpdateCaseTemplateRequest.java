@@ -26,6 +26,6 @@ public class UpdateCaseTemplateRequest {
     private Integer priority;
     @JsonProperty("isNext")
     private boolean next;
-    @NotNull(message = "The envDataCollConnList can not be empty")
+    /*@NotNull(message = "The envDataCollConnList can not be empty")*/
     private List<EnvDataCollConnRequest> envDataCollConnList;
 }

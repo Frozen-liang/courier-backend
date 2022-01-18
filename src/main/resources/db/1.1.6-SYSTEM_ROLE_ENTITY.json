@@ -1,0 +1,14 @@
+[
+  {
+    "id": "61e6727da4a242377e3345d6",
+    "name": "GENERATOR_TEMPLATE_QUERY_ALL",
+    "description": "代码模板链接查询",
+    "roleType": 0
+  },
+  {
+    "id": "61e67349a55ab65c10218ac2",
+    "name": "GENERATOR_TEMPLATE_CRE_UPD_DEL",
+    "description": "代码模板增加修改删除",
+    "roleType": 0
+  }
+]
