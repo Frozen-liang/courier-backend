@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateGeneratorTemplateRequest {
+    @NotNull(message = "The id can not be empty")
+    private String id;
     @NotNull(message = "The name can not be empty")
     private String name;
     @NotNull(message = "The codeType can not be empty")

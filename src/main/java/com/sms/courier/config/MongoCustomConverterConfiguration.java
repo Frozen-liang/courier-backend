@@ -40,6 +40,7 @@ import com.sms.courier.common.enums.VerificationElementType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.engine.enums.EngineStatus;
+import com.sms.courier.generator.enums.CodeType;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.webhook.enums.WebhookType;
 import java.time.Duration;
@@ -84,7 +85,7 @@ public class MongoCustomConverterConfiguration {
 
     @Bean
     public MappingMongoConverter mappingMongoConverter(MongoDatabaseFactory factory, MongoMappingContext context,
-        BeanFactory beanFactory) {
+                                                       BeanFactory beanFactory) {
         DbRefResolver dbRefResolver = new DefaultDbRefResolver(factory);
         MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, context);
         try {
@@ -101,34 +102,35 @@ public class MongoCustomConverterConfiguration {
     @Bean
     public MongoClientSettingsBuilderCustomizer mappingMongoClientSetting() {
         return clientSettingsBuilder -> clientSettingsBuilder.applyToConnectionPoolSettings(
-            builder -> builder.maxConnectionIdleTime(maxConnectionIdleTime, TimeUnit.MILLISECONDS));
+                builder -> builder.maxConnectionIdleTime(maxConnectionIdleTime, TimeUnit.MILLISECONDS));
     }
 
     @Bean
     MongoCustomConversions mongoCustomConversions() {
         List<Converter<?, ?>> converters = List
-            .of(EnumCommonToIntegerConverter.INSTANCE, IntegerToApiProtocolConverter.INSTANCE,
-                IntegerToApiRequestParamTypeConverter.INSTANCE, IntegerToApiStatusConverter.INSTANCE,
-                IntegerToParamTypeConverter.INSTANCE, IntegerToRequestMethodConverter.INSTANCE,
-                IntegerToApiTagTypeConverter.INSTANCE, IntegerToApiJsonTypeConverter.INSTANCE,
-                IntegerToSaveModeConverter.INSTANCE, IntegerToDocumentTypeConverter.INSTANCE,
-                IntegerToGroupImportTypeConverter.INSTANCE, IntegerToOperationTypeConverter.INSTANCE,
-                IntegerToOperationModuleConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
-                IntegerToApiTypeConverter.INSTANCE, IntegerToMatchTypeConverter.INSTANCE,
-                IntegerToApiBindingStatusConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
-                IntegerToDocumentUrlTypeConverter.INSTANCE, IntegerToJobStatusConverter.INSTANCE,
-                IntegerToProjectTypeConverter.INSTANCE, IntegerToImportStatusConverter.INSTANCE,
-                IntegerToResultVerificationTypeConverter.INSTANCE,
-                IntegerToResponseParamsExtractionTypeConverter.INSTANCE, IntegerToResultTypeConverter.INSTANCE,
-                IntegerToEngineStatusConverter.INSTANCE, IntegerToRoleTypeConverter.INSTANCE,
-                IntegerToVerificationElementTypeConverter.INSTANCE, IntegerToRawTypeConverter.INSTANCE,
-                IntegerToScheduleStatusTypeConverter.INSTANCE, IntegerToCycleTypeConverter.INSTANCE,
-                IntegerToNoticeTypeConverter.INSTANCE, IntegerToCaseFilterConverter.INSTANCE,
-                IntegerToTaskStatusConverter.INSTANCE, DurationToLongConverter.INSTANCE,
-                LongToDurationConverter.INSTANCE, IntegerToMockApiResponseParamTypeConverter.INSTANCE,
-                IntegerToApiEncodingTypeConverter.INSTANCE, IntegerToMockApiJsonLocateTypeConverter.INSTANCE,
-                IntegerToCaseTypeConverter.INSTANCE, IntegerToContainerStatusConverter.INSTANCE,
-                IntegerToWebhookTypeConverter.INSTANCE, IntegerToDataBaseTypeConverter.INSTANCE);
+                .of(EnumCommonToIntegerConverter.INSTANCE, IntegerToApiProtocolConverter.INSTANCE,
+                        IntegerToApiRequestParamTypeConverter.INSTANCE, IntegerToApiStatusConverter.INSTANCE,
+                        IntegerToParamTypeConverter.INSTANCE, IntegerToRequestMethodConverter.INSTANCE,
+                        IntegerToApiTagTypeConverter.INSTANCE, IntegerToApiJsonTypeConverter.INSTANCE,
+                        IntegerToSaveModeConverter.INSTANCE, IntegerToDocumentTypeConverter.INSTANCE,
+                        IntegerToGroupImportTypeConverter.INSTANCE, IntegerToOperationTypeConverter.INSTANCE,
+                        IntegerToOperationModuleConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
+                        IntegerToApiTypeConverter.INSTANCE, IntegerToMatchTypeConverter.INSTANCE,
+                        IntegerToApiBindingStatusConverter.INSTANCE, IntegerToGroupImportTypeConverter.INSTANCE,
+                        IntegerToDocumentUrlTypeConverter.INSTANCE, IntegerToJobStatusConverter.INSTANCE,
+                        IntegerToProjectTypeConverter.INSTANCE, IntegerToImportStatusConverter.INSTANCE,
+                        IntegerToResultVerificationTypeConverter.INSTANCE,
+                        IntegerToResponseParamsExtractionTypeConverter.INSTANCE, IntegerToResultTypeConverter.INSTANCE,
+                        IntegerToEngineStatusConverter.INSTANCE, IntegerToRoleTypeConverter.INSTANCE,
+                        IntegerToVerificationElementTypeConverter.INSTANCE, IntegerToRawTypeConverter.INSTANCE,
+                        IntegerToScheduleStatusTypeConverter.INSTANCE, IntegerToCycleTypeConverter.INSTANCE,
+                        IntegerToNoticeTypeConverter.INSTANCE, IntegerToCaseFilterConverter.INSTANCE,
+                        IntegerToTaskStatusConverter.INSTANCE, DurationToLongConverter.INSTANCE,
+                        LongToDurationConverter.INSTANCE, IntegerToMockApiResponseParamTypeConverter.INSTANCE,
+                        IntegerToApiEncodingTypeConverter.INSTANCE, IntegerToMockApiJsonLocateTypeConverter.INSTANCE,
+                        IntegerToCaseTypeConverter.INSTANCE, IntegerToContainerStatusConverter.INSTANCE,
+                        IntegerToWebhookTypeConverter.INSTANCE, IntegerToDataBaseTypeConverter.INSTANCE,
+                        IntegerToCodeTypeConverter.INSTANCE);
 
         return new MongoCustomConversions(converters);
     }
@@ -137,12 +139,12 @@ public class MongoCustomConverterConfiguration {
     AuditorAware<String> auditorAware() {
         // get createUserId and modifyUserId
         return () -> Optional.ofNullable(SecurityContextHolder.getContext())
-            .map(SecurityContext::getAuthentication)
-            .filter(Authentication::isAuthenticated)
-            .map(Authentication::getPrincipal)
-            .filter(user -> !"anonymousUser".equals(user.toString()))
-            .map(CustomUser.class::cast)
-            .map(CustomUser::getId);
+                .map(SecurityContext::getAuthentication)
+                .filter(Authentication::isAuthenticated)
+                .map(Authentication::getPrincipal)
+                .filter(user -> !"anonymousUser".equals(user.toString()))
+                .map(CustomUser.class::cast)
+                .map(CustomUser::getId);
     }
 
 
@@ -165,8 +167,7 @@ public class MongoCustomConverterConfiguration {
         INSTANCE;
 
         public Long convert(@NotNull Duration duration) {
-            return
-                ApplicationConversionService.getSharedInstance().convert(duration, Long.class);
+            return ApplicationConversionService.getSharedInstance().convert(duration, Long.class);
         }
     }
 
@@ -175,8 +176,7 @@ public class MongoCustomConverterConfiguration {
         INSTANCE;
 
         public Duration convert(@NotNull Long millisecond) {
-            return
-                ApplicationConversionService.getSharedInstance().convert(millisecond, Duration.class);
+            return ApplicationConversionService.getSharedInstance().convert(millisecond, Duration.class);
         }
     }
 
@@ -523,6 +523,15 @@ public class MongoCustomConverterConfiguration {
 
         public DatabaseType convert(@NonNull Integer code) {
             return DatabaseType.getDatabaseType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToCodeTypeConverter implements Converter<Integer, CodeType> {
+        INSTANCE;
+
+        public CodeType convert(@NonNull Integer code) {
+            return CodeType.getCodeType(code);
         }
     }
 

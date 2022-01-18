@@ -6,11 +6,14 @@ import com.sms.courier.dto.request.UpdateGeneratorTemplateRequest;
 import com.sms.courier.entity.generator.GeneratorTemplateEntity;
 import com.sms.courier.service.GeneratorTemplateService;
 import java.util.List;
+import javax.validation.Valid;
+import org.bson.types.ObjectId;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,9 +45,9 @@ public class GeneratorTemplateController {
         return generatorTemplateService.deleteByIds(ids);
     }
 
-    @PostMapping
+    @PutMapping
     @PreAuthorize("hasRoleOrAdmin(@role.GENERATOR_TEMPLATE_CRE_UPD_DEL)")
-    private Boolean edit(@RequestBody UpdateGeneratorTemplateRequest updateGeneratorTemplateRequest) {
+    private Boolean edit(@Valid @RequestBody UpdateGeneratorTemplateRequest updateGeneratorTemplateRequest) {
         return generatorTemplateService.edit(updateGeneratorTemplateRequest);
     }
 }
