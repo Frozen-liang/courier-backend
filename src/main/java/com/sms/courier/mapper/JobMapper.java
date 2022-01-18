@@ -2,9 +2,6 @@ package com.sms.courier.mapper;
 
 import static com.sms.courier.common.constant.TimePatternConstant.DEFAULT_PATTERN;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sms.courier.chat.common.NotificationTemplateType;
 import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.enums.ResultType;
@@ -39,6 +36,7 @@ import com.sms.courier.entity.job.common.JobEnvironment;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.utils.EnumCommonUtils;
+import com.sms.courier.utils.JsonUtils;
 import com.sms.courier.webhook.response.WebhookCaseJobResponse;
 import com.sms.courier.webhook.response.WebhookCaseReportResponse;
 import com.sms.courier.webhook.response.WebhookSceneCaseJobResponse;
@@ -54,7 +52,7 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE,
     uses = {EnumCommonUtils.class, ParamInfoMapper.class, MatchParamInfoMapper.class,
         ResponseResultVerificationMapper.class},
-    imports = {JobStatus.class, NotificationTemplateType.class, ResultType.class, Objects.class})
+    imports = {JobStatus.class, NotificationTemplateType.class, ResultType.class, Objects.class, JsonUtils.class})
 public interface JobMapper {
 
     JobEnvironment toJobEnvironment(ProjectEnvironmentEntity projectEnvironment);
@@ -172,13 +170,13 @@ public interface JobMapper {
     @Mapping(target = "type", expression = "java(NotificationTemplateType.TEST_REPORT)")
     TestReportEvent toTestReportEvent(SceneCaseJobEntity jobEntity, List<CaseReport> caseReports);
 
-    @Mapping(target = "caseReportList", expression = "java(this.toJsonString(jobReport.getCaseReportList()))")
+    @Mapping(target = "caseReportList", expression = "java(JsonUtils.serializeObjectNotNull(jobReport.getCaseReportList()))")
     WebhookSceneCaseJobResponse toWebhookSceneCaseJobResponse(SceneCaseJobReport jobReport);
 
     @Mapping(target = "requestHeader",
-        expression = "java(this.toJsonString(caseReport.getRequestHeader()))")
+        expression = "java(JsonUtils.serializeObjectNotNull(caseReport.getRequestHeader()))")
     @Mapping(target = "responseHeader",
-        expression = "java(this.toJsonString(caseReport.getResponseHeader()))")
+        expression = "java(JsonUtils.serializeObjectNotNull(caseReport.getResponseHeader()))")
     WebhookCaseReportResponse toWebhookCaseReportResponse(CaseReport caseReport) throws IOException;
 
     default String getDataName(JobEntity jobEntity) {
@@ -188,19 +186,6 @@ public interface JobMapper {
         return "";
     }
 
-    ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    default String toJsonString(Object obj) {
-        OBJECT_MAPPER.setSerializationInclusion(Include.NON_NULL);
-        try {
-            if (Objects.nonNull(obj)) {
-                return OBJECT_MAPPER.writeValueAsString(obj);
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
 
     default long count(ResultType resultType, List<CaseReport> caseReports, SceneCaseJobEntity jobEntity) {
         if (Objects.isNull(caseReports)) {
