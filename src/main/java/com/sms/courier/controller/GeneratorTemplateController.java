@@ -50,8 +50,4 @@ public class GeneratorTemplateController {
     private Boolean edit(@Valid @RequestBody UpdateGeneratorTemplateRequest updateGeneratorTemplateRequest) {
         return generatorTemplateService.edit(updateGeneratorTemplateRequest);
     }
-
-    public static void main(String[] args) {
-        System.out.println(new ObjectId());
-    }
 }
