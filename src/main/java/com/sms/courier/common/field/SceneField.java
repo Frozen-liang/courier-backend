@@ -21,6 +21,8 @@ public enum SceneField implements Field {
     JOB_ENV_ID("environment.id"),
     API_TYPE("apiType"),
     API_TEST_CASE_PROJECT_ID("apiTestCase.projectId"),
+    ENV_DATA_COLL_CONN_LIST("envDataCollConnList"),
+    SCENE_CASE_DATA_COLL_ID("envDataCollConnList.dataCollId"),
     IS_SQL_RESULT("isSqlResult");
 
     private final String name;

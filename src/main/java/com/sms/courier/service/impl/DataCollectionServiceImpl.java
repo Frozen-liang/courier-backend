@@ -217,17 +217,14 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     public List<DataCollectionResponse> listByEnvIdAndEnvIdIsNull(String envId, String projectId) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
-            DataCollectionEntity dataCollection = DataCollectionEntity.builder().envId(envId)
+            DataCollectionEntity dataCollection = DataCollectionEntity.builder().envId(envId).projectId(projectId)
                 .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(REMOVE.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(PROJECT_ID.getName(), GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING);
             Example<DataCollectionEntity> example = Example.of(dataCollection, exampleMatcher);
             List<DataCollectionEntity> dataCollectionEntityList = dataCollectionRepository.findAll(example, sort);
-            List<DataCollectionEntity> entityList =
-                dataCollectionRepository
-                    .findAllByEnvIdExistsAndRemovedAndProjectId(Boolean.FALSE, Boolean.FALSE, projectId);
-            dataCollectionEntityList.addAll(entityList);
             return dataCollectionMapper.toDtoList(dataCollectionEntityList);
         } catch (Exception e) {
             log.error("Failed to get the DataCollection list!", e);
