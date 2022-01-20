@@ -22,7 +22,10 @@ public class MustacheUtils {
         Mustache mustache = MUSTACHE_FACTORY.compile(new StringReader(template), "courier");
         Writer result = mustache.execute(new StringWriter(), scope);
         try {
-            return result.toString().replace("&quot;","\"");
+            return result.toString()
+                .replace("&quot;", "\"")
+                .replace("&#10;", "")
+                .replace("&#61;", "=");
         } finally {
             if (Objects.nonNull(result)) {
                 try {

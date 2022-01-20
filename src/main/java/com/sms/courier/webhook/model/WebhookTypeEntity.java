@@ -21,7 +21,6 @@ public class WebhookTypeEntity {
     private String id;
     @Indexed(unique = true)
     private WebhookType type;
-    private String name;
     private String defaultPayload;
     private List<Map<String, Object>> fieldDesc;
 }

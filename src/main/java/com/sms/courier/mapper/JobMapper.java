@@ -170,7 +170,8 @@ public interface JobMapper {
     @Mapping(target = "type", expression = "java(NotificationTemplateType.TEST_REPORT)")
     TestReportEvent toTestReportEvent(SceneCaseJobEntity jobEntity, List<CaseReport> caseReports);
 
-    @Mapping(target = "caseReportList", expression = "java(JsonUtils.serializeObjectNotNull(jobReport.getCaseReportList()))")
+    @Mapping(target = "caseReportList",
+        expression = "java(JsonUtils.serializeObjectNotNull(jobReport.getCaseReportList()))")
     WebhookSceneCaseJobResponse toWebhookSceneCaseJobResponse(SceneCaseJobReport jobReport);
 
     @Mapping(target = "requestHeader",

@@ -61,4 +61,9 @@ public class WebhookController {
         return webhookService.getAllType();
     }
 
+    @PostMapping("/test-connection")
+    public Boolean testConnection(@Validated(UpdateGroup.class) @RequestBody WebhookRequest request) {
+        return webhookService.testConnection(request);
+    }
+
 }

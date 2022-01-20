@@ -18,4 +18,6 @@ public interface WebhookService {
     Boolean delete(List<String> ids);
 
     List<WebhookTypeResponse> getAllType();
+
+    Boolean testConnection(WebhookRequest request);
 }
