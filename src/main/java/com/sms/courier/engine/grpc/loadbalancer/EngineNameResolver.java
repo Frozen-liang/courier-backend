@@ -192,10 +192,12 @@ public class EngineNameResolver extends NameResolver {
                 response.getData().forEach(engineAddress -> {
                     InetSocketAddress inetSocketAddress = new InetSocketAddress(engineAddress.getHost(),
                         engineAddress.getPort());
-                    EquivalentAddressGroup addressGroup =
-                        new EquivalentAddressGroup(inetSocketAddress);
-                    addressGroups.add(addressGroup);
+                    addressGroups.add(new EquivalentAddressGroup(inetSocketAddress));
                 });
+                if (addressGroups.isEmpty()) {
+                    InetSocketAddress inetSocketAddress = new InetSocketAddress("", 0);
+                    addressGroups.add(new EquivalentAddressGroup(inetSocketAddress));
+                }
                 return addressGroups;
             } catch (Exception e) {
                 e.printStackTrace();

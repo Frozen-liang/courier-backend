@@ -180,4 +180,8 @@ public class Role {
     public static final String DATABASE_QUERY_ALL = "Database" + QUERY_ALL;
     public static final String DATABASE_CRE_UPD_DEL = "Database" + CRE_UPD_DEL;
 
+    // GeneratorTemplate
+    public static final String GENERATOR_TEMPLATE_CRE_UPD_DEL = "Generator_Template" + CRE_UPD_DEL;
+    public static final String GENERATOR_TEMPLATE_QUERY_ALL = "Case_Template" + QUERY_ALL;
+
 }

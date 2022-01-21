@@ -8,6 +8,7 @@ import static com.sms.courier.common.exception.ErrorCode.GET_WEBHOOK_PAGE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -24,25 +25,30 @@ import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.WebhookRepository;
 import com.sms.courier.repository.WebhookTypeRepository;
 import com.sms.courier.service.impl.WebhookServiceImpl;
+import com.sms.courier.webhook.enums.WebhookType;
 import com.sms.courier.webhook.model.WebhookEntity;
+import com.sms.courier.webhook.model.WebhookTypeEntity;
 import java.util.Collections;
 import java.util.List;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestTemplate;
 
 @DisplayName("Tests for WebhookService")
 class WebhookServiceTest {
 
     private final WebhookRepository webhookRepository = mock(WebhookRepository.class);
     private final WebhookTypeRepository webhookTypeRepository = mock(WebhookTypeRepository.class);
+    private final RestTemplate restTemplate = mock(RestTemplate.class);
     private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final WebhookMapper webhookMapper = new WebhookMapperImpl();
     private final WebhookService webhookService = new WebhookServiceImpl(
-        webhookRepository, commonRepository, webhookTypeRepository, webhookMapper);
+        webhookRepository, commonRepository, webhookTypeRepository, webhookMapper, restTemplate);
     private final WebhookEntity webhook = WebhookEntity.builder().id(ID).build();
-    private final WebhookRequest webhookRequest = WebhookRequest.builder()
+    private final WebhookRequest webhookRequest = WebhookRequest.builder().webhookType(WebhookType.CASE_REPORT).payload("")
         .id(ID).build();
     private static final String ID = ObjectId.get().toString();
 
@@ -130,6 +136,18 @@ class WebhookServiceTest {
         when(webhookTypeRepository.findAll()).thenReturn(Collections.emptyList());
         List<WebhookTypeResponse> result = webhookService.getAllType();
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Test the testConnection method in the Webhook service")
+    public void testConnection_test() {
+        when(webhookTypeRepository.findAll()).thenReturn(Collections.emptyList());
+        when(restTemplate.exchange(anyString(),any(HttpMethod.class),any(),any(Class.class))).thenReturn(null);
+        WebhookTypeEntity webhookTypeEntity = new WebhookTypeEntity();
+        webhookTypeEntity.setFieldDesc(Collections.emptyList());
+        when(webhookTypeRepository.findByType(any())).thenReturn(webhookTypeEntity);
+        Boolean result = webhookService.testConnection(webhookRequest);
+        assertThat(result).isTrue();
     }
 
 }

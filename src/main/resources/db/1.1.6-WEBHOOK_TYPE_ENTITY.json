@@ -2,8 +2,7 @@
   {
     "id": "61e4cd12e973ed57cf565e3b",
     "type": 0,
-    "name": "单个用例测试结果",
-    "defaultPayload": "{\n      \"jobStatus\": \"{{jobStatus}}\",\n      \"message\": \"{{message}}\",\n      \"errCode\": \"{{errCode}}\",\n      \"totalTimeCost\": \"{{totalTimeCost}}\",\n      \"paramsTotalTimeCost\": \"{{paramsTotalTimeCost}}\",\n      \"caseReport\": {\n        \"status\": \"{{caseReport.status}}\",\n        \"requestMethod\": \"{{caseReport.requestMethod}}\",\n        \"requestUrl\": \"{{caseReport.requestUrl}}\",\n        \"requestHeader\": \"{{caseReport.requestHeader}}\",\n        \"responseHeader\": \"{{caseReport.responseHeader}}\",\n        \"responseData\": \"{{caseReport.responseData}}\",\n        \"requestData\": \"{{caseReport.requestData}}\",\n        \"isSuccess\": \"{{caseReport.isSuccess}}\",\n        \"errCode\": \"{{caseReport.errCode}}\",\n        \"failMessage\": \"{{caseReport.failMessage}}\",\n        \"timeCost\": \"{{caseReport.timeCost}}\",\n        \"paramsTimeCost\": \"{{caseReport.paramsTimeCost}}\"\n      }\n    }",
+    "defaultPayload": "{\n  \"jobStatus\": \"{{jobStatus}}\",\n  \"message\": \"{{message}}\",\n  \"errCode\": \"{{errCode}}\",\n  \"totalTimeCost\": \"{{totalTimeCost}}\",\n  \"paramsTotalTimeCost\": \"{{paramsTotalTimeCost}}\",\n  \"caseReport\": {\n    \"status\": \"{{caseReport.status}}\",\n    \"requestMethod\": \"{{caseReport.requestMethod}}\",\n    \"requestUrl\": \"{{caseReport.requestUrl}}\",\n    \"requestHeader\": \"{{caseReport.requestHeader}}\",\n    \"responseHeader\": \"{{caseReport.responseHeader}}\",\n    \"responseData\": \"{{caseReport.responseData}}\",\n    \"requestData\": \"{{caseReport.requestData}}\",\n    \"isSuccess\": \"{{caseReport.isSuccess}}\",\n    \"errCode\": \"{{caseReport.errCode}}\",\n    \"failMessage\": \"{{caseReport.failMessage}}\",\n    \"timeCost\": \"{{caseReport.timeCost}}\",\n    \"paramsTimeCost\": \"{{caseReport.paramsTimeCost}}\"\n  }\n}",
     "fieldDesc": [
       {
         "key": "jobStatus",
@@ -57,13 +56,19 @@
         "key": "caseReport.requestHeader",
         "desc": "Api请求头",
         "paramType": "json",
-        "example": "{\n        \"ContextType\": \"Application/json\",\n        \"Authorization\": \"Bearer eyJhbGci...\"\n      }"
+        "example": {
+          "ContextType": "Application/json",
+          "Authorization": "Bearer eyJhbGci..."
+        }
       },
       {
         "key": "caseReport.responseHeader",
         "desc": "Api响应头",
         "paramType": "json",
-        "example": "{\n        \"ContextType\": \"Application/json\",\n        \"Authorization\": \"Bearer eyJhbGci...\"\n      }"
+        "example": {
+          "ContextType": "Application/json",
+          "Authorization": "Bearer eyJhbGci..."
+        }
       },
       {
         "key": "caseReport.requestData",
@@ -75,7 +80,10 @@
         "key": "caseReport.responseData",
         "desc": "响应数据",
         "paramType": "sting",
-        "example": "{\n        \"username\": \"jack\",\n        \"age\": 18\n      }"
+        "example": {
+          "username": "jack",
+          "age": 18
+        }
       },
       {
         "key": "caseReport.isSuccess",
@@ -100,8 +108,7 @@
   {
     "id": "61e4cd12e973ed57cf565e3c",
     "type": 1,
-    "name": "流程用例测试结果",
-    "defaultPayload": "{\n      \"jobStatus\": \"{{jobStatus}}\",\n      \"message\": \"{{message}}\",\n      \"errCode\": \"{{errCode}}\",\n      \"totalTimeCost\": \"{{totalTimeCost}}\",\n      \"paramsTotalTimeCost\": \"{{paramsTotalTimeCost}}\",\n      \"caseReportList\": \"{{caseReportList}}\"\n    }",
+    "defaultPayload": "{\n      \"jobStatus\": \"{{jobStatus}}\",\n      \"message\": \"{{message}}\",\n      \"errCode\": \"{{errCode}}\",\n      \"totalTimeCost\": \"{{totalTimeCost}}\",\n      \"paramsTotalTimeCost\": \"{{paramsTotalTimeCost}}\",\n      \"caseReportList\": \"{{caseReportList}}\"\n}",
     "fieldDesc": [
       {
         "key": "jobStatus",
@@ -137,15 +144,37 @@
         "key": "caseReportList",
         "desc": "流程用例中每一个用例的测试结果(具体数值含义参考单个用例)",
         "paramType": "json",
-        "example": "[\n          {\n            \"status\": 200,\n            \"requestMethod\": 1,\n            \"requestUrl\": \"http://localhost:8080/example\",\n            \"requestHeader\": \"{\\n              \\\"ContextType\\\": \\\"Application/json\\\",\\n              \\\"Authorization\\\": \\\"Bearer eyJhbGci...\\\"\\n            }\",\n            \"responseHeader\": \"{\\n              \\\"ContextType\\\": \\\"Application/json\\\"\\n            }\",\n            \"requestData\": \"{\\n              \\\"username\\\": \\\"jack\\\"\\n            }\",\n            \"responseData\": \"{\\n              \\\"username\\\": \\\"jack\\\",\\n              \\\"age\\\": 18\\n            }\",\n            \"isSuccess\": 1,\n            \"timeCost\": 100,\n            \"paramsTimeCost\": 10\n          }\n        ]"
+        "example": [
+          {
+            "status": 200,
+            "requestMethod": 1,
+            "requestUrl": "http://localhost:8080/example",
+            "requestHeader": {
+              "ContextType": "Application/json",
+              "Authorization": "Bearer eyJhbGci..."
+            },
+            "responseHeader": {
+              "ContextType": "Application/json"
+            },
+            "requestData": {
+              "username": "jack"
+            },
+            "responseData": {
+              "username": "jack",
+              "age": 18
+            },
+            "isSuccess": 1,
+            "timeCost": 100,
+            "paramsTimeCost": 10
+          }
+        ]
       }
     ]
   },
   {
     "id": "61e4cd12e973ed57cf565e3d",
     "type": 2,
-    "name": "定时任务测试结果",
-    "defaultPayload": "{\n      \"id\": \"{{id}}\",\n      \"name\": \"{{name}}\",\n      \"success\": \"{{success}}\",\n      \"fail\": \"{{fail}}\"\n    }",
+    "defaultPayload": "{\n  \"id\": \"{{id}}\",\n  \"name\": \"{{name}}\",\n  \"success\": \"{{success}}\",\n  \"fail\": \"{{fail}}\"\n}",
     "fieldDesc": [
       {
         "key": "id",

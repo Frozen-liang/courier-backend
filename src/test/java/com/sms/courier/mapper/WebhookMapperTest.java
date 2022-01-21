@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sms.courier.dto.request.WebhookRequest;
 import com.sms.courier.dto.response.WebhookTypeResponse;
+import com.sms.courier.webhook.enums.WebhookType;
 import com.sms.courier.webhook.model.WebhookEntity;
 import com.sms.courier.webhook.model.WebhookTypeEntity;
 import java.util.List;
@@ -30,9 +31,10 @@ class WebhookMapperTest {
     @DisplayName("Test the method to convert the WebhookType entity object to a dto object")
     void toWebhookType_test() {
         WebhookTypeEntity webhookTypeEntity = new WebhookTypeEntity();
-        webhookTypeEntity.setName("type");
-        List<WebhookTypeResponse> webhookTypeResponses = webhookMapper.toWebhookType(List.of(webhookTypeEntity));
-        assertThat(webhookTypeResponses).isNullOrEmpty();
+        webhookTypeEntity.setDefaultPayload("type");
+        webhookTypeEntity.setType(WebhookType.SCHEDULE);
+        List<WebhookTypeResponse> webhookTypeResponses = webhookMapper.toWebhookTypeList(List.of(webhookTypeEntity));
+        assertThat(webhookTypeResponses).isNotEmpty();
     }
 
 }

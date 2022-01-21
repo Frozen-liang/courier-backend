@@ -1,6 +1,6 @@
 package com.sms.courier.dto.response;
 
-import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,5 +18,13 @@ public class WebhookResponse extends LookupUserResponse {
 
     private String description;
 
-    private List<Integer> webhookType;
+    private Integer webhookType;
+
+    private String typeName;
+
+    private String name;
+
+    private Map<String, String> header;
+
+    private String payload;
 }
