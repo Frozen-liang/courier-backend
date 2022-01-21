@@ -12,7 +12,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 
 group = "com.sms.courier"
-version = "1.1.5"
+version = "1.1.6"
 description = "courier-backend"
 
 val grpcVersion by extra("1.42.1")
@@ -133,6 +133,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-jackson:$versionJjwt")
     implementation("net.logstash.logback:logstash-logback-encoder:6.6")
     implementation("com.jayway.jsonpath:json-path:2.4.0")
+    implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.mockito:mockito-inline:3.6.28")

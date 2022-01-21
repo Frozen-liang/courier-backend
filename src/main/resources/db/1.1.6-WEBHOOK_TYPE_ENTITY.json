@@ -1,0 +1,205 @@
+[
+  {
+    "id": "61e4cd12e973ed57cf565e3b",
+    "type": 0,
+    "defaultPayload": "{\n  \"jobStatus\": \"{{jobStatus}}\",\n  \"message\": \"{{message}}\",\n  \"errCode\": \"{{errCode}}\",\n  \"totalTimeCost\": \"{{totalTimeCost}}\",\n  \"paramsTotalTimeCost\": \"{{paramsTotalTimeCost}}\",\n  \"caseReport\": {\n    \"status\": \"{{caseReport.status}}\",\n    \"requestMethod\": \"{{caseReport.requestMethod}}\",\n    \"requestUrl\": \"{{caseReport.requestUrl}}\",\n    \"requestHeader\": \"{{caseReport.requestHeader}}\",\n    \"responseHeader\": \"{{caseReport.responseHeader}}\",\n    \"responseData\": \"{{caseReport.responseData}}\",\n    \"requestData\": \"{{caseReport.requestData}}\",\n    \"isSuccess\": \"{{caseReport.isSuccess}}\",\n    \"errCode\": \"{{caseReport.errCode}}\",\n    \"failMessage\": \"{{caseReport.failMessage}}\",\n    \"timeCost\": \"{{caseReport.timeCost}}\",\n    \"paramsTimeCost\": \"{{caseReport.paramsTimeCost}}\"\n  }\n}",
+    "fieldDesc": [
+      {
+        "key": "jobStatus",
+        "desc": "测试结果 1(成功) 2(失败)",
+        "paramType": "int",
+        "example": 1
+      },
+      {
+        "key": "message",
+        "desc": "错误信息",
+        "paramType": "string",
+        "example": ""
+      },
+      {
+        "key": "errCode",
+        "desc": "错误代码",
+        "paramType": "string",
+        "example": ""
+      },
+      {
+        "key": "totalTimeCost",
+        "desc": "所有用例总运行时间（毫秒）",
+        "paramType": "int",
+        "example": 100
+      },
+      {
+        "key": "paramsTotalTimeCost",
+        "desc": "所有用例参数时间（毫秒）",
+        "paramType": "int",
+        "example": 10
+      },
+      {
+        "key": "caseReport.status",
+        "desc": "Api响应状态码",
+        "paramType": "int",
+        "example": 200
+      },
+      {
+        "key": "caseReport.requestMethod",
+        "desc": "Api请求方式 0(Get)1(Post)2(Put)3(Patch)4(Delete)5(Head)6(Options)7(Trace)",
+        "paramType": "int",
+        "example": 0
+      },
+      {
+        "key": "caseReport.requestUrl",
+        "desc": "Api请求地址",
+        "paramType": "int",
+        "example": "http://localhost:8080/example"
+      },
+      {
+        "key": "caseReport.requestHeader",
+        "desc": "Api请求头",
+        "paramType": "json",
+        "example": {
+          "ContextType": "Application/json",
+          "Authorization": "Bearer eyJhbGci..."
+        }
+      },
+      {
+        "key": "caseReport.responseHeader",
+        "desc": "Api响应头",
+        "paramType": "json",
+        "example": {
+          "ContextType": "Application/json",
+          "Authorization": "Bearer eyJhbGci..."
+        }
+      },
+      {
+        "key": "caseReport.requestData",
+        "desc": "请求体数据",
+        "paramType": "string",
+        "example": "username=jack"
+      },
+      {
+        "key": "caseReport.responseData",
+        "desc": "响应数据",
+        "paramType": "sting",
+        "example": {
+          "username": "jack",
+          "age": 18
+        }
+      },
+      {
+        "key": "caseReport.isSuccess",
+        "desc": "用例测试结果 0(失败)1(成功)",
+        "paramType": "int",
+        "example": 1
+      },
+      {
+        "key": "caseReport.timeCost",
+        "desc": "Api请求或脚本运行时间(毫秒)",
+        "paramType": "int",
+        "example": 100
+      },
+      {
+        "key": "caseReport.paramsTimeCost",
+        "desc": "参数准备时间 (毫秒)",
+        "paramType": "int",
+        "example": 10
+      }
+    ]
+  },
+  {
+    "id": "61e4cd12e973ed57cf565e3c",
+    "type": 1,
+    "defaultPayload": "{\n      \"jobStatus\": \"{{jobStatus}}\",\n      \"message\": \"{{message}}\",\n      \"errCode\": \"{{errCode}}\",\n      \"totalTimeCost\": \"{{totalTimeCost}}\",\n      \"paramsTotalTimeCost\": \"{{paramsTotalTimeCost}}\",\n      \"caseReportList\": \"{{caseReportList}}\"\n}",
+    "fieldDesc": [
+      {
+        "key": "jobStatus",
+        "desc": "测试结果 1(成功) 2(失败)",
+        "paramType": "int",
+        "example": 1
+      },
+      {
+        "key": "message",
+        "desc": "错误信息",
+        "paramType": "string",
+        "example": ""
+      },
+      {
+        "key": "errCode",
+        "desc": "错误代码",
+        "paramType": "string",
+        "example": ""
+      },
+      {
+        "key": "totalTimeCost",
+        "desc": "所有用例总运行时间（毫秒）",
+        "paramType": "int",
+        "example": 100
+      },
+      {
+        "key": "paramsTotalTimeCost",
+        "desc": "所有用例参数时间（毫秒）",
+        "paramType": "int",
+        "example": 10
+      },
+      {
+        "key": "caseReportList",
+        "desc": "流程用例中每一个用例的测试结果(具体数值含义参考单个用例)",
+        "paramType": "json",
+        "example": [
+          {
+            "status": 200,
+            "requestMethod": 1,
+            "requestUrl": "http://localhost:8080/example",
+            "requestHeader": {
+              "ContextType": "Application/json",
+              "Authorization": "Bearer eyJhbGci..."
+            },
+            "responseHeader": {
+              "ContextType": "Application/json"
+            },
+            "requestData": {
+              "username": "jack"
+            },
+            "responseData": {
+              "username": "jack",
+              "age": 18
+            },
+            "isSuccess": 1,
+            "timeCost": 100,
+            "paramsTimeCost": 10
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "61e4cd12e973ed57cf565e3d",
+    "type": 2,
+    "defaultPayload": "{\n  \"id\": \"{{id}}\",\n  \"name\": \"{{name}}\",\n  \"success\": \"{{success}}\",\n  \"fail\": \"{{fail}}\"\n}",
+    "fieldDesc": [
+      {
+        "key": "id",
+        "desc": "定时任务Id",
+        "paramType": "string",
+        "example": "61e12d1798f62c4ba9ff4268"
+      },
+      {
+        "key": "name",
+        "desc": "定时任务名称",
+        "paramType": "string",
+        "example": "courier"
+      },
+      {
+        "key": "success",
+        "desc": "成功数量",
+        "paramType": "int",
+        "example": 10
+      },
+      {
+        "key": "fail",
+        "desc": "失败数量",
+        "paramType": "int",
+        "example": 0
+      }
+    ]
+  }
+]

@@ -7,23 +7,27 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public enum WebhookType implements EnumCommon {
-    API_ADD(0),
-    API_UPDATE(1),
-    API_DELETE(2),
-    CASE_REPORT(3),
-    SCENE_CASE_REPORT(4);
+    CASE_REPORT(0, "CaseReport"),
+    SCENE_CASE_REPORT(1, "SceneCaseReport"),
+    SCHEDULE(2, "Scheduler");
 
     private final Integer code;
+    private final String name;
     private static final Map<Integer, WebhookType> MAPPINGS =
         Arrays.stream(values()).collect(Collectors.toMap(WebhookType::getCode, Function.identity()));
 
-    WebhookType(Integer code) {
+    WebhookType(Integer code, String name) {
         this.code = code;
+        this.name = name;
     }
 
     @Override
     public int getCode() {
         return this.code;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public static WebhookType getType(Integer code) {

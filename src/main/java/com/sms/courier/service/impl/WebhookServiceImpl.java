@@ -18,18 +18,30 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.WebhookPageRequest;
 import com.sms.courier.dto.request.WebhookRequest;
 import com.sms.courier.dto.response.WebhookResponse;
+import com.sms.courier.dto.response.WebhookTypeResponse;
 import com.sms.courier.entity.mongo.LookupVo;
 import com.sms.courier.entity.mongo.QueryVo;
 import com.sms.courier.mapper.WebhookMapper;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.WebhookRepository;
+import com.sms.courier.repository.WebhookTypeRepository;
 import com.sms.courier.service.WebhookService;
 import com.sms.courier.utils.ExceptionUtils;
+import com.sms.courier.utils.MustacheUtils;
+import com.sms.courier.webhook.enums.WebhookType;
 import com.sms.courier.webhook.model.WebhookEntity;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
@@ -37,14 +49,19 @@ public class WebhookServiceImpl implements WebhookService {
 
     private final WebhookRepository webhookRepository;
     private final CommonRepository commonRepository;
+    private final WebhookTypeRepository webhookTypeRepository;
     private final WebhookMapper webhookMapper;
+    private final RestTemplate restTemplate;
 
     public WebhookServiceImpl(WebhookRepository webhookRepository,
         CommonRepository commonRepository,
-        WebhookMapper webhookMapper) {
+        WebhookTypeRepository webhookTypeRepository, WebhookMapper webhookMapper,
+        RestTemplate restTemplate) {
         this.webhookRepository = webhookRepository;
         this.commonRepository = commonRepository;
+        this.webhookTypeRepository = webhookTypeRepository;
         this.webhookMapper = webhookMapper;
+        this.restTemplate = restTemplate;
     }
 
 
@@ -55,7 +72,10 @@ public class WebhookServiceImpl implements WebhookService {
             queryVo.setCriteriaList(List.of(URL.like(request.getUrl()), WEBHOOK_TYPE.in(request.getWebhookType())));
             queryVo.setLookupVo(List.of(LookupVo.createLookupUser()));
             queryVo.setCollectionName("Webhook");
-            return commonRepository.page(queryVo, request, WebhookResponse.class);
+            Page<WebhookResponse> page = commonRepository.page(queryVo, request, WebhookResponse.class);
+            page.forEach(webhookResponse -> webhookResponse
+                .setTypeName(WebhookType.getType(webhookResponse.getWebhookType()).getName()));
+            return page;
         } catch (Exception e) {
             log.error("Failed to get the Webhook list!", e);
             throw new ApiTestPlatformException(GET_WEBHOOK_PAGE_ERROR);
@@ -109,6 +129,30 @@ public class WebhookServiceImpl implements WebhookService {
             log.error("Failed to delete the Webhook!", e);
             throw new ApiTestPlatformException(DELETE_WEBHOOK_BY_ID_ERROR);
         }
+    }
+
+    @Override
+    public List<WebhookTypeResponse> getAllType() {
+        return webhookMapper.toWebhookTypeList(webhookTypeRepository.findAll());
+    }
+
+    @Override
+    public Boolean testConnection(WebhookRequest request) {
+        try {
+            HttpHeaders header = new HttpHeaders();
+            request.getHeader().forEach(header::add);
+            header.setContentType(MediaType.APPLICATION_JSON);
+            List<Map<String, Object>> fieldDesc = webhookTypeRepository.findByType(request.getWebhookType())
+                .getFieldDesc();
+            Map<Object, Object> scope = fieldDesc.stream()
+                .collect(Collectors.toMap(field -> field.get("key"), field -> field.get("example")));
+            String body = MustacheUtils.getContent(request.getPayload(), scope);
+            HttpEntity<String> httpEntity = new HttpEntity<>(body, header);
+            restTemplate.exchange(request.getUrl(), HttpMethod.POST, httpEntity, String.class);
+        } catch (RestClientException e) {
+            throw ExceptionUtils.mpe("Test connection fail!", e);
+        }
+        return true;
     }
 
 }

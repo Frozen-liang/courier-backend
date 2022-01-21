@@ -36,8 +36,11 @@ import com.sms.courier.entity.job.common.JobEnvironment;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.utils.EnumCommonUtils;
+import com.sms.courier.utils.JsonUtils;
 import com.sms.courier.webhook.response.WebhookCaseJobResponse;
+import com.sms.courier.webhook.response.WebhookCaseReportResponse;
 import com.sms.courier.webhook.response.WebhookSceneCaseJobResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import org.mapstruct.InjectionStrategy;
@@ -49,7 +52,7 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE,
     uses = {EnumCommonUtils.class, ParamInfoMapper.class, MatchParamInfoMapper.class,
         ResponseResultVerificationMapper.class},
-    imports = {JobStatus.class, NotificationTemplateType.class, ResultType.class, Objects.class})
+    imports = {JobStatus.class, NotificationTemplateType.class, ResultType.class, Objects.class, JsonUtils.class})
 public interface JobMapper {
 
     JobEnvironment toJobEnvironment(ProjectEnvironmentEntity projectEnvironment);
@@ -167,7 +170,15 @@ public interface JobMapper {
     @Mapping(target = "type", expression = "java(NotificationTemplateType.TEST_REPORT)")
     TestReportEvent toTestReportEvent(SceneCaseJobEntity jobEntity, List<CaseReport> caseReports);
 
+    @Mapping(target = "caseReportList",
+        expression = "java(JsonUtils.serializeObjectNotNull(jobReport.getCaseReportList()))")
     WebhookSceneCaseJobResponse toWebhookSceneCaseJobResponse(SceneCaseJobReport jobReport);
+
+    @Mapping(target = "requestHeader",
+        expression = "java(JsonUtils.serializeObjectNotNull(caseReport.getRequestHeader()))")
+    @Mapping(target = "responseHeader",
+        expression = "java(JsonUtils.serializeObjectNotNull(caseReport.getResponseHeader()))")
+    WebhookCaseReportResponse toWebhookCaseReportResponse(CaseReport caseReport) throws IOException;
 
     default String getDataName(JobEntity jobEntity) {
         if (Objects.nonNull(jobEntity) && Objects.nonNull(jobEntity.getDataCollection())) {
@@ -175,6 +186,7 @@ public interface JobMapper {
         }
         return "";
     }
+
 
     default long count(ResultType resultType, List<CaseReport> caseReports, SceneCaseJobEntity jobEntity) {
         if (Objects.isNull(caseReports)) {

@@ -2,7 +2,7 @@ package com.sms.courier.webhook.model;
 
 import com.sms.courier.entity.BaseEntity;
 import com.sms.courier.webhook.enums.WebhookType;
-import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,7 +18,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "Webhook")
 public class WebhookEntity extends BaseEntity {
 
+    private String name;
     private String url;
     private String description;
-    private List<WebhookType> webhookType;
+    private Map<String, String> header;
+    private WebhookType webhookType;
+    private String payload;
 }

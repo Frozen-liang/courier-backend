@@ -28,6 +28,7 @@ public class UserEntity extends BaseEntity {
     @HashIndexed
     @Indexed(unique = true)
     private String email;
+    private Integer age;
     private String password;
 
     @Field(targetType = FieldType.OBJECT_ID)

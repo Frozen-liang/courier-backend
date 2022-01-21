@@ -1,6 +1,7 @@
 package com.sms.courier.webhook;
 
 import com.sms.courier.repository.WebhookRepository;
+import com.sms.courier.utils.MustacheUtils;
 import com.sms.courier.webhook.model.WebhookEntity;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -58,13 +59,15 @@ public class HookEventHandler implements InitializingBean, DisposableBean {
             try {
                 WebhookEvent<?> webhookEvent = webhookEventQueue.take();
                 List<WebhookEntity> webhookEntities = webhookRepository
-                    .findByWebhookTypeContains(webhookEvent.getWebhookType());
-                HttpHeaders header = new HttpHeaders();
-                header.setContentType(MediaType.APPLICATION_JSON);
-                HttpEntity<WebhookEvent<?>> httpEntity = new HttpEntity<>(webhookEvent, header);
+                    .findByWebhookType(webhookEvent.getWebhookType());
                 for (WebhookEntity webhookEntity : webhookEntities) {
                     try {
-                        restTemplate.exchange(webhookEntity.getUrl(), HttpMethod.POST, httpEntity, Object.class);
+                        HttpHeaders header = new HttpHeaders();
+                        webhookEntity.getHeader().forEach(header::add);
+                        header.setContentType(MediaType.APPLICATION_JSON);
+                        String body = MustacheUtils.getContent(webhookEntity.getPayload(), webhookEvent.getData());
+                        HttpEntity<String> httpEntity = new HttpEntity<>(body, header);
+                        restTemplate.exchange(webhookEntity.getUrl(), HttpMethod.POST, httpEntity, String.class);
                     } catch (Exception e) {
                         log.error("Webhook network exception! url: {}", webhookEntity.getUrl(), e);
                     }
