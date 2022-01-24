@@ -49,8 +49,8 @@ public class DataCollectionController {
 
     @GetMapping("/list/{projectId}")
     @PreAuthorize("hasRoleOrAdmin(@role.DATA_COLLECTION_QUERY_ALL)")
-    public List<DataCollectionResponse> list(@PathVariable String projectId, String collectionName) {
-        return dataCollectionService.list(projectId, collectionName);
+    public List<DataCollectionResponse> list(@PathVariable String projectId, String collectionName, String groupId) {
+        return dataCollectionService.list(projectId, collectionName, groupId);
     }
 
     @GetMapping("/param-list/{id}")

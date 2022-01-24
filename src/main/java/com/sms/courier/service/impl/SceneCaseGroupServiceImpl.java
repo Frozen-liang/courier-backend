@@ -9,6 +9,7 @@ import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_GROUP
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_GROUP_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_GROUP_LIST_ERROR;
+import static com.sms.courier.common.field.CommonField.GROUP_ID;
 import static com.sms.courier.utils.Assert.isTrue;
 
 import com.google.common.collect.Lists;
@@ -18,10 +19,12 @@ import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.SceneCaseGroupRequest;
 import com.sms.courier.dto.response.TreeResponse;
+import com.sms.courier.entity.datacollection.DataCollectionEntity;
 import com.sms.courier.entity.group.SceneCaseGroupEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.infrastructure.id.DefaultIdentifierGenerator;
 import com.sms.courier.mapper.SceneCaseGroupMapper;
+import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.repository.SceneCaseGroupRepository;
 import com.sms.courier.service.SceneCaseGroupService;
@@ -34,6 +37,9 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -44,15 +50,18 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
     private final SceneCaseGroupMapper sceneCaseGroupMapper;
     private final SceneCaseService sceneCaseService;
     private final CustomizedSceneCaseRepository customizedSceneCaseRepository;
+    private final CommonRepository commonRepository;
     private final DefaultIdentifierGenerator identifierGenerator = DefaultIdentifierGenerator.getSharedInstance();
 
     public SceneCaseGroupServiceImpl(SceneCaseGroupRepository sceneCaseGroupRepository,
         SceneCaseGroupMapper sceneCaseGroupMapper, SceneCaseService sceneCaseService,
-        CustomizedSceneCaseRepository customizedSceneCaseRepository) {
+        CustomizedSceneCaseRepository customizedSceneCaseRepository,
+        CommonRepository commonRepository) {
         this.sceneCaseGroupRepository = sceneCaseGroupRepository;
         this.sceneCaseGroupMapper = sceneCaseGroupMapper;
         this.sceneCaseService = sceneCaseService;
         this.customizedSceneCaseRepository = customizedSceneCaseRepository;
+        this.commonRepository = commonRepository;
     }
 
     @Override
@@ -121,6 +130,7 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
             }
             if (CollectionUtils.isNotEmpty(ids)) {
                 sceneCaseGroupRepository.deleteAllByIdIn(ids);
+                removeDataCollGroupId(ids);
                 List<SceneCaseEntity> sceneCaseEntityList = customizedSceneCaseRepository
                     .getSceneCaseIdsByGroupIds(ids);
                 if (CollectionUtils.isNotEmpty(sceneCaseEntityList)) {
@@ -138,6 +148,13 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
             log.error("Failed to delete the SceneCaseGroup!", e);
             throw ExceptionUtils.mpe(DELETE_SCENE_CASE_GROUP_ERROR);
         }
+    }
+
+    private void removeDataCollGroupId(List<String> ids) {
+        Query query = Query.query(Criteria.where(GROUP_ID.getName()).in(ids));
+        Update update = new Update();
+        update.unset(GROUP_ID.getName());
+        commonRepository.updateField(query, update, DataCollectionEntity.class);
     }
 
     @Override

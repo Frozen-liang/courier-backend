@@ -27,6 +27,7 @@ import com.sms.courier.repository.WebhookRepository;
 import com.sms.courier.repository.WebhookTypeRepository;
 import com.sms.courier.service.WebhookService;
 import com.sms.courier.utils.ExceptionUtils;
+import com.sms.courier.utils.JsonUtils;
 import com.sms.courier.utils.MustacheUtils;
 import com.sms.courier.webhook.enums.WebhookType;
 import com.sms.courier.webhook.model.WebhookEntity;
@@ -52,6 +53,10 @@ public class WebhookServiceImpl implements WebhookService {
     private final WebhookTypeRepository webhookTypeRepository;
     private final WebhookMapper webhookMapper;
     private final RestTemplate restTemplate;
+    private static final String KEY = "key";
+    private static final String PARAM_TYPE = "paramType";
+    private static final String JSON = "json";
+    private static final String EXAMPLE = "example";
 
     public WebhookServiceImpl(WebhookRepository webhookRepository,
         CommonRepository commonRepository,
@@ -145,7 +150,9 @@ public class WebhookServiceImpl implements WebhookService {
             List<Map<String, Object>> fieldDesc = webhookTypeRepository.findByType(request.getWebhookType())
                 .getFieldDesc();
             Map<Object, Object> scope = fieldDesc.stream()
-                .collect(Collectors.toMap(field -> field.get("key"), field -> field.get("example")));
+                .collect(Collectors.toMap(field -> field.get(KEY),
+                    field -> JSON.equals(field.get(PARAM_TYPE)) ? JsonUtils.serializeObjectNotNull(field.get(EXAMPLE))
+                        : field.get(EXAMPLE)));
             String body = MustacheUtils.getContent(request.getPayload(), scope);
             HttpEntity<String> httpEntity = new HttpEntity<>(body, header);
             restTemplate.exchange(request.getUrl(), HttpMethod.POST, httpEntity, String.class);

@@ -24,6 +24,9 @@ public class DataCollectionRequest {
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId cannot be empty")
     private String projectId;
 
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The groupId cannot be empty")
+    private String groupId;
+
     @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The collectionName cannot be empty")
     private String collectionName;
 
@@ -32,5 +35,6 @@ public class DataCollectionRequest {
     @Valid
     private List<TestDataRequest> dataList;
 
+    @NotBlank(groups = {InsertGroup.class, UpdateGroup.class}, message = "The envId cannot be empty")
     private String envId;
 }

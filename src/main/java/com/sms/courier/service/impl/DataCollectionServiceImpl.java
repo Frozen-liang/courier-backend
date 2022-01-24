@@ -13,6 +13,7 @@ import static com.sms.courier.common.exception.ErrorCode.GET_DATA_COLLECTION_LIS
 import static com.sms.courier.common.exception.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.IMPORT_DATA_COLLECTION_ERROR;
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
+import static com.sms.courier.common.field.CommonField.GROUP_ID;
 import static com.sms.courier.common.field.CommonField.PROJECT_ID;
 import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.utils.Assert.isTrue;
@@ -79,18 +80,24 @@ public class DataCollectionServiceImpl implements DataCollectionService {
 
     @Override
     public DataCollectionEntity findOne(String id) {
-        return dataCollectionRepository.findById(id).orElse(null);
+        Optional<DataCollectionEntity> optional = dataCollectionRepository.findById(id);
+        if (optional.isPresent() && !optional.get().isRemoved()) {
+            return optional.get();
+        }
+        return null;
     }
 
     @Override
-    public List<DataCollectionResponse> list(String projectId, String collectionName) {
+    public List<DataCollectionResponse> list(String projectId, String collectionName, String groupId) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
             DataCollectionEntity dataCollection = DataCollectionEntity.builder().projectId(projectId)
                 .collectionName(collectionName)
+                .groupId(groupId)
                 .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(GROUP_ID.getName(), GenericPropertyMatchers.exact())
                 .withMatcher(REMOVE.getName(), GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING);
             Example<DataCollectionEntity> example = Example.of(dataCollection, exampleMatcher);
@@ -213,17 +220,14 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     public List<DataCollectionResponse> listByEnvIdAndEnvIdIsNull(String envId, String projectId) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
-            DataCollectionEntity dataCollection = DataCollectionEntity.builder().envId(envId)
+            DataCollectionEntity dataCollection = DataCollectionEntity.builder().envId(envId).projectId(projectId)
                 .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(REMOVE.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(PROJECT_ID.getName(), GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING);
             Example<DataCollectionEntity> example = Example.of(dataCollection, exampleMatcher);
             List<DataCollectionEntity> dataCollectionEntityList = dataCollectionRepository.findAll(example, sort);
-            List<DataCollectionEntity> entityList =
-                dataCollectionRepository
-                    .findAllByEnvIdExistsAndRemovedAndProjectId(Boolean.FALSE, Boolean.FALSE, projectId);
-            dataCollectionEntityList.addAll(entityList);
             return dataCollectionMapper.toDtoList(dataCollectionEntityList);
         } catch (Exception e) {
             log.error("Failed to get the DataCollection list!", e);

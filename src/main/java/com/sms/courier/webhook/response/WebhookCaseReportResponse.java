@@ -3,6 +3,7 @@ package com.sms.courier.webhook.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +13,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class WebhookCaseReportResponse {
 
-    private Integer status;
+    @Default
+    private Integer status = 500;
 
     private Integer requestMethod;
 
@@ -22,20 +24,24 @@ public class WebhookCaseReportResponse {
 
     private String responseHeader;
 
-    private Object responseData;
+    @Default
+    private Object responseData = "";
 
-    private Object requestData;
+    private String requestData;
 
-    private Integer isSuccess;
+    @Default
+    private Integer isSuccess = 0;
 
     private String errCode;
 
     private String failMessage;
 
+    @Default
     //The time it takes to run.
-    private Integer timeCost;
+    private Integer timeCost = 0;
 
+    @Default
     // The time it takes to prepare parameters.
-    private Integer paramsTimeCost;
+    private Integer paramsTimeCost = 0;
 
 }

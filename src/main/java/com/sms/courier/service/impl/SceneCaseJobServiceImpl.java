@@ -286,7 +286,7 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
             caseDispatcherService
                 .sendJobReport(sceneCaseJobEntity.getCreateUserId(),
                     jobMapper.toSceneCaseJobReportResponse(sceneCaseJobReport));
-            applicationEventPublisher.publishEvent(WebhookEvent.create(WebhookType.CASE_REPORT,
+            applicationEventPublisher.publishEvent(WebhookEvent.create(WebhookType.SCENE_CASE_REPORT,
                 jobMapper.toWebhookSceneCaseJobResponse(sceneCaseJobReport)));
             applicationEventPublisher
                 .publishEvent(jobMapper.toTestReportEvent(sceneCaseJobEntity, sceneCaseJobReport.getCaseReportList()));

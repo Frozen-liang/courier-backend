@@ -1,6 +1,5 @@
 package com.sms.courier.service;
 
-import static com.mongodb.client.model.Filters.eq;
 import static com.sms.courier.common.exception.ErrorCode.ADD_DATA_COLLECTION_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
@@ -148,7 +147,7 @@ class DataCollectionServiceTest {
         }
         when(dataCollectionRepository.findAll(any(), any(Sort.class))).thenReturn(dataCollectionList);
         when(dataCollectionMapper.toDtoList(dataCollectionList)).thenReturn(dataCollectionDtoList);
-        List<DataCollectionResponse> result = dataCollectionService.list(PROJECT_ID, COLLECTION_NAME);
+        List<DataCollectionResponse> result = dataCollectionService.list(PROJECT_ID, COLLECTION_NAME, "");
         assertThat(result).hasSize(TOTAL_ELEMENTS);
     }
 
@@ -156,7 +155,7 @@ class DataCollectionServiceTest {
     @DisplayName("An exception occurred while getting DataCollection list")
     public void list_exception_test() {
         doThrow(new RuntimeException()).when(dataCollectionRepository).findAll(any(), any(Sort.class));
-        assertThatThrownBy(() -> dataCollectionService.list(PROJECT_ID, COLLECTION_NAME))
+        assertThatThrownBy(() -> dataCollectionService.list(PROJECT_ID, COLLECTION_NAME, ""))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_DATA_COLLECTION_LIST_ERROR.getCode());
     }

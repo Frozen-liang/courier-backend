@@ -49,6 +49,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -173,28 +174,30 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
 
     protected DataCollectionEntity getDataCollection(String dataCollId) {
         if (StringUtils.isNotBlank(dataCollId)) {
-            return commonRepository.findById(dataCollId, DataCollectionEntity.class).orElse(null);
+            Optional<DataCollectionEntity> optional = commonRepository.findById(dataCollId, DataCollectionEntity.class);
+            if (optional.isPresent() && !optional.get().isRemoved()) {
+                return optional.get();
+            }
         }
         return null;
     }
 
     protected DataCollectionEntity getDataCollection(SceneCaseEntity sceneCaseEntity, String envId) {
-        List<String> dataCollIds;
+        Optional<String> dataCollId;
         boolean isExist = sceneCaseEntity.getEnvDataCollConnList().stream().anyMatch(envData -> Objects.equals(envId,
             envData.getEnvId()));
         if (isExist) {
-            dataCollIds = sceneCaseEntity.getEnvDataCollConnList().stream()
+            dataCollId = sceneCaseEntity.getEnvDataCollConnList().stream()
                 .filter(envData -> Objects.equals(envId, envData.getEnvId()))
-                .map(EnvDataCollConn::getDataCollId).collect(Collectors.toList());
+                .map(EnvDataCollConn::getDataCollId).findFirst();
         } else {
-            dataCollIds = sceneCaseEntity.getEnvDataCollConnList().stream()
+            dataCollId = sceneCaseEntity.getEnvDataCollConnList().stream()
                 .filter(envData -> Objects.isNull(envData.getEnvId()))
-                .map(EnvDataCollConn::getDataCollId).collect(Collectors.toList());
+                .map(EnvDataCollConn::getDataCollId).findFirst();
         }
 
-        if (CollectionUtils.isNotEmpty(dataCollIds)) {
-            DataCollectionEntity dataCollectionEntity = commonRepository.findById(dataCollIds.get(0),
-                DataCollectionEntity.class).orElse(null);
+        if (dataCollId.isPresent()) {
+            DataCollectionEntity dataCollectionEntity = this.getDataCollection(dataCollId.get());
             if (Objects.nonNull(dataCollectionEntity) && Objects.nonNull(dataCollectionEntity.getEnvId())) {
                 isTrue(Objects.equals(dataCollectionEntity.getEnvId(), envId), THE_DATA_IS_NOT_BINDING_THE_ENV);
             }
