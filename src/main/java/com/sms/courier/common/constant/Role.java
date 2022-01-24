@@ -182,6 +182,6 @@ public class Role {
 
     // GeneratorTemplate
     public static final String GENERATOR_TEMPLATE_CRE_UPD_DEL = "Generator_Template" + CRE_UPD_DEL;
-    public static final String GENERATOR_TEMPLATE_QUERY_ALL = "Case_Template" + QUERY_ALL;
+    public static final String GENERATOR_TEMPLATE_QUERY_ALL = "Generator_Template" + QUERY_ALL;
 
 }
