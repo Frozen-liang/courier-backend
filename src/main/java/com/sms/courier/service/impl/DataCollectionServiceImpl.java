@@ -13,6 +13,7 @@ import static com.sms.courier.common.exception.ErrorCode.GET_DATA_COLLECTION_LIS
 import static com.sms.courier.common.exception.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.IMPORT_DATA_COLLECTION_ERROR;
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
+import static com.sms.courier.common.field.CommonField.GROUP_ID;
 import static com.sms.courier.common.field.CommonField.PROJECT_ID;
 import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.utils.Assert.isTrue;
@@ -87,14 +88,16 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
-    public List<DataCollectionResponse> list(String projectId, String collectionName) {
+    public List<DataCollectionResponse> list(String projectId, String collectionName, String groupId) {
         try {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
             DataCollectionEntity dataCollection = DataCollectionEntity.builder().projectId(projectId)
                 .collectionName(collectionName)
+                .groupId(groupId)
                 .build();
             ExampleMatcher exampleMatcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID.getName(), GenericPropertyMatchers.exact())
+                .withMatcher(GROUP_ID.getName(), GenericPropertyMatchers.exact())
                 .withMatcher(REMOVE.getName(), GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING);
             Example<DataCollectionEntity> example = Example.of(dataCollection, exampleMatcher);

@@ -1,6 +1,7 @@
 package com.sms.courier.mapper;
 
 import static com.sms.courier.common.constant.TimePatternConstant.DEFAULT_PATTERN;
+import static org.mapstruct.NullValueCheckStrategy.ALWAYS;
 
 import com.sms.courier.chat.common.NotificationTemplateType;
 import com.sms.courier.common.enums.JobStatus;
@@ -170,15 +171,20 @@ public interface JobMapper {
     @Mapping(target = "type", expression = "java(NotificationTemplateType.TEST_REPORT)")
     TestReportEvent toTestReportEvent(SceneCaseJobEntity jobEntity, List<CaseReport> caseReports);
 
-    @Mapping(target = "caseReportList",
-        expression = "java(JsonUtils.serializeObjectNotNull(jobReport.getCaseReportList()))")
-    WebhookSceneCaseJobResponse toWebhookSceneCaseJobResponse(SceneCaseJobReport jobReport);
-
     @Mapping(target = "requestHeader",
         expression = "java(JsonUtils.serializeObjectNotNull(caseReport.getRequestHeader()))")
     @Mapping(target = "responseHeader",
         expression = "java(JsonUtils.serializeObjectNotNull(caseReport.getResponseHeader()))")
+    @Mapping(target = "requestData", expression = "java(JsonUtils.serializeObjectNotNull(caseReport.getRequestData()))")
+    @Mapping(target = "status", nullValueCheckStrategy = ALWAYS)
+    @Mapping(target = "isSuccess", nullValueCheckStrategy = ALWAYS)
+    @Mapping(target = "timeCost", nullValueCheckStrategy = ALWAYS)
+    @Mapping(target = "paramsTimeCost", nullValueCheckStrategy = ALWAYS)
     WebhookCaseReportResponse toWebhookCaseReportResponse(CaseReport caseReport) throws IOException;
+
+    @Mapping(target = "caseReportList",
+        expression = "java(JsonUtils.serializeObjectNotNull(jobReport.getCaseReportList()))")
+    WebhookSceneCaseJobResponse toWebhookSceneCaseJobResponse(SceneCaseJobReport jobReport);
 
     default String getDataName(JobEntity jobEntity) {
         if (Objects.nonNull(jobEntity) && Objects.nonNull(jobEntity.getDataCollection())) {

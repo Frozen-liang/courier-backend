@@ -2,7 +2,7 @@
   {
     "id": "61e4cd12e973ed57cf565e3b",
     "type": 0,
-    "defaultPayload": "{\n  \"jobStatus\": \"{{jobStatus}}\",\n  \"message\": \"{{message}}\",\n  \"errCode\": \"{{errCode}}\",\n  \"totalTimeCost\": \"{{totalTimeCost}}\",\n  \"paramsTotalTimeCost\": \"{{paramsTotalTimeCost}}\",\n  \"caseReport\": {\n    \"status\": \"{{caseReport.status}}\",\n    \"requestMethod\": \"{{caseReport.requestMethod}}\",\n    \"requestUrl\": \"{{caseReport.requestUrl}}\",\n    \"requestHeader\": \"{{caseReport.requestHeader}}\",\n    \"responseHeader\": \"{{caseReport.responseHeader}}\",\n    \"responseData\": \"{{caseReport.responseData}}\",\n    \"requestData\": \"{{caseReport.requestData}}\",\n    \"isSuccess\": \"{{caseReport.isSuccess}}\",\n    \"errCode\": \"{{caseReport.errCode}}\",\n    \"failMessage\": \"{{caseReport.failMessage}}\",\n    \"timeCost\": \"{{caseReport.timeCost}}\",\n    \"paramsTimeCost\": \"{{caseReport.paramsTimeCost}}\"\n  }\n}",
+    "defaultPayload": "{\n  \"message\": \"{{message}}\",\n  \"errCode\": \"{{errCode}}\",\n  \"totalTimeCost\": {{totalTimeCost}},\n  \"paramsTotalTimeCost\": {{paramsTotalTimeCost}},\n  \"caseReport\": {\n    \"status\": {{caseReport.status}},\n    \"requestMethod\": {{caseReport.requestMethod}},\n    \"requestUrl\": \"{{caseReport.requestUrl}}\",\n    \"requestHeader\": {{caseReport.requestHeader}},\n    \"responseHeader\": {{caseReport.responseHeader}},\n    \"responseData\": {{caseReport.responseData}},\n    \"requestData\": {{caseReport.requestData}},\n    \"isSuccess\": {{caseReport.isSuccess}},\n    \"errCode\": \"{{caseReport.errCode}}\",\n    \"failMessage\": \"{{caseReport.failMessage}}\",\n    \"timeCost\": {{caseReport.timeCost}},\n    \"paramsTimeCost\": {{caseReport.paramsTimeCost}}\n  }\n}",
     "fieldDesc": [
       {
         "key": "jobStatus",
@@ -74,12 +74,12 @@
         "key": "caseReport.requestData",
         "desc": "请求体数据",
         "paramType": "string",
-        "example": "username=jack"
+        "example": "{\n          \"username\": \"jack\"\n        }"
       },
       {
         "key": "caseReport.responseData",
         "desc": "响应数据",
-        "paramType": "sting",
+        "paramType": "json",
         "example": {
           "username": "jack",
           "age": 18
@@ -108,7 +108,7 @@
   {
     "id": "61e4cd12e973ed57cf565e3c",
     "type": 1,
-    "defaultPayload": "{\n      \"jobStatus\": \"{{jobStatus}}\",\n      \"message\": \"{{message}}\",\n      \"errCode\": \"{{errCode}}\",\n      \"totalTimeCost\": \"{{totalTimeCost}}\",\n      \"paramsTotalTimeCost\": \"{{paramsTotalTimeCost}}\",\n      \"caseReportList\": \"{{caseReportList}}\"\n}",
+    "defaultPayload": "{\n  \"jobStatus\": {{jobStatus}},\n  \"message\": \"{{message}}\",\n  \"errCode\": \"{{errCode}}\",\n  \"totalTimeCost\": {{totalTimeCost}},\n  \"paramsTotalTimeCost\": {{paramsTotalTimeCost}},\n  \"caseReportList\": {{caseReportList}}\n}",
     "fieldDesc": [
       {
         "key": "jobStatus",
@@ -174,7 +174,7 @@
   {
     "id": "61e4cd12e973ed57cf565e3d",
     "type": 2,
-    "defaultPayload": "{\n  \"id\": \"{{id}}\",\n  \"name\": \"{{name}}\",\n  \"success\": \"{{success}}\",\n  \"fail\": \"{{fail}}\"\n}",
+    "defaultPayload": "{\n  \"id\": \"{{id}}\",\n  \"name\": \"{{name}}\",\n  \"success\": {{success}},\n  \"fail\": {{fail}}\n}",
     "fieldDesc": [
       {
         "key": "id",

@@ -12,7 +12,7 @@ public interface DataCollectionService {
 
     DataCollectionEntity findOne(String id);
 
-    List<DataCollectionResponse> list(String projectId, String collectionName);
+    List<DataCollectionResponse> list(String projectId, String collectionName, String groupId);
 
     Boolean add(DataCollectionRequest dataCollectionRequest);
 
