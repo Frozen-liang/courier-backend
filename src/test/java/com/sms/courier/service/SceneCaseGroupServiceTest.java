@@ -1,22 +1,5 @@
 package com.sms.courier.service;
 
-import com.sms.courier.common.exception.ApiTestPlatformException;
-import com.sms.courier.dto.request.SceneCaseGroupRequest;
-import com.sms.courier.dto.response.SceneCaseGroupResponse;
-import com.sms.courier.dto.response.TreeResponse;
-import com.sms.courier.entity.group.SceneCaseGroupEntity;
-import com.sms.courier.entity.scenetest.SceneCaseEntity;
-import com.sms.courier.mapper.SceneCaseGroupMapper;
-import com.sms.courier.repository.CustomizedSceneCaseRepository;
-import com.sms.courier.repository.SceneCaseGroupRepository;
-import com.sms.courier.service.impl.SceneCaseGroupServiceImpl;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-import org.assertj.core.util.Lists;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_GROUP_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_GROUP_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_GROUP_ERROR;
@@ -29,17 +12,37 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
 
+import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.dto.request.SceneCaseGroupRequest;
+import com.sms.courier.dto.response.SceneCaseGroupResponse;
+import com.sms.courier.dto.response.TreeResponse;
+import com.sms.courier.entity.group.SceneCaseGroupEntity;
+import com.sms.courier.entity.scenetest.SceneCaseEntity;
+import com.sms.courier.mapper.SceneCaseGroupMapper;
+import com.sms.courier.repository.CommonRepository;
+import com.sms.courier.repository.CustomizedSceneCaseRepository;
+import com.sms.courier.repository.SceneCaseGroupRepository;
+import com.sms.courier.service.impl.SceneCaseGroupServiceImpl;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.data.mongodb.core.query.Query;
+
 @DisplayName("Test cases for SceneCaseGroupServiceTest")
 class SceneCaseGroupServiceTest {
 
     private final SceneCaseGroupRepository sceneCaseGroupRepository = mock(SceneCaseGroupRepository.class);
     private final SceneCaseGroupMapper sceneCaseGroupMapper = mock(SceneCaseGroupMapper.class);
+    private final CommonRepository commonRepository = mock(CommonRepository.class);
     private final SceneCaseService sceneCaseService = mock(SceneCaseService.class);
     private final CustomizedSceneCaseRepository customizedSceneCaseRepository = mock(
         CustomizedSceneCaseRepository.class);
     private final SceneCaseGroupService sceneCaseGroupService =
         new SceneCaseGroupServiceImpl(sceneCaseGroupRepository, sceneCaseGroupMapper, sceneCaseService,
-            customizedSceneCaseRepository);
+            customizedSceneCaseRepository, commonRepository);
 
     private final static String MOCK_ID = "1";
     private final static String MOCK_ID_TWO = "2";
@@ -113,6 +116,7 @@ class SceneCaseGroupServiceTest {
         when(sceneCaseGroupRepository.findAllByPathContains(any())).thenReturn(
             Stream.of(SceneCaseGroupEntity.builder().id(MOCK_ID).build()));
         doNothing().when(sceneCaseGroupRepository).deleteAllByIdIn(any());
+        when(commonRepository.updateField(any(Query.class), any(), any())).thenReturn(true);
         List<SceneCaseEntity> sceneCaseList = Lists.newArrayList(SceneCaseEntity.builder().build());
         when(customizedSceneCaseRepository.getSceneCaseIdsByGroupIds(any())).thenReturn(sceneCaseList);
         Boolean isSuccess = sceneCaseGroupService.deleteById(MOCK_ID);
