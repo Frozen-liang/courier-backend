@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
@@ -22,7 +24,13 @@ public class GeneratorTemplateEntity extends BaseEntity {
 
     private String name;
 
+    @Field(targetType = FieldType.OBJECT_ID)
+    private String projectId;
+
     private CodeType codeType;
+
+    @Field("isDefaultTemplate")
+    private boolean defaultTemplate;
 
     private List<CodeTemplate> codeTemplates;
 }

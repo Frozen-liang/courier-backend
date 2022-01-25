@@ -307,6 +307,7 @@ public enum ErrorCode {
     DELETE_GENERATOR_TEMPLATE_ERROR("4282", "Failed to delete the GeneratorTemplate!"),
     EDIT_GENERATOR_TEMPLATE_ERROR("4283", "Failed to edit the GeneratorTemplate!"),
     GET_GENERATOR_TEMPLATE_ERROR("4284", "Failed to get the GeneratorTemplate by id!"),
+    GET_GENERATOR_TEMPLATE_LIST_ERROR("4285", "Failed to get the GeneratorTemplate list!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),

@@ -1,6 +1,5 @@
-package com.sms.courier.entity.generator;
+package com.sms.courier.dto.response;
 
-import com.sms.courier.common.enums.TemplateType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,12 +9,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CodeTemplate {
+public class CodeTemplateResponse {
 
     private String name;
 
     private String value;
 
-    private TemplateType templateType;
+    private Integer templateType;
 
 }

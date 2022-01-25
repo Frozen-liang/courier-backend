@@ -3,13 +3,13 @@ package com.sms.courier.service;
 import com.google.common.collect.Lists;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
-import com.sms.courier.dto.request.AddGeneratorTemplateRequest;
-import com.sms.courier.dto.request.UpdateGeneratorTemplateRequest;
+import com.sms.courier.dto.request.GeneratorTemplateRequest;
 import com.sms.courier.entity.generator.CodeTemplate;
 import com.sms.courier.entity.generator.GeneratorTemplateEntity;
 import com.sms.courier.generator.enums.CodeType;
 import com.sms.courier.mapper.GeneratorTemplateMapper;
 import com.sms.courier.repository.GeneratorTemplateRepository;
+import com.sms.courier.repository.GeneratorTemplateTypeRepository;
 import com.sms.courier.service.impl.GeneratorTemplateServiceImpl;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
@@ -31,8 +31,11 @@ public class GeneratorTemplateServiceTest {
 
     private final GeneratorTemplateRepository generatorTemplateRepository = mock(GeneratorTemplateRepository.class);
     private final GeneratorTemplateMapper generatorTemplateMapper = mock(GeneratorTemplateMapper.class);
+    private final GeneratorTemplateTypeRepository generatorTemplateTypeRepository =
+        mock(GeneratorTemplateTypeRepository.class);
     private final GeneratorTemplateService generatorTemplateService =
-            new GeneratorTemplateServiceImpl(generatorTemplateRepository, generatorTemplateMapper);
+        new GeneratorTemplateServiceImpl(generatorTemplateRepository, generatorTemplateMapper,
+            generatorTemplateTypeRepository);
 
     private static final String MOCK_ID = ObjectId.get().toString();
     private static final String MOCK_NAME = "test";
@@ -43,40 +46,44 @@ public class GeneratorTemplateServiceTest {
     @DisplayName("Test the add method in the GeneratorTemplate service")
     void add_test() {
         GeneratorTemplateEntity generatorTemplate = GeneratorTemplateEntity.builder()
-                .name(MOCK_NAME).codeType(MOCK_CODE_TYPE).codeTemplates(List.of(CodeTemplate.builder().name(MOCK_NAME).build())).build();
-        when(generatorTemplateMapper.toGeneratorTemplateByAddRequest(any())).thenReturn(generatorTemplate);
+            .name(MOCK_NAME).codeType(MOCK_CODE_TYPE)
+            .codeTemplates(List.of(CodeTemplate.builder().name(MOCK_NAME).build())).build();
+        when(generatorTemplateMapper.toEntity(any())).thenReturn(generatorTemplate);
         when(generatorTemplateRepository.insert(any(GeneratorTemplateEntity.class))).thenReturn(generatorTemplate);
-        assertTrue(generatorTemplateService.add(AddGeneratorTemplateRequest.builder().build()));
+        assertTrue(generatorTemplateService.add(GeneratorTemplateRequest.builder().build()));
     }
 
     @Test
     @DisplayName("Test the add method in the GeneratorTemplate service throws exception")
     void add_test_thenThrow_Exception() {
         GeneratorTemplateEntity generatorTemplate = GeneratorTemplateEntity.builder()
-                .name(MOCK_NAME).codeType(MOCK_CODE_TYPE).codeTemplates(List.of(CodeTemplate.builder().name(MOCK_NAME).build())).build();
-        when(generatorTemplateMapper.toGeneratorTemplateByAddRequest(any())).thenReturn(generatorTemplate);
+            .name(MOCK_NAME).codeType(MOCK_CODE_TYPE)
+            .codeTemplates(List.of(CodeTemplate.builder().name(MOCK_NAME).build())).build();
+        when(generatorTemplateMapper.toEntity(any())).thenReturn(generatorTemplate);
         when(generatorTemplateRepository.insert(any(GeneratorTemplateEntity.class)))
-                .thenThrow(new RuntimeException());
-        assertThatThrownBy(() -> generatorTemplateService.add(AddGeneratorTemplateRequest.builder().build()))
-                .isInstanceOf(ApiTestPlatformException.class);
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> generatorTemplateService.add(GeneratorTemplateRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test
     @DisplayName("Test the add method in the GeneratorTemplate service throws exception")
     void add_test_thenThrowException() {
         GeneratorTemplateEntity generatorTemplate = GeneratorTemplateEntity.builder()
-                .name(MOCK_NAME).codeType(MOCK_CODE_TYPE).codeTemplates(List.of(CodeTemplate.builder().name(MOCK_NAME).build())).build();
-        when(generatorTemplateMapper.toGeneratorTemplateByAddRequest(any())).thenReturn(generatorTemplate);
+            .name(MOCK_NAME).codeType(MOCK_CODE_TYPE)
+            .codeTemplates(List.of(CodeTemplate.builder().name(MOCK_NAME).build())).build();
+        when(generatorTemplateMapper.toEntity(any())).thenReturn(generatorTemplate);
         when(generatorTemplateRepository.insert(any(GeneratorTemplateEntity.class)))
-                .thenThrow(new ApiTestPlatformException(ErrorCode.ADD_GENERATOR_TEMPLATE_ERROR));
-        assertThatThrownBy(() -> generatorTemplateService.add(AddGeneratorTemplateRequest.builder().build()))
-                .isInstanceOf(ApiTestPlatformException.class);
+            .thenThrow(new ApiTestPlatformException(ErrorCode.ADD_GENERATOR_TEMPLATE_ERROR));
+        assertThatThrownBy(() -> generatorTemplateService.add(GeneratorTemplateRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test
     @DisplayName("Test the findById method in the GeneratorTemplate service")
     void findById() {
-        when(generatorTemplateRepository.findById(MOCK_ID)).thenReturn(Optional.of(GeneratorTemplateEntity.builder().id(MOCK_ID).build()));
+        when(generatorTemplateRepository.findById(MOCK_ID))
+            .thenReturn(Optional.of(GeneratorTemplateEntity.builder().id(MOCK_ID).build()));
         GeneratorTemplateEntity serviceById = generatorTemplateService.findById(MOCK_ID);
         assertThat(serviceById.getId()).isEqualTo(MOCK_ID);
     }
@@ -92,30 +99,31 @@ public class GeneratorTemplateServiceTest {
     @Test
     @DisplayName("Test the delete method in the GeneratorTemplate service throws exception")
     void delete_test_thenThrow_Exception() {
-        doThrow(new ApiTestPlatformException(ErrorCode.DELETE_GENERATOR_TEMPLATE_ERROR)).when(generatorTemplateRepository)
-                .deleteAllByIdIsIn(any());
+        doThrow(new ApiTestPlatformException(ErrorCode.DELETE_GENERATOR_TEMPLATE_ERROR))
+            .when(generatorTemplateRepository)
+            .deleteAllByIdIsIn(any());
         assertThatThrownBy(() -> generatorTemplateService.deleteByIds(List.of(MOCK_ID)))
-                .isInstanceOf(ApiTestPlatformException.class);
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test
     @DisplayName("Test the delete method in the GeneratorTemplate service throws exception")
     void delete_test_thenThrowException() {
         doThrow(new RuntimeException()).when(generatorTemplateRepository)
-                .deleteAllByIdIsIn(any());
+            .deleteAllByIdIsIn(any());
         assertThatThrownBy(() -> generatorTemplateService.deleteByIds(List.of(MOCK_ID)))
-                .isInstanceOf(ApiTestPlatformException.class);
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
     @Test
     @DisplayName("Test the edit method in the GeneratorTemplate service")
     void edit() {
         GeneratorTemplateEntity generatorTemplate =
-                GeneratorTemplateEntity.builder()
-                        .id(MOCK_ID).createUserId(MOCK_ID).modifyUserId(MOCK_ID).name(MOCK_NAME).removed(Boolean).build();
-        when(generatorTemplateMapper.toGeneratorTemplateByEditRequest(any())).thenReturn(generatorTemplate);
+            GeneratorTemplateEntity.builder()
+                .id(MOCK_ID).createUserId(MOCK_ID).modifyUserId(MOCK_ID).name(MOCK_NAME).removed(Boolean).build();
+        when(generatorTemplateMapper.toEntity(any())).thenReturn(generatorTemplate);
         when(generatorTemplateRepository.save(any())).thenReturn(generatorTemplate);
-        Boolean result2 = generatorTemplateService.edit(UpdateGeneratorTemplateRequest.builder().build());
+        Boolean result2 = generatorTemplateService.edit(GeneratorTemplateRequest.builder().build());
         assertTrue(result2);
     }
 
@@ -123,12 +131,12 @@ public class GeneratorTemplateServiceTest {
     @DisplayName("Test the edit method in the GeneratorTemplate service throws exception")
     void edit_test_then_thrownException() {
         GeneratorTemplateEntity generatorTemplate =
-                GeneratorTemplateEntity.builder()
-                        .id(MOCK_ID).createUserId(MOCK_ID).modifyUserId(MOCK_ID).name(MOCK_NAME).removed(Boolean).build();
-        when(generatorTemplateMapper.toGeneratorTemplateByEditRequest(any())).thenReturn(generatorTemplate);
+            GeneratorTemplateEntity.builder()
+                .id(MOCK_ID).createUserId(MOCK_ID).modifyUserId(MOCK_ID).name(MOCK_NAME).removed(Boolean).build();
+        when(generatorTemplateMapper.toEntity(any())).thenReturn(generatorTemplate);
         when(generatorTemplateRepository.save(any()))
-                .thenReturn(new ApiTestPlatformException(ErrorCode.DELETE_GENERATOR_TEMPLATE_ERROR));
-        assertThatThrownBy(() -> generatorTemplateService.edit(UpdateGeneratorTemplateRequest.builder().build()))
-                .isInstanceOf(ApiTestPlatformException.class);
+            .thenReturn(new ApiTestPlatformException(ErrorCode.DELETE_GENERATOR_TEMPLATE_ERROR));
+        assertThatThrownBy(() -> generatorTemplateService.edit(GeneratorTemplateRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 }
