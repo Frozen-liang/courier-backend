@@ -6,7 +6,7 @@ import java.util.Map;
 
 public enum CodeType implements EnumCommon {
 
-    CSHARP_CORE(0), CSHARP_FRAME_WORK(1);
+    CSHARP(0);
 
     private final Integer code;
 

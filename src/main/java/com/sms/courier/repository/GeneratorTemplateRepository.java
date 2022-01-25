@@ -8,4 +8,7 @@ public interface GeneratorTemplateRepository extends MongoRepository<GeneratorTe
 
     Long deleteAllByIdIsIn(List<String> ids);
 
+    List<GeneratorTemplateEntity> findByProjectIdAndDefaultTemplateIsFalse(String projectId);
+
+    List<GeneratorTemplateEntity> findAllByDefaultTemplate(boolean isDefaultTemplate);
 }

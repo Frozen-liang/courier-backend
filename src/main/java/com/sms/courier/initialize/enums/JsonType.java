@@ -3,6 +3,8 @@ package com.sms.courier.initialize.enums;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.sms.courier.docker.entity.ContainerSettingEntity;
 import com.sms.courier.engine.model.EngineSettingEntity;
+import com.sms.courier.entity.generator.GeneratorTemplateEntity;
+import com.sms.courier.entity.generator.GeneratorTemplateTypeEntity;
 import com.sms.courier.entity.system.SystemRoleEntity;
 import com.sms.courier.entity.system.UserGroupEntity;
 import com.sms.courier.webhook.model.WebhookTypeEntity;
@@ -19,7 +21,12 @@ public enum JsonType {
     CONTAINER_SETTING_ENTITY(ContainerSettingEntity.class, new TypeReference<List<ContainerSettingEntity>>() {
     }),
     WEBHOOK_TYPE_ENTITY(WebhookTypeEntity.class, new TypeReference<List<WebhookTypeEntity>>() {
-    });
+    }),
+    GENERATOR_TEMPLATE_ENTITY(GeneratorTemplateEntity.class, new TypeReference<List<GeneratorTemplateEntity>>() {
+    }),
+    GENERATOR_TEMPLATE_TYPE_ENTITY(GeneratorTemplateTypeEntity.class,
+        new TypeReference<List<GeneratorTemplateTypeEntity>>() {
+        });
 
     private final Class<?> entityClass;
     private final TypeReference<?> typeReference;

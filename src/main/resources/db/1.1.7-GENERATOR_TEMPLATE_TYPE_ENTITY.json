@@ -1,0 +1,196 @@
+[
+  {
+    "id": "61ee829010583363dab894cc",
+    "templateType": 0,
+    "fieldDescList": [
+      {
+        "key":"className",
+        "desc":"类名"
+      },
+      {
+        "key":"packageName",
+        "desc":"包名"
+      },
+      {
+        "key":"classPackage",
+        "desc":"类所在包名"
+      },
+      {
+        "key":"imports",
+        "desc":"导入的类"
+      },
+      {
+        "key": "params",
+        "desc": "字段集合",
+        "childField": [
+          {
+            "key": "key",
+            "desc": "字段名称"
+          },
+          {
+            "key": "description",
+            "desc": "字段备注"
+          },
+          {
+            "key": "paramType",
+            "desc": "字段类型"
+          },
+          {
+            "key": "required",
+            "desc": "是否必填"
+          }
+        ]
+      }]
+   },
+    {
+      "id": "61ee867ca130a8638c041b83",
+      "templateType": 1,
+      "fieldDescList": [
+      {
+        "key":"className",
+        "desc":"类名"
+      },
+      {
+        "key":"packageName",
+        "desc":"包名"
+      },
+      {
+        "key":"classPackage",
+        "desc":"类所在包名"
+      },
+      {
+        "key":"imports",
+        "desc":"导入的类"
+      },
+      {
+        "key":"apiUrl",
+        "desc":"api 路径"
+      },
+      {
+        "key":"requestMethod",
+        "desc":"请求类型"
+      },
+      {
+        "key":"requestEntity",
+        "desc":"请求体的实体名"
+      },
+      {
+        "key":"queryEntity",
+        "desc":"请求路径的实体名"
+      },
+      {
+        "key":"responseEntity",
+        "desc":"返回值的实体名"
+      },
+      {
+        "key":"serviceName",
+        "desc":"service 类名"
+      },
+      {
+        "key":"serviceImplName",
+        "desc":"service 实现类名"
+      }
+    ]
+  },
+  {
+    "id": "61ee86688b09e847b490bc08",
+    "templateType": 2,
+    "fieldDescList": [
+      {
+        "key":"className",
+        "desc":"类名"
+      },
+      {
+        "key":"packageName",
+        "desc":"包名"
+      },
+      {
+        "key":"classPackage",
+        "desc":"类所在包名"
+      },
+      {
+        "key":"imports",
+        "desc":"导入的类"
+      },
+      {
+        "key":"apiUrl",
+        "desc":"api 路径"
+      },
+      {
+        "key":"requestMethod",
+        "desc":"请求类型"
+      },
+      {
+        "key":"requestEntity",
+        "desc":"请求体的实体名"
+      },
+      {
+        "key":"queryEntity",
+        "desc":"请求路径的实体名"
+      },
+      {
+        "key":"responseEntity",
+        "desc":"返回值的实体名"
+      },
+      {
+        "key":"serviceName",
+        "desc":"service 类名"
+      },
+      {
+        "key":"serviceImplName",
+        "desc":"service 实现类名"
+      }
+    ]
+  },
+      {
+        "id": "61ee861e3625e75cd9c3ab54",
+        "templateType": 3,
+        "fieldDescList": [
+          {
+            "key":"className",
+            "desc":"类名"
+          },
+          {
+            "key":"packageName",
+            "desc":"包名"
+          },
+          {
+            "key":"classPackage",
+            "desc":"类所在包名"
+          },
+          {
+            "key":"imports",
+            "desc":"导入的类"
+          },
+          {
+            "key":"apiUrl",
+            "desc":"api 路径"
+          },
+          {
+            "key":"requestMethod",
+            "desc":"请求类型"
+          },
+          {
+            "key":"requestEntity",
+            "desc":"请求体的实体名"
+          },
+          {
+            "key":"queryEntity",
+            "desc":"请求路径的实体名"
+          },
+          {
+            "key":"responseEntity",
+            "desc":"返回值的实体名"
+          },
+          {
+            "key":"serviceName",
+            "desc":"service 类名"
+          },
+          {
+            "key":"serviceImplName",
+            "desc":"service 实现类名"
+          }
+        ]
+      }
+
+]
