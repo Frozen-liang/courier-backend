@@ -71,15 +71,15 @@
         "desc":"请求类型"
       },
       {
-        "key":"requestEntity",
+        "key":"requestName",
         "desc":"请求体的实体名"
       },
       {
-        "key":"queryEntity",
+        "key":"queryName",
         "desc":"请求路径的实体名"
       },
       {
-        "key":"responseEntity",
+        "key":"responseName",
         "desc":"返回值的实体名"
       },
       {
@@ -87,8 +87,22 @@
         "desc":"service 类名"
       },
       {
-        "key":"serviceImplName",
-        "desc":"service 实现类名"
+        "key":"pathParams",
+        "desc":"路径参数集合",
+        "childField": [
+          {
+            "key": "key",
+            "desc": "字段名称"
+          },
+          {
+            "key": "description",
+            "desc": "字段备注"
+          },
+          {
+            "key": "paramType",
+            "desc": "字段类型"
+          }
+        ]
       }
     ]
   },
@@ -113,23 +127,15 @@
         "desc":"导入的类"
       },
       {
-        "key":"apiUrl",
-        "desc":"api 路径"
-      },
-      {
-        "key":"requestMethod",
-        "desc":"请求类型"
-      },
-      {
-        "key":"requestEntity",
+        "key":"requestName",
         "desc":"请求体的实体名"
       },
       {
-        "key":"queryEntity",
+        "key":"queryName",
         "desc":"请求路径的实体名"
       },
       {
-        "key":"responseEntity",
+        "key":"responseName",
         "desc":"返回值的实体名"
       },
       {
@@ -137,8 +143,22 @@
         "desc":"service 类名"
       },
       {
-        "key":"serviceImplName",
-        "desc":"service 实现类名"
+        "key":"pathParams",
+        "desc":"路径参数集合",
+        "childField": [
+          {
+            "key": "key",
+            "desc": "字段名称"
+          },
+          {
+            "key": "description",
+            "desc": "字段备注"
+          },
+          {
+            "key": "paramType",
+            "desc": "字段类型"
+          }
+        ]
       }
     ]
   },
@@ -163,23 +183,15 @@
             "desc":"导入的类"
           },
           {
-            "key":"apiUrl",
-            "desc":"api 路径"
-          },
-          {
-            "key":"requestMethod",
-            "desc":"请求类型"
-          },
-          {
-            "key":"requestEntity",
+            "key":"requestName",
             "desc":"请求体的实体名"
           },
           {
-            "key":"queryEntity",
+            "key":"queryName",
             "desc":"请求路径的实体名"
           },
           {
-            "key":"responseEntity",
+            "key":"responseName",
             "desc":"返回值的实体名"
           },
           {
@@ -187,8 +199,22 @@
             "desc":"service 类名"
           },
           {
-            "key":"serviceImplName",
-            "desc":"service 实现类名"
+            "key":"pathParams",
+            "desc":"路径参数集合",
+            "childField": [
+              {
+                "key": "key",
+                "desc": "字段名称"
+              },
+              {
+                "key": "description",
+                "desc": "字段备注"
+              },
+              {
+                "key": "paramType",
+                "desc": "字段类型"
+              }
+            ]
           }
         ]
       }
