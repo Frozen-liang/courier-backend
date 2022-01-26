@@ -1,6 +1,6 @@
 package com.sms.courier.entity.generator;
 
-import com.sms.courier.common.enums.TemplateType;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,12 +10,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CodeTemplate {
+public class CodeFieldDesc {
 
-    private String name;
+    private String key;
 
-    private String value;
+    private String desc;
 
-    private TemplateType templateType;
-
+    private List<CodeFieldDesc> childField;
 }
