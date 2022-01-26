@@ -6,5 +6,6 @@ import lombok.Getter;
 public enum TokenType {
     USER,
     ENGINE,
-    MOCK
+    MOCK,
+    OPEN_API
 }

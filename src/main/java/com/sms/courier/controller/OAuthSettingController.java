@@ -9,6 +9,7 @@ import com.sms.courier.dto.request.OAuthSettingRequest;
 import com.sms.courier.dto.response.OAuthSettingResponse;
 import com.sms.courier.service.OAuthSettingService;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(OAUTH_SETTING)
+@PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
 public class OAuthSettingController {
 
     private final OAuthSettingService oauthSettingService;

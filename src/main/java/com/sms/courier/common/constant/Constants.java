@@ -59,6 +59,7 @@ public class Constants {
     public static final String OAUTH_SETTING = SDK_VERSION + "/oauth-setting";
     public static final String OAUTH = SDK_VERSION + "/oauth";
     public static final String GENERATOR_TEMPLATE_PATH = SDK_VERSION + "/generator-template";
+    public static final String OPEN_API_PATH = SDK_VERSION + "/open-api-setting";
 
     public static final int MAX_DEPTH = 3;
     public static final String HTTP_DEFAULT_STATUS_CODE = "200";

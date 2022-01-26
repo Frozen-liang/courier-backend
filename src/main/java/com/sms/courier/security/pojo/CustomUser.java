@@ -82,4 +82,8 @@ public class CustomUser extends User {
     public static CustomUser createMock() {
         return new CustomUser("mock", TokenType.MOCK);
     }
+
+    public static CustomUser createOpenApi(String id, String name) {
+        return new CustomUser(id, name, TokenType.OPEN_API);
+    }
 }

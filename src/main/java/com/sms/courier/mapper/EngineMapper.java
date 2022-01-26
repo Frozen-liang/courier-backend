@@ -4,6 +4,7 @@ import com.sms.courier.docker.enmu.LabelType;
 import com.sms.courier.docker.entity.ContainerInfo;
 import com.sms.courier.dto.response.EngineResponse;
 import com.sms.courier.dto.response.EngineSettingResponse;
+import com.sms.courier.engine.grpc.api.v1.GrpcEngineRegisterRequest;
 import com.sms.courier.engine.model.EngineMemberEntity;
 import com.sms.courier.utils.EnumCommonUtils;
 import com.sms.courier.utils.SecurityUtil;
@@ -25,4 +26,6 @@ public interface EngineMapper {
     @Mapping(target = "destination", constant = "engine")
     @Mapping(target = "labelType", expression = "java(LabelType.ENGINE)")
     ContainerInfo toContainerSetting(EngineSettingResponse engineSettingResponse);
+
+    EngineMemberEntity toEngineEntity(GrpcEngineRegisterRequest engineRegisterRequest);
 }

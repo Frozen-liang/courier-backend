@@ -21,6 +21,7 @@ import com.sms.courier.entity.group.ScheduleGroupEntity;
 import com.sms.courier.entity.mock.MockApiEntity;
 import com.sms.courier.entity.mock.MockSettingEntity;
 import com.sms.courier.entity.notification.EmailServiceEntity;
+import com.sms.courier.entity.openapi.OpenApiSettingEntity;
 import com.sms.courier.entity.project.ProjectEntity;
 import com.sms.courier.entity.project.ProjectImportSourceEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
@@ -35,6 +36,7 @@ import com.sms.courier.entity.system.UserEntity;
 import com.sms.courier.entity.system.UserGroupEntity;
 import com.sms.courier.entity.tag.ApiTagEntity;
 import com.sms.courier.entity.workspace.WorkspaceEntity;
+import com.sms.courier.security.oauth.OAuthSettingEntity;
 import com.sms.courier.webhook.model.WebhookEntity;
 import java.util.Arrays;
 import java.util.Map;
@@ -79,7 +81,9 @@ public enum OperationModule implements EnumCommon {
     WEBHOOK(32, WebhookEntity.class),
     COURIER_SCHEDULER(33, CourierSchedulerEntity.class),
     DATABASE(34, DatabaseEntity.class),
-    GENERATOR_TEMPLATE(35, GeneratorTemplateEntity.class);
+    GENERATOR_TEMPLATE(35, GeneratorTemplateEntity.class),
+    OAUTH_SETTING(36, OAuthSettingEntity.class),
+    OPEN_API_SETTING(37, OpenApiSettingEntity.class);
 
     private static final Map<Integer, OperationModule> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationModule::getCode, Function.identity()));

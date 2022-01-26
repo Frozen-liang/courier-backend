@@ -30,6 +30,7 @@ public class EngineController {
     }
 
     @GetMapping("/get")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public List<EngineResponse> getRunningEngine() {
         return engineMemberManagement.getRunningEngine();
     }
@@ -40,6 +41,7 @@ public class EngineController {
     }
 
     @PostMapping("/edit")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean edit(@Validated @RequestBody EngineMemberRequest request) {
         return engineMemberManagement.edit(request);
     }
@@ -81,6 +83,7 @@ public class EngineController {
     }
 
     @GetMapping("/queryLog")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public Boolean queryLog(@Validated DockerLogRequest request) {
         return engineMemberManagement.queryLog(request);
     }

@@ -128,19 +128,15 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
                 for (JobEnvironment jobEnv : jobEnvList) {
                     DataCollectionEntity dataCollectionEntity = super
                         .getDataCollection(sceneCaseEntity, jobEnv.getId());
-                    if (Objects.nonNull(dataCollectionEntity) && CollectionUtils
-                        .isNotEmpty(dataCollectionEntity.getDataList())) {
+                    if (CollectionUtils.isNotEmpty(dataCollectionEntity.getDataList())) {
                         List<TestData> dataList = dataCollectionEntity.getDataList();
                         jobRecord.setSceneCount(dataList.size());
                         for (TestData testData : dataList) {
-                            JobDataCollection jobDataCollection = JobDataCollection.builder()
-                                .collectionName(dataCollectionEntity.getCollectionName())
-                                .id(dataCollectionEntity.getId())
-                                .testData(testData).projectId(dataCollectionEntity.getProjectId()).build();
                             ScheduleSceneCaseJobEntity scheduleSceneCaseJobEntity =
                                 getSceneCaseJobEntity(sceneCaseId, scheduleRecordEntity, jobEnv, apiCaseList);
                             scheduleSceneCaseJobEntity.setNext(sceneCaseEntity.isNext());
-                            scheduleSceneCaseJobEntity.setDataCollection(jobDataCollection);
+                            scheduleSceneCaseJobEntity
+                                .setDataCollection(createJobDataCollection(dataCollectionEntity, testData));
                             scheduleSceneCaseJobEntity.setName(sceneCaseEntity.getName());
                             scheduleRecordEntity.getJobIds().add(scheduleSceneCaseJobEntity.getId());
                             scheduleSceneCaseJobEntities.add(scheduleSceneCaseJobEntity);
@@ -171,6 +167,13 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
             log.error("Dispatcher schedule scene case job system exception.", e);
         }
 
+    }
+
+    private JobDataCollection createJobDataCollection(DataCollectionEntity dataCollectionEntity, TestData testData) {
+        return JobDataCollection.builder()
+            .collectionName(dataCollectionEntity.getCollectionName())
+            .id(dataCollectionEntity.getId())
+            .testData(testData).projectId(dataCollectionEntity.getProjectId()).build();
     }
 
     private List<SceneCaseEntity> getSceneCaseEntity(String projectId, CaseFilter caseFilter,

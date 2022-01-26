@@ -16,7 +16,7 @@ public class AesUtil {
     }
 
     private static final Key key;
-    private static final String KEY_STR = "courier/09.16.2020";
+    public static final String KEY_STR = "courier/09.16.2020";
     private static final String KEY_ALGORITHM = "AES";
     private static final String CIPHER_ALGORITHM = "AES/ECB/PKCS5Padding";
     private static final String RANDOM_ALGORITHM = "SHA1PRNG";

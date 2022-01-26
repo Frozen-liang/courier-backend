@@ -35,6 +35,7 @@ import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.EngineMemberRepository;
 import com.sms.courier.security.jwt.JwtTokenManager;
 import com.sms.courier.security.pojo.CustomUser;
+import com.sms.courier.utils.AesUtil;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.List;
 import java.util.Map;
@@ -73,32 +74,28 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     @Override
     public void registerEngine(GrpcEngineRegisterRequest request) {
-        EngineMemberEntity engineMember;
         try {
             Optional<EngineMemberEntity> optional = engineMemberRepository.findFirstByName(request.getName());
-            if (optional.isEmpty()) {
-                EngineSettingResponse engineSetting = engineSettingService.findOne();
-                engineMember = EngineMemberEntity.builder()
-                    .port(request.getPort())
-                    .taskSizeLimit(Objects.isNull(engineSetting.getTaskSizeLimit()) ? Integer.valueOf(-1) :
-                        engineSetting.getTaskSizeLimit())
-                    .status(EngineStatus.PENDING)
-                    .containerStatus(ContainerStatus.START)
-                    .name(request.getName())
-                    .version(request.getVersion())
-                    .build();
-            } else {
-                engineMember = optional.get();
-                engineMember.setName(request.getName());
-                engineMember.setContainerStatus(ContainerStatus.START);
-                engineMember.setStatus(EngineStatus.PENDING);
-            }
-            engineMemberRepository.save(engineMember);
+            optional.ifPresentOrElse(this::updateEngine, () -> addEngine(request));
             log.info("Register engine : {} is success.", request.getName());
         } catch (Exception e) {
             log.error("Register engine : {} error!", request.getName(), e);
         }
 
+    }
+
+    private void addEngine(GrpcEngineRegisterRequest request) {
+        EngineSettingResponse engineSetting = engineSettingService.findOne();
+        EngineMemberEntity engineMember = engineMapper.toEngineEntity(request);
+        Integer integer = Objects.requireNonNullElse(engineSetting.getTaskSizeLimit(), -1);
+        engineMember.setTaskSizeLimit(integer);
+        engineMemberRepository.save(engineMember);
+    }
+
+    private void updateEngine(EngineMemberEntity engineMember) {
+        engineMember.setContainerStatus(ContainerStatus.START);
+        engineMember.setStatus(EngineStatus.PENDING);
+        engineMemberRepository.save(engineMember);
     }
 
     @Override
@@ -127,8 +124,10 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
             long count = engineMemberRepository.count();
             count++;
             engineSetting.setContainerName(engineSetting.getContainerName() + "-" + count);
-            engineSetting.getEnvVariable().put("TOKEN",
+            Map<String, String> envVariable = engineSetting.getEnvVariable();
+            envVariable.put("TOKEN",
                 jwtTokenManager.generateAccessToken(CustomUser.createEngine(engineSetting.getContainerName())));
+            envVariable.put("AUTHKEY", AesUtil.KEY_STR);
             dockerService.startContainer(engineMapper.toContainerSetting(engineSetting));
             return true;
         } catch (ApiTestPlatformException e) {
@@ -218,9 +217,15 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     public List<EngineAddress> getAvailableEngine() {
         return engineMemberRepository.findAllByContainerStatusAndOpenIsTrue(ContainerStatus.START)
             .filter(this::taskSizeLimit)
-            .map(engineMember -> EngineAddress.builder().host(engineMember.getName()).port(engineMember.getPort())
-                .build())
+            .map(this::buildEngineAddress)
             .collect(Collectors.toList());
+    }
+
+    private EngineAddress buildEngineAddress(EngineMemberEntity engineMember) {
+        return EngineAddress.builder()
+            .host(engineMember.getName())
+            .port(engineMember.getPort())
+            .build();
     }
 
     private boolean taskSizeLimit(EngineMemberEntity engineMemberEntity) {
