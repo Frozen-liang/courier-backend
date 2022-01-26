@@ -5,20 +5,13 @@ import static com.sms.courier.utils.JwtUtils.TOKEN_USER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.sms.courier.common.enums.RoleType;
-import com.sms.courier.dto.UserEntityAuthority;
-import com.sms.courier.entity.system.SystemRoleEntity;
-import com.sms.courier.entity.system.UserEntity;
-import com.sms.courier.repository.SystemRoleRepository;
 import com.sms.courier.security.TokenType;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.security.strategy.SecurityStrategyFactory;
 import com.sms.courier.security.strategy.impl.UserSecurityStrategy;
-import com.sms.courier.service.UserService;
 import com.sms.courier.utils.JwtUtils;
 import com.sms.courier.utils.SecurityUtil;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -32,7 +25,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,10 +61,7 @@ public class JwtTokenManagerTest {
     SecurityStrategyFactory securityStrategyFactory = mock(SecurityStrategyFactory.class);
     SigningKeyResolver signingKeyResolver = mock(SigningKeyResolver.class);
     UserSecurityStrategy userSecurityStrategy = mock(UserSecurityStrategy.class);
-    UserService userService = mock(UserService.class);
-    SystemRoleRepository roleRepository = mock(SystemRoleRepository.class);
-
-    JwtTokenManager jwtTokenManager = new JwtTokenManager(userService, roleRepository, securityStrategyFactory,
+    JwtTokenManager jwtTokenManager = new JwtTokenManager( securityStrategyFactory,
         signingKeyResolver);
 
     @Test
@@ -116,43 +105,22 @@ public class JwtTokenManagerTest {
         JWT_UTILS_MOCKED_STATIC.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
             .thenReturn(jwsHeader);
         when(jwsHeader.get(TOKEN_TYPE)).thenReturn(userTokenType);
-        UserEntity userEntity =
-            UserEntity.builder().id(id).username(username).nickname(nickname).email(email).groupId(groupId)
-                .expiredDate(EXPIRED_DATE)
-                .build();
-        UserEntityAuthority userEntityAuthority =
-            UserEntityAuthority.builder().userEntity(userEntity).authorities(Collections.emptyList()).build();
-        when(userService.getUserDetailsByUserId(id)).thenReturn(userEntityAuthority);
+        when(securityStrategyFactory.fetchSecurityStrategy(any())).thenReturn(userSecurityStrategy);
         Authentication mockAuthentication = mock(Authentication.class);
+        when(userSecurityStrategy.createAuthentication(any())).thenReturn(mockAuthentication);
         SECURITY_UTIL_MOCKED_STATIC.when(() -> SecurityUtil.newAuthentication(id, email, username, nickname,
             Collections.emptyList(), TokenType.USER, EXPIRED_DATE)).thenReturn(mockAuthentication);
         Authentication authentication = jwtTokenManager.createAuthentication(token);
         assertThat(authentication).isEqualTo(mockAuthentication);
     }
 
-    @Test
-    @DisplayName("Parsing out identity information based on token")
-    public void createEngineAuthenticationTest() {
-        Stream<SystemRoleEntity> roles = Stream.of(SystemRoleEntity.builder().name("Admin").build());
-        JWT_UTILS_MOCKED_STATIC.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
-            .thenReturn(jwsHeader);
-        when(jwsHeader.get(TOKEN_TYPE)).thenReturn(engineTokenType);
-        when(roleRepository.findAllByRoleType(RoleType.ENGINE))
-            .thenReturn(roles);
-        Authentication mockAuthentication = mock(Authentication.class);
-        SECURITY_UTIL_MOCKED_STATIC.when(() -> SecurityUtil.newAuthentication(anyString(), anyString(), anyString(),
-            anyString(),
-            any(), any(), any())).thenReturn(mockAuthentication);
-        Authentication authentication = jwtTokenManager.createAuthentication(token);
-        assertThat(authentication).isEqualTo(mockAuthentication);
-    }
+
 
     @Test
     @DisplayName("Failed to Parse out identity information based on token because of exception")
     public void createAuthenticationWhileThrowExceptionTest() {
         JWT_UTILS_MOCKED_STATIC.when(() -> JwtUtils.decodeJwt(any(String.class), any(SigningKeyResolver.class)))
             .thenReturn(jwsHeader);
-//        when(userRepository.findById(id)).thenThrow(RuntimeException.class);
         Authentication authentication = jwtTokenManager.createAuthentication(token);
         assertThat(authentication).isEqualTo(null);
     }

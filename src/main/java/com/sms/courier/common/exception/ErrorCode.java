@@ -308,6 +308,11 @@ public enum ErrorCode {
     EDIT_GENERATOR_TEMPLATE_ERROR("4283", "Failed to edit the GeneratorTemplate!"),
     GET_GENERATOR_TEMPLATE_ERROR("4284", "Failed to get the GeneratorTemplate by id!"),
     GET_GENERATOR_TEMPLATE_LIST_ERROR("4285", "Failed to get the GeneratorTemplate list!"),
+    ADD_OPEN_API_SETTING_ERROR("4286", "Failed to add the OpenApiSetting!"),
+    GET_OPEN_API_SETTING_LIST_ERROR("4287", "Failed to get the OpenApiSetting list!"),
+    GET_OPEN_API_SETTING_BY_ID_ERROR("4288", "The OpenApiSetting not exist!"),
+    DELETE_OPEN_API_SETTING_BY_ID_ERROR("4289", "Failed to delete the OpenApiSetting!"),
+    EDIT_OPEN_API_SETTING_ERROR("4290", "Failed to edit the OpenApiSetting!"),
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),

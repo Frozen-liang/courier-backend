@@ -1,5 +1,9 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.enums.OperationModule.OAUTH_SETTING;
+import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.DELETE;
+import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.exception.ErrorCode.ADD_AUTH_SETTING_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_AUTH_SETTING_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_AUTH_SETTING_ERROR;
@@ -7,6 +11,8 @@ import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_AUTH_SETTING_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_AUTH_SETTING_LIST_ERROR;
 
+import com.sms.courier.common.aspect.annotation.Enhance;
+import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.OAuthSettingRequest;
 import com.sms.courier.dto.response.OAuthSettingResponse;
@@ -18,8 +24,8 @@ import com.sms.courier.utils.AesUtil;
 import com.sms.courier.utils.Assert;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -53,6 +59,7 @@ public class OAuthSettingServiceImpl implements OAuthSettingService {
 
 
     @Override
+    @LogRecord(operationType = ADD, operationModule = OAUTH_SETTING, template = "{{#authSettingRequest.name}}")
     public Boolean add(OAuthSettingRequest authSettingRequest) {
         log.info("AuthSettingService-add()-params: [AuthSetting]={}", authSettingRequest.toString());
         try {
@@ -72,6 +79,7 @@ public class OAuthSettingServiceImpl implements OAuthSettingService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = OAUTH_SETTING, template = "{{#authSettingRequest.name}}")
     public Boolean edit(OAuthSettingRequest authSettingRequest) {
         log.info("AuthSettingService-edit()-params: [AuthSetting]={}", authSettingRequest.toString());
         try {
@@ -81,11 +89,10 @@ public class OAuthSettingServiceImpl implements OAuthSettingService {
                     .existsByName(authSettingRequest.getName()),
                 "The %s already exists!", authSettingRequest.getName());
             OAuthSettingEntity authSetting = authSettingMapper.toEntity(authSettingRequest);
-            if (StringUtils.isNotBlank(authSettingRequest.getClientSecret())) {
-                authSetting.setClientSecret(AesUtil.encrypt(authSettingRequest.getClientSecret()));
-            } else {
-                authSetting.setClientSecret(oldAuthSetting.getClientSecret());
-            }
+            Optional.ofNullable(authSettingRequest.getClientSecret())
+                .ifPresentOrElse(
+                    clientSecret -> authSetting.setClientSecret(AesUtil.encrypt(clientSecret)),
+                    () -> authSetting.setClientSecret(oldAuthSetting.getClientSecret()));
             oauthSettingRepository.save(authSetting);
         } catch (ApiTestPlatformException apiTestPlatEx) {
             log.error(apiTestPlatEx.getMessage());
@@ -98,6 +105,8 @@ public class OAuthSettingServiceImpl implements OAuthSettingService {
     }
 
     @Override
+    @LogRecord(operationType = DELETE, operationModule = OAUTH_SETTING,
+        template = "{{#result.name}}", enhance = @Enhance(enable = true))
     public Boolean delete(String id) {
         try {
             oauthSettingRepository.deleteById(id);

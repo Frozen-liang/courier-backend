@@ -2,6 +2,7 @@ package com.sms.courier.engine.impl;
 
 import static com.sms.courier.common.field.EngineMemberField.CASE_TASK;
 import static com.sms.courier.common.field.EngineMemberField.SCENE_CASE_TASK;
+import static com.sms.courier.engine.grpc.loadbalancer.Constants.AUTHORIZATION;
 import static com.sms.courier.engine.grpc.loadbalancer.Constants.JOB_ID;
 import static com.sms.courier.engine.grpc.loadbalancer.Constants.JOT_TYPE;
 import static com.sms.courier.engine.grpc.loadbalancer.Constants.TASK_TYPE;
@@ -16,9 +17,11 @@ import com.sms.courier.entity.job.SceneCaseJobEntity;
 import com.sms.courier.entity.job.ScheduleCaseJobEntity;
 import com.sms.courier.entity.job.ScheduleSceneCaseJobEntity;
 import com.sms.courier.mapper.GrpcMapper;
+import com.sms.courier.utils.AesUtil;
 import io.grpc.ClientInterceptor;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -85,6 +88,7 @@ public class EngineJobManagementImpl implements EngineJobManagement {
         Metadata metadata = new Metadata();
         metadata.put(JOB_ID, jobId);
         metadata.put(JOT_TYPE, jobType.name());
+        metadata.put(AUTHORIZATION, AesUtil.encrypt(RandomStringUtils.random(8, true, true)));
         return MetadataUtils.newAttachHeadersInterceptor(metadata);
     }
 }

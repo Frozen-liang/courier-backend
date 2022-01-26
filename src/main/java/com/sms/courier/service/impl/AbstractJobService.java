@@ -1,10 +1,8 @@
 package com.sms.courier.service.impl;
 
-import static com.sms.courier.common.exception.ErrorCode.THE_DATA_IS_NOT_BINDING_THE_ENV;
 import static com.sms.courier.common.exception.ErrorCode.THE_ENV_NOT_EXIST;
 import static com.sms.courier.common.field.ScheduleField.LAST_TASK_COMPLETE_TIME;
 import static com.sms.courier.common.field.ScheduleField.TASK_STATUS;
-import static com.sms.courier.utils.Assert.isTrue;
 import static com.sms.courier.utils.Assert.notEmpty;
 import static com.sms.courier.utils.Assert.notNull;
 
@@ -179,7 +177,7 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
                 return optional.get();
             }
         }
-        return null;
+        return new DataCollectionEntity();
     }
 
     protected DataCollectionEntity getDataCollection(SceneCaseEntity sceneCaseEntity, String envId) {
@@ -198,12 +196,11 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
 
         if (dataCollId.isPresent()) {
             DataCollectionEntity dataCollectionEntity = this.getDataCollection(dataCollId.get());
-            if (Objects.nonNull(dataCollectionEntity) && Objects.nonNull(dataCollectionEntity.getEnvId())) {
-                isTrue(Objects.equals(dataCollectionEntity.getEnvId(), envId), THE_DATA_IS_NOT_BINDING_THE_ENV);
+            if (Objects.equals(dataCollectionEntity.getEnvId(), envId)) {
+                return dataCollectionEntity;
             }
-            return dataCollectionEntity;
         }
-        return null;
+        return new DataCollectionEntity();
     }
 
     protected JobRecord createSceneCaseJobRecord(String caseId, String name) {

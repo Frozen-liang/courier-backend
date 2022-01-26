@@ -38,7 +38,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
@@ -112,8 +111,7 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
                 JobRecord jobRecord = createSceneCaseJobRecord(apiTestCaseEntity.getId(),
                     apiTestCaseEntity.getCaseName());
                 scheduleRecordEntity.getJobRecords().add(jobRecord);
-                if (Objects.nonNull(dataCollectionEntity) && CollectionUtils
-                    .isNotEmpty(dataCollectionEntity.getDataList())) {
+                if (CollectionUtils.isNotEmpty(dataCollectionEntity.getDataList())) {
                     List<TestData> dataList = dataCollectionEntity.getDataList();
                     jobRecord.setSceneCount(dataList.size());
                     for (TestData testData : dataList) {
