@@ -20,6 +20,7 @@ public class AddSceneCaseRequest {
     private String projectId;
     @NotNull(message = "The groupId can not be empty")
     private String groupId;
+    private String description;
     private String testStatus;
     private List<String> tagId;
     private Integer priority;

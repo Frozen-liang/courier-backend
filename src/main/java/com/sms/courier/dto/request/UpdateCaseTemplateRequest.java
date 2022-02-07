@@ -18,6 +18,7 @@ public class UpdateCaseTemplateRequest {
     private String id;
     @NotNull(message = "The name can not be empty")
     private String name;
+    private String description;
     @NotNull(message = "The projectId can not be empty")
     private String projectId;
     private String groupId;
