@@ -16,6 +16,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,7 +56,7 @@ public class GeneratorController {
                     zos.write(strBuffer, 0, strBuffer.length);
                 }
             }
-            response.setContentType("APPLICATION/OCTET-STREAM");
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM.toString());
             response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s-generated.zip\"",
                 "code"));
         } catch (IOException e) {
@@ -72,6 +73,5 @@ public class GeneratorController {
             }
         }
     }
-
 
 }
