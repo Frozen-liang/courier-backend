@@ -432,8 +432,10 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                     .collect(Collectors.toList());
             List<String> caseTemplateId =
                 customizedCaseTemplateApiRepository.findCaseTemplateIdByApiIds(Lists.newArrayList(apiId));
-            List<String> templateSceneId =
-                customizedSceneCaseApiRepository.findSceneCaseIdByCaseTemplateIds(caseTemplateId);
+            List<String> templateSceneId = Lists.newArrayList();
+            if (CollectionUtils.isNotEmpty(caseTemplateId)) {
+                templateSceneId = customizedSceneCaseApiRepository.findSceneCaseIdByCaseTemplateIds(caseTemplateId);
+            }
             sceneCaseId.addAll(templateSceneId);
             if (CollectionUtils.isNotEmpty(sceneCaseId)) {
                 return sceneCaseRepository.findByIdInAndRemoved(sceneCaseId, Boolean.FALSE).stream()
