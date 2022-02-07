@@ -25,6 +25,8 @@ public class SceneCaseEntity extends BaseEntity {
 
     private String name;
 
+    private String description;
+
     @Field(targetType = FieldType.OBJECT_ID)
     private String projectId;
 
