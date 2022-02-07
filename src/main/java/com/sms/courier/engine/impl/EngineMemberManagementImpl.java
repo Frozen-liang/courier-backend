@@ -127,7 +127,7 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
             Map<String, String> envVariable = engineSetting.getEnvVariable();
             envVariable.put("TOKEN",
                 jwtTokenManager.generateAccessToken(CustomUser.createEngine(engineSetting.getContainerName())));
-            envVariable.put("AUTHKEY", AesUtil.KEY_STR);
+            envVariable.put("AUTH_KEY", AesUtil.KEY_STR);
             dockerService.startContainer(engineMapper.toContainerSetting(engineSetting));
             return true;
         } catch (ApiTestPlatformException e) {

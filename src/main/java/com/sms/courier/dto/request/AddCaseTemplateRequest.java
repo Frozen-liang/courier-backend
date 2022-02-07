@@ -16,6 +16,7 @@ public class AddCaseTemplateRequest {
 
     @NotNull(message = "The name can not be empty")
     private String name;
+    private String description;
     @NotNull(message = "The projectId can not be empty")
     private String projectId;
     @NotNull(message = "The groupId can not be empty")

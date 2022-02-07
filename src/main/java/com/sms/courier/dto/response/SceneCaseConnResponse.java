@@ -19,6 +19,7 @@ public class SceneCaseConnResponse extends LookupUserResponse {
     private String name;
     private String projectId;
     private String groupName;
+    private String description;
     private String groupId;
     private String testStatus;
     private List<String> tagName;

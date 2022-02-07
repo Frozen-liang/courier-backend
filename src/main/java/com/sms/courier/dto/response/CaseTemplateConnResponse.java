@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class CaseTemplateConnResponse extends LookupUserResponse {
 
     private String name;
+    private String description;
     private String projectId;
     private String groupId;
     private String groupName;
