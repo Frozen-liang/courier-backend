@@ -185,7 +185,7 @@ public class CsharpCoreCodegenStrategy extends AbstractCodegen implements Genera
                     : CodeEntityName.REQUEST_PARAM.getName());
         }
         if (CollectionUtils.isNotEmpty(apiEntity.getRestfulParams())) {
-            for(ParamInfoResponse info:apiEntity.getRestfulParams()){
+            for (ParamInfoResponse info : apiEntity.getRestfulParams()) {
                 info.setParamType(ParamType.STRING.getCode());
             }
             List<CodeEntityParamVo> restfulParams = codegenMapper
