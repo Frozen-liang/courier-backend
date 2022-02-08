@@ -60,7 +60,7 @@ public class GeneratorTemplateServiceImpl implements GeneratorTemplateService {
             log.error(e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("Failed to add the GeneratorTemplate!");
+            log.error("Failed to add the GeneratorTemplate!", e);
             throw ExceptionUtils.mpe(ErrorCode.ADD_GENERATOR_TEMPLATE_ERROR);
         }
     }

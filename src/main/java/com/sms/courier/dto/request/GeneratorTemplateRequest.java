@@ -29,13 +29,13 @@ public class GeneratorTemplateRequest {
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The name can not be empty")
     private String name;
 
-    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The projectId can not be empty")
+    @NotNull(groups = {InsertGroup.class}, message = "The projectId can not be empty")
     private String projectId;
 
     @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The codeType can not be empty")
     private CodeType codeType;
 
-    @AssertFalse(groups = {InsertGroup.class, UpdateGroup.class}, message = "The isDefaultTemplate must be false")
+    @AssertFalse(groups = {InsertGroup.class}, message = "The isDefaultTemplate must be false")
     @JsonProperty("isDefaultTemplate")
     private boolean defaultTemplate;
 
