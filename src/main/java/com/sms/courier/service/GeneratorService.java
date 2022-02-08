@@ -1,9 +1,9 @@
 package com.sms.courier.service;
 
 import com.sms.courier.dto.request.CodeGenRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
 
 public interface GeneratorService {
 
-    void generator(HttpServletResponse response, CodeGenRequest request);
+    void generator(OutputStream outputStream, CodeGenRequest request);
 }

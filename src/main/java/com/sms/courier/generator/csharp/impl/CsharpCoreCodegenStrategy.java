@@ -22,8 +22,8 @@ import com.sms.courier.generator.enums.CodeType;
 import com.sms.courier.generator.enums.TemplateType;
 import com.sms.courier.generator.pojo.CodeEntityParamVo;
 import com.sms.courier.generator.pojo.CodegenClassVo;
-import com.sms.courier.generator.pojo.FilePackageVo;
-import com.sms.courier.generator.pojo.FileVo;
+import com.sms.courier.generator.pojo.StringFile;
+import com.sms.courier.generator.pojo.StringFiles;
 import com.sms.courier.mapper.CodegenMapper;
 import com.sms.courier.utils.CustomStringUtil;
 import com.sms.courier.utils.ExceptionUtils;
@@ -84,11 +84,11 @@ public class CsharpCoreCodegenStrategy extends AbstractCodegen implements Genera
 
 
     @Override
-    public List<FilePackageVo> generate(CodeGenRequest request, ApiResponse apiEntity,
+    public List<StringFiles> generate(CodeGenRequest request, ApiResponse apiEntity,
         GeneratorTemplateEntity templateEntity) {
         try {
-            List<FilePackageVo> fileVos = Lists.newArrayList();
-            List<FileVo> requestFile = Lists.newArrayList();
+            List<StringFiles> fileVos = Lists.newArrayList();
+            List<StringFile> requestFile = Lists.newArrayList();
             List<String> controllerImportString = Lists.newArrayList();
             List<String> serviceImportString = Lists.newArrayList();
             CodegenClassVo codegenClassVo = CodegenClassVo.builder()
@@ -108,7 +108,7 @@ public class CsharpCoreCodegenStrategy extends AbstractCodegen implements Genera
 
             if (CollectionUtils.isNotEmpty(requestFile)) {
                 fileVos
-                    .add(FilePackageVo.builder().filePackageName(CodeFileName.ENTITY.getName()).fileList(requestFile)
+                    .add(StringFiles.builder().filePackageName(CodeFileName.ENTITY.getName()).fileList(requestFile)
                         .build());
                 controllerImportString
                     .add(String.format("%s.%s", request.getPackageName(), CodeFileName.ENTITY.getName()));
@@ -126,10 +126,10 @@ public class CsharpCoreCodegenStrategy extends AbstractCodegen implements Genera
 
             if (request.getTemplateType().contains(TemplateType.SERVICE.getCode())) {
                 setClassVo(codegenClassVo, serviceImportString, serviceName, CodeFileName.SERVICE.getName());
-                List<FileVo> serviceFile = Lists.newArrayList();
+                List<StringFile> serviceFile = Lists.newArrayList();
                 setFile(codegenClassVo, serviceFile, templateMap.get(TemplateType.SERVICE.getCode()));
                 fileVos.add(
-                    FilePackageVo.builder().filePackageName(CodeFileName.SERVICE.getName()).fileList(serviceFile)
+                    StringFiles.builder().filePackageName(CodeFileName.SERVICE.getName()).fileList(serviceFile)
                         .build());
                 controllerImportString.add(String.format("%s.%s", request.getPackageName(),
                     CodeFileName.SERVICE.getName()));
@@ -138,20 +138,20 @@ public class CsharpCoreCodegenStrategy extends AbstractCodegen implements Genera
             if (request.getTemplateType().contains(TemplateType.SERVICE_IMPL.getCode())) {
                 codegenClassVo.setServiceName(serviceName);
                 setClassVo(codegenClassVo, serviceImportString, serviceImplName, CodeFileName.SERVICE.getName());
-                List<FileVo> serviceImplFile = Lists.newArrayList();
+                List<StringFile> serviceImplFile = Lists.newArrayList();
                 setFile(codegenClassVo, serviceImplFile, templateMap.get(TemplateType.SERVICE_IMPL.getCode()));
                 fileVos.add(
-                    FilePackageVo.builder().filePackageName(CodeFileName.SERVICE.getName()).fileList(serviceImplFile)
+                    StringFiles.builder().filePackageName(CodeFileName.SERVICE.getName()).fileList(serviceImplFile)
                         .build());
             }
 
             if (request.getTemplateType().contains(TemplateType.CONTROLLER.getCode())) {
                 codegenClassVo.setServiceName(serviceName);
                 setClassVo(codegenClassVo, controllerImportString, controllerName, CodeFileName.CONTROLLER.getName());
-                List<FileVo> controllerFile = Lists.newArrayList();
+                List<StringFile> controllerFile = Lists.newArrayList();
                 setFile(codegenClassVo, controllerFile, templateMap.get(TemplateType.CONTROLLER.getCode()));
                 fileVos.add(
-                    FilePackageVo.builder().filePackageName(CodeFileName.CONTROLLER.getName()).fileList(controllerFile)
+                    StringFiles.builder().filePackageName(CodeFileName.CONTROLLER.getName()).fileList(controllerFile)
                         .build());
             }
 
@@ -171,7 +171,7 @@ public class CsharpCoreCodegenStrategy extends AbstractCodegen implements Genera
         classVo.setClassPackage(classPackage);
     }
 
-    private void generateEntity(List<FileVo> requestFile, Map<Integer, CodeTemplate> templateMap,
+    private void generateEntity(List<StringFile> requestFile, Map<Integer, CodeTemplate> templateMap,
         CodegenClassVo codegenControllerVo, ApiResponse apiEntity, CodeGenRequest request) {
 
         if (CollectionUtils.isNotEmpty(apiEntity.getRequestParams())) {
