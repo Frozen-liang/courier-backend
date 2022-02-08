@@ -63,8 +63,8 @@
         "desc":"导入的类"
       },
       {
-        "key":"apiUrl",
-        "desc":"api 路径"
+        "key":"route",
+        "desc":"路由路径"
       },
       {
         "key":"requestMethod",
@@ -86,6 +86,10 @@
         "key":"serviceName",
         "desc":"service 类名"
       },
+        {
+          "key":"methodName",
+          "desc":"方法名"
+        },
       {
         "key":"pathParams",
         "desc":"路径参数集合",
@@ -143,6 +147,10 @@
         "desc":"service 类名"
       },
       {
+        "key":"methodName",
+        "desc":"方法名"
+      },
+      {
         "key":"pathParams",
         "desc":"路径参数集合",
         "childField": [
@@ -197,6 +205,10 @@
           {
             "key":"serviceName",
             "desc":"service 类名"
+          },
+          {
+            "key":"methodName",
+            "desc":"方法名"
           },
           {
             "key":"pathParams",

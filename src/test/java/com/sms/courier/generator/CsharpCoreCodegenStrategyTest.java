@@ -14,7 +14,6 @@ import com.sms.courier.generator.csharp.impl.CsharpCoreCodegenStrategy;
 import com.sms.courier.generator.pojo.CodeEntityParamVo;
 import com.sms.courier.generator.pojo.FilePackageVo;
 import com.sms.courier.mapper.CodegenMapper;
-import com.sms.courier.repository.ApiGroupRepository;
 import java.util.List;
 import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
@@ -31,10 +30,9 @@ import static org.mockito.Mockito.when;
 public class CsharpCoreCodegenStrategyTest {
 
     private final CodegenMapper codegenMapper = mock(CodegenMapper.class);
-    private final ApiGroupRepository apiGroupRepository = mock(ApiGroupRepository.class);
     private final TemplateEngine templateEngine = mock(TemplateEngine.class);
     private final CsharpCoreCodegenStrategy csharpCoreCodegenStrategy = new CsharpCoreCodegenStrategy(templateEngine,
-        codegenMapper, apiGroupRepository);
+        codegenMapper);
 
     private final String MOCK_ID = new ObjectId().toString();
     private final String MOCK_DES = "test";
@@ -83,10 +81,10 @@ public class CsharpCoreCodegenStrategyTest {
         .build();
     private final CodeEntityParamVo arrayVo =
         CodeEntityParamVo.builder().key(MOCK_DES).paramType("12").oldParamType(ParamType.ARRAY)
-        .childParam(Lists
-            .newArrayList(
-                CodeEntityParamVo.builder().paramType("0").oldParamType(ParamType.STRING).build(),objectVo))
-        .build();
+            .childParam(Lists
+                .newArrayList(
+                    CodeEntityParamVo.builder().paramType("0").oldParamType(ParamType.STRING).build(), objectVo))
+            .build();
 
     private final List<CodeEntityParamVo> requestParams = Lists.newArrayList(
         objectVo,

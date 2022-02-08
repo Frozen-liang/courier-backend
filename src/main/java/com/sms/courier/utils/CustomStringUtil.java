@@ -18,4 +18,15 @@ public class CustomStringUtil {
         }
         return String.valueOf(chars);
     }
+
+    public static String formatFirstLowerCase(String name) {
+        if (name == null || "".equals(name)) {
+            return name;
+        }
+        if (name.length() == 1) {
+            return name.toLowerCase();
+        }
+        return name.substring(0, 1).toLowerCase() + name.substring(1);
+    }
+
 }

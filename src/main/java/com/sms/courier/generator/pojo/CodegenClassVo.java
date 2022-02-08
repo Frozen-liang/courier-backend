@@ -17,7 +17,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class CodegenClassVo extends BaseCodegen {
 
-    private String apiUrl;
+    private String route;
 
     private String requestMethod;
 
@@ -30,5 +30,7 @@ public class CodegenClassVo extends BaseCodegen {
     private String serviceName;
 
     private List<CodeEntityParamVo> pathParams;
+
+    private String methodName;
 
 }

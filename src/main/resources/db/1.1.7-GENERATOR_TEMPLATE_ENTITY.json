@@ -6,23 +6,23 @@
     "defaultTemplate": true,
     "codeTemplates": [
       {
-        "name": "Name",
+        "name": "entity",
         "value": "using System;\nusing System.Collections.Generic;\nusing System.Collections.ObjectModel;\nusing System.ComponentModel.DataAnnotations;\nusing System.Linq;\n{{#imports}}\nusing {{.}};\n{{/imports}}\nnamespace {{packageName}}.{{classPackage}}\n{\n\n    public class {{className}}\n    {\n        {{#params}}\n            {{#description}}\n             //{{description}}\n            {{/description}}\n            {{#required}}\n            [Required]\n            {{/required}}\n            public {{&paramType}} {{key}} { get; set; }\n        {{/params}}\n    }\n}\n",
         "templateType": 0
       },
       {
         "name": "controller",
-        "value": "using Microsoft.AspNetCore.Mvc;\nusing System.Threading.Tasks;\n{{#imports}}\nusing {{.}};\n{{/imports}}\n\nnamespace {{packageName}}.{{classPackage}}\n{\n\n    public class {{className}} : Controller\n    {\n\n{{#serviceName}}\n    private readonly {{serviceName}} _service;\n\n    public  {{className}}({{serviceName}} service)\n    {\n        _service = service;\n    }\n\n    {{#requestName}}\n    {{#responseName}}\n    [ResponseType(typeof({{responseName}}))]\n    {{/responseName}}\n    public async Task<ActionResult> MethodName({{requestName}} input)\n    {\n        {{responseName}} result = await _service.methodName(input);\n        return View(result);\n    }\n    {{/requestName}}\n\n{{/serviceName}}\n\n\n }\n\n}",
+        "value": "using Microsoft.AspNetCore.Mvc;\nusing System.Threading.Tasks;\n{{#imports}}\nusing {{.}};\n{{/imports}}\n\nnamespace {{packageName}}.{{classPackage}}\n{\n\n    public class {{className}} : Controller\n    {\n\n{{#serviceName}}\n    private readonly {{serviceName}} _service;\n\n    public  {{className}}({{serviceName}} service)\n    {\n        _service = service;\n    }\n\n    {{#requestMethod}}\n    [{{requestMethod}}]\n    {{/requestMethod}}\n    [Route(\"{{route}}\")]\n    {{#requestName}}\n    {{#responseName}}\n    [ResponseType(typeof({{responseName}}))]\n    {{/responseName}}\n    public async Task<ActionResult> {{methodName}}({{requestName}} input)\n    {\n        {{responseName}} result = await _service.{{methodName}}(input);\n        return View(result);\n    }\n    {{/requestName}}\n    {{#queryName}}\n    {{#responseName}}\n    [ResponseType(typeof({{responseName}}))]\n    {{/responseName}}\n    public async Task<ActionResult> {{methodName}}({{queryName}} input)\n    {\n        {{responseName}} result = await _{{serviceName}}.{{methodName}}(input);\n        return View(result);\n    }\n    {{/queryName}}\n    \n\n{{/serviceName}}\n\n\n }\n\n}",
         "templateType": 1
       },
       {
         "name": "service",
-        "value": "using Microsoft.AspNetCore.Mvc;\nusing System.Threading.Tasks;\n{{#imports}}\nusing {{.}};\n{{/imports}}\n\nnamespace {{packageName}}.{{classPackage}}\n{\n\n    public interface {{className}}\n    {\n    {{#requestName}}\n        Task<{{responseName}}> MethodName({{requestName}} input);\n    {{/requestName}}\n\n    }\n}",
+        "value": "using Microsoft.AspNetCore.Mvc;\nusing System.Threading.Tasks;\n{{#imports}}\nusing {{.}};\n{{/imports}}\n\nnamespace {{packageName}}.{{classPackage}}\n{\n\n    public interface {{className}}\n    {\n    {{#requestName}}\n        Task<{{responseName}}> {{methodName}}({{requestName}} input);\n    {{/requestName}}\n    {{#queryName}}\n        Task<{{responseName}}> {{methodName}}({{queryName}} input);\n    {{/queryName}}\n    }\n}",
         "templateType": 2
       },
       {
         "name": "serviceImpl",
-        "value": "using Microsoft.AspNetCore.Mvc;\nusing System;\nusing System.Threading.Tasks;\n{{#imports}}\nusing {{.}};\n{{/imports}}\n\nnamespace {{packageName}}.{{classPackage}}\n{\n\n    public class {{className}} : {{serviceName}}\n    {\n    {{#requestName}}\n        public async Task<{{responseName}}> MethodName({{requestName}} input)\n        {\n            /// TODO\n            return null;\n        }\n    {{/requestName}}\n\n    }\n}",
+        "value": "using Microsoft.AspNetCore.Mvc;\nusing System;\nusing System.Threading.Tasks;\n{{#imports}}\nusing {{.}};\n{{/imports}}\n\nnamespace {{packageName}}.{{classPackage}}\n{\n\n    public class {{className}} : {{serviceName}}\n    {\n    {{#requestName}}\n        public async Task<{{responseName}}> {{methodName}}({{requestName}} input)\n        {\n            /// TODO\n            return null;\n        }\n    {{/requestName}}\n    {{#queryName}}\n        public async Task<{{responseName}}> {{methodName}}({{queryName}} input)\n        {\n            /// TODO\n            return null;\n        }\n    {{/queryName}}\n\n    }\n}",
         "templateType": 3
       }
 

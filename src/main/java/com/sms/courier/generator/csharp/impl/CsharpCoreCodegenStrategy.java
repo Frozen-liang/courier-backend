@@ -8,9 +8,9 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.request.CodeGenRequest;
 import com.sms.courier.dto.response.ApiResponse;
+import com.sms.courier.dto.response.ParamInfoResponse;
 import com.sms.courier.entity.generator.CodeTemplate;
 import com.sms.courier.entity.generator.GeneratorTemplateEntity;
-import com.sms.courier.entity.group.ApiGroupEntity;
 import com.sms.courier.generator.AbstractCodegen;
 import com.sms.courier.generator.BaseCodegen;
 import com.sms.courier.generator.GeneratorStrategy;
@@ -25,7 +25,7 @@ import com.sms.courier.generator.pojo.CodegenClassVo;
 import com.sms.courier.generator.pojo.FilePackageVo;
 import com.sms.courier.generator.pojo.FileVo;
 import com.sms.courier.mapper.CodegenMapper;
-import com.sms.courier.repository.ApiGroupRepository;
+import com.sms.courier.utils.CustomStringUtil;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +35,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -43,17 +44,14 @@ import org.springframework.stereotype.Component;
 public class CsharpCoreCodegenStrategy extends AbstractCodegen implements GeneratorStrategy {
 
     private final CodegenMapper codegenMapper;
-    private final ApiGroupRepository apiGroupRepository;
 
     private static final String SUFFIX = ".cs";
     private static final Map<ParamType, String> TYPE_MAPPING;
     private static final Map<RequestMethod, String> SWAGGER_METHOD;
 
-    public CsharpCoreCodegenStrategy(TemplateEngine templateEngine, CodegenMapper codegenMapper,
-        ApiGroupRepository apiGroupRepository) {
+    public CsharpCoreCodegenStrategy(TemplateEngine templateEngine, CodegenMapper codegenMapper) {
         super(templateEngine, TYPE_MAPPING, SUFFIX);
         this.codegenMapper = codegenMapper;
-        this.apiGroupRepository = apiGroupRepository;
     }
 
     static {
@@ -94,9 +92,10 @@ public class CsharpCoreCodegenStrategy extends AbstractCodegen implements Genera
             List<String> controllerImportString = Lists.newArrayList();
             List<String> serviceImportString = Lists.newArrayList();
             CodegenClassVo codegenClassVo = CodegenClassVo.builder()
-                .apiUrl(apiEntity.getApiPath())
+                .route(CustomStringUtil.formatFirstLowerCase(getMethodName(apiEntity.getApiPath())))
                 .requestMethod(SWAGGER_METHOD.get(RequestMethod.getType(apiEntity.getRequestMethod())))
                 .packageName(request.getPackageName())
+                .methodName(getMethodName(apiEntity.getApiPath()))
                 .build();
             Map<Integer, CodeTemplate> templateMap =
                 templateEntity.getCodeTemplates().stream()
@@ -117,14 +116,12 @@ public class CsharpCoreCodegenStrategy extends AbstractCodegen implements Genera
                     .add(String.format("%s.%s", request.getPackageName(), CodeFileName.ENTITY.getName()));
             }
 
-            String groupName =
-                apiGroupRepository.findById(apiEntity.getGroupId()).map(ApiGroupEntity::getName).orElse(null);
-
-            String controllerName = Objects.nonNull(groupName) ? String.format("%sController", groupName)
+            String className = getClassName(apiEntity.getApiPath());
+            String controllerName = Objects.nonNull(className) ? String.format("%sController", className)
                 : CodeEntityName.COURIER_CODEGEN_CONTROLLER.getName();
-            String serviceName = Objects.nonNull(groupName) ? String.format("I%sService", groupName)
+            String serviceName = Objects.nonNull(className) ? String.format("I%sService", className)
                 : CodeEntityName.COURIER_CODEGEN_SERVICE.getName();
-            String serviceImplName = Objects.nonNull(groupName) ? String.format("%sService", groupName)
+            String serviceImplName = Objects.nonNull(className) ? String.format("%sService", className)
                 : CodeEntityName.COURIER_CODEGEN_SERVICE_IMPL.getName();
 
             if (request.getTemplateType().contains(TemplateType.SERVICE.getCode())) {
@@ -188,6 +185,9 @@ public class CsharpCoreCodegenStrategy extends AbstractCodegen implements Genera
                     : CodeEntityName.REQUEST_PARAM.getName());
         }
         if (CollectionUtils.isNotEmpty(apiEntity.getRestfulParams())) {
+            for(ParamInfoResponse info:apiEntity.getRestfulParams()){
+                info.setParamType(ParamType.STRING.getCode());
+            }
             List<CodeEntityParamVo> restfulParams = codegenMapper
                 .toParamModelList(apiEntity.getRestfulParams());
             requestFile.addAll(generateParamObject(restfulParams, CodeEntityName.QUERY_PARAM.getName(),
@@ -211,5 +211,21 @@ public class CsharpCoreCodegenStrategy extends AbstractCodegen implements Genera
         }
     }
 
+
+    private static String getClassName(String apiPath) {
+        if (StringUtils.isBlank(apiPath)) {
+            return null;
+        }
+        String[] apiUrls = apiPath.split("/");
+        return apiUrls.length > 1 ? apiUrls[1] : null;
+    }
+
+    private static String getMethodName(String apiPath) {
+        if (StringUtils.isBlank(apiPath)) {
+            return null;
+        }
+        String[] apiUrls = apiPath.split("/");
+        return apiUrls.length > 1 ? apiUrls[apiUrls.length - 1] : null;
+    }
 
 }
