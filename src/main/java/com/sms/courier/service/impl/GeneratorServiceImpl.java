@@ -12,16 +12,25 @@ import com.sms.courier.entity.generator.GeneratorTemplateEntity;
 import com.sms.courier.generator.CodeGeneratorContext;
 import com.sms.courier.generator.ReplaceHelper;
 import com.sms.courier.generator.pojo.FilePackageVo;
+import com.sms.courier.generator.pojo.FileVo;
 import com.sms.courier.service.ApiService;
 import com.sms.courier.service.GeneratorService;
 import com.sms.courier.service.GeneratorTemplateService;
 import com.sms.courier.utils.Assert;
 import com.sms.courier.utils.ExceptionUtils;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.compress.archivers.zip.ZipUtil;
 import org.apache.commons.compress.utils.Lists;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -43,9 +52,8 @@ public class GeneratorServiceImpl implements GeneratorService {
         this.generatorTemplateService = generatorTemplateService;
     }
 
-
     @Override
-    public List<FilePackageVo> generator(CodeGenRequest request) {
+    public void generator(HttpServletResponse response, CodeGenRequest request) {
         try {
             ApiResponse apiResponse = apiService.findById(request.getApiId());
             GeneratorTemplateEntity templateEntity = generatorTemplateService.findById(request.getTemplateId());
@@ -64,13 +72,37 @@ public class GeneratorServiceImpl implements GeneratorService {
                 codeGeneratorContext.getGeneratorStrategy(templateEntity.getCodeType().getCode()).generate(request,
                     apiResponse, templateEntity);
             fileList.addAll(requestFile);
-            return fileList;
+            zipFile(response, fileList, request.getPackageName());
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage(), e);
             throw e;
         } catch (Exception e) {
             log.error("Failed to generate code!", e);
             throw ExceptionUtils.mpe(ErrorCode.GENERATE_CODE_ERROR);
+        }
+    }
+
+    private void zipFile(HttpServletResponse response, List<FilePackageVo> fileVoList, String packageName) {
+        try (ZipOutputStream zos = new ZipOutputStream(response.getOutputStream())) {
+            packageName = Objects.nonNull(packageName) ? packageName + File.separator : null;
+            ZipEntry zipEntry = null;
+            for (FilePackageVo filePackageVo : fileVoList) {
+                for (FileVo file : filePackageVo.getFileList()) {
+                    zipEntry = new ZipEntry(
+                        packageName + filePackageVo.getFilePackageName()
+                            + File.separator + file.getFileName());
+                    zos.putNextEntry(zipEntry);
+                    byte[] strBuffer = file.getFileContents().getBytes(StandardCharsets.UTF_8);
+                    zos.write(strBuffer, 0, strBuffer.length);
+                }
+            }
+            response.setContentType(MediaType.APPLICATION_OCTET_STREAM.toString());
+            response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s-generated.zip\"",
+                "code"));
+            zos.closeEntry();
+        } catch (IOException e) {
+            log.error("File compression error!");
+            throw ExceptionUtils.mpe(ErrorCode.FILE_COMPRESSION_ERROE, e);
         }
     }
 
