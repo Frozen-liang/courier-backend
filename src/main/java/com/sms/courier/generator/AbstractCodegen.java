@@ -5,7 +5,7 @@ import com.sms.courier.entity.generator.CodeTemplate;
 import com.sms.courier.generator.enums.CodeFileName;
 import com.sms.courier.generator.pojo.CodeEntityParamVo;
 import com.sms.courier.generator.pojo.CodegenEntityVo;
-import com.sms.courier.generator.pojo.FileVo;
+import com.sms.courier.generator.pojo.StringFile;
 import com.sms.courier.utils.CustomStringUtil;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +28,9 @@ public abstract class AbstractCodegen {
         this.suffix = suffix;
     }
 
-    public List<FileVo> generateParamObject(List<CodeEntityParamVo> infoList, String className, String packageName,
+    public List<StringFile> generateParamObject(List<CodeEntityParamVo> infoList, String className, String packageName,
         CodeTemplate codeTemplate) {
-        List<FileVo> fileList = Lists.newArrayList();
+        List<StringFile> fileList = Lists.newArrayList();
         for (CodeEntityParamVo paramModel : infoList) {
             if (ParamType.ARRAY.equals(paramModel.getOldParamType())) {
                 paramModel.setParamType(replaceDefaultList(typeMapping.get(paramModel.getOldParamType())));
@@ -54,7 +54,7 @@ public abstract class AbstractCodegen {
         return fileList;
     }
 
-    private void setArrayModel(CodeEntityParamVo paramModel, List<FileVo> fileList, String packageName,
+    private void setArrayModel(CodeEntityParamVo paramModel, List<StringFile> fileList, String packageName,
         CodeTemplate codeTemplate) {
         for (CodeEntityParamVo paramInfo : paramModel.getChildParam()) {
             if (ParamType.OBJECT.equals(paramInfo.getOldParamType())) {
@@ -73,7 +73,7 @@ public abstract class AbstractCodegen {
         }
     }
 
-    private void setObjectModel(CodeEntityParamVo paramModel, List<FileVo> fileList, String packageName,
+    private void setObjectModel(CodeEntityParamVo paramModel, List<StringFile> fileList, String packageName,
         CodeTemplate codeTemplate) {
         List<CodeEntityParamVo> paramModelList = Lists.newArrayList();
         for (CodeEntityParamVo paramInfo : paramModel.getChildParam()) {
@@ -101,9 +101,9 @@ public abstract class AbstractCodegen {
         setFile(entityModel, fileList, codeTemplate);
     }
 
-    protected void setFile(BaseCodegen entityModel, List<FileVo> fileList, CodeTemplate codeTemplate) {
+    protected void setFile(BaseCodegen entityModel, List<StringFile> fileList, CodeTemplate codeTemplate) {
         String contents = templateEngine.getRendered(entityModel, codeTemplate);
-        fileList.add(FileVo.builder().fileName(entityModel.getClassName() + suffix).fileContents(contents).build());
+        fileList.add(StringFile.builder().fileName(entityModel.getClassName() + suffix).fileContents(contents).build());
     }
 
     protected String replaceString(String paramType) {

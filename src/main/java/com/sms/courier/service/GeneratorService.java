@@ -1,10 +1,9 @@
 package com.sms.courier.service;
 
 import com.sms.courier.dto.request.CodeGenRequest;
-import com.sms.courier.generator.pojo.FilePackageVo;
-import java.util.List;
+import java.io.OutputStream;
 
 public interface GeneratorService {
 
-    List<FilePackageVo> generator(CodeGenRequest request);
+    void generator(OutputStream outputStream, CodeGenRequest request);
 }

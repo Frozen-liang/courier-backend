@@ -1,5 +1,6 @@
 package com.sms.courier.generator.pojo;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,9 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileVo {
+public class StringFiles {
 
-    private String fileName;
+    private String filePackageName;
 
-    private String fileContents;
+    private List<StringFile> fileList;
+
 }

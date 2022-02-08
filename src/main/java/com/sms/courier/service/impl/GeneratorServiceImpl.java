@@ -11,12 +11,14 @@ import com.sms.courier.dto.response.ParamInfoResponse;
 import com.sms.courier.entity.generator.GeneratorTemplateEntity;
 import com.sms.courier.generator.CodeGeneratorContext;
 import com.sms.courier.generator.ReplaceHelper;
-import com.sms.courier.generator.pojo.FilePackageVo;
+import com.sms.courier.generator.pojo.StringFiles;
 import com.sms.courier.service.ApiService;
 import com.sms.courier.service.GeneratorService;
 import com.sms.courier.service.GeneratorTemplateService;
 import com.sms.courier.utils.Assert;
 import com.sms.courier.utils.ExceptionUtils;
+import com.sms.courier.utils.ZipUtil;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -43,16 +45,15 @@ public class GeneratorServiceImpl implements GeneratorService {
         this.generatorTemplateService = generatorTemplateService;
     }
 
-
     @Override
-    public List<FilePackageVo> generator(CodeGenRequest request) {
+    public void generator(OutputStream outputStream, CodeGenRequest request) {
         try {
             ApiResponse apiResponse = apiService.findById(request.getApiId());
             GeneratorTemplateEntity templateEntity = generatorTemplateService.findById(request.getTemplateId());
             Assert.isTrue(Objects.nonNull(apiResponse), ErrorCode.API_CAN_NOT_BE_NULL);
             Assert.isTrue(Objects.nonNull(templateEntity), ErrorCode.TEMPLATE_CAN_NOT_BE_NULL);
 
-            List<FilePackageVo> fileList = Lists.newArrayList();
+            List<StringFiles> fileList = Lists.newArrayList();
             if (CollectionUtils.isNotEmpty(apiResponse.getRequestParams())) {
                 apiResponse.setRequestParams(resetApiRequest(apiResponse.getRequestParams()));
             }
@@ -60,11 +61,11 @@ public class GeneratorServiceImpl implements GeneratorService {
                 apiResponse.setResponseParams(resetApiRequest(apiResponse.getResponseParams()));
             }
 
-            List<FilePackageVo> requestFile =
+            List<StringFiles> requestFile =
                 codeGeneratorContext.getGeneratorStrategy(templateEntity.getCodeType().getCode()).generate(request,
                     apiResponse, templateEntity);
             fileList.addAll(requestFile);
-            return fileList;
+            ZipUtil.compressionFileByString(outputStream, fileList, request.getPackageName());
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage(), e);
             throw e;

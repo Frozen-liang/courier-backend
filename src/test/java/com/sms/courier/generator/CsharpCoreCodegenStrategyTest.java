@@ -12,7 +12,7 @@ import com.sms.courier.entity.generator.CodeTemplate;
 import com.sms.courier.entity.generator.GeneratorTemplateEntity;
 import com.sms.courier.generator.csharp.impl.CsharpCoreCodegenStrategy;
 import com.sms.courier.generator.pojo.CodeEntityParamVo;
-import com.sms.courier.generator.pojo.FilePackageVo;
+import com.sms.courier.generator.pojo.StringFiles;
 import com.sms.courier.mapper.CodegenMapper;
 import java.util.List;
 import org.assertj.core.util.Lists;
@@ -95,7 +95,7 @@ public class CsharpCoreCodegenStrategyTest {
     @DisplayName("Test the generate method for CsharpCoreCodegenStrategy")
     public void generate_test() {
         when(codegenMapper.toParamModelList(any())).thenReturn(requestParams);
-        List<FilePackageVo> filePackageVos = csharpCoreCodegenStrategy.generate(request, apiResponse, templateEntity);
+        List<StringFiles> filePackageVos = csharpCoreCodegenStrategy.generate(request, apiResponse, templateEntity);
         assertThat(filePackageVos).isNotEmpty();
     }
 
