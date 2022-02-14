@@ -343,7 +343,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                     .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_BY_ID_ERROR));
             for (AddCaseTemplateApi addCaseTemplateApi : addCaseTemplateConnRequest.getCaseTemplateIds()) {
                 List<CaseTemplateApiEntity> caseTemplateApiList =
-                    caseTemplateApiService.listByCaseTemplateId(addCaseTemplateApi.getId(), Boolean.FALSE);
+                    caseTemplateApiService.listByCaseTemplateId(addCaseTemplateApi.getId());
                 SceneCaseApiEntity sceneCaseApi = SceneCaseApiEntity.builder()
                     .sceneCaseId(addCaseTemplateConnRequest.getSceneCaseId())
                     .caseTemplateId(addCaseTemplateApi.getId())
@@ -577,7 +577,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private void resetSceneCaseApiConn(SceneCaseApiConnResponse response,
         SceneCaseApiEntity sceneCaseApi) {
         List<CaseTemplateApiEntity> caseTemplateApiList =
-            caseTemplateApiService.listByCaseTemplateId(sceneCaseApi.getCaseTemplateId(), Boolean.FALSE);
+            caseTemplateApiService.listByCaseTemplateId(sceneCaseApi.getCaseTemplateId());
         Map<String, Boolean> isExecuteMap =
             sceneCaseApi.getCaseTemplateApiConnList().stream().collect(
                 Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::isExecute));

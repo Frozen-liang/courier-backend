@@ -18,14 +18,19 @@ import static org.wildfly.common.Assert.assertTrue;
 
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.request.AddSceneCaseApiRequest;
 import com.sms.courier.dto.request.BatchAddSceneCaseApiRequest;
 import com.sms.courier.dto.request.BatchUpdateSceneCaseApiRequest;
+import com.sms.courier.dto.request.SyncApiRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.courier.dto.response.SceneCaseApiResponse;
+import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
+import com.sms.courier.mapper.ParamInfoMapper;
 import com.sms.courier.mapper.SceneCaseApiMapper;
+import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseApiRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
 import com.sms.courier.service.impl.SceneCaseApiServiceImpl;
@@ -46,8 +51,10 @@ class SceneCaseApiServiceTest {
     private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository =
         mock(CustomizedSceneCaseApiRepository.class);
     private final CaseApiCountHandler sceneCaseApiCountHandler = mock(CaseApiCountHandler.class);
+    private final ApiRepository apiRepository = mock(ApiRepository.class);
+    private final ParamInfoMapper paramInfoMapper = mock(ParamInfoMapper.class);
     private final SceneCaseApiServiceImpl sceneCaseApiService = new SceneCaseApiServiceImpl(sceneCaseApiRepository,
-        sceneCaseApiMapper, customizedSceneCaseApiRepository, sceneCaseApiCountHandler);
+        sceneCaseApiMapper, customizedSceneCaseApiRepository, sceneCaseApiCountHandler, apiRepository, paramInfoMapper);
 
     private final static String MOCK_SCENE_CASE_ID = "1";
     private final static String MOCK_ID = new ObjectId().toString();
@@ -136,27 +143,6 @@ class SceneCaseApiServiceTest {
     }
 
     @Test
-    @DisplayName("Test the list method in the SceneCaseApi service")
-    void listBySceneCaseId_test() {
-        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(SceneCaseApiEntity.builder().build());
-        when(sceneCaseApiRepository.findAll(any(), any(Sort.class))).thenReturn(sceneCaseApiList);
-        SceneCaseApiResponse dto = SceneCaseApiResponse.builder().build();
-        when(sceneCaseApiMapper.toSceneCaseApiDto(any())).thenReturn(dto);
-        List<SceneCaseApiResponse> dtoList = sceneCaseApiService
-            .listBySceneCaseId(MOCK_SCENE_CASE_ID, Boolean.FALSE);
-        assertThat(dtoList).isNotEmpty();
-    }
-
-    @Test
-    @DisplayName("Test the list method in the SceneCaseApi service throws exception")
-    void listBySceneCaseId_thenThrowException() {
-        when(sceneCaseApiRepository.findAll(any(), any(Sort.class)))
-            .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR));
-        assertThatThrownBy(() -> sceneCaseApiService.listBySceneCaseId(MOCK_SCENE_CASE_ID, Boolean.FALSE))
-            .isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
     @DisplayName("Test the list by sceneCaseId method in the SceneCaseApi service")
     void listBySceneCaseId_test_thenReturnSceneCaseApi() {
         List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(SceneCaseApiEntity.builder().build());
@@ -171,25 +157,6 @@ class SceneCaseApiServiceTest {
         when(sceneCaseApiRepository.findAll(any(Example.class), any(Sort.class)))
             .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR));
         assertThatThrownBy(() -> sceneCaseApiService.listBySceneCaseId(MOCK_SCENE_CASE_ID))
-            .isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
-    @DisplayName("Test the getApiBySceneCaseId method in the SceneCaseApi service")
-    void getApiBySceneCaseId_test() {
-        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(SceneCaseApiEntity.builder().build());
-        when(sceneCaseApiRepository.findAll(any(), any(Sort.class))).thenReturn(sceneCaseApiList);
-        List<SceneCaseApiEntity> dtoList = sceneCaseApiService
-            .getApiBySceneCaseId(MOCK_SCENE_CASE_ID, Boolean.FALSE);
-        assertThat(dtoList).isNotEmpty();
-    }
-
-    @Test
-    @DisplayName("Test the getApiBySceneCaseId method in the SceneCaseApi service throws exception")
-    void getApiBySceneCaseId_thenThrowException() {
-        when(sceneCaseApiRepository.findAll(any(), any(Sort.class)))
-            .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR));
-        assertThatThrownBy(() -> sceneCaseApiService.getApiBySceneCaseId(MOCK_SCENE_CASE_ID, Boolean.FALSE))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
@@ -248,6 +215,41 @@ class SceneCaseApiServiceTest {
         when(sceneCaseApiRepository.existsByCaseTemplateIdInAndRemovedIsFalse(any())).thenReturn(true);
         boolean result = sceneCaseApiService.existsByCaseTemplateId(List.of(MOCK_ID));
         assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("Test the syncApi method in the SceneCaseApi service")
+    public void syncApi_test() {
+        Optional<SceneCaseApiEntity> sceneCaseApiEntity =
+            Optional.of(SceneCaseApiEntity.builder()
+                .apiTestCase(ApiTestCaseEntity.builder()
+                    .apiEntity(ApiEntity.builder().build())
+                    .build())
+                .build());
+        when(sceneCaseApiRepository.findById(any())).thenReturn(sceneCaseApiEntity);
+        when(sceneCaseApiRepository.save(any())).thenReturn(sceneCaseApiEntity.get());
+        Optional<ApiEntity> apiEntity = Optional.of(ApiEntity.builder().build());
+        when(apiRepository.findById(any())).thenReturn(apiEntity);
+        Boolean isSuccess = sceneCaseApiService.syncApi(SyncApiRequest.builder().build());
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sync api")
+    public void syncApi_smsException_test() {
+        when(sceneCaseApiRepository.findById(any()))
+            .thenThrow(new ApiTestPlatformException(ErrorCode.CASE_SYNC_API_ERROR));
+        assertThatThrownBy(() -> sceneCaseApiService.syncApi(SyncApiRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sync api")
+    public void syncApi_exception_test() {
+        when(sceneCaseApiRepository.findById(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> sceneCaseApiService.syncApi(SyncApiRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
     private BatchUpdateSceneCaseApiRequest getUpdateSortOrder() {

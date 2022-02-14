@@ -34,7 +34,9 @@ public enum OperationType implements EnumCommon {
     // 重置
     RESET(12),
     //重启
-    RESTART(13);
+    RESTART(13),
+    //用例同步Api
+    CASE_SYNC(14);
 
     private static final Map<Integer, OperationType> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationType::getCode, Function.identity()));

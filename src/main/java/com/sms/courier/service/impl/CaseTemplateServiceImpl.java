@@ -27,7 +27,6 @@ import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.enums.ResponseParamsExtractionType;
 import com.sms.courier.common.enums.ResultVerificationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
-import com.sms.courier.common.field.CommonField;
 import com.sms.courier.dto.request.AddCaseTemplateApiByIdsRequest;
 import com.sms.courier.dto.request.AddCaseTemplateRequest;
 import com.sms.courier.dto.request.AddSceneCaseApi;
@@ -83,9 +82,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.bson.types.ObjectId;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -256,23 +252,6 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         } catch (Exception e) {
             log.error("Failed to search the CaseTemplate!", e);
             throw ExceptionUtils.mpe(SEARCH_CASE_TEMPLATE_ERROR);
-        }
-    }
-
-    @Override
-    public List<CaseTemplateEntity> get(String groupId, String projectId) {
-        try {
-            CaseTemplateEntity caseTemplate = CaseTemplateEntity.builder().groupId(groupId).projectId(projectId)
-                .build();
-            ExampleMatcher exampleMatcher = ExampleMatcher.matching()
-                .withMatcher(CommonField.PROJECT_ID.getName(), GenericPropertyMatchers.exact())
-                .withMatcher(CommonField.GROUP_ID.getName(), GenericPropertyMatchers.exact())
-                .withIgnoreNullValues();
-            Example<CaseTemplateEntity> example = Example.of(caseTemplate, exampleMatcher);
-            return caseTemplateRepository.findAll(example);
-        } catch (Exception e) {
-            log.error("Failed to get the CaseTemplate!", e);
-            throw ExceptionUtils.mpe(GET_CASE_TEMPLATE_ERROR);
         }
     }
 
