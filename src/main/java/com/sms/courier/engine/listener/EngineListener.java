@@ -122,7 +122,6 @@ public class EngineListener implements ApplicationContextAware {
     }
 
     @EventListener
-    @Async("commonExecutor")
     public void engineStatus(EngineStatusEvent event) {
         Query query = Query.query(Criteria.where(EngineMemberField.NAME.getName()).is(event.getName()));
         Update update = new Update();
