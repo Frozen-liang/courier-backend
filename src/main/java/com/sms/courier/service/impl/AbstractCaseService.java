@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
-import org.bson.types.ObjectId;
 
 public abstract class AbstractCaseService {
 
@@ -82,15 +81,17 @@ public abstract class AbstractCaseService {
             Function.identity()));
 
         for (ParamInfo paramInfo : targetInfoList) {
-            if (CollectionUtils.isNotEmpty(paramInfo.getChildParam())
-                && sourceInfoMap.containsKey(paramInfo.getKey())) {
+            if (sourceInfoMap.containsKey(paramInfo.getKey())) {
                 ParamInfo sourceParam = sourceInfoMap.get(paramInfo.getKey());
+                if (Objects.equals(paramInfo.getParamType(), sourceParam.getParamType())
+                    && CollectionUtils.isNotEmpty(paramInfo.getChildParam())) {
+                    syncPramInfo(sourceInfoMap.get(paramInfo.getKey()).getChildParam(), paramInfo.getChildParam());
+                }
                 if (!Objects.equals(paramInfo.getParamType(), sourceParam.getParamType())) {
                     paramInfo.setParamType(sourceParam.getParamType());
                     paramInfo.setChildParam(sourceParam.getChildParam());
-                } else {
-                    syncPramInfo(sourceInfoMap.get(paramInfo.getKey()).getChildParam(), paramInfo.getChildParam());
                 }
+
             }
         }
         Map<String, ParamInfo> targetInfoMap = targetInfoList.stream().collect(Collectors.toMap(ParamInfo::getKey,
