@@ -185,7 +185,7 @@ class CaseTemplateServiceTest {
     void deleteByIds_test() {
         doNothing().when(caseTemplateApiService).deleteAllByCaseTemplateIds(any());
         List<CaseTemplateApiEntity> caseTemplateApiList = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
-        when(caseTemplateApiService.listByCaseTemplateId(any(), anyBoolean())).thenReturn(caseTemplateApiList);
+        when(caseTemplateApiService.listByCaseTemplateId(any())).thenReturn(caseTemplateApiList);
         when(caseTemplateRepository.deleteAllByIdIsIn(any())).thenReturn(1L);
         Boolean isSuccess = caseTemplateService.deleteByIds(Lists.newArrayList(MOCK_ID));
         assertTrue(isSuccess);
@@ -222,7 +222,7 @@ class CaseTemplateServiceTest {
         when(caseTemplateRepository.save(any(CaseTemplateEntity.class))).thenReturn(caseTemplate);
         List<CaseTemplateApiEntity> caseTemplateApiDtoList = Lists
             .newArrayList(CaseTemplateApiEntity.builder().id(MOCK_ID).build());
-        when(caseTemplateApiService.listByCaseTemplateId(any(), anyBoolean())).thenReturn(caseTemplateApiDtoList);
+        when(caseTemplateApiService.listByCaseTemplateId(any())).thenReturn(caseTemplateApiDtoList);
         Boolean isSuccess = caseTemplateService
             .edit(UpdateCaseTemplateRequest.builder().build());
         assertTrue(isSuccess);
@@ -262,24 +262,6 @@ class CaseTemplateServiceTest {
         when(customizedCaseTemplateRepository.page(any(), any()))
             .thenThrow(new ApiTestPlatformException(SEARCH_CASE_TEMPLATE_ERROR));
         assertThatThrownBy(() -> caseTemplateService.page(dto, new ObjectId()))
-            .isInstanceOf(ApiTestPlatformException.class);
-    }
-
-    @Test
-    @DisplayName("Test the get method in the CaseTemplate service")
-    void get_thenRight() {
-        List<CaseTemplateEntity> caseTemplateList = Lists.newArrayList(CaseTemplateEntity.builder().build());
-        when(caseTemplateRepository.findAll(any(Example.class))).thenReturn(caseTemplateList);
-        List<CaseTemplateEntity> dto = caseTemplateService.get(MOCK_ID, MOCK_ID);
-        assertThat(dto.size()).isEqualTo(MOCK_SIZE);
-    }
-
-    @Test
-    @DisplayName("Test the get method in the CaseTemplate service thrown exception")
-    void get_thenThrownException() {
-        when(caseTemplateRepository.findAll(any(Example.class)))
-            .thenThrow(new ApiTestPlatformException(GET_CASE_TEMPLATE_ERROR));
-        assertThatThrownBy(() -> caseTemplateService.get(MOCK_ID, MOCK_ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 

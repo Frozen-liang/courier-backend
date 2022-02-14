@@ -37,7 +37,7 @@ public class ZipUtil {
             zos.closeEntry();
         } catch (IOException e) {
             log.error("File compression error!");
-            throw ExceptionUtils.mpe(ErrorCode.FILE_COMPRESSION_ERROE, e);
+            throw ExceptionUtils.mpe(ErrorCode.FILE_COMPRESSION_ERROR, e);
         }
     }
 

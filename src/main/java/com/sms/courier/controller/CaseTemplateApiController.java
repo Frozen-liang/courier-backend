@@ -3,12 +3,14 @@ package com.sms.courier.controller;
 import com.sms.courier.common.constant.Constants;
 import com.sms.courier.dto.request.BatchAddCaseTemplateApiRequest;
 import com.sms.courier.dto.request.BatchUpdateCaseTemplateApiRequest;
+import com.sms.courier.dto.request.SyncApiRequest;
 import com.sms.courier.dto.request.UpdateCaseTemplateApiRequest;
 import com.sms.courier.dto.response.CaseTemplateApiResponse;
 import com.sms.courier.service.CaseTemplateApiService;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,4 +59,9 @@ public class CaseTemplateApiController {
         return caseTemplateApiService.getCaseTemplateApiById(id);
     }
 
+    @PutMapping("/sync-api")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_TEMPLATE_API_CRE_UPD_DEL)")
+    public Boolean syncApi(@Validated @RequestBody SyncApiRequest request) {
+        return caseTemplateApiService.syncApi(request);
+    }
 }

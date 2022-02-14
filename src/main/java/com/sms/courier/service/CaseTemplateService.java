@@ -25,8 +25,6 @@ public interface CaseTemplateService {
 
     Page<CaseTemplateResponse> page(CaseTemplateSearchRequest searchDto, ObjectId projectId);
 
-    List<CaseTemplateEntity> get(String groupId, String projectId);
-
     CaseTemplateDetailResponse getApiList(String caseTemplateId);
 
     Boolean addApi(AddCaseTemplateApiByIdsRequest request);

@@ -5,6 +5,7 @@ import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.request.ApiTestCasePageRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
+import com.sms.courier.dto.request.SyncApiRequest;
 import com.sms.courier.dto.request.UpdateCaseByApiRequest;
 import com.sms.courier.dto.response.ApiTestCasePageResponse;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
@@ -92,6 +93,12 @@ public class ApiTestCaseController {
     @PreAuthorize("hasRoleOrAdmin(@role.CASE_CRE_UPD_DEL)")
     public Boolean updateCaseByApi(@RequestBody List<UpdateCaseByApiRequest> requests) {
         return apiTestCaseService.updateCaseByApi(requests);
+    }
+
+    @PutMapping("/sync-api")
+    @PreAuthorize("hasRoleOrAdmin(@role.CASE_CRE_UPD_DEL)")
+    public Boolean syncApi(@Validated @RequestBody SyncApiRequest request) {
+        return apiTestCaseService.syncApi(request);
     }
 
 }

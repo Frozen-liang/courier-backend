@@ -2,12 +2,14 @@ package com.sms.courier.controller;
 
 import com.sms.courier.common.constant.Constants;
 import com.sms.courier.dto.request.BatchAddSceneCaseApiRequest;
+import com.sms.courier.dto.request.SyncApiRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.courier.dto.response.SceneCaseApiResponse;
 import com.sms.courier.service.SceneCaseApiService;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,4 +52,9 @@ public class SceneCaseApiController {
         return sceneCaseApiService.getSceneCaseApiById(id);
     }
 
+    @PutMapping("/sync-api")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_API_CRE_UPD_DEL)")
+    public Boolean syncApi(@Validated @RequestBody SyncApiRequest request) {
+        return sceneCaseApiService.syncApi(request);
+    }
 }

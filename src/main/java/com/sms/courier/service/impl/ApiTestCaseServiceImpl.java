@@ -2,11 +2,13 @@ package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.OperationModule.API_TEST_CASE;
 import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.CASE_SYNC;
 import static com.sms.courier.common.enums.OperationType.CLEAR_RECYCLE_BIN;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.enums.OperationType.RECOVER;
 import static com.sms.courier.common.exception.ErrorCode.ADD_API_TEST_CASE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.CASE_SYNC_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_API_TEST_CASE_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_API_TEST_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
@@ -20,10 +22,12 @@ import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.ApiTestCasePageRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
+import com.sms.courier.dto.request.SyncApiRequest;
 import com.sms.courier.dto.request.UpdateCaseByApiRequest;
 import com.sms.courier.dto.request.UpdateCaseByApiRequest.CaseRequest;
 import com.sms.courier.dto.response.ApiTestCasePageResponse;
@@ -32,6 +36,8 @@ import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.apitestcase.TestResult;
 import com.sms.courier.mapper.ApiTestCaseMapper;
+import com.sms.courier.mapper.ParamInfoMapper;
+import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.ApiTestCaseRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseRepository;
 import com.sms.courier.service.ApiTestCaseService;
@@ -52,7 +58,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class ApiTestCaseServiceImpl implements ApiTestCaseService {
+public class ApiTestCaseServiceImpl extends AbstractCaseService implements ApiTestCaseService {
 
     private final ApiTestCaseRepository apiTestCaseRepository;
     private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository;
@@ -61,8 +67,9 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
 
     public ApiTestCaseServiceImpl(ApiTestCaseRepository apiTestCaseRepository,
         CustomizedApiTestCaseRepository customizedApiTestCaseRepository,
-        ApiTestCaseMapper apiTestCaseMapper,
-        CaseApiCountHandler caseApiCountHandler) {
+        ApiTestCaseMapper apiTestCaseMapper, CaseApiCountHandler caseApiCountHandler,
+        ApiRepository apiRepository, ParamInfoMapper paramInfoMapper) {
+        super(apiRepository, paramInfoMapper);
         this.apiTestCaseRepository = apiTestCaseRepository;
         this.customizedApiTestCaseRepository = customizedApiTestCaseRepository;
         this.apiTestCaseMapper = apiTestCaseMapper;
@@ -244,6 +251,26 @@ public class ApiTestCaseServiceImpl implements ApiTestCaseService {
         } catch (Exception e) {
             log.error("Update case by api error!", e);
             throw ExceptionUtils.mpe(UPDATE_CASE_BY_API_ERROR);
+        }
+    }
+
+    @Override
+    @LogRecord(operationType = CASE_SYNC, operationModule = API_TEST_CASE,
+        template = "{{#request.caseName}}")
+    public Boolean syncApi(SyncApiRequest request) {
+        try {
+            ApiTestCaseEntity apiTestCase =
+                apiTestCaseRepository.findById(request.getCaseId()).orElseThrow(() -> ExceptionUtils.mpe(
+                ErrorCode.EDIT_NOT_EXIST_ERROR));
+            apiTestCase.setLastTestResult(null);
+            syncApiEntity(apiTestCase.getApiEntity());
+            apiTestCaseRepository.save(apiTestCase);
+            return Boolean.TRUE;
+        } catch (ApiTestPlatformException courierException) {
+            throw courierException;
+        } catch (Exception e) {
+            log.error("Sync api error!", e);
+            throw ExceptionUtils.mpe(CASE_SYNC_API_ERROR);
         }
     }
 
