@@ -53,14 +53,14 @@ public class EngineListener implements ApplicationContextAware {
     private ApplicationContext applicationContext;
 
     @EventListener
-    @Async
+    @Async("commonExecutor")
     public void engineRegister(EngineRegisterEvent event) {
         log.info("Engine : {} register!", event.getRequest());
         engineMemberManagement.registerEngine(event.getRequest());
     }
 
     @EventListener
-    @Async
+    @Async("engineExecutor")
     public void jobReport(SceneCaseJobReportEvent event) {
         GrpcSceneCaseJobReport jobReport = event.getJobReport();
         SceneCaseJobReport sceneCaseJobReport = grpcMapper.toJobReport(jobReport);
@@ -68,7 +68,7 @@ public class EngineListener implements ApplicationContextAware {
     }
 
     @EventListener
-    @Async
+    @Async("engineExecutor")
     public void jobReport(CaseJobReportEvent event) {
         GrpcCaseJobReport jobReport = event.getJobReport();
         ApiTestCaseJobReport caseJobReport = grpcMapper.toJobReport(jobReport);
@@ -77,7 +77,6 @@ public class EngineListener implements ApplicationContextAware {
     }
 
     @EventListener
-    @Async
     public void jobCompleted(JobCompletedEvent event) {
         log.info("Job completed jobType : {}", event.getJobType());
         commonRepository.findById(event.getJobId(), event.getJobType().getEntityClass()).ifPresent(job -> {
@@ -87,7 +86,7 @@ public class EngineListener implements ApplicationContextAware {
     }
 
     @EventListener
-    @Async
+    @Async("engineExecutor")
     public void jobError(JobErrorEvent event) {
         log.info("Job error jobType : {}", event.getJobType());
         commonRepository.findById(event.getJobId(), event.getJobType().getEntityClass()).ifPresent(job -> {
@@ -101,7 +100,7 @@ public class EngineListener implements ApplicationContextAware {
     }
 
     @EventListener
-    @Async
+    @Async("commonExecutor")
     public void projectFunction(EngineProjectFunctionEvent event) {
         log.info("Push project function! {}", event.getFunctions());
         EngineRegisterServiceImpl engineRegisterService = applicationContext.getBean(EngineRegisterServiceImpl.class);
@@ -112,7 +111,7 @@ public class EngineListener implements ApplicationContextAware {
     }
 
     @EventListener
-    @Async
+    @Async("commonExecutor")
     public void globalFunction(EngineGlobalFunctionEvent event) {
         log.info("Push global function! {}", event.getFunctions());
         EngineRegisterServiceImpl engineRegisterService = applicationContext.getBean(EngineRegisterServiceImpl.class);
@@ -123,7 +122,7 @@ public class EngineListener implements ApplicationContextAware {
     }
 
     @EventListener
-    @Async
+    @Async("commonExecutor")
     public void engineStatus(EngineStatusEvent event) {
         Query query = Query.query(Criteria.where(EngineMemberField.NAME.getName()).is(event.getName()));
         Update update = new Update();

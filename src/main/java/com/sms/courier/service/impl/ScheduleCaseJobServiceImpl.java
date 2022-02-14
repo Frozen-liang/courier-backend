@@ -96,7 +96,7 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
     }
 
     @Override
-    @Async
+    @Async("commonExecutor")
     public void schedule(ScheduleEntity scheduleEntity) {
         try {
             CaseFilter caseFilter = scheduleEntity.getCaseFilter();
