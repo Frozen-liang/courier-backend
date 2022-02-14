@@ -6,15 +6,27 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.AsyncConfigurer;
 
 @Configuration
-public class AsyncConfig implements AsyncConfigurer {
+public class AsyncConfig {
 
-    @Override
-    public Executor getAsyncExecutor() {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("async-thread-%d").build();
+    @Bean("commonExecutor")
+    public Executor commonExecutor() {
+        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("common-thread-%d").build();
         return new ThreadPoolExecutor(10, 20, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(500), threadFactory);
+    }
+
+    @Bean("importApiExecutor")
+    public Executor importApiExecutor() {
+        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("import-api-thread-%d").build();
+        return new ThreadPoolExecutor(10, 20, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(100), threadFactory);
+    }
+
+    @Bean("engineExecutor")
+    public Executor engineExecutor() {
+        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("engine-thread-%d").build();
+        return new ThreadPoolExecutor(50, 100, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(5000), threadFactory);
     }
 }

@@ -27,7 +27,7 @@ public class CaseJobReportStreamObserver implements StreamObserver<GrpcCaseJobRe
 
     @Override
     public void onNext(GrpcCaseJobReport jobReport) {
-        log.info("Receive case job report :{}", jobReport);
+        log.info("Receive case job report!");
         applicationEventPublisher.publishEvent(new CaseJobReportEvent(jobType, jobReport));
         applicationEventPublisher.publishEvent(new JobCompletedEvent(jobId, jobType));
     }
