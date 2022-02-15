@@ -18,4 +18,6 @@ public class WebhookScheduleResponse {
     private int success;
 
     private int fail;
+
+    private String metadata;
 }

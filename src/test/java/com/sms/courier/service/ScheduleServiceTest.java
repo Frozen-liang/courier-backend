@@ -31,7 +31,6 @@ import com.sms.courier.mapper.ScheduleMapper;
 import com.sms.courier.mapper.ScheduleMapperImpl;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedScheduleRepository;
-import com.sms.courier.repository.CustomizedScheduleRepositoryTest;
 import com.sms.courier.repository.ScheduleRepository;
 import com.sms.courier.service.impl.ScheduleServiceImpl;
 import java.util.Collections;
@@ -62,6 +61,7 @@ class ScheduleServiceTest {
     private final ScheduleEntity schedule =
         ScheduleEntity.builder().id(ID).cycle(CycleType.DAY).time(Set.of("11:40")).build();
     private final ScheduleRequest scheduleRequest = ScheduleRequest.builder().cycle(CycleType.DAY).id(ID).build();
+    private static final String METADATA = "metadata";
 
     @Test
     @DisplayName("Test the findById method in the Schedule service")
@@ -183,9 +183,9 @@ class ScheduleServiceTest {
             .build();
         when(scheduleRepository.findById(ID)).thenReturn(Optional.of(scheduleEntity));
         when(commonRepository.updateField(any(), any(), any())).thenReturn(true);
-        doNothing().when(scheduleCaseJobService).schedule(any());
-        doNothing().when(scheduleSceneCaseJobService).schedule(any());
-        assertThat(scheduleService.handle(ID)).isTrue();
+        doNothing().when(scheduleCaseJobService).schedule(any(),anyString());
+        doNothing().when(scheduleSceneCaseJobService).schedule(any(),anyString());
+        assertThat(scheduleService.handle(ID,METADATA)).isTrue();
     }
 
     @Test
@@ -193,7 +193,7 @@ class ScheduleServiceTest {
     public void handle_system_exception_test() {
         when(scheduleRepository.findById(ID)).thenReturn(Optional.of(schedule));
         doThrow(new RuntimeException()).when(commonRepository).updateField(any(), any(), any());
-        assertThatThrownBy(() -> scheduleService.handle(ID))
+        assertThatThrownBy(() -> scheduleService.handle(ID,METADATA))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(SYSTEM_ERROR.getCode());
     }
@@ -202,7 +202,7 @@ class ScheduleServiceTest {
     @DisplayName("An custom exception occurred while handle Schedule")
     public void handle_custom_exception_test() {
         when(scheduleRepository.findById(ID)).thenReturn(Optional.empty());
-        assertThatThrownBy(() -> scheduleService.handle(ID))
+        assertThatThrownBy(() -> scheduleService.handle(ID,METADATA))
             .isInstanceOf(ApiTestPlatformException.class)
             .extracting("code").isEqualTo(GET_SCHEDULE_BY_ID_ERROR.getCode());
     }

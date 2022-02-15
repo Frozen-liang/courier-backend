@@ -1,5 +1,6 @@
 package com.sms.courier.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +18,9 @@ public class WebhookResponse extends LookupUserResponse {
     private String url;
 
     private String description;
+
+    @JsonProperty("isOnlyHandleError")
+    private boolean onlyHandleError;
 
     private Integer webhookType;
 

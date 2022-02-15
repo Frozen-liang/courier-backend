@@ -103,6 +103,7 @@ public class ScheduleJobRecordListener {
         WebhookScheduleResponse webhookScheduleResponse = WebhookScheduleResponse.builder()
             .id(scheduleRecord.getScheduleId())
             .name(scheduleRecord.getScheduleName()).success(scheduleRecord.getSuccess())
+            .metadata(scheduleRecord.getMetadata())
             .fail(scheduleRecord.getFail()).build();
         applicationEventPublisher
             .publishEvent(WebhookEvent.create(WebhookType.SCHEDULE, webhookScheduleResponse));

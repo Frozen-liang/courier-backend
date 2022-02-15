@@ -12,27 +12,24 @@ import java.util.List;
 
 public enum JsonType {
 
-    SYSTEM_ROLE_ENTITY(SystemRoleEntity.class, new TypeReference<List<SystemRoleEntity>>() {
+    SYSTEM_ROLE_ENTITY(new TypeReference<List<SystemRoleEntity>>() {
     }),
-    USER_GROUP_ENTITY(UserGroupEntity.class, new TypeReference<List<UserGroupEntity>>() {
+    USER_GROUP_ENTITY(new TypeReference<List<UserGroupEntity>>() {
     }),
-    ENGINE_SETTING_ENTITY(EngineSettingEntity.class, new TypeReference<List<EngineSettingEntity>>() {
+    ENGINE_SETTING_ENTITY(new TypeReference<List<EngineSettingEntity>>() {
     }),
-    CONTAINER_SETTING_ENTITY(ContainerSettingEntity.class, new TypeReference<List<ContainerSettingEntity>>() {
+    CONTAINER_SETTING_ENTITY(new TypeReference<List<ContainerSettingEntity>>() {
     }),
-    WEBHOOK_TYPE_ENTITY(WebhookTypeEntity.class, new TypeReference<List<WebhookTypeEntity>>() {
+    WEBHOOK_TYPE_ENTITY(new TypeReference<List<WebhookTypeEntity>>() {
     }),
-    GENERATOR_TEMPLATE_ENTITY(GeneratorTemplateEntity.class, new TypeReference<List<GeneratorTemplateEntity>>() {
+    GENERATOR_TEMPLATE_ENTITY(new TypeReference<List<GeneratorTemplateEntity>>() {
     }),
-    GENERATOR_TEMPLATE_TYPE_ENTITY(GeneratorTemplateTypeEntity.class,
-        new TypeReference<List<GeneratorTemplateTypeEntity>>() {
-        });
+    GENERATOR_TEMPLATE_TYPE_ENTITY(new TypeReference<List<GeneratorTemplateTypeEntity>>() {
+    });
 
-    private final Class<?> entityClass;
     private final TypeReference<?> typeReference;
 
-    JsonType(Class<?> entityClass, TypeReference<?> typeReference) {
-        this.entityClass = entityClass;
+    JsonType(TypeReference<?> typeReference) {
         this.typeReference = typeReference;
     }
 
@@ -40,7 +37,4 @@ public enum JsonType {
         return typeReference;
     }
 
-    public Class<?> getEntityClass() {
-        return entityClass;
-    }
 }
