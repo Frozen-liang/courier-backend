@@ -4,5 +4,5 @@ import com.sms.courier.entity.schedule.ScheduleEntity;
 
 public interface ScheduleCaseJobService extends JobService {
 
-    void schedule(ScheduleEntity scheduleEntity,String metadata);
+    void schedule(ScheduleEntity scheduleEntity, String metadata);
 }
