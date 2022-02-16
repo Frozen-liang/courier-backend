@@ -110,7 +110,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
 
     @Override
     @Async("commonExecutor")
-    public void schedule(ScheduleEntity scheduleEntity) {
+    public void schedule(ScheduleEntity scheduleEntity, String metadata) {
         try {
             CaseFilter caseFilter = scheduleEntity.getCaseFilter();
             List<SceneCaseEntity> sceneCaseEntities = getSceneCaseEntity(scheduleEntity.getProjectId(), caseFilter,
