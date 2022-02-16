@@ -1,10 +1,13 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.enums.DataCollection.COLLECTION_NAME;
+import static com.sms.courier.common.enums.DataCollection.DATA_NAME;
 import static com.sms.courier.common.enums.OperationModule.DATA_COLLECTION;
 import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.exception.ErrorCode.ADD_DATA_COLLECTION_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DATA_COLLECTION_NOTEXITS_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
@@ -19,6 +22,7 @@ import static com.sms.courier.common.field.CommonField.PROJECT_ID;
 import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.utils.Assert.isTrue;
 import static com.sms.courier.utils.Assert.notEmpty;
+
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.params.ExcelExportEntity;
@@ -248,9 +252,9 @@ public class DataCollectionServiceImpl implements DataCollectionService {
         try {
             Optional<DataCollectionEntity> optional = dataCollectionRepository.findById(id);
             DataCollectionEntity dataCollection = optional
-                    .orElseThrow(() -> ExceptionUtils.mpe("The dataCollection not exits. id = %s", id));
+                    .orElseThrow(() -> ExceptionUtils.mpe(DATA_COLLECTION_NOTEXITS_ERROR, id));
             List<ExcelExportEntity> list = Lists.newArrayList();
-            ExcelExportEntity entity1 = new ExcelExportEntity("collectionName", "dataName");
+            ExcelExportEntity entity1 = new ExcelExportEntity(COLLECTION_NAME.getName(), DATA_NAME);
             list.add(entity1);
             for (String string : dataCollection.getParamList()) {
                 ExcelExportEntity colEntity = new ExcelExportEntity(string, string);
@@ -260,7 +264,7 @@ public class DataCollectionServiceImpl implements DataCollectionService {
             for (TestData testData : dataCollection.getDataList()) {
                 Map<String, Object> dataMap = testData.getData().stream().collect(Collectors.toMap(DataParam::getKey,
                         DataParam::getValue));
-                dataMap.put("dataName", testData.getDataName());
+                dataMap.put(DATA_NAME.getName(), testData.getDataName());
                 datList.add(dataMap);
             }
             Workbook workbook = ExcelExportUtil.exportExcel(
