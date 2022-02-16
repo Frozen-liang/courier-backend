@@ -313,8 +313,9 @@ public enum ErrorCode {
     GET_OPEN_API_SETTING_BY_ID_ERROR("4288", "The OpenApiSetting not exist!"),
     DELETE_OPEN_API_SETTING_BY_ID_ERROR("4289", "Failed to delete the OpenApiSetting!"),
     EDIT_OPEN_API_SETTING_ERROR("4290", "Failed to edit the OpenApiSetting!"),
-    EXPORT_DATA_COLLECTION_ERROR("4291", "Failed to export the DataCollection!"),
-    DATA_COLLECTION_NOTEXITS_ERROR("4292", "The dataCollection not exits. id = %s"),
+    SYNC_API_ERROR("4291", "Failed to sync api!"),
+    EXPORT_DATA_COLLECTION_ERROR("4292", "Failed to export the DataCollection!"),
+    DATA_COLLECTION_NOTEXITS_ERROR("4293", "The dataCollection not exits. id = %s"),
 
     // 50001 - 51000 describes code generate exception
     FILE_FILL_THE_CONTENT_ERROR("50001", "File fill the content error!"),
@@ -324,14 +325,14 @@ public enum ErrorCode {
     TEMPLATE_CAN_NOT_BE_NULL("50005", "Template can not be null!"),
     CODE_TYPE_IS_NOT_EXIST("50006", "Code type is not exist!"),
     ENTITY_SERIALIZATION_ERROR("50007", "Entity serialization error!"),
-    FILE_COMPRESSION_ERROE("50008", "File compression error!"),
+    FILE_COMPRESSION_ERROR("50008", "File compression error!"),
 
 
     // 60001 - 61000 describes api import exception
     PARSE_SWAGGER_FILE_ERROR("60001", "Parse the swagger file error, Please check the format of the file contents."),
     PARSE_SWAGGER_URL_ERROR("60002", "Parse the swagger url error, Please check the url."),
     THE_OPERATION_ID_NOT_UNIQUE_ERROR("60003", "%s"),
-    SYNC_API_ERROR("60004", "Sync api fail."),
+    CASE_SYNC_API_ERROR("60004", "Sync api fail."),
 
 
     // 61001  describes the test exception

@@ -99,6 +99,10 @@ final class CustomRoundRobinLoadBalancer extends LoadBalancer {
             if (existingSubchannel != null) {
                 // EAG's Attributes may have changed.
                 existingSubchannel.updateAddresses(Collections.singletonList(originalAddressGroup));
+                String name = existingSubchannel.getAttributes().get(ENGINE_NAME);
+                ConnectivityState state = getSubchannelStateInfoRef(existingSubchannel).value.getState();
+                applicationContext
+                    .publishEvent(new EngineStatusEvent(name, EngineStatus.getByConnectivityState(state)));
                 continue;
             }
             // Create new subchannels for new addresses.
@@ -114,7 +118,10 @@ final class CustomRoundRobinLoadBalancer extends LoadBalancer {
                     new Ref<>(ConnectivityStateInfo.forNonError(IDLE)));
             if (originalAddressGroup != null && CollectionUtils.isNotEmpty(originalAddressGroup.getAddresses())) {
                 InetSocketAddress inetSocketAddress = (InetSocketAddress) originalAddressGroup.getAddresses().get(0);
-                subchannelAttrs.set(ENGINE_NAME, inetSocketAddress.getAddress().getHostName());
+                String engineName =
+                    inetSocketAddress.getAddress() != null ? inetSocketAddress.getAddress().getHostName()
+                        : inetSocketAddress.getHostName();
+                subchannelAttrs.set(ENGINE_NAME, engineName);
             }
             final Subchannel subchannel = checkNotNull(
                 helper.createSubchannel(CreateSubchannelArgs.newBuilder()

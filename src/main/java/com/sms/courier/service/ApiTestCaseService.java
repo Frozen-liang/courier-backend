@@ -4,6 +4,7 @@ import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.ApiTestCasePageRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
+import com.sms.courier.dto.request.SyncApiRequest;
 import com.sms.courier.dto.request.UpdateCaseByApiRequest;
 import com.sms.courier.dto.response.ApiTestCasePageResponse;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
@@ -46,4 +47,6 @@ public interface ApiTestCaseService {
     Page<ApiTestCasePageResponse> page(ApiTestCasePageRequest request);
 
     Boolean updateCaseByApi(List<UpdateCaseByApiRequest> requests);
+
+    Boolean syncApi(SyncApiRequest request);
 }

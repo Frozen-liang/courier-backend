@@ -1,13 +1,19 @@
 package com.sms.courier.service;
 
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.request.AddCaseTemplateApiRequest;
 import com.sms.courier.dto.request.BatchAddCaseTemplateApiRequest;
 import com.sms.courier.dto.request.BatchUpdateCaseTemplateApiRequest;
+import com.sms.courier.dto.request.SyncApiRequest;
 import com.sms.courier.dto.request.UpdateCaseTemplateApiRequest;
 import com.sms.courier.dto.response.CaseTemplateApiResponse;
+import com.sms.courier.entity.api.ApiEntity;
+import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.mapper.CaseTemplateApiMapper;
+import com.sms.courier.mapper.ParamInfoMapper;
+import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.CaseTemplateApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseApiRepository;
 import com.sms.courier.service.impl.CaseTemplateApiServiceImpl;
@@ -46,10 +52,11 @@ class CaseTemplateApiServiceTest {
     private final CaseTemplateApiMapper caseTemplateApiMapper = mock(CaseTemplateApiMapper.class);
     private final CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository =
         mock(CustomizedSceneCaseApiRepository.class);
+    private final ApiRepository apiRepository = mock(ApiRepository.class);
+    private final ParamInfoMapper paramInfoMapper = mock(ParamInfoMapper.class);
     private CaseTemplateApiServiceImpl caseTemplateApiService = new CaseTemplateApiServiceImpl(
-        caseTemplateApiRepository,
-        caseTemplateApiMapper, customizedSceneCaseApiRepository,
-        caseApiCountHandler);
+        caseTemplateApiRepository, caseTemplateApiMapper, customizedSceneCaseApiRepository,
+        caseApiCountHandler, apiRepository, paramInfoMapper);
 
     private final static String MOCK_SCENE_CASE_ID = "1";
     private final static String MOCK_ID = new ObjectId().toString();
@@ -170,7 +177,7 @@ class CaseTemplateApiServiceTest {
         List<CaseTemplateApiEntity> caseTemplateApiList = Lists.newArrayList(CaseTemplateApiEntity.builder().build());
         when(caseTemplateApiRepository.findAll(any(Example.class), any(Sort.class))).thenReturn(caseTemplateApiList);
         List<CaseTemplateApiEntity> dto = caseTemplateApiService
-            .listByCaseTemplateId(MOCK_SCENE_CASE_ID, Boolean.FALSE);
+            .listByCaseTemplateId(MOCK_SCENE_CASE_ID);
         assertThat(dto).isNotEmpty();
     }
 
@@ -179,7 +186,7 @@ class CaseTemplateApiServiceTest {
     void listBySceneCaseId_test_thenThrowException() {
         when(caseTemplateApiRepository.findAll(any(Example.class), any(Sort.class)))
             .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR));
-        assertThatThrownBy(() -> caseTemplateApiService.listByCaseTemplateId(MOCK_SCENE_CASE_ID, Boolean.FALSE))
+        assertThatThrownBy(() -> caseTemplateApiService.listByCaseTemplateId(MOCK_SCENE_CASE_ID))
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
@@ -209,6 +216,38 @@ class CaseTemplateApiServiceTest {
         when(caseTemplateApiRepository.deleteAllByCaseTemplateIdIsIn(any())).thenReturn(1L);
         caseTemplateApiService.deleteAllByCaseTemplateIds(List.of(MOCK_ID));
         verify(caseTemplateApiRepository, times(1)).deleteAllByCaseTemplateIdIsIn(any());
+    }
+
+    @Test
+    @DisplayName("Test the syncApi method in the CaseTemplateApi service")
+    public void syncApi_test() {
+        Optional<CaseTemplateApiEntity> caseTemplateApiEntity =
+            Optional.of(CaseTemplateApiEntity.builder().apiTestCase(ApiTestCaseEntity.builder().apiEntity(
+                ApiEntity.builder().build()).build()).build());
+        when(caseTemplateApiRepository.findById(any())).thenReturn(caseTemplateApiEntity);
+        when(caseTemplateApiRepository.save(any())).thenReturn(caseTemplateApiEntity.get());
+        Optional<ApiEntity> apiEntity = Optional.of(ApiEntity.builder().build());
+        when(apiRepository.findById(any())).thenReturn(apiEntity);
+        Boolean isSuccess = caseTemplateApiService.syncApi(SyncApiRequest.builder().build());
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sync api")
+    public void syncApi_smsException_test() {
+        when(caseTemplateApiRepository.findById(any()))
+            .thenThrow(new ApiTestPlatformException(ErrorCode.CASE_SYNC_API_ERROR));
+        assertThatThrownBy(() -> caseTemplateApiService.syncApi(SyncApiRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sync api")
+    public void syncApi_exception_test() {
+        when(caseTemplateApiRepository.findById(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> caseTemplateApiService.syncApi(SyncApiRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
     }
 
     private BatchAddCaseTemplateApiRequest getAddDto() {

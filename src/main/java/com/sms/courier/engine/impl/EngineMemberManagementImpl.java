@@ -12,7 +12,6 @@ import static com.sms.courier.common.exception.ErrorCode.NO_SUCH_CONTAINER_ERROR
 import static com.sms.courier.common.exception.ErrorCode.RESTART_ENGINE_ERROR;
 import static com.sms.courier.common.field.EngineMemberField.NAME;
 import static com.sms.courier.common.field.EngineMemberField.OPEN;
-import static com.sms.courier.common.field.EngineMemberField.STATUS;
 import static com.sms.courier.common.field.EngineMemberField.TASK_SIZE_LIMIT;
 import static com.sms.courier.docker.enmu.ContainerField.CONTAINER_STATUS;
 
@@ -175,7 +174,6 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     private void updateEngineStatus(String name) {
         Query query = new Query();
         query.addCriteria(Criteria.where(NAME.getName()).is(name));
-        query.addCriteria(Criteria.where(STATUS.getName()).ne(EngineStatus.RUNNING));
         Update update = new Update();
         update.set(CONTAINER_STATUS.getName(), DESTROY);
         commonRepository.updateField(query, update, EngineMemberEntity.class);
@@ -215,7 +213,8 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
 
     @Override
     public List<EngineAddress> getAvailableEngine() {
-        return engineMemberRepository.findAllByContainerStatusAndOpenIsTrue(ContainerStatus.START)
+        return engineMemberRepository
+            .findAllByContainerStatusOrStatusAndOpenIsTrue(ContainerStatus.START, EngineStatus.RUNNING)
             .filter(this::taskSizeLimit)
             .map(this::buildEngineAddress)
             .collect(Collectors.toList());

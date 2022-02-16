@@ -2,10 +2,12 @@ package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.OperationModule.SCENE_CASE_API;
 import static com.sms.courier.common.enums.OperationType.ADD;
+import static com.sms.courier.common.enums.OperationType.CASE_SYNC;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.BATCH_EDIT_SCENE_CASE_API_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.CASE_SYNC_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_API_BY_ID_ERROR;
@@ -15,13 +17,17 @@ import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.ApiType;
+import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.field.SceneField;
 import com.sms.courier.dto.request.BatchAddSceneCaseApiRequest;
 import com.sms.courier.dto.request.BatchUpdateSceneCaseApiRequest;
+import com.sms.courier.dto.request.SyncApiRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.courier.dto.response.SceneCaseApiResponse;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
+import com.sms.courier.mapper.ParamInfoMapper;
 import com.sms.courier.mapper.SceneCaseApiMapper;
+import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseApiRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
 import com.sms.courier.service.CaseApiCountHandler;
@@ -41,7 +47,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class SceneCaseApiServiceImpl implements SceneCaseApiService {
+public class SceneCaseApiServiceImpl extends AbstractCaseService implements SceneCaseApiService {
 
     private final SceneCaseApiRepository sceneCaseApiRepository;
     private final SceneCaseApiMapper sceneCaseApiMapper;
@@ -50,7 +56,9 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
 
     public SceneCaseApiServiceImpl(SceneCaseApiRepository sceneCaseApiRepository,
         SceneCaseApiMapper sceneCaseApiMapper, CustomizedSceneCaseApiRepository customizedSceneCaseApiRepository,
-        CaseApiCountHandler sceneCaseApiCountHandler) {
+        CaseApiCountHandler sceneCaseApiCountHandler, ApiRepository apiRepository,
+        ParamInfoMapper paramInfoMapper) {
+        super(apiRepository, paramInfoMapper);
         this.sceneCaseApiRepository = sceneCaseApiRepository;
         this.sceneCaseApiMapper = sceneCaseApiMapper;
         this.customizedSceneCaseApiRepository = customizedSceneCaseApiRepository;
@@ -139,22 +147,6 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     }
 
     @Override
-    public List<SceneCaseApiResponse> listBySceneCaseId(String sceneCaseId, boolean removed) {
-        try {
-            Example<SceneCaseApiEntity> example = Example.of(
-                SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(removed).build(),
-                ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName(), SceneField.IS_SQL_RESULT
-                    .getName()));
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
-            List<SceneCaseApiEntity> sceneCaseApiList = sceneCaseApiRepository.findAll(example, sort);
-            return sceneCaseApiList.stream().map(sceneCaseApiMapper::toSceneCaseApiDto).collect(Collectors.toList());
-        } catch (Exception e) {
-            log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);
-            throw ExceptionUtils.mpe(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR);
-        }
-    }
-
-    @Override
     public List<SceneCaseApiEntity> listBySceneCaseId(String sceneCaseId) {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
@@ -169,20 +161,6 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
         }
     }
 
-    @Override
-    public List<SceneCaseApiEntity> getApiBySceneCaseId(String sceneCaseId, boolean remove) {
-        try {
-            Example<SceneCaseApiEntity> example = Example.of(
-                SceneCaseApiEntity.builder().sceneCaseId(sceneCaseId).removed(remove).build(),
-                ExampleMatcher.matching().withIgnorePaths(SceneField.IS_LOCK.getName(), SceneField.IS_SQL_RESULT
-                    .getName()));
-            Sort sort = Sort.by(Direction.fromString(Direction.ASC.name()), SceneField.ORDER.getName());
-            return sceneCaseApiRepository.findAll(example, sort);
-        } catch (Exception e) {
-            log.error("Failed to get the SceneCaseApi list by sceneCaseId!", e);
-            throw ExceptionUtils.mpe(GET_SCENE_CASE_API_LIST_BY_SCENE_CASE_ID_ERROR);
-        }
-    }
 
     @Override
     public SceneCaseApiResponse getSceneCaseApiById(String id) {
@@ -225,6 +203,24 @@ public class SceneCaseApiServiceImpl implements SceneCaseApiService {
     @Override
     public boolean existsByCaseTemplateId(List<String> caseTemplateIds) {
         return sceneCaseApiRepository.existsByCaseTemplateIdInAndRemovedIsFalse(caseTemplateIds);
+    }
+
+    @Override
+    @LogRecord(operationType = CASE_SYNC, operationModule = SCENE_CASE_API,
+        template = "{{#request.caseName}}")
+    public Boolean syncApi(SyncApiRequest request) {
+        try {
+            SceneCaseApiEntity sceneCaseApi = sceneCaseApiRepository.findById(request.getCaseId())
+                .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_API_BY_ID_ERROR));
+            syncApiEntity(sceneCaseApi.getApiTestCase().getApiEntity());
+            sceneCaseApiRepository.save(sceneCaseApi);
+            return Boolean.TRUE;
+        } catch (ApiTestPlatformException courierException) {
+            throw courierException;
+        } catch (Exception e) {
+            log.error("Sync api error!", e);
+            throw ExceptionUtils.mpe(CASE_SYNC_API_ERROR);
+        }
     }
 
 }
