@@ -313,6 +313,7 @@ public enum ErrorCode {
     GET_OPEN_API_SETTING_BY_ID_ERROR("4288", "The OpenApiSetting not exist!"),
     DELETE_OPEN_API_SETTING_BY_ID_ERROR("4289", "Failed to delete the OpenApiSetting!"),
     EDIT_OPEN_API_SETTING_ERROR("4290", "Failed to edit the OpenApiSetting!"),
+    EXPORT_DATA_COLLECTION_ERROR("4291", "Failed to export the DataCollection!"),
 
     // 50001 - 51000 describes code generate exception
     FILE_FILL_THE_CONTENT_ERROR("50001", "File fill the content error!"),

@@ -24,6 +24,7 @@ val versionJjwt by extra("0.11.2")
 val caffeine by extra("3.0.0")
 val versionMustache by extra("compiler:0.9.10")
 val versionJsonPath by extra("2.4.0")
+val versionEasyPoiBase by extra("3.0.1")
 
 plugins {
     val springVersion = "2.4.5"
@@ -139,6 +140,7 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:3.6.28")
     implementation("com.github.spullara.mustache.java:$versionMustache")
     implementation("com.jayway.jsonpath:json-path:$versionJsonPath")
+    implementation("cn.afterturn:easypoi-base:$versionEasyPoiBase")
 
 }
 
