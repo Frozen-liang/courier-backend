@@ -12,7 +12,7 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 
 group = "com.sms.courier"
-version = "1.1.8"
+version = "1.2"
 description = "courier-backend"
 
 val grpcVersion by extra("1.42.1")

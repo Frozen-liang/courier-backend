@@ -1,5 +1,6 @@
 package com.sms.courier.entity.scenetest;
 
+import com.sms.courier.common.enums.ReviewStatus;
 import com.sms.courier.entity.BaseEntity;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,4 +47,6 @@ public class SceneCaseEntity extends BaseEntity {
 
     @Default
     private List<EnvDataCollConn> envDataCollConnList = new ArrayList<>();
+
+    private ReviewStatus reviewStatus;
 }
