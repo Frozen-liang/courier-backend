@@ -20,19 +20,28 @@ import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
 
 import com.sms.courier.common.enums.ApiBindingStatus;
+import com.sms.courier.common.enums.ParamType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.ApiTestCasePageRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
+import com.sms.courier.dto.request.SyncApiRequest;
 import com.sms.courier.dto.request.UpdateCaseByApiRequest;
 import com.sms.courier.dto.request.UpdateCaseByApiRequest.CaseRequest;
+import com.sms.courier.dto.response.ApiResponse;
 import com.sms.courier.dto.response.ApiTestCasePageResponse;
 import com.sms.courier.dto.response.ApiTestCaseResponse;
+import com.sms.courier.dto.response.ParamInfoResponse;
 import com.sms.courier.entity.api.ApiEntity;
+import com.sms.courier.entity.api.common.ParamInfo;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.apitestcase.TestResult;
+import com.sms.courier.entity.structure.StructureEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
+import com.sms.courier.mapper.ParamInfoMapper;
+import com.sms.courier.repository.ApiRepository;
 import com.sms.courier.repository.ApiTestCaseRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseJobRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseRepository;
@@ -60,9 +69,11 @@ class ApiTestCaseServiceTest {
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository = mock(
         CustomizedApiTestCaseJobRepository.class);
     private final CaseApiCountHandler caseApiCountHandler = mock(CaseApiCountHandler.class);
+    private final ApiRepository apiRepository = mock(ApiRepository.class);
+    private final ParamInfoMapper paramInfoMapper = mock(ParamInfoMapper.class);
     private final ApiTestCaseService apiTestCaseService = new ApiTestCaseServiceImpl(
         apiTestCaseRepository, customizedApiTestCaseRepository, apiTestCaseMapper,
-        caseApiCountHandler);
+        caseApiCountHandler, apiRepository, paramInfoMapper);
     private final ApiTestCaseEntity apiTestCase =
         ApiTestCaseEntity.builder().id(ID).apiEntity(ApiEntity.builder().id(ID).build()).build();
     private final ApiTestCaseResponse apiTestCaseResponse = ApiTestCaseResponse.builder()
@@ -156,8 +167,10 @@ class ApiTestCaseServiceTest {
     public void list_test() {
         ArrayList<ApiTestCaseResponse> apiTestCaseResponseList = new ArrayList<>();
         for (int i = 0; i < TOTAL_ELEMENTS; i++) {
-            apiTestCaseResponseList.add(ApiTestCaseResponse.builder().build());
+            apiTestCaseResponseList
+                .add(ApiTestCaseResponse.builder().id(ID).apiEntity(ApiResponse.builder().build()).build());
         }
+        when(apiTestCaseRepository.findById(ID)).thenReturn(Optional.of(apiTestCase));
         when(customizedApiTestCaseRepository.listByJoin(any(), any(), anyBoolean()))
             .thenReturn(apiTestCaseResponseList);
         List<ApiTestCaseResponse> result = apiTestCaseService.list(API_ID, PROJECT_ID, REMOVED);
@@ -289,13 +302,80 @@ class ApiTestCaseServiceTest {
             .isEqualTo(UPDATE_CASE_BY_API_ERROR.getCode());
     }
 
+    @Test
+    @DisplayName("Test the syncApi method in the ApiTestCase service")
+    public void syncApi_test() {
+        Optional<ApiTestCaseEntity> apiTestCase =
+            Optional.of(ApiTestCaseEntity.builder()
+                .apiEntity(ApiEntity.builder()
+                    .requestParams(Lists.newArrayList(ParamInfo.builder().key("test").paramType(ParamType.OBJECT)
+                        .childParam(Lists.newArrayList(ParamInfo.builder().key("testChild").paramType(ParamType.STRING)
+                            .build())).build()))
+                    .pathParams(Lists.newArrayList(ParamInfo.builder().key("test").paramType(ParamType.STRING).build()))
+                    .build())
+                .build());
+        when(apiTestCaseRepository.findById(any())).thenReturn(apiTestCase);
+        Optional<ApiEntity> sourceApiEntity =
+            Optional.of(ApiEntity.builder().requestParams(Lists.newArrayList(ParamInfo.builder().key(
+                "test").paramType(ParamType.OBJECT).childParam(Lists.newArrayList()).build())).build());
+        when(apiRepository.findById(any())).thenReturn(sourceApiEntity);
+        when(apiTestCaseRepository.save(any())).thenReturn(apiTestCase.get());
+        Boolean isSuccess = apiTestCaseService.syncApi(SyncApiRequest.builder().build());
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the syncApi method in the ApiTestCase service")
+    public void syncApiByDataStructureIsNotNull_test() {
+        Optional<ApiTestCaseEntity> apiTestCase =
+            Optional.of(ApiTestCaseEntity.builder()
+                .apiEntity(ApiEntity.builder()
+                    .requestParams(Lists.newArrayList(ParamInfo.builder().key("test").paramType(ParamType.OBJECT)
+                        .childParam(Lists.newArrayList(ParamInfo.builder().key("testChild").paramType(ParamType.STRING)
+                            .build())).build()))
+                    .build())
+                .build());
+        when(apiTestCaseRepository.findById(any())).thenReturn(apiTestCase);
+        Optional<ApiEntity> sourceApiEntity =
+            Optional.of(ApiEntity.builder()
+                .pathParams(Lists.newArrayList(ParamInfo.builder().key("test").paramType(ParamType.STRING).build()))
+                .requestParams(Lists.newArrayList(
+                    ParamInfo.builder().ref(Boolean.TRUE)
+                        .structureRef(StructureEntity.builder().struct(
+                            Lists.newArrayList(ParamInfo.builder().key("test1").paramType(ParamType.STRING).build()))
+                            .build())
+                        .build()))
+                .build());
+        when(apiRepository.findById(any())).thenReturn(sourceApiEntity);
+        when(apiTestCaseRepository.save(any())).thenReturn(apiTestCase.get());
+        Boolean isSuccess = apiTestCaseService.syncApi(SyncApiRequest.builder().build());
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sync api")
+    public void syncApi_smsException_test() {
+        when(apiTestCaseRepository.findById(any()))
+            .thenThrow(new ApiTestPlatformException(ErrorCode.CASE_SYNC_API_ERROR));
+        assertThatThrownBy(() -> apiTestCaseService.syncApi(SyncApiRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while sync api")
+    public void syncApi_exception_test() {
+        when(apiTestCaseRepository.findById(any()))
+            .thenThrow(new RuntimeException());
+        assertThatThrownBy(() -> apiTestCaseService.syncApi(SyncApiRequest.builder().build()))
+            .isInstanceOf(ApiTestPlatformException.class);
+    }
 
     private List<UpdateCaseByApiRequest> getUpdateCaseByApiRequests() {
         UpdateCaseByApiRequest updateCaseByApiRequest = new UpdateCaseByApiRequest();
         updateCaseByApiRequest.setApi(ApiRequest.builder().build());
         updateCaseByApiRequest.setCaseList(List.of(new CaseRequest()));
-        List<UpdateCaseByApiRequest> requests = List.of(updateCaseByApiRequest);
-        return requests;
+        return List.of(updateCaseByApiRequest);
     }
+
 
 }

@@ -1,5 +1,6 @@
 package com.sms.courier.docker.event;
 
+import static com.sms.courier.common.field.EngineMemberField.STATUS;
 import static com.sms.courier.docker.enmu.ContainerField.CONTAINER_NAME;
 import static com.sms.courier.docker.enmu.ContainerField.CONTAINER_STATUS;
 import static com.sms.courier.docker.enmu.ContainerField.NAME;
@@ -8,6 +9,7 @@ import com.github.dockerjava.api.async.ResultCallbackTemplate;
 import com.github.dockerjava.api.model.Event;
 import com.sms.courier.common.enums.ContainerStatus;
 import com.sms.courier.docker.enmu.LabelType;
+import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.repository.CommonRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -63,6 +65,9 @@ public class ContainerEvent extends ResultCallbackTemplate<ContainerEvent, Event
         query.addCriteria(criteria);
         Update update = new Update();
         update.set(CONTAINER_STATUS.getName(), containerStatus);
+        if (labelType == LabelType.ENGINE && !(ContainerStatus.START == containerStatus)) {
+            update.set(STATUS.getName(), EngineStatus.INVALID);
+        }
         commonRepository.updateField(query, update, labelType.getEntityClass());
     }
 }

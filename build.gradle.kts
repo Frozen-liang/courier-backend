@@ -22,6 +22,8 @@ val versionLombok by extra("1.18.20")
 val versionMapstruct by extra("1.4.2.Final")
 val versionJjwt by extra("0.11.2")
 val caffeine by extra("3.0.0")
+val versionMustache by extra("compiler:0.9.10")
+val versionJsonPath by extra("2.4.0")
 
 plugins {
     val springVersion = "2.4.5"
@@ -132,11 +134,11 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl:$versionJjwt")
     implementation("io.jsonwebtoken:jjwt-jackson:$versionJjwt")
     implementation("net.logstash.logback:logstash-logback-encoder:6.6")
-    implementation("com.jayway.jsonpath:json-path:2.4.0")
-    implementation("com.github.spullara.mustache.java:compiler:0.9.10")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.mockito:mockito-inline:3.6.28")
+    implementation("com.github.spullara.mustache.java:$versionMustache")
+    implementation("com.jayway.jsonpath:json-path:$versionJsonPath")
 
 }
 

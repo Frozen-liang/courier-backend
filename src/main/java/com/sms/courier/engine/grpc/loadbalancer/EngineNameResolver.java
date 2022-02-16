@@ -207,6 +207,7 @@ public class EngineNameResolver extends NameResolver {
     }
 
     private void resolve() {
+        logger.log(Level.INFO, "Refresh engine resolving=" + resolving + ",shutdown=" + shutdown);
         if (resolving || shutdown || !cacheRefreshRequired()) {
             return;
         }
@@ -222,6 +223,7 @@ public class EngineNameResolver extends NameResolver {
 
     @Override
     public void shutdown() {
+        logger.log(Level.WARNING, "----------------Shutdown---------------!!!");
         if (shutdown) {
             return;
         }

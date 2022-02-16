@@ -2,6 +2,7 @@ package com.sms.courier.service;
 
 import com.sms.courier.dto.request.BatchAddCaseTemplateApiRequest;
 import com.sms.courier.dto.request.BatchUpdateCaseTemplateApiRequest;
+import com.sms.courier.dto.request.SyncApiRequest;
 import com.sms.courier.dto.request.UpdateCaseTemplateApiRequest;
 import com.sms.courier.dto.response.CaseTemplateApiResponse;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
@@ -19,9 +20,11 @@ public interface CaseTemplateApiService {
 
     List<CaseTemplateApiResponse> listResponseByCaseTemplateId(String caseTemplateId);
 
-    List<CaseTemplateApiEntity> listByCaseTemplateId(String caseTemplateId, boolean remove);
+    List<CaseTemplateApiEntity> listByCaseTemplateId(String caseTemplateId);
 
     CaseTemplateApiResponse getCaseTemplateApiById(String id);
 
     void deleteAllByCaseTemplateIds(List<String> ids);
+
+    Boolean syncApi(SyncApiRequest request);
 }

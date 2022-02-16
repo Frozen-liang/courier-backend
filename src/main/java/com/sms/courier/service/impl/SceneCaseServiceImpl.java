@@ -343,7 +343,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                     .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_BY_ID_ERROR));
             for (AddCaseTemplateApi addCaseTemplateApi : addCaseTemplateConnRequest.getCaseTemplateIds()) {
                 List<CaseTemplateApiEntity> caseTemplateApiList =
-                    caseTemplateApiService.listByCaseTemplateId(addCaseTemplateApi.getId(), Boolean.FALSE);
+                    caseTemplateApiService.listByCaseTemplateId(addCaseTemplateApi.getId());
                 SceneCaseApiEntity sceneCaseApi = SceneCaseApiEntity.builder()
                     .sceneCaseId(addCaseTemplateConnRequest.getSceneCaseId())
                     .caseTemplateId(addCaseTemplateApi.getId())
@@ -432,8 +432,10 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                     .collect(Collectors.toList());
             List<String> caseTemplateId =
                 customizedCaseTemplateApiRepository.findCaseTemplateIdByApiIds(Lists.newArrayList(apiId));
-            List<String> templateSceneId =
-                customizedSceneCaseApiRepository.findSceneCaseIdByCaseTemplateIds(caseTemplateId);
+            List<String> templateSceneId = Lists.newArrayList();
+            if (CollectionUtils.isNotEmpty(caseTemplateId)) {
+                templateSceneId = customizedSceneCaseApiRepository.findSceneCaseIdByCaseTemplateIds(caseTemplateId);
+            }
             sceneCaseId.addAll(templateSceneId);
             if (CollectionUtils.isNotEmpty(sceneCaseId)) {
                 return sceneCaseRepository.findByIdInAndRemoved(sceneCaseId, Boolean.FALSE).stream()
@@ -575,7 +577,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private void resetSceneCaseApiConn(SceneCaseApiConnResponse response,
         SceneCaseApiEntity sceneCaseApi) {
         List<CaseTemplateApiEntity> caseTemplateApiList =
-            caseTemplateApiService.listByCaseTemplateId(sceneCaseApi.getCaseTemplateId(), Boolean.FALSE);
+            caseTemplateApiService.listByCaseTemplateId(sceneCaseApi.getCaseTemplateId());
         Map<String, Boolean> isExecuteMap =
             sceneCaseApi.getCaseTemplateApiConnList().stream().collect(
                 Collectors.toMap(CaseTemplateApiConn::getCaseTemplateApiId, CaseTemplateApiConn::isExecute));

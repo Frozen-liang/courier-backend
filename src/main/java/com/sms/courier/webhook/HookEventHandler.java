@@ -38,7 +38,7 @@ public class HookEventHandler implements InitializingBean, DisposableBean {
     }
 
     @EventListener
-    @Async
+    @Async("commonExecutor")
     public void handle(WebhookEvent<?> webhookEvent) {
         webhookEventQueue.add(webhookEvent);
     }

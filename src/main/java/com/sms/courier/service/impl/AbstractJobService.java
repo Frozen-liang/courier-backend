@@ -88,7 +88,7 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
     @Override
     public void handleJobReport(JobReport jobReport) {
         repository.findById(jobReport.getJobId()).ifPresent(job -> {
-            log.info("Handle job report. jobReport:{}", jobReport);
+            log.info("Handle job report. jobId:{} jobStatus:{}", jobReport.getJobId(), jobReport.getJobStatus());
             saveJobReport(jobReport, job);
         });
     }
