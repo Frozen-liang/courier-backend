@@ -3,19 +3,12 @@ package com.sms.courier.initialize.impl;
 import com.sms.courier.common.enums.ContainerStatus;
 import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.engine.grpc.GrpcProperties;
-import com.sms.courier.engine.grpc.api.v1.EngineGrpc;
-import com.sms.courier.engine.grpc.api.v1.EngineGrpc.EngineStub;
 import com.sms.courier.engine.grpc.interceptor.AuthorizationServerInterceptor;
-import com.sms.courier.engine.grpc.loadbalancer.Constants;
 import com.sms.courier.engine.grpc.server.EngineRegisterServiceImpl;
 import com.sms.courier.initialize.DataInitializer;
 import com.sms.courier.initialize.constant.Order;
 import com.sms.courier.repository.EngineMemberRepository;
 import com.sms.courier.utils.ApplicationContextUtils;
-import io.grpc.CompressorRegistry;
-import io.grpc.DecompressorRegistry;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import java.util.Objects;
@@ -38,19 +31,6 @@ public class EngineInitializer implements DataInitializer {
         initServer(engineRegisterService, grpcProperties, interceptor);
         GenericApplicationContext genericApplicationContext = (GenericApplicationContext) applicationContext;
         genericApplicationContext.registerBean(EngineRegisterServiceImpl.class, () -> engineRegisterService);
-        genericApplicationContext.registerBean(EngineStub.class,
-            () -> {
-                ManagedChannel channel = ManagedChannelBuilder.forTarget("engine")
-                    // Channels are secure by default (via SSL/TLS). For the example we disable TLS to avoid
-                    // needing certificates.
-                    .usePlaintext()
-                    .compressorRegistry(CompressorRegistry.getDefaultInstance())
-                    .decompressorRegistry(DecompressorRegistry.getDefaultInstance())
-                    .defaultLoadBalancingPolicy(Constants.ROUND_ROBIN)
-                    .build();
-                return EngineGrpc.newStub(channel);
-
-            });
         log.info("Clean running engine");
         EngineMemberRepository engineMemberRepository = applicationContext.getBean(EngineMemberRepository.class);
         engineMemberRepository.findAllByContainerStatus(ContainerStatus.START)

@@ -10,6 +10,7 @@ import static com.sms.courier.engine.grpc.loadbalancer.Constants.TASK_TYPE;
 import com.sms.courier.common.enums.JobType;
 import com.sms.courier.engine.EngineJobManagement;
 import com.sms.courier.engine.grpc.api.v1.EngineGrpc.EngineStub;
+import com.sms.courier.engine.grpc.client.EngineStubFactory;
 import com.sms.courier.engine.grpc.streamobserver.CaseJobReportStreamObserver;
 import com.sms.courier.engine.grpc.streamobserver.SceneCaseJobReportStreamObserver;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
@@ -22,28 +23,24 @@ import io.grpc.ClientInterceptor;
 import io.grpc.Metadata;
 import io.grpc.stub.MetadataUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EngineJobManagementImpl implements EngineJobManagement {
 
-    private final ApplicationContext applicationContext;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final GrpcMapper grpcMapper;
 
-    public EngineJobManagementImpl(ApplicationContext applicationContext,
-        ApplicationEventPublisher applicationEventPublisher,
+    public EngineJobManagementImpl(ApplicationEventPublisher applicationEventPublisher,
         GrpcMapper grpcMapper) {
-        this.applicationContext = applicationContext;
         this.applicationEventPublisher = applicationEventPublisher;
         this.grpcMapper = grpcMapper;
     }
 
     @Override
     public void dispatcherJob(SceneCaseJobEntity request) {
-        EngineStub engineStub = applicationContext.getBean(EngineStub.class);
+        EngineStub engineStub = EngineStubFactory.getEngineStub();
         ClientInterceptor clientInterceptor = getClientInterceptor(request.getId(), JobType.SCENE_CASE);
         engineStub.withOption(TASK_TYPE, SCENE_CASE_TASK.getName())
             .withInterceptors(clientInterceptor)
@@ -53,7 +50,7 @@ public class EngineJobManagementImpl implements EngineJobManagement {
 
     @Override
     public void dispatcherJob(ScheduleSceneCaseJobEntity request) {
-        EngineStub engineStub = applicationContext.getBean(EngineStub.class);
+        EngineStub engineStub = EngineStubFactory.getEngineStub();
         ClientInterceptor clientInterceptor = getClientInterceptor(request.getId(), JobType.SCHEDULER_SCENE_CASE);
         engineStub.withOption(TASK_TYPE, SCENE_CASE_TASK.getName())
             .withInterceptors(clientInterceptor)
@@ -64,7 +61,7 @@ public class EngineJobManagementImpl implements EngineJobManagement {
 
     @Override
     public void dispatcherJob(ApiTestCaseJobEntity request) {
-        EngineStub engineStub = applicationContext.getBean(EngineStub.class);
+        EngineStub engineStub = EngineStubFactory.getEngineStub();
         ClientInterceptor clientInterceptor = getClientInterceptor(request.getId(), JobType.CASE);
         engineStub.withOption(TASK_TYPE, CASE_TASK.getName())
             .withInterceptors(clientInterceptor)
@@ -74,7 +71,7 @@ public class EngineJobManagementImpl implements EngineJobManagement {
 
     @Override
     public void dispatcherJob(ScheduleCaseJobEntity request) {
-        EngineStub engineStub = applicationContext.getBean(EngineStub.class);
+        EngineStub engineStub = EngineStubFactory.getEngineStub();
         ClientInterceptor clientInterceptor = getClientInterceptor(request.getId(), JobType.SCHEDULE_CATE);
         engineStub.withOption(TASK_TYPE, CASE_TASK.getName())
             .withInterceptors(clientInterceptor)

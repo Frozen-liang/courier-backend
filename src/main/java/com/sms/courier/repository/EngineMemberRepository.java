@@ -15,7 +15,7 @@ public interface EngineMemberRepository extends MongoRepository<EngineMemberEnti
     List<EngineMemberEntity> findAllByContainerStatusInOrderByCreateDateTimeDesc(
         List<ContainerStatus> containerStatuses);
 
-    Stream<EngineMemberEntity> findAllByContainerStatusOrStatusAndOpenIsTrue(ContainerStatus status,
+    Stream<EngineMemberEntity> findAllByContainerStatusOrStatus(ContainerStatus status,
         EngineStatus engineStatus);
 
     List<EngineMemberEntity> findAllByContainerStatus(ContainerStatus status);

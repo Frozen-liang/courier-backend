@@ -26,6 +26,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.response.Response;
+import com.sms.courier.engine.grpc.client.EngineStubFactory;
 import com.sms.courier.engine.model.EngineAddress;
 import com.sms.courier.utils.EnvUtils;
 import com.sms.courier.utils.ExceptionUtils;
@@ -87,6 +88,7 @@ public class EngineNameResolver extends NameResolver {
     protected boolean resolved;
     private boolean shutdown;
     private Executor executor;
+    private final ScheduledExecutorService scheduledExecutor;
 
     /**
      * True if using an executor resource that should be released after use.
@@ -116,8 +118,7 @@ public class EngineNameResolver extends NameResolver {
         this.executor = args.getOffloadExecutor();
         this.usingExecutorResource = executor == null;
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("refresh-engine-thread-%d").build();
-        ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1, threadFactory);
-        scheduledExecutorService.scheduleWithFixedDelay(this::refresh, 60, 15, TimeUnit.SECONDS);
+        scheduledExecutor = Executors.newScheduledThreadPool(1, threadFactory);
     }
 
     @Override
@@ -133,6 +134,12 @@ public class EngineNameResolver extends NameResolver {
         }
         this.listener = checkNotNull(listener, "listener");
         resolve();
+        scheduler();
+    }
+
+    private void scheduler() {
+        logger.log(Level.INFO, "Open scheduler executor!");
+        scheduledExecutor.scheduleWithFixedDelay(this::refresh, 60, 15, TimeUnit.SECONDS);
     }
 
     @Override
@@ -209,10 +216,21 @@ public class EngineNameResolver extends NameResolver {
     private void resolve() {
         logger.log(Level.INFO, "Refresh engine resolving=" + resolving + ",shutdown=" + shutdown);
         if (resolving || shutdown || !cacheRefreshRequired()) {
+            if (shutdown) {
+                EngineStubFactory.refresh();
+                closeScheduler();
+            }
             return;
         }
         resolving = true;
         executor.execute(new Resolve(listener));
+    }
+
+    private void closeScheduler() {
+        if (!scheduledExecutor.isShutdown()) {
+            logger.log(Level.INFO, "Close scheduler executor!");
+            scheduledExecutor.shutdown();
+        }
     }
 
     private boolean cacheRefreshRequired() {
