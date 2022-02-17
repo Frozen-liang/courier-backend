@@ -73,6 +73,7 @@ public class DataCollectionController {
 
     @SneakyThrows(IOException.class)
     @GetMapping("/export/{id}")
+    @PreAuthorize("hasRoleOrAdmin(@role.DATA_COLLECTION_CRE_UPD_DEL)")
     public void exportDataCollection(HttpServletResponse response, @PathVariable String id) {
         dataCollectionService.exportDataCollection(response.getOutputStream(), id);
         response.setContentType("application/vnd.ms-excel");
