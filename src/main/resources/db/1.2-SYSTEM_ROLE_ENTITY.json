@@ -1,0 +1,14 @@
+[
+  {
+    "id": "620c5751dd59a044a605004a",
+    "name": "Scene_Case_Comment_Query_All",
+    "description": "流程用例评论查询",
+    "roleType": 0
+  },
+  {
+    "id": "620c576c65316257549de0ad",
+    "name": "Scene_Case_Comment_Create_Update_Delete",
+    "description": "流程用例评论增加修改删除",
+    "roleType": 0
+  }
+]

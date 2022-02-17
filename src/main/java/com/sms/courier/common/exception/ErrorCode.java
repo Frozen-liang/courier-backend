@@ -314,6 +314,9 @@ public enum ErrorCode {
     DELETE_OPEN_API_SETTING_BY_ID_ERROR("4289", "Failed to delete the OpenApiSetting!"),
     EDIT_OPEN_API_SETTING_ERROR("4290", "Failed to edit the OpenApiSetting!"),
     SYNC_API_ERROR("4291", "Failed to sync api!"),
+    ADD_SCENE_CASE_COMMENT_ERROR("4292", "Failed to add the SceneCaseComment!"),
+    GET_SCENE_CASE_COMMENT_LIST_ERROR("4293", "Failed to get the SceneCaseComment list!"),
+    DELETE_SCENE_CASE_COMMENT_BY_ID_ERROR("4294", "Failed to delete the SceneCaseComment!"),
 
     // 50001 - 51000 describes code generate exception
     FILE_FILL_THE_CONTENT_ERROR("50001", "File fill the content error!"),

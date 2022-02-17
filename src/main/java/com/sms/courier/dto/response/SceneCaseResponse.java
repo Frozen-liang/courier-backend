@@ -29,4 +29,5 @@ public class SceneCaseResponse extends LookupUserResponse {
     @JsonProperty("isNext")
     private boolean next;
     private List<EnvDataCollResponse> envDataCollConnList;
+    private Integer reviewStatus;
 }
