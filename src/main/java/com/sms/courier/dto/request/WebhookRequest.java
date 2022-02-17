@@ -1,5 +1,6 @@
 package com.sms.courier.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.webhook.enums.WebhookType;
@@ -31,6 +32,9 @@ public class WebhookRequest {
 
     @NotNull(groups = {UpdateGroup.class, InsertGroup.class}, message = "The webhookType cannot be null.")
     private WebhookType webhookType;
+
+    @JsonAlias("isOnlyHandleError")
+    private boolean onlyHandleError;
 
     @Default
     private Map<String, String> header = new HashMap<>();

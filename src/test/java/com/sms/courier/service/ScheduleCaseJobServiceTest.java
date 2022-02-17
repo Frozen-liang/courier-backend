@@ -78,6 +78,7 @@ class ScheduleCaseJobServiceTest {
         "name").build();
     private static final String ID = ObjectId.get().toString();
     private static final String ENGINE_ID = "/engine/13/invoke";
+    private static final String METADATA = "metadata";
     private static final List<String> ENGINE_ID_LIST = Collections.singletonList(ENGINE_ID);
 
 
@@ -114,7 +115,7 @@ class ScheduleCaseJobServiceTest {
         doNothing().when(engineJobManagement).dispatcherJob(any(ScheduleCaseJobEntity.class));
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());
         when(scheduleCaseJobRepository.saveAll(any())).thenReturn(Collections.emptyList());
-        scheduleCaseJobService.schedule(schedule);
+        scheduleCaseJobService.schedule(schedule,METADATA);
         verify(scheduleCaseJobRepository, times(1)).saveAll(any());
     }
 
@@ -135,7 +136,7 @@ class ScheduleCaseJobServiceTest {
         doNothing().when(engineJobManagement).dispatcherJob(any(ScheduleCaseJobEntity.class));
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());
         when(scheduleCaseJobRepository.saveAll(any())).thenReturn(Collections.emptyList());
-        scheduleCaseJobService.schedule(schedule);
+        scheduleCaseJobService.schedule(schedule,METADATA);
         verify(scheduleCaseJobRepository, times(1)).saveAll(any());
     }
 
@@ -152,7 +153,7 @@ class ScheduleCaseJobServiceTest {
         doNothing().when(engineJobManagement).dispatcherJob(any(ScheduleCaseJobEntity.class));
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());
         when(commonRepository.updateField(any(), any(), any())).thenReturn(true);
-        scheduleCaseJobService.schedule(schedule);
+        scheduleCaseJobService.schedule(schedule,METADATA);
         verify(commonRepository, times(1)).updateField(any(), any(), any());
     }
 

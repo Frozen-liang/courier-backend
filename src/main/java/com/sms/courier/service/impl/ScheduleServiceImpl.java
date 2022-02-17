@@ -164,7 +164,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public Boolean handle(String id) {
+    public Boolean handle(String id, String metadata) {
         try {
             ScheduleEntity scheduleEntity = scheduleRepository.findById(id)
                 .orElseThrow(() -> ExceptionUtils.mpe(GET_SCHEDULE_BY_ID_ERROR));
@@ -175,10 +175,10 @@ public class ScheduleServiceImpl implements ScheduleService {
             commonRepository.updateField(query, update, ScheduleEntity.class);
             switch (caseType) {
                 case CASE:
-                    scheduleCaseJobService.schedule(scheduleEntity);
+                    scheduleCaseJobService.schedule(scheduleEntity, metadata);
                     break;
                 case SCENE_CASE:
-                    scheduleSceneCaseJobService.schedule(scheduleEntity);
+                    scheduleSceneCaseJobService.schedule(scheduleEntity, metadata);
                     break;
                 default:
                     throw ExceptionUtils.mpe(CASE_TYPE_ERROR);

@@ -210,7 +210,7 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
             .sceneCount(1).build();
     }
 
-    protected ScheduleRecordEntity createScheduleRecord(ScheduleEntity scheduleEntity) {
+    protected ScheduleRecordEntity createScheduleRecord(ScheduleEntity scheduleEntity, String metadata) {
         return ScheduleRecordEntity.builder()
             .id(ObjectId.get().toString())
             .scheduleId(scheduleEntity.getId())
@@ -223,6 +223,7 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
             .projectId(scheduleEntity.getProjectId())
             .jobIds(new ArrayList<>())
             .version(1)
+            .metadata(metadata)
             .build();
     }
 

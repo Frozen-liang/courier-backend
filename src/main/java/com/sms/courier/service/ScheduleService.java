@@ -21,7 +21,7 @@ public interface ScheduleService {
 
     void deleteByGroupId(String groupId);
 
-    Boolean handle(String id);
+    Boolean handle(String id, String metadata);
 
     Boolean open(String id, boolean enable);
 

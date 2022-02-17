@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -67,8 +68,8 @@ public class ScheduleController {
     }
 
     @PostMapping("/handle")
-    public Boolean handle(String id) {
-        return scheduleService.handle(id);
+    public Boolean handle(String id, @RequestHeader(value = "Metadata", required = false) String metadata) {
+        return scheduleService.handle(id, metadata);
     }
 
 }

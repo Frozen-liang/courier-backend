@@ -2,7 +2,9 @@ package com.sms.courier.webhook;
 
 import com.sms.courier.repository.WebhookRepository;
 import com.sms.courier.utils.MustacheUtils;
+import com.sms.courier.webhook.enums.WebhookType;
 import com.sms.courier.webhook.model.WebhookEntity;
+import com.sms.courier.webhook.response.WebhookScheduleResponse;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -60,8 +62,12 @@ public class HookEventHandler implements InitializingBean, DisposableBean {
                 WebhookEvent<?> webhookEvent = webhookEventQueue.take();
                 List<WebhookEntity> webhookEntities = webhookRepository
                     .findByWebhookType(webhookEvent.getWebhookType());
+                boolean hasError = hasError(webhookEvent);
                 for (WebhookEntity webhookEntity : webhookEntities) {
                     try {
+                        if (webhookEntity.isOnlyHandleError() && !hasError) {
+                            continue;
+                        }
                         HttpHeaders header = new HttpHeaders();
                         webhookEntity.getHeader().forEach(header::add);
                         header.setContentType(MediaType.APPLICATION_JSON);
@@ -78,6 +84,14 @@ public class HookEventHandler implements InitializingBean, DisposableBean {
                 log.error("Webhook Exception", e);
             }
         }
+    }
+
+    private boolean hasError(WebhookEvent<?> webhookEvent) {
+        if (webhookEvent.getWebhookType() == WebhookType.SCHEDULE.getCode()) {
+            WebhookScheduleResponse webhookScheduleResponse = (WebhookScheduleResponse) webhookEvent.getData();
+            return webhookScheduleResponse.getFail() > 0;
+        }
+        return false;
     }
 
 }

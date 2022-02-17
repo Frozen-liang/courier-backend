@@ -97,13 +97,13 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
 
     @Override
     @Async("commonExecutor")
-    public void schedule(ScheduleEntity scheduleEntity) {
+    public void schedule(ScheduleEntity scheduleEntity, String metadata) {
         try {
             CaseFilter caseFilter = scheduleEntity.getCaseFilter();
             List<ApiTestCaseEntity> apiTestCaseEntities = getApiTestCaseEntity(scheduleEntity.getProjectId(),
                 caseFilter, scheduleEntity.getCaseCondition(), scheduleEntity.getCaseIds());
             final JobEnvironment jobEnv = getJobEnv(scheduleEntity.getEnvIds().get(0));
-            ScheduleRecordEntity scheduleRecordEntity = createScheduleRecord(scheduleEntity);
+            ScheduleRecordEntity scheduleRecordEntity = createScheduleRecord(scheduleEntity, metadata);
             List<ScheduleCaseJobEntity> scheduleCaseJobEntities = new ArrayList<>();
             for (ApiTestCaseEntity apiTestCaseEntity : apiTestCaseEntities) {
                 final JobApiTestCase jobApiTestCase = jobMapper.toJobApiTestCase(apiTestCaseEntity);

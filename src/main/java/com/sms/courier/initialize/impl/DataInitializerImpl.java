@@ -66,7 +66,7 @@ public class DataInitializerImpl implements DataInitializer {
                     String entityName = filename.substring(filename.indexOf("-") + 1, filename.lastIndexOf("."));
                     JsonType jsonType = JsonType.valueOf(entityName);
                     List<?> list = (List<?>) objectMapper.readValue(inputStream, jsonType.getTypeReference());
-                    mongoTemplate.insert(list, jsonType.getEntityClass());
+                    list.forEach(mongoTemplate::save);
                     log.info("Initialize {} success.", filename);
                 }
                 systemVersion.setInitialized(true);

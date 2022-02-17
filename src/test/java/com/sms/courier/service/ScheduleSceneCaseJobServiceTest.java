@@ -92,7 +92,7 @@ class ScheduleSceneCaseJobServiceTest {
             .caseReportList(List.of(CaseReport.builder().build()))
             .jobId(ObjectId.get().toString()).build();
     private static final String ID = ObjectId.get().toString();
-    private static final String ENGINE_ID = "/engine/13/invoke";
+    private static final String METADATA = "metadata";
 
 
     @Test
@@ -138,7 +138,7 @@ class ScheduleSceneCaseJobServiceTest {
                 TestData.builder().dataName("name").data(List.of(DataParam.builder().build())).build())).build()));
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());
         when(scheduleSceneCaseJobRepository.saveAll(any())).thenReturn(Collections.emptyList());
-        scheduleSceneCaseJobService.schedule(schedule);
+        scheduleSceneCaseJobService.schedule(schedule,METADATA);
         verify(scheduleSceneCaseJobRepository, times(1)).saveAll(any());
     }
 
@@ -164,7 +164,7 @@ class ScheduleSceneCaseJobServiceTest {
         when(commonRepository.findById(ID, DataCollectionEntity.class)).thenReturn(Optional.empty());
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());
         when(scheduleSceneCaseJobRepository.saveAll(any())).thenReturn(Collections.emptyList());
-        scheduleSceneCaseJobService.schedule(schedule);
+        scheduleSceneCaseJobService.schedule(schedule,METADATA);
         verify(scheduleSceneCaseJobRepository, times(1)).saveAll(any());
     }
 
@@ -181,7 +181,7 @@ class ScheduleSceneCaseJobServiceTest {
         when(commonRepository.findById(ID, DataCollectionEntity.class)).thenReturn(Optional.empty());
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());
         when(commonRepository.updateField(any(), any(), any())).thenReturn(true);
-        scheduleSceneCaseJobService.schedule(schedule);
+        scheduleSceneCaseJobService.schedule(schedule,METADATA);
         verify(commonRepository, times(1)).updateField(any(), any(), any());
     }
 
