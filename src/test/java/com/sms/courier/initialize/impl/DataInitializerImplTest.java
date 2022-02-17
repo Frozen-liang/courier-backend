@@ -52,7 +52,7 @@ public class DataInitializerImplTest {
         when(buildProperties.getGroup()).thenReturn(GROUP);
         when(systemVersionRepository.findByVersion(VERSION)).thenReturn(systemVersionEntity);
         dataInitializerImpl.init(applicationContext);
-        verify(mongoTemplate, times(1)).insert(any(), any(Class.class));
+        verify(mongoTemplate, times(1)).save(any());
         verify(systemVersionRepository, times(1)).save(systemVersionEntity);
     }
 
@@ -69,7 +69,7 @@ public class DataInitializerImplTest {
         when(buildProperties.getGroup()).thenReturn(GROUP);
         when(systemVersionRepository.findByVersion("v1")).thenReturn(systemVersionEntity);
         dataInitializerImpl.init(applicationContext);
-        verify(mongoTemplate, never()).insert(any(), any(Class.class));
+        verify(mongoTemplate, never()).save(any());
         verify(systemVersionRepository, times(1)).save(systemVersionEntity);
     }
 }

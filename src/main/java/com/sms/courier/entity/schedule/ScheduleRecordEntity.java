@@ -61,4 +61,7 @@ public class ScheduleRecordEntity {
     private List<String> jobIds;
 
     private int version;
+
+    // 触发定时任务测试时 请求头metadata中的数据 用于向eagle-eye推送监测结果时添加元数据
+    private String metadata;
 }

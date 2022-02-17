@@ -32,6 +32,7 @@ import com.sms.courier.common.enums.RequestMethod;
 import com.sms.courier.common.enums.ResponseParamsExtractionType;
 import com.sms.courier.common.enums.ResultType;
 import com.sms.courier.common.enums.ResultVerificationType;
+import com.sms.courier.common.enums.ReviewStatus;
 import com.sms.courier.common.enums.RoleType;
 import com.sms.courier.common.enums.SaveMode;
 import com.sms.courier.common.enums.ScheduleStatusType;
@@ -131,7 +132,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToApiEncodingTypeConverter.INSTANCE, IntegerToMockApiJsonLocateTypeConverter.INSTANCE,
                 IntegerToCaseTypeConverter.INSTANCE, IntegerToContainerStatusConverter.INSTANCE,
                 IntegerToWebhookTypeConverter.INSTANCE, IntegerToDataBaseTypeConverter.INSTANCE,
-                IntegerToCodeTypeConverter.INSTANCE, IntegerToTemplateTypeConverter.INSTANCE);
+                IntegerToCodeTypeConverter.INSTANCE, IntegerToTemplateTypeConverter.INSTANCE,
+                IntegerToReviewStatusConverter.INSTANCE);
 
         return new MongoCustomConversions(converters);
     }
@@ -544,5 +546,15 @@ public class MongoCustomConverterConfiguration {
             return TemplateType.getTemplateType(code);
         }
     }
+
+    @ReadingConverter
+    enum IntegerToReviewStatusConverter implements Converter<Integer, ReviewStatus> {
+        INSTANCE;
+
+        public ReviewStatus convert(@NonNull Integer code) {
+            return ReviewStatus.getType(code);
+        }
+    }
+
 }
 

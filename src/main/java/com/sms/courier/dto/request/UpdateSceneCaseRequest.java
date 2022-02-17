@@ -28,4 +28,5 @@ public class UpdateSceneCaseRequest {
     @JsonProperty("isNext")
     private boolean next;
     private List<EnvDataCollConnRequest> envDataCollConnList;
+    private Integer reviewStatus;
 }

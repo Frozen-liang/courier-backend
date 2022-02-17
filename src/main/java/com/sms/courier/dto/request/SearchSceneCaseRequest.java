@@ -26,5 +26,5 @@ public class SearchSceneCaseRequest extends PageDto {
     private List<ObjectId> tagId;
     private List<Integer> priority;
     private List<ObjectId> createUserId;
-
+    private Integer reviewStatus;
 }

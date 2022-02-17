@@ -23,7 +23,8 @@ public enum SceneField implements Field {
     API_TEST_CASE_PROJECT_ID("apiTestCase.projectId"),
     ENV_DATA_COLL_CONN_LIST("envDataCollConnList"),
     SCENE_CASE_DATA_COLL_ID("envDataCollConnList.dataCollId"),
-    IS_SQL_RESULT("isSqlResult");
+    IS_SQL_RESULT("isSqlResult"),
+    REVIEW_STATUS("reviewStatus");
 
     private final String name;
 

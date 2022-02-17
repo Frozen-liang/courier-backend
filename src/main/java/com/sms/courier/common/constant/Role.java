@@ -184,4 +184,9 @@ public class Role {
     public static final String GENERATOR_TEMPLATE_CRE_UPD_DEL = "Generator_Template" + CRE_UPD_DEL;
     public static final String GENERATOR_TEMPLATE_QUERY_ALL = "Generator_Template" + QUERY_ALL;
 
+    // SceneCase Comment
+    public static final String SCENE_CASE_COMMENT_CRE_UPD_DEL = "Scene_Case_Comment" + CRE_UPD_DEL;
+    public static final String SCENE_CASE_COMMENT_QUERY_ALL = "Scene_Case_Comment" + QUERY_ALL;
+    public static final String SCENE_CASE_COMMENT_QUERY_OWN = "Scene_Case_Comment" + QUERY_OWN;
+
 }
