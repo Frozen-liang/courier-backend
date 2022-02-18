@@ -29,8 +29,13 @@ public class EngineJobManagementImplTest {
     private final GrpcMapper grpcMapper = new GrpcMapperImpl();
     private final EngineJobManagement engineJobManagement = new EngineJobManagementImpl(applicationEventPublisher,
         grpcMapper);
+    private static final EngineStub ENGINE_STUB = mock(EngineStub.class);
 
     private final static MockedStatic<EngineStubFactory> MOCKED_STATIC = mockStatic(EngineStubFactory.class);
+
+    static {
+        MOCKED_STATIC.when(EngineStubFactory::getEngineStub).thenReturn(ENGINE_STUB);
+    }
 
     @AfterAll
     public static void close() {
@@ -43,13 +48,11 @@ public class EngineJobManagementImplTest {
     public void dispatcherCaseJob_test() {
         ApiTestCaseJobEntity apiTestCaseJobEntity = ApiTestCaseJobEntity.builder().id("1").build();
         ScheduleCaseJobEntity scheduleCaseJobEntity = ScheduleCaseJobEntity.builder().id("id").build();
-        EngineStub engineStub = mock(EngineStub.class);
-        MOCKED_STATIC.when(EngineStubFactory::getEngineStub).thenReturn(engineStub);
-        when(engineStub.withOption(any(), any())).thenReturn(engineStub);
-        when(engineStub.withInterceptors(any())).thenReturn(engineStub);
+        when(ENGINE_STUB.withOption(any(), any())).thenReturn(ENGINE_STUB);
+        when(ENGINE_STUB.withInterceptors(any())).thenReturn(ENGINE_STUB);
         engineJobManagement.dispatcherJob(apiTestCaseJobEntity);
         engineJobManagement.dispatcherJob(scheduleCaseJobEntity);
-        verify(engineStub, times(2)).sendCaseJob(any(), any());
+        verify(ENGINE_STUB, times(2)).sendCaseJob(any(), any());
     }
 
     @DisplayName("Test for dispatcherSceneCaseJob in EngineJobManagementImpl")
@@ -57,11 +60,11 @@ public class EngineJobManagementImplTest {
     public void dispatcherSceneCaseJob_test() {
         SceneCaseJobEntity sceneCaseJobEntity = SceneCaseJobEntity.builder().id("1").build();
         ScheduleSceneCaseJobEntity scheduleSceneCaseJobEntity = ScheduleSceneCaseJobEntity.builder().id("1").build();
-        EngineStub engineStub = mock(EngineStub.class);
-        MOCKED_STATIC.when(EngineStubFactory::getEngineStub).thenReturn(engineStub);
+        when(ENGINE_STUB.withOption(any(), any())).thenReturn(ENGINE_STUB);
+        when(ENGINE_STUB.withInterceptors(any())).thenReturn(ENGINE_STUB);
         engineJobManagement.dispatcherJob(sceneCaseJobEntity);
         engineJobManagement.dispatcherJob(scheduleSceneCaseJobEntity);
-        verify(engineStub, times(2)).sendSceneCaseJob(any(), any());
+        verify(ENGINE_STUB, times(2)).sendSceneCaseJob(any(), any());
     }
 
 }
