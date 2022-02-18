@@ -317,6 +317,8 @@ public enum ErrorCode {
     ADD_SCENE_CASE_COMMENT_ERROR("4292", "Failed to add the SceneCaseComment!"),
     GET_SCENE_CASE_COMMENT_LIST_ERROR("4293", "Failed to get the SceneCaseComment list!"),
     DELETE_SCENE_CASE_COMMENT_BY_ID_ERROR("4294", "Failed to delete the SceneCaseComment!"),
+    EXPORT_DATA_COLLECTION_ERROR("4292", "Failed to export the DataCollection!"),
+    DATA_COLLECTION_NOTEXITS_ERROR("4293", "The dataCollection not exits. id = %s"),
 
     // 50001 - 51000 describes code generate exception
     FILE_FILL_THE_CONTENT_ERROR("50001", "File fill the content error!"),

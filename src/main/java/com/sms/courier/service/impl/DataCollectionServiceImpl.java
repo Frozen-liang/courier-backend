@@ -1,13 +1,17 @@
 package com.sms.courier.service.impl;
 
+import static com.sms.courier.common.enums.DataCollection.COLLECTION_NAME;
+import static com.sms.courier.common.enums.DataCollection.DATA_NAME;
 import static com.sms.courier.common.enums.OperationModule.DATA_COLLECTION;
 import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.exception.ErrorCode.ADD_DATA_COLLECTION_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DATA_COLLECTION_NOTEXITS_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_DATA_COLLECTION_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.EXPORT_DATA_COLLECTION_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_DATA_COLLECTION_BY_ID_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_DATA_COLLECTION_LIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_DATA_COLLECTION_PARAM_LIST_BY_ID_ERROR;
@@ -19,6 +23,10 @@ import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.utils.Assert.isTrue;
 import static com.sms.courier.utils.Assert.notEmpty;
 
+import cn.afterturn.easypoi.excel.ExcelExportUtil;
+import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.afterturn.easypoi.excel.entity.params.ExcelExportEntity;
+import com.google.common.collect.Lists;
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.enums.ImportMode;
@@ -37,13 +45,17 @@ import com.sms.courier.service.DataCollectionService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.utils.ExceptionUtils;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
@@ -235,4 +247,33 @@ public class DataCollectionServiceImpl implements DataCollectionService {
         }
     }
 
+    @Override
+    public void exportDataCollection(OutputStream outputStream, String id) {
+        try {
+            Optional<DataCollectionEntity> optional = dataCollectionRepository.findById(id);
+            DataCollectionEntity dataCollection = optional
+                    .orElseThrow(() -> ExceptionUtils.mpe(DATA_COLLECTION_NOTEXITS_ERROR, id));
+            List<ExcelExportEntity> list = Lists.newArrayList();
+            ExcelExportEntity entity1 = new ExcelExportEntity(COLLECTION_NAME.getName(), DATA_NAME);
+            list.add(entity1);
+            for (String string : dataCollection.getParamList()) {
+                ExcelExportEntity colEntity = new ExcelExportEntity(string, string);
+                list.add(colEntity);
+            }
+            List<Map<String, Object>> datList = Lists.newArrayList();
+            for (TestData testData : dataCollection.getDataList()) {
+                Map<String, Object> dataMap = testData.getData().stream().collect(Collectors.toMap(DataParam::getKey,
+                        DataParam::getValue));
+                dataMap.put(DATA_NAME.getName(), testData.getDataName());
+                datList.add(dataMap);
+            }
+            Workbook workbook = ExcelExportUtil.exportExcel(
+                    new ExportParams(null, dataCollection.getCollectionName()), list, datList);
+            workbook.write(outputStream);
+            workbook.close();
+        } catch (Exception e) {
+            log.error("Failed to export the DataCollection!", e);
+            throw new ApiTestPlatformException(EXPORT_DATA_COLLECTION_ERROR);
+        }
+    }
 }
