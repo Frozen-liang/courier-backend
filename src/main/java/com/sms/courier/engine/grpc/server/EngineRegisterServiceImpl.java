@@ -34,25 +34,12 @@ public class EngineRegisterServiceImpl extends EngineRegisterGrpc.EngineRegister
     @Override
     public void register(GrpcEngineRegisterRequest request,
         StreamObserver<GrpcFunctionResponse> responseObserver) {
-        Builder functionBuilder = GrpcFunctionResponse.newBuilder().setOperationType(0);
         try {
             Assert.isTrue(request.getPort() > 0, "The port must gt 0!");
             Assert.isTrue(StringUtils.isNotBlank(request.getName()), "The name must not empty!");
             Assert.isTrue(StringUtils.isNotBlank(request.getVersion()), "The version must not empty!");
             applicationContext.publishEvent(new EngineRegisterEvent(request));
-            GrpcMapper grpcMapper = applicationContext.getBean(GrpcMapper.class);
-            ProjectFunctionRepository projectFunctionRepository = applicationContext
-                .getBean(ProjectFunctionRepository.class);
-            GlobalFunctionRepository globalFunctionRepository = applicationContext
-                .getBean(GlobalFunctionRepository.class);
-            // Response project function.
-            projectFunctionRepository.findAllByRemovedIsFalse().map(grpcMapper::toGrpcFunction).forEach(function -> {
-                responseObserver.onNext(functionBuilder.setFunction(function).build());
-            });
-            // Response global function.
-            globalFunctionRepository.findAllByRemovedIsFalse().map(grpcMapper::toGrpcFunction).forEach(function -> {
-                responseObserver.onNext(functionBuilder.setFunction(function).build());
-            });
+            publishFunction(responseObserver);
             streamObserverMap.put(request.getName(), responseObserver);
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
@@ -61,6 +48,23 @@ public class EngineRegisterServiceImpl extends EngineRegisterGrpc.EngineRegister
             log.error("Register engine error!", e);
             responseObserver.onError(new ApiTestPlatformException("Register engine error!"));
         }
+    }
+
+    private void publishFunction(StreamObserver<GrpcFunctionResponse> responseObserver) {
+        Builder functionBuilder = GrpcFunctionResponse.newBuilder().setOperationType(0);
+        GrpcMapper grpcMapper = applicationContext.getBean(GrpcMapper.class);
+        ProjectFunctionRepository projectFunctionRepository = applicationContext
+            .getBean(ProjectFunctionRepository.class);
+        // Response project function.
+        projectFunctionRepository.findAllByRemovedIsFalse().map(grpcMapper::toGrpcFunction).forEach(function -> {
+            responseObserver.onNext(functionBuilder.setFunction(function).build());
+        });
+        GlobalFunctionRepository globalFunctionRepository = applicationContext
+            .getBean(GlobalFunctionRepository.class);
+        // Response global function.
+        globalFunctionRepository.findAllByRemovedIsFalse().map(grpcMapper::toGrpcFunction).forEach(function -> {
+            responseObserver.onNext(functionBuilder.setFunction(function).build());
+        });
     }
 
     public void pushFunction(GrpcFunctionResponse functionResponse) {

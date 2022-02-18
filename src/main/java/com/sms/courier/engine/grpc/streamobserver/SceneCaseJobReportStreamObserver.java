@@ -28,6 +28,7 @@ public class SceneCaseJobReportStreamObserver implements StreamObserver<GrpcScen
     @Override
     public void onNext(GrpcSceneCaseJobReport jobReport) {
         log.info("Receive scene case job report!");
+        JobType jobType = JobType.valueOf(jobReport.getJobType());
         applicationEventPublisher.publishEvent(new SceneCaseJobReportEvent(jobType, jobReport));
         applicationEventPublisher.publishEvent(new JobCompletedEvent(jobId, jobType));
     }

@@ -188,8 +188,9 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     @Override
     @LogRecord(operationType = EDIT, operationModule = ENGINE_MEMBER)
     public Boolean edit(EngineMemberRequest request) {
-        return commonRepository.updateFieldById(request.getId(), Map.of(TASK_SIZE_LIMIT, request.getTaskSizeLimit()),
-            EngineMemberEntity.class);
+        return commonRepository
+            .updateFieldById(request.getId(), Map.of(TASK_SIZE_LIMIT, request.getTaskSizeLimit()),
+                EngineMemberEntity.class);
     }
 
     @Override
@@ -214,7 +215,8 @@ public class EngineMemberManagementImpl implements EngineMemberManagement {
     @Override
     public List<EngineAddress> getAvailableEngine() {
         return engineMemberRepository
-            .findAllByContainerStatusOrStatusAndOpenIsTrue(ContainerStatus.START, EngineStatus.RUNNING)
+            .findAllByContainerStatusOrStatus(ContainerStatus.START, EngineStatus.RUNNING)
+            .filter(EngineMemberEntity::isOpen)
             .filter(this::taskSizeLimit)
             .map(this::buildEngineAddress)
             .collect(Collectors.toList());

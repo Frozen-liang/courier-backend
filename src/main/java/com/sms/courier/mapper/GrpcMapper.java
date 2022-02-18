@@ -52,12 +52,20 @@ import org.springframework.core.convert.TypeDescriptor;
     uses = {EnumCommonUtils.class})
 public interface GrpcMapper {
 
+    @Mapping(target = "jobType",
+        expression = "java(com.sms.courier.common.enums.JobType.SCENE_CASE.name())")
     GrpcSceneCaseJobRequest toGrpcJobRequest(SceneCaseJobEntity sceneCaseJobEntity);
 
+    @Mapping(target = "jobType",
+        expression = "java(com.sms.courier.common.enums.JobType.SCHEDULER_SCENE_CASE.name())")
     GrpcSceneCaseJobRequest toGrpcJobRequest(ScheduleSceneCaseJobEntity sceneCaseJobEntity);
 
+    @Mapping(target = "jobType",
+        expression = "java(com.sms.courier.common.enums.JobType.CASE.name())")
     GrpcCaseJobRequest toGrpcJobRequest(ApiTestCaseJobEntity apiTestCaseJobEntity);
 
+    @Mapping(target = "jobType",
+        expression = "java(com.sms.courier.common.enums.JobType.SCHEDULE_CATE.name())")
     GrpcCaseJobRequest toGrpcJobRequest(ScheduleCaseJobEntity scheduleCaseJobEntity);
 
 

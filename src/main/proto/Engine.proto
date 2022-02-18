@@ -183,6 +183,7 @@ message GrpcCaseJobRequest{
   bool next = 12;
   GrpcJobSceneCaseApi apiTestCase = 13;
   string createUserName = 14;
+  string jobType = 15;
 }
 
 message GrpcSceneCaseJobRequest{
@@ -200,6 +201,7 @@ message GrpcSceneCaseJobRequest{
   bool next = 12;
   repeated GrpcJobSceneCaseApi apiTestCase = 13;
   string createUserName = 14;
+  string jobType = 15;
 }
 
 
@@ -213,6 +215,7 @@ message GrpcSceneCaseJobReport {
   int32 delayTimeTotalTimeCost = 7;
   repeated string infoList = 8;
   repeated GrpcCaseReport caseReportList = 9;
+  string jobType = 10;
 }
 
 message GrpcCaseJobReport {
@@ -225,6 +228,7 @@ message GrpcCaseJobReport {
   int32 delayTimeTotalTimeCost = 7;
   repeated string infoList = 8;
   GrpcCaseReport caseReport = 9;
+  string jobType = 10;
 }
 
 message GrpcCaseJobDatabase {
