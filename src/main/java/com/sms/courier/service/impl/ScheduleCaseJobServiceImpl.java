@@ -33,6 +33,9 @@ import com.sms.courier.repository.ScheduleRecordRepository;
 import com.sms.courier.service.DatabaseService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.ScheduleCaseJobService;
+import com.sms.courier.webhook.WebhookEvent;
+import com.sms.courier.webhook.enums.WebhookType;
+import com.sms.courier.webhook.response.WebhookScheduleResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -137,6 +140,7 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
                 return;
             }
             repository.saveAll(scheduleCaseJobEntities);
+            publishSchedulerStartEvent(scheduleEntity, metadata);
             for (ScheduleCaseJobEntity scheduleCaseJobEntity : scheduleCaseJobEntities) {
                 dispatcherJob(scheduleCaseJobEntity);
             }
@@ -146,6 +150,14 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
             log.error("Dispatcher schedule job system exception.", e);
         }
 
+    }
+
+    private void publishSchedulerStartEvent(ScheduleEntity scheduleEntity, String metadata) {
+        WebhookScheduleResponse webhookScheduleResponse = WebhookScheduleResponse.builder()
+            .id(scheduleEntity.getId())
+            .name(scheduleEntity.getName()).metadata(metadata).build();
+        applicationEventPublisher
+            .publishEvent(WebhookEvent.create(WebhookType.SCHEDULE_START, webhookScheduleResponse));
     }
 
     private ScheduleCaseJobEntity createScheduleCaseJob(ScheduleRecordEntity scheduleRecord,

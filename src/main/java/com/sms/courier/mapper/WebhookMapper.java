@@ -17,8 +17,8 @@ public interface WebhookMapper {
 
     WebhookEntity toEntity(WebhookRequest webhookRequest);
 
-    @Mapping(target = "name", expression = "java(webhookRequest.getType().getName())")
-    WebhookTypeResponse toWebhookType(WebhookTypeEntity webhookRequest);
+    @Mapping(target = "name", expression = "java(webhookTypeEntity.getType().getName())")
+    WebhookTypeResponse toWebhookType(WebhookTypeEntity webhookTypeEntity);
 
-    List<WebhookTypeResponse> toWebhookTypeList(List<WebhookTypeEntity> webhookRequest);
+    List<WebhookTypeResponse> toWebhookTypeList(List<WebhookTypeEntity> webhookTypeEntityList);
 }
