@@ -141,6 +141,7 @@ dependencies {
     implementation("com.github.spullara.mustache.java:$versionMustache")
     implementation("com.jayway.jsonpath:json-path:$versionJsonPath")
     implementation("cn.afterturn:easypoi-base:$versionEasyPoiBase")
+    implementation ("net.sourceforge.jexcelapi:jxl:2.6.12")
 
 }
 

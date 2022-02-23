@@ -1,16 +1,17 @@
 package com.sms.courier.controller;
 
 import static com.sms.courier.common.constant.Constants.DATA_COLLECTION_PATH;
+
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.request.DataCollectionImportRequest;
 import com.sms.courier.dto.request.DataCollectionRequest;
 import com.sms.courier.dto.response.DataCollectionResponse;
+import com.sms.courier.dto.response.ExportExcelResponse;
 import com.sms.courier.service.DataCollectionService;
-import java.io.IOException;
+import com.sms.courier.utils.ResponseUtil;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
-import lombok.SneakyThrows;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -67,17 +68,16 @@ public class DataCollectionController {
     }
 
     @PostMapping("/import")
+    @PreAuthorize("hasRoleOrAdmin(@role.DATA_COLLECTION_CRE_UPD_DEL)")
     public Boolean importDataCollection(@Validated DataCollectionImportRequest request) {
         return dataCollectionService.importDataCollection(request);
     }
 
-    @SneakyThrows(IOException.class)
     @GetMapping("/export/{id}")
     @PreAuthorize("hasRoleOrAdmin(@role.DATA_COLLECTION_CRE_UPD_DEL)")
-    public void exportDataCollection(HttpServletResponse response, @PathVariable String id) {
-        dataCollectionService.exportDataCollection(response.getOutputStream(), id);
-        response.setContentType("application/vnd.ms-excel");
-        response.setHeader("Content-disposition", "attachment;filename=DataCollection.xls");
+    public void export(HttpServletResponse response, @PathVariable String id) {
+        ExportExcelResponse exportExcelResponse = dataCollectionService.export(id);
+        ResponseUtil.export(response, exportExcelResponse.getWorkbook(), exportExcelResponse.getFilename());
     }
 
     @GetMapping("/list/env/{envId}/{projectId}")

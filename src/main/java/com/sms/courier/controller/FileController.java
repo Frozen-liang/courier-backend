@@ -1,26 +1,16 @@
 package com.sms.courier.controller;
 
 import com.sms.courier.common.constant.Constants;
-import com.sms.courier.common.enums.Media;
 import com.sms.courier.common.validate.InsertGroup;
 import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.request.TestFileRequest;
 import com.sms.courier.dto.response.FileInfoResponse;
 import com.sms.courier.service.FileService;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import com.sms.courier.utils.ResponseUtil;
 import java.util.List;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import lombok.SneakyThrows;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -38,7 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class FileController {
 
     private final FileService fileService;
-    private static final String FILENAME = "数据集导入模板.csv";
+    private static final String FILENAME = "data-coll-template.xls";
 
     public FileController(FileService fileService) {
         this.fileService = fileService;
@@ -69,23 +59,15 @@ public class FileController {
     @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
     public void downloadTestFile(@PathVariable("id") String id, HttpServletResponse response) {
         GridFsResource gridFsResource = fileService.downloadTestFile(id);
-        String filename = gridFsResource.getFilename();
-        response.setContentType(gridFsResource.getContentType());
-        response.setHeader("Content-Disposition",
-            "attachment;filename=" + URLEncoder
-                .encode(StringUtils.isEmpty(filename) ? ObjectId.get().toString() : filename, StandardCharsets.UTF_8));
-        writeStream(response, gridFsResource);
+        ResponseUtil.export(response, ResponseUtil.getInputStream(gridFsResource), gridFsResource.getFilename(),
+            gridFsResource.getContentType());
     }
 
     @GetMapping(value = "/download/data-collection-template")
     @PreAuthorize("hasRoleOrAdmin(@role.DATA_COLLECTION_CRE_UPD_DEL)")
     public void downloadDataCollectionTemplate(HttpServletResponse response) {
-        final ClassPathResource classPathResource = new ClassPathResource("template/data-collection.csv");
-        response.setContentType(Media.APPLICATION_OCTET_STREAM.getType());
-        response.setHeader("Content-Disposition",
-            "attachment;filename=" + URLEncoder
-                .encode(FILENAME, StandardCharsets.UTF_8));
-        writeStream(response, classPathResource);
+        final ClassPathResource classPathResource = new ClassPathResource("template/data-collection.xls");
+        ResponseUtil.export(response, ResponseUtil.getInputStream(classPathResource), FILENAME);
     }
 
 
@@ -94,7 +76,7 @@ public class FileController {
         GridFsResource gridFsResource = fileService.downloadTestFile(id);
         response.setContentType(gridFsResource.getContentType());
         response.setHeader("filename", gridFsResource.getFilename());
-        writeStream(response, gridFsResource);
+        ResponseUtil.write(response, ResponseUtil.getInputStream(gridFsResource));
     }
 
     @DeleteMapping("/{id}")
@@ -104,25 +86,4 @@ public class FileController {
         return fileService.deleteTestFileById(id);
     }
 
-    @SneakyThrows(IOException.class)
-    private void writeStream(HttpServletResponse response, Resource resource) {
-        ServletOutputStream os = null;
-        InputStream is = null;
-        try {
-            os = response.getOutputStream();
-            is = resource.getInputStream();
-            IOUtils.copy(is, os);
-            os.flush();
-        } finally {
-            close(is);
-            close(os);
-        }
-    }
-
-    @SneakyThrows(IOException.class)
-    private void close(Closeable stream) {
-        if (stream != null) {
-            stream.close();
-        }
-    }
 }

@@ -1,7 +1,6 @@
 package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.DataCollection.COLLECTION_NAME;
-import static com.sms.courier.common.enums.DataCollection.DATA_NAME;
 import static com.sms.courier.common.enums.OperationModule.DATA_COLLECTION;
 import static com.sms.courier.common.enums.OperationType.ADD;
 import static com.sms.courier.common.enums.OperationType.DELETE;
@@ -21,10 +20,10 @@ import static com.sms.courier.common.field.CommonField.GROUP_ID;
 import static com.sms.courier.common.field.CommonField.PROJECT_ID;
 import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.utils.Assert.isTrue;
-import static com.sms.courier.utils.Assert.notEmpty;
 
 import cn.afterturn.easypoi.excel.ExcelExportUtil;
 import cn.afterturn.easypoi.excel.entity.ExportParams;
+import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
 import cn.afterturn.easypoi.excel.entity.params.ExcelExportEntity;
 import com.google.common.collect.Lists;
 import com.sms.courier.common.aspect.annotation.Enhance;
@@ -34,6 +33,7 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.DataCollectionImportRequest;
 import com.sms.courier.dto.request.DataCollectionRequest;
 import com.sms.courier.dto.response.DataCollectionResponse;
+import com.sms.courier.dto.response.ExportExcelResponse;
 import com.sms.courier.entity.datacollection.DataCollectionEntity;
 import com.sms.courier.entity.datacollection.DataParam;
 import com.sms.courier.entity.datacollection.TestData;
@@ -43,19 +43,19 @@ import com.sms.courier.repository.CustomizedDataCollectionRepository;
 import com.sms.courier.repository.DataCollectionRepository;
 import com.sms.courier.service.DataCollectionService;
 import com.sms.courier.service.ProjectEnvironmentService;
+import com.sms.courier.utils.Assert;
 import com.sms.courier.utils.ExceptionUtils;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatchers;
@@ -63,12 +63,12 @@ import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
 public class DataCollectionServiceImpl implements DataCollectionService {
 
-    private static final String DELIMITER = ",";
     private final DataCollectionRepository dataCollectionRepository;
     private final DataCollectionMapper dataCollectionMapper;
     private final CustomizedDataCollectionRepository customizedDataCollectionRepository;
@@ -195,26 +195,36 @@ public class DataCollectionServiceImpl implements DataCollectionService {
             List<String> paramList = Objects.requireNonNullElse(dataCollection.getParamList(), new ArrayList<>());
             List<TestData> dataList = Objects.requireNonNullElse(dataCollection.getDataList(), new ArrayList<>());
             ImportMode importMode = ImportMode.getType(request.getImportMode());
-            InputStream inputStream = request.getFile().getInputStream();
-            List<String> sourceList = IOUtils.readLines(inputStream, StandardCharsets.UTF_8);
-            notEmpty(sourceList, "The file is empty.");
             if (importMode == ImportMode.COVER) {
                 paramList.clear();
                 dataList.clear();
             }
-            String[] keys = sourceList.get(0).split(DELIMITER);
-            for (int i = 1; i < keys.length; i++) {
-                if (!paramList.contains(keys[i])) {
-                    paramList.add(keys[i]);
+            MultipartFile file = request.getFile();
+            Assert.isTrue(StringUtils.endsWith(file.getOriginalFilename(), ".xls"), "Only support .xls!");
+            jxl.Workbook workbook = Workbook.getWorkbook(file.getInputStream());
+            int firstIndex = 0;
+            Sheet sheet = workbook.getSheet(firstIndex);
+            Cell[] keyCell = sheet.getRow(firstIndex);
+            int dataBeginIndex = 1;
+            for (int i = dataBeginIndex; i < keyCell.length; i++) {
+                String value = keyCell[i].getContents();
+                if (!paramList.contains(value)) {
+                    paramList.add(value);
                 }
             }
-            for (int i = 1; i < sourceList.size(); i++) {
-                String[] values = sourceList.get(i).split(DELIMITER);
+            for (int i = dataBeginIndex; i < sheet.getRows(); i++) {
                 List<DataParam> dataParams = new ArrayList<>();
-                for (int j = 1; j < values.length; j++) {
-                    dataParams.add(DataParam.builder().key(keys[j]).value(values[j]).build());
+                for (int j = dataBeginIndex; j < sheet.getColumns(); j++) {
+                    if (j >= keyCell.length) {
+                        break;
+                    }
+                    Cell cell = sheet.getCell(j, i);
+                    String value = cell.getContents();
+                    dataParams.add(DataParam.builder().key(keyCell[j].getContents()).value(value).build());
                 }
-                TestData testData = TestData.builder().dataName(values[0]).data(dataParams).build();
+                TestData testData = TestData.builder().dataName(sheet.getCell(firstIndex, i).getContents())
+                    .data(dataParams)
+                    .build();
                 dataList.add(testData);
             }
             dataCollectionRepository.save(dataCollection);
@@ -248,29 +258,31 @@ public class DataCollectionServiceImpl implements DataCollectionService {
     }
 
     @Override
-    public void exportDataCollection(OutputStream outputStream, String id) {
+    public ExportExcelResponse export(String id) {
         try {
-            Optional<DataCollectionEntity> optional = dataCollectionRepository.findById(id);
-            DataCollectionEntity dataCollection = optional
-                    .orElseThrow(() -> ExceptionUtils.mpe(DATA_COLLECTION_NOTEXITS_ERROR, id));
-            List<ExcelExportEntity> list = Lists.newArrayList();
-            ExcelExportEntity entity1 = new ExcelExportEntity(COLLECTION_NAME.getName(), DATA_NAME);
-            list.add(entity1);
-            for (String string : dataCollection.getParamList()) {
-                ExcelExportEntity colEntity = new ExcelExportEntity(string, string);
-                list.add(colEntity);
+            DataCollectionEntity dataCollection = dataCollectionRepository.findById(id)
+                .orElseThrow(() -> ExceptionUtils.mpe(DATA_COLLECTION_NOTEXITS_ERROR, id));
+            // Prepare excel header
+            List<ExcelExportEntity> header = Lists.newArrayList();
+            header.add(new ExcelExportEntity(COLLECTION_NAME.getName(), COLLECTION_NAME.getName()));
+            for (String param : dataCollection.getParamList()) {
+                header.add(new ExcelExportEntity(param, param));
             }
-            List<Map<String, Object>> datList = Lists.newArrayList();
+            // Prepare excel data set
+            List<Map<String, Object>> dateList = Lists.newArrayList();
             for (TestData testData : dataCollection.getDataList()) {
-                Map<String, Object> dataMap = testData.getData().stream().collect(Collectors.toMap(DataParam::getKey,
-                        DataParam::getValue));
-                dataMap.put(DATA_NAME.getName(), testData.getDataName());
-                datList.add(dataMap);
+                Map<String, Object> dataMap = testData.getData().stream()
+                    .collect(Collectors.toMap(DataParam::getKey, DataParam::getValue));
+                dataMap.put(COLLECTION_NAME.getName(), testData.getDataName());
+                dateList.add(dataMap);
             }
-            Workbook workbook = ExcelExportUtil.exportExcel(
-                    new ExportParams(null, dataCollection.getCollectionName()), list, datList);
-            workbook.write(outputStream);
-            workbook.close();
+            ExportParams exportParams = new ExportParams();
+            exportParams.setType(ExcelType.HSSF);
+            return ExportExcelResponse.builder()
+                .filename(dataCollection.getCollectionName() + ".xls")
+                .workbook(ExcelExportUtil
+                    .exportExcel(exportParams, header, dateList))
+                .build();
         } catch (Exception e) {
             log.error("Failed to export the DataCollection!", e);
             throw new ApiTestPlatformException(EXPORT_DATA_COLLECTION_ERROR);
