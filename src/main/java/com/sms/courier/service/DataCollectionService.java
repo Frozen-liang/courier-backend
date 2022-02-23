@@ -3,8 +3,8 @@ package com.sms.courier.service;
 import com.sms.courier.dto.request.DataCollectionImportRequest;
 import com.sms.courier.dto.request.DataCollectionRequest;
 import com.sms.courier.dto.response.DataCollectionResponse;
+import com.sms.courier.dto.response.ExportExcelResponse;
 import com.sms.courier.entity.datacollection.DataCollectionEntity;
-import java.io.OutputStream;
 import java.util.List;
 
 public interface DataCollectionService {
@@ -27,5 +27,5 @@ public interface DataCollectionService {
 
     List<DataCollectionResponse> listByEnvIdAndEnvIdIsNull(String envId, String projectId);
 
-    void exportDataCollection(OutputStream outputStream, String id);
+    ExportExcelResponse export(String id);
 }
