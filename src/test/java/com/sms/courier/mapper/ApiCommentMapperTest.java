@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.sms.courier.dto.request.ApiCommentRequest;
 import com.sms.courier.dto.response.ApiCommentResponse;
 import com.sms.courier.entity.api.ApiCommentEntity;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ class ApiCommentMapperTest {
 
     @Test
     @DisplayName("Test the method to convert the ApiComment's entity object to a dto object")
-    void entity_to_dto() throws IOException {
+    void entity_to_dto() {
         ApiCommentEntity apiComment = ApiCommentEntity.builder()
             .comment(COMMENT)
             .createDateTime(CREATE_TIME)

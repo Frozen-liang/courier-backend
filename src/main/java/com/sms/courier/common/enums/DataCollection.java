@@ -1,8 +1,7 @@
 package com.sms.courier.common.enums;
 
 public enum DataCollection {
-    COLLECTION_NAME("collectionName"),
-    DATA_NAME("dataName");
+    COLLECTION_NAME("collectionName");
 
     private final String name;
 
