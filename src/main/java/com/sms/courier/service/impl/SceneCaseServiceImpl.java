@@ -499,10 +499,11 @@ public class SceneCaseServiceImpl implements SceneCaseService {
                 List<SceneCaseApiEntity> newSceneCaseApiList = setIdConvert(sceneCaseApiEntityList, caseOrderMap,
                     sceneCaseEntity.getId());
                 sceneCaseApiRepository.insert(newSceneCaseApiList);
+                return Boolean.TRUE;
             }
-            return Boolean.TRUE;
+            return Boolean.FALSE;
         } catch (Exception e) {
-            log.error("Failed to copy scene steps!", e);
+            log.error("Failed to copy scene steps!");
             throw ExceptionUtils.mpe(COPY_SCENE_STEPS_ERROR);
         }
     }
