@@ -3,6 +3,7 @@ package com.sms.courier.service;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.ENTITY_SERIALIZATION_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_CONN_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.RECOVER_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR;
@@ -27,6 +28,8 @@ import com.sms.courier.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.courier.dto.request.AddSceneCaseRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.ApiTestCaseRequest;
+import com.sms.courier.dto.request.CopyStepsRequest;
+import com.sms.courier.dto.request.CopyStepsRequest.CaseOrderRequest;
 import com.sms.courier.dto.request.EnvDataCollConnRequest;
 import com.sms.courier.dto.request.ReviewRequest;
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
@@ -39,6 +42,7 @@ import com.sms.courier.dto.response.SceneCaseApiConnResponse;
 import com.sms.courier.dto.response.SceneCaseConnResponse;
 import com.sms.courier.dto.response.SceneCaseResponse;
 import com.sms.courier.dto.response.SceneTemplateResponse;
+import com.sms.courier.dto.vo.SceneCaseApiVo;
 import com.sms.courier.entity.api.ApiEntity;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateApiConn;
@@ -61,6 +65,8 @@ import com.sms.courier.repository.SceneCaseCommentRepository;
 import com.sms.courier.repository.SceneCaseRepository;
 import com.sms.courier.service.impl.SceneCaseServiceImpl;
 import com.sms.courier.utils.SecurityUtil;
+import io.swagger.annotations.Api;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -592,6 +598,38 @@ class SceneCaseServiceTest {
         assertThat(result).isEmpty();
     }
 
+    @Test
+    @DisplayName("Test the copySteps method in the SceneCase service")
+    void copySteps_thenRight() throws JsonProcessingException {
+        Optional<SceneCaseEntity> sceneCaseEntity = Optional.ofNullable(SceneCaseEntity.builder().build());
+        when(sceneCaseRepository.findById(any())).thenReturn(sceneCaseEntity);
+        List<SceneCaseApiEntity> sceneCaseApiEntityList =
+            Lists.newArrayList(SceneCaseApiEntity.builder().id(MOCK_ID).order(MOCK_SIZE).aliasName(MOCK_NAME).build());
+        when(sceneCaseApiRepository.findAllByIdIsIn(any())).thenReturn(sceneCaseApiEntityList);
+        List<SceneCaseApiVo> sceneCaseApiResponseList =
+            Lists.newArrayList(SceneCaseApiVo.builder().id(MOCK_ID).order(MOCK_SIZE).aliasName(MOCK_NAME).build());
+        when(sceneCaseApiMapper.toSceneCaseApiVoList(any())).thenReturn(sceneCaseApiResponseList);
+        CopyStepsRequest request = CopyStepsRequest.builder()
+            .sceneCaseId(MOCK_ID)
+            .projectId(MOCK_ID)
+            .caseOrderList(Lists.newArrayList(CaseOrderRequest.builder().caseId(MOCK_ID).order(MOCK_PAGE).build()))
+            .build();
+        when(objectMapper.writeValueAsString(any())).thenReturn("[]");
+        Boolean isSuccess = sceneCaseService.copySteps(request);
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("An exception occurred while copy steps")
+    void copySteps_thenJsonException() throws JsonProcessingException {
+        when(sceneCaseRepository.findById(any())).thenThrow(new RuntimeException());
+        CopyStepsRequest request = CopyStepsRequest.builder()
+            .sceneCaseId(MOCK_ID)
+            .projectId(MOCK_ID)
+            .caseOrderList(Lists.newArrayList(CaseOrderRequest.builder().caseId(MOCK_ID).order(MOCK_PAGE).build()))
+            .build();
+        assertThatThrownBy(()->sceneCaseService.copySteps(request)).isInstanceOf(ApiTestPlatformException.class);
+    }
     @Test
     @DisplayName("Test the review method in the SceneCase service")
     public void review_thenRight() {

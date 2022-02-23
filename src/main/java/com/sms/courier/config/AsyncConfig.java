@@ -24,9 +24,4 @@ public class AsyncConfig {
         return new ThreadPoolExecutor(10, 20, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(100), threadFactory);
     }
 
-    @Bean("engineExecutor")
-    public Executor engineExecutor() {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("engine-thread-%d").build();
-        return new ThreadPoolExecutor(50, 100, 60, TimeUnit.SECONDS, new ArrayBlockingQueue<>(5000), threadFactory);
-    }
 }
