@@ -31,4 +31,6 @@ public class LogPageRequest extends PageDto {
     private String operationDesc;
 
     private List<String> operatorId;
+
+    private List<String> sourceId;
 }

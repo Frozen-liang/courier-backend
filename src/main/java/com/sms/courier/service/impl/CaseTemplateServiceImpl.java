@@ -214,7 +214,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
 
     @Override
     @LogRecord(operationType = REMOVE, operationModule = CASE_TEMPLATE, template = "{{#result?.![#this.name]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        enhance = @Enhance(enable = true, primaryKey = "ids"), sourceId = "{{#ids}}")
     public Boolean deleteByIds(List<String> ids) {
         log.info("CaseTemplateService-deleteById()-params: [id]={}", ids);
         try {
@@ -231,7 +231,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE, template = "{{#updateCaseTemplateRequest.name}}")
+    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE, template = "{{#updateCaseTemplateRequest.name}}",
+        sourceId = "{{#updateCaseTemplateRequest.id}}")
     public Boolean edit(UpdateCaseTemplateRequest updateCaseTemplateRequest) {
         log.info("CaseTemplateService-edit()-params: [CaseTemplate]={}", updateCaseTemplateRequest.toString());
         try {
@@ -276,7 +277,7 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
 
     @Override
     @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE_API,
-        template = "{{#request.caseTemplateApis?.![#this.name]}}")
+        template = "{{#request.caseTemplateApis?.![#this.name]}}", sourceId = "{{#request.caseTemplateId}}")
     public Boolean addApi(AddCaseTemplateApiByIdsRequest request) {
         try {
             CaseTemplateEntity caseTemplate =
@@ -298,7 +299,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     @Override
     @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE,
         template = "{{#result.name]}}",
-        enhance = @Enhance(enable = true))
+        enhance = @Enhance(enable = true),
+        sourceId = "{{#ids}}")
     public Boolean delete(List<String> ids) {
         try {
             Assert.isFalse(sceneCaseApiService.existsByCaseTemplateId(ids),
@@ -325,7 +327,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
     @Override
     @LogRecord(operationType = RECOVER, operationModule = CASE_TEMPLATE,
         template = "{{#result?.![#this.name]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        enhance = @Enhance(enable = true, primaryKey = "ids"),
+        sourceId = "{{#ids}}")
     public Boolean recover(List<String> ids) {
         try {
             customizedCaseTemplateRepository.recover(ids);

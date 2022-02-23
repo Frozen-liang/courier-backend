@@ -15,7 +15,6 @@ import static com.sms.courier.common.exception.ErrorCode.GET_CASE_TEMPLATE_API_L
 
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
-import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.field.SceneField;
 import com.sms.courier.dto.request.BatchAddCaseTemplateApiRequest;
@@ -33,7 +32,6 @@ import com.sms.courier.service.CaseApiCountHandler;
 import com.sms.courier.service.CaseTemplateApiService;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +64,8 @@ public class CaseTemplateApiServiceImpl extends AbstractCaseService implements C
     @Override
     @LogRecord(operationType = ADD, operationModule = CASE_TEMPLATE_API,
         template = "{{#addCaseTemplateApiRequest.addCaseTemplateApiRequestList?.![#this.apiTestCase.caseName]}}",
-        refId = "addCaseTemplateApiRequestList[0].projectId")
+        refId = "addCaseTemplateApiRequestList[0].projectId",
+        sourceId = "{{#addCaseTemplateApiRequest.addCaseTemplateApiRequestList?.![#this.caseTemplateId]}}")
     public Boolean batchAdd(BatchAddCaseTemplateApiRequest addCaseTemplateApiRequest) {
         log.info("CaseTemplateApiService-batchAdd()-params: [CaseTemplateApi]={}",
             addCaseTemplateApiRequest.toString());
@@ -84,7 +83,8 @@ public class CaseTemplateApiServiceImpl extends AbstractCaseService implements C
     @Override
     @LogRecord(operationType = DELETE, operationModule = CASE_TEMPLATE_API,
         template = "{{#result?.![#this.apiTestCase.caseName]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        enhance = @Enhance(enable = true, primaryKey = "ids"),
+        sourceId = "{{#result?.![#this.caseTemplateId]}}")
     public Boolean deleteByIds(List<String> ids) {
         log.info("CaseTemplateApiService-deleteById()-params: [id]={}", ids);
         try {
@@ -100,7 +100,8 @@ public class CaseTemplateApiServiceImpl extends AbstractCaseService implements C
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API,
-        template = "{{#updateCaseTemplateApiRequest.apiTestCase.caseName}}")
+        template = "{{#updateCaseTemplateApiRequest.apiTestCase.caseName}}",
+        sourceId = "{{#updateCaseTemplateApiRequest.caseTemplateId}}")
     public Boolean edit(UpdateCaseTemplateApiRequest updateCaseTemplateApiRequest) {
         log.info("CaseTemplateApiService-edit()-params: [CaseTemplateApi]={}", updateCaseTemplateApiRequest.toString());
         try {
@@ -115,9 +116,10 @@ public class CaseTemplateApiServiceImpl extends AbstractCaseService implements C
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API, template = "{{#updateCaseTemplateApiDto"
-        + ".updateCaseTemplateApiRequestList?.![#this.apiTestCase.caseName]}}",
-        refId = "updateCaseTemplateApiRequestList[0].projectId")
+    @LogRecord(operationType = EDIT, operationModule = CASE_TEMPLATE_API,
+        template = "{{#updateCaseTemplateApiDto.updateCaseTemplateApiRequestList?.![#this.apiTestCase.caseName]}}",
+        refId = "updateCaseTemplateApiRequestList[0].projectId",
+        sourceId = "{{#updateCaseTemplateApiDto.updateCaseTemplateApiRequestList?.![#this.caseTemplateId]}}")
     public Boolean batchEdit(BatchUpdateCaseTemplateApiRequest updateCaseTemplateApiDto) {
         log.info("CaseTemplateApiService-batchEdit()-params: [CaseTemplateApi]={}",
             updateCaseTemplateApiDto.toString());
@@ -176,7 +178,7 @@ public class CaseTemplateApiServiceImpl extends AbstractCaseService implements C
 
     @Override
     @LogRecord(operationType = CASE_SYNC, operationModule = CASE_TEMPLATE_API,
-        template = "{{#request.caseName}}")
+        template = "{{#request.caseName}}", sourceId = "{{#request.caseTemplateId}}")
     public Boolean syncApi(SyncApiRequest request) {
         try {
             CaseTemplateApiEntity caseTemplateApiEntity = caseTemplateApiRepository.findById(request.getCaseId())

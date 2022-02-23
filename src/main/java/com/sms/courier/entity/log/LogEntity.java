@@ -40,4 +40,6 @@ public class LogEntity {
 
     @CreatedDate
     private LocalDateTime createDateTime;
+
+    private String sourceId;
 }

@@ -24,4 +24,6 @@ public @interface LogRecord {
     String template() default "";
 
     Enhance enhance() default @Enhance;
+
+    String sourceId() default "";
 }

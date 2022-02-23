@@ -116,7 +116,8 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = GLOBAL_FUNCTION,
-        template = "{{#globalFunctionRequest.functionName}}", refId = "workspaceId")
+        template = "{{#globalFunctionRequest.functionName}}", refId = "workspaceId",
+        sourceId = "{{#globalFunctionRequest.id}}")
     public Boolean edit(GlobalFunctionRequest globalFunctionRequest) {
         log.info("GlobalFunctionService-edit()-params: [GlobalFunction]={}", globalFunctionRequest.toString());
         try {
@@ -144,7 +145,8 @@ public class GlobalFunctionServiceImpl implements GlobalFunctionService {
     @Override
     @LogRecord(operationType = DELETE, operationModule = GLOBAL_FUNCTION,
         template = "{{#result?.![#this.functionName]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"), refId = "workspaceId")
+        enhance = @Enhance(enable = true, primaryKey = "ids"), refId = "workspaceId",
+        sourceId = "{{#ids}}")
     public Boolean delete(List<String> ids) {
         try {
             Boolean result = commonRepository.deleteByIds(ids, GlobalFunctionEntity.class);

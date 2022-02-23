@@ -177,7 +177,7 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     @LogRecord(operationType = OperationType.EDIT, operationModule = OperationModule.API,
-        template = "{{#apiRequest.apiName}}")
+        template = "{{#apiRequest.apiName}}", sourceId = "{{#apiRequest.id}}")
     public Boolean edit(ApiRequest apiRequest) {
         log.info("ApiService-edit()-params: [Api]={}", apiRequest.toString());
         try {
@@ -214,7 +214,8 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     @LogRecord(operationType = OperationType.DELETE, operationModule = OperationModule.API,
-        template = "{{#result?.![#this.apiName]}}", enhance = @Enhance(enable = true, primaryKey = "ids"))
+        template = "{{#result?.![#this.apiName]}}", enhance = @Enhance(enable = true, primaryKey = "ids"),
+        sourceId = "{{#ids}}")
     public Boolean delete(List<String> ids) {
         try {
             return customizedApiRepository.deleteByIds(ids);
@@ -226,7 +227,8 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     @LogRecord(operationType = OperationType.REMOVE, operationModule = OperationModule.API,
-        template = "{{#result?.![#this.apiName]}}", enhance = @Enhance(enable = true, primaryKey = "ids"))
+        template = "{{#result?.![#this.apiName]}}", enhance = @Enhance(enable = true, primaryKey = "ids"),
+        sourceId = "{{#ids}}")
     public Boolean deleteByIds(List<String> ids) {
         log.info("Delete api ids:{}.", ids);
         if (CollectionUtils.isEmpty(ids)) {
@@ -240,7 +242,8 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    @LogRecord(operationType = OperationType.CLEAR_RECYCLE_BIN, operationModule = OperationModule.API)
+    @LogRecord(operationType = OperationType.CLEAR_RECYCLE_BIN, operationModule = OperationModule.API,
+        sourceId = "{{#projectId}}")
     public Boolean deleteAll(String projectId) {
         log.info("Delete all api projectId:{}.", projectId);
         List<ApiEntity> apiEntities = apiRepository.deleteAllByProjectIdAndRemovedIsTrue(projectId);
@@ -253,7 +256,8 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     @LogRecord(operationType = OperationType.RECOVER, operationModule = OperationModule.API,
-        template = "{{#result?.![#this.apiName]}}", enhance = @Enhance(enable = true, primaryKey = "ids"))
+        template = "{{#result?.![#this.apiName]}}", enhance = @Enhance(enable = true, primaryKey = "ids"),
+        sourceId = "{{#ids}}")
     public Boolean recover(List<String> ids) {
         return customizedApiRepository.recover(ids);
     }

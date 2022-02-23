@@ -126,7 +126,8 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = PROJECT_ENV,
-        template = "{{#projectEnvironmentRequest.envName}}")
+        template = "{{#projectEnvironmentRequest.envName}}",
+        sourceId = "{{#projectEnvironmentRequest.id}}")
     public Boolean edit(ProjectEnvironmentRequest projectEnvironmentRequest) {
         log.info("ProjectEnvironmentService-edit()-params: [ProjectEnvironment]={}",
             projectEnvironmentRequest.toString());
@@ -149,7 +150,8 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     @Override
     @LogRecord(operationType = DELETE, operationModule = PROJECT_ENV,
         template = "{{#result?.![#this.envName]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        enhance = @Enhance(enable = true, primaryKey = "ids"),
+        sourceId = "{{#ids}}")
     public Boolean delete(List<String> ids) {
         try {
             return commonRepository.deleteByIds(ids, ProjectEnvironmentEntity.class);

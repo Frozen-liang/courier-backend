@@ -18,4 +18,7 @@ public class SyncApiRequest {
     private String caseName;
     @NotNull(message = "The projectId cannot be empty")
     private String projectId;
+    private String sceneCaseId;
+    private String caseTemplateId;
+
 }
