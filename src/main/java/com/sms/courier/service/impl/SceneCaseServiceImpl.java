@@ -515,6 +515,30 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         }
     }
 
+    @Override
+    @LogRecord(operationType = REVIEW, operationModule = SCENE_CASE,
+        template = "{{#request.sceneCaseName}}", sourceId = "{{#request.sceneCaseId}}")
+    public Boolean review(ReviewRequest request) {
+        try {
+            SceneCaseEntity sceneCaseEntity = sceneCaseRepository.findById(request.getSceneCaseId())
+                .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_BY_ID_ERROR));
+            sceneCaseEntity.setReviewStatus(ReviewStatus.getType(request.getReviewStatus()));
+            sceneCaseRepository.save(sceneCaseEntity);
+            if (StringUtils.isNotBlank(request.getComment())) {
+                SceneCaseCommentEntity commentEntity = SceneCaseCommentEntity.builder()
+                    .sceneCaseId(sceneCaseEntity.getId())
+                    .comment(request.getComment())
+                    .reviewStatus(ReviewStatus.getType(request.getReviewStatus()))
+                    .build();
+                sceneCaseCommentRepository.insert(commentEntity);
+            }
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to edit the SceneCase!", e);
+            throw ExceptionUtils.mpe(EDIT_SCENE_CASE_ERROR);
+        }
+    }
+
     private List<SceneCaseApiEntity> setIdConvert(List<SceneCaseApiEntity> sceneCaseApiEntityList,
         Map<String, Integer> caseOrderMap, String sceneCaseId)
         throws JsonProcessingException {
@@ -543,31 +567,6 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             });
 
         return sceneCaseApiMapper.toEntityByVoList(entityList);
-    }
-
-
-    @Override
-    @LogRecord(operationType = REVIEW, operationModule = SCENE_CASE,
-        template = "{{#request.sceneCaseName}}", sourceId = "{{#request.sceneCaseId}}")
-    public Boolean review(ReviewRequest request) {
-        try {
-            SceneCaseEntity sceneCaseEntity = sceneCaseRepository.findById(request.getSceneCaseId())
-                .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_BY_ID_ERROR));
-            sceneCaseEntity.setReviewStatus(ReviewStatus.getType(request.getReviewStatus()));
-            sceneCaseRepository.save(sceneCaseEntity);
-            if (StringUtils.isNotBlank(request.getComment())) {
-                SceneCaseCommentEntity commentEntity = SceneCaseCommentEntity.builder()
-                    .sceneCaseId(sceneCaseEntity.getId())
-                    .comment(request.getComment())
-                    .reviewStatus(ReviewStatus.getType(request.getReviewStatus()))
-                    .build();
-                sceneCaseCommentRepository.insert(commentEntity);
-            }
-            return Boolean.TRUE;
-        } catch (Exception e) {
-            log.error("Failed to edit the SceneCase!", e);
-            throw ExceptionUtils.mpe(EDIT_SCENE_CASE_ERROR);
-        }
     }
 
     private List<SceneCaseApiEntity> caseTemplateConvertToSceneCase(SceneCaseApiEntity sceneCaseApiEntity) {
