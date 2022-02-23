@@ -7,6 +7,7 @@ import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.enums.OperationType.RECOVER;
 import static com.sms.courier.common.enums.OperationType.REMOVE;
+import static com.sms.courier.common.enums.OperationType.REVIEW;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_ERROR;
@@ -32,6 +33,7 @@ import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.enums.ResponseParamsExtractionType;
 import com.sms.courier.common.enums.ResultVerificationType;
+import com.sms.courier.common.enums.ReviewStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.field.CommonField;
 import com.sms.courier.dto.request.AddCaseTemplateApi;
@@ -41,6 +43,7 @@ import com.sms.courier.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.courier.dto.request.AddSceneCaseRequest;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.EnvDataCollConnRequest;
+import com.sms.courier.dto.request.ReviewRequest;
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseApiConnRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseConnRequest;
@@ -60,6 +63,7 @@ import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateApiConn;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
+import com.sms.courier.entity.scenetest.SceneCaseCommentEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.mapper.ApiTestCaseMapper;
 import com.sms.courier.mapper.CaseTemplateApiMapper;
@@ -73,6 +77,7 @@ import com.sms.courier.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
+import com.sms.courier.repository.SceneCaseCommentRepository;
 import com.sms.courier.repository.SceneCaseRepository;
 import com.sms.courier.service.CaseApiCountHandler;
 import com.sms.courier.service.CaseTemplateApiService;
@@ -96,6 +101,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -127,6 +133,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     private final DataCollectionMapper dataCollectionMapper;
     private final ObjectMapper objectMapper;
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
+    private final SceneCaseCommentRepository sceneCaseCommentRepository;
 
     public SceneCaseServiceImpl(SceneCaseRepository sceneCaseRepository,
         CustomizedSceneCaseRepository customizedSceneCaseRepository,
@@ -141,7 +148,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         ProjectEnvironmentMapper projectEnvironmentMapper,
         DataCollectionService dataCollectionService, DataCollectionMapper dataCollectionMapper,
         ObjectMapper objectMapper,
-        CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository) {
+        CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository,
+        SceneCaseCommentRepository sceneCaseCommentRepository) {
         this.sceneCaseRepository = sceneCaseRepository;
         this.customizedSceneCaseRepository = customizedSceneCaseRepository;
         this.sceneCaseMapper = sceneCaseMapper;
@@ -162,6 +170,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         this.dataCollectionMapper = dataCollectionMapper;
         this.objectMapper = objectMapper;
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
+        this.sceneCaseCommentRepository = sceneCaseCommentRepository;
     }
 
     @Override
@@ -271,25 +280,23 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         try {
             sceneCaseRepository.findById(updateSceneTemplateRequest.getSceneCaseId())
                 .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_BY_ID_ERROR));
-            if (CollectionUtils.isNotEmpty(updateSceneTemplateRequest.getSceneCaseApiRequest())) {
-                List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList();
-                for (UpdateSceneCaseApiConnRequest request :
-                    updateSceneTemplateRequest.getSceneCaseApiRequest()) {
-                    Optional<SceneCaseApiEntity> sceneCaseApi = sceneCaseApiRepository.findById(request.getId());
-                    sceneCaseApi.ifPresent(api -> {
-                        api.setOrder(request.getOrder());
-                        api.setLock(request.isLock());
-                        if (Objects.isNull(api.getCaseTemplateId())) {
-                            api.getApiTestCase().setExecute(request.getApiTestCase().isExecute());
-                        } else {
-                            api.setCaseTemplateApiConnList(sceneCaseMapper
-                                .toCaseTemplateApiConnListByResponse(request.getCaseTemplateApiList()));
-                        }
-                        sceneCaseApiList.add(api);
-                    });
-                }
-                sceneCaseApiRepository.saveAll(sceneCaseApiList);
+            List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList();
+            for (UpdateSceneCaseApiConnRequest request :
+                updateSceneTemplateRequest.getSceneCaseApiRequest()) {
+                Optional<SceneCaseApiEntity> sceneCaseApi = sceneCaseApiRepository.findById(request.getId());
+                sceneCaseApi.ifPresent(api -> {
+                    api.setOrder(request.getOrder());
+                    api.setLock(request.isLock());
+                    if (Objects.isNull(api.getCaseTemplateId())) {
+                        api.getApiTestCase().setExecute(request.getApiTestCase().isExecute());
+                    } else {
+                        api.setCaseTemplateApiConnList(sceneCaseMapper
+                            .toCaseTemplateApiConnListByResponse(request.getCaseTemplateApiList()));
+                    }
+                    sceneCaseApiList.add(api);
+                });
             }
+            sceneCaseApiRepository.saveAll(sceneCaseApiList);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
@@ -474,6 +481,30 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             order++;
         }
         return getSceneCaseApiConnResponses(id);
+    }
+
+    @Override
+    @LogRecord(operationType = REVIEW, operationModule = SCENE_CASE,
+        template = "{{#request.sceneCaseName}}", sourceId = "{{#request.sceneCaseId}}")
+    public Boolean review(ReviewRequest request) {
+        try {
+            SceneCaseEntity sceneCaseEntity = sceneCaseRepository.findById(request.getSceneCaseId())
+                .orElseThrow(() -> ExceptionUtils.mpe(GET_SCENE_CASE_BY_ID_ERROR));
+            sceneCaseEntity.setReviewStatus(ReviewStatus.getType(request.getReviewStatus()));
+            sceneCaseRepository.save(sceneCaseEntity);
+            if (StringUtils.isNotBlank(request.getComment())) {
+                SceneCaseCommentEntity commentEntity = SceneCaseCommentEntity.builder()
+                    .sceneCaseId(sceneCaseEntity.getId())
+                    .comment(request.getComment())
+                    .reviewStatus(ReviewStatus.getType(request.getReviewStatus()))
+                    .build();
+                sceneCaseCommentRepository.insert(commentEntity);
+            }
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Failed to edit the SceneCase!", e);
+            throw ExceptionUtils.mpe(EDIT_SCENE_CASE_ERROR);
+        }
     }
 
     private List<SceneCaseApiEntity> caseTemplateConvertToSceneCase(SceneCaseApiEntity sceneCaseApiEntity) {

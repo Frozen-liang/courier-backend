@@ -1,5 +1,6 @@
 package com.sms.courier.entity.scenetest;
 
+import com.sms.courier.common.enums.ReviewStatus;
 import com.sms.courier.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,5 +26,7 @@ public class SceneCaseCommentEntity extends BaseEntity {
     private String parentId;
 
     private String comment;
+
+    private ReviewStatus reviewStatus;
 
 }

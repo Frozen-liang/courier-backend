@@ -4,6 +4,7 @@ import com.sms.courier.common.constant.Constants;
 import com.sms.courier.dto.request.AddCaseTemplateConnRequest;
 import com.sms.courier.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.courier.dto.request.AddSceneCaseRequest;
+import com.sms.courier.dto.request.ReviewRequest;
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseConnRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseRequest;
@@ -108,4 +109,9 @@ public class SceneCaseController {
         return sceneCaseService.removeRef(id, caseTemplateId, order);
     }
 
+    @PutMapping("/review")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_API_CRE_UPD_DEL)")
+    public Boolean review(@Validated @RequestBody ReviewRequest request) {
+        return sceneCaseService.review(request);
+    }
 }
