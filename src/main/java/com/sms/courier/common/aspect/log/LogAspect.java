@@ -67,6 +67,7 @@ public class LogAspect {
         enhance(enhance, context, operationModule, method);
         Object result = jp.proceed();
         String operationDesc = SpelUtils.getValue(context, logRecord.template(), String.class);
+        String sourceId = SpelUtils.getValue(context, logRecord.sourceId(), String.class);
         String projectId = SpelUtils.getProjectId(context, logRecord, method, args);
         if (StringUtils.isEmpty(operationDesc)) {
             log.warn("The operationDesc is empty,please check the method: {} template:{}",
@@ -75,7 +76,7 @@ public class LogAspect {
         try {
             LogEntity logEntity = LogEntity.builder().operationType(operationType).operationModule(operationModule)
                 .operationDesc(operationDesc).operator(SecurityUtil.getCurrentUser().getUsername()).refId(projectId)
-                .build();
+                .sourceId(sourceId).build();
             logService.add(logEntity);
         } catch (Exception e) {
             log.error("Insert log error!", e);

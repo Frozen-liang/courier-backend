@@ -180,7 +180,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
 
     @Override
     @LogRecord(operationType = REMOVE, operationModule = SCENE_CASE, template = "{{#result?.![#this.name]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        enhance = @Enhance(enable = true, primaryKey = "ids"), sourceId = "{{#ids}}")
     public Boolean deleteByIds(List<String> ids) {
         log.info("SceneCaseService-deleteById()-params: [ids]={}", ids.toString());
         try {
@@ -197,7 +197,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE, template = "{{#updateSceneCaseRequest.name}}")
+    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE, template = "{{#updateSceneCaseRequest.name}}",
+        sourceId = "{{#updateSceneCaseRequest.id}}")
     public Boolean edit(UpdateSceneCaseRequest updateSceneCaseRequest) {
         log.info("SceneCaseService-edit()-params: [SceneCase]={}", updateSceneCaseRequest.toString());
         try {
@@ -262,6 +263,9 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     }
 
     @Override
+    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE,
+        template = "{{#updateSceneTemplateRequest.sceneCaseName}}",
+        sourceId = "{{#updateSceneTemplateRequest.sceneCaseId}}")
     public Boolean editConn(UpdateSceneCaseConnRequest updateSceneTemplateRequest) {
         log.info("SceneCaseService-editConn()-params: [SceneTemplateDto]={}", updateSceneTemplateRequest.toString());
         try {
@@ -314,7 +318,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
 
     @Override
     @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API,
-        template = "{{#request.sceneCaseApis?.![#this.name]}}")
+        template = "{{#request.sceneCaseApis?.![#this.name]}}", sourceId = "{{#request.sceneCaseId}}")
     public Boolean addApi(AddSceneCaseApiByIdsRequest request) {
         try {
             SceneCaseEntity sceneCase =
@@ -335,7 +339,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
 
     @Override
     @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API,
-        template = "{{#addCaseTemplateConnRequest.caseTemplateIds?.![#this.name]}}")
+        template = "{{#addCaseTemplateConnRequest.caseTemplateIds?.![#this.name]}}",
+        sourceId = "{{#addCaseTemplateConnRequest.sceneCaseId}}")
     public Boolean addTemplate(AddCaseTemplateConnRequest addCaseTemplateConnRequest) {
         try {
             SceneCaseEntity sceneCase =
@@ -379,7 +384,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     @Override
     @LogRecord(operationType = DELETE, operationModule = SCENE_CASE,
         template = "{{#res?.![#this.name]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids", queryResultKey = "res"))
+        enhance = @Enhance(enable = true, primaryKey = "ids", queryResultKey = "res"), sourceId = "{{#ids}}")
     public Boolean delete(List<String> ids) {
         try {
             customizedSceneCaseRepository.deleteByIds(ids);
@@ -403,7 +408,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
     @Override
     @LogRecord(operationType = RECOVER, operationModule = SCENE_CASE,
         template = "{{#result?.![#this.name]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        enhance = @Enhance(enable = true, primaryKey = "ids"), sourceId = "{{#ids}}")
     public Boolean recover(List<String> ids) {
         try {
             customizedSceneCaseRepository.recover(ids);

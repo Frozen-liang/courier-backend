@@ -117,7 +117,7 @@ public class ApiTestCaseServiceImpl extends AbstractCaseService implements ApiTe
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = API_TEST_CASE,
-        template = "{{#apiTestCaseRequest.caseName}}")
+        template = "{{#apiTestCaseRequest.caseName}}", sourceId = "{{#apiTestCaseRequest.id}}")
     public Boolean edit(ApiTestCaseRequest apiTestCaseRequest) {
         log.info("ApiTestCaseService-edit()-params: [ApiTestCase]={}", apiTestCaseRequest.toString());
         try {
@@ -139,7 +139,8 @@ public class ApiTestCaseServiceImpl extends AbstractCaseService implements ApiTe
     @Override
     @LogRecord(operationType = DELETE, operationModule = API_TEST_CASE,
         template = "{{#result?.![#this.caseName]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        enhance = @Enhance(enable = true, primaryKey = "ids"),
+        sourceId = "{{#ids}}")
     public Boolean delete(List<String> ids) {
         try {
             Boolean result = customizedApiTestCaseRepository.deleteByIds(ids);
@@ -163,7 +164,8 @@ public class ApiTestCaseServiceImpl extends AbstractCaseService implements ApiTe
     @Override
     @LogRecord(operationType = OperationType.REMOVE, operationModule = API_TEST_CASE,
         template = "{{#result?.![#this.caseName]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        enhance = @Enhance(enable = true, primaryKey = "ids"),
+        sourceId = "{{#ids}}")
     public Boolean deleteByIds(List<String> ids) {
         log.info("Delete ApiTestCase ids:{}.", ids);
         apiTestCaseRepository.deleteAllByIdIn(ids);
@@ -181,7 +183,8 @@ public class ApiTestCaseServiceImpl extends AbstractCaseService implements ApiTe
     @Override
     @LogRecord(operationType = RECOVER, operationModule = API_TEST_CASE,
         template = "{{#result?.![#this.caseName]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        enhance = @Enhance(enable = true, primaryKey = "ids"),
+        sourceId = "{{#ids}}")
     public Boolean recover(List<String> ids) {
         Boolean isSuccess = customizedApiTestCaseRepository.recover(ids);
         if (isSuccess) {
@@ -256,12 +259,12 @@ public class ApiTestCaseServiceImpl extends AbstractCaseService implements ApiTe
 
     @Override
     @LogRecord(operationType = CASE_SYNC, operationModule = API_TEST_CASE,
-        template = "{{#request.caseName}}")
+        template = "{{#request.caseName}}", sourceId = "{{#request.caseId}}")
     public Boolean syncApi(SyncApiRequest request) {
         try {
             ApiTestCaseEntity apiTestCase =
                 apiTestCaseRepository.findById(request.getCaseId()).orElseThrow(() -> ExceptionUtils.mpe(
-                ErrorCode.EDIT_NOT_EXIST_ERROR));
+                    ErrorCode.EDIT_NOT_EXIST_ERROR));
             apiTestCase.setLastTestResult(null);
             syncApiEntity(apiTestCase.getApiEntity());
             apiTestCaseRepository.save(apiTestCase);

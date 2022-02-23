@@ -71,7 +71,8 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = GLOBAL_ENV,
-        template = "{{#globalEnvironmentRequest.envName}}", refId = "workspaceId")
+        template = "{{#globalEnvironmentRequest.envName}}", refId = "workspaceId",
+        sourceId = "{{#globalEnvironmentRequest.id}}")
     public Boolean edit(GlobalEnvironmentRequest globalEnvironmentRequest) {
         log.info("GlobalEnvironmentService-edit()-params: [GlobalEnvironment]={}", globalEnvironmentRequest.toString());
         try {
@@ -104,7 +105,8 @@ public class GlobalEnvironmentServiceImpl implements GlobalEnvironmentService {
     @Override
     @LogRecord(operationType = DELETE, operationModule = GLOBAL_ENV,
         template = "{{#result?.![#this.envName]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"), refId = "workspaceId")
+        enhance = @Enhance(enable = true, primaryKey = "ids"), refId = "workspaceId",
+        sourceId = "{{#ids}}")
     public Boolean delete(List<String> ids) {
         try {
             return commonRepository.deleteByIds(ids, GlobalEnvironmentEntity.class);

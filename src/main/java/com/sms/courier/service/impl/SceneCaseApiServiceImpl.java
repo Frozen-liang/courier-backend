@@ -68,7 +68,8 @@ public class SceneCaseApiServiceImpl extends AbstractCaseService implements Scen
     @Override
     @LogRecord(operationType = ADD, operationModule = SCENE_CASE_API,
         template = "{{#addSceneCaseApiDto.addSceneCaseApiRequestList?.![#this.apiTestCase.caseName]}}",
-        refId = "addSceneCaseApiRequestList[0].projectId")
+        refId = "addSceneCaseApiRequestList[0].projectId",
+        sourceId = "{{#addSceneCaseApiDto.addSceneCaseApiRequestList?.![#this.sceneCaseId]}}")
     public Boolean batchAdd(BatchAddSceneCaseApiRequest addSceneCaseApiDto) {
         log.info("SceneCaseApiService-batchAdd()-params: [SceneCaseApi]={}", addSceneCaseApiDto.toString());
         try {
@@ -97,7 +98,8 @@ public class SceneCaseApiServiceImpl extends AbstractCaseService implements Scen
     @Override
     @LogRecord(operationType = DELETE, operationModule = SCENE_CASE_API,
         template = "{{#result?.![#this.apiTestCase.caseName]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        enhance = @Enhance(enable = true, primaryKey = "ids"),
+        sourceId = "{{#result?.![#this.sceneCaseId]}}")
     public Boolean deleteByIds(List<String> ids) {
         log.info("SceneCaseApiService-deleteByIds()-params: [ids]={}", ids);
         try {
@@ -112,7 +114,8 @@ public class SceneCaseApiServiceImpl extends AbstractCaseService implements Scen
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
-        template = "{{#updateSceneCaseApiRequest.apiTestCase.caseName}}")
+        template = "{{#updateSceneCaseApiRequest.apiTestCase.caseName}}",
+        sourceId = "{{#updateSceneCaseApiRequest.sceneCaseId}}")
     public Boolean edit(UpdateSceneCaseApiRequest updateSceneCaseApiRequest) {
         log.info("SceneCaseApiService-edit()-params: [SceneCaseApi]={}", updateSceneCaseApiRequest.toString());
         try {
@@ -129,7 +132,8 @@ public class SceneCaseApiServiceImpl extends AbstractCaseService implements Scen
     @Override
     @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
         template = "{{#updateSceneCaseApiSortOrderDto.sceneCaseApiRequestList?.![#this.apiTestCase.caseName]}}",
-        refId = "sceneCaseApiRequestList[0].projectId")
+        refId = "sceneCaseApiRequestList[0].projectId",
+        sourceId = "{{#updateSceneCaseApiSortOrderDto.sceneCaseApiRequestList?.![#this.sceneCaseId]}}")
     public Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiSortOrderDto) {
         log.info("SceneCaseApiService-batchEdit()-params: [SceneCaseApi]={}",
             updateSceneCaseApiSortOrderDto.toString());
@@ -207,7 +211,7 @@ public class SceneCaseApiServiceImpl extends AbstractCaseService implements Scen
 
     @Override
     @LogRecord(operationType = CASE_SYNC, operationModule = SCENE_CASE_API,
-        template = "{{#request.caseName}}")
+        template = "{{#request.caseName}}", sourceId = "{{#request.sceneCaseId}}")
     public Boolean syncApi(SyncApiRequest request) {
         try {
             SceneCaseApiEntity sceneCaseApi = sceneCaseApiRepository.findById(request.getCaseId())

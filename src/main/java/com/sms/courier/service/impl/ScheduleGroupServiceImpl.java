@@ -96,7 +96,7 @@ public class ScheduleGroupServiceImpl implements ScheduleGroupService {
 
     @Override
     @LogRecord(operationType = OperationType.DELETE, operationModule = SCHEDULE_GROUP, template = "{{#result.name}}",
-        enhance = @Enhance(enable = true))
+        enhance = @Enhance(enable = true), sourceId = "{{#id}}")
     public Boolean delete(String id) {
         try {
             scheduleGroupRepository.deleteById(id);

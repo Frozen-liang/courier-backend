@@ -16,6 +16,7 @@ import javax.validation.Valid;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,7 +69,7 @@ public class SceneCaseController {
 
     @PutMapping("/conn/edit")
     @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_CRE_UPD_DEL)")
-    public Boolean editConn(@RequestBody UpdateSceneCaseConnRequest updateSceneTemplateRequest) {
+    public Boolean editConn(@Validated @RequestBody UpdateSceneCaseConnRequest updateSceneTemplateRequest) {
         return sceneCaseService.editConn(updateSceneTemplateRequest);
     }
 

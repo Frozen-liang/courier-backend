@@ -129,7 +129,8 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = PROJECT_FUNCTION,
-        template = "{{#projectFunctionRequest.functionName}}")
+        template = "{{#projectFunctionRequest.functionName}}",
+        sourceId = "{{#projectFunctionRequest.id}}")
     public Boolean edit(ProjectFunctionRequest projectFunctionRequest) {
         log.info("ProjectFunctionService-edit()-params: [ProjectFunction]={}", projectFunctionRequest.toString());
         try {
@@ -158,7 +159,8 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     @Override
     @LogRecord(operationType = DELETE, operationModule = PROJECT_FUNCTION,
         template = "{{#result?.![#this.functionName]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        enhance = @Enhance(enable = true, primaryKey = "ids"),
+        sourceId = "{{#ids}}")
     public Boolean delete(List<String> ids) {
         try {
             Boolean result = commonRepository.deleteByIds(ids, ProjectFunctionEntity.class);

@@ -2,6 +2,7 @@ package com.sms.courier.repository.impl;
 
 import static com.sms.courier.common.field.CommonField.CREATE_DATE_TIME;
 import static com.sms.courier.common.field.CommonField.REF_ID;
+import static com.sms.courier.common.field.CommonField.SOURCE_ID;
 import static com.sms.courier.common.field.LogField.OPERATION_DESC;
 import static com.sms.courier.common.field.LogField.OPERATION_MODULE;
 import static com.sms.courier.common.field.LogField.OPERATION_TYPE;
@@ -39,6 +40,7 @@ public class CustomizedLogRepositoryImpl implements CustomizedLogRepository {
         OPERATION_TYPE.in(logPageRequest.getOperationType()).ifPresent(query::addCriteria);
         OPERATION_MODULE.in(logPageRequest.getOperationModule()).ifPresent(query::addCriteria);
         OPERATOR_ID.in(logPageRequest.getOperatorId()).ifPresent(query::addCriteria);
+        SOURCE_ID.in(logPageRequest.getSourceId()).ifPresent(query::addCriteria);
         long count = mongoTemplate.count(query, LogEntity.class);
         Pageable pageable = PageDtoConverter.createPageable(logPageRequest);
         List<LogEntity> logList = mongoTemplate.find(query.with(pageable), LogEntity.class);

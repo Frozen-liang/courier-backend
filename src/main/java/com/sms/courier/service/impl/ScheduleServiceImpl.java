@@ -113,7 +113,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = SCHEDULE, template = "{{#request.name}}")
+    @LogRecord(operationType = EDIT, operationModule = SCHEDULE, template = "{{#request.name}}",
+        sourceId = "{{#request.id}}")
     public Boolean edit(ScheduleRequest request) {
         try {
             ScheduleEntity oldSchedule = scheduleRepository.findById(request.getId())
@@ -139,7 +140,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     @LogRecord(operationType = OperationType.DELETE, operationModule = SCHEDULE,
         template = "{{#result?.![#this.name]}}",
-        enhance = @Enhance(enable = true, primaryKey = "ids"))
+        enhance = @Enhance(enable = true, primaryKey = "ids"),
+        sourceId = "{{#ids}}")
     public Boolean delete(List<String> ids) {
         try {
             Map<Field, Object> updateFields = new HashMap<>();

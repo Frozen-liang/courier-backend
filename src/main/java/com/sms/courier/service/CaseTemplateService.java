@@ -8,7 +8,6 @@ import com.sms.courier.dto.request.UpdateCaseTemplateRequest;
 import com.sms.courier.dto.response.CaseTemplateDetailResponse;
 import com.sms.courier.dto.response.CaseTemplateResponse;
 import com.sms.courier.dto.response.IdResponse;
-import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
