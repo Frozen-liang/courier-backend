@@ -32,7 +32,7 @@ class WebhookMapperTest {
     void toWebhookType_test() {
         WebhookTypeEntity webhookTypeEntity = new WebhookTypeEntity();
         webhookTypeEntity.setDefaultPayload("type");
-        webhookTypeEntity.setType(WebhookType.SCHEDULE);
+        webhookTypeEntity.setType(WebhookType.SCHEDULE_END);
         List<WebhookTypeResponse> webhookTypeResponses = webhookMapper.toWebhookTypeList(List.of(webhookTypeEntity));
         assertThat(webhookTypeResponses).isNotEmpty();
     }

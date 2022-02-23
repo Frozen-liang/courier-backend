@@ -1,0 +1,64 @@
+[
+  {
+    "id": "61e4cd12e973ed57cf565e3d",
+    "type": 2,
+    "defaultPayload": "{\n  \"id\": \"{{id}}\",\n  \"name\": \"{{name}}\",\n  \"success\": {{success}},\n  \"fail\": {{fail}}\n}",
+    "fieldDesc": [
+      {
+        "key": "id",
+        "desc": "定时任务Id",
+        "paramType": "string",
+        "example": "61e12d1798f62c4ba9ff4268"
+      },
+      {
+        "key": "name",
+        "desc": "定时任务名称",
+        "paramType": "string",
+        "example": "courier"
+      },
+      {
+        "key": "success",
+        "desc": "成功数量",
+        "paramType": "int",
+        "example": 10
+      },
+      {
+        "key": "fail",
+        "desc": "失败数量",
+        "paramType": "int",
+        "example": 0
+      },
+      {
+        "key": "metadata",
+        "desc": "请求头Metadata中的数据",
+        "paramType": "string",
+        "example": "metadata"
+      }
+    ]
+  },
+  {
+    "id": "62147cf60e5e467b5382864e",
+    "type": 3,
+    "defaultPayload": "{\n    \"id\": \"{{id}}\",\n    \"name\": \"{{name}}\"\n}",
+    "fieldDesc": [
+      {
+        "key": "id",
+        "desc": "定时任务Id",
+        "paramType": "string",
+        "example": "61e12d1798f62c4ba9ff4268"
+      },
+      {
+        "key": "name",
+        "desc": "定时任务名称",
+        "paramType": "string",
+        "example": "courier"
+      },
+      {
+        "key": "metadata",
+        "desc": "请求头Metadata中的数据",
+        "paramType": "string",
+        "example": "metadata"
+      }
+    ]
+  }
+]

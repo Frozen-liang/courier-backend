@@ -9,7 +9,8 @@ import java.util.stream.Collectors;
 public enum WebhookType implements EnumCommon {
     CASE_REPORT(0, "CaseReport"),
     SCENE_CASE_REPORT(1, "SceneCaseReport"),
-    SCHEDULE(2, "Scheduler");
+    SCHEDULE_END(2, "SchedulerEnd"),
+    SCHEDULE_START(3, "SchedulerStart");
 
     private final Integer code;
     private final String name;

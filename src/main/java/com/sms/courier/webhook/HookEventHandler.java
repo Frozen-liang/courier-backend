@@ -87,7 +87,7 @@ public class HookEventHandler implements InitializingBean, DisposableBean {
     }
 
     private boolean hasError(WebhookEvent<?> webhookEvent) {
-        if (webhookEvent.getWebhookType() == WebhookType.SCHEDULE.getCode()) {
+        if (webhookEvent.getWebhookType() == WebhookType.SCHEDULE_END.getCode()) {
             WebhookScheduleResponse webhookScheduleResponse = (WebhookScheduleResponse) webhookEvent.getData();
             return webhookScheduleResponse.getFail() > 0;
         }

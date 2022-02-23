@@ -106,6 +106,6 @@ public class ScheduleJobRecordListener {
             .metadata(scheduleRecord.getMetadata())
             .fail(scheduleRecord.getFail()).build();
         applicationEventPublisher
-            .publishEvent(WebhookEvent.create(WebhookType.SCHEDULE, webhookScheduleResponse));
+            .publishEvent(WebhookEvent.create(WebhookType.SCHEDULE_END, webhookScheduleResponse));
     }
 }

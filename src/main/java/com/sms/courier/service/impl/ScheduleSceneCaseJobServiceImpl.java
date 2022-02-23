@@ -37,6 +37,9 @@ import com.sms.courier.repository.ScheduleSceneCaseJobRepository;
 import com.sms.courier.service.DatabaseService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.ScheduleSceneCaseJobService;
+import com.sms.courier.webhook.WebhookEvent;
+import com.sms.courier.webhook.enums.WebhookType;
+import com.sms.courier.webhook.response.WebhookScheduleResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -158,6 +161,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
                 return;
             }
             repository.saveAll(scheduleSceneCaseJobEntities);
+            publishSchedulerStartEvent(scheduleEntity, metadata);
             for (ScheduleSceneCaseJobEntity scheduleSceneCaseJobEntity : scheduleSceneCaseJobEntities) {
                 this.dispatcherJob(scheduleSceneCaseJobEntity);
             }
@@ -167,6 +171,14 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
             log.error("Dispatcher schedule scene case job system exception.", e);
         }
 
+    }
+
+    private void publishSchedulerStartEvent(ScheduleEntity scheduleEntity, String metadata) {
+        WebhookScheduleResponse webhookScheduleResponse = WebhookScheduleResponse.builder()
+            .id(scheduleEntity.getId())
+            .name(scheduleEntity.getName()).metadata(metadata).build();
+        applicationEventPublisher
+            .publishEvent(WebhookEvent.create(WebhookType.SCHEDULE_START, webhookScheduleResponse));
     }
 
     private JobDataCollection createJobDataCollection(DataCollectionEntity dataCollectionEntity, TestData testData) {
