@@ -31,9 +31,11 @@ class SceneCaseApiMapperTest {
     private final ResponseHeadersVerificationMapper headersVerificationMapper =
         mock(ResponseHeadersVerificationMapper.class);
     private final ResponseResultVerificationMapper resultVerificationMapper =
-        mock(ResponseResultVerificationMapper.class);;
+        mock(ResponseResultVerificationMapper.class);
+    private final ParamInfoMapper paramInfoMapper = mock(ParamInfoMapper.class);
+    private final MatchParamInfoMapper matchParamInfoMapper = mock(MatchParamInfoMapper.class);
     private final SceneCaseApiMapper sceneCaseApiMapper = new SceneCaseApiMapperImpl(apiTestCaseMapper,
-        headersVerificationMapper,resultVerificationMapper);
+        headersVerificationMapper, resultVerificationMapper, paramInfoMapper, matchParamInfoMapper);
     private static final String MOCK_ID = "1";
 
     @Test
@@ -133,15 +135,15 @@ class SceneCaseApiMapperTest {
     @DisplayName("Test the apiTestCaseRequestToApiTestCaseEntity test method in the SceneCaseApiMapper")
     void apiTestCaseRequestToApiTestCaseEntity_test() {
         AddSceneCaseApiRequest addSceneCaseApiRequest = AddSceneCaseApiRequest.builder()
-                .apiTestCase(ApiTestCaseRequest.builder()
-                        .apiEntity(ApiRequest.builder()
-                                .requestHeaders(Lists.newArrayList(ParamInfoRequest.builder()
-                                        .paramType(ParamType.NUMBER.getCode())
-                                        .build()))
-                                .build())
-                        .tagId(Lists.newArrayList("tagId"))
-                        .build())
-                .build();
+            .apiTestCase(ApiTestCaseRequest.builder()
+                .apiEntity(ApiRequest.builder()
+                    .requestHeaders(Lists.newArrayList(ParamInfoRequest.builder()
+                        .paramType(ParamType.NUMBER.getCode())
+                        .build()))
+                    .build())
+                .tagId(Lists.newArrayList("tagId"))
+                .build())
+            .build();
         assertThat(sceneCaseApiMapper.toSceneCaseApi(addSceneCaseApiRequest)).isNotNull();
     }
 

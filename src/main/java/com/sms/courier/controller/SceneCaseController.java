@@ -4,6 +4,7 @@ import com.sms.courier.common.constant.Constants;
 import com.sms.courier.dto.request.AddCaseTemplateConnRequest;
 import com.sms.courier.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.courier.dto.request.AddSceneCaseRequest;
+import com.sms.courier.dto.request.CopyStepsRequest;
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseConnRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseRequest;
@@ -106,6 +107,12 @@ public class SceneCaseController {
     @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_API_CRE_UPD_DEL)")
     public List<SceneCaseApiConnResponse> removeRef(String id, String caseTemplateId, Integer order) {
         return sceneCaseService.removeRef(id, caseTemplateId, order);
+    }
+
+    @PostMapping("/copy-steps")
+    @PreAuthorize("hasRoleOrAdmin(@role.SCENE_CASE_API_CRE_UPD_DEL)")
+    public Boolean copySteps(@Validated @RequestBody CopyStepsRequest request) {
+        return sceneCaseService.copySteps(request);
     }
 
 }
