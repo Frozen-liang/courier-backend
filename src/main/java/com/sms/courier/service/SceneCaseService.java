@@ -4,6 +4,7 @@ import com.sms.courier.dto.request.AddCaseTemplateConnRequest;
 import com.sms.courier.dto.request.AddSceneCaseApiByIdsRequest;
 import com.sms.courier.dto.request.AddSceneCaseRequest;
 import com.sms.courier.dto.request.CopyStepsRequest;
+import com.sms.courier.dto.request.ReviewRequest;
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseConnRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseRequest;
@@ -44,4 +45,6 @@ public interface SceneCaseService {
     List<SceneCaseApiConnResponse> removeRef(String id, String caseTemplateId, int order);
 
     Boolean copySteps(CopyStepsRequest request);
+
+    Boolean review(ReviewRequest request);
 }

@@ -10,7 +10,6 @@ import static com.sms.courier.common.exception.ErrorCode.SEARCH_SCENE_CASE_ERROR
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -32,6 +31,7 @@ import com.sms.courier.dto.request.ApiTestCaseRequest;
 import com.sms.courier.dto.request.CopyStepsRequest;
 import com.sms.courier.dto.request.CopyStepsRequest.CaseOrderRequest;
 import com.sms.courier.dto.request.EnvDataCollConnRequest;
+import com.sms.courier.dto.request.ReviewRequest;
 import com.sms.courier.dto.request.SearchSceneCaseRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseApiConnRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseConnRequest;
@@ -61,6 +61,7 @@ import com.sms.courier.repository.CustomizedCaseTemplateApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseApiRepository;
 import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
+import com.sms.courier.repository.SceneCaseCommentRepository;
 import com.sms.courier.repository.SceneCaseRepository;
 import com.sms.courier.service.impl.SceneCaseServiceImpl;
 import com.sms.courier.utils.SecurityUtil;
@@ -105,6 +106,7 @@ class SceneCaseServiceTest {
     private DataCollectionMapper dataCollectionMapper;
     private ObjectMapper objectMapper = mock(ObjectMapper.class);
     private CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
+    private SceneCaseCommentRepository sceneCaseCommentRepository;
 
     private final static String MOCK_ID = new ObjectId().toString();
     private final static String MOCK_NAME = "test";
@@ -137,6 +139,7 @@ class SceneCaseServiceTest {
         dataCollectionService = mock(DataCollectionService.class);
         dataCollectionMapper = mock(DataCollectionMapper.class);
         customizedCaseTemplateApiRepository = mock(CustomizedCaseTemplateApiRepository.class);
+        sceneCaseCommentRepository = mock(SceneCaseCommentRepository.class);
         sceneCaseService = new SceneCaseServiceImpl(sceneCaseRepository,
             customizedSceneCaseRepository,
             sceneCaseMapper, sceneCaseApiService,
@@ -147,7 +150,7 @@ class SceneCaseServiceTest {
             sceneCaseApiMapper, caseTemplateApiMapper,
             caseApiCountHandler, matchParamInfoMapper,
             scheduleService, projectEnvironmentService, projectEnvironmentMapper, dataCollectionService,
-            dataCollectionMapper, objectMapper, customizedCaseTemplateApiRepository);
+            dataCollectionMapper, objectMapper, customizedCaseTemplateApiRepository, sceneCaseCommentRepository);
     }
 
     static {
@@ -626,6 +629,23 @@ class SceneCaseServiceTest {
             .caseOrderList(Lists.newArrayList(CaseOrderRequest.builder().caseId(MOCK_ID).order(MOCK_PAGE).build()))
             .build();
         assertThatThrownBy(()->sceneCaseService.copySteps(request)).isInstanceOf(ApiTestPlatformException.class);
+    }
+    @Test
+    @DisplayName("Test the review method in the SceneCase service")
+    public void review_thenRight() {
+        Optional<SceneCaseEntity> sceneCaseEntity = Optional.ofNullable(SceneCaseEntity.builder().id(MOCK_ID).build());
+        when(sceneCaseRepository.findById(any())).thenReturn(sceneCaseEntity);
+        ReviewRequest request = ReviewRequest.builder().comment(MOCK_NAME).reviewStatus(MOCK_PAGE).build();
+        Boolean isSuccess = sceneCaseService.review(request);
+        assertTrue(isSuccess);
+    }
+
+    @Test
+    @DisplayName("Test the review method in the SceneCase service")
+    public void review_thenException() {
+        when(sceneCaseRepository.findById(any())).thenThrow(new RuntimeException());
+        ReviewRequest request = ReviewRequest.builder().comment(MOCK_NAME).reviewStatus(MOCK_PAGE).build();
+        assertThatThrownBy(() -> sceneCaseService.review(request)).isInstanceOf(ApiTestPlatformException.class);
     }
 
     private AddCaseTemplateConnRequest getAddConnRequest() {

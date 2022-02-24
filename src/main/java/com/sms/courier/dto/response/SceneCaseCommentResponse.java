@@ -28,4 +28,6 @@ public class SceneCaseCommentResponse extends TreeResponse {
     private String createNickname;
 
     private String comment;
+
+    private Integer reviewStatus;
 }
