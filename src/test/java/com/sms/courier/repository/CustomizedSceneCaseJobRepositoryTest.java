@@ -33,19 +33,6 @@ class CustomizedSceneCaseJobRepositoryTest {
     private final static Long COUNT = 1L;
 
     @Test
-    @DisplayName("Test the page method in the CustomizedSceneCaseJobRepository")
-    void page_test() {
-        List<SceneCaseJobEntity> sceneCaseJobList = Lists
-            .newArrayList(SceneCaseJobEntity.builder().id(MOCK_ID).build());
-        when(mongoTemplate.find(any(Query.class), eq(SceneCaseJobEntity.class))).thenReturn(sceneCaseJobList);
-        when(mongoTemplate.count(any(Query.class), eq(SceneCaseJobEntity.class))).thenReturn(COUNT);
-        SceneCaseJobRequest request =
-            SceneCaseJobRequest.builder().sceneCaseId(MOCK_ID).userIds(Lists.newArrayList(MOCK_ID)).build();
-        Page<SceneCaseJobEntity> page = customizedSceneCaseJobRepository.page(request);
-        assertThat(page).isNotNull();
-    }
-
-    @Test
     @DisplayName("Test the getGroupDayCount method in the CommonStatisticsRepositoryTest")
     public void getGroupDayCount_test() {
         AggregationResults<CaseCountStatisticsResponse> results = mock(AggregationResults.class);

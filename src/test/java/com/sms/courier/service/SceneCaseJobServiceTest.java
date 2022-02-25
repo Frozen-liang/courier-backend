@@ -32,6 +32,7 @@ import com.sms.courier.entity.job.SceneCaseJobReport;
 import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
 import com.sms.courier.entity.job.common.JobDataCollection;
+import com.sms.courier.entity.mongo.CustomQuery;
 import com.sms.courier.entity.scenetest.CaseTemplateApiConn;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
@@ -229,8 +230,8 @@ class SceneCaseJobServiceTest {
     @Test
     @DisplayName("Test the page method in the SceneCaseJob service")
     void page_test() {
-        Page<SceneCaseJobEntity> sceneCaseJobPage = Page.empty(Pageable.unpaged());
-        when(customizedSceneCaseJobRepository.page(any())).thenReturn(sceneCaseJobPage);
+        Page<SceneCaseJobEntity> page = Page.empty(Pageable.unpaged());
+        when(commonRepository.page(any(CustomQuery.class), any(), any(Class.class))).thenReturn(page);
         SceneCaseJobRequest request =
             SceneCaseJobRequest.builder().sceneCaseId(MOCK_ID).userIds(Lists.newArrayList(MOCK_ID)).build();
         Page<SceneCaseJobResponse> responsePage = sceneCaseJobService.page(request);
@@ -240,7 +241,7 @@ class SceneCaseJobServiceTest {
     @Test
     @DisplayName("Test the page method in the SceneCaseJob service thrown exception")
     void page_test_thrownException() {
-        when(customizedSceneCaseJobRepository.page(any()))
+        when(commonRepository.page(any(CustomQuery.class), any(), any(Class.class)))
             .thenThrow(new ApiTestPlatformException(GET_SCENE_CASE_JOB_PAGE_ERROR));
         SceneCaseJobRequest request =
             SceneCaseJobRequest.builder().sceneCaseId(MOCK_ID).userIds(Lists.newArrayList(MOCK_ID)).build();
