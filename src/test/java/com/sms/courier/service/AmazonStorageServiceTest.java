@@ -13,12 +13,9 @@ import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static com.sms.courier.common.exception.ErrorCode.DELETE_AWS3_SETTING_BY_ID_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.EDIT_AWS3_SETTING_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
