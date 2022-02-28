@@ -10,8 +10,11 @@ import static com.sms.courier.utils.Assert.isTrue;
 
 import com.google.common.collect.Lists;
 import com.sms.courier.common.annotation.JobServiceType;
+import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.enums.JobType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.field.CommonField;
+import com.sms.courier.common.field.SceneField;
 import com.sms.courier.dto.request.AddSceneCaseJobRequest;
 import com.sms.courier.dto.request.SceneCaseJobRequest;
 import com.sms.courier.dto.request.TestDataRequest;
@@ -27,6 +30,7 @@ import com.sms.courier.entity.job.common.JobDataCollection;
 import com.sms.courier.entity.job.common.JobEntity;
 import com.sms.courier.entity.job.common.JobEnvironment;
 import com.sms.courier.entity.job.common.JobReport;
+import com.sms.courier.entity.mongo.CustomQuery;
 import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
@@ -51,15 +55,18 @@ import com.sms.courier.webhook.WebhookEvent;
 import com.sms.courier.webhook.enums.WebhookType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.mongodb.core.query.Criteria;
 
 @Slf4j
 @JobServiceType(type = JobType.SCENE_CASE)
@@ -102,7 +109,17 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
     @Override
     public Page<SceneCaseJobResponse> page(SceneCaseJobRequest sceneCaseJobRequest) {
         try {
-            return customizedSceneCaseJobRepository.page(sceneCaseJobRequest).map(jobMapper::toSceneCaseJobResponse);
+            List<Optional<Criteria>> criteriaList = new ArrayList<>();
+            criteriaList.add(CommonField.CREATE_USER_ID.in(sceneCaseJobRequest.getUserIds()));
+            criteriaList.add(SceneField.SCENE_CASE_ID.is(sceneCaseJobRequest.getSceneCaseId()));
+            criteriaList.add(SceneField.CASE_TEMPLATE_ID.is(sceneCaseJobRequest.getCaseTemplateId()));
+            criteriaList.add(SceneField.JOB_ENV_ID.in(sceneCaseJobRequest.getEnvId()));
+            criteriaList.add(
+                CommonField.JOB_STATUS.in(Lists.newArrayList(JobStatus.SUCCESS.getCode(), JobStatus.FAIL.getCode())));
+            CustomQuery customQuery = new CustomQuery();
+            customQuery.setCriteriaList(criteriaList);
+            return commonRepository.page(customQuery, sceneCaseJobRequest, SceneCaseJobEntity.class)
+                .map(jobMapper::toSceneCaseJobResponse);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseJob page!", e);
             throw new ApiTestPlatformException(GET_SCENE_CASE_JOB_PAGE_ERROR);
