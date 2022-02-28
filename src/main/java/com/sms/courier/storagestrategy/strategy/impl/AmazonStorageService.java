@@ -26,9 +26,10 @@ import org.springframework.web.multipart.MultipartFile;
 @StorageStrategy(type = StorageType.AMAZON)
 @Slf4j
 public class AmazonStorageService implements FileStorageService, InitializingBean {
+
     private final AmazonStorageSettingRepository amazonStorageSettingRepository;
     private AmazonS3 amazonS3;
-    private final String bucketNamePre = "sms-courier";
+    private String bucketName;
 
     public AmazonStorageService(AmazonStorageSettingRepository amazonStorageSettingRepository) {
         this.amazonStorageSettingRepository = amazonStorageSettingRepository;
@@ -37,18 +38,13 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
     @Override
     public boolean store(FileInfoEntity fileInfo, MultipartFile file) {
         check();
-        String key = fileInfo.getId() + file.getOriginalFilename();
+        String key = fileInfo.getId() + "-" + file.getOriginalFilename();
         try {
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentType(file.getContentType());
             objectMetadata.setContentLength(file.getSize());
-            String bucketName = bucketNamePre + fileInfo.getProjectId();
-            boolean exists = amazonS3.doesBucketExistV2(bucketName);
-            if (!exists) {
-                amazonS3.createBucket(bucketName);
-            }
             amazonS3.putObject(new PutObjectRequest(bucketName, key, file.getInputStream(), objectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
+                .withCannedAcl(CannedAccessControlList.PublicRead));
             fileInfo.setSourceId(key);
         } catch (AmazonServiceException e) {
             log.error(e.getMessage());
@@ -72,12 +68,11 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
     public Boolean delete(FileInfoEntity fileInfo) {
         try {
             check();
-            String bucketName = bucketNamePre + fileInfo.getProjectId();
             amazonS3.deleteObject(bucketName, fileInfo.getSourceId());
             return true;
         } catch (AmazonServiceException e) {
-            log.error(e.getMessage());
-            throw e;
+            log.warn("Delete amazon s3 file error!", e);
+            return true;
         } catch (Exception e) {
             log.error("Amazon delete error!", e);
             throw ExceptionUtils.mpe("Delete error!");
@@ -88,11 +83,11 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
     public DownloadModel download(FileInfoEntity fileInfo) {
         try {
             check();
-            S3Object s3Object = amazonS3.getObject(bucketNamePre + fileInfo.getProjectId(), fileInfo.getSourceId());
+            S3Object s3Object = amazonS3.getObject(bucketName, fileInfo.getSourceId());
             return DownloadModel.builder()
-                    .filename(fileInfo.getFilename())
-                    .contentType(s3Object.getObjectMetadata().getContentType())
-                    .inputStream(s3Object.getObjectContent()).build();
+                .filename(fileInfo.getFilename())
+                .contentType(s3Object.getObjectMetadata().getContentType())
+                .inputStream(s3Object.getObjectContent()).build();
         } catch (AmazonServiceException e) {
             log.error(e.getMessage());
             throw e;
@@ -124,13 +119,14 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
             amazonS3 = null;
             return;
         }
+        bucketName = amazonStorageSettingEntity.getBucketName();
         String accessKeyId = AesUtil.decrypt(amazonStorageSettingEntity.getAccessKeyId());
         String accessKeyIdSecret = AesUtil.decrypt(amazonStorageSettingEntity.getAccessKeySecret());
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKeyId, accessKeyIdSecret);
         amazonS3 = AmazonS3Client.builder()
-                .withRegion(amazonStorageSettingEntity.getRegion())
-                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-                .build();
+            .withRegion(amazonStorageSettingEntity.getRegion())
+            .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+            .build();
     }
 
     @Override

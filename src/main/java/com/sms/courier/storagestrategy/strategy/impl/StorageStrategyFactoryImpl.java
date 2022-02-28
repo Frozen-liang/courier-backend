@@ -27,13 +27,18 @@ public class StorageStrategyFactoryImpl implements StorageStrategyFactory, Initi
     }
 
     @Override
+    public FileStorageService fetchStorageStrategy(StorageType type) {
+        return storageStrategyMap.get(type);
+    }
+
+    @Override
     public void afterPropertiesSet() {
         Map<String, Object> beans = this.applicationContext
-                .getBeansWithAnnotation(StorageStrategy.class);
+            .getBeansWithAnnotation(StorageStrategy.class);
         this.storageStrategyMap = beans.values().stream()
-                .map(FileStorageService.class::cast)
-                .collect(Collectors.toMap(strategy -> AnnotationUtils
-                        .findAnnotation(strategy.getClass(), StorageStrategy.class).type(), Function.identity()));
+            .map(FileStorageService.class::cast)
+            .collect(Collectors.toMap(strategy -> AnnotationUtils
+                .findAnnotation(strategy.getClass(), StorageStrategy.class).type(), Function.identity()));
     }
 
     @Override

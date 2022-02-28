@@ -44,6 +44,7 @@ import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.engine.enums.EngineStatus;
 import com.sms.courier.generator.enums.CodeType;
 import com.sms.courier.security.pojo.CustomUser;
+import com.sms.courier.storagestrategy.StorageType;
 import com.sms.courier.webhook.enums.WebhookType;
 import java.time.Duration;
 import java.util.List;
@@ -133,7 +134,7 @@ public class MongoCustomConverterConfiguration {
                 IntegerToCaseTypeConverter.INSTANCE, IntegerToContainerStatusConverter.INSTANCE,
                 IntegerToWebhookTypeConverter.INSTANCE, IntegerToDataBaseTypeConverter.INSTANCE,
                 IntegerToCodeTypeConverter.INSTANCE, IntegerToTemplateTypeConverter.INSTANCE,
-                IntegerToReviewStatusConverter.INSTANCE);
+                IntegerToReviewStatusConverter.INSTANCE, IntegerToStorageTypeConverter.INSTANCE);
 
         return new MongoCustomConversions(converters);
     }
@@ -553,6 +554,15 @@ public class MongoCustomConverterConfiguration {
 
         public ReviewStatus convert(@NonNull Integer code) {
             return ReviewStatus.getType(code);
+        }
+    }
+
+    @ReadingConverter
+    enum IntegerToStorageTypeConverter implements Converter<Integer, StorageType> {
+        INSTANCE;
+
+        public StorageType convert(@NonNull Integer code) {
+            return StorageType.getType(code);
         }
     }
 

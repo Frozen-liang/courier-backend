@@ -1,5 +1,13 @@
 package com.sms.courier.storagestrategy;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -17,26 +25,19 @@ import com.sms.courier.repository.AmazonStorageSettingRepository;
 import com.sms.courier.storagestrategy.model.DownloadModel;
 import com.sms.courier.storagestrategy.strategy.impl.AmazonStorageService;
 import com.sms.courier.utils.AesUtil;
+import java.io.IOException;
+import java.io.InputStream;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
-import java.io.InputStream;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class AmazonStorageServiceTest {
 
     private final AmazonStorageSettingRepository amazonStorageSettingRepository
-            = mock(AmazonStorageSettingRepository.class);
+        = mock(AmazonStorageSettingRepository.class);
     private final AmazonStorageService amazonStorageService = new AmazonStorageService(amazonStorageSettingRepository);
     private static final AmazonS3 amazonS3 = mock(AmazonS3.class);
     private final ObjectMetadata objectMetadata = mock(ObjectMetadata.class);
@@ -104,7 +105,7 @@ public class AmazonStorageServiceTest {
         S3Object s3Object = mock(S3Object.class);
         when(fileInfo.getSourceId()).thenReturn(ID);
         when(fileInfo.getFilename()).thenReturn(NAME);
-        when(amazonS3.getObject(anyString(),anyString())).thenReturn(s3Object);
+        when(amazonS3.getObject(any(), anyString())).thenReturn(s3Object);
         when(s3Object.getObjectContent()).thenReturn(s3ObjectInputStream);
         when(s3Object.getObjectMetadata()).thenReturn(objectMetadata);
         assertThat(amazonStorageService.download(fileInfo)).isNotNull();
@@ -121,11 +122,12 @@ public class AmazonStorageServiceTest {
     @DisplayName("Test the update method in the AmazonStorageService")
     public void update() {
         createS3Client();
-        assertThat(amazonStorageService.update(fileInfo,multipartFile)).isTrue();
+        assertThat(amazonStorageService.update(fileInfo, multipartFile)).isTrue();
     }
 
     public void createS3Client() {
-        AmazonStorageSettingEntity amazonStorage = AmazonStorageSettingEntity.builder().accessKeyId(AesUtil.encrypt(
+        AmazonStorageSettingEntity amazonStorage =
+            AmazonStorageSettingEntity.builder().bucketName("bucketName").accessKeyId(AesUtil.encrypt(
                 KEY)).region(REGION).accessKeySecret(AesUtil.encrypt(KEY)).build();
         amazonStorageService.createS3Client(amazonStorage);
     }

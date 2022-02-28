@@ -17,7 +17,6 @@ import com.sms.courier.security.TokenType;
 import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.utils.SecurityUtil;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,10 +93,10 @@ class CustomizedFileRepositoryTest {
         FileInfoEntity fileInfo = FileInfoEntity.builder().id(ObjectId.get().toString()).build();
         GridFSFile gridFSFile = createGridFsFile();
         when(gridFsTemplate.findOne(any())).thenReturn(gridFSFile);
-        when(testFile.getInputStream()).thenReturn(InputStream.nullInputStream());
+        when(testFile.getInputStream()).thenReturn(null);
         when(testFile.getOriginalFilename()).thenReturn("test.txt");
         when(testFile.getContentType()).thenReturn("application/octet-stream");
-        when(gridFsTemplate.store(any())).thenReturn(ObjectId.get());
+        when(gridFsTemplate.store(any(), anyString(), anyString())).thenReturn(ObjectId.get());
         assertThat(customizedFileRepository.updateTestFile(fileInfo,testFile)).isTrue();
     }
 
