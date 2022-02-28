@@ -71,7 +71,7 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
             amazonS3.deleteObject(bucketName, fileInfo.getSourceId());
             return true;
         } catch (AmazonServiceException e) {
-            log.error("Delete error!", e);
+            log.warn("Delete amazon s3 file error!", e);
             return true;
         } catch (Exception e) {
             log.error("Amazon delete error!", e);
