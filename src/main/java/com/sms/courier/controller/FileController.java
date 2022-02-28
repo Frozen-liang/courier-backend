@@ -6,12 +6,12 @@ import com.sms.courier.common.validate.UpdateGroup;
 import com.sms.courier.dto.request.TestFileRequest;
 import com.sms.courier.dto.response.FileInfoResponse;
 import com.sms.courier.service.FileService;
+import com.sms.courier.storagestrategy.model.DownloadModel;
 import com.sms.courier.utils.ResponseUtil;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
-import org.bson.types.ObjectId;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -34,10 +34,17 @@ public class FileController {
         this.fileService = fileService;
     }
 
+    @GetMapping("/region")
+    @ResponseBody
+    @PreAuthorize("hasRoleOrAdmin(@role.FILE_QUERY_ALL)")
+    public Map<String, String> getAllRegion() {
+        return fileService.getAllRegion();
+    }
+
     @GetMapping("/list/{projectId}")
     @ResponseBody
     @PreAuthorize("hasRoleOrAdmin(@role.FILE_QUERY_ALL)")
-    public List<FileInfoResponse> list(@PathVariable("projectId") ObjectId projectId) {
+    public List<FileInfoResponse> list(@PathVariable("projectId") String projectId) {
         return fileService.list(projectId);
     }
 
@@ -58,9 +65,9 @@ public class FileController {
     @GetMapping(value = "/download/{id}")
     @PreAuthorize("hasRoleOrAdmin(@role.FILE_CRE_UPD_DEL)")
     public void downloadTestFile(@PathVariable("id") String id, HttpServletResponse response) {
-        GridFsResource gridFsResource = fileService.downloadTestFile(id);
-        ResponseUtil.export(response, ResponseUtil.getInputStream(gridFsResource), gridFsResource.getFilename(),
-            gridFsResource.getContentType());
+        DownloadModel downloadModel = fileService.downloadTestFile(id);
+        ResponseUtil.export(response, downloadModel.getInputStream(), downloadModel.getFilename(),
+                downloadModel.getContentType());
     }
 
     @GetMapping(value = "/download/data-collection-template")
@@ -73,10 +80,10 @@ public class FileController {
 
     @GetMapping(value = "/stream/{id}")
     public void getOutputStream(@PathVariable("id") String id, HttpServletResponse response) {
-        GridFsResource gridFsResource = fileService.downloadTestFile(id);
-        response.setContentType(gridFsResource.getContentType());
-        response.setHeader("filename", gridFsResource.getFilename());
-        ResponseUtil.write(response, ResponseUtil.getInputStream(gridFsResource));
+        DownloadModel downloadModel = fileService.downloadTestFile(id);
+        response.setContentType(downloadModel.getContentType());
+        response.setHeader("filename", downloadModel.getFilename());
+        ResponseUtil.write(response, downloadModel.getInputStream());
     }
 
     @DeleteMapping("/{id}")

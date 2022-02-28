@@ -19,10 +19,10 @@ public class TestFileRequest {
 
     @NotNull(groups = UpdateGroup.class, message = "The id must not be null.")
     @Null(groups = InsertGroup.class, message = "The id must be null.")
-    private ObjectId id;
+    private String id;
 
     @NotNull(groups = {InsertGroup.class}, message = "The projectId must not be null.")
-    private ObjectId projectId;
+    private String projectId;
 
     @NotNull(groups = {UpdateGroup.class, InsertGroup.class}, message = "The testFile must not be null.")
     private MultipartFile testFile;
