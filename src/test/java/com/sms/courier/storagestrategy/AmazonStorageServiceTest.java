@@ -1,8 +1,6 @@
 package com.sms.courier.storagestrategy;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
@@ -13,29 +11,20 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
-import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.entity.file.AmazonStorageSettingEntity;
 import com.sms.courier.entity.file.FileInfoEntity;
 import com.sms.courier.repository.AmazonStorageSettingRepository;
-import com.sms.courier.security.TokenType;
-import com.sms.courier.security.pojo.CustomUser;
 import com.sms.courier.storagestrategy.model.DownloadModel;
 import com.sms.courier.storagestrategy.strategy.impl.AmazonStorageService;
 import com.sms.courier.utils.AesUtil;
-import com.sms.courier.utils.SecurityUtil;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDate;
-import java.util.Collections;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
