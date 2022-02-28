@@ -317,9 +317,13 @@ public enum ErrorCode {
     ADD_SCENE_CASE_COMMENT_ERROR("4292", "Failed to add the SceneCaseComment!"),
     GET_SCENE_CASE_COMMENT_LIST_ERROR("4293", "Failed to get the SceneCaseComment list!"),
     DELETE_SCENE_CASE_COMMENT_BY_ID_ERROR("4294", "Failed to delete the SceneCaseComment!"),
-    EXPORT_DATA_COLLECTION_ERROR("4292", "Failed to export the DataCollection!"),
-    DATA_COLLECTION_NOTEXITS_ERROR("4293", "The dataCollection not exits. id = %s"),
-    COPY_SCENE_STEPS_ERROR("4294", "Failed to copy scene steps!"),
+    EXPORT_DATA_COLLECTION_ERROR("4295", "Failed to export the DataCollection!"),
+    DATA_COLLECTION_NOTEXITS_ERROR("4296", "The dataCollection not exits. id = %s"),
+    COPY_SCENE_STEPS_ERROR("4297", "Failed to copy scene steps!"),
+    QUERY_AWS3_SETTING_API_ERROR("4297", "Failed to query the AmazonStorageSetting!"),
+    EDIT_AWS3_SETTING_ERROR("4298", "Failed to edit the AmazonStorageSetting!"),
+    DELETE_AWS3_SETTING_BY_ID_ERROR("4299", "Failed to delete the AmazonStorageSetting!"),
+    BUCKET_NOT_EXIST_ERROR("4300", "The %s not found. id=%s"),
 
     // 50001 - 51000 describes code generate exception
     FILE_FILL_THE_CONTENT_ERROR("50001", "File fill the content error!"),

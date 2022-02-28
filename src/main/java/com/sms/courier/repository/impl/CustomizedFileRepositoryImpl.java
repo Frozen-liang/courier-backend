@@ -2,20 +2,17 @@ package com.sms.courier.repository.impl;
 
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.field.CommonField.ID;
-import static com.sms.courier.common.field.CommonField.PROJECT_ID;
-
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
-import com.sms.courier.dto.request.TestFileRequest;
+import com.sms.courier.entity.file.FileInfoEntity;
 import com.sms.courier.repository.CustomizedFileRepository;
 import com.sms.courier.utils.ExceptionUtils;
-import com.sms.courier.utils.SecurityUtil;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -45,38 +42,40 @@ public class CustomizedFileRepositoryImpl implements CustomizedFileRepository {
     }
 
     @Override
-    public String insertTestFile(TestFileRequest testFileRequest) throws IOException {
-        MultipartFile testFile = testFileRequest.getTestFile();
-        Document document = new Document();
-        document.put(PROJECT_ID.getName(), testFileRequest.getProjectId());
-        document.put("userId", new ObjectId(SecurityUtil.getCurrUserId()));
-        document.put("uploadUser", SecurityUtil.getCurrentUser().getUsername());
-        ObjectId id = gridFsTemplate
-            .store(testFile.getInputStream(), testFile.getOriginalFilename(), testFile.getContentType(), document);
-        return id.toString();
+    public String insertTestFile(MultipartFile multipartFile) {
+        try {
+            ObjectId id = gridFsTemplate.store(
+                    multipartFile.getInputStream(),
+                    multipartFile.getOriginalFilename(),
+                    multipartFile.getContentType());
+            return id.toString();
+        } catch (IOException e) {
+            throw ExceptionUtils.mpe("Get file InputStream error!");
+        }
     }
 
     @Override
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-    public Boolean updateTestFile(TestFileRequest testFileRequest) throws IOException {
-        ObjectId id = testFileRequest.getId();
-        Query query = new Query();
-        ID.is(id).ifPresent(query::addCriteria);
-        GridFSFile gridFsFile = gridFsTemplate.findOne(query);
-        if (Objects.isNull(gridFsFile)) {
-            throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "TestFile", id.toString());
+    public Boolean updateTestFile(FileInfoEntity fileInfo, MultipartFile multipartFile) {
+        try {
+            String id = fileInfo.getSourceId();
+            Query query = new Query();
+            ID.is(id).ifPresent(query::addCriteria);
+            GridFSFile gridFsFile = gridFsTemplate.findOne(query);
+            if (Objects.isNull(gridFsFile)) {
+                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "TestFile", id.toString());
+            }
+            gridFsTemplate.delete(query);
+            InputStream inputStream = multipartFile.getInputStream();
+            GridFsUpload<String> gridFsUpload = GridFsUpload.fromStream(inputStream)
+                    .id(id).contentType(Objects.requireNonNull(multipartFile.getContentType()))
+                    .filename(Objects.requireNonNull(multipartFile.getOriginalFilename())).build();
+            gridFsTemplate.store(gridFsUpload);
+            return true;
+        } catch (IOException e) {
+            throw ExceptionUtils.mpe("The file is error!");
         }
-        gridFsTemplate.delete(query);
-        Document document = Objects.requireNonNullElse(gridFsFile.getMetadata(), new Document());
-        document.put("userId", new ObjectId(SecurityUtil.getCurrUserId()));
-        document.put("uploadUser", SecurityUtil.getCurrentUser().getUsername());
-        MultipartFile testFile = testFileRequest.getTestFile();
-        GridFsUpload<ObjectId> gridFsUpload = GridFsUpload.fromStream(testFile.getInputStream())
-            .id(id).contentType(Objects.requireNonNull(testFile.getContentType()))
-            .filename(Objects.requireNonNull(testFile.getOriginalFilename()))
-            .metadata(document).build();
-        gridFsTemplate.store(gridFsUpload);
-        return true;
+
     }
 
     @Override

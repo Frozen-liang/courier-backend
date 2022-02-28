@@ -83,7 +83,8 @@ public enum OperationModule implements EnumCommon {
     DATABASE(34, DatabaseEntity.class),
     GENERATOR_TEMPLATE(35, GeneratorTemplateEntity.class),
     OAUTH_SETTING(36, OAuthSettingEntity.class),
-    OPEN_API_SETTING(37, OpenApiSettingEntity.class);
+    OPEN_API_SETTING(37, OpenApiSettingEntity.class),
+    AWS3_SETTING(38, OpenApiSettingEntity.class);
 
     private static final Map<Integer, OperationModule> MAPPINGS =
         Arrays.stream(values()).sequential().collect(Collectors.toMap(OperationModule::getCode, Function.identity()));

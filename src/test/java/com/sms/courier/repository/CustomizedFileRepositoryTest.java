@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.sms.courier.dto.request.TestFileRequest;
+import com.sms.courier.entity.file.FileInfoEntity;
 import com.sms.courier.repository.impl.CustomizedFileRepositoryImpl;
 import com.sms.courier.security.TokenType;
 import com.sms.courier.security.pojo.CustomUser;
@@ -38,8 +39,9 @@ class CustomizedFileRepositoryTest {
 
     private final GridFsTemplate gridFsTemplate = mock(GridFsTemplate.class);
     private final CustomizedFileRepository customizedFileRepository = new CustomizedFileRepositoryImpl(gridFsTemplate);
+    private final MultipartFile multipartFile = mock(MultipartFile.class);
     private static final int TOTAL_ELEMENTS = 20;
-    private final ObjectId projectId = ObjectId.get();
+    private final String projectId = ObjectId.get().toString();
     private static final String ID = ObjectId.get().toString();
 
     private final static MockedStatic<SecurityUtil> SECURITY_UTIL_MOCKED_STATIC;
@@ -75,28 +77,28 @@ class CustomizedFileRepositoryTest {
     @DisplayName("Test the insertTestFile method in the CustomizedFileRepository")
     public void insertTestFile_test() throws IOException {
         TestFileRequest testFileRequest = TestFileRequest.builder().projectId(projectId).build();
-        MultipartFile testFile = mock(MultipartFile.class);
-        testFileRequest.setTestFile(testFile);
-        when(testFile.getInputStream()).thenReturn(null);
-        when(testFile.getOriginalFilename()).thenReturn("test.txt");
-        when(testFile.getContentType()).thenReturn("application/octet-stream");
-        when(gridFsTemplate.store(any(), anyString(), anyString(), any())).thenReturn(ObjectId.get());
-        assertThat(customizedFileRepository.insertTestFile(testFileRequest)).isNotNull();
+        testFileRequest.setTestFile(multipartFile);
+        when(multipartFile.getInputStream()).thenReturn(null);
+        when(multipartFile.getOriginalFilename()).thenReturn("test.txt");
+        when(multipartFile.getContentType()).thenReturn("application/octet-stream");
+        when(gridFsTemplate.store(any(), anyString(), anyString())).thenReturn(ObjectId.get());
+        assertThat(customizedFileRepository.insertTestFile(multipartFile)).isNotNull();
     }
 
     @Test
     @DisplayName("Test the updateTestFile method in the CustomizedFileRepository")
     public void updateTestFile_test() throws IOException {
-        TestFileRequest testFileRequest = TestFileRequest.builder().id(ObjectId.get()).projectId(projectId).build();
+        TestFileRequest testFileRequest = TestFileRequest.builder().id(ObjectId.get().toString()).projectId(projectId).build();
         MultipartFile testFile = mock(MultipartFile.class);
         testFileRequest.setTestFile(testFile);
+        FileInfoEntity fileInfo = FileInfoEntity.builder().id(ObjectId.get().toString()).build();
         GridFSFile gridFSFile = createGridFsFile();
         when(gridFsTemplate.findOne(any())).thenReturn(gridFSFile);
         when(testFile.getInputStream()).thenReturn(InputStream.nullInputStream());
         when(testFile.getOriginalFilename()).thenReturn("test.txt");
         when(testFile.getContentType()).thenReturn("application/octet-stream");
         when(gridFsTemplate.store(any())).thenReturn(ObjectId.get());
-        assertThat(customizedFileRepository.updateTestFile(testFileRequest)).isTrue();
+        assertThat(customizedFileRepository.updateTestFile(fileInfo,testFile)).isTrue();
     }
 
     @Test

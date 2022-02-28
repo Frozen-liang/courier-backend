@@ -189,4 +189,7 @@ public class Role {
     public static final String SCENE_CASE_COMMENT_QUERY_ALL = "Scene_Case_Comment" + QUERY_ALL;
     public static final String SCENE_CASE_COMMENT_QUERY_OWN = "Scene_Case_Comment" + QUERY_OWN;
 
+    // Aws3 Setting
+    public static final String AWS3_SETTING_CRE_UPD_DEL = "Aws3_Setting" + CRE_UPD_DEL;
+    public static final String AWS3_SETTING_QUERY_ALL = "Aws3_Setting" + QUERY_ALL;
 }

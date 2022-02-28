@@ -42,6 +42,7 @@ public class Constants {
     public static final String NOTIFICATION_TEMPLATE_PATH = SDK_VERSION + "/notification-template";
     public static final String EMAIL_SERVICE_PATH = SDK_VERSION + "/email-service";
     public static final String LOGIN_SETTING_PATH = SDK_VERSION + "/login-setting";
+    public static final String AMAZON_STORAGE_SETTING_PATH = SDK_VERSION + "/amazon-setting";
     public static final String CHECK_HEALTH = SDK_VERSION + "/check-health";
     public static final String SCHEDULE_RECORD_PATH = SDK_VERSION + "/schedule-record";
     public static final String SCHEDULE_JOB_PATH = SDK_VERSION + "/schedule-job";
