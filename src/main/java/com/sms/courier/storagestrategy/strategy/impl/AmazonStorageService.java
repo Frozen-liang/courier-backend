@@ -71,6 +71,7 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
     @Override
     public Boolean delete(FileInfoEntity fileInfo) {
         try {
+            check();
             String bucketName = bucketNamePre + fileInfo.getProjectId();
             amazonS3.deleteObject(bucketName, fileInfo.getSourceId());
             return true;
@@ -86,6 +87,7 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
     @Override
     public DownloadModel download(FileInfoEntity fileInfo) {
         try {
+            check();
             S3Object s3Object = amazonS3.getObject(bucketNamePre + fileInfo.getProjectId(), fileInfo.getSourceId());
             return DownloadModel.builder()
                     .filename(fileInfo.getFilename())
@@ -102,6 +104,7 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
 
     @Override
     public boolean update(FileInfoEntity fileInfo, MultipartFile file) {
+        check();
         delete(fileInfo);
         store(fileInfo, file);
         return Boolean.TRUE;
@@ -123,8 +126,7 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
         }
         String accessKeyId = AesUtil.decrypt(amazonStorageSettingEntity.getAccessKeyId());
         String accessKeyIdSecret = AesUtil.decrypt(amazonStorageSettingEntity.getAccessKeySecret());
-        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(
-                accessKeyId, accessKeyIdSecret);
+        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKeyId, accessKeyIdSecret);
         amazonS3 = AmazonS3Client.builder()
                 .withRegion(amazonStorageSettingEntity.getRegion())
                 .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
