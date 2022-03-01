@@ -325,10 +325,10 @@ public enum ErrorCode {
     DELETE_AWS3_SETTING_BY_ID_ERROR("4299", "Failed to delete the AmazonStorageSetting!"),
     BUCKET_NOT_EXIST_ERROR("4300", "The %s not found. id=%s"),
     CONFIG_AMAZON_SERVICE_ERROR("4301", "The amazonS3 not config!"),
-    STORE_AMAZON_SERVICE_ERROR("4302", "Failed to store the AmazonStorageService!"),
-    DELETE_AMAZON_SERVICE_ERROR("4303", "Failed to delete the AmazonStorageService!"),
-    DOWNLOAD_AMAZON_SERVICE_ERROR("4304", "Failed to download the AmazonStorageService!"),
-    UPDATE_AMAZON_SERVICE_ERROR("4305", "Failed to update the AmazonStorageService!"),
+    STORE_AMAZON_SERVICE_ERROR("4302", "Failed to store the File!"),
+    DELETE_AMAZON_SERVICE_ERROR("4303", "Failed to delete the File!"),
+    DOWNLOAD_AMAZON_SERVICE_ERROR("4304", "Failed to download the File!"),
+    UPDATE_AMAZON_SERVICE_ERROR("4305", "Failed to update the File!"),
 
     // 50001 - 51000 describes code generate exception
     FILE_FILL_THE_CONTENT_ERROR("50001", "File fill the content error!"),

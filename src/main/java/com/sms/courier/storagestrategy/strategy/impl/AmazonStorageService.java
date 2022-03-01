@@ -53,7 +53,7 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
                     .withCannedAcl(CannedAccessControlList.PublicRead));
             fileInfo.setSourceId(key);
         } catch (AmazonServiceException e) {
-            log.error("Failed to store the AmazonStorageService!", e);
+            log.error("Failed to store the File!", e);
             throw ExceptionUtils.mpe(STORE_AMAZON_SERVICE_ERROR);
         }
         return Boolean.TRUE;
@@ -73,10 +73,10 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
             amazonS3.deleteObject(bucketName, fileInfo.getSourceId());
             return true;
         } catch (AmazonServiceException e) {
-            log.warn("Failed to delete the AmazonStorageService!", e);
+            log.warn("Failed to delete the File!", e);
             return true;
         } catch (Exception e) {
-            log.error("Failed to delete the AmazonStorageService!", e);
+            log.error("Failed to delete the File!", e);
             throw ExceptionUtils.mpe(DELETE_AMAZON_SERVICE_ERROR);
         }
     }
@@ -91,7 +91,7 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
                     .contentType(s3Object.getObjectMetadata().getContentType())
                     .inputStream(s3Object.getObjectContent()).build();
         } catch (Exception e) {
-            log.error("Failed to download the AmazonStorageService!", e);
+            log.error("Failed to download the File!", e);
             throw ExceptionUtils.mpe(DOWNLOAD_AMAZON_SERVICE_ERROR);
         }
     }
@@ -118,7 +118,7 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
             amazonS3 = null;
             return;
         }
-        bucketName = amazonStorageSettingEntity.getBucketName() + "/upload";
+        bucketName = amazonStorageSettingEntity.getBucketName() + "/courier";
         String accessKeyId = AesUtil.decrypt(amazonStorageSettingEntity.getAccessKeyId());
         String accessKeyIdSecret = AesUtil.decrypt(amazonStorageSettingEntity.getAccessKeySecret());
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKeyId, accessKeyIdSecret);
