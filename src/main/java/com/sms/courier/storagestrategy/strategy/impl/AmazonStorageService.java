@@ -1,5 +1,9 @@
 package com.sms.courier.storagestrategy.strategy.impl;
 
+import static com.sms.courier.common.exception.ErrorCode.CONFIG_AMAZON_SERVICE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DELETE_AMAZON_SERVICE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DOWNLOAD_AMAZON_SERVICE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.STORE_AMAZON_SERVICE_ERROR;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -19,6 +23,7 @@ import com.sms.courier.storagestrategy.strategy.StorageStrategy;
 import com.sms.courier.utils.AesUtil;
 import com.sms.courier.utils.ExceptionUtils;
 import java.io.IOException;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +40,7 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
         this.amazonStorageSettingRepository = amazonStorageSettingRepository;
     }
 
+    @SneakyThrows(IOException.class)
     @Override
     public boolean store(FileInfoEntity fileInfo, MultipartFile file) {
         check();
@@ -44,23 +50,19 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
             objectMetadata.setContentType(file.getContentType());
             objectMetadata.setContentLength(file.getSize());
             amazonS3.putObject(new PutObjectRequest(bucketName, key, file.getInputStream(), objectMetadata)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
             fileInfo.setSourceId(key);
         } catch (AmazonServiceException e) {
-            log.error(e.getMessage());
-            throw e;
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        } catch (Exception e) {
-            log.error("Amazon store error!", e);
-            throw ExceptionUtils.mpe("Store error!");
+            log.error("Failed to store the AmazonStorageService!", e);
+            throw ExceptionUtils.mpe(STORE_AMAZON_SERVICE_ERROR);
         }
         return Boolean.TRUE;
     }
 
     private void check() {
         if (amazonS3 == null) {
-            throw ExceptionUtils.mpe("The amazonS3 not config!");
+            log.error("The amazonS3 not config!");
+            throw ExceptionUtils.mpe(CONFIG_AMAZON_SERVICE_ERROR);
         }
     }
 
@@ -71,11 +73,11 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
             amazonS3.deleteObject(bucketName, fileInfo.getSourceId());
             return true;
         } catch (AmazonServiceException e) {
-            log.warn("Delete amazon s3 file error!", e);
+            log.warn("Failed to delete the AmazonStorageService!", e);
             return true;
         } catch (Exception e) {
-            log.error("Amazon delete error!", e);
-            throw ExceptionUtils.mpe("Delete error!");
+            log.error("Failed to delete the AmazonStorageService!", e);
+            throw ExceptionUtils.mpe(DELETE_AMAZON_SERVICE_ERROR);
         }
     }
 
@@ -85,15 +87,12 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
             check();
             S3Object s3Object = amazonS3.getObject(bucketName, fileInfo.getSourceId());
             return DownloadModel.builder()
-                .filename(fileInfo.getFilename())
-                .contentType(s3Object.getObjectMetadata().getContentType())
-                .inputStream(s3Object.getObjectContent()).build();
-        } catch (AmazonServiceException e) {
-            log.error(e.getMessage());
-            throw e;
+                    .filename(fileInfo.getFilename())
+                    .contentType(s3Object.getObjectMetadata().getContentType())
+                    .inputStream(s3Object.getObjectContent()).build();
         } catch (Exception e) {
-            log.error("Amazon download error!", e);
-            throw ExceptionUtils.mpe("Download error!");
+            log.error("Failed to download the AmazonStorageService!", e);
+            throw ExceptionUtils.mpe(DOWNLOAD_AMAZON_SERVICE_ERROR);
         }
     }
 
@@ -119,14 +118,14 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
             amazonS3 = null;
             return;
         }
-        bucketName = amazonStorageSettingEntity.getBucketName();
+        bucketName = amazonStorageSettingEntity.getBucketName() + "/upload";
         String accessKeyId = AesUtil.decrypt(amazonStorageSettingEntity.getAccessKeyId());
         String accessKeyIdSecret = AesUtil.decrypt(amazonStorageSettingEntity.getAccessKeySecret());
         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKeyId, accessKeyIdSecret);
         amazonS3 = AmazonS3Client.builder()
-            .withRegion(amazonStorageSettingEntity.getRegion())
-            .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-            .build();
+                .withRegion(amazonStorageSettingEntity.getRegion())
+                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                .build();
     }
 
     @Override
