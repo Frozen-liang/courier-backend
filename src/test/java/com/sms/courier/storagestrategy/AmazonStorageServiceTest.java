@@ -1,13 +1,23 @@
 package com.sms.courier.storagestrategy;
 
+import static com.sms.courier.common.exception.ErrorCode.CONFIG_AMAZON_SERVICE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DELETE_AMAZON_SERVICE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.DOWNLOAD_AMAZON_SERVICE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.STORE_AMAZON_SERVICE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.UPDATE_AMAZON_SERVICE_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.UPLOAD_TEST_FILE_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -19,6 +29,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.entity.file.AmazonStorageSettingEntity;
 import com.sms.courier.entity.file.FileInfoEntity;
 import com.sms.courier.repository.AmazonStorageSettingRepository;
@@ -27,6 +38,8 @@ import com.sms.courier.storagestrategy.strategy.impl.AmazonStorageService;
 import com.sms.courier.utils.AesUtil;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
+
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
@@ -46,11 +59,8 @@ public class AmazonStorageServiceTest {
     private final PutObjectRequest putObjectRequest = mock(PutObjectRequest.class);
     private final FileInfoEntity fileInfo = mock(FileInfoEntity.class);
     private final InputStream inputStream = mock(InputStream.class);
-    private final DeleteObjectsRequest deleteObjectsRequest = mock(DeleteObjectsRequest.class);
-    private final DownloadModel downloadModel = mock(DownloadModel.class);
     private final S3ObjectInputStream s3ObjectInputStream = mock(S3ObjectInputStream.class);
     private final static AmazonS3ClientBuilder AMAZON_S3_BUILDER = mock(AmazonS3ClientBuilder.class);
-    private final AWSStaticCredentialsProvider awsStaticCredentialsProvider = mock(AWSStaticCredentialsProvider.class);
 
     private final static MockedStatic<AmazonS3Client> AMAZON_MOCKED_STATIC;
 
@@ -80,13 +90,21 @@ public class AmazonStorageServiceTest {
     @DisplayName("Test the store method in the AmazonStorageService")
     public void store() throws IOException {
         createS3Client();
-        doNothing().when(objectMetadata).setContentType("application/octet-stream");
+        doNothing().when(objectMetadata).setContentType(TYPE);
         doNothing().when(objectMetadata).setContentLength(LONG);
         when(putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead)).thenReturn(putObjectRequest);
         when(multipartFile.getInputStream()).thenReturn(inputStream);
         when(amazonS3.putObject(putObjectRequest)).thenReturn(putObjectResult);
         doNothing().when(fileInfo).setSourceId(ID);
         assertThat(amazonStorageService.store(fileInfo, multipartFile)).isTrue();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while upload TestFile")
+    public void store_AmazonServiceException_test() throws IOException {
+        doThrow(new AmazonServiceException(STRING)).when(multipartFile).getInputStream();
+        assertThatThrownBy(() -> amazonStorageService.store(fileInfo, multipartFile)).isInstanceOf(
+                ApiTestPlatformException.class).extracting("code").isEqualTo(CONFIG_AMAZON_SERVICE_ERROR.getCode());
     }
 
     @Test
@@ -99,16 +117,34 @@ public class AmazonStorageServiceTest {
     }
 
     @Test
+    @DisplayName("An exception occurred while delete TestFile")
+    public void delete_exception_test() {
+        createS3Client();
+        doThrow(new RuntimeException()).when(amazonS3).deleteObject(any(),any());
+        assertThatThrownBy(() -> amazonStorageService.delete(fileInfo)).isInstanceOf(
+                ApiTestPlatformException.class).extracting("code").isEqualTo(DELETE_AMAZON_SERVICE_ERROR.getCode());
+    }
+
+    @Test
     @DisplayName("Test the download method in the AmazonStorageService")
     public void download() {
         createS3Client();
         S3Object s3Object = mock(S3Object.class);
+        when(amazonS3.getObject(any(), anyString())).thenReturn(s3Object);
         when(fileInfo.getSourceId()).thenReturn(ID);
         when(fileInfo.getFilename()).thenReturn(NAME);
-        when(amazonS3.getObject(any(), anyString())).thenReturn(s3Object);
         when(s3Object.getObjectContent()).thenReturn(s3ObjectInputStream);
         when(s3Object.getObjectMetadata()).thenReturn(objectMetadata);
         assertThat(amazonStorageService.download(fileInfo)).isNotNull();
+    }
+
+    @Test
+    @DisplayName("An exception occurred while download TestFile")
+    public void download_exception_test() {
+        createS3Client();
+        doThrow(new RuntimeException()).when(fileInfo).getFilename();
+        assertThatThrownBy(() -> amazonStorageService.download(fileInfo)).isInstanceOf(
+                ApiTestPlatformException.class).extracting("code").isEqualTo(DOWNLOAD_AMAZON_SERVICE_ERROR.getCode());
     }
 
     @Test
