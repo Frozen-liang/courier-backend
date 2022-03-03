@@ -1,6 +1,7 @@
 package com.sms.courier.entity.schedule;
 
 import com.sms.courier.common.enums.CaseType;
+import com.sms.courier.common.enums.ExecuteType;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -64,4 +65,10 @@ public class ScheduleRecordEntity {
 
     // 触发定时任务测试时 请求头metadata中的数据 用于向eagle-eye推送监测结果时添加元数据
     private String metadata;
+
+    // 定时任务执行类型
+    private ExecuteType executeType;
+
+    // 串行时记录此次定时任务所有job,分批执行，当为空时，说明此次定时任务都已完成.
+    private List<ExecuteRecord> executeRecord;
 }

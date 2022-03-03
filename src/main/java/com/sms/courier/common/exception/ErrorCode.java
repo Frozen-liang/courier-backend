@@ -324,6 +324,7 @@ public enum ErrorCode {
     EDIT_AWS3_SETTING_ERROR("4298", "Failed to edit the AmazonStorageSetting!"),
     DELETE_AWS3_SETTING_BY_ID_ERROR("4299", "Failed to delete the AmazonStorageSetting!"),
     BUCKET_NOT_EXIST_ERROR("4300", "The %s not found. id=%s"),
+    GET_SCHEDULE_RECORD_BY_ID_ERROR("4301", "Failed to get the ScheduleRecord by id!"),
 
     // 50001 - 51000 describes code generate exception
     FILE_FILL_THE_CONTENT_ERROR("50001", "File fill the content error!"),

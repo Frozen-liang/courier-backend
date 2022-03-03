@@ -60,4 +60,5 @@ public class ScheduleResponse extends BaseResponse {
 
     private List<String> emails;
 
+    private Integer executeType;
 }
