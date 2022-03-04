@@ -329,6 +329,7 @@ public enum ErrorCode {
     DELETE_AMAZON_SERVICE_ERROR("4303", "Failed to delete the File!"),
     DOWNLOAD_AMAZON_SERVICE_ERROR("4304", "Failed to download the File!"),
     UPDATE_AMAZON_SERVICE_ERROR("4305", "Failed to update the File!"),
+    GET_SCHEDULE_RECORD_BY_ID_ERROR("4306", "Failed to get the ScheduleRecord by id!"),
 
     // 50001 - 51000 describes code generate exception
     FILE_FILL_THE_CONTENT_ERROR("50001", "File fill the content error!"),

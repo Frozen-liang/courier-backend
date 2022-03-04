@@ -70,4 +70,6 @@ public class ScheduleRequest {
 
     private List<String> emails;
 
+    @NotNull(groups = {InsertGroup.class, UpdateGroup.class}, message = "The executeType must not be null.")
+    private Integer executeType;
 }
