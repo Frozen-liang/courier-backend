@@ -41,6 +41,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
@@ -140,7 +141,7 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
                 return;
             }
             repository.saveAll(scheduleCaseJobEntities);
-            publishSchedulerStartEvent(scheduleEntity, metadata);
+            publishSchedulerStartEvent(scheduleEntity, scheduleRecordEntity.getMetadata());
             for (ScheduleCaseJobEntity scheduleCaseJobEntity : scheduleCaseJobEntities) {
                 dispatcherJob(scheduleCaseJobEntity);
             }
@@ -152,7 +153,7 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
 
     }
 
-    private void publishSchedulerStartEvent(ScheduleEntity scheduleEntity, String metadata) {
+    private void publishSchedulerStartEvent(ScheduleEntity scheduleEntity, Map<String, Object> metadata) {
         WebhookScheduleResponse webhookScheduleResponse = WebhookScheduleResponse.builder()
             .id(scheduleEntity.getId())
             .name(scheduleEntity.getName()).metadata(metadata).build();
