@@ -224,6 +224,7 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
             .jobIds(new ArrayList<>())
             .version(1)
             .metadata(metadata)
+            .executeType(scheduleEntity.getExecuteType())
             .build();
     }
 

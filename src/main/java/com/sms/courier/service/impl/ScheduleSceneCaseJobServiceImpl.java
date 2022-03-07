@@ -5,9 +5,11 @@ import static com.sms.courier.common.enums.JobStatus.PENDING;
 import com.google.common.collect.Lists;
 import com.sms.courier.common.annotation.JobServiceType;
 import com.sms.courier.common.enums.CaseFilter;
+import com.sms.courier.common.enums.ExecuteType;
 import com.sms.courier.common.enums.JobStatus;
 import com.sms.courier.common.enums.JobType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.common.listener.event.ScheduleJobRecordEvent;
 import com.sms.courier.engine.EngineJobManagement;
 import com.sms.courier.engine.service.CaseDispatcherService;
@@ -24,12 +26,14 @@ import com.sms.courier.entity.scenetest.CaseTemplateApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.entity.schedule.CaseCondition;
+import com.sms.courier.entity.schedule.ExecuteRecord;
 import com.sms.courier.entity.schedule.JobRecord;
 import com.sms.courier.entity.schedule.ScheduleEntity;
 import com.sms.courier.entity.schedule.ScheduleRecordEntity;
 import com.sms.courier.mapper.JobMapper;
 import com.sms.courier.repository.CaseTemplateApiRepository;
 import com.sms.courier.repository.CommonRepository;
+import com.sms.courier.repository.CustomizedScheduleRecordRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
 import com.sms.courier.repository.SceneCaseRepository;
 import com.sms.courier.repository.ScheduleRecordRepository;
@@ -37,6 +41,7 @@ import com.sms.courier.repository.ScheduleSceneCaseJobRepository;
 import com.sms.courier.service.DatabaseService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.service.ScheduleSceneCaseJobService;
+import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.webhook.WebhookEvent;
 import com.sms.courier.webhook.enums.WebhookType;
 import com.sms.courier.webhook.response.WebhookScheduleResponse;
@@ -47,6 +52,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
@@ -63,6 +69,8 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
     private final CaseTemplateApiRepository caseTemplateApiRepository;
     private final ScheduleRecordRepository scheduleRecordRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final CustomizedScheduleRecordRepository customizedScheduleRecordRepository;
+    private final ScheduleSceneCaseJobRepository scheduleSceneCaseJobRepository;
 
     public ScheduleSceneCaseJobServiceImpl(ScheduleSceneCaseJobRepository repository, JobMapper jobMapper,
         CaseDispatcherService caseDispatcherService, ProjectEnvironmentService projectEnvironmentService,
@@ -72,7 +80,9 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
         CaseTemplateApiRepository caseTemplateApiRepository,
         ScheduleRecordRepository scheduleRecordRepository,
         ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement,
-        DatabaseService dataBaseService) {
+        DatabaseService dataBaseService,
+        CustomizedScheduleRecordRepository customizedScheduleRecordRepository,
+        ScheduleSceneCaseJobRepository scheduleSceneCaseJobRepository) {
         super(repository, jobMapper, caseDispatcherService, projectEnvironmentService, engineJobManagement,
             commonRepository, dataBaseService);
         this.sceneCaseRepository = sceneCaseRepository;
@@ -80,6 +90,8 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
         this.caseTemplateApiRepository = caseTemplateApiRepository;
         this.scheduleRecordRepository = scheduleRecordRepository;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.customizedScheduleRecordRepository = customizedScheduleRecordRepository;
+        this.scheduleSceneCaseJobRepository = scheduleSceneCaseJobRepository;
     }
 
     @Override
@@ -90,6 +102,17 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
             SceneCaseJobReport sceneCaseJobReport = (SceneCaseJobReport) jobReport;
             setJobReport(sceneCaseJobReport, scheduleCaseJob);
             repository.save(scheduleCaseJob);
+            ScheduleRecordEntity recordEntity = scheduleRecordRepository.findById(scheduleCaseJob.getScheduleRecordId())
+                .orElseThrow(() -> ExceptionUtils.mpe(ErrorCode.GET_SCHEDULE_RECORD_BY_ID_ERROR));
+            if (Objects.equals(ExecuteType.SERIAL, recordEntity.getExecuteType())) {
+                ExecuteRecord executeRecord =
+                    recordEntity.getExecuteRecord().stream().filter(record -> Objects.equals(scheduleCaseJob.getId(),
+                        record.getJobId())).findFirst().orElse(null);
+                ScheduleRecordEntity newRecordEntity = customizedScheduleRecordRepository
+                    .findAndModifyExecuteRecord(recordEntity.getId(), scheduleCaseJob);
+                executeSerialJob(executeRecord, newRecordEntity);
+            }
+
             applicationEventPublisher
                 .publishEvent(ScheduleJobRecordEvent
                     .create(scheduleCaseJob.getScheduleRecordId(), job.getId(), scheduleCaseJob.getSceneCaseId(),
@@ -122,6 +145,8 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
             ScheduleRecordEntity scheduleRecordEntity = createScheduleRecord(scheduleEntity, metadata);
             List<ScheduleSceneCaseJobEntity> scheduleSceneCaseJobEntities = new ArrayList<>();
 
+            int order = 1;
+            List<ExecuteRecord> executeRecordList = Lists.newArrayList();
             for (SceneCaseEntity sceneCaseEntity : sceneCaseEntities) {
                 String sceneCaseId = sceneCaseEntity.getId();
                 List<JobSceneCaseApi> apiCaseList = getApiCaseList(sceneCaseId);
@@ -142,6 +167,11 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
                                 .setDataCollection(createJobDataCollection(dataCollectionEntity, testData));
                             scheduleSceneCaseJobEntity.setName(sceneCaseEntity.getName());
                             scheduleRecordEntity.getJobIds().add(scheduleSceneCaseJobEntity.getId());
+                            if (Objects.equals(ExecuteType.SERIAL, scheduleEntity.getExecuteType())) {
+                                executeRecordList.add(ExecuteRecord.builder().jobId(scheduleSceneCaseJobEntity.getId())
+                                    .order(order)
+                                    .build());
+                            }
                             scheduleSceneCaseJobEntities.add(scheduleSceneCaseJobEntity);
                         }
 
@@ -151,10 +181,18 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
                         scheduleSceneCaseJobEntity.setNext(sceneCaseEntity.isNext());
                         scheduleSceneCaseJobEntity.setName(sceneCaseEntity.getName());
                         scheduleRecordEntity.getJobIds().add(scheduleSceneCaseJobEntity.getId());
+                        if (Objects.equals(ExecuteType.SERIAL, scheduleEntity.getExecuteType())) {
+                            executeRecordList.add(ExecuteRecord.builder().jobId(scheduleSceneCaseJobEntity.getId())
+                                .order(order)
+                                .build());
+                        }
                         scheduleSceneCaseJobEntities.add(scheduleSceneCaseJobEntity);
                     }
                 }
+                order++;
             }
+            scheduleRecordEntity.setExecuteRecord(executeRecordList);
+
             scheduleRecordRepository.save(scheduleRecordEntity);
             if (CollectionUtils.isEmpty(sceneCaseEntities)) {
                 super.updateScheduleTaskStatus(scheduleEntity.getId());
@@ -162,6 +200,15 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
             }
             repository.saveAll(scheduleSceneCaseJobEntities);
             publishSchedulerStartEvent(scheduleEntity, metadata);
+
+            if (Objects.equals(ExecuteType.SERIAL, scheduleEntity.getExecuteType())) {
+                List<String> jobIds = scheduleRecordEntity.getExecuteRecord().stream()
+                    .filter(record -> Objects.equals(1, record.getOrder()))
+                    .map(ExecuteRecord::getJobId).collect(Collectors.toList());
+                scheduleSceneCaseJobEntities = scheduleSceneCaseJobEntities.stream()
+                    .filter(job -> jobIds.contains(job.getId()))
+                    .collect(Collectors.toList());
+            }
             for (ScheduleSceneCaseJobEntity scheduleSceneCaseJobEntity : scheduleSceneCaseJobEntities) {
                 this.dispatcherJob(scheduleSceneCaseJobEntity);
             }
@@ -171,6 +218,23 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
             log.error("Dispatcher schedule scene case job system exception.", e);
         }
 
+    }
+
+    private void executeSerialJob(ExecuteRecord executeRecord, ScheduleRecordEntity newRecordEntity) {
+        List<String> jobIds = Lists.newArrayList();
+        if (CollectionUtils.isNotEmpty(newRecordEntity.getExecuteRecord())
+            && newRecordEntity.getExecuteRecord().stream().noneMatch(record -> Objects.equals(executeRecord.getOrder(),
+            record.getOrder()))) {
+            jobIds = newRecordEntity.getExecuteRecord().stream()
+                .filter(record -> Objects.equals(executeRecord.getOrder() + 1, record.getOrder()))
+                .map(ExecuteRecord::getJobId).collect(Collectors.toList());
+        }
+        if (CollectionUtils.isNotEmpty(jobIds)) {
+            Iterable<ScheduleSceneCaseJobEntity> jobEntities = scheduleSceneCaseJobRepository.findAllById(jobIds);
+            for (ScheduleSceneCaseJobEntity jobEntity : jobEntities) {
+                this.dispatcherJob(jobEntity);
+            }
+        }
     }
 
     private void publishSchedulerStartEvent(ScheduleEntity scheduleEntity, String metadata) {
@@ -201,6 +265,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
                 break;
             case CUSTOM:
                 sceneCaseEntities = sceneCaseRepository.findByIdIn(caseIds);
+                resetOrder(sceneCaseEntities, caseIds);
                 break;
             default:
                 sceneCaseEntities = Collections.emptyList();
@@ -268,4 +333,20 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
             .sceneCaseId(sceneCaseId)
             .build();
     }
+
+    private void resetOrder(List<SceneCaseEntity> sceneCaseEntities, List<String> caseIds) {
+        sceneCaseEntities.sort(((o1, o2) -> {
+            int io1 = caseIds.indexOf(o1.getId());
+            int io2 = caseIds.indexOf(o2.getId());
+
+            if (io1 != -1) {
+                io1 = sceneCaseEntities.size() - io1;
+            }
+            if (io2 != -1) {
+                io2 = sceneCaseEntities.size() - io2;
+            }
+            return io2 - io1;
+        }));
+    }
+
 }

@@ -4,6 +4,7 @@ package com.sms.courier.entity.schedule;
 import com.sms.courier.common.enums.CaseFilter;
 import com.sms.courier.common.enums.CaseType;
 import com.sms.courier.common.enums.CycleType;
+import com.sms.courier.common.enums.ExecuteType;
 import com.sms.courier.common.enums.NoticeType;
 import com.sms.courier.common.enums.ScheduleStatusType;
 import com.sms.courier.common.enums.TaskStatus;
@@ -78,4 +79,8 @@ public class ScheduleEntity extends BaseEntity {
     @Field("isOpen")
     @Default
     private boolean open = true;
+
+    @Default
+    private ExecuteType executeType = ExecuteType.PARALLEL;
+
 }

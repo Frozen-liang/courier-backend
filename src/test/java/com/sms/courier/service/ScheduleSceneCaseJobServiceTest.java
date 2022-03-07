@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.sms.courier.common.enums.CaseFilter;
 import com.sms.courier.common.enums.CaseType;
+import com.sms.courier.common.enums.ExecuteType;
 import com.sms.courier.common.enums.JobType;
 import com.sms.courier.dto.response.ApiTestCaseJobReportResponse;
 import com.sms.courier.engine.EngineJobManagement;
@@ -25,11 +26,13 @@ import com.sms.courier.entity.job.SceneCaseJobReport;
 import com.sms.courier.entity.job.ScheduleSceneCaseJobEntity;
 import com.sms.courier.entity.job.common.CaseReport;
 import com.sms.courier.entity.job.common.JobApiTestCase;
+import com.sms.courier.entity.job.common.JobEntity;
 import com.sms.courier.entity.scenetest.CaseTemplateApiConn;
 import com.sms.courier.entity.scenetest.EnvDataCollConn;
 import com.sms.courier.entity.scenetest.SceneCaseApiEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.entity.schedule.CaseCondition;
+import com.sms.courier.entity.schedule.ExecuteRecord;
 import com.sms.courier.entity.schedule.ScheduleEntity;
 import com.sms.courier.entity.schedule.ScheduleRecordEntity;
 import com.sms.courier.mapper.JobMapper;
@@ -41,6 +44,7 @@ import com.sms.courier.mapper.ResponseResultVerificationMapperImpl;
 import com.sms.courier.repository.ApiTestCaseRepository;
 import com.sms.courier.repository.CaseTemplateApiRepository;
 import com.sms.courier.repository.CommonRepository;
+import com.sms.courier.repository.CustomizedScheduleRecordRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
 import com.sms.courier.repository.SceneCaseRepository;
 import com.sms.courier.repository.ScheduleRecordRepository;
@@ -77,10 +81,21 @@ class ScheduleSceneCaseJobServiceTest {
     private final JobMapper jobMapper = new JobMapperImpl(paramInfoMapper, new MatchParamInfoMapperImpl(),
         new ResponseResultVerificationMapperImpl(new MatchParamInfoMapperImpl()));
     private final DatabaseService dataBaseService = mock(DatabaseService.class);
+    private final CustomizedScheduleRecordRepository customizedScheduleRecordRepository =
+        mock(CustomizedScheduleRecordRepository.class);
     private final ScheduleSceneCaseJobService scheduleSceneCaseJobService =
         new ScheduleSceneCaseJobServiceImpl(scheduleSceneCaseJobRepository, jobMapper, caseDispatcherService,
             projectEnvironmentService, commonRepository, sceneCaseRepository, sceneCaseApiRepository,
-            caseTemplateApiRepository, scheduleRecordRepository, applicationEventPublisher, engineJobManagement, dataBaseService);
+            caseTemplateApiRepository, scheduleRecordRepository, applicationEventPublisher, engineJobManagement,
+            dataBaseService,
+            customizedScheduleRecordRepository, scheduleSceneCaseJobRepository);
+    private final JobService jobService = new ScheduleSceneCaseJobServiceImpl(scheduleSceneCaseJobRepository, jobMapper,
+        caseDispatcherService,
+        projectEnvironmentService, commonRepository, sceneCaseRepository, sceneCaseApiRepository,
+        caseTemplateApiRepository, scheduleRecordRepository, applicationEventPublisher, engineJobManagement,
+        dataBaseService,
+        customizedScheduleRecordRepository, scheduleSceneCaseJobRepository);
+
     private final ScheduleSceneCaseJobEntity scheduleCaseJob =
         ScheduleSceneCaseJobEntity.builder().id(ID)
             .apiTestCase(List.of(JobSceneCaseApi.builder().jobApiTestCase(JobApiTestCase.builder().build()).build()))
@@ -93,6 +108,7 @@ class ScheduleSceneCaseJobServiceTest {
             .jobId(ObjectId.get().toString()).build();
     private static final String ID = ObjectId.get().toString();
     private static final String METADATA = "metadata";
+    private static final Integer NUMBER = 1;
 
 
     @Test
@@ -138,7 +154,7 @@ class ScheduleSceneCaseJobServiceTest {
                 TestData.builder().dataName("name").data(List.of(DataParam.builder().build())).build())).build()));
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());
         when(scheduleSceneCaseJobRepository.saveAll(any())).thenReturn(Collections.emptyList());
-        scheduleSceneCaseJobService.schedule(schedule,METADATA);
+        scheduleSceneCaseJobService.schedule(schedule, METADATA);
         verify(scheduleSceneCaseJobRepository, times(1)).saveAll(any());
     }
 
@@ -164,7 +180,7 @@ class ScheduleSceneCaseJobServiceTest {
         when(commonRepository.findById(ID, DataCollectionEntity.class)).thenReturn(Optional.empty());
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());
         when(scheduleSceneCaseJobRepository.saveAll(any())).thenReturn(Collections.emptyList());
-        scheduleSceneCaseJobService.schedule(schedule,METADATA);
+        scheduleSceneCaseJobService.schedule(schedule, METADATA);
         verify(scheduleSceneCaseJobRepository, times(1)).saveAll(any());
     }
 
@@ -181,8 +197,49 @@ class ScheduleSceneCaseJobServiceTest {
         when(commonRepository.findById(ID, DataCollectionEntity.class)).thenReturn(Optional.empty());
         when(scheduleRecordRepository.save(any())).thenReturn(ScheduleRecordEntity.builder().build());
         when(commonRepository.updateField(any(), any(), any())).thenReturn(true);
-        scheduleSceneCaseJobService.schedule(schedule,METADATA);
+        scheduleSceneCaseJobService.schedule(schedule, METADATA);
         verify(commonRepository, times(1)).updateField(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Test the saveJobReport method in the ScheduleSceneCaseJob service")
+    public void saveJobReport_test() {
+        Optional<ScheduleRecordEntity> recordEntity = Optional.of(ScheduleRecordEntity.builder()
+            .executeType(ExecuteType.SERIAL)
+            .executeRecord(Lists.newArrayList(ExecuteRecord.builder().jobId(ID).order(NUMBER).build()))
+            .id(ID).build());
+        when(scheduleRecordRepository.findById(any())).thenReturn(recordEntity);
+        ScheduleRecordEntity newRecordEntity =
+            ScheduleRecordEntity.builder().id(ID).executeType(ExecuteType.SERIAL).executeRecord(Lists.newArrayList(
+                ExecuteRecord.builder().jobId(ID).order(NUMBER + 1).build())).build();
+        when(customizedScheduleRecordRepository.findAndModifyExecuteRecord(any(), any())).thenReturn(newRecordEntity);
+        Iterable<ScheduleSceneCaseJobEntity> jobEntities =
+            Lists.newArrayList(ScheduleSceneCaseJobEntity.builder().build());
+        when(scheduleSceneCaseJobRepository.findAllById(any())).thenReturn(jobEntities);
+        SceneCaseJobReport sceneCaseJobReport = SceneCaseJobReport.builder().jobId(ID).build();
+        Optional<ScheduleSceneCaseJobEntity> jobEntity =
+            Optional.of(ScheduleSceneCaseJobEntity.builder().id(ID).build());
+        when(scheduleSceneCaseJobRepository.findById(any())).thenReturn(jobEntity);
+        jobService.handleJobReport(sceneCaseJobReport);
+        verify(scheduleRecordRepository, times(1)).findById(any());
+    }
+
+    @Test
+    @DisplayName("Test the onError method in the ScheduleSceneCaseJob service")
+    public void onError_test_when_resend_isTrue() {
+        doNothing().when(engineJobManagement).dispatcherJob(any(ScheduleSceneCaseJobEntity.class));
+        ScheduleSceneCaseJobEntity jobEntity = ScheduleSceneCaseJobEntity.builder().id(ID).build();
+        jobService.onError(jobEntity, Boolean.TRUE);
+        verify(engineJobManagement, times(1)).dispatcherJob(any(ScheduleSceneCaseJobEntity.class));
+    }
+
+    @Test
+    @DisplayName("Test the onError method in the ScheduleSceneCaseJob service")
+    public void onError_test_when_resend_isFalse() {
+        doNothing().when(engineJobManagement).dispatcherJob(any(ScheduleSceneCaseJobEntity.class));
+        ScheduleSceneCaseJobEntity sceneCaseJobEntity = ScheduleSceneCaseJobEntity.builder().id(ID).build();
+        jobService.onError(sceneCaseJobEntity, Boolean.FALSE);
+        verify(scheduleRecordRepository, times(1)).findById(any());
     }
 
     private List<SceneCaseApiEntity> getSceneCaseApiList() {

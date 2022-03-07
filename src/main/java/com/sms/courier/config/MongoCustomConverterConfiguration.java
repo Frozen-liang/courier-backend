@@ -16,6 +16,7 @@ import com.sms.courier.common.enums.DatabaseType;
 import com.sms.courier.common.enums.DocumentType;
 import com.sms.courier.common.enums.DocumentUrlType;
 import com.sms.courier.common.enums.EnumCommon;
+import com.sms.courier.common.enums.ExecuteType;
 import com.sms.courier.common.enums.GroupImportType;
 import com.sms.courier.common.enums.ImportStatus;
 import com.sms.courier.common.enums.JobStatus;
@@ -134,7 +135,8 @@ public class MongoCustomConverterConfiguration {
                 IntegerToCaseTypeConverter.INSTANCE, IntegerToContainerStatusConverter.INSTANCE,
                 IntegerToWebhookTypeConverter.INSTANCE, IntegerToDataBaseTypeConverter.INSTANCE,
                 IntegerToCodeTypeConverter.INSTANCE, IntegerToTemplateTypeConverter.INSTANCE,
-                IntegerToReviewStatusConverter.INSTANCE, IntegerToStorageTypeConverter.INSTANCE);
+                IntegerToReviewStatusConverter.INSTANCE, IntegerToStorageTypeConverter.INSTANCE,
+                IntegerToExecuteTypeConverter.INSTANCE);
 
         return new MongoCustomConversions(converters);
     }
@@ -566,5 +568,13 @@ public class MongoCustomConverterConfiguration {
         }
     }
 
+    @ReadingConverter
+    enum IntegerToExecuteTypeConverter implements Converter<Integer, ExecuteType> {
+        INSTANCE;
+
+        public ExecuteType convert(@NonNull Integer code) {
+            return ExecuteType.getExecuteType(code);
+        }
+    }
 }
 
