@@ -41,6 +41,7 @@ import com.sms.courier.service.DatabaseService;
 import com.sms.courier.service.JobService;
 import com.sms.courier.service.ProjectEnvironmentService;
 import com.sms.courier.utils.ExceptionUtils;
+import com.sms.courier.utils.JsonUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -223,7 +224,7 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
             .projectId(scheduleEntity.getProjectId())
             .jobIds(new ArrayList<>())
             .version(1)
-            .metadata(metadata)
+            .metadata(JsonUtils.readValue(metadata, Map.class))
             .executeType(scheduleEntity.getExecuteType())
             .build();
     }

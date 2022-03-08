@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -199,7 +200,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
                 return;
             }
             repository.saveAll(scheduleSceneCaseJobEntities);
-            publishSchedulerStartEvent(scheduleEntity, metadata);
+            publishSchedulerStartEvent(scheduleEntity, scheduleRecordEntity.getMetadata());
 
             if (Objects.equals(ExecuteType.SERIAL, scheduleEntity.getExecuteType())) {
                 List<String> jobIds = scheduleRecordEntity.getExecuteRecord().stream()
@@ -237,7 +238,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
         }
     }
 
-    private void publishSchedulerStartEvent(ScheduleEntity scheduleEntity, String metadata) {
+    private void publishSchedulerStartEvent(ScheduleEntity scheduleEntity, Map<String, Object> metadata) {
         WebhookScheduleResponse webhookScheduleResponse = WebhookScheduleResponse.builder()
             .id(scheduleEntity.getId())
             .name(scheduleEntity.getName()).metadata(metadata).build();

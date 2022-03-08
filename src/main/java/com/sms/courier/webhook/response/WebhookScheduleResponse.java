@@ -1,5 +1,6 @@
 package com.sms.courier.webhook.response;
 
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,5 +20,5 @@ public class WebhookScheduleResponse {
 
     private int fail;
 
-    private String metadata;
+    private Map<String, Object> metadata;
 }
