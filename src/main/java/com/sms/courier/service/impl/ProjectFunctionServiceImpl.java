@@ -20,6 +20,7 @@ import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.field.FunctionField;
 import com.sms.courier.dto.request.ProjectFunctionRequest;
 import com.sms.courier.dto.response.FunctionResponse;
 import com.sms.courier.dto.response.GlobalFunctionResponse;
@@ -57,7 +58,6 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
     private final CommonRepository commonRepository;
     private final CustomizedFunctionRepository customizedFunctionRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private static final String FUNCTION_KEY = "functionKey";
 
     public ProjectFunctionServiceImpl(ProjectFunctionRepository projectFunctionRepository,
         ProjectFunctionMapper projectFunctionMapper, GlobalFunctionService globalFunctionService,
@@ -86,7 +86,7 @@ public class ProjectFunctionServiceImpl implements ProjectFunctionService {
             Sort sort = Sort.by(Direction.DESC, CREATE_DATE_TIME.getName());
             ExampleMatcher matcher = ExampleMatcher.matching()
                 .withMatcher(PROJECT_ID.getName(), ExampleMatcher.GenericPropertyMatchers.exact())
-                .withMatcher(FUNCTION_KEY, ExampleMatcher.GenericPropertyMatchers.exact())
+                .withMatcher(FunctionField.FUNCTION_KEY.getName(), ExampleMatcher.GenericPropertyMatchers.exact())
                 .withMatcher(REMOVE.getName(), ExampleMatcher.GenericPropertyMatchers.exact())
                 .withStringMatcher(StringMatcher.CONTAINING).withIgnoreNullValues();
             Example<ProjectFunctionEntity> example = Example.of(projectFunction, matcher);
