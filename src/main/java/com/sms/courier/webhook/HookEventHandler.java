@@ -110,7 +110,8 @@ public class HookEventHandler implements InitializingBean, DisposableBean {
     private double calculateFailureRate(WebhookScheduleResponse webhookScheduleResponse) {
         double fail = webhookScheduleResponse.getFail();
         double count = (webhookScheduleResponse.getFail() + webhookScheduleResponse.getSuccess());
-        return (fail / count) * 100;
+        webhookScheduleResponse.setFailureRate((fail / count) * 100);
+        return webhookScheduleResponse.getFailureRate();
     }
 
 }

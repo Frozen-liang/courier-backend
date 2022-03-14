@@ -21,4 +21,6 @@ public class WebhookScheduleResponse {
     private int fail;
 
     private Map<String, Object> metadata;
+
+    private double failureRate;
 }
