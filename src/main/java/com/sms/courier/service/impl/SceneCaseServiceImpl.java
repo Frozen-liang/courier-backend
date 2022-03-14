@@ -103,7 +103,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -222,7 +221,7 @@ public class SceneCaseServiceImpl implements SceneCaseService {
             SceneCaseEntity sceneCase = sceneCaseMapper.toUpdateSceneCase(updateSceneCaseRequest);
             try {
                 FunctionHandle.isTrue(CollectionUtils.isNotEmpty(updateSceneCaseRequest.getEnvDataCollConnList()))
-                    .handle(() -> {
+                    .handler(() -> {
                         updateSceneCaseRequest.getEnvDataCollConnList().stream().collect(
                             Collectors.toMap(EnvDataCollConnRequest::getEnvId, EnvDataCollConnRequest::getDataCollId));
                     });

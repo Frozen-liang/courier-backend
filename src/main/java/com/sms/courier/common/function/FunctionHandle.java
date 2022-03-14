@@ -2,20 +2,20 @@ package com.sms.courier.common.function;
 
 public class FunctionHandle {
 
-    public static BranchHandle isTrueOrFalse(boolean value) {
-        return (trueHandle, falseHandle) -> {
+    public static BranchHandler isTrueOrFalse(boolean value) {
+        return (confirmed, negate) -> {
             if (value) {
-                trueHandle.run();
+                confirmed.run();
             } else {
-                falseHandle.run();
+                negate.run();
             }
         };
     }
 
-    public static TrueHandle isTrue(boolean value) {
-        return (trueHandle -> {
+    public static TrueHandler isTrue(boolean value) {
+        return (confirmed -> {
             if (value) {
-                trueHandle.run();
+                confirmed.run();
             }
         });
     }
