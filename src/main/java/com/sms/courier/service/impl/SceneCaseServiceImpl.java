@@ -37,6 +37,7 @@ import com.sms.courier.common.enums.ResultVerificationType;
 import com.sms.courier.common.enums.ReviewStatus;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.field.CommonField;
+import com.sms.courier.common.function.FunctionHandler;
 import com.sms.courier.dto.request.AddCaseTemplateApi;
 import com.sms.courier.dto.request.AddCaseTemplateConnRequest;
 import com.sms.courier.dto.request.AddSceneCaseApi;
@@ -219,10 +220,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         try {
             SceneCaseEntity sceneCase = sceneCaseMapper.toUpdateSceneCase(updateSceneCaseRequest);
             try {
-                if (CollectionUtils.isNotEmpty(updateSceneCaseRequest.getEnvDataCollConnList())) {
-                    updateSceneCaseRequest.getEnvDataCollConnList().stream().collect(
-                        Collectors.toMap(EnvDataCollConnRequest::getEnvId, EnvDataCollConnRequest::getDataCollId));
-                }
+                FunctionHandler.confirmed(CollectionUtils.isNotEmpty(updateSceneCaseRequest.getEnvDataCollConnList()))
+                    .handler(() -> this.checkRepeat(updateSceneCaseRequest.getEnvDataCollConnList()));
             } catch (Exception e) {
                 log.error("The environment cannot be repeated!", e);
                 throw ExceptionUtils.mpe(ENV_CANNOT_REPEATED);
@@ -689,4 +688,9 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         response.setCaseTemplateApiList(caseTemplateApiMapper.toCaseTemplateApiDtoList(caseTemplateApiList));
     }
 
+    private boolean checkRepeat(List<EnvDataCollConnRequest> envDataCollConnRequestList) {
+        envDataCollConnRequestList.stream().collect(
+            Collectors.toMap(EnvDataCollConnRequest::getEnvId, EnvDataCollConnRequest::getDataCollId));
+        return Boolean.TRUE;
+    }
 }
