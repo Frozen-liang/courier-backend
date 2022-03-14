@@ -220,8 +220,9 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         try {
             SceneCaseEntity sceneCase = sceneCaseMapper.toUpdateSceneCase(updateSceneCaseRequest);
             try {
-                FunctionHandler.confirmed(CollectionUtils.isNotEmpty(updateSceneCaseRequest.getEnvDataCollConnList()))
-                    .handler(() -> this.checkRepeat(updateSceneCaseRequest.getEnvDataCollConnList()));
+                FunctionHandler.confirmed(CollectionUtils.isNotEmpty(updateSceneCaseRequest.getEnvDataCollConnList()),
+                    updateSceneCaseRequest.getEnvDataCollConnList())
+                    .handler(this::checkRepeat);
             } catch (Exception e) {
                 log.error("The environment cannot be repeated!", e);
                 throw ExceptionUtils.mpe(ENV_CANNOT_REPEATED);
@@ -688,9 +689,8 @@ public class SceneCaseServiceImpl implements SceneCaseService {
         response.setCaseTemplateApiList(caseTemplateApiMapper.toCaseTemplateApiDtoList(caseTemplateApiList));
     }
 
-    private boolean checkRepeat(List<EnvDataCollConnRequest> envDataCollConnRequestList) {
+    public void checkRepeat(List<EnvDataCollConnRequest> envDataCollConnRequestList) {
         envDataCollConnRequestList.stream().collect(
             Collectors.toMap(EnvDataCollConnRequest::getEnvId, EnvDataCollConnRequest::getDataCollId));
-        return Boolean.TRUE;
     }
 }

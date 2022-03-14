@@ -12,10 +12,10 @@ public interface FunctionHandler {
         };
     }
 
-    static TrueHandler confirmed(boolean value) {
+    static <T> TrueHandler<T> confirmed(boolean value, T param) {
         return (confirmed -> {
             if (value) {
-                confirmed.apply();
+                confirmed.accept(param);
             }
         });
     }

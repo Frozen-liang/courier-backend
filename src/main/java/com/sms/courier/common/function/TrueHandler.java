@@ -1,9 +1,9 @@
 package com.sms.courier.common.function;
 
-import io.vavr.Function0;
+import java.util.function.Consumer;
 
 @FunctionalInterface
-public interface TrueHandler {
+public interface TrueHandler<T> {
 
-    void handler(Function0 confirmed);
+    void handler(Consumer<? super T> confirmed);
 }
