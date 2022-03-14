@@ -1,6 +1,6 @@
 package com.sms.courier.common.function;
 
-public class FunctionHandle {
+public class FunctionHandler {
 
     public static BranchHandler isTrueOrFalse(boolean value) {
         return (confirmed, negate) -> {
