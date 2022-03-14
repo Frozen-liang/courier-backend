@@ -7,29 +7,14 @@ import java.util.List;
 
 public interface WorkspaceStatisticsService {
 
-    List<CaseCountStatisticsResponse> caseGroupDayCount(String workspaceId, Integer day);
+    Long allCount(String workspaceId, String countType);
 
-    Long sceneAllCount(String workspaceId);
+    List<CaseCountStatisticsResponse> groupDayCount(String workspaceId, Integer day, String groupType);
 
-    Long caseAllCount(String workspaceId);
+    List<CaseCountUserStatisticsResponse> groupUserCount(Integer day, String workspaceId, String groupType);
 
-    Long apiAllCount(String workspaceId);
+    List<CaseCountUserStatisticsResponse> groupUserByJob(Integer day, String workspaceId, String groupType);
 
-    List<CaseCountStatisticsResponse> sceneCaseGroupDayCount(String workspaceId, Integer day);
+    List<WorkspaceProjectCaseStatisticsResponse> projectPercentage(String workspaceId, String queryType);
 
-    List<CaseCountStatisticsResponse> caseJobGroupDayCount(String workspaceId, Integer day);
-
-    List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(String workspaceId, Integer day);
-
-    List<CaseCountUserStatisticsResponse> caseGroupUserCount(Integer day, String workspaceId);
-
-    List<CaseCountUserStatisticsResponse> sceneCaseGroupUserCount(Integer day, String workspaceId);
-
-    List<CaseCountUserStatisticsResponse> caseJobGroupUserCount(Integer day, String workspaceId);
-
-    List<CaseCountUserStatisticsResponse> sceneCaseJobGroupUserCount(Integer day, String workspaceId);
-
-    List<WorkspaceProjectCaseStatisticsResponse> projectCasePercentage(String workspaceId);
-
-    List<WorkspaceProjectCaseStatisticsResponse> projectSceneCasePercentage(String workspaceId);
 }

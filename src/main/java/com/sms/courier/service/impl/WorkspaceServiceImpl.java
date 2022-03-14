@@ -15,6 +15,7 @@ import static com.sms.courier.common.exception.ErrorCode.THE_WORKSPACE_CANNOT_DE
 import static com.sms.courier.common.field.CommonField.REMOVE;
 import static com.sms.courier.common.field.WorkspaceField.USER_IDS;
 import static com.sms.courier.utils.Assert.isFalse;
+import static com.sms.courier.utils.Assert.isTrue;
 
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
@@ -84,7 +85,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         }
     }
 
-
     @Override
     @LogRecord(operationType = ADD, operationModule = WORKSPACE, template = "{{#workspaceRequest.name}}")
     public Boolean add(WorkspaceRequest workspaceRequest) {
@@ -105,9 +105,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         log.info("WorkspaceService-edit()-params: [Workspace]={}", workspaceRequest.toString());
         try {
             boolean exists = workspaceRepository.existsById(workspaceRequest.getId());
-            if (!exists) {
-                throw ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "Workspace", workspaceRequest.getId());
-            }
+            isTrue(exists, EDIT_NOT_EXIST_ERROR, "Workspace", workspaceRequest.getId());
             WorkspaceEntity workspace = workspaceMapper.toEntity(workspaceRequest);
             workspaceRepository.save(workspace);
         } catch (ApiTestPlatformException courierException) {
@@ -161,13 +159,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public Page<ApiTestCaseResponse> getCase(String id, PageDto pageDto) {
         try {
             List<ProjectResponse> projectResponses = projectService.list(id);
-            if (CollectionUtils.isNotEmpty(projectResponses)) {
-                List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)
-                    .collect(Collectors.toList());
-                LocalDateTime dateTime = LocalDateTime.now().minusDays(Constants.CASE_DAY);
-                return apiTestCaseService.getCasePageByProjectIdsAndCreateDate(projectIds, dateTime, pageDto);
-            }
-            return Page.empty();
+            return CollectionUtils.isEmpty(projectResponses)
+                ? Page.empty()
+                : apiTestCaseService.getCasePageByProjectIdsAndCreateDate(projectResponses.stream()
+                    .map(ProjectResponse::getId).collect(Collectors.toList()),
+                    LocalDateTime.now().minusDays(Constants.CASE_DAY), pageDto);
         } catch (Exception e) {
             log.error("Failed to get the Workspace case!", e);
             throw new ApiTestPlatformException(GET_WORKSPACE_CASE_ERROR);
