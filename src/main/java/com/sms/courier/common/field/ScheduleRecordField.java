@@ -10,7 +10,9 @@ public enum ScheduleRecordField implements Field {
     SCHEDULE_ID("scheduleId"),
     SUCCESS("success"),
     FAIL("fail"),
-    VERSION("version");
+    VERSION("version"),
+    EXECUTE_RECORD("executeRecord"),
+    JOB_ID("jobId");
 
     private final String name;
 

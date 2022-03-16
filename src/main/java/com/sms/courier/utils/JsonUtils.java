@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class JsonUtils {
@@ -33,14 +34,15 @@ public class JsonUtils {
         return "";
     }
 
-    /*public static String toJsonString(Object o) {
+    public static <T> T readValue(String json, Class<T> type) {
         try {
-            String s = MAPPER.writeValueAsString(o);
-            Map<String, String> map = Map.of("json", s);
-            return MAPPER.writeValueAsString(map)
+            if (StringUtils.isBlank(json)) {
+                return null;
+            }
+            return MAPPER.readValue(json, type);
         } catch (JsonProcessingException e) {
-            log.error("Serialize object error!", e);
+            log.error("Pares json error!", e);
+            return null;
         }
-        return "";
-    }*/
+    }
 }

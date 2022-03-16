@@ -2,6 +2,8 @@ package com.sms.courier.controller;
 
 import static com.sms.courier.common.constant.Constants.WORKSPACE_STATISTICS_PATH;
 
+import com.sms.courier.common.enums.StatisticsCountType;
+import com.sms.courier.common.enums.StatisticsGroupQueryType;
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.CaseCountUserStatisticsResponse;
 import com.sms.courier.dto.response.WorkspaceProjectCaseStatisticsResponse;
@@ -24,74 +26,84 @@ public class WorkspaceStatisticsController {
 
     @GetMapping("/scene/all/count/{workspaceId}")
     public Long sceneAllCount(@PathVariable String workspaceId) {
-        return workspaceStatisticsService.sceneAllCount(workspaceId);
+        return workspaceStatisticsService.allCount(workspaceId, StatisticsCountType.SCENE_CASE.getName());
     }
 
     @GetMapping("/case/all/count/{workspaceId}")
     public Long caseAllCount(@PathVariable String workspaceId) {
-        return workspaceStatisticsService.caseAllCount(workspaceId);
+        return workspaceStatisticsService.allCount(workspaceId, StatisticsCountType.API_TEST_CASE.getName());
     }
 
     @GetMapping("/api/all/count/{workspaceId}")
     public Long apiAllCount(@PathVariable String workspaceId) {
-        return workspaceStatisticsService.apiAllCount(workspaceId);
+        return workspaceStatisticsService.allCount(workspaceId, StatisticsCountType.API.getName());
     }
 
     @GetMapping("/case/group-day/{day}/count/{workspaceId}")
     public List<CaseCountStatisticsResponse> caseGroupDayCount(@PathVariable String workspaceId,
         @PathVariable Integer day) {
-        return workspaceStatisticsService.caseGroupDayCount(workspaceId, day);
+        return workspaceStatisticsService
+            .groupDayCount(workspaceId, day, StatisticsGroupQueryType.API_TEST_CASE.getName());
     }
 
     @GetMapping("/scene/case/group-day/{day}/count/{workspaceId}")
     public List<CaseCountStatisticsResponse> sceneCaseGroupDayCount(@PathVariable String workspaceId,
         @PathVariable Integer day) {
-        return workspaceStatisticsService.sceneCaseGroupDayCount(workspaceId, day);
+        return workspaceStatisticsService
+            .groupDayCount(workspaceId, day, StatisticsGroupQueryType.SCENE_CASE.getName());
     }
 
     @GetMapping("/case/job/group-day/{day}/count/{workspaceId}")
     public List<CaseCountStatisticsResponse> caseJobGroupDayCount(@PathVariable String workspaceId,
         @PathVariable Integer day) {
-        return workspaceStatisticsService.caseJobGroupDayCount(workspaceId, day);
+        return workspaceStatisticsService
+            .groupDayCount(workspaceId, day, StatisticsGroupQueryType.API_TEST_CASE_JOB.getName());
     }
 
     @GetMapping("/scene/case/job/group-day/{day}/count/{workspaceId}")
     public List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(@PathVariable String workspaceId,
         @PathVariable Integer day) {
-        return workspaceStatisticsService.sceneCaseJobGroupDayCount(workspaceId, day);
+        return workspaceStatisticsService
+            .groupDayCount(workspaceId, day, StatisticsGroupQueryType.SCENE_CASE_JOB.getName());
     }
+
 
     @GetMapping("/case/group-user/{day}/count/{workspaceId}")
     public List<CaseCountUserStatisticsResponse> caseGroupUserCount(@PathVariable Integer day,
         @PathVariable String workspaceId) {
-        return workspaceStatisticsService.caseGroupUserCount(day, workspaceId);
+        return workspaceStatisticsService
+            .groupUserCount(day, workspaceId, StatisticsGroupQueryType.API_TEST_CASE.getName());
     }
 
     @GetMapping("/scene/case/group-user/{day}/count/{workspaceId}")
     public List<CaseCountUserStatisticsResponse> sceneCaseGroupUserCount(@PathVariable Integer day,
         @PathVariable String workspaceId) {
-        return workspaceStatisticsService.sceneCaseGroupUserCount(day, workspaceId);
+        return workspaceStatisticsService
+            .groupUserCount(day, workspaceId, StatisticsGroupQueryType.SCENE_CASE.getName());
     }
 
     @GetMapping("/case/job/group-user/{day}/count/{workspaceId}")
     public List<CaseCountUserStatisticsResponse> caseJobGroupUserCount(@PathVariable Integer day,
         @PathVariable String workspaceId) {
-        return workspaceStatisticsService.caseJobGroupUserCount(day, workspaceId);
+        return workspaceStatisticsService
+            .groupUserByJob(day, workspaceId, StatisticsGroupQueryType.API_TEST_CASE_JOB.getName());
     }
 
     @GetMapping("/scene/case/job/group-user/{day}/count/{workspaceId}")
     public List<CaseCountUserStatisticsResponse> sceneCaseJobGroupUserCount(@PathVariable Integer day,
         @PathVariable String workspaceId) {
-        return workspaceStatisticsService.sceneCaseJobGroupUserCount(day, workspaceId);
+        return workspaceStatisticsService
+            .groupUserByJob(day, workspaceId, StatisticsGroupQueryType.SCENE_CASE_JOB.getName());
     }
 
     @GetMapping("/project/case/percentage/{workspaceId}")
     public List<WorkspaceProjectCaseStatisticsResponse> projectCasePercentage(@PathVariable String workspaceId) {
-        return workspaceStatisticsService.projectCasePercentage(workspaceId);
+        return workspaceStatisticsService.projectPercentage(workspaceId, StatisticsCountType.API_TEST_CASE.getName());
     }
 
     @GetMapping("/project/scene/case/percentage/{workspaceId}")
     public List<WorkspaceProjectCaseStatisticsResponse> projectSceneCasePercentage(@PathVariable String workspaceId) {
-        return workspaceStatisticsService.projectSceneCasePercentage(workspaceId);
+        return workspaceStatisticsService.projectPercentage(workspaceId, StatisticsCountType.SCENE_CASE.getName());
     }
+
 }
