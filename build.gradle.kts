@@ -147,7 +147,7 @@ dependencies {
     implementation ("net.sourceforge.jexcelapi:jxl:2.6.12"){
         exclude(module = "log4j")
     }
-    implementation("software.amazon.awssdk:s3:")
+    implementation("software.amazon.awssdk:s3")
     implementation("net.minidev:json-smart:2.4.8")
 
 }
