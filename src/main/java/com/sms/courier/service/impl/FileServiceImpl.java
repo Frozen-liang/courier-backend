@@ -9,8 +9,6 @@ import static com.sms.courier.common.exception.ErrorCode.DOWNLOAD_TEST_FILE_ERRO
 import static com.sms.courier.common.exception.ErrorCode.EDIT_NOT_EXIST_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_TEST_FILE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.UPLOAD_TEST_FILE_ERROR;
-
-import com.amazonaws.regions.Regions;
 import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.exception.ApiTestPlatformException;
@@ -27,14 +25,15 @@ import com.sms.courier.storagestrategy.strategy.StorageStrategyFactory;
 import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.regions.Region;
 
 @Service
 @Slf4j
@@ -45,7 +44,7 @@ public class FileServiceImpl implements FileService {
     private final FileMapper fileMapper;
 
     public FileServiceImpl(StorageStrategyFactory storageStrategyFactory, FileInfoRepository fileInfoRepository,
-        FileMapper fileMapper) {
+                           FileMapper fileMapper) {
         this.storageStrategyFactory = storageStrategyFactory;
         this.fileInfoRepository = fileInfoRepository;
         this.fileMapper = fileMapper;
@@ -53,8 +52,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Map<String, String> getAllRegion() {
-        return Arrays.stream(Regions.values()).collect(Collectors.toMap(Regions::getName,
-            Regions::getDescription));
+        return Region.regions().stream()
+                .collect(Collectors.toMap(item -> item.id().toUpperCase(Locale.ROOT), Region::id));
     }
 
     @Override
@@ -64,21 +63,21 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @LogRecord(operationType = ADD, operationModule = TEST_FILE,
-        template = "{{#testFileRequest.testFile.originalFilename}}")
+            template = "{{#testFileRequest.testFile.originalFilename}}")
     public String insertTestFile(TestFileRequest testFileRequest) {
         try {
             FileStorageService fileStorageService = storageStrategyFactory.fetchStorageStrategy();
             StorageType type = fileStorageService.getType();
             MultipartFile file = testFileRequest.getTestFile();
             FileInfoEntity fileInfo = FileInfoEntity.builder()
-                .id(ObjectId.get().toString())
-                .createDateTime(LocalDateTime.now())
-                .createUserId(SecurityUtil.getCurrUserId())
-                .filename(file.getOriginalFilename())
-                .length(file.getSize())
-                .projectId(testFileRequest.getProjectId())
-                .type(type)
-                .build();
+                    .id(ObjectId.get().toString())
+                    .createDateTime(LocalDateTime.now())
+                    .createUserId(SecurityUtil.getCurrUserId())
+                    .filename(file.getOriginalFilename())
+                    .length(file.getSize())
+                    .projectId(testFileRequest.getProjectId())
+                    .type(type)
+                    .build();
             fileStorageService.store(fileInfo, file);
             fileInfoRepository.save(fileInfo);
             return fileInfo.getSourceId();
@@ -90,7 +89,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @LogRecord(operationType = EDIT, operationModule = TEST_FILE,
-        template = "{{#testFileRequest.testFile.originalFilename}}")
+            template = "{{#testFileRequest.testFile.originalFilename}}")
     public Boolean updateTestFile(TestFileRequest testFileRequest) {
         try {
             FileInfoEntity fileInfo = getById(testFileRequest.getId());
@@ -114,8 +113,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @LogRecord(operationType = DELETE, operationModule = TEST_FILE,
-        template = "{{#result.filename}}",
-        enhance = @Enhance(enable = true))
+            template = "{{#result.filename}}",
+            enhance = @Enhance(enable = true))
     public Boolean deleteTestFileById(String id) {
         try {
             FileInfoEntity fileInfo = getById(id);
@@ -147,7 +146,7 @@ public class FileServiceImpl implements FileService {
 
     private FileInfoEntity getById(String id) {
         return fileInfoRepository
-            .findById(id)
-            .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "FileInfo", id));
+                .findById(id)
+                .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "FileInfo", id));
     }
 }
