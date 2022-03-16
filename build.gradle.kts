@@ -142,7 +142,7 @@ dependencies {
     implementation("com.jayway.jsonpath:json-path:$versionJsonPath")
     implementation("cn.afterturn:easypoi-base:$versionEasyPoiBase")
     implementation ("net.sourceforge.jexcelapi:jxl:2.6.12")
-    implementation("com.amazonaws:aws-java-sdk-s3:1.11.901")
+    implementation("software.amazon.awssdk:s3:2.16.60")
 }
 
 // Temporarily cancel writing to the list through packaging.

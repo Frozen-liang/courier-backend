@@ -4,15 +4,6 @@ import static com.sms.courier.common.exception.ErrorCode.CONFIG_AMAZON_SERVICE_E
 import static com.sms.courier.common.exception.ErrorCode.DELETE_AMAZON_SERVICE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DOWNLOAD_AMAZON_SERVICE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.STORE_AMAZON_SERVICE_ERROR;
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.S3Object;
 import com.sms.courier.entity.file.AmazonStorageSettingEntity;
 import com.sms.courier.entity.file.FileInfoEntity;
 import com.sms.courier.repository.AmazonStorageSettingRepository;
@@ -22,37 +13,45 @@ import com.sms.courier.storagestrategy.strategy.FileStorageService;
 import com.sms.courier.storagestrategy.strategy.StorageStrategy;
 import com.sms.courier.utils.AesUtil;
 import com.sms.courier.utils.ExceptionUtils;
-import java.io.IOException;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @StorageStrategy(type = StorageType.AMAZON)
 @Slf4j
 public class AmazonStorageService implements FileStorageService, InitializingBean {
 
     private final AmazonStorageSettingRepository amazonStorageSettingRepository;
-    private AmazonS3 amazonS3;
+    private S3Client amazonS3;
     private String bucketName;
 
     public AmazonStorageService(AmazonStorageSettingRepository amazonStorageSettingRepository) {
         this.amazonStorageSettingRepository = amazonStorageSettingRepository;
     }
 
-    @SneakyThrows(IOException.class)
     @Override
     public boolean store(FileInfoEntity fileInfo, MultipartFile file) {
         check();
         String key = fileInfo.getId() + "-" + file.getOriginalFilename();
         try {
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentType(file.getContentType());
-            objectMetadata.setContentLength(file.getSize());
-            amazonS3.putObject(new PutObjectRequest(bucketName, key, file.getInputStream(), objectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
+            amazonS3.putObject(PutObjectRequest.builder().bucket(bucketName).key(key).build(),
+                    RequestBody.fromInputStream(file.getInputStream(), fileInfo.getLength()));
             fileInfo.setSourceId(key);
-        } catch (AmazonServiceException e) {
+        } catch (S3Exception e) {
+            log.error("Failed to store the File!", e);
+            return false;
+        } catch (Exception e) {
             log.error("Failed to store the File!", e);
             throw ExceptionUtils.mpe(STORE_AMAZON_SERVICE_ERROR);
         }
@@ -70,9 +69,9 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
     public Boolean delete(FileInfoEntity fileInfo) {
         try {
             check();
-            amazonS3.deleteObject(bucketName, fileInfo.getSourceId());
+            amazonS3.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(fileInfo.getSourceId()).build());
             return true;
-        } catch (AmazonServiceException e) {
+        } catch (S3Exception e) {
             log.warn("Failed to delete the File!", e);
             return true;
         } catch (Exception e) {
@@ -85,11 +84,13 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
     public DownloadModel download(FileInfoEntity fileInfo) {
         try {
             check();
-            S3Object s3Object = amazonS3.getObject(bucketName, fileInfo.getSourceId());
+            ResponseInputStream<GetObjectResponse> object =
+                    amazonS3.getObject(GetObjectRequest.builder()
+                            .bucket(bucketName).key(fileInfo.getSourceId()).build());
             return DownloadModel.builder()
                     .filename(fileInfo.getFilename())
-                    .contentType(s3Object.getObjectMetadata().getContentType())
-                    .inputStream(s3Object.getObjectContent()).build();
+                    .contentType(object.response().contentType())
+                    .inputStream(object).build();
         } catch (Exception e) {
             log.error("Failed to download the File!", e);
             throw ExceptionUtils.mpe(DOWNLOAD_AMAZON_SERVICE_ERROR);
@@ -114,17 +115,17 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
             if (amazonS3 == null) {
                 return;
             }
-            amazonS3.shutdown();
+            amazonS3.close();
             amazonS3 = null;
             return;
         }
         bucketName = amazonStorageSettingEntity.getBucketName() + "/courier";
         String accessKeyId = AesUtil.decrypt(amazonStorageSettingEntity.getAccessKeyId());
         String accessKeyIdSecret = AesUtil.decrypt(amazonStorageSettingEntity.getAccessKeySecret());
-        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKeyId, accessKeyIdSecret);
-        amazonS3 = AmazonS3Client.builder()
-                .withRegion(amazonStorageSettingEntity.getRegion())
-                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+        AwsBasicCredentials awsBasicCredentials = AwsBasicCredentials.create(accessKeyId, accessKeyIdSecret);
+        amazonS3 = S3Client.builder()
+                .region(Region.of(amazonStorageSettingEntity.getRegion()))
+                .credentialsProvider(StaticCredentialsProvider.create(awsBasicCredentials))
                 .build();
     }
 
