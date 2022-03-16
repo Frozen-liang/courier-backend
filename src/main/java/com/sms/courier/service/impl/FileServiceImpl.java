@@ -70,14 +70,14 @@ public class FileServiceImpl implements FileService {
             StorageType type = fileStorageService.getType();
             MultipartFile file = testFileRequest.getTestFile();
             FileInfoEntity fileInfo = FileInfoEntity.builder()
-                .id(ObjectId.get().toString())
-                .createDateTime(LocalDateTime.now())
-                .createUserId(SecurityUtil.getCurrUserId())
-                .filename(file.getOriginalFilename())
-                .length(file.getSize())
-                .projectId(testFileRequest.getProjectId())
-                .type(type)
-                .build();
+                    .id(ObjectId.get().toString())
+                    .createDateTime(LocalDateTime.now())
+                    .createUserId(SecurityUtil.getCurrUserId())
+                    .filename(file.getOriginalFilename())
+                    .length(file.getSize())
+                    .projectId(testFileRequest.getProjectId())
+                    .type(type)
+                    .build();
             fileStorageService.store(fileInfo, file);
             fileInfoRepository.save(fileInfo);
             return fileInfo.getSourceId();
