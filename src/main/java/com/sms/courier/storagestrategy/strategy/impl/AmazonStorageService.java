@@ -4,6 +4,7 @@ import static com.sms.courier.common.exception.ErrorCode.CONFIG_AMAZON_SERVICE_E
 import static com.sms.courier.common.exception.ErrorCode.DELETE_AMAZON_SERVICE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DOWNLOAD_AMAZON_SERVICE_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.STORE_AMAZON_SERVICE_ERROR;
+
 import com.sms.courier.entity.file.AmazonStorageSettingEntity;
 import com.sms.courier.entity.file.FileInfoEntity;
 import com.sms.courier.repository.AmazonStorageSettingRepository;
@@ -46,11 +47,8 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
         String key = fileInfo.getId() + "-" + file.getOriginalFilename();
         try {
             amazonS3.putObject(PutObjectRequest.builder().bucket(bucketName).key(key).build(),
-                    RequestBody.fromInputStream(file.getInputStream(), fileInfo.getLength()));
+                RequestBody.fromInputStream(file.getInputStream(), fileInfo.getLength()));
             fileInfo.setSourceId(key);
-        } catch (S3Exception e) {
-            log.error("Failed to store the File!", e);
-            return false;
         } catch (Exception e) {
             log.error("Failed to store the File!", e);
             throw ExceptionUtils.mpe(STORE_AMAZON_SERVICE_ERROR);
@@ -85,12 +83,12 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
         try {
             check();
             ResponseInputStream<GetObjectResponse> object =
-                    amazonS3.getObject(GetObjectRequest.builder()
-                            .bucket(bucketName).key(fileInfo.getSourceId()).build());
+                amazonS3.getObject(GetObjectRequest.builder()
+                    .bucket(bucketName).key(fileInfo.getSourceId()).build());
             return DownloadModel.builder()
-                    .filename(fileInfo.getFilename())
-                    .contentType(object.response().contentType())
-                    .inputStream(object).build();
+                .filename(fileInfo.getFilename())
+                .contentType(object.response().contentType())
+                .inputStream(object).build();
         } catch (Exception e) {
             log.error("Failed to download the File!", e);
             throw ExceptionUtils.mpe(DOWNLOAD_AMAZON_SERVICE_ERROR);
@@ -124,9 +122,9 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
         String accessKeyIdSecret = AesUtil.decrypt(amazonStorageSettingEntity.getAccessKeySecret());
         AwsBasicCredentials awsBasicCredentials = AwsBasicCredentials.create(accessKeyId, accessKeyIdSecret);
         amazonS3 = S3Client.builder()
-                .region(Region.of(amazonStorageSettingEntity.getRegion()))
-                .credentialsProvider(StaticCredentialsProvider.create(awsBasicCredentials))
-                .build();
+            .region(Region.of(amazonStorageSettingEntity.getRegion()))
+            .credentialsProvider(StaticCredentialsProvider.create(awsBasicCredentials))
+            .build();
     }
 
     @Override
