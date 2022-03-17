@@ -53,7 +53,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public Map<String, String> getAllRegion() {
         return Region.regions().stream()
-                .collect(Collectors.toMap(item -> item.id().toUpperCase(Locale.ROOT), Region::id));
+                .collect(Collectors.toMap(Region::id, Region::id));
     }
 
     @Override

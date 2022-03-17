@@ -43,7 +43,7 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
     @Override
     public boolean store(FileInfoEntity fileInfo, MultipartFile file) {
         check();
-        String key = fileInfo.getId() + "-" + file.getOriginalFilename();
+        String key = "courier" + fileInfo.getId() + "-" + file.getOriginalFilename();
         try {
             amazonS3.putObject(PutObjectRequest.builder().bucket(bucketName).key(key).build(),
                     RequestBody.fromInputStream(file.getInputStream(), fileInfo.getLength()));
@@ -119,7 +119,7 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
             amazonS3 = null;
             return;
         }
-        bucketName = amazonStorageSettingEntity.getBucketName() + "/courier";
+        bucketName = amazonStorageSettingEntity.getBucketName();
         String accessKeyId = AesUtil.decrypt(amazonStorageSettingEntity.getAccessKeyId());
         String accessKeyIdSecret = AesUtil.decrypt(amazonStorageSettingEntity.getAccessKeySecret());
         AwsBasicCredentials awsBasicCredentials = AwsBasicCredentials.create(accessKeyId, accessKeyIdSecret);
