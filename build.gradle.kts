@@ -24,10 +24,10 @@ val versionJjwt by extra("0.11.2")
 val caffeine by extra("3.0.0")
 val versionMustache by extra("compiler:0.9.10")
 val versionJsonPath by extra("2.4.0")
-val versionEasyPoiBase by extra("3.0.1")
+val versionEasyPoiBase by extra("4.4.0")
 
 plugins {
-    val springVersion = "2.4.5"
+    val springVersion = "2.5.10"
     java
     checkstyle
     jacoco
@@ -36,6 +36,7 @@ plugins {
     id("org.springframework.boot") version springVersion
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("com.google.protobuf") version "0.8.18"
+    id ("org.cyclonedx.bom") version "1.5.0"
 
 }
 
@@ -85,15 +86,17 @@ springBoot {
 }
 
 
+
 dependencies {
 
+    implementation(platform(SpringBootPlugin.BOM_COORDINATES))
+    implementation(platform("software.amazon.awssdk:bom:2.17.149"))
     implementation("com.google.protobuf:protobuf-java-util:$protocVersion")
     annotationProcessor("no.entur.mapstruct.spi:protobuf-spi-impl:$mapstructSpiGrpcVersion")
     implementation("io.grpc:grpc-stub:$grpcVersion")
     implementation("io.grpc:grpc-protobuf:$grpcVersion")
     implementation("io.grpc:grpc-netty-shaded:$grpcVersion")
     implementation("io.grpc:grpc-services:${grpcVersion}")
-    implementation(platform(SpringBootPlugin.BOM_COORDINATES))
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("org.springframework.boot:spring-boot-starter-web") {
         exclude(module = "spring-boot-starter-tomcat")
@@ -141,8 +144,12 @@ dependencies {
     implementation("com.github.spullara.mustache.java:$versionMustache")
     implementation("com.jayway.jsonpath:json-path:$versionJsonPath")
     implementation("cn.afterturn:easypoi-base:$versionEasyPoiBase")
-    implementation ("net.sourceforge.jexcelapi:jxl:2.6.12")
-    implementation("com.amazonaws:aws-java-sdk-s3:1.11.901")
+    implementation ("net.sourceforge.jexcelapi:jxl:2.6.12"){
+        exclude(module = "log4j")
+    }
+    implementation("software.amazon.awssdk:s3")
+    implementation("net.minidev:json-smart:2.4.8")
+
 }
 
 // Temporarily cancel writing to the list through packaging.
