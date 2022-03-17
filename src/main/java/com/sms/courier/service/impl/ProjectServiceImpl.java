@@ -72,7 +72,6 @@ public class ProjectServiceImpl implements ProjectService {
             ProjectEntity project = projectMapper.toEntity(projectRequest);
             Example<ProjectEntity> example = Example.of(project);
             Optional<ProjectEntity> optional = projectRepository.findOne(example);
-            System.out.println(optional.isPresent());
             isTrue(optional.isEmpty(), THE_PROJECT_EXIST_ERROR, project.getName(), project.getVersion());
             projectRepository.insert(project);
         } catch (ApiTestPlatformException courierException) {

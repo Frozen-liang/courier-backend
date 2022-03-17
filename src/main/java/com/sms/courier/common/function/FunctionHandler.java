@@ -20,7 +20,7 @@ public interface FunctionHandler {
         });
     }
 
-    static <T, R> Function1Handler<T, R> confirmedF1(boolean isConfirmed, T param) {
+    static <T, R> FunctionOneParamHandler<T, R> confirmedOne(boolean isConfirmed, T param) {
         return (confirmed -> {
             R value = null;
             if (isConfirmed) {
