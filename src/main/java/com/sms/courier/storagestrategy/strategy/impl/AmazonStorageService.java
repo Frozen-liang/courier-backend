@@ -13,6 +13,7 @@ import com.sms.courier.storagestrategy.strategy.FileStorageService;
 import com.sms.courier.storagestrategy.strategy.StorageStrategy;
 import com.sms.courier.utils.AesUtil;
 import com.sms.courier.utils.ExceptionUtils;
+import java.io.File;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +44,7 @@ public class AmazonStorageService implements FileStorageService, InitializingBea
     @Override
     public boolean store(FileInfoEntity fileInfo, MultipartFile file) {
         check();
-        String key = "courier" + fileInfo.getId() + "-" + file.getOriginalFilename();
+        String key = "courier" + File.separator + fileInfo.getId() + "-" + file.getOriginalFilename();
         try {
             amazonS3.putObject(PutObjectRequest.builder().bucket(bucketName).key(key).build(),
                     RequestBody.fromInputStream(file.getInputStream(), fileInfo.getLength()));
