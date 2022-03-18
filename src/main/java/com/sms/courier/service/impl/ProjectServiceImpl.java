@@ -72,11 +72,8 @@ public class ProjectServiceImpl implements ProjectService {
             ProjectEntity project = projectMapper.toEntity(projectRequest);
             Example<ProjectEntity> example = Example.of(project);
             Optional<ProjectEntity> optional = projectRepository.findOne(example);
-            if (optional.isEmpty()) {
-                projectRepository.insert(project);
-                return Boolean.TRUE;
-            }
-            throw ExceptionUtils.mpe(THE_PROJECT_EXIST_ERROR, project.getName(), project.getVersion());
+            isTrue(optional.isEmpty(), THE_PROJECT_EXIST_ERROR, project.getName(), project.getVersion());
+            projectRepository.insert(project);
         } catch (ApiTestPlatformException courierException) {
             log.error(courierException.getMessage());
             throw courierException;
@@ -84,6 +81,7 @@ public class ProjectServiceImpl implements ProjectService {
             log.error("Failed to add the Project!", e);
             throw new ApiTestPlatformException(ADD_PROJECT_ERROR);
         }
+        return Boolean.TRUE;
     }
 
     @Override

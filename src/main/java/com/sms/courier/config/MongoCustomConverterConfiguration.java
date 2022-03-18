@@ -53,6 +53,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Value;
@@ -136,7 +137,7 @@ public class MongoCustomConverterConfiguration {
                 IntegerToWebhookTypeConverter.INSTANCE, IntegerToDataBaseTypeConverter.INSTANCE,
                 IntegerToCodeTypeConverter.INSTANCE, IntegerToTemplateTypeConverter.INSTANCE,
                 IntegerToReviewStatusConverter.INSTANCE, IntegerToStorageTypeConverter.INSTANCE,
-                IntegerToExecuteTypeConverter.INSTANCE);
+                IntegerToExecuteTypeConverter.INSTANCE, ListToStringConverter.INSTANCE);
 
         return new MongoCustomConversions(converters);
     }
@@ -576,5 +577,16 @@ public class MongoCustomConverterConfiguration {
             return ExecuteType.getExecuteType(code);
         }
     }
+
+    @ReadingConverter
+    enum ListToStringConverter implements Converter<List<String>, String> {
+        INSTANCE;
+
+        @Override
+        public String convert(List<String> source) {
+            return CollectionUtils.isNotEmpty(source) ? source.get(0) : null;
+        }
+    }
+
 }
 

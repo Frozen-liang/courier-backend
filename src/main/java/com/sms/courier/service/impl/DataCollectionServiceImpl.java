@@ -55,6 +55,7 @@ import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -220,12 +221,16 @@ public class DataCollectionServiceImpl implements DataCollectionService {
                     }
                     Cell cell = sheet.getCell(j, i);
                     String value = cell.getContents();
-                    dataParams.add(DataParam.builder().key(keyCell[j].getContents()).value(value).build());
+                    if (StringUtils.isNotBlank(value)) {
+                        dataParams.add(DataParam.builder().key(keyCell[j].getContents()).value(value).build());
+                    }
                 }
-                TestData testData = TestData.builder().dataName(sheet.getCell(firstIndex, i).getContents())
-                    .data(dataParams)
-                    .build();
-                dataList.add(testData);
+                if (CollectionUtils.isNotEmpty(dataParams)) {
+                    TestData testData = TestData.builder().dataName(sheet.getCell(firstIndex, i).getContents())
+                        .data(dataParams)
+                        .build();
+                    dataList.add(testData);
+                }
             }
             dataCollectionRepository.save(dataCollection);
             return Boolean.TRUE;

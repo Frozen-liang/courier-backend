@@ -178,8 +178,8 @@ public class WorkspaceStatisticsServiceTest {
     public void projectCasePercentage_test() {
         List<ProjectResponse> projectResponses = Lists.newArrayList();
         when(projectService.list(any())).thenReturn(projectResponses);
-        when(projectStatisticsService.caseCount(any())).thenReturn(MOCK_COUNT);
-        when(projectStatisticsService.apiAllCount(any())).thenReturn(MOCK_COUNT);
+        when(projectStatisticsService.caseCount(any(),any())).thenReturn(MOCK_COUNT);
+        when(projectStatisticsService.allCount(any(),any())).thenReturn(MOCK_COUNT);
         List<WorkspaceProjectCaseStatisticsResponse> dto = workspaceStatisticsService.projectPercentage(ID,
             StatisticsCountType.API_TEST_CASE.getName());
         assertThat(dto).isEmpty();
