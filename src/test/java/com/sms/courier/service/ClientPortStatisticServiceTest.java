@@ -5,6 +5,9 @@ import com.sms.courier.dto.response.CountStatisticsResponse;
 import com.sms.courier.entity.statistics.ClientPortStatisticEntity;
 import com.sms.courier.repository.ClientPortStatisticRepository;
 import com.sms.courier.repository.CommonStatisticsRepository;
+import com.sms.courier.repository.CustomizedApiRepository;
+import com.sms.courier.repository.CustomizedApiTestCaseRepository;
+import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.service.impl.ClientPortStatisticServiceImpl;
 import java.util.List;
 import org.assertj.core.util.Lists;
@@ -24,8 +27,14 @@ public class ClientPortStatisticServiceTest {
     private final ClientPortStatisticRepository clientPortStatisticRepository = mock(
         ClientPortStatisticRepository.class);
     private final CommonStatisticsRepository commonStatisticsRepository = mock(CommonStatisticsRepository.class);
+    private final CustomizedSceneCaseRepository customizedSceneCaseRepository = mock(
+        CustomizedSceneCaseRepository.class);
+    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository =
+        mock(CustomizedApiTestCaseRepository.class);
+    private final CustomizedApiRepository customizedApiRepository = mock(CustomizedApiRepository.class);
     private final ClientPortStatisticService clientPortStatisticService =
-        new ClientPortStatisticServiceImpl(clientPortStatisticRepository, commonStatisticsRepository);
+        new ClientPortStatisticServiceImpl(clientPortStatisticRepository, commonStatisticsRepository,
+            customizedSceneCaseRepository, customizedApiTestCaseRepository, customizedApiRepository);
     private final static String MOCK_IP = "123";
     private final static Integer MOCK_DAY = 7;
 

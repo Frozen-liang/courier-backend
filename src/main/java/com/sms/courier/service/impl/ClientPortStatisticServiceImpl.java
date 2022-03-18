@@ -7,6 +7,9 @@ import com.sms.courier.dto.response.CountStatisticsResponse;
 import com.sms.courier.entity.statistics.ClientPortStatisticEntity;
 import com.sms.courier.repository.ClientPortStatisticRepository;
 import com.sms.courier.repository.CommonStatisticsRepository;
+import com.sms.courier.repository.CustomizedApiRepository;
+import com.sms.courier.repository.CustomizedApiTestCaseRepository;
+import com.sms.courier.repository.CustomizedSceneCaseRepository;
 import com.sms.courier.service.ClientPortStatisticService;
 import com.sms.courier.utils.ExceptionUtils;
 import java.util.List;
@@ -21,8 +24,12 @@ public class ClientPortStatisticServiceImpl extends AbstractStatisticsService im
 
     public ClientPortStatisticServiceImpl(
         ClientPortStatisticRepository clientPortStatisticRepository,
-        CommonStatisticsRepository commonStatisticsRepository) {
-        super(commonStatisticsRepository);
+        CommonStatisticsRepository commonStatisticsRepository,
+        CustomizedSceneCaseRepository customizedSceneCaseRepository,
+        CustomizedApiTestCaseRepository customizedApiTestCaseRepository,
+        CustomizedApiRepository customizedApiRepository) {
+        super(commonStatisticsRepository, customizedSceneCaseRepository, customizedApiTestCaseRepository,
+            customizedApiRepository);
         this.clientPortStatisticRepository = clientPortStatisticRepository;
     }
 

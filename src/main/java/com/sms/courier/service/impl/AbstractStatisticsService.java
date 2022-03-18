@@ -3,8 +3,6 @@ package com.sms.courier.service.impl;
 import com.google.common.collect.Lists;
 import com.sms.courier.common.enums.StatisticsCountType;
 import com.sms.courier.common.enums.StatisticsGroupQueryType;
-import com.sms.courier.common.enums.StatisticsCountType;
-import com.sms.courier.common.enums.StatisticsGroupQueryType;
 import com.sms.courier.dto.response.CaseCountUserStatisticsResponse;
 import com.sms.courier.dto.response.CountStatisticsResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
