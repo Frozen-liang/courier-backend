@@ -9,25 +9,13 @@ import org.springframework.data.domain.Page;
 
 public interface ProjectStatisticsService {
 
-    Page<ApiPageResponse> sceneCountPage(ApiIncludeCaseRequest request);
+    Page<ApiPageResponse> caseCountPage(ApiIncludeCaseRequest request, String countType);
 
-    Page<ApiPageResponse> caseCountPage(ApiIncludeCaseRequest request);
+    Long allCount(String projectId, String countType);
 
-    List<CountStatisticsResponse> caseGroupDayCount(String projectId);
+    Long caseCount(ObjectId projectId, String countType);
 
-    List<CountStatisticsResponse> sceneCaseGroupDayCount(String projectId);
-
-    Long apiAllCount(String projectId);
-
-    Long sceneAllCount(String projectId);
-
-    Long caseAllCount(String projectId);
-
-    Long sceneCount(ObjectId projectId);
-
-    Long caseCount(ObjectId projectId);
-
-    List<CountStatisticsResponse> caseJobGroupDayCount(String projectId, Integer day);
+    List<CountStatisticsResponse> groupDayCount(String projectId, Integer day, String groupType);
 
     List<CountStatisticsResponse> sceneCaseJobGroupDayCount(String projectId, Integer day);
 }
