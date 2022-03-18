@@ -12,11 +12,21 @@ public interface FunctionHandler {
         };
     }
 
-    static <T> TrueHandler<T> confirmed(boolean value, T param) {
+    static <T> TrueHandler<T> confirmed(boolean isConfirmed, T param) {
         return (confirmed -> {
-            if (value) {
+            if (isConfirmed) {
                 confirmed.accept(param);
             }
+        });
+    }
+
+    static <T, R> FunctionOneParamHandler<T, R> confirmedOne(boolean isConfirmed, T param) {
+        return (confirmed -> {
+            R value = null;
+            if (isConfirmed) {
+                value = confirmed.apply(param);
+            }
+            return value;
         });
     }
 

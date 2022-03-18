@@ -3,15 +3,12 @@ package com.sms.courier.service.impl;
 import static com.sms.courier.common.exception.ErrorCode.GET_PROJECT_CASE_GROUP_BY_DAY_ERROR;
 
 import com.google.common.collect.Lists;
-import com.sms.courier.common.constant.Constants;
+import com.sms.courier.common.enums.StatisticsCountType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
 import com.sms.courier.dto.response.CaseCountStatisticsResponse;
-import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
-import com.sms.courier.entity.job.ApiTestCaseJobEntity;
-import com.sms.courier.entity.scenetest.SceneCaseEntity;
 import com.sms.courier.repository.CommonStatisticsRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseRepository;
@@ -21,10 +18,12 @@ import com.sms.courier.service.ProjectStatisticsService;
 import com.sms.courier.utils.ExceptionUtils;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+
 
 @Slf4j
 @Service
@@ -32,105 +31,46 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
 
     private final CustomizedApiRepository customizedApiRepository;
     private final CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository;
-    private final CustomizedApiTestCaseRepository customizedApiTestCaseRepository;
-    private final CustomizedSceneCaseRepository customizedSceneCaseRepository;
 
     public ProjectStatisticsServiceImpl(CustomizedApiRepository customizedApiRepository,
         CommonStatisticsRepository commonStatisticsRepository,
         CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository,
         CustomizedApiTestCaseRepository customizedApiTestCaseRepository,
         CustomizedSceneCaseRepository customizedSceneCaseRepository) {
-        super(commonStatisticsRepository);
+        super(commonStatisticsRepository, customizedSceneCaseRepository, customizedApiTestCaseRepository,
+            customizedApiRepository);
         this.customizedApiRepository = customizedApiRepository;
         this.customizedSceneCaseJobRepository = customizedSceneCaseJobRepository;
-        this.customizedApiTestCaseRepository = customizedApiTestCaseRepository;
-        this.customizedSceneCaseRepository = customizedSceneCaseRepository;
     }
 
     @Override
-    public Page<ApiPageResponse> sceneCountPage(ApiIncludeCaseRequest request) {
+    public Page<ApiPageResponse> caseCountPage(ApiIncludeCaseRequest request, String countType) {
         try {
-            return customizedApiRepository.sceneCountPage(request);
-        } catch (Exception e) {
-            log.error("Failed to get scene count api page!", e);
-            throw ExceptionUtils.mpe(ErrorCode.GET_SCENE_COUNT_API_PAGE_ERROR);
-        }
-    }
-
-    @Override
-    public Page<ApiPageResponse> caseCountPage(ApiIncludeCaseRequest request) {
-        try {
-            return customizedApiRepository.caseCountPage(request);
+            return Objects.equals(StatisticsCountType.SCENE_CASE.getName(), countType)
+                ? customizedApiRepository.sceneCountPage(request) : customizedApiRepository.caseCountPage(request);
         } catch (Exception e) {
             log.error("Failed to get case count api page!", e);
             throw ExceptionUtils.mpe(ErrorCode.GET_CASE_COUNT_API_PAGE_ERROR);
         }
     }
 
-    @Override
-    public List<CaseCountStatisticsResponse> caseGroupDayCount(String projectId) {
-        try {
-            return groupDay(Lists.newArrayList(projectId), Constants.CASE_DAY, ApiTestCaseEntity.class);
-        } catch (Exception e) {
-            log.error("Failed to get the Project case group by day!", e);
-            throw new ApiTestPlatformException(GET_PROJECT_CASE_GROUP_BY_DAY_ERROR);
-        }
-    }
 
     @Override
-    public List<CaseCountStatisticsResponse> sceneCaseGroupDayCount(String projectId) {
+    public Long allCount(String projectId, String countType) {
         try {
-            return groupDay(Lists.newArrayList(projectId), Constants.CASE_DAY, SceneCaseEntity.class);
-        } catch (Exception e) {
-            log.error("Failed to get the Project case group by day!", e);
-            throw ExceptionUtils.mpe(ErrorCode.GET_PROJECT_SCENE_CASE_GROUP_BY_DAY_ERROR);
-        }
-    }
-
-    @Override
-    public Long apiAllCount(String projectId) {
-        try {
-            return customizedApiRepository.count(Lists.newArrayList(projectId));
+            return allCountTypeMap.get(countType).apply(Lists.newArrayList(projectId));
         } catch (Exception e) {
             log.error("Failed to get the Project api count!", e);
             throw ExceptionUtils.mpe(ErrorCode.GET_PROJECT_API_COUNT_ERROR);
         }
     }
 
-    @Override
-    public Long sceneAllCount(String projectId) {
-        try {
-            return customizedSceneCaseRepository.count(Lists.newArrayList(projectId));
-        } catch (Exception e) {
-            log.error("Failed to get the Project scene count!", e);
-            throw ExceptionUtils.mpe(ErrorCode.GET_PROJECT_SCENE_COUNT_ERROR);
-        }
-    }
 
     @Override
-    public Long caseAllCount(String projectId) {
+    public Long caseCount(ObjectId projectId, String countType) {
         try {
-            return customizedApiTestCaseRepository.count(Lists.newArrayList(projectId));
-        } catch (Exception e) {
-            log.error("Failed to get the Project api case count!", e);
-            throw ExceptionUtils.mpe(ErrorCode.GET_PROJECT_API_CASE_COUNT_ERROR);
-        }
-    }
-
-    @Override
-    public Long sceneCount(ObjectId projectId) {
-        try {
-            return customizedApiRepository.sceneCount(projectId);
-        } catch (Exception e) {
-            log.error("Failed to query scene count the Api!", e);
-            throw new ApiTestPlatformException(ErrorCode.GET_SCENE_COUNT_BY_API_ERROR);
-        }
-    }
-
-    @Override
-    public Long caseCount(ObjectId projectId) {
-        try {
-            return customizedApiRepository.caseCount(projectId);
+            return Objects.equals(StatisticsCountType.SCENE_CASE.getName(), countType)
+                ? customizedApiRepository.sceneCount(projectId) : customizedApiRepository.caseCount(projectId);
         } catch (Exception e) {
             log.error("Failed to query case count the Api!", e);
             throw new ApiTestPlatformException(ErrorCode.GET_CASE_COUNT_BY_API_ERROR);
@@ -138,12 +78,13 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
     }
 
     @Override
-    public List<CaseCountStatisticsResponse> caseJobGroupDayCount(String projectId, Integer day) {
+    public List<CaseCountStatisticsResponse> groupDayCount(String projectId, Integer day, String groupType) {
         try {
-            return groupDay(Lists.newArrayList(projectId), day, ApiTestCaseJobEntity.class);
+            return groupDay(Lists.newArrayList(projectId), day,
+                groupQueryTypeMap.get(groupType));
         } catch (Exception e) {
-            log.error("Failed to get case job count!", e);
-            throw ExceptionUtils.mpe(ErrorCode.GET_CASE_JOB_COUNT_ERROR);
+            log.error("Failed to get the Project case group by day!", e);
+            throw new ApiTestPlatformException(GET_PROJECT_CASE_GROUP_BY_DAY_ERROR);
         }
     }
 
