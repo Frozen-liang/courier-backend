@@ -6,7 +6,7 @@ import com.sms.courier.common.enums.StatisticsGroupQueryType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CountStatisticsResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.repository.CommonStatisticsRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
@@ -23,7 +23,6 @@ import org.assertj.core.util.Lists;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.shadow.com.univocity.parsers.common.fields.FieldSelector;
 import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.util.ReflectionUtils;
@@ -79,10 +78,10 @@ public class ProjectStatisticsServiceTest {
     @Test
     @DisplayName("Test the caseGroupDayCount method in the ProjectStatisticsService")
     public void caseGroupDayCount_test() {
-        List<CaseCountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
+        List<CountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
         when(commonStatisticsRepository.getGroupDayCount(any(), any(), eq(ApiTestCaseEntity.class)))
             .thenReturn(caseCountStatisticsResponses);
-        List<CaseCountStatisticsResponse> responses = projectStatisticsService.groupDayCount(ID,
+        List<CountStatisticsResponse> responses = projectStatisticsService.groupDayCount(ID,
             Constants.CASE_DAY, StatisticsGroupQueryType.API_TEST_CASE.getName());
         assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
     }
@@ -154,10 +153,10 @@ public class ProjectStatisticsServiceTest {
     @Test
     @DisplayName("Test the sceneCaseJobGroupDayCount method in the ProjectStatisticsService")
     public void sceneCaseJobGroupDayCount_test() {
-        List<CaseCountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
+        List<CountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
         when(customizedSceneCaseJobRepository.getGroupDayCount(any(), any()))
             .thenReturn(caseCountStatisticsResponses);
-        List<CaseCountStatisticsResponse> responses = projectStatisticsService.sceneCaseJobGroupDayCount(ID, MOCK_DAY);
+        List<CountStatisticsResponse> responses = projectStatisticsService.sceneCaseJobGroupDayCount(ID, MOCK_DAY);
         assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
     }
 

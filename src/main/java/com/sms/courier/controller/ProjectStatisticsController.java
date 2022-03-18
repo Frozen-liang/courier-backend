@@ -7,7 +7,7 @@ import com.sms.courier.common.enums.StatisticsCountType;
 import com.sms.courier.common.enums.StatisticsGroupQueryType;
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CountStatisticsResponse;
 import com.sms.courier.service.ProjectStatisticsService;
 import java.util.List;
 import org.bson.types.ObjectId;
@@ -41,14 +41,14 @@ public class ProjectStatisticsController {
     }
 
     @GetMapping("/case/group-day/count/{projectId}")
-    public List<CaseCountStatisticsResponse> caseGroupDayCount(@PathVariable String projectId) {
+    public List<CountStatisticsResponse> caseGroupDayCount(@PathVariable String projectId) {
         return projectStatisticsService
             .groupDayCount(projectId, Constants.CASE_DAY, StatisticsGroupQueryType.API_TEST_CASE
                 .getName());
     }
 
     @GetMapping("/scene/case/group-day/count/{projectId}")
-    public List<CaseCountStatisticsResponse> sceneCaseGroupDayCount(@PathVariable String projectId) {
+    public List<CountStatisticsResponse> sceneCaseGroupDayCount(@PathVariable String projectId) {
         return projectStatisticsService.groupDayCount(projectId, Constants.CASE_DAY, StatisticsGroupQueryType.SCENE_CASE
             .getName());
     }
@@ -79,14 +79,14 @@ public class ProjectStatisticsController {
     }
 
     @GetMapping("/case/job/group-day/{day}/count/{projectId}")
-    public List<CaseCountStatisticsResponse> caseJobGroupDayCount(@PathVariable String projectId,
+    public List<CountStatisticsResponse> caseJobGroupDayCount(@PathVariable String projectId,
         @PathVariable Integer day) {
         return projectStatisticsService.groupDayCount(projectId, day, StatisticsGroupQueryType.API_TEST_CASE_JOB
             .getName());
     }
 
     @GetMapping("/scene/case/job/group-day/{day}/count/{projectId}")
-    public List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(@PathVariable String projectId,
+    public List<CountStatisticsResponse> sceneCaseJobGroupDayCount(@PathVariable String projectId,
         @PathVariable Integer day) {
         return projectStatisticsService.sceneCaseJobGroupDayCount(projectId, day);
     }

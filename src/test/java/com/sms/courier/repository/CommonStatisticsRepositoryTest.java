@@ -1,6 +1,6 @@
 package com.sms.courier.repository;
 
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CountStatisticsResponse;
 import com.sms.courier.dto.response.CaseCountUserStatisticsResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.repository.impl.CommonStatisticsRepositoryImpl;
@@ -32,13 +32,13 @@ public class CommonStatisticsRepositoryTest {
     @Test
     @DisplayName("Test the getGroupDayCount method in the CommonStatisticsRepositoryTest")
     public void getGroupDayCount_test() {
-        AggregationResults<CaseCountStatisticsResponse> results = mock(AggregationResults.class);
-        List<CaseCountStatisticsResponse> caseCountStatisticsResponses =
-            Lists.newArrayList(CaseCountStatisticsResponse.builder().day(LocalDate.now()).count(0).build());
+        AggregationResults<CountStatisticsResponse> results = mock(AggregationResults.class);
+        List<CountStatisticsResponse> caseCountStatisticsResponses =
+            Lists.newArrayList(CountStatisticsResponse.builder().day(LocalDate.now()).count(0).build());
         when(results.getMappedResults()).thenReturn(caseCountStatisticsResponses);
-        when(mongoTemplate.aggregate(any(), eq(ApiTestCaseEntity.class), eq(CaseCountStatisticsResponse.class)))
+        when(mongoTemplate.aggregate(any(), eq(ApiTestCaseEntity.class), eq(CountStatisticsResponse.class)))
             .thenReturn(results);
-        List<CaseCountStatisticsResponse> responses =
+        List<CountStatisticsResponse> responses =
             commonStatisticsRepository.getGroupDayCount(Lists.newArrayList(ID), LocalDateTime.now(),
                 ApiTestCaseEntity.class);
         assertThat(responses).isNotEmpty();

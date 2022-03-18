@@ -2,7 +2,7 @@ package com.sms.courier.service;
 
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CountStatisticsResponse;
 import java.util.List;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
@@ -15,7 +15,7 @@ public interface ProjectStatisticsService {
 
     Long caseCount(ObjectId projectId, String countType);
 
-    List<CaseCountStatisticsResponse> groupDayCount(String projectId, Integer day, String groupType);
+    List<CountStatisticsResponse> groupDayCount(String projectId, Integer day, String groupType);
 
-    List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(String projectId, Integer day);
+    List<CountStatisticsResponse> sceneCaseJobGroupDayCount(String projectId, Integer day);
 }

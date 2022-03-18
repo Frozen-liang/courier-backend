@@ -8,7 +8,7 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CountStatisticsResponse;
 import com.sms.courier.repository.CommonStatisticsRepository;
 import com.sms.courier.repository.CustomizedApiRepository;
 import com.sms.courier.repository.CustomizedApiTestCaseRepository;
@@ -78,7 +78,7 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
     }
 
     @Override
-    public List<CaseCountStatisticsResponse> groupDayCount(String projectId, Integer day, String groupType) {
+    public List<CountStatisticsResponse> groupDayCount(String projectId, Integer day, String groupType) {
         try {
             return groupDay(Lists.newArrayList(projectId), day,
                 groupQueryTypeMap.get(groupType));
@@ -89,10 +89,10 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
     }
 
     @Override
-    public List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(String projectId, Integer day) {
+    public List<CountStatisticsResponse> sceneCaseJobGroupDayCount(String projectId, Integer day) {
         try {
             LocalDateTime dateTime = LocalDateTime.now().minusDays(day);
-            List<CaseCountStatisticsResponse> responses = customizedSceneCaseJobRepository
+            List<CountStatisticsResponse> responses = customizedSceneCaseJobRepository
                 .getGroupDayCount(Lists.newArrayList(projectId), dateTime);
             return handleResponses(responses, day);
         } catch (Exception e) {

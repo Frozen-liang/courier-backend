@@ -8,8 +8,8 @@ import static com.sms.courier.common.exception.ErrorCode.GET_WORKSPACE_PROJECT_C
 
 import com.sms.courier.common.enums.StatisticsCountType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
 import com.sms.courier.dto.response.CaseCountUserStatisticsResponse;
+import com.sms.courier.dto.response.CountStatisticsResponse;
 import com.sms.courier.dto.response.ProjectResponse;
 import com.sms.courier.dto.response.WorkspaceProjectCaseStatisticsResponse;
 import com.sms.courier.repository.CommonStatisticsRepository;
@@ -64,7 +64,7 @@ public class WorkspaceStatisticsServiceImpl extends AbstractStatisticsService im
     }
 
     @Override
-    public List<CaseCountStatisticsResponse> groupDayCount(String workspaceId, Integer day, String groupType) {
+    public List<CountStatisticsResponse> groupDayCount(String workspaceId, Integer day, String groupType) {
         try {
             List<ProjectResponse> projectResponses = projectService.list(workspaceId);
             List<String> projectIds = projectResponses.stream().map(ProjectResponse::getId)

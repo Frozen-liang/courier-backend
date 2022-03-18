@@ -324,6 +324,8 @@ public enum ErrorCode {
     DOWNLOAD_AMAZON_SERVICE_ERROR("4304", "Failed to download the File!"),
     UPDATE_AMAZON_SERVICE_ERROR("4305", "Failed to update the File!"),
     GET_SCHEDULE_RECORD_BY_ID_ERROR("4306", "Failed to get the ScheduleRecord by id!"),
+    ADD_CLIENT_PORT_STATISTIC_ERROR("4307", "Failed to add the ClientPortStatistic!"),
+    GET_CLIENT_PORT_STATISTIC_COUNT_ERROR("4308", "Failed to get the ClientPortStatistic count!"),
 
     // 50001 - 51000 describes code generate exception
     FILE_FILL_THE_CONTENT_ERROR("50001", "File fill the content error!"),
