@@ -26,14 +26,15 @@ import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.SecurityUtil;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.regions.RegionMetadata;
 
 @Service
 @Slf4j
@@ -52,8 +53,9 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Map<String, String> getAllRegion() {
-        return Region.regions().stream()
-                .collect(Collectors.toMap(item -> item.id().toUpperCase(Locale.ROOT), Region::id));
+        return Region.regions().stream().map(Region::metadata)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(RegionMetadata::id, RegionMetadata::description));
     }
 
     @Override
