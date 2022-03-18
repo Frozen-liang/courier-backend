@@ -23,6 +23,7 @@ import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
+import com.sms.courier.common.function.FunctionHandler;
 import com.sms.courier.dto.PageDto;
 import com.sms.courier.dto.request.ApiRequest;
 import com.sms.courier.dto.request.ApiTestCasePageRequest;
@@ -94,7 +95,7 @@ public class ApiTestCaseServiceImpl extends AbstractCaseService implements ApiTe
             return customizedApiTestCaseRepository.listByJoin(apiId, projectId, removed);
         } catch (Exception e) {
             log.error("Failed to get the ApiTestCase list!", e);
-            throw new ApiTestPlatformException(GET_API_TEST_CASE_LIST_ERROR);
+            throw ExceptionUtils.mpe(GET_API_TEST_CASE_LIST_ERROR);
         }
     }
 
@@ -109,7 +110,7 @@ public class ApiTestCaseServiceImpl extends AbstractCaseService implements ApiTe
             caseApiCountHandler.addTestCaseByApiIds(List.of(apiTestCase.getApiEntity().getId()), 1);
         } catch (Exception e) {
             log.error("Failed to add the ApiTestCase!", e);
-            throw new ApiTestPlatformException(ADD_API_TEST_CASE_ERROR);
+            throw ExceptionUtils.mpe(ADD_API_TEST_CASE_ERROR);
         }
         return Boolean.TRUE;
     }
@@ -131,7 +132,7 @@ public class ApiTestCaseServiceImpl extends AbstractCaseService implements ApiTe
             throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the ApiTestCase!", e);
-            throw new ApiTestPlatformException(EDIT_API_TEST_CASE_ERROR);
+            throw ExceptionUtils.mpe(EDIT_API_TEST_CASE_ERROR);
         }
         return Boolean.TRUE;
     }
@@ -144,14 +145,11 @@ public class ApiTestCaseServiceImpl extends AbstractCaseService implements ApiTe
     public Boolean delete(List<String> ids) {
         try {
             Boolean result = customizedApiTestCaseRepository.deleteByIds(ids);
-            if (result) {
-                List<String> apiIds = customizedApiTestCaseRepository.findApiIdsByTestIds(ids);
-                caseApiCountHandler.deleteTestCaseByApiIds(apiIds);
-            }
+            FunctionHandler.confirmed(result, ids).handler(this::deleteApiCaseCount);
             return result;
         } catch (Exception e) {
             log.error("Failed to delete the ApiTestCase!", e);
-            throw new ApiTestPlatformException(DELETE_API_TEST_CASE_BY_ID_ERROR);
+            throw ExceptionUtils.mpe(DELETE_API_TEST_CASE_BY_ID_ERROR);
         }
     }
 
@@ -187,10 +185,7 @@ public class ApiTestCaseServiceImpl extends AbstractCaseService implements ApiTe
         sourceId = "{{#ids}}")
     public Boolean recover(List<String> ids) {
         Boolean isSuccess = customizedApiTestCaseRepository.recover(ids);
-        if (isSuccess) {
-            List<String> apiIds = customizedApiTestCaseRepository.findApiIdsByTestIds(ids);
-            caseApiCountHandler.addTestCaseByApiIds(apiIds, 1);
-        }
+        FunctionHandler.confirmed(isSuccess, ids).handler(this::addApiCaseCount);
         return isSuccess;
     }
 
@@ -297,6 +292,16 @@ public class ApiTestCaseServiceImpl extends AbstractCaseService implements ApiTe
         apiEntity.setApiStatus(apiRequest.getApiStatus());
         apiEntity.setDescription(apiRequest.getDescription());
         apiTestCase.setApiEntity(apiEntity);
+    }
+
+    private void deleteApiCaseCount(List<String> ids) {
+        List<String> apiIds = customizedApiTestCaseRepository.findApiIdsByTestIds(ids);
+        caseApiCountHandler.deleteTestCaseByApiIds(apiIds);
+    }
+
+    private void addApiCaseCount(List<String> ids) {
+        List<String> apiIds = customizedApiTestCaseRepository.findApiIdsByTestIds(ids);
+        caseApiCountHandler.addTestCaseByApiIds(apiIds, 1);
     }
 
 }

@@ -58,7 +58,7 @@ public class ProjectServiceImpl implements ProjectService {
                 projectRepository.findAllByRemovedIsFalseAndWorkspaceIdOrderByCreateDateTimeDesc(workspaceId));
         } catch (Exception e) {
             log.error("Failed to get the Project list!", e);
-            throw new ApiTestPlatformException(GET_PROJECT_LIST_ERROR);
+            throw ExceptionUtils.mpe(GET_PROJECT_LIST_ERROR);
         }
     }
 
@@ -79,7 +79,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the Project!", e);
-            throw new ApiTestPlatformException(ADD_PROJECT_ERROR);
+            throw ExceptionUtils.mpe(ADD_PROJECT_ERROR);
         }
         return Boolean.TRUE;
     }
@@ -99,7 +99,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the Project!", e);
-            throw new ApiTestPlatformException(EDIT_PROJECT_ERROR);
+            throw ExceptionUtils.mpe(EDIT_PROJECT_ERROR);
         }
         return Boolean.TRUE;
     }
@@ -113,7 +113,7 @@ public class ProjectServiceImpl implements ProjectService {
             return commonRepository.deleteByIds(ids, ProjectEntity.class);
         } catch (Exception e) {
             log.error("Failed to delete the Project!", e);
-            throw new ApiTestPlatformException(DELETE_PROJECT_BY_ID_ERROR);
+            throw ExceptionUtils.mpe(DELETE_PROJECT_BY_ID_ERROR);
         }
     }
 

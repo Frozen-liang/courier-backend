@@ -53,7 +53,7 @@ public class ApiTagGroupServiceImpl implements ApiTagGroupService {
             return apiTagGroupMapper.toDtoList(apiTagGroupRepository.findByProjectId(projectId));
         } catch (Exception e) {
             log.error("Failed to get the ApiTagGroup list!", e);
-            throw new ApiTestPlatformException(GET_API_TAG_GROUP_LIST_ERROR);
+            throw ExceptionUtils.mpe(GET_API_TAG_GROUP_LIST_ERROR);
         }
     }
 
@@ -73,7 +73,7 @@ public class ApiTagGroupServiceImpl implements ApiTagGroupService {
             throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the ApiTagGroup!", e);
-            throw new ApiTestPlatformException(ADD_API_TAG_GROUP_ERROR);
+            throw ExceptionUtils.mpe(ADD_API_TAG_GROUP_ERROR);
         }
         return Boolean.TRUE;
     }
@@ -95,7 +95,7 @@ public class ApiTagGroupServiceImpl implements ApiTagGroupService {
             throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the ApiTagGroup!", e);
-            throw new ApiTestPlatformException(EDIT_API_TAG_GROUP_ERROR);
+            throw ExceptionUtils.mpe(EDIT_API_TAG_GROUP_ERROR);
         }
         return Boolean.TRUE;
     }
@@ -109,7 +109,7 @@ public class ApiTagGroupServiceImpl implements ApiTagGroupService {
             return apiTagGroupRepository.deleteByIdIn(ids) > 0;
         } catch (Exception e) {
             log.error("Failed to delete the ApiTagGroup!", e);
-            throw new ApiTestPlatformException(DELETE_API_TAG_GROUP_BY_ID_ERROR);
+            throw ExceptionUtils.mpe(DELETE_API_TAG_GROUP_BY_ID_ERROR);
         }
     }
 

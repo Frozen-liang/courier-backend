@@ -81,7 +81,7 @@ public class ApiTagServiceImpl implements ApiTagService {
             return apiTagMapper.toDtoList(list);
         } catch (Exception e) {
             log.error("Failed to get the ApiTag list!", e);
-            throw new ApiTestPlatformException(GET_API_TAG_LIST_ERROR);
+            throw ExceptionUtils.mpe(GET_API_TAG_LIST_ERROR);
         }
     }
 
@@ -94,7 +94,7 @@ public class ApiTagServiceImpl implements ApiTagService {
             apiTagRepository.insert(apiTag);
         } catch (Exception e) {
             log.error("Failed to add the ApiTag!", e);
-            throw new ApiTestPlatformException(ADD_API_TAG_ERROR);
+            throw ExceptionUtils.mpe(ADD_API_TAG_ERROR);
         }
         return Boolean.TRUE;
     }
@@ -149,7 +149,7 @@ public class ApiTagServiceImpl implements ApiTagService {
             return removeCount > 0;
         } catch (Exception e) {
             log.error("Failed to delete the ApiTag!", e);
-            throw new ApiTestPlatformException(DELETE_API_TAG_BY_ID_ERROR);
+            throw ExceptionUtils.mpe(DELETE_API_TAG_BY_ID_ERROR);
         }
     }
 
