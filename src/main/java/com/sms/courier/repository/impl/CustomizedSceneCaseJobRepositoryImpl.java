@@ -10,27 +10,16 @@ import static com.sms.courier.common.field.SceneCaseJobField.PARAMS_TOTAL_TIME_C
 import static com.sms.courier.common.field.SceneCaseJobField.TOTAL_TIME_COST;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
 
-import com.google.common.collect.Lists;
 import com.sms.courier.common.constant.Constants;
-import com.sms.courier.common.enums.JobStatus;
-import com.sms.courier.common.field.CommonField;
 import com.sms.courier.common.field.SceneCaseJobField;
-import com.sms.courier.common.field.SceneField;
-import com.sms.courier.dto.request.SceneCaseJobRequest;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CountStatisticsResponse;
 import com.sms.courier.entity.job.SceneCaseJobEntity;
 import com.sms.courier.repository.CustomizedSceneCaseJobRepository;
-import com.sms.courier.utils.PageDtoConverter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.bson.Document;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -64,7 +53,7 @@ public class CustomizedSceneCaseJobRepositoryImpl implements CustomizedSceneCase
     }
 
     @Override
-    public List<CaseCountStatisticsResponse> getGroupDayCount(List<String> projectIds, LocalDateTime dateTime) {
+    public List<CountStatisticsResponse> getGroupDayCount(List<String> projectIds, LocalDateTime dateTime) {
         List<AggregationOperation> aggregationOperations = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(projectIds)) {
             aggregationOperations.add(Aggregation.match(Criteria.where(PROJECT_ID.getName()).in(projectIds)));
@@ -79,7 +68,7 @@ public class CustomizedSceneCaseJobRepositoryImpl implements CustomizedSceneCase
         aggregationOperations.add(Aggregation.sort(Direction.DESC, Constants.DAY));
 
         Aggregation aggregation = Aggregation.newAggregation(aggregationOperations);
-        return mongoTemplate.aggregate(aggregation, SceneCaseJobEntity.class, CaseCountStatisticsResponse.class)
+        return mongoTemplate.aggregate(aggregation, SceneCaseJobEntity.class, CountStatisticsResponse.class)
             .getMappedResults();
     }
 

@@ -4,7 +4,7 @@ import static com.sms.courier.common.constant.Constants.PROJECT_STATISTICS_PATH;
 
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CountStatisticsResponse;
 import com.sms.courier.service.ProjectStatisticsService;
 import java.util.List;
 import org.bson.types.ObjectId;
@@ -38,12 +38,12 @@ public class ProjectStatisticsController {
     }
 
     @GetMapping("/case/group-day/count/{projectId}")
-    public List<CaseCountStatisticsResponse> caseGroupDayCount(@PathVariable String projectId) {
+    public List<CountStatisticsResponse> caseGroupDayCount(@PathVariable String projectId) {
         return projectStatisticsService.caseGroupDayCount(projectId);
     }
 
     @GetMapping("/scene/case/group-day/count/{projectId}")
-    public List<CaseCountStatisticsResponse> sceneCaseGroupDayCount(@PathVariable String projectId) {
+    public List<CountStatisticsResponse> sceneCaseGroupDayCount(@PathVariable String projectId) {
         return projectStatisticsService.sceneCaseGroupDayCount(projectId);
     }
 
@@ -73,13 +73,13 @@ public class ProjectStatisticsController {
     }
 
     @GetMapping("/case/job/group-day/{day}/count/{projectId}")
-    public List<CaseCountStatisticsResponse> caseJobGroupDayCount(@PathVariable String projectId,
+    public List<CountStatisticsResponse> caseJobGroupDayCount(@PathVariable String projectId,
         @PathVariable Integer day) {
         return projectStatisticsService.caseJobGroupDayCount(projectId, day);
     }
 
     @GetMapping("/scene/case/job/group-day/{day}/count/{projectId}")
-    public List<CaseCountStatisticsResponse> sceneCaseJobGroupDayCount(@PathVariable String projectId,
+    public List<CountStatisticsResponse> sceneCaseJobGroupDayCount(@PathVariable String projectId,
         @PathVariable Integer day) {
         return projectStatisticsService.sceneCaseJobGroupDayCount(projectId, day);
     }

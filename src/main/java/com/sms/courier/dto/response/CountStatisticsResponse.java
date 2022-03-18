@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CaseCountStatisticsResponse {
+public class CountStatisticsResponse {
 
     private LocalDate day;
 

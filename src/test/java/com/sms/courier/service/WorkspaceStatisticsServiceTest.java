@@ -5,7 +5,7 @@ import com.sms.courier.common.enums.StatisticsCountType;
 import com.sms.courier.common.enums.StatisticsGroupQueryType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CountStatisticsResponse;
 import com.sms.courier.dto.response.CaseCountUserStatisticsResponse;
 import com.sms.courier.dto.response.ProjectResponse;
 import com.sms.courier.dto.response.WorkspaceProjectCaseStatisticsResponse;
@@ -74,10 +74,10 @@ public class WorkspaceStatisticsServiceTest {
     public void caseGroupDayCount_test() {
         List<ProjectResponse> projectResponses = Lists.newArrayList(ProjectResponse.builder().id(ID).build());
         when(projectService.list(any())).thenReturn(projectResponses);
-        List<CaseCountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
+        List<CountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
         when(commonStatisticsRepository.getGroupDayCount(any(), any(), eq(ApiTestCaseEntity.class)))
             .thenReturn(caseCountStatisticsResponses);
-        List<CaseCountStatisticsResponse> responses = workspaceStatisticsService.groupDayCount(ID, MOCK_DAY,
+        List<CountStatisticsResponse> responses = workspaceStatisticsService.groupDayCount(ID, MOCK_DAY,
             StatisticsGroupQueryType.API_TEST_CASE.getName());
         assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
     }

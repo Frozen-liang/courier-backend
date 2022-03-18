@@ -4,7 +4,7 @@ import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
-import com.sms.courier.dto.response.CaseCountStatisticsResponse;
+import com.sms.courier.dto.response.CountStatisticsResponse;
 import com.sms.courier.entity.apitestcase.ApiTestCaseEntity;
 import com.sms.courier.entity.job.ApiTestCaseJobEntity;
 import com.sms.courier.entity.scenetest.SceneCaseEntity;
@@ -87,10 +87,10 @@ public class ProjectStatisticsServiceTest {
     @Test
     @DisplayName("Test the caseGroupDayCount method in the ProjectStatisticsService")
     public void caseGroupDayCount_test() {
-        List<CaseCountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
+        List<CountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
         when(commonStatisticsRepository.getGroupDayCount(any(), any(), eq(ApiTestCaseEntity.class)))
             .thenReturn(caseCountStatisticsResponses);
-        List<CaseCountStatisticsResponse> responses = projectStatisticsService.caseGroupDayCount(ID);
+        List<CountStatisticsResponse> responses = projectStatisticsService.caseGroupDayCount(ID);
         assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
     }
 
@@ -187,10 +187,10 @@ public class ProjectStatisticsServiceTest {
     @Test
     @DisplayName("Test for sceneCaseGroupDayCount in ProjectStatisticsService")
     public void sceneCaseGroupDayCount_test() {
-        List<CaseCountStatisticsResponse> responses = Lists.newArrayList();
+        List<CountStatisticsResponse> responses = Lists.newArrayList();
         when(commonStatisticsRepository.getGroupDayCount(any(), any(), eq(SceneCaseEntity.class)))
             .thenReturn(responses);
-        List<CaseCountStatisticsResponse> dto = projectStatisticsService.sceneCaseGroupDayCount(ID);
+        List<CountStatisticsResponse> dto = projectStatisticsService.sceneCaseGroupDayCount(ID);
         assertThat(dto).isNotEmpty();
     }
 
@@ -206,10 +206,10 @@ public class ProjectStatisticsServiceTest {
     @Test
     @DisplayName("Test the caseJobGroupDayCount method in the ProjectStatisticsService")
     public void caseJobGroupDayCount_test() {
-        List<CaseCountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
+        List<CountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
         when(commonStatisticsRepository.getGroupDayCount(any(), any(), eq(ApiTestCaseJobEntity.class)))
             .thenReturn(caseCountStatisticsResponses);
-        List<CaseCountStatisticsResponse> responses = projectStatisticsService.caseJobGroupDayCount(ID, MOCK_DAY);
+        List<CountStatisticsResponse> responses = projectStatisticsService.caseJobGroupDayCount(ID, MOCK_DAY);
         assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
     }
 
@@ -225,10 +225,10 @@ public class ProjectStatisticsServiceTest {
     @Test
     @DisplayName("Test the sceneCaseJobGroupDayCount method in the ProjectStatisticsService")
     public void sceneCaseJobGroupDayCount_test() {
-        List<CaseCountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
+        List<CountStatisticsResponse> caseCountStatisticsResponses = Lists.newArrayList();
         when(customizedSceneCaseJobRepository.getGroupDayCount(any(), any()))
             .thenReturn(caseCountStatisticsResponses);
-        List<CaseCountStatisticsResponse> responses = projectStatisticsService.sceneCaseJobGroupDayCount(ID, MOCK_DAY);
+        List<CountStatisticsResponse> responses = projectStatisticsService.sceneCaseJobGroupDayCount(ID, MOCK_DAY);
         assertThat(responses.size()).isEqualTo(Constants.CASE_DAY);
     }
 
