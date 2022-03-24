@@ -41,6 +41,12 @@ public class ProjectEnvironmentController {
         return projectEnvironmentService.findById(id);
     }
 
+    @GetMapping("/one/{id}")
+    public ProjectEnvironmentResponse getOneById(@PathVariable String id) {
+        // Query global environment and project environment. Used for open api.
+        return projectEnvironmentService.getOneById(id);
+    }
+
     @GetMapping("/list/{projectId}/{workspaceId}")
     @PreAuthorize("hasRoleOrAdmin(@role.PRO_ENV_QUERY_ALL)")
     public List<Object> list(@PathVariable String projectId, @PathVariable String workspaceId) {

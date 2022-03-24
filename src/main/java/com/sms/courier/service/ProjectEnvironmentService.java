@@ -26,4 +26,6 @@ public interface ProjectEnvironmentService {
     List<ProjectEnvironmentResponse> findAllByProjectId(String projectId);
 
     List<ProjectEnvironmentEntity> findAll(List<String> id);
+
+    ProjectEnvironmentResponse getOneById(String id);
 }
