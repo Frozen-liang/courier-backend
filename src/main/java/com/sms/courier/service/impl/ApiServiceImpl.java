@@ -11,6 +11,7 @@ import com.sms.courier.common.enums.OperationModule;
 import com.sms.courier.common.enums.OperationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
+import com.sms.courier.common.function.FunctionHandler;
 import com.sms.courier.common.listener.event.ApiDeleteEvent;
 import com.sms.courier.dto.request.ApiCaseRequest;
 import com.sms.courier.dto.request.ApiImportRequest;
@@ -132,7 +133,7 @@ public class ApiServiceImpl implements ApiService {
             return customizedApiRepository.page(apiPageRequest);
         } catch (Exception e) {
             log.error("Failed to get the Api page!", e);
-            throw new ApiTestPlatformException(ErrorCode.GET_API_PAGE_ERROR);
+            throw ExceptionUtils.mpe(ErrorCode.GET_API_PAGE_ERROR);
         }
     }
 
@@ -162,7 +163,7 @@ public class ApiServiceImpl implements ApiService {
             throw e;
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
-            throw new ApiTestPlatformException(ErrorCode.ADD_API_ERROR);
+            throw ExceptionUtils.mpe(ErrorCode.ADD_API_ERROR);
         }
         return true;
     }
@@ -207,7 +208,7 @@ public class ApiServiceImpl implements ApiService {
             throw courierException;
         } catch (Exception e) {
             log.error("Failed to add the Api!", e);
-            throw new ApiTestPlatformException(ErrorCode.EDIT_API_ERROR);
+            throw ExceptionUtils.mpe(ErrorCode.EDIT_API_ERROR);
         }
         return Boolean.TRUE;
     }
@@ -221,7 +222,7 @@ public class ApiServiceImpl implements ApiService {
             return customizedApiRepository.deleteByIds(ids);
         } catch (Exception e) {
             log.error("Failed to delete the Api!", e);
-            throw new ApiTestPlatformException(ErrorCode.DELETE_API_BY_ID_ERROR);
+            throw ExceptionUtils.mpe(ErrorCode.DELETE_API_BY_ID_ERROR);
         }
     }
 
@@ -283,17 +284,17 @@ public class ApiServiceImpl implements ApiService {
             ApiHistoryEntity apiHistoryEntity = apiHistoryRepository.findById(historyId)
                 .orElseThrow(() -> ExceptionUtils.mpe(ErrorCode.GET_INTERFACE_HISTORY_BY_ID_ERROR));
             Optional<ApiEntity> optional = apiRepository.findById(apiHistoryEntity.getRecord().getId());
-            if (optional.isPresent()) {
-                ApiEntity oldApiEntity = optional.get();
-                ApiEntity newApiEntity = apiMapper.toEntityByHistory(apiHistoryEntity.getRecord());
-                newApiEntity.setHistoryId(apiHistoryEntity.getId());
-                newApiEntity.setCaseCount(oldApiEntity.getCaseCount());
-                newApiEntity.setSceneCaseCount(oldApiEntity.getSceneCaseCount());
-                newApiEntity.setOtherProjectSceneCaseCount(oldApiEntity.getOtherProjectSceneCaseCount());
-                apiRepository.save(newApiEntity);
-                return Boolean.TRUE;
+            if (optional.isEmpty()) {
+                return Boolean.FALSE;
             }
-            return Boolean.FALSE;
+            ApiEntity oldApiEntity = optional.get();
+            ApiEntity newApiEntity = apiMapper.toEntityByHistory(apiHistoryEntity.getRecord());
+            newApiEntity.setHistoryId(apiHistoryEntity.getId());
+            newApiEntity.setCaseCount(oldApiEntity.getCaseCount());
+            newApiEntity.setSceneCaseCount(oldApiEntity.getSceneCaseCount());
+            newApiEntity.setOtherProjectSceneCaseCount(oldApiEntity.getOtherProjectSceneCaseCount());
+            apiRepository.save(newApiEntity);
+            return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to reset api version!", e);
             throw ExceptionUtils.mpe(ErrorCode.RESET_API_VERSION_ERROR);
@@ -342,7 +343,8 @@ public class ApiServiceImpl implements ApiService {
         rollbackDeletedApi(deletedApi);
         rollbackUpdatedApi(updatedApi);
         rollbackAddedApi(addedApi);
-        rollbackAddedGroup(importFlow.getAddedGroup(), projectId);
+        FunctionHandler.confirmedTwoNoReturn(CollectionUtils.isNotEmpty(importFlow.getAddedGroup()),
+            importFlow.getAddedGroup(), projectId).handler(this::rollbackAddedGroup);
         saveRollbackRecord(importFlow);
         return Boolean.TRUE;
     }
@@ -350,19 +352,22 @@ public class ApiServiceImpl implements ApiService {
     private void rollbackDeletedApi(List<ApiRecord> deletedApi) {
         List<String> deleteApiHistoryIds = deletedApi.stream().map(ApiRecord::getHistoryId)
             .collect(Collectors.toList());
-        if (CollectionUtils.isNotEmpty(deleteApiHistoryIds)) {
-            List<String> deleteApiId = deletedApi.stream().map(ApiRecord::getId)
-                .collect(Collectors.toList());
-            List<ApiEntity> apiEntities = apiHistoryRepository.findAllByIdIn(deleteApiHistoryIds)
-                .map(apiHistoryEntity -> {
-                    ApiEntity apiEntity = apiMapper.toEntityByHistory(apiHistoryEntity.getRecord());
-                    apiEntity.setHistoryId(apiHistoryEntity.getId());
-                    return apiEntity;
-                })
-                .collect(Collectors.toList());
-            apiRepository.insert(apiEntities);
-            customizedApiRepository.updateCaseStatus(deleteApiId, ApiBindingStatus.BINDING);
-        }
+        FunctionHandler.confirmedTwoNoReturn(CollectionUtils.isNotEmpty(deleteApiHistoryIds),
+            deletedApi, deleteApiHistoryIds).handler(this::insertApi);
+    }
+
+    private void insertApi(List<ApiRecord> deletedApi, List<String> deleteApiHistoryIds) {
+        List<String> deleteApiId = deletedApi.stream().map(ApiRecord::getId)
+            .collect(Collectors.toList());
+        List<ApiEntity> apiEntities = apiHistoryRepository.findAllByIdIn(deleteApiHistoryIds)
+            .map(apiHistoryEntity -> {
+                ApiEntity apiEntity = apiMapper.toEntityByHistory(apiHistoryEntity.getRecord());
+                apiEntity.setHistoryId(apiHistoryEntity.getId());
+                return apiEntity;
+            })
+            .collect(Collectors.toList());
+        apiRepository.insert(apiEntities);
+        customizedApiRepository.updateCaseStatus(deleteApiId, ApiBindingStatus.BINDING);
     }
 
     private void rollbackUpdatedApi(List<ApiRecord> updatedApi) {
@@ -374,11 +379,10 @@ public class ApiServiceImpl implements ApiService {
     }
 
     private void rollbackAddedGroup(List<String> addedGroup, String projectId) {
-        if (CollectionUtils.isNotEmpty(addedGroup)) {
-            List<String> allGroupId = customizedApiRepository.findAllGroupId(projectId);
-            Collection<String> deleteGroupId = CollectionUtils.subtract(addedGroup, allGroupId);
-            apiGroupRepository.deleteAllByIdIn(deleteGroupId);
-        }
+        List<String> allGroupId = customizedApiRepository.findAllGroupId(projectId);
+        Collection<String> deleteGroupId = CollectionUtils.subtract(addedGroup, allGroupId);
+        apiGroupRepository.deleteAllByIdIn(deleteGroupId);
+
     }
 
     private void saveRollbackRecord(ProjectImportFlowEntity importFlow) {
@@ -407,4 +411,5 @@ public class ApiServiceImpl implements ApiService {
         apiStructureRefRecordEntity.setName(name);
         apiDataStructureRefRecordRepository.save(apiStructureRefRecordEntity);
     }
+
 }

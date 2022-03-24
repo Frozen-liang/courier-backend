@@ -52,9 +52,8 @@ public class ApiHistoryServiceImpl implements ApiHistoryService {
             LookupField.builder().field(USERNAME).alias("apiManager").build()
         );
         lookupVoList.add(
-            LookupVo.builder().from(CollectionName.USER).localField(ApiHistoryField.API_MANAGER_ID).foreignField(ID).as(
-                "manager")
-                .queryFields(managerUserField).build());
+            LookupVo.builder().from(CollectionName.USER).localField(ApiHistoryField.API_MANAGER_ID).foreignField(ID)
+                .as("manager").queryFields(managerUserField).build());
 
         List<LookupField> tagField = List.of(LookupField.builder().field(TAG_NAME).build());
         lookupVoList

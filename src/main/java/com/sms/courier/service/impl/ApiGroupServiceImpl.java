@@ -57,7 +57,7 @@ public class ApiGroupServiceImpl implements ApiGroupService {
             return TreeUtils.createTree(apiGroupMapper.toResponse(apiGroupEntities));
         } catch (Exception e) {
             log.error("Failed to list the ApiGroupService!", e);
-            throw new ApiTestPlatformException(GET_API_GROUP_LIST_ERROR);
+            throw ExceptionUtils.mpe(GET_API_GROUP_LIST_ERROR);
         }
     }
 
@@ -119,15 +119,11 @@ public class ApiGroupServiceImpl implements ApiGroupService {
         try {
             ApiGroupEntity apiGroup = apiGroupRepository.findById(id)
                 .orElseThrow(() -> ExceptionUtils.mpe(EDIT_NOT_EXIST_ERROR, "ApiGroup", id));
-            List<String> ids;
-            if (Objects.nonNull(apiGroup.getRealGroupId())) {
-                //Query all apiGroup contain children groups
-                ids = apiGroupRepository
-                    .findAllByPathContains(apiGroup.getRealGroupId()).map(ApiGroupEntity::getId)
-                    .collect(Collectors.toList());
-            } else {
-                ids = List.of(id);
-            }
+            List<String> ids = Objects.nonNull(apiGroup.getRealGroupId())
+                ? apiGroupRepository.findAllByPathContains(apiGroup.getRealGroupId())
+                .map(ApiGroupEntity::getId).collect(Collectors.toList())
+                : List.of(id);
+
             if (CollectionUtils.isNotEmpty(ids)) {
                 apiGroupRepository.deleteAllByIdIn(ids);
                 customizedApiRepository.deleteByGroupIds(ids);

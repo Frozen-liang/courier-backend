@@ -7,6 +7,7 @@ import static com.sms.courier.common.exception.ErrorCode.THE_REPLIED_COMMENT_NOT
 import static com.sms.courier.common.field.ApiCommentField.API_ID;
 
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.function.FunctionHandler;
 import com.sms.courier.dto.request.ApiCommentRequest;
 import com.sms.courier.dto.response.ApiCommentResponse;
 import com.sms.courier.dto.response.TreeResponse;
@@ -49,7 +50,7 @@ public class ApiCommentServiceImpl implements ApiCommentService {
             return TreeUtils.createTree(apiComment);
         } catch (Exception e) {
             log.error("Failed to get the ApiComment list!", e);
-            throw new ApiTestPlatformException(GET_API_COMMENT_LIST_ERROR);
+            throw ExceptionUtils.mpe(GET_API_COMMENT_LIST_ERROR);
         }
     }
 
@@ -58,12 +59,8 @@ public class ApiCommentServiceImpl implements ApiCommentService {
     public Boolean add(ApiCommentRequest apiCommentRequest) {
         log.info("ApiCommentService-add()-params: [ApiComment]={}", apiCommentRequest.toString());
         try {
-            if (StringUtils.isNotBlank(apiCommentRequest.getParentId())) {
-                ApiCommentEntity parentComment = apiCommentRepository.findById(apiCommentRequest.getParentId())
-                    .orElseThrow(() -> ExceptionUtils.mpe(THE_REPLIED_COMMENT_NOT_EXIST));
-                Assert.isFalse(SecurityUtil.getCurrUserId().equals(parentComment.getCreateUserId()), "Can't reply to "
-                    + "your own comments!");
-            }
+            FunctionHandler.confirmed(StringUtils.isNotBlank(apiCommentRequest.getParentId()),
+                apiCommentRequest.getParentId()).handler(this::checkApiComment);
             ApiCommentEntity apiComment = apiCommentMapper.toEntity(apiCommentRequest);
             apiCommentRepository.insert(apiComment);
         } catch (ApiTestPlatformException e) {
@@ -71,7 +68,7 @@ public class ApiCommentServiceImpl implements ApiCommentService {
             throw e;
         } catch (Exception e) {
             log.error("Failed to add the ApiComment!", e);
-            throw new ApiTestPlatformException(ADD_API_COMMENT_ERROR);
+            throw ExceptionUtils.mpe(ADD_API_COMMENT_ERROR);
         }
         return Boolean.TRUE;
     }
@@ -83,8 +80,15 @@ public class ApiCommentServiceImpl implements ApiCommentService {
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to delete the ApiComment!", e);
-            throw new ApiTestPlatformException(DELETE_API_COMMENT_BY_ID_ERROR);
+            throw ExceptionUtils.mpe(DELETE_API_COMMENT_BY_ID_ERROR);
         }
+    }
+
+    private void checkApiComment(String parentId) {
+        ApiCommentEntity parentComment = apiCommentRepository.findById(parentId)
+            .orElseThrow(() -> ExceptionUtils.mpe(THE_REPLIED_COMMENT_NOT_EXIST));
+        Assert.isFalse(SecurityUtil.getCurrUserId().equals(parentComment.getCreateUserId()), "Can't reply to "
+            + "your own comments!");
     }
 
 }

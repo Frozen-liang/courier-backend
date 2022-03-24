@@ -1,10 +1,7 @@
 package com.sms.courier.service.impl;
 
-import static com.sms.courier.common.exception.ErrorCode.GET_PROJECT_CASE_GROUP_BY_DAY_ERROR;
-
 import com.google.common.collect.Lists;
 import com.sms.courier.common.enums.StatisticsCountType;
-import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.request.ApiIncludeCaseRequest;
 import com.sms.courier.dto.response.ApiPageResponse;
@@ -73,7 +70,7 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
                 ? customizedApiRepository.sceneCount(projectId) : customizedApiRepository.caseCount(projectId);
         } catch (Exception e) {
             log.error("Failed to query case count the Api!", e);
-            throw new ApiTestPlatformException(ErrorCode.GET_CASE_COUNT_BY_API_ERROR);
+            throw ExceptionUtils.mpe(ErrorCode.GET_CASE_COUNT_BY_API_ERROR);
         }
     }
 
@@ -84,7 +81,7 @@ public class ProjectStatisticsServiceImpl extends AbstractStatisticsService impl
                 groupQueryTypeMap.get(groupType));
         } catch (Exception e) {
             log.error("Failed to get the Project case group by day!", e);
-            throw new ApiTestPlatformException(GET_PROJECT_CASE_GROUP_BY_DAY_ERROR);
+            throw ExceptionUtils.mpe(ErrorCode.GET_PROJECT_CASE_GROUP_BY_DAY_ERROR);
         }
     }
 
