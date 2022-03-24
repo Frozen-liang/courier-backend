@@ -11,6 +11,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,10 +38,12 @@ public class ChannelController {
             (CustomUser) authentication.getPrincipal());
     }
 
+    @PostMapping(Constants.CHANNEL + "/run-scene-job")
     @MessageMapping(Constants.SDK_VERSION + "/run-scene-job")
     public void runSceneJob(@Header(StompHeaderAccessor.USER_HEADER) UsernamePasswordAuthenticationToken authentication,
-        @Payload AddSceneCaseJobRequest addSceneCaseJobRequest) {
+        @RequestBody @Payload AddSceneCaseJobRequest addSceneCaseJobRequest) {
         jobServiceFactory.getSceneCaseJobService()
             .runJob(addSceneCaseJobRequest, (CustomUser) authentication.getPrincipal());
     }
+
 }
