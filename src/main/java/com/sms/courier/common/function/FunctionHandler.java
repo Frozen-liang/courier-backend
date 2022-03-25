@@ -20,6 +20,14 @@ public interface FunctionHandler {
         });
     }
 
+    static <T, U> BiConsumerHandler<T, U> confirmedTwoNoReturn(boolean isConfirmed, T paramOne, U paramTwo) {
+        return (confirmed -> {
+            if (isConfirmed) {
+                confirmed.accept(paramOne, paramTwo);
+            }
+        });
+    }
+
     static <T, R> FunctionOneParamHandler<T, R> confirmedOne(boolean isConfirmed, T param) {
         return (confirmed -> {
             R value = null;
