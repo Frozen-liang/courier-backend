@@ -5,9 +5,7 @@ import static com.sms.courier.common.exception.ErrorCode.GET_API_TEST_CASE_JOB_E
 import static com.sms.courier.common.exception.ErrorCode.THE_CASE_NOT_EXIST;
 import static com.sms.courier.utils.Assert.notEmpty;
 
-import com.sms.courier.common.annotation.JobServiceType;
 import com.sms.courier.common.enums.JobStatus;
-import com.sms.courier.common.enums.JobType;
 import com.sms.courier.common.enums.ResultType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.dto.request.ApiTestCaseJobPageRequest;
@@ -54,26 +52,28 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
 
 @Slf4j
-@JobServiceType(type = JobType.CASE)
-public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJobRepository> implements
-    ApiTestCaseJobService {
+@Service
+public class ApiTestCaseJobServiceImpl extends AbstractJobService implements ApiTestCaseJobService {
 
     private final CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository;
     private final ApiTestCaseService apiTestCaseService;
     private final JobMapper jobMapper;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ApiTestCaseJobRepository repository;
 
-    public ApiTestCaseJobServiceImpl(ApiTestCaseJobRepository apiTestCaseJobRepository,
+    public ApiTestCaseJobServiceImpl(ApiTestCaseJobRepository repository,
         CustomizedApiTestCaseJobRepository customizedApiTestCaseJobRepository,
         CaseDispatcherService caseDispatcherService,
         ProjectEnvironmentService projectEnvironmentService, ApiTestCaseService apiTestCaseService,
         CommonRepository commonRepository, JobMapper jobMapper,
         ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement,
         DatabaseService dataBaseService) {
-        super(apiTestCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService,
+        super(jobMapper, caseDispatcherService, projectEnvironmentService,
             engineJobManagement, commonRepository, dataBaseService);
+        this.repository = repository;
         this.customizedApiTestCaseJobRepository = customizedApiTestCaseJobRepository;
         this.apiTestCaseService = apiTestCaseService;
         this.jobMapper = jobMapper;
@@ -219,6 +219,8 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
         }
     }
 
+
+
     @Override
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public void saveJobReport(JobReport jobReport, JobEntity job) {
@@ -254,6 +256,15 @@ public class ApiTestCaseJobServiceImpl extends AbstractJobService<ApiTestCaseJob
         // Sava test result in api test case.
         apiTestCaseService.insertTestResult(caseId, testResult);
     }
+
+    @Override
+    public void handleJobReport(JobReport jobReport) {
+        repository.findById(jobReport.getJobId()).ifPresent(job -> {
+            log.info("Handle job report. jobId:{} jobStatus:{}", jobReport.getJobId(), jobReport.getJobStatus());
+            this.saveJobReport(jobReport, job);
+        });
+    }
+
 
     @Override
     public void onError(JobEntity jobEntity, boolean resend) {

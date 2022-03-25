@@ -59,13 +59,10 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.data.mongodb.repository.MongoRepository;
 
 @Slf4j
-public abstract class AbstractJobService<T extends MongoRepository<? extends JobEntity, String>> implements
-    JobService {
+public abstract class AbstractJobService implements JobService {
 
-    protected final T repository;
     protected final JobMapper jobMapper;
     protected final CaseDispatcherService caseDispatcherService;
     protected final ProjectEnvironmentService projectEnvironmentService;
@@ -73,25 +70,16 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
     protected final CommonRepository commonRepository;
     protected final DatabaseService dataBaseService;
 
-    public AbstractJobService(T repository, JobMapper jobMapper,
+    public AbstractJobService(JobMapper jobMapper,
         CaseDispatcherService caseDispatcherService,
         ProjectEnvironmentService projectEnvironmentService,
         EngineJobManagement engineJobManagement, CommonRepository commonRepository, DatabaseService dataBaseService) {
-        this.repository = repository;
         this.jobMapper = jobMapper;
         this.caseDispatcherService = caseDispatcherService;
         this.projectEnvironmentService = projectEnvironmentService;
         this.engineJobManagement = engineJobManagement;
         this.commonRepository = commonRepository;
         this.dataBaseService = dataBaseService;
-    }
-
-    @Override
-    public void handleJobReport(JobReport jobReport) {
-        repository.findById(jobReport.getJobId()).ifPresent(job -> {
-            log.info("Handle job report. jobId:{} jobStatus:{}", jobReport.getJobId(), jobReport.getJobStatus());
-            saveJobReport(jobReport, job);
-        });
     }
 
 
@@ -109,6 +97,8 @@ public abstract class AbstractJobService<T extends MongoRepository<? extends Job
             throw ExceptionUtils.mpe("No support the job class type! clz : {}", jobEntity.getClass());
         }
     }
+
+    public abstract void handleJobReport(JobReport jobReport);
 
 
     public abstract void saveJobReport(JobReport jobReport, JobEntity job);

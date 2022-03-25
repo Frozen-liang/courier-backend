@@ -27,6 +27,7 @@ import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.enums.ResponseParamsExtractionType;
 import com.sms.courier.common.enums.ResultVerificationType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.function.FunctionHandler;
 import com.sms.courier.dto.request.AddCaseTemplateApiByIdsRequest;
 import com.sms.courier.dto.request.AddCaseTemplateRequest;
 import com.sms.courier.dto.request.AddSceneCaseApi;
@@ -308,12 +309,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             customizedCaseTemplateRepository.deleteByIds(ids);
             List<CaseTemplateApiEntity> caseTemplateApiEntityList = customizedCaseTemplateApiRepository
                 .findCaseTemplateApiIdsByCaseTemplateIds(ids);
-            if (CollectionUtils.isNotEmpty(caseTemplateApiEntityList)) {
-                List<String> caseTemplateApiIds =
-                    caseTemplateApiEntityList.stream().map(CaseTemplateApiEntity::getId).collect(Collectors.toList());
-                customizedCaseTemplateApiRepository.deleteByIds(caseTemplateApiIds);
-                caseApiCountHandler.deleteTemplateCaseByCaseTemplateApiIds(caseTemplateApiIds);
-            }
+            FunctionHandler.confirmed(CollectionUtils.isNotEmpty(caseTemplateApiEntityList),
+                caseTemplateApiEntityList).handler(this::batchDelete);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
@@ -334,13 +331,8 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
             customizedCaseTemplateRepository.recover(ids);
             List<CaseTemplateApiEntity> caseTemplateApiEntityList = customizedCaseTemplateApiRepository
                 .findCaseTemplateApiIdsByCaseTemplateIds(ids);
-            if (CollectionUtils.isNotEmpty(caseTemplateApiEntityList)) {
-                List<String> caseTemplateApiIds =
-                    caseTemplateApiEntityList.stream().map(CaseTemplateApiEntity::getId).collect(
-                        Collectors.toList());
-                customizedCaseTemplateApiRepository.recover(caseTemplateApiIds);
-                caseApiCountHandler.addTemplateCaseByCaseTemplateApiIds(caseTemplateApiIds);
-            }
+            FunctionHandler.confirmed(CollectionUtils.isNotEmpty(caseTemplateApiEntityList),
+                caseTemplateApiEntityList).handler(this::batchAdd);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
@@ -351,24 +343,42 @@ public class CaseTemplateServiceImpl implements CaseTemplateService {
         }
     }
 
+    private void batchDelete(List<CaseTemplateApiEntity> caseTemplateApiEntityList) {
+        List<String> caseTemplateApiIds =
+            caseTemplateApiEntityList.stream().map(CaseTemplateApiEntity::getId).collect(Collectors.toList());
+        customizedCaseTemplateApiRepository.deleteByIds(caseTemplateApiIds);
+        caseApiCountHandler.deleteTemplateCaseByCaseTemplateApiIds(caseTemplateApiIds);
+    }
+
+    private void batchAdd(List<CaseTemplateApiEntity> caseTemplateApiEntityList) {
+        List<String> caseTemplateApiIds =
+            caseTemplateApiEntityList.stream().map(CaseTemplateApiEntity::getId).collect(
+                Collectors.toList());
+        customizedCaseTemplateApiRepository.recover(caseTemplateApiIds);
+        caseApiCountHandler.addTemplateCaseByCaseTemplateApiIds(caseTemplateApiIds);
+    }
+
     private CaseTemplateConnResponse setCaseTemplateConnDto(CaseTemplateResponse caseTemplateResponse) {
         CaseTemplateConnResponse dto = caseTemplateMapper.toConnResponse(caseTemplateResponse);
         List<EnvDataCollConnResponse> connResponses = Lists.newArrayList();
-        if (CollectionUtils.isNotEmpty(caseTemplateResponse.getEnvDataCollConnList())) {
-            for (EnvDataCollResponse response : caseTemplateResponse.getEnvDataCollConnList()) {
-                ProjectEnvironmentResponse envResponse = Objects.nonNull(response.getEnvId())
-                    ? projectEnvironmentMapper.toDto(projectEnvironmentService.findOne(response.getEnvId())) : null;
-                DataCollectionResponse dataResponse = Objects.nonNull(response.getDataCollId())
-                    ? dataCollectionMapper.toDto(dataCollectionService.findOne(response.getDataCollId())) : null;
-                EnvDataCollConnResponse collConnResponse = EnvDataCollConnResponse.builder()
-                    .environment(envResponse)
-                    .dataCollection(dataResponse)
-                    .build();
-                connResponses.add(collConnResponse);
-            }
-        }
+        FunctionHandler.confirmedTwoNoReturn(CollectionUtils.isNotEmpty(caseTemplateResponse.getEnvDataCollConnList()),
+            connResponses, caseTemplateResponse).handler(this::resetDto);
         dto.setEnvDataCollConnList(connResponses);
         return dto;
+    }
+
+    private void resetDto(List<EnvDataCollConnResponse> connResponses, CaseTemplateResponse caseTemplateResponse) {
+        for (EnvDataCollResponse response : caseTemplateResponse.getEnvDataCollConnList()) {
+            ProjectEnvironmentResponse envResponse = Objects.nonNull(response.getEnvId())
+                ? projectEnvironmentMapper.toDto(projectEnvironmentService.findOne(response.getEnvId())) : null;
+            DataCollectionResponse dataResponse = Objects.nonNull(response.getDataCollId())
+                ? dataCollectionMapper.toDto(dataCollectionService.findOne(response.getDataCollId())) : null;
+            EnvDataCollConnResponse collConnResponse = EnvDataCollConnResponse.builder()
+                .environment(envResponse)
+                .dataCollection(dataResponse)
+                .build();
+            connResponses.add(collConnResponse);
+        }
     }
 
     private List<CaseTemplateApiEntity> setIdConvert(List<CaseTemplateApiEntity> caseTemplateApiList)

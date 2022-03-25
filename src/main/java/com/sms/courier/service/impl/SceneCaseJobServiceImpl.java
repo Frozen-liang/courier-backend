@@ -9,9 +9,7 @@ import static com.sms.courier.common.exception.ErrorCode.THE_DATA_IS_NOT_BINDING
 import static com.sms.courier.utils.Assert.isTrue;
 
 import com.google.common.collect.Lists;
-import com.sms.courier.common.annotation.JobServiceType;
 import com.sms.courier.common.enums.JobStatus;
-import com.sms.courier.common.enums.JobType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.field.CommonField;
 import com.sms.courier.common.field.SceneField;
@@ -40,7 +38,6 @@ import com.sms.courier.repository.CaseTemplateApiRepository;
 import com.sms.courier.repository.CaseTemplateRepository;
 import com.sms.courier.repository.CommonRepository;
 import com.sms.courier.repository.CustomizedCaseTemplateApiRepository;
-import com.sms.courier.repository.CustomizedSceneCaseJobRepository;
 import com.sms.courier.repository.SceneCaseApiRepository;
 import com.sms.courier.repository.SceneCaseJobRepository;
 import com.sms.courier.repository.SceneCaseRepository;
@@ -67,26 +64,26 @@ import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.stereotype.Service;
 
 @Slf4j
-@JobServiceType(type = JobType.SCENE_CASE)
-public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepository> implements SceneCaseJobService {
+@Service
+public class SceneCaseJobServiceImpl extends AbstractJobService implements SceneCaseJobService {
 
     private final SceneCaseRepository sceneCaseRepository;
-    private final CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository;
     private final CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository;
     private final CaseTemplateRepository caseTemplateRepository;
     private final CaseTemplateApiRepository caseTemplateApiRepository;
     private final SceneCaseApiRepository sceneCaseApiRepository;
     private final CommonRepository commonRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final SceneCaseJobRepository repository;
 
     public SceneCaseJobServiceImpl(
         ProjectEnvironmentService projectEnvironmentService,
         SceneCaseRepository sceneCaseRepository,
         SceneCaseJobRepository sceneCaseJobRepository,
         JobMapper jobMapper,
-        CustomizedSceneCaseJobRepository customizedSceneCaseJobRepository,
         CaseDispatcherService caseDispatcherService,
         CustomizedCaseTemplateApiRepository customizedCaseTemplateApiRepository,
         CaseTemplateRepository caseTemplateRepository,
@@ -94,16 +91,16 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
         SceneCaseApiRepository sceneCaseApiRepository, CommonRepository commonRepository,
         ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement,
         DatabaseService dataBaseService) {
-        super(sceneCaseJobRepository, jobMapper, caseDispatcherService, projectEnvironmentService, engineJobManagement,
+        super(jobMapper, caseDispatcherService, projectEnvironmentService, engineJobManagement,
             commonRepository, dataBaseService);
         this.sceneCaseRepository = sceneCaseRepository;
-        this.customizedSceneCaseJobRepository = customizedSceneCaseJobRepository;
         this.customizedCaseTemplateApiRepository = customizedCaseTemplateApiRepository;
         this.caseTemplateRepository = caseTemplateRepository;
         this.caseTemplateApiRepository = caseTemplateApiRepository;
         this.sceneCaseApiRepository = sceneCaseApiRepository;
         this.commonRepository = commonRepository;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.repository = sceneCaseJobRepository;
     }
 
     @Override
@@ -122,7 +119,7 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
                 .map(jobMapper::toSceneCaseJobResponse);
         } catch (Exception e) {
             log.error("Failed to get the SceneCaseJob page!", e);
-            throw new ApiTestPlatformException(GET_SCENE_CASE_JOB_PAGE_ERROR);
+            throw ExceptionUtils.mpe(GET_SCENE_CASE_JOB_PAGE_ERROR);
         }
     }
 
@@ -275,6 +272,14 @@ public class SceneCaseJobServiceImpl extends AbstractJobService<SceneCaseJobRepo
                 .findAllByCaseTemplateIdAndRemovedOrderByOrder(sceneCaseApi.getCaseTemplateId(),
                     Boolean.FALSE);
         return super.createIndex(sceneCaseApi, caseList, index, templateApiList);
+    }
+
+    @Override
+    public void handleJobReport(JobReport jobReport) {
+        repository.findById(jobReport.getJobId()).ifPresent(job -> {
+            log.info("Handle job report. jobId:{} jobStatus:{}", jobReport.getJobId(), jobReport.getJobStatus());
+            this.saveJobReport(jobReport, job);
+        });
     }
 
     @Override

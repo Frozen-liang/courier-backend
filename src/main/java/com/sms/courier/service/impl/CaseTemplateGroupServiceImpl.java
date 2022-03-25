@@ -16,6 +16,7 @@ import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.function.FunctionHandler;
 import com.sms.courier.dto.request.CaseTemplateGroupRequest;
 import com.sms.courier.dto.response.TreeResponse;
 import com.sms.courier.entity.group.CaseTemplateGroupEntity;
@@ -119,17 +120,7 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
                     .findAllByPathContains(caseTemplateGroup.getRealGroupId()).map(CaseTemplateGroupEntity::getId)
                     .collect(Collectors.toList());
             }
-            if (CollectionUtils.isNotEmpty(ids)) {
-                caseTemplateGroupRepository.deleteAllByIdIn(ids);
-                List<CaseTemplateEntity> caseTemplateEntityList = customizedCaseTemplateRepository
-                    .getCaseTemplateIdsByGroupIds(ids);
-                if (CollectionUtils.isNotEmpty(caseTemplateEntityList)) {
-                    List<String> caseTemplateIds = caseTemplateEntityList.stream().map(CaseTemplateEntity::getId)
-                        .collect(Collectors.toList());
-                    caseTemplateService.delete(caseTemplateIds);
-                    customizedCaseTemplateRepository.deleteGroupIdByIds(caseTemplateIds);
-                }
-            }
+            FunctionHandler.confirmed(CollectionUtils.isNotEmpty(ids), ids).handler(this::deleteByIds);
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to delete the CaseTemplateGroup!", e);
@@ -146,6 +137,18 @@ public class CaseTemplateGroupServiceImpl implements CaseTemplateGroupService {
         } catch (Exception e) {
             log.error("Failed to getList the CaseTemplateGroup!", e);
             throw new ApiTestPlatformException(GET_CASE_TEMPLATE_GROUP_LIST_ERROR);
+        }
+    }
+
+    private void deleteByIds(List<String> ids) {
+        caseTemplateGroupRepository.deleteAllByIdIn(ids);
+        List<CaseTemplateEntity> caseTemplateEntityList = customizedCaseTemplateRepository
+            .getCaseTemplateIdsByGroupIds(ids);
+        if (CollectionUtils.isNotEmpty(caseTemplateEntityList)) {
+            List<String> caseTemplateIds = caseTemplateEntityList.stream().map(CaseTemplateEntity::getId)
+                .collect(Collectors.toList());
+            caseTemplateService.delete(caseTemplateIds);
+            customizedCaseTemplateRepository.deleteGroupIdByIds(caseTemplateIds);
         }
     }
 

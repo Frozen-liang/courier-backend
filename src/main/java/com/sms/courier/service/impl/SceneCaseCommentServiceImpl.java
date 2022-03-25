@@ -7,6 +7,7 @@ import static com.sms.courier.common.exception.ErrorCode.THE_REPLIED_COMMENT_NOT
 import static com.sms.courier.common.field.SceneCaseCommentField.SCENE_CASE_ID;
 
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.function.FunctionHandler;
 import com.sms.courier.dto.request.SceneCaseCommentRequest;
 import com.sms.courier.dto.response.SceneCaseCommentResponse;
 import com.sms.courier.dto.response.TreeResponse;
@@ -57,13 +58,8 @@ public class SceneCaseCommentServiceImpl implements SceneCaseCommentService {
     public Boolean add(SceneCaseCommentRequest sceneCaseCommentRequest) {
         log.info("SceneCaseCommentService-add()-params: [SceneCaseComment]={}", sceneCaseCommentRequest.toString());
         try {
-            if (StringUtils.isNotBlank(sceneCaseCommentRequest.getParentId())) {
-                SceneCaseCommentEntity parentComment = sceneCaseCommentRepository
-                    .findById(sceneCaseCommentRequest.getParentId())
-                    .orElseThrow(() -> ExceptionUtils.mpe(THE_REPLIED_COMMENT_NOT_EXIST));
-                Assert.isFalse(SecurityUtil.getCurrUserId().equals(parentComment.getCreateUserId()), "Can't reply to "
-                    + "your own comments!");
-            }
+            FunctionHandler.confirmed(StringUtils.isNotBlank(sceneCaseCommentRequest.getParentId()),
+                sceneCaseCommentRequest).handler(this::checkSceneCaseComment);
             SceneCaseCommentEntity sceneCaseCommentEntity = sceneCaseCommentMapper.toEntity(sceneCaseCommentRequest);
             sceneCaseCommentRepository.insert(sceneCaseCommentEntity);
         } catch (ApiTestPlatformException e) {
@@ -85,6 +81,14 @@ public class SceneCaseCommentServiceImpl implements SceneCaseCommentService {
             log.error("Failed to delete the SceneCaseComment!", e);
             throw new ApiTestPlatformException(DELETE_SCENE_CASE_COMMENT_BY_ID_ERROR);
         }
+    }
+
+    private void checkSceneCaseComment(SceneCaseCommentRequest sceneCaseCommentRequest) {
+        SceneCaseCommentEntity parentComment = sceneCaseCommentRepository
+            .findById(sceneCaseCommentRequest.getParentId())
+            .orElseThrow(() -> ExceptionUtils.mpe(THE_REPLIED_COMMENT_NOT_EXIST));
+        Assert.isFalse(SecurityUtil.getCurrUserId().equals(parentComment.getCreateUserId()), "Can't reply to "
+            + "your own comments!");
     }
 
 }

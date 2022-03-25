@@ -27,7 +27,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.BATCH_EDIT_SCENE_CASE_API_ERROR;
+import static com.sms.courier.common.exception.ErrorCode.BATCH_EDIT_CASE_TEMPLATE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_CASE_TEMPLATE_API_LIST_BY_CASE_TEMPLATE_ID_ERROR;
@@ -36,7 +36,6 @@ import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_API_LIST
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -146,7 +145,7 @@ class CaseTemplateApiServiceTest {
     void batchEdit_thenThrowException() {
         BatchUpdateCaseTemplateApiRequest dto = getUpdateSortOrder();
         when(caseTemplateApiRepository.saveAll(any()))
-            .thenThrow(new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR));
+            .thenThrow(new ApiTestPlatformException(BATCH_EDIT_CASE_TEMPLATE_API_ERROR));
         assertThatThrownBy(() -> caseTemplateApiService.batchEdit(dto)).isInstanceOf(ApiTestPlatformException.class);
     }
 

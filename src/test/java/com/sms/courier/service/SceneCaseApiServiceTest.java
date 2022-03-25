@@ -1,7 +1,6 @@
 package com.sms.courier.service;
 
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.BATCH_EDIT_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.GET_SCENE_CASE_API_BY_ID_ERROR;
@@ -21,7 +20,6 @@ import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.dto.request.AddSceneCaseApiRequest;
 import com.sms.courier.dto.request.BatchAddSceneCaseApiRequest;
-import com.sms.courier.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.courier.dto.request.SyncApiRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.courier.dto.response.SceneCaseApiResponse;
@@ -122,25 +120,6 @@ class SceneCaseApiServiceTest {
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
-    @Test
-    @DisplayName("Test the batchEdit method in the SceneCaseApi service")
-    void batchEdit_test() {
-        BatchUpdateSceneCaseApiRequest dto = getUpdateSortOrder();
-        SceneCaseApiEntity sceneCaseApi = SceneCaseApiEntity.builder().id(MOCK_ID).build();
-        List<SceneCaseApiEntity> sceneCaseApiList = Lists.newArrayList(sceneCaseApi);
-        when(sceneCaseApiRepository.saveAll(any())).thenReturn(sceneCaseApiList);
-        Boolean isSuccess = sceneCaseApiService.batchEdit(dto);
-        assertTrue(isSuccess);
-    }
-
-    @Test
-    @DisplayName("Test the batchEdit method in the SceneCaseApi service throws exception")
-    void batchEdit_thenThrowException() {
-        BatchUpdateSceneCaseApiRequest dto = getUpdateSortOrder();
-        when(sceneCaseApiRepository.saveAll(any()))
-            .thenThrow(new ApiTestPlatformException(BATCH_EDIT_SCENE_CASE_API_ERROR));
-        assertThatThrownBy(() -> sceneCaseApiService.batchEdit(dto)).isInstanceOf(ApiTestPlatformException.class);
-    }
 
     @Test
     @DisplayName("Test the list by sceneCaseId method in the SceneCaseApi service")
@@ -252,13 +231,6 @@ class SceneCaseApiServiceTest {
             .isInstanceOf(ApiTestPlatformException.class);
     }
 
-    private BatchUpdateSceneCaseApiRequest getUpdateSortOrder() {
-        return BatchUpdateSceneCaseApiRequest.builder()
-            .sceneCaseApiRequestList(Lists.newArrayList(UpdateSceneCaseApiRequest.builder()
-                .sceneCaseId(MOCK_SCENE_CASE_ID)
-                .order(MOCK_ORDER_NUMBER)
-                .build())).build();
-    }
 
     private BatchAddSceneCaseApiRequest getAddDto() {
         return BatchAddSceneCaseApiRequest.builder()

@@ -6,7 +6,6 @@ import static com.sms.courier.common.enums.OperationType.CASE_SYNC;
 import static com.sms.courier.common.enums.OperationType.DELETE;
 import static com.sms.courier.common.enums.OperationType.EDIT;
 import static com.sms.courier.common.exception.ErrorCode.ADD_SCENE_CASE_API_ERROR;
-import static com.sms.courier.common.exception.ErrorCode.BATCH_EDIT_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.CASE_SYNC_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.DELETE_SCENE_CASE_API_ERROR;
 import static com.sms.courier.common.exception.ErrorCode.EDIT_SCENE_CASE_API_ERROR;
@@ -19,8 +18,8 @@ import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.common.enums.ApiType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.field.SceneField;
+import com.sms.courier.common.function.FunctionHandler;
 import com.sms.courier.dto.request.BatchAddSceneCaseApiRequest;
-import com.sms.courier.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.courier.dto.request.SyncApiRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.courier.dto.response.SceneCaseApiResponse;
@@ -130,27 +129,6 @@ public class SceneCaseApiServiceImpl extends AbstractCaseService implements Scen
     }
 
     @Override
-    @LogRecord(operationType = EDIT, operationModule = SCENE_CASE_API,
-        template = "{{#updateSceneCaseApiSortOrderDto.sceneCaseApiRequestList?.![#this.apiTestCase.caseName]}}",
-        refId = "sceneCaseApiRequestList[0].projectId",
-        sourceId = "{{#updateSceneCaseApiSortOrderDto.sceneCaseApiRequestList?.![#this.sceneCaseId]}}")
-    public Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiSortOrderDto) {
-        log.info("SceneCaseApiService-batchEdit()-params: [SceneCaseApi]={}",
-            updateSceneCaseApiSortOrderDto.toString());
-        try {
-            if (!updateSceneCaseApiSortOrderDto.getSceneCaseApiRequestList().isEmpty()) {
-                List<SceneCaseApiEntity> caseApiList = sceneCaseApiMapper
-                    .toSceneCaseApiList(updateSceneCaseApiSortOrderDto.getSceneCaseApiRequestList());
-                sceneCaseApiRepository.saveAll(caseApiList);
-            }
-            return Boolean.TRUE;
-        } catch (Exception e) {
-            log.error("Failed to batch edit the SceneCaseApi!", e);
-            throw ExceptionUtils.mpe(BATCH_EDIT_SCENE_CASE_API_ERROR);
-        }
-    }
-
-    @Override
     public List<SceneCaseApiEntity> listBySceneCaseId(String sceneCaseId) {
         try {
             Example<SceneCaseApiEntity> example = Example.of(
@@ -186,12 +164,8 @@ public class SceneCaseApiServiceImpl extends AbstractCaseService implements Scen
     public Boolean updateStatusByApiIds(List<String> ids, ApiBindingStatus apiBindingStatus) {
         try {
             List<SceneCaseApiEntity> sceneCaseApiList = customizedSceneCaseApiRepository.findSceneCaseApiByApiIds(ids);
-            if (CollectionUtils.isNotEmpty(sceneCaseApiList)) {
-                for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
-                    sceneCaseApi.getApiTestCase().setStatus(apiBindingStatus);
-                }
-                sceneCaseApiRepository.saveAll(sceneCaseApiList);
-            }
+            FunctionHandler.confirmedTwoNoReturn(CollectionUtils.isNotEmpty(sceneCaseApiList), sceneCaseApiList,
+                apiBindingStatus).handler(this::updateStatus);
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to update status the SceneCaseApi!", e);
@@ -225,6 +199,13 @@ public class SceneCaseApiServiceImpl extends AbstractCaseService implements Scen
             log.error("Sync api error!", e);
             throw ExceptionUtils.mpe(CASE_SYNC_API_ERROR);
         }
+    }
+
+    private void updateStatus(List<SceneCaseApiEntity> sceneCaseApiList, ApiBindingStatus apiBindingStatus) {
+        for (SceneCaseApiEntity sceneCaseApi : sceneCaseApiList) {
+            sceneCaseApi.getApiTestCase().setStatus(apiBindingStatus);
+        }
+        sceneCaseApiRepository.saveAll(sceneCaseApiList);
     }
 
 }
