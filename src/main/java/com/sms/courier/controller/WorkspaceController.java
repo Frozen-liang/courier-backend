@@ -55,7 +55,7 @@ public class WorkspaceController {
     }
 
     @GetMapping("/list")
-    @PreAuthorize("hasRoleOrAdmin(@role.WORKSPACE_QUERY_OWN)")
+    @PreAuthorize("hasRoleOrAdmin(@role.ADMIN)")
     public List<WorkspaceResponse> list() {
         return workspaceService.list();
     }
