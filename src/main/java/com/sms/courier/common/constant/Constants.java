@@ -64,6 +64,7 @@ public class Constants {
     public static final String GENERATE_CODE = SDK_VERSION + "/generate-code";
     public static final String SCENE_CASE_COMMENT_PATH = SDK_VERSION + "/scene-case-comment";
     public static final String CLIENT_PORT_STATISTIC = SDK_VERSION + "/client-port-statistic";
+    public static final String CHANNEL = SDK_VERSION + "/channel";
 
     public static final int MAX_DEPTH = 3;
     public static final String HTTP_DEFAULT_STATUS_CODE = "200";

@@ -174,6 +174,12 @@ public class ProjectEnvironmentServiceImpl implements ProjectEnvironmentService 
     }
 
     @Override
+    public ProjectEnvironmentResponse getOneById(String id) {
+        return projectEnvironmentMapper.toDto(projectEnvironmentRepository.findById(id)
+            .orElse(projectEnvironmentMapper.toEntityByGlobal(globalEnvironmentService.findOne(id))));
+    }
+
+    @Override
     public ProjectEnvironmentResponse findById(String id) {
         return projectEnvironmentRepository.findById(id).map(projectEnvironmentMapper::toDto)
             .orElseThrow(() -> ExceptionUtils.mpe(GET_PROJECT_ENVIRONMENT_BY_ID_ERROR));
