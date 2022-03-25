@@ -2,7 +2,6 @@ package com.sms.courier.service;
 
 import com.sms.courier.common.enums.ApiBindingStatus;
 import com.sms.courier.dto.request.BatchAddSceneCaseApiRequest;
-import com.sms.courier.dto.request.BatchUpdateSceneCaseApiRequest;
 import com.sms.courier.dto.request.SyncApiRequest;
 import com.sms.courier.dto.request.UpdateSceneCaseApiRequest;
 import com.sms.courier.dto.response.SceneCaseApiResponse;
@@ -16,8 +15,6 @@ public interface SceneCaseApiService {
     Boolean deleteByIds(List<String> ids);
 
     Boolean edit(UpdateSceneCaseApiRequest updateSceneCaseApiRequest);
-
-    Boolean batchEdit(BatchUpdateSceneCaseApiRequest updateSceneCaseApiDto);
 
     List<SceneCaseApiEntity> listBySceneCaseId(String sceneCaseId);
 

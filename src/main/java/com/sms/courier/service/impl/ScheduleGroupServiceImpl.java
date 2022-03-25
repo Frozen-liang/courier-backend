@@ -54,7 +54,7 @@ public class ScheduleGroupServiceImpl implements ScheduleGroupService {
             return scheduleGroupRepository.findByProjectIdIsOrderByName(projectId);
         } catch (Exception e) {
             log.error("Failed to get the ScheduleGroup list!", e);
-            throw new ApiTestPlatformException(GET_SCHEDULE_GROUP_LIST_ERROR);
+            throw ExceptionUtils.mpe(GET_SCHEDULE_GROUP_LIST_ERROR);
         }
     }
 
@@ -68,7 +68,7 @@ public class ScheduleGroupServiceImpl implements ScheduleGroupService {
             scheduleGroupRepository.insert(scheduleGroup);
         } catch (Exception e) {
             log.error("Failed to add the ScheduleGroup!", e);
-            throw new ApiTestPlatformException(ADD_SCHEDULE_GROUP_ERROR);
+            throw ExceptionUtils.mpe(ADD_SCHEDULE_GROUP_ERROR);
         }
         return Boolean.TRUE;
     }
@@ -89,7 +89,7 @@ public class ScheduleGroupServiceImpl implements ScheduleGroupService {
             throw apiTestPlatEx;
         } catch (Exception e) {
             log.error("Failed to add the ScheduleGroup!", e);
-            throw new ApiTestPlatformException(EDIT_SCHEDULE_GROUP_ERROR);
+            throw ExceptionUtils.mpe(EDIT_SCHEDULE_GROUP_ERROR);
         }
         return Boolean.TRUE;
     }
@@ -104,7 +104,7 @@ public class ScheduleGroupServiceImpl implements ScheduleGroupService {
             return Boolean.TRUE;
         } catch (Exception e) {
             log.error("Failed to delete the ScheduleGroup!", e);
-            throw new ApiTestPlatformException(DELETE_SCHEDULE_GROUP_BY_ID_ERROR);
+            throw ExceptionUtils.mpe(DELETE_SCHEDULE_GROUP_BY_ID_ERROR);
         }
     }
 

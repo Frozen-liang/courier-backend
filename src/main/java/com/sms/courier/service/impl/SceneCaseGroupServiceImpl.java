@@ -17,6 +17,7 @@ import com.sms.courier.common.aspect.annotation.Enhance;
 import com.sms.courier.common.aspect.annotation.LogRecord;
 import com.sms.courier.common.constant.Constants;
 import com.sms.courier.common.exception.ApiTestPlatformException;
+import com.sms.courier.common.function.FunctionHandler;
 import com.sms.courier.dto.request.SceneCaseGroupRequest;
 import com.sms.courier.dto.response.TreeResponse;
 import com.sms.courier.entity.datacollection.DataCollectionEntity;
@@ -128,18 +129,7 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
                     .findAllByPathContains(sceneCaseGroupEntity.getRealGroupId()).map(SceneCaseGroupEntity::getId)
                     .collect(Collectors.toList());
             }
-            if (CollectionUtils.isNotEmpty(ids)) {
-                sceneCaseGroupRepository.deleteAllByIdIn(ids);
-                removeDataCollGroupId(ids);
-                List<SceneCaseEntity> sceneCaseEntityList = customizedSceneCaseRepository
-                    .getSceneCaseIdsByGroupIds(ids);
-                if (CollectionUtils.isNotEmpty(sceneCaseEntityList)) {
-                    List<String> sceneCaseIds = sceneCaseEntityList.stream().map(SceneCaseEntity::getId)
-                        .collect(Collectors.toList());
-                    sceneCaseService.delete(sceneCaseIds);
-                    customizedSceneCaseRepository.deleteGroupIdByIds(sceneCaseIds);
-                }
-            }
+            FunctionHandler.confirmed(CollectionUtils.isNotEmpty(ids), ids).handler(this::deleteByIds);
             return Boolean.TRUE;
         } catch (ApiTestPlatformException e) {
             log.error(e.getMessage());
@@ -147,6 +137,19 @@ public class SceneCaseGroupServiceImpl implements SceneCaseGroupService {
         } catch (Exception e) {
             log.error("Failed to delete the SceneCaseGroup!", e);
             throw ExceptionUtils.mpe(DELETE_SCENE_CASE_GROUP_ERROR);
+        }
+    }
+
+    private void deleteByIds(List<String> ids) {
+        sceneCaseGroupRepository.deleteAllByIdIn(ids);
+        removeDataCollGroupId(ids);
+        List<SceneCaseEntity> sceneCaseEntityList = customizedSceneCaseRepository
+            .getSceneCaseIdsByGroupIds(ids);
+        if (CollectionUtils.isNotEmpty(sceneCaseEntityList)) {
+            List<String> sceneCaseIds = sceneCaseEntityList.stream().map(SceneCaseEntity::getId)
+                .collect(Collectors.toList());
+            sceneCaseService.delete(sceneCaseIds);
+            customizedSceneCaseRepository.deleteGroupIdByIds(sceneCaseIds);
         }
     }
 

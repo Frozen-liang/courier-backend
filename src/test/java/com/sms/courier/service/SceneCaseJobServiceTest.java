@@ -92,7 +92,6 @@ class SceneCaseJobServiceTest {
         sceneCaseRepository,
         sceneCaseJobRepository,
         jobMapper,
-        customizedSceneCaseJobRepository,
         caseDispatcherService,
         customizedCaseTemplateApiRepository,
         caseTemplateRepository,

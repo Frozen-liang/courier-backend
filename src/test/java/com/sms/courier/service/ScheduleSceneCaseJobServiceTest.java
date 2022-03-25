@@ -84,16 +84,19 @@ class ScheduleSceneCaseJobServiceTest {
     private final CustomizedScheduleRecordRepository customizedScheduleRecordRepository =
         mock(CustomizedScheduleRecordRepository.class);
     private final ScheduleSceneCaseJobService scheduleSceneCaseJobService =
-        new ScheduleSceneCaseJobServiceImpl(scheduleSceneCaseJobRepository, jobMapper, caseDispatcherService,
-            projectEnvironmentService, commonRepository, sceneCaseRepository, sceneCaseApiRepository,
-            caseTemplateApiRepository, scheduleRecordRepository, applicationEventPublisher, engineJobManagement,
-            dataBaseService,
+        new ScheduleSceneCaseJobServiceImpl(jobMapper,
+            caseDispatcherService, projectEnvironmentService,
+            commonRepository, sceneCaseRepository,
+            sceneCaseApiRepository, caseTemplateApiRepository,
+            scheduleRecordRepository, applicationEventPublisher,
+            engineJobManagement, dataBaseService,
             customizedScheduleRecordRepository, scheduleSceneCaseJobRepository);
-    private final JobService jobService = new ScheduleSceneCaseJobServiceImpl(scheduleSceneCaseJobRepository, jobMapper,
-        caseDispatcherService,
-        projectEnvironmentService, commonRepository, sceneCaseRepository, sceneCaseApiRepository,
-        caseTemplateApiRepository, scheduleRecordRepository, applicationEventPublisher, engineJobManagement,
-        dataBaseService,
+    private final JobService jobService = new ScheduleSceneCaseJobServiceImpl(jobMapper,
+        caseDispatcherService, projectEnvironmentService,
+        commonRepository, sceneCaseRepository,
+        sceneCaseApiRepository, caseTemplateApiRepository,
+        scheduleRecordRepository, applicationEventPublisher,
+        engineJobManagement, dataBaseService,
         customizedScheduleRecordRepository, scheduleSceneCaseJobRepository);
 
     private final ScheduleSceneCaseJobEntity scheduleCaseJob =

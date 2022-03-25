@@ -16,6 +16,7 @@ import com.sms.courier.entity.schedule.ScheduleRecordEntity;
 import com.sms.courier.mapper.ScheduleRecordMapper;
 import com.sms.courier.repository.ScheduleRecordRepository;
 import com.sms.courier.service.ScheduleRecordService;
+import com.sms.courier.utils.ExceptionUtils;
 import com.sms.courier.utils.PageDtoConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Example;
@@ -56,7 +57,7 @@ public class ScheduleRecordServiceImpl implements ScheduleRecordService {
             return page.map(scheduleRecordMapper::toResponse);
         } catch (Exception e) {
             log.error("Failed to get the ScheduleRecord page!", e);
-            throw new ApiTestPlatformException(GET_SCHEDULE_RECORD_PAGE_ERROR);
+            throw ExceptionUtils.mpe(GET_SCHEDULE_RECORD_PAGE_ERROR);
         }
     }
 }

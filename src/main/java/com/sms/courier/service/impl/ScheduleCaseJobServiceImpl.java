@@ -2,10 +2,8 @@ package com.sms.courier.service.impl;
 
 import static com.sms.courier.common.enums.JobStatus.PENDING;
 
-import com.sms.courier.common.annotation.JobServiceType;
 import com.sms.courier.common.enums.CaseFilter;
 import com.sms.courier.common.enums.JobStatus;
-import com.sms.courier.common.enums.JobType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.listener.event.ScheduleJobRecordEvent;
 import com.sms.courier.engine.EngineJobManagement;
@@ -47,15 +45,16 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
-@JobServiceType(type = JobType.SCHEDULE_CATE)
 @Slf4j
-public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJobRepository> implements
-    ScheduleCaseJobService {
+@Service
+public class ScheduleCaseJobServiceImpl extends AbstractJobService implements ScheduleCaseJobService {
 
     private final ApiTestCaseRepository apiTestCaseRepository;
     private final ScheduleRecordRepository scheduleRecordRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ScheduleCaseJobRepository repository;
 
     public ScheduleCaseJobServiceImpl(ScheduleCaseJobRepository repository, JobMapper jobMapper,
         CaseDispatcherService caseDispatcherService, ProjectEnvironmentService projectEnvironmentService,
@@ -64,11 +63,12 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
         ScheduleRecordRepository scheduleRecordRepository,
         ApplicationEventPublisher applicationEventPublisher, EngineJobManagement engineJobManagement,
         DatabaseService dataBaseService) {
-        super(repository, jobMapper, caseDispatcherService, projectEnvironmentService, engineJobManagement,
+        super(jobMapper, caseDispatcherService, projectEnvironmentService, engineJobManagement,
             commonRepository, dataBaseService);
         this.apiTestCaseRepository = apiTestCaseRepository;
         this.scheduleRecordRepository = scheduleRecordRepository;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.repository = repository;
     }
 
     @Override
@@ -85,6 +85,14 @@ public class ScheduleCaseJobServiceImpl extends AbstractJobService<ScheduleCaseJ
         } catch (Exception e) {
             log.error("Save schedule case job report error. jobId={}", jobReport.getJobId(), e);
         }
+    }
+
+    @Override
+    public void handleJobReport(JobReport jobReport) {
+        repository.findById(jobReport.getJobId()).ifPresent(job -> {
+            log.info("Handle job report. jobId:{} jobStatus:{}", jobReport.getJobId(), jobReport.getJobStatus());
+            this.saveJobReport(jobReport, job);
+        });
     }
 
     @Override

@@ -1,44 +1,41 @@
 package com.sms.courier.service.impl;
 
-import com.sms.courier.common.annotation.JobServiceType;
 import com.sms.courier.common.enums.JobType;
 import com.sms.courier.service.ApiTestCaseJobService;
 import com.sms.courier.service.JobService;
 import com.sms.courier.service.JobServiceFactory;
 import com.sms.courier.service.SceneCaseJobService;
+import com.sms.courier.service.ScheduleCaseJobService;
+import com.sms.courier.service.ScheduleSceneCaseJobService;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.annotation.AnnotationUtils;
+import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
 @Service
-public class JobServiceFactoryImpl implements JobServiceFactory, ApplicationContextAware {
+public class JobServiceFactoryImpl implements JobServiceFactory {
 
-    private Map<JobType, JobService> jobServiceMap = new HashMap<>();
+    private final ApiTestCaseJobService apiTestCaseJobService;
+    private final SceneCaseJobService sceneCaseJobService;
+    private final ScheduleCaseJobService scheduleCaseJobService;
+    private final ScheduleSceneCaseJobService scheduleSceneCaseJobService;
+    private final Map<JobType, JobService> jobServiceMap = new HashMap<>();
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        jobServiceMap = applicationContext
-            .getBeansWithAnnotation(JobServiceType.class).values().stream()
-            .map(JobService.class::cast)
-            .collect(
-                Collectors.toMap(getJobServiceType(), Function.identity()));
+    public JobServiceFactoryImpl(ApiTestCaseJobService apiTestCaseJobService,
+        SceneCaseJobService sceneCaseJobService, ScheduleCaseJobService scheduleCaseJobService,
+        ScheduleSceneCaseJobService scheduleSceneCaseJobService) {
+        this.apiTestCaseJobService = apiTestCaseJobService;
+        this.sceneCaseJobService = sceneCaseJobService;
+        this.scheduleCaseJobService = scheduleCaseJobService;
+        this.scheduleSceneCaseJobService = scheduleSceneCaseJobService;
     }
 
-    private Function<JobService, JobType> getJobServiceType() {
-        return (job) -> {
-            Class<?> clz = job.getClass();
-            if (AopUtils.isAopProxy(job)) {
-                clz = AopUtils.getTargetClass(job);
-            }
-            return AnnotationUtils.findAnnotation(clz, JobServiceType.class).type();
-        };
+    @PostConstruct
+    public void setJobServiceMap() {
+        jobServiceMap.put(JobType.CASE, apiTestCaseJobService);
+        jobServiceMap.put(JobType.SCENE_CASE, sceneCaseJobService);
+        jobServiceMap.put(JobType.SCHEDULE_CATE, scheduleCaseJobService);
+        jobServiceMap.put(JobType.SCHEDULER_SCENE_CASE, scheduleSceneCaseJobService);
     }
 
     @Override

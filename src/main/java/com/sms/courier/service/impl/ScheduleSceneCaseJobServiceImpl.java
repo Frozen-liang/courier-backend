@@ -3,11 +3,9 @@ package com.sms.courier.service.impl;
 import static com.sms.courier.common.enums.JobStatus.PENDING;
 
 import com.google.common.collect.Lists;
-import com.sms.courier.common.annotation.JobServiceType;
 import com.sms.courier.common.enums.CaseFilter;
 import com.sms.courier.common.enums.ExecuteType;
 import com.sms.courier.common.enums.JobStatus;
-import com.sms.courier.common.enums.JobType;
 import com.sms.courier.common.exception.ApiTestPlatformException;
 import com.sms.courier.common.exception.ErrorCode;
 import com.sms.courier.common.listener.event.ScheduleJobRecordEvent;
@@ -59,10 +57,11 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.bson.types.ObjectId;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
-@JobServiceType(type = JobType.SCHEDULER_SCENE_CASE)
 @Slf4j
-public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<ScheduleSceneCaseJobRepository> implements
+@Service
+public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService implements
     ScheduleSceneCaseJobService {
 
     private final SceneCaseRepository sceneCaseRepository;
@@ -71,9 +70,9 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
     private final ScheduleRecordRepository scheduleRecordRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final CustomizedScheduleRecordRepository customizedScheduleRecordRepository;
-    private final ScheduleSceneCaseJobRepository scheduleSceneCaseJobRepository;
+    private final ScheduleSceneCaseJobRepository repository;
 
-    public ScheduleSceneCaseJobServiceImpl(ScheduleSceneCaseJobRepository repository, JobMapper jobMapper,
+    public ScheduleSceneCaseJobServiceImpl(JobMapper jobMapper,
         CaseDispatcherService caseDispatcherService, ProjectEnvironmentService projectEnvironmentService,
         CommonRepository commonRepository,
         SceneCaseRepository sceneCaseRepository,
@@ -84,7 +83,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
         DatabaseService dataBaseService,
         CustomizedScheduleRecordRepository customizedScheduleRecordRepository,
         ScheduleSceneCaseJobRepository scheduleSceneCaseJobRepository) {
-        super(repository, jobMapper, caseDispatcherService, projectEnvironmentService, engineJobManagement,
+        super(jobMapper, caseDispatcherService, projectEnvironmentService, engineJobManagement,
             commonRepository, dataBaseService);
         this.sceneCaseRepository = sceneCaseRepository;
         this.sceneCaseApiRepository = sceneCaseApiRepository;
@@ -92,7 +91,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
         this.scheduleRecordRepository = scheduleRecordRepository;
         this.applicationEventPublisher = applicationEventPublisher;
         this.customizedScheduleRecordRepository = customizedScheduleRecordRepository;
-        this.scheduleSceneCaseJobRepository = scheduleSceneCaseJobRepository;
+        this.repository = scheduleSceneCaseJobRepository;
     }
 
     @Override
@@ -121,6 +120,14 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
         } catch (Exception e) {
             log.error("Save schedule scene case job report error. jobId={}", jobReport.getJobId(), e);
         }
+    }
+
+    @Override
+    public void handleJobReport(JobReport jobReport) {
+        repository.findById(jobReport.getJobId()).ifPresent(job -> {
+            log.info("Handle job report. jobId:{} jobStatus:{}", jobReport.getJobId(), jobReport.getJobStatus());
+            this.saveJobReport(jobReport, job);
+        });
     }
 
     @Override
@@ -231,7 +238,7 @@ public class ScheduleSceneCaseJobServiceImpl extends AbstractJobService<Schedule
                 .map(ExecuteRecord::getJobId).collect(Collectors.toList());
         }
         if (CollectionUtils.isNotEmpty(jobIds)) {
-            Iterable<ScheduleSceneCaseJobEntity> jobEntities = scheduleSceneCaseJobRepository.findAllById(jobIds);
+            Iterable<ScheduleSceneCaseJobEntity> jobEntities = repository.findAllById(jobIds);
             for (ScheduleSceneCaseJobEntity jobEntity : jobEntities) {
                 this.dispatcherJob(jobEntity);
             }
